@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - Horizonte Financeiro</title>
+  <link rel="icon" type="image/svg+xml" href="/images/horizonte_fiel_original_icon_light.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/cadastro_usuario.css">
+</head>
+<body>
+  <div class="cadastro-container">
+    <div class="cadastro-card">
+      <div class="logo-card">
+        <img src="/images/horizonte_fiel_original_icon_light.svg" alt="Horizonte Financeiro" class="logo">
+        <span class="logo-texto">Horizonte Financeiro</span>
+      </div>
+      <h1>Criar Conta</h1>
+      <p class="subtitle">Comece a organizar sua vida financeira</p>
+
+      <form id="cadastroForm">
+        <div class="form-group">
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" name="nome" placeholder="Seu nome completo" required autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" placeholder="seu@email.com" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" name="senha" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+          <label for="confirmarSenha">Confirmar senha</label>
+          <input type="password" id="confirmarSenha" name="confirmarSenha" placeholder="Repita sua senha" required autocomplete="new-password">
+        </div>
+
+        <button type="submit" class="btn-cadastrar">Criar conta</button>
+      </form>
+
+      <div class="mensagem" id="mensagem"></div>
+
+      <p class="login-link">
+        Já tem conta? <a href="login.html">Entrar</a>
+      </p>
+
+      <div class="security-badge">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+        </svg>
+        <span>Seus dados estão seguros</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/scripts/cadastro_usuario.js"></script>
+</body>
+</html>
