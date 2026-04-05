@@ -53,7 +53,7 @@ app.post('/api/auth/request-password-reset', async (c) => {
     })
   } catch (error) {
     console.error('request-password-reset failed', error)
-    return c.json({ message: 'Nao foi possivel iniciar a redefinicao de senha.' }, 500)
+    return c.json({ message: 'Nao foi possivel enviar o link agora. Tente novamente em instantes.' }, 500)
   }
 })
 

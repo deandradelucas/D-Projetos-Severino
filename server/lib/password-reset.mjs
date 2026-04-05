@@ -23,6 +23,9 @@ function getSmtpConfig() {
   const user = process.env.SMTP_USER
   const pass = process.env.SMTP_PASS
   const from = process.env.SMTP_FROM_EMAIL || user
+  const connectionTimeout = Number(process.env.SMTP_CONNECTION_TIMEOUT_MS || 10000)
+  const greetingTimeout = Number(process.env.SMTP_GREETING_TIMEOUT_MS || 10000)
+  const socketTimeout = Number(process.env.SMTP_SOCKET_TIMEOUT_MS || 15000)
 
   if (!host || !user || !pass || !from) {
     return null
@@ -35,6 +38,24 @@ function getSmtpConfig() {
     user,
     pass,
     from,
+    connectionTimeout,
+    greetingTimeout,
+    socketTimeout,
+  }
+}
+
+async function withTimeout(promise, ms, message) {
+  let timer
+
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(message)), ms)
+      }),
+    ])
+  } finally {
+    clearTimeout(timer)
   }
 }
 
@@ -162,18 +183,25 @@ export async function sendResetEmail({ to, resetUrl }) {
       host: smtpConfig.host,
       port: smtpConfig.port,
       secure: smtpConfig.secure,
+      connectionTimeout: smtpConfig.connectionTimeout,
+      greetingTimeout: smtpConfig.greetingTimeout,
+      socketTimeout: smtpConfig.socketTimeout,
       auth: {
         user: smtpConfig.user,
         pass: smtpConfig.pass,
       },
     })
 
-    await transporter.sendMail({
-      from: smtpConfig.from,
-      to,
-      subject,
-      html,
-    })
+    await withTimeout(
+      transporter.sendMail({
+        from: smtpConfig.from,
+        to,
+        subject,
+        html,
+      }),
+      smtpConfig.socketTimeout + 2000,
+      'SMTP send timeout'
+    )
 
     return {
       delivered: true,
