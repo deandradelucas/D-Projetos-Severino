@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { BRAND_ASSETS } from '../lib/brandAssets'
 
 export default function PwaInstallPrompt() {
   const [installEvent, setInstallEvent] = useState(null)
@@ -46,7 +47,7 @@ export default function PwaInstallPrompt() {
     <div className="fixed right-4 bottom-4 z-20 max-w-[320px] rounded-2xl border border-white/15 bg-black/75 p-4 text-[#f5f5f5] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] backdrop-blur-md">
       <div className="flex items-start gap-3">
         <img
-          src="/horizonte_fiel_original_icon_dark.svg"
+          src={BRAND_ASSETS.iconOnDark}
           alt="Horizonte Financeiro"
           className="h-11 w-11 shrink-0 rounded-xl bg-[#111111] p-1.5"
         />

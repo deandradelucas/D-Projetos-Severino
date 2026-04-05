@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { BRAND_ASSETS } from '../lib/brandAssets'
 
 export default function RedefinirSenha() {
   const [searchParams] = useSearchParams()
@@ -65,7 +66,7 @@ export default function RedefinirSenha() {
       <div className="w-full max-w-[380px] rounded-2xl border border-white/20 bg-black/50 p-5 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] backdrop-blur-[2px] sm:p-6">
         <div className="mb-5 flex justify-center sm:mb-6">
           <img
-            src="/images/horizonte_fiel_original_logo_dark.png"
+            src={BRAND_ASSETS.logoOnDark}
             alt="Horizonte Financeiro"
             className="mx-auto block h-auto w-[230px] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)] sm:w-[270px]"
           />

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { getSupabaseErrorMessage, parseSupabaseResponse, supabaseKey, supabaseUrl } from '../lib/supabase'
+import { BRAND_ASSETS } from '../lib/brandAssets'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
 
@@ -177,7 +179,7 @@ export default function Login() {
         <div className={`bg-black/50 backdrop-blur-[2px] border border-white/20 rounded-2xl p-5 sm:p-6 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="flex justify-center mb-5 sm:mb-6">
               <img 
-                src="/images/horizonte_fiel_original_logo_dark.png" 
+                src={BRAND_ASSETS.logoOnDark}
                 alt="Horizonte Financeiro" 
                 className="mx-auto block h-auto w-[230px] sm:w-[270px] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
               />
@@ -270,7 +272,7 @@ export default function Login() {
                   Digite seu e-mail para receber um link seguro de redefinicao.
                 </p>
 
-                <form onSubmit={handleForgotPassword} className="space-y-2">
+                <div className="space-y-2">
                   <input
                     type="email"
                     value={forgotEmail}
@@ -282,13 +284,14 @@ export default function Login() {
                   />
 
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={handleForgotPassword}
                     disabled={requestingReset}
                     className="w-full rounded-lg border border-[#d4a84b]/40 bg-transparent px-3 py-2 text-xs font-semibold text-[#d4a84b] transition-colors hover:bg-[#d4a84b]/10 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {requestingReset ? 'Enviando link...' : 'Enviar link de redefinicao'}
                   </button>
-                </form>
+                </div>
 
                 {forgotPasswordState.text && (
                   <div
@@ -333,9 +336,9 @@ export default function Login() {
 
           <p className="text-center text-[#a3a3a3] mt-4 text-xs">
             Não tem conta?{' '}
-            <a href="/cadastro" className="text-[#d4a84b] font-medium hover:text-[#b8923f] hover:underline transition-colors">
+            <Link to="/cadastro" className="text-[#d4a84b] font-medium hover:text-[#b8923f] hover:underline transition-colors">
               Criar conta
-            </a>
+            </Link>
           </p>
 
           <div className="flex items-center justify-center gap-1.5 mt-3 text-[#737373] text-[10px]">

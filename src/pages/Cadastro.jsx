@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { getSupabaseErrorMessage, parseSupabaseResponse, supabaseKey, supabaseUrl } from '../lib/supabase'
+import { BRAND_ASSETS } from '../lib/brandAssets'
 
 function formatTelefone(value) {
   const numbers = value.replace(/\D/g, '')
@@ -122,7 +124,7 @@ export default function Cadastro() {
         <div className={`bg-black/50 backdrop-blur-[2px] border border-white/20 rounded-2xl p-5 sm:p-6 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="flex justify-center mb-5 sm:mb-6">
               <img 
-                src="/images/horizonte_fiel_original_logo_dark.png" 
+                src={BRAND_ASSETS.logoOnDark}
                 alt="Horizonte Financeiro" 
                 className="mx-auto block h-auto w-[230px] sm:w-[270px] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
               />
@@ -311,9 +313,9 @@ export default function Cadastro() {
 
           <p className="text-center text-[#a3a3a3] mt-4 text-xs">
             Já tem conta?{' '}
-            <a href="/login" className="text-[#d4a84b] font-medium hover:text-[#b8923f] hover:underline transition-colors">
+            <Link to="/login" className="text-[#d4a84b] font-medium hover:text-[#b8923f] hover:underline transition-colors">
               Entrar
-            </a>
+            </Link>
           </p>
 
           <div className="flex items-center justify-center gap-1.5 mt-3 text-[#737373] text-[10px]">
