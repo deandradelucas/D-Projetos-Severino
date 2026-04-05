@@ -37,7 +37,7 @@ formulario.addEventListener('submit', async (e) => {
     mostrarMensagem('Cadastro realizado com sucesso!', 'sucesso')
     formulario.reset()
     setTimeout(() => {
-      window.location.href = 'login.html'
+      window.location.href = '/login'
     }, 2000)
   } catch (err) {
     mostrarMensagem('Erro ao conectar com o banco', 'erro')
