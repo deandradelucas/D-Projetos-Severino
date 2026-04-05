@@ -58,10 +58,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   margin-bottom: 32px;
 }
 
 .logo-card .logo {
+  display: block;
+  margin: 0 auto;
   width: 220px;
   height: auto;
   max-width: 100%;

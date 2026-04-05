@@ -124,7 +124,7 @@ export default function Cadastro() {
               <img 
                 src="/images/horizonte_fiel_original_logo_light.svg" 
                 alt="Horizonte Financeiro" 
-                className="h-auto w-52 sm:w-64"
+                className="mx-auto block h-auto w-52 sm:w-64"
               />
             </div>
 
