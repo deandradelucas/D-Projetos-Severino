@@ -23,3 +23,5 @@ src/lib/supabase_config.js
 .agents/
 skills-lock.json
 nul
+
+.vercel

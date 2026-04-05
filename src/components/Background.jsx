@@ -38,7 +38,6 @@ const images = [
   '/images/horizons/horizon-044.jpg',
   '/images/horizons/horizon-046.jpg',
   '/images/horizons/horizon-047.jpg',
-  '/images/horizons/horizon-048.jpg',
   '/images/horizons/horizon-049.jpg',
   '/images/horizons/horizon-050.jpg',
 ]
