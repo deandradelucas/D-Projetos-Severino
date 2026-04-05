@@ -90,7 +90,7 @@ export default function Login() {
 
     try {
       const controller = new AbortController()
-      const timeoutId = window.setTimeout(() => controller.abort(), 15000)
+      const timeoutId = window.setTimeout(() => controller.abort(), 45000)
 
       const response = await fetch('/api/auth/request-password-reset', {
         method: 'POST',
@@ -100,9 +100,6 @@ export default function Login() {
         body: JSON.stringify({ email: normalizedEmail }),
         signal: controller.signal,
       })
-
-      window.clearTimeout(timeoutId)
-
       const data = await response.json()
 
       if (!response.ok) {
@@ -117,12 +114,13 @@ export default function Login() {
       })
     } catch (error) {
       if (error?.name === 'AbortError') {
-        setForgotPasswordState({ text: 'O envio demorou mais do que o esperado. Tente novamente em instantes.', type: 'error', link: '' })
+        setForgotPasswordState({ text: 'O envio demorou mais do que o esperado. Se o problema continuar, tente novamente em alguns instantes.', type: 'error', link: '' })
         return
       }
 
       setForgotPasswordState({ text: 'Erro ao conectar com o servidor.', type: 'error', link: '' })
     } finally {
+      window.clearTimeout(timeoutId)
       setRequestingReset(false)
     }
   }
