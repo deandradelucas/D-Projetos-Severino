@@ -59,15 +59,22 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .logo-card .logo {
   display: block;
   margin: 0 auto;
-  width: 220px;
+  width: 230px;
   height: auto;
   max-width: 100%;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35));
+}
+
+@media (min-width: 640px) {
+  .logo-card .logo {
+    width: 270px;
+  }
 }
 
 .cadastro-card h1 {
