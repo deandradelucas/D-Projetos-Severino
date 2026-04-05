@@ -87,12 +87,13 @@ body {
 }
 
 .logo {
-  width: 176px;
+  width: 208px;
+  height: auto;
 }
 
 @media (min-width: 640px) {
   .logo {
-    width: 224px;
+    width: 256px;
   }
 }
 
