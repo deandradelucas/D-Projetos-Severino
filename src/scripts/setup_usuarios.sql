@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS public.usuarios (
   telefone VARCHAR(20),
   email VARCHAR(255) UNIQUE NOT NULL,
   senha VARCHAR(255) NOT NULL,
+  reset_token_hash TEXT,
+  reset_token_expires_at TIMESTAMPTZ,
+  reset_token_created_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

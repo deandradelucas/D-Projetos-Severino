@@ -4,14 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"npm:dev:web\" \"npm:dev:api\"",
+    "dev:web": "vite",
+    "dev:api": "node server/index.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "supabase:check": "node scripts/supabase-admin-check.mjs"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.12",
     "@supabase/supabase-js": "^2.101.1",
+    "concurrently": "^9.2.1",
+    "hono": "^4.12.10",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.14.0"

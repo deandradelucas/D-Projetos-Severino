@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { getSupabaseErrorMessage, parseSupabaseResponse, supabaseKey, supabaseUrl } from '../lib/supabase'
 
+const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
+
 function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
@@ -8,14 +10,29 @@ function validateEmail(email) {
 export default function Login() {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [rememberEmail, setRememberEmail] = useState(false)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [forgotPasswordState, setForgotPasswordState] = useState({ text: '', type: '', link: '' })
   const [mensagem, setMensagem] = useState({ texto: '', tipo: '' })
   const [loading, setLoading] = useState(false)
+  const [requestingReset, setRequestingReset] = useState(false)
   const [showSenha, setShowSenha] = useState(false)
   const [animate, setAnimate] = useState(false)
   const inputsRef = useRef([])
 
   useEffect(() => {
     setAnimate(true)
+  }, [])
+
+  useEffect(() => {
+    const savedEmail = window.localStorage.getItem(REMEMBER_EMAIL_KEY)
+
+    if (savedEmail) {
+      setEmail(savedEmail)
+      setForgotEmail(savedEmail)
+      setRememberEmail(true)
+    }
   }, [])
 
   useEffect(() => {
@@ -39,6 +56,64 @@ export default function Login() {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
 
+  useEffect(() => {
+    if (!rememberEmail) {
+      window.localStorage.removeItem(REMEMBER_EMAIL_KEY)
+      return
+    }
+
+    if (email) {
+      window.localStorage.setItem(REMEMBER_EMAIL_KEY, email)
+    }
+  }, [email, rememberEmail])
+
+  useEffect(() => {
+    if (!forgotEmail && email) {
+      setForgotEmail(email)
+    }
+  }, [email, forgotEmail])
+
+  async function handleForgotPassword(event) {
+    event.preventDefault()
+    setForgotPasswordState({ text: '', type: '', link: '' })
+
+    const normalizedEmail = forgotEmail.trim().toLowerCase()
+
+    if (!validateEmail(normalizedEmail)) {
+      setForgotPasswordState({ text: 'Informe um e-mail valido para recuperar a senha.', type: 'error', link: '' })
+      return
+    }
+
+    setRequestingReset(true)
+
+    try {
+      const response = await fetch('/api/auth/request-password-reset', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: normalizedEmail }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setForgotPasswordState({ text: data.message || 'Nao foi possivel enviar o link de redefinicao.', type: 'error', link: '' })
+        return
+      }
+
+      setForgotPasswordState({
+        text: data.message || 'Se este e-mail existir, enviaremos um link de redefinicao.',
+        type: 'success',
+        link: data.devResetUrl || '',
+      })
+    } catch {
+      setForgotPasswordState({ text: 'Erro ao conectar com o servidor.', type: 'error', link: '' })
+    } finally {
+      setRequestingReset(false)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setMensagem({ texto: '', tipo: '' })
@@ -51,6 +126,12 @@ export default function Login() {
     if (!senha) {
       setMensagem({ texto: 'Preencha a senha', tipo: 'erro' })
       return
+    }
+
+    if (rememberEmail) {
+      window.localStorage.setItem(REMEMBER_EMAIL_KEY, email)
+    } else {
+      window.localStorage.removeItem(REMEMBER_EMAIL_KEY)
     }
 
     setLoading(true)
@@ -96,7 +177,7 @@ export default function Login() {
         <div className={`bg-black/50 backdrop-blur-[2px] border border-white/20 rounded-2xl p-5 sm:p-6 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="flex justify-center mb-5 sm:mb-6">
               <img 
-                src="/images/horizonte_fiel_original_logo_light.svg" 
+                src="/images/horizonte_fiel_original_logo_dark.png" 
                 alt="Horizonte Financeiro" 
                 className="mx-auto block h-auto w-[230px] sm:w-[270px] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
               />
@@ -159,7 +240,77 @@ export default function Login() {
                   )}
                 </button>
               </div>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <label className="flex items-center gap-2 text-[11px] font-medium text-[#cfcfcf]">
+                  <input
+                    type="checkbox"
+                    checked={rememberEmail}
+                    onChange={(e) => setRememberEmail(e.target.checked)}
+                    className="h-3.5 w-3.5 rounded border border-white/20 bg-white/5 accent-[#d4a84b]"
+                  />
+                  <span>Lembrar e-mail</span>
+                </label>
+                <a
+                  href="#"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setShowForgotPassword((current) => !current)
+                    setForgotPasswordState({ text: '', type: '', link: '' })
+                  }}
+                  className="text-[11px] font-medium text-[#d4a84b] transition-colors hover:text-[#b8923f] hover:underline"
+                >
+                  Esqueceu a senha?
+                </a>
+              </div>
             </div>
+
+            {showForgotPassword && (
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                <p className="mb-2 text-[11px] text-[#cfcfcf]">
+                  Digite seu e-mail para receber um link seguro de redefinicao.
+                </p>
+
+                <form onSubmit={handleForgotPassword} className="space-y-2">
+                  <input
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(event) => setForgotEmail(event.target.value)}
+                    placeholder="seu@email.com"
+                    className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-[#f5f5f5] placeholder-[#737373] transition-all duration-200 focus:border-[#d4a84b] focus:bg-white/10 focus:outline-none"
+                    autoComplete="email"
+                    required
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={requestingReset}
+                    className="w-full rounded-lg border border-[#d4a84b]/40 bg-transparent px-3 py-2 text-xs font-semibold text-[#d4a84b] transition-colors hover:bg-[#d4a84b]/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {requestingReset ? 'Enviando link...' : 'Enviar link de redefinicao'}
+                  </button>
+                </form>
+
+                {forgotPasswordState.text && (
+                  <div
+                    className={`mt-2 rounded-lg border p-2 text-[11px] ${
+                      forgotPasswordState.type === 'success'
+                        ? 'border-[rgba(34,197,94,0.3)] bg-[rgba(34,197,94,0.15)] text-[#22c55e]'
+                        : 'border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.15)] text-[#ef4444]'
+                    }`}
+                  >
+                    <p>{forgotPasswordState.text}</p>
+                    {forgotPasswordState.link && (
+                      <a
+                        href={forgotPasswordState.link}
+                        className="mt-1 inline-block font-medium underline"
+                      >
+                        Abrir link de redefinicao
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             <button
               type="submit"

@@ -1,9 +1,18 @@
 import { getSupabaseErrorMessage, parseSupabaseResponse, supabaseKey, supabaseUrl } from '../lib/supabase'
 
+const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
+
 const formulario = document.getElementById('loginForm')
 const mensagem = document.getElementById('mensagem')
 const toggleSenha = document.getElementById('toggleSenha')
 const inputSenha = document.getElementById('senha')
+const rememberEmailInput = document.getElementById('rememberEmail')
+
+const savedEmail = window.localStorage.getItem(REMEMBER_EMAIL_KEY)
+if (savedEmail) {
+  document.getElementById('email').value = savedEmail
+  rememberEmailInput.checked = true
+}
 
 toggleSenha.addEventListener('click', () => {
   const type = inputSenha.type === 'password' ? 'text' : 'password'
@@ -11,6 +20,19 @@ toggleSenha.addEventListener('click', () => {
   
   toggleSenha.querySelector('.eye-icon').classList.toggle('hidden')
   toggleSenha.querySelector('.eye-off-icon').classList.toggle('hidden')
+})
+
+rememberEmailInput.addEventListener('change', () => {
+  const email = document.getElementById('email').value
+
+  if (!rememberEmailInput.checked) {
+    window.localStorage.removeItem(REMEMBER_EMAIL_KEY)
+    return
+  }
+
+  if (email) {
+    window.localStorage.setItem(REMEMBER_EMAIL_KEY, email)
+  }
 })
 
 function validateEmail(email) {
@@ -31,6 +53,12 @@ formulario.addEventListener('submit', async (e) => {
   if (!senha) {
     mostrarMensagem('Preencha a senha', 'erro')
     return
+  }
+
+  if (rememberEmailInput.checked) {
+    window.localStorage.setItem(REMEMBER_EMAIL_KEY, email)
+  } else {
+    window.localStorage.removeItem(REMEMBER_EMAIL_KEY)
   }
 
   const btn = formulario.querySelector('.btn-entrar')
