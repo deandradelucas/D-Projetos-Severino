@@ -110,7 +110,7 @@ export async function consumeResetToken(rawToken, newPassword) {
 export async function sendResetEmail({ to, resetUrl }) {
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.RESEND_FROM_EMAIL
-  const subject = 'Recuperacao de senha - Horizonte Financeiro'
+  const subject = 'Recuperação de senha - Horizonte Financeiro'
   const html = `
     <div style="margin:0;padding:32px 16px;background:#f4efe4;">
       <div style="max-width:620px;margin:0 auto;background:#111111;border-radius:24px;overflow:hidden;border:1px solid rgba(212,168,75,0.25);box-shadow:0 18px 50px rgba(17,17,17,0.18);font-family:Arial,sans-serif;color:#f7f3ea;">
@@ -119,10 +119,10 @@ export async function sendResetEmail({ to, resetUrl }) {
             Horizonte Financeiro
           </div>
           <h1 style="margin:20px 0 10px;font-size:30px;line-height:1.15;color:#ffffff;">
-            Recupere o acesso com seguranca
+            Recupere o acesso com segurança
           </h1>
           <p style="margin:0;font-size:16px;line-height:1.7;color:rgba(247,243,234,0.78);">
-            Recebemos um pedido para redefinir a senha da sua conta. Se foi voce, use o botao abaixo para criar uma nova senha.
+            Recebemos um pedido para redefinir a senha da sua conta. Se foi você, use o botão abaixo para criar uma nova senha.
           </p>
         </div>
         <div style="padding:32px 36px;">
@@ -135,13 +135,13 @@ export async function sendResetEmail({ to, resetUrl }) {
             </a>
           </div>
           <p style="margin:0 0 12px;font-size:14px;line-height:1.7;color:rgba(247,243,234,0.72);">
-            Se o botao nao abrir, copie e cole este link no navegador:
+            Se o botão não abrir, copie e cole este link no navegador:
           </p>
           <p style="margin:0 0 24px;word-break:break-all;font-size:13px;line-height:1.7;color:#d4a84b;">
             ${resetUrl}
           </p>
           <p style="margin:0;font-size:14px;line-height:1.7;color:rgba(247,243,234,0.72);">
-            Se voce nao pediu essa alteracao, ignore este e-mail. Sua senha atual continuara a mesma.
+            Se você não pediu esta alteração, ignore este e-mail. Sua senha atual continuará a mesma.
           </p>
         </div>
       </div>
@@ -154,7 +154,7 @@ export async function sendResetEmail({ to, resetUrl }) {
     `Use este link para continuar: ${resetUrl}`,
     '',
     `Esse link expira em ${RESET_WINDOW_MINUTES} minutos.`,
-    'Se voce nao pediu essa alteracao, ignore este e-mail.',
+    'Se você não pediu esta alteração, ignore este e-mail.',
   ].join('\n')
 
   if (apiKey && from) {

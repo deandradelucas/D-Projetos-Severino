@@ -42,7 +42,7 @@ export default async function handler(req, res) {
 
     if (!user) {
       return res.status(200).json({
-        message: 'Se este e-mail existir, enviaremos um link de redefinicao.',
+        message: 'Enviamos um link para seu e-mail.',
       })
     }
 
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     })
 
     return res.status(200).json({
-      message: 'Se este e-mail existir, enviaremos um link de redefinicao.',
+      message: 'Enviamos um link para seu e-mail.',
       devResetUrl: emailResult.devResetUrl || null,
     })
   } catch (error) {

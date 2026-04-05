@@ -108,7 +108,7 @@ export default function Login() {
       }
 
       setForgotPasswordState({
-        text: data.message || 'Se este e-mail existir, enviaremos um link de redefinicao.',
+        text: data.message || 'Enviamos um link para seu e-mail.',
         type: 'success',
         link: data.devResetUrl || '',
       })

@@ -27,7 +27,7 @@ app.post('/api/auth/request-password-reset', async (c) => {
 
     if (!user) {
       return c.json({
-        message: 'Se este e-mail existir, enviaremos um link de redefinicao.',
+        message: 'Enviamos um link para seu e-mail.',
       })
     }
 
@@ -48,7 +48,7 @@ app.post('/api/auth/request-password-reset', async (c) => {
     })
 
     return c.json({
-      message: 'Se este e-mail existir, enviaremos um link de redefinicao.',
+      message: 'Enviamos um link para seu e-mail.',
       devResetUrl: emailResult.devResetUrl || null,
     })
   } catch (error) {
