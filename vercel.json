@@ -6,9 +6,6 @@
     },
     "api/auth/reset-password.js": {
       "maxDuration": 30
-    },
-    "api/[[...route]].js": {
-      "maxDuration": 60
     }
   },
   "rewrites": [
