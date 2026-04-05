@@ -1,1 +1,2 @@
 api/[...route].js
+api/[[...route]].js

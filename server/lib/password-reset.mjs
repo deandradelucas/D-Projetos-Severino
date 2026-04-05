@@ -1,62 +1,10 @@
 import crypto from 'node:crypto'
-import nodemailer from 'nodemailer'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 
 const RESET_WINDOW_MINUTES = 30
 
 function sha256(value) {
   return crypto.createHash('sha256').update(value).digest('hex')
-}
-
-function parseBoolean(value, fallback = false) {
-  if (value == null || value === '') {
-    return fallback
-  }
-
-  return String(value).toLowerCase() === 'true'
-}
-
-function getSmtpConfig() {
-  const host = process.env.SMTP_HOST
-  const port = Number(process.env.SMTP_PORT || 465)
-  const secure = parseBoolean(process.env.SMTP_SECURE, true)
-  const user = process.env.SMTP_USER
-  const pass = process.env.SMTP_PASS
-  const from = process.env.SMTP_FROM_EMAIL || user
-  const connectionTimeout = Number(process.env.SMTP_CONNECTION_TIMEOUT_MS || 10000)
-  const greetingTimeout = Number(process.env.SMTP_GREETING_TIMEOUT_MS || 10000)
-  const socketTimeout = Number(process.env.SMTP_SOCKET_TIMEOUT_MS || 15000)
-
-  if (!host || !user || !pass || !from) {
-    return null
-  }
-
-  return {
-    host,
-    port,
-    secure,
-    user,
-    pass,
-    from,
-    connectionTimeout,
-    greetingTimeout,
-    socketTimeout,
-  }
-}
-
-async function withTimeout(promise, ms, message) {
-  let timer
-
-  try {
-    return await Promise.race([
-      promise,
-      new Promise((_, reject) => {
-        timer = setTimeout(() => reject(new Error(message)), ms)
-      }),
-    ])
-  } finally {
-    clearTimeout(timer)
-  }
 }
 
 export function createResetToken() {
@@ -162,21 +110,52 @@ export async function consumeResetToken(rawToken, newPassword) {
 export async function sendResetEmail({ to, resetUrl }) {
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.RESEND_FROM_EMAIL
-  const smtpConfig = getSmtpConfig()
   const subject = 'Recuperacao de senha - Horizonte Financeiro'
   const html = `
-    <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-      <h2>Recuperacao de senha</h2>
-      <p>Recebemos um pedido para redefinir sua senha.</p>
-      <p>
-        <a href="${resetUrl}" style="display:inline-block;padding:12px 18px;background:#d4a84b;color:#0a0a0a;text-decoration:none;border-radius:8px;font-weight:600;">
-          Redefinir senha
-        </a>
-      </p>
-      <p>Esse link expira em ${RESET_WINDOW_MINUTES} minutos.</p>
-      <p>Se voce nao pediu essa alteracao, ignore este e-mail.</p>
+    <div style="margin:0;padding:32px 16px;background:#f4efe4;">
+      <div style="max-width:620px;margin:0 auto;background:#111111;border-radius:24px;overflow:hidden;border:1px solid rgba(212,168,75,0.25);box-shadow:0 18px 50px rgba(17,17,17,0.18);font-family:Arial,sans-serif;color:#f7f3ea;">
+        <div style="padding:36px 36px 24px;background:linear-gradient(135deg,#111111 0%,#1a1814 55%,#201b11 100%);border-bottom:1px solid rgba(212,168,75,0.16);">
+          <div style="display:inline-block;padding:8px 14px;border-radius:999px;background:rgba(212,168,75,0.14);color:#d4a84b;font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;">
+            Horizonte Financeiro
+          </div>
+          <h1 style="margin:20px 0 10px;font-size:30px;line-height:1.15;color:#ffffff;">
+            Recupere o acesso com seguranca
+          </h1>
+          <p style="margin:0;font-size:16px;line-height:1.7;color:rgba(247,243,234,0.78);">
+            Recebemos um pedido para redefinir a senha da sua conta. Se foi voce, use o botao abaixo para criar uma nova senha.
+          </p>
+        </div>
+        <div style="padding:32px 36px;">
+          <div style="margin:0 0 24px;padding:18px 20px;border-radius:18px;background:rgba(255,255,255,0.04);border:1px solid rgba(212,168,75,0.12);color:rgba(247,243,234,0.84);font-size:15px;line-height:1.7;">
+            Este link expira em <strong style="color:#ffffff;">${RESET_WINDOW_MINUTES} minutos</strong> e pode ser usado apenas uma vez.
+          </div>
+          <div style="margin:28px 0;">
+            <a href="${resetUrl}" style="display:inline-block;padding:15px 26px;background:#d4a84b;color:#111111;text-decoration:none;border-radius:14px;font-size:16px;font-weight:700;">
+              Redefinir senha
+            </a>
+          </div>
+          <p style="margin:0 0 12px;font-size:14px;line-height:1.7;color:rgba(247,243,234,0.72);">
+            Se o botao nao abrir, copie e cole este link no navegador:
+          </p>
+          <p style="margin:0 0 24px;word-break:break-all;font-size:13px;line-height:1.7;color:#d4a84b;">
+            ${resetUrl}
+          </p>
+          <p style="margin:0;font-size:14px;line-height:1.7;color:rgba(247,243,234,0.72);">
+            Se voce nao pediu essa alteracao, ignore este e-mail. Sua senha atual continuara a mesma.
+          </p>
+        </div>
+      </div>
     </div>
   `
+  const text = [
+    'Horizonte Financeiro',
+    '',
+    'Recebemos um pedido para redefinir sua senha.',
+    `Use este link para continuar: ${resetUrl}`,
+    '',
+    `Esse link expira em ${RESET_WINDOW_MINUTES} minutos.`,
+    'Se voce nao pediu essa alteracao, ignore este e-mail.',
+  ].join('\n')
 
   if (apiKey && from) {
     const response = await fetch('https://api.resend.com/emails', {
@@ -190,6 +169,7 @@ export async function sendResetEmail({ to, resetUrl }) {
         to: [to],
         subject,
         html,
+        text,
       }),
     })
 
@@ -201,37 +181,6 @@ export async function sendResetEmail({ to, resetUrl }) {
     return {
       delivered: true,
       provider: 'resend',
-    }
-  }
-
-  if (smtpConfig) {
-    const transporter = nodemailer.createTransport({
-      host: smtpConfig.host,
-      port: smtpConfig.port,
-      secure: smtpConfig.secure,
-      connectionTimeout: smtpConfig.connectionTimeout,
-      greetingTimeout: smtpConfig.greetingTimeout,
-      socketTimeout: smtpConfig.socketTimeout,
-      auth: {
-        user: smtpConfig.user,
-        pass: smtpConfig.pass,
-      },
-    })
-
-    await withTimeout(
-      transporter.sendMail({
-        from: smtpConfig.from,
-        to,
-        subject,
-        html,
-      }),
-      smtpConfig.socketTimeout + 2000,
-      'SMTP send timeout'
-    )
-
-    return {
-      delivered: true,
-      provider: 'smtp',
     }
   }
 

@@ -1,4 +1,5 @@
-import { handle } from '@hono/node-server/vercel'
-import app from '../server/app.mjs'
+export const runtime = 'nodejs'
 
-export default handle(app)
+export default async function handler(_req, res) {
+  return res.status(200).json({ ok: true })
+}

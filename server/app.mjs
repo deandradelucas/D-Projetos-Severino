@@ -15,11 +15,8 @@ const app = new Hono()
 app.get('/api/health', (c) => c.json({ ok: true }))
 
 app.post('/api/auth/request-password-reset', async (c) => {
-  const startedAt = Date.now()
   try {
-    console.log('request-password-reset:start')
     const body = await c.req.json()
-    console.log('request-password-reset:body-parsed', Date.now() - startedAt)
     const email = String(body?.email || '').trim().toLowerCase()
 
     if (!isValidEmail(email)) {
@@ -27,7 +24,6 @@ app.post('/api/auth/request-password-reset', async (c) => {
     }
 
     const user = await findUserByEmail(email)
-    console.log('request-password-reset:user-lookup', Date.now() - startedAt, Boolean(user))
 
     if (!user) {
       return c.json({
@@ -44,14 +40,12 @@ app.post('/api/auth/request-password-reset', async (c) => {
       tokenHash,
       expiresAt,
     })
-    console.log('request-password-reset:token-stored', Date.now() - startedAt)
 
     const resetUrl = `${origin}/redefinir-senha?token=${rawToken}`
     const emailResult = await sendResetEmail({
       to: email,
       resetUrl,
     })
-    console.log('request-password-reset:email-sent', Date.now() - startedAt, emailResult.provider || 'unknown')
 
     return c.json({
       message: 'Se este e-mail existir, enviaremos um link de redefinicao.',
@@ -64,11 +58,8 @@ app.post('/api/auth/request-password-reset', async (c) => {
 })
 
 app.post('/api/auth/reset-password', async (c) => {
-  const startedAt = Date.now()
   try {
-    console.log('reset-password:start')
     const body = await c.req.json()
-    console.log('reset-password:body-parsed', Date.now() - startedAt)
     const token = String(body?.token || '').trim()
     const password = String(body?.password || '')
 
@@ -81,7 +72,6 @@ app.post('/api/auth/reset-password', async (c) => {
     }
 
     const updated = await consumeResetToken(token, password)
-    console.log('reset-password:token-consumed', Date.now() - startedAt, updated)
 
     if (!updated) {
       return c.json({ message: 'Link invalido ou expirado.' }, 400)
