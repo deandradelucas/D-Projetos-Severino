@@ -1,10 +1,41 @@
 import crypto from 'node:crypto'
-import { supabaseAdmin } from './supabase-admin.mjs'
+import nodemailer from 'nodemailer'
+import { getSupabaseAdmin } from './supabase-admin.mjs'
 
 const RESET_WINDOW_MINUTES = 30
 
 function sha256(value) {
   return crypto.createHash('sha256').update(value).digest('hex')
+}
+
+function parseBoolean(value, fallback = false) {
+  if (value == null || value === '') {
+    return fallback
+  }
+
+  return String(value).toLowerCase() === 'true'
+}
+
+function getSmtpConfig() {
+  const host = process.env.SMTP_HOST
+  const port = Number(process.env.SMTP_PORT || 465)
+  const secure = parseBoolean(process.env.SMTP_SECURE, true)
+  const user = process.env.SMTP_USER
+  const pass = process.env.SMTP_PASS
+  const from = process.env.SMTP_FROM_EMAIL || user
+
+  if (!host || !user || !pass || !from) {
+    return null
+  }
+
+  return {
+    host,
+    port,
+    secure,
+    user,
+    pass,
+    from,
+  }
 }
 
 export function createResetToken() {
@@ -41,6 +72,7 @@ export function getRequestOrigin(c) {
 }
 
 export async function findUserByEmail(email) {
+  const supabaseAdmin = getSupabaseAdmin()
   const { data, error } = await supabaseAdmin
     .from('usuarios')
     .select('id, email, nome')
@@ -55,6 +87,7 @@ export async function findUserByEmail(email) {
 }
 
 export async function storeResetToken({ email, tokenHash, expiresAt }) {
+  const supabaseAdmin = getSupabaseAdmin()
   const { error } = await supabaseAdmin
     .from('usuarios')
     .update({
@@ -70,6 +103,7 @@ export async function storeResetToken({ email, tokenHash, expiresAt }) {
 }
 
 export async function consumeResetToken(rawToken, newPassword) {
+  const supabaseAdmin = getSupabaseAdmin()
   const tokenHash = sha256(rawToken)
 
   const { data, error } = await supabaseAdmin
@@ -105,8 +139,47 @@ export async function consumeResetToken(rawToken, newPassword) {
 }
 
 export async function sendResetEmail({ to, resetUrl }) {
+  const smtpConfig = getSmtpConfig()
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.RESEND_FROM_EMAIL
+  const subject = 'Recuperacao de senha - Horizonte Financeiro'
+  const html = `
+    <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
+      <h2>Recuperacao de senha</h2>
+      <p>Recebemos um pedido para redefinir sua senha.</p>
+      <p>
+        <a href="${resetUrl}" style="display:inline-block;padding:12px 18px;background:#d4a84b;color:#0a0a0a;text-decoration:none;border-radius:8px;font-weight:600;">
+          Redefinir senha
+        </a>
+      </p>
+      <p>Esse link expira em ${RESET_WINDOW_MINUTES} minutos.</p>
+      <p>Se voce nao pediu essa alteracao, ignore este e-mail.</p>
+    </div>
+  `
+
+  if (smtpConfig) {
+    const transporter = nodemailer.createTransport({
+      host: smtpConfig.host,
+      port: smtpConfig.port,
+      secure: smtpConfig.secure,
+      auth: {
+        user: smtpConfig.user,
+        pass: smtpConfig.pass,
+      },
+    })
+
+    await transporter.sendMail({
+      from: smtpConfig.from,
+      to,
+      subject,
+      html,
+    })
+
+    return {
+      delivered: true,
+      provider: 'smtp',
+    }
+  }
 
   if (!apiKey || !from) {
     return {
@@ -124,20 +197,8 @@ export async function sendResetEmail({ to, resetUrl }) {
     body: JSON.stringify({
       from,
       to: [to],
-      subject: 'Recuperacao de senha - Horizonte Financeiro',
-      html: `
-        <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-          <h2>Recuperacao de senha</h2>
-          <p>Recebemos um pedido para redefinir sua senha.</p>
-          <p>
-            <a href="${resetUrl}" style="display:inline-block;padding:12px 18px;background:#d4a84b;color:#0a0a0a;text-decoration:none;border-radius:8px;font-weight:600;">
-              Redefinir senha
-            </a>
-          </p>
-          <p>Esse link expira em ${RESET_WINDOW_MINUTES} minutos.</p>
-          <p>Se voce nao pediu essa alteracao, ignore este e-mail.</p>
-        </div>
-      `,
+      subject,
+      html,
     }),
   })
 
@@ -148,5 +209,6 @@ export async function sendResetEmail({ to, resetUrl }) {
 
   return {
     delivered: true,
+    provider: 'resend',
   }
 }
