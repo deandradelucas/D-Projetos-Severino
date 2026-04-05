@@ -160,9 +160,9 @@ export async function consumeResetToken(rawToken, newPassword) {
 }
 
 export async function sendResetEmail({ to, resetUrl }) {
-  const smtpConfig = getSmtpConfig()
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.RESEND_FROM_EMAIL
+  const smtpConfig = getSmtpConfig()
   const subject = 'Recuperacao de senha - Horizonte Financeiro'
   const html = `
     <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
@@ -177,6 +177,32 @@ export async function sendResetEmail({ to, resetUrl }) {
       <p>Se voce nao pediu essa alteracao, ignore este e-mail.</p>
     </div>
   `
+
+  if (apiKey && from) {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to: [to],
+        subject,
+        html,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Failed to send reset email with Resend: ${errorText}`)
+    }
+
+    return {
+      delivered: true,
+      provider: 'resend',
+    }
+  }
 
   if (smtpConfig) {
     const transporter = nodemailer.createTransport({
@@ -209,34 +235,8 @@ export async function sendResetEmail({ to, resetUrl }) {
     }
   }
 
-  if (!apiKey || !from) {
-    return {
-      delivered: false,
-      devResetUrl: resetUrl,
-    }
-  }
-
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from,
-      to: [to],
-      subject,
-      html,
-    }),
-  })
-
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(`Failed to send reset email: ${errorText}`)
-  }
-
   return {
-    delivered: true,
-    provider: 'resend',
+    delivered: false,
+    devResetUrl: resetUrl,
   }
 }
