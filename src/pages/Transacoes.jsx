@@ -236,25 +236,23 @@ export default function Transacoes() {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Data</th>
-                    <th>Descrição</th>
-                    <th>Categoria</th>
-                    <th>Valor</th>
-                    <th>Status</th>
-                    <th style={{ textAlign: 'right' }}>Ações</th>
-                  </tr>
+                     <th>Data</th>
+                     <th>Categoria</th>
+                     <th>Valor</th>
+                     <th>Status</th>
+                     <th style={{ textAlign: 'right' }}>Ações</th>
+                   </tr>
                 </thead>
                 <tbody>
                   {transacoes.map(t => (
                     <tr key={t.id}>
-                      <td>{new Date(t.data_transacao).toLocaleDateString('pt-BR')}</td>
-                      <td style={{ fontWeight: 500 }}>{t.descricao}</td>
-                      <td>
-                        <span style={{ fontSize: '13px', opacity: 0.8 }}>
-                          {t.categorias?.nome}
-                          {t.subcategorias?.nome ? ` • ${t.subcategorias.nome}` : ''}
-                        </span>
-                      </td>
+                       <td>{new Date(t.data_transacao).toLocaleDateString('pt-BR')}</td>
+                       <td>
+                         <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{t.categorias?.nome || 'Sem categoria'}</div>
+                         <div style={{ fontSize: '11px', color: 'var(--text-secondary)', opacity: 0.8 }}>
+                           {t.subcategorias?.nome || t.descricao || ''}
+                         </div>
+                       </td>
                       <td className={t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
                           {t.tipo === 'RECEITA' ? (
