@@ -1,7 +1,7 @@
 const CACHE_NAME = 'horizonte-financeiro-v3'
 const APP_SHELL = [
   '/',
-  '/manifest.webmanifest',
+  '/manifest.json',
   '/images/horizonte_fiel_original_icon_dark.png',
 ]
 
@@ -55,6 +55,10 @@ self.addEventListener('fetch', (event) => {
 
         return networkResponse
       })
-      .catch(() => caches.match(request))
+      .catch(async () => {
+        const cached = await caches.match(request)
+        if (cached) return cached
+        return new Response('Network error and no cache available', { status: 503 })
+      })
   )
 })
