@@ -8,7 +8,7 @@ const execAsync = promisify(exec)
 
 const RCLONE_REMOTE = 'gdrive-backup'
 const BACKUP_DIR = '.backup-temp'
-const RCLONE_DEST = `${RCLONE_REMOTE}:d-mestremente/horizonte-financeiro`
+const RCLONE_DEST = `${RCLONE_REMOTE}:1QA_b7h0BdJN0BNb6_DwJD7GkJeE-Clqa/Backup - Horizonte Financeiro`
 
 function getEnv(name, { required = true, fallback = '' } = {}) {
   loadEnv()
