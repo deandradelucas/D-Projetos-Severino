@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "supabase:check": "node scripts/supabase-admin-check.mjs",
-    "backup:rclone": "node scripts/run-rclone-backup.mjs"
+    "backup:rclone": "node scripts/run-rclone-backup.mjs",
+    "backup:rclone:task": "powershell -ExecutionPolicy Bypass -File scripts/install-rclone-backup-task.ps1"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.12",

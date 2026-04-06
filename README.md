@@ -10,6 +10,18 @@ Para executar o backup manual para o Google Drive via `rclone`, rode:
 npm run backup:rclone
 ```
 
+Para instalar uma tarefa automatica no Windows Task Scheduler:
+
+```bash
+npm run backup:rclone:task
+```
+
+Horario padrao da tarefa:
+
+```text
+02:00
+```
+
 Destino padrao:
 
 ```text
