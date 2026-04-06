@@ -1,12 +1,30 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 
 export default function Dashboard() {
+  const [usuario] = useState(() => {
+    const saved = localStorage.getItem('horizonte_user')
+    if (saved) {
+      try {
+        return JSON.parse(saved) || { nome: 'Usuário', email: '' }
+      } catch (e) {
+        console.error('Error parsing user', e)
+      }
+    }
+    return { nome: 'Usuário', email: '' }
+  })
+  const [menuAberto, setMenuAberto] = useState(false)
+
   return (
     <div className="dashboard-container">
+      {/* Mobile Backdrop */}
+      {menuAberto && (
+        <div className="mobile-backdrop" onClick={() => setMenuAberto(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${menuAberto ? 'open' : ''}`}>
         <div className="brand-wrapper">
           <img 
             src="/images/horizonte_fiel_original_logo_dark.png" 
@@ -14,6 +32,9 @@ export default function Dashboard() {
             className="brand-logo" 
             onError={(e) => { e.target.src = '/images/horizonte_fiel_original_logo_light.png' }}
           />
+          <button className="mobile-close-btn" onClick={() => setMenuAberto(false)}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f5f5f5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
         </div>
 
         <ul className="nav-menu">
@@ -75,21 +96,26 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="main-content relative z-10">
         <header className="top-header">
-          <div>
-            <h1 style={{ fontSize: '24px', color: 'var(--text-primary)', marginBottom: '4px' }}>
-              Olá, Usuário 👋
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-              Aqui está o resumo financeiro da sua conta.
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button className="mobile-menu-btn" onClick={() => setMenuAberto(true)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            </button>
+            <div>
+              <h1 style={{ fontSize: '24px', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                Olá, {usuario.nome} 👋
+              </h1>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+                Aqui está o resumo financeiro da sua conta.
+              </p>
+            </div>
           </div>
           
           <div className="user-profile">
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: 500, fontSize: '14px' }}>Usuário Demo</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>demo@horizonte.com</div>
+            <div style={{ textAlign: 'right', display: 'none' }} className="sm:block">
+              <div style={{ fontWeight: 500, fontSize: '14px' }}>{usuario.nome}</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{usuario.email || 'usuário autenticado'}</div>
             </div>
-            <div className="avatar">U</div>
+            <div className="avatar">{usuario.nome.charAt(0).toUpperCase()}</div>
           </div>
         </header>
 
@@ -102,8 +128,8 @@ export default function Dashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
               </svg>
             </div>
-            <div className="kpi-value">R$ 45.230,00</div>
-            <div className="trend-up">+2.4% vs mês passado</div>
+            <div className="kpi-value">R$ 0,00</div>
+            <div className="trend-up" style={{ color: 'var(--text-secondary)' }}>Sem dados no período</div>
           </div>
 
           <div className="kpi-card">
@@ -113,8 +139,8 @@ export default function Dashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
               </svg>
             </div>
-            <div className="kpi-value">R$ 12.850,00</div>
-            <div className="trend-up">+14.2% vs mês passado</div>
+            <div className="kpi-value">R$ 0,00</div>
+            <div className="trend-up" style={{ color: 'var(--text-secondary)' }}>Sem receitas cadastradas</div>
           </div>
 
           <div className="kpi-card">
@@ -124,8 +150,8 @@ export default function Dashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" />
               </svg>
             </div>
-            <div className="kpi-value">R$ 4.320,50</div>
-            <div className="trend-down">-1.5% vs mês passado</div>
+            <div className="kpi-value">R$ 0,00</div>
+            <div className="trend-down" style={{ color: 'var(--text-secondary)' }}>Sem despesas cadastradas</div>
           </div>
         </div>
 
@@ -136,48 +162,8 @@ export default function Dashboard() {
             <button className="btn-primary">+ Nova Transação</button>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Descrição</th>
-                  <th>Categoria</th>
-                  <th>Tipo</th>
-                  <th style={{ textAlign: 'right' }}>Valor</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>06 Abr 2026</td>
-                  <td style={{ fontWeight: 500 }}>Pagamento Fornecedor XYZ</td>
-                  <td>Serviços</td>
-                  <td><span className="badge badge-expense">Despesa</span></td>
-                  <td style={{ textAlign: 'right' }} className="val-negative">- R$ 1.250,50</td>
-                </tr>
-                <tr>
-                  <td>05 Abr 2026</td>
-                  <td style={{ fontWeight: 500 }}>Mensalidade Cliente Premium</td>
-                  <td>Vendas</td>
-                  <td><span className="badge badge-income">Receita</span></td>
-                  <td style={{ textAlign: 'right', fontWeight: 600 }} className="val-positive">+ R$ 3.500,00</td>
-                </tr>
-                <tr>
-                  <td>03 Abr 2026</td>
-                  <td style={{ fontWeight: 500 }}>Compra de Equipamentos</td>
-                  <td>Infraestrutura</td>
-                  <td><span className="badge badge-expense">Despesa</span></td>
-                  <td style={{ textAlign: 'right' }} className="val-negative">- R$ 450,00</td>
-                </tr>
-                <tr>
-                  <td>02 Abr 2026</td>
-                  <td style={{ fontWeight: 500 }}>Consultoria Mestre da Mente</td>
-                  <td>Serviços prestados</td>
-                  <td><span className="badge badge-income">Receita</span></td>
-                  <td style={{ textAlign: 'right', fontWeight: 600 }} className="val-positive">+ R$ 5.000,00</td>
-                </tr>
-              </tbody>
-            </table>
+          <div style={{ overflowX: 'auto', textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
+            <p>Nenhuma transação encontrada para este período.</p>
           </div>
         </section>
       </main>

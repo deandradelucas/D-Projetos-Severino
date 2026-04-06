@@ -139,6 +139,9 @@ export default function Login() {
       }
 
       setMensagem({ texto: 'Login realizado com sucesso!', tipo: 'sucesso' })
+      if (data.user) {
+        window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
+      }
       setLoading(false)
       setTimeout(() => {
         window.location.href = '/dashboard'
