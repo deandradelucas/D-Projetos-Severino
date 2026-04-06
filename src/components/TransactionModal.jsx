@@ -102,10 +102,19 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
     descricao: '',
     valor: '',
     tipo: 'DESPESA',
-    data_transacao: new Date().toISOString().split('T')[0],
+    data_transacao: (() => {
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000;
+      return new Date(now - offset).toISOString().slice(0, 16);
+    })(),
     categoria_id: '',
     subcategoria_id: '',
-    status: 'EFETIVADA'
+    status: 'EFETIVADA',
+    recorrencia: {
+      ativo: false,
+      frequencia: 'MENSAL',
+      quantidade: 12
+    }
   })
   
   const [displayValor, setDisplayValor] = useState('')
@@ -139,7 +148,12 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
         categoria_id: '', 
         subcategoria_id: '',
         status: 'EFETIVADA',
-        data_transacao: new Date().toISOString().split('T')[0]
+        data_transacao: (() => {
+          const now = new Date();
+          const offset = now.getTimezoneOffset() * 60000;
+          return new Date(now - offset).toISOString().slice(0, 16);
+        })(),
+        recorrencia: { ativo: false, frequencia: 'MENSAL', quantidade: 12 }
       }))
       
       // Auto focus valor field
@@ -207,7 +221,15 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
           'Content-Type': 'application/json',
           'x-user-id': usuarioId
         },
-        body: JSON.stringify({ ...formData, descricao: finalDescricao })
+        body: JSON.stringify({ 
+          ...formData, 
+          data_transacao: new Date(formData.data_transacao).toISOString(),
+          descricao: finalDescricao,
+          recorrencia: formData.recorrencia.ativo ? {
+            frequencia: formData.recorrencia.frequencia,
+            quantidade: parseInt(formData.recorrencia.quantidade, 10)
+          } : null
+        })
       })
       if (res.ok) {
         onSave()
@@ -311,8 +333,10 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
                     type="button" 
                     className="date-shortcut-btn"
                     onClick={() => {
-                      const today = new Date().toISOString().split('T')[0];
-                      setFormData(prev => ({ ...prev, data_transacao: today }));
+                      const now = new Date();
+                      const offset = now.getTimezoneOffset() * 60000;
+                      const dStr = new Date(now - offset).toISOString().slice(0, 16);
+                      setFormData(prev => ({ ...prev, data_transacao: dStr }));
                     }}
                   >
                     Hoje
@@ -323,7 +347,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
                     onClick={() => {
                       const yesterday = new Date();
                       yesterday.setDate(yesterday.getDate() - 1);
-                      const yStr = yesterday.toISOString().split('T')[0];
+                      const offset = yesterday.getTimezoneOffset() * 60000;
+                      const yStr = new Date(yesterday - offset).toISOString().slice(0, 16);
                       setFormData(prev => ({ ...prev, data_transacao: yStr }));
                     }}
                   >
@@ -331,7 +356,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
                   </button>
                 </div>
               </div>
-              <input type="date" name="data_transacao" value={formData.data_transacao} onChange={handleChange} required className="input-premium" />
+              <input type="datetime-local" name="data_transacao" value={formData.data_transacao} onChange={handleChange} required className="input-premium" />
             </div>
           </div>
 
@@ -362,6 +387,85 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
               <label>Descrição <span style={{ fontSize: '11px', opacity: 0.7, fontWeight: 400, textTransform: 'lowercase' }}>(opcional)</span></label>
               <input type="text" name="descricao" value={formData.descricao} onChange={handleChange} placeholder="O que você comprou?" className="input-premium" />
             </div>
+          </div>
+
+          {/* Recurrence Section */}
+          <div className="recorrencia-wrapper" style={{ 
+            background: 'linear-gradient(135deg, rgba(212, 168, 75, 0.08) 0%, rgba(212, 168, 75, 0.03) 100%)', 
+            padding: '20px', 
+            borderRadius: '24px', 
+            border: '1px solid rgba(212, 168, 75, 0.15)',
+            marginBottom: '28px',
+            transition: 'all 0.3s ease',
+            boxShadow: formData.recorrencia.ativo ? '0 10px 20px -10px rgba(212, 168, 75, 0.2)' : 'none'
+          }}>
+            <label className="checkbox-container" style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer', userSelect: 'none', width: '100%' }}>
+              <div style={{ 
+                width: '40px', 
+                height: '40px', 
+                borderRadius: '12px', 
+                background: formData.recorrencia.ativo ? 'var(--accent)' : 'rgba(0,0,0,0.05)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.3s ease',
+                color: formData.recorrencia.ativo ? '#000' : '#666'
+              }}>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 15l-4 4-4-4M8 9l4-4 4 4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20 12a8 8 0 11-16 0 8 8 0 0116 0z" />
+                </svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a1a', marginBottom: '2px' }}>Repetir esta transação</div>
+                <div style={{ fontSize: '12px', color: '#666', opacity: 0.8 }}>Parcele suas contas ou crie assinaturas fixas.</div>
+              </div>
+              <input 
+                type="checkbox" 
+                checked={formData.recorrencia.ativo} 
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  recorrencia: { ...prev.recorrencia, ativo: e.target.checked }
+                }))}
+                style={{ width: '22px', height: '22px', accentColor: 'var(--accent)', cursor: 'pointer' }}
+              />
+            </label>
+
+            {formData.recorrencia.ativo && (
+              <div className="slide-down" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '20px', paddingTop: '20px', borderTop: '1px dashed rgba(212, 168, 75, 0.2)' }}>
+                <div className="form-group">
+                  <label style={{ fontSize: '11px', color: '#888' }}>Frequência</label>
+                  <select 
+                    className="input-premium" 
+                    value={formData.recorrencia.frequencia}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      recorrencia: { ...prev.recorrencia, frequencia: e.target.value }
+                    }))}
+                    style={{ background: '#fff' }}
+                  >
+                    <option value="MENSAL">Mensal</option>
+                    <option value="SEMANAL">Semanal</option>
+                    <option value="ANUAL">Anual</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label style={{ fontSize: '11px', color: '#888' }}>Quantidade (Parcelas)</label>
+                  <input 
+                    type="number" 
+                    min="2" 
+                    max="120"
+                    className="input-premium"
+                    value={formData.recorrencia.quantidade}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      recorrencia: { ...prev.recorrencia, quantidade: e.target.value }
+                    }))}
+                    style={{ background: '#fff' }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="modal-actions">

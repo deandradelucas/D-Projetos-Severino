@@ -82,7 +82,7 @@ async function _seedCategoriesForUser(usuario_id, supabaseAdmin) {
   }
 }
 
-export async function inserirTransacao({ usuario_id, conta_id, categoria_id, subcategoria_id, tipo, valor, descricao, data_transacao, status }) {
+export async function inserirTransacao({ usuario_id, conta_id, categoria_id, subcategoria_id, tipo, valor, descricao, data_transacao, status, recorrencia }) {
   const supabaseAdmin = getSupabaseAdmin()
   const valNum = parseFloat(valor)
   
@@ -90,22 +90,54 @@ export async function inserirTransacao({ usuario_id, conta_id, categoria_id, sub
     throw new Error('Valor inválido.')
   }
 
-  const payload = {
+  const basePayload = {
     usuario_id,
     tipo,
     valor: valNum,
     descricao,
-    data_transacao,
     status: status || 'EFETIVADA'
   }
 
-  if (conta_id) payload.conta_id = conta_id
-  if (categoria_id) payload.categoria_id = categoria_id
-  if (subcategoria_id) payload.subcategoria_id = subcategoria_id
+  if (conta_id) basePayload.conta_id = conta_id
+  if (categoria_id) basePayload.categoria_id = categoria_id
+  if (subcategoria_id) basePayload.subcategoria_id = subcategoria_id
+
+  const payloads = []
+  
+  if (recorrencia && recorrencia.quantidade > 1) {
+    const grupoId = crypto.randomUUID()
+    const startDate = new Date(data_transacao)
+
+    for (let i = 0; i < recorrencia.quantidade; i++) {
+      const currentLabel = i + 1
+      const pDate = new Date(startDate)
+      
+      if (recorrencia.frequencia === 'MENSAL') {
+        pDate.setMonth(pDate.getMonth() + i)
+      } else if (recorrencia.frequencia === 'SEMANAL') {
+        pDate.setDate(pDate.getDate() + (i * 7))
+      } else if (recorrencia.frequencia === 'ANUAL') {
+        pDate.setFullYear(pDate.getFullYear() + i)
+      }
+
+      payloads.push({
+        ...basePayload,
+        data_transacao: pDate.toISOString(),
+        recorrente_grupo_id: grupoId,
+        recorrente_index: currentLabel,
+        recorrente_total: recorrencia.quantidade
+      })
+    }
+  } else {
+    payloads.push({
+      ...basePayload,
+      data_transacao
+    })
+  }
 
   const { data, error } = await supabaseAdmin
     .from('transacoes')
-    .insert([payload])
+    .insert(payloads)
     .select()
 
   if (error) throw error

@@ -1,7 +1,13 @@
-import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { useTheme } from '../context/ThemeContext'
 
 export default function Sidebar({ menuAberto, setMenuAberto }) {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark' || theme === 'glass'
+  
+  const logoSrc = isDark 
+    ? '/images/horizonte_fiel_original_logo_light.png' 
+    : '/images/horizonte_fiel_original_logo_dark.png'
   return (
     <>
       {/* Mobile Backdrop */}
@@ -12,10 +18,9 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
       <aside className={`sidebar ${menuAberto ? 'open' : ''}`}>
         <div className="brand-wrapper">
           <img 
-            src="/images/horizonte_fiel_original_logo_dark.png" 
+            src={logoSrc} 
             alt="Horizonte Financeiro" 
             className="brand-logo" 
-            onError={(e) => { e.target.src = '/images/horizonte_fiel_original_logo_light.png' }}
           />
           <button className="mobile-close-btn" onClick={() => setMenuAberto(false)}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f5f5f5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>

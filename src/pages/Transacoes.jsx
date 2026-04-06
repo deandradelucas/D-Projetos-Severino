@@ -246,9 +246,23 @@ export default function Transacoes() {
                 <tbody>
                   {transacoes.map(t => (
                     <tr key={t.id}>
-                       <td>{new Date(t.data_transacao).toLocaleDateString('pt-BR')}</td>
                        <td>
-                         <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{t.categorias?.nome || 'Sem categoria'}</div>
+                         <div style={{ fontSize: '13px', fontWeight: 500 }}>
+                           {new Date(t.data_transacao).toLocaleDateString('pt-BR')}
+                         </div>
+                         <div style={{ fontSize: '11px', opacity: 0.6 }}>
+                           {new Date(t.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                         </div>
+                       </td>
+                       <td>
+                         <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                           {t.categorias?.nome || 'Sem categoria'}
+                           {t.recorrente_index && (
+                             <span style={{ marginLeft: '8px', fontSize: '10px', color: 'var(--accent)', background: 'rgba(212, 168, 75, 0.1)', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                               {t.recorrente_index}/{t.recorrente_total}
+                             </span>
+                           )}
+                         </div>
                          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', opacity: 0.8 }}>
                            {t.subcategorias?.nome || t.descricao || ''}
                          </div>

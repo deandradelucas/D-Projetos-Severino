@@ -201,9 +201,19 @@ export default function Dashboard() {
                     <tbody>
                       {transacoes.slice(0, 8).map(t => (
                         <tr key={t.id}>
-                          <td style={{ fontSize: '13px' }}>{new Date(t.data_transacao).toLocaleDateString('pt-BR')}</td>
+                           <td style={{ minWidth: '85px' }}>
+                             <div style={{ fontSize: '13px', fontWeight: 500 }}>{new Date(t.data_transacao).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</div>
+                             <div style={{ fontSize: '11px', opacity: 0.6 }}>{new Date(t.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
+                           </td>
                           <td>
-                            <div style={{ fontWeight: 500 }}>{t.categorias?.nome || 'Sem categoria'}</div>
+                            <div style={{ fontWeight: 500 }}>
+                              {t.categorias?.nome || 'Sem categoria'}
+                              {t.recorrente_index && (
+                                <span style={{ marginLeft: '6px', fontSize: '10px', color: 'var(--accent)', fontWeight: 700 }}>
+                                  ({t.recorrente_index}/{t.recorrente_total})
+                                </span>
+                              )}
+                            </div>
                             <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
                               {t.subcategorias?.nome || ''}
                             </div>
