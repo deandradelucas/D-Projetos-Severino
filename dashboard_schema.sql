@@ -12,6 +12,14 @@ CREATE TABLE public.categorias (
     criado_em TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- 1.5 Tabela de Subcategorias
+CREATE TABLE public.subcategorias (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    categoria_id UUID REFERENCES public.categorias(id) ON DELETE CASCADE,
+    nome VARCHAR(100) NOT NULL,
+    criado_em TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- 2. Tabela de Contas Financeiras
 CREATE TABLE public.contas (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -28,6 +36,7 @@ CREATE TABLE public.transacoes (
     usuario_id UUID REFERENCES public.usuarios(id) ON DELETE CASCADE,
     conta_id UUID REFERENCES public.contas(id) ON DELETE SET NULL,
     categoria_id UUID REFERENCES public.categorias(id) ON DELETE SET NULL,
+    subcategoria_id UUID REFERENCES public.subcategorias(id) ON DELETE SET NULL,
     tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('RECEITA', 'DESPESA')),
     valor DECIMAL(12, 2) NOT NULL,
     descricao VARCHAR(255) NOT NULL,

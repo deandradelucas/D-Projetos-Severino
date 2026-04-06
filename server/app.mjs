@@ -115,4 +115,58 @@ app.post('/api/auth/reset-password', async (c) => {
   }
 })
 
+// Transaction and Category Routes
+
+import { getCategorias, inserirTransacao, getTransacoes } from './lib/transacoes.mjs'
+
+app.get('/api/categorias', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) {
+      return c.json({ message: 'Não autorizado.' }, 401)
+    }
+
+    const data = await getCategorias(usuarioId)
+    return c.json(data)
+  } catch (error) {
+    console.error('get categories failed', error)
+    return c.json({ message: 'Erro ao buscar categorias.' }, 500)
+  }
+})
+
+app.get('/api/transacoes', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) {
+      return c.json({ message: 'Não autorizado.' }, 401)
+    }
+
+    const data = await getTransacoes(usuarioId)
+    return c.json(data)
+  } catch (error) {
+    console.error('get transactions failed', error)
+    return c.json({ message: 'Erro ao buscar transaçoes.' }, 500)
+  }
+})
+
+app.post('/api/transacoes', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) {
+      return c.json({ message: 'Não autorizado.' }, 401)
+    }
+
+    const body = await c.req.json()
+    
+    // Vincula o usuario logado
+    body.usuario_id = usuarioId
+
+    const data = await inserirTransacao(body)
+    return c.json({ message: 'Transação inserida com sucesso.', data }, 201)
+  } catch (error) {
+    console.error('insert transaction failed', error)
+    return c.json({ message: error.message || 'Erro ao inserir transação.' }, 500)
+  }
+})
+
 export default app

@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
+import TransactionModal from '../components/TransactionModal'
 
 export default function Dashboard() {
   const [usuario] = useState(() => {
@@ -15,6 +16,32 @@ export default function Dashboard() {
     return { nome: 'Usuário', email: '' }
   })
   const [menuAberto, setMenuAberto] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [transacoes, setTransacoes] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  const fetchTransacoes = React.useCallback(async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/transacoes', {
+        headers: { 'x-user-id': usuario.id }
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setTransacoes(data || [])
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }, [usuario.id])
+
+  useEffect(() => {
+    if (usuario.id) {
+      fetchTransacoes()
+    }
+  }, [usuario.id, fetchTransacoes])
 
   return (
     <div className="dashboard-container">
@@ -159,14 +186,57 @@ export default function Dashboard() {
         <section className="content-section">
           <div className="section-header">
             <h2 style={{ fontSize: '18px', fontWeight: 600 }}>Transações Recentes</h2>
-            <button className="btn-primary">+ Nova Transação</button>
+            <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Nova Transação</button>
           </div>
 
-          <div style={{ overflowX: 'auto', textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
-            <p>Nenhuma transação encontrada para este período.</p>
+          <div style={{ overflowX: 'auto', padding: '10px 0' }}>
+            {loading ? (
+              <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Carregando...</p>
+            ) : transacoes.length === 0 ? (
+              <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Nenhuma transação encontrada para este período.</p>
+            ) : (
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transacoes.map(t => (
+                    <tr key={t.id}>
+                      <td>{new Date(t.data_transacao).toLocaleDateString('pt-BR')}</td>
+                      <td>{t.descricao}</td>
+                      <td>
+                        {t.categorias?.nome}
+                        {t.subcategorias?.nome ? ` - ${t.subcategorias.nome}` : ''}
+                      </td>
+                      <td className={t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'}>
+                        {t.tipo === 'RECEITA' ? '+' : '-'} R$ {parseFloat(t.valor).toFixed(2)}
+                      </td>
+                      <td>
+                        <span className={`badge ${t.tipo === 'RECEITA' ? 'badge-income' : 'badge-expense'}`}>
+                          {t.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </section>
       </main>
+
+      <TransactionModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={fetchTransacoes}
+        usuarioId={usuario.id}
+      />
     </div>
   )
 }
