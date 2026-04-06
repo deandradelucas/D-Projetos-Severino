@@ -6,6 +6,7 @@ import RedefinirSenha from './pages/RedefinirSenha'
 import Dashboard from './pages/Dashboard'
 import Transacoes from './pages/Transacoes'
 import Configuracoes from './pages/Configuracoes'
+import Relatorios from './pages/Relatorios'
 import Background from './components/Background'
 import PwaInstallPrompt from './components/PwaInstallPrompt'
 import HorizonChat from './components/HorizonChat'
@@ -23,6 +24,7 @@ function App() {
           <Route path="/redefinir-senha" element={<RedefinirSenha />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/transacoes" element={<Transacoes />} />
+          <Route path="/relatorios" element={<Relatorios />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
           <Route path="/" element={<Login />} />
         </Routes>
