@@ -195,4 +195,34 @@ app.delete('/api/transacoes/:id', async (c) => {
   }
 })
 
+// AI Chat Route — Pergunte ao Horizon
+import { askHorizon } from './lib/ai.mjs'
+
+app.post('/api/ai/chat', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) {
+      return c.json({ message: 'Não autorizado.' }, 401)
+    }
+
+    const body = await c.req.json()
+    const message = String(body?.message || '').trim()
+    const historico = Array.isArray(body?.historico) ? body.historico : []
+
+    if (!message) {
+      return c.json({ message: 'Mensagem não pode estar vazia.' }, 400)
+    }
+
+    const resposta = await askHorizon(message, usuarioId, historico)
+
+    return c.json({ resposta })
+  } catch (error) {
+    console.error('ai chat failed', error)
+    const msg = error.message?.includes('GEMINI_API_KEY')
+      ? 'Chave de API do Gemini não configurada. Adicione GEMINI_API_KEY no .env do servidor.'
+      : 'Não foi possível processar sua pergunta agora. Tente novamente.'
+    return c.json({ message: msg }, 500)
+  }
+})
+
 export default app

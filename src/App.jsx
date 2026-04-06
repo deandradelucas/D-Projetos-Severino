@@ -8,6 +8,7 @@ import Transacoes from './pages/Transacoes'
 import Configuracoes from './pages/Configuracoes'
 import Background from './components/Background'
 import PwaInstallPrompt from './components/PwaInstallPrompt'
+import HorizonChat from './components/HorizonChat'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <BrowserRouter>
         <Background />
         <PwaInstallPrompt />
+        <HorizonChat />
         <Routes>
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/login" element={<Login />} />
