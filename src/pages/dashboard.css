@@ -37,8 +37,8 @@ h1, h2, h3 {
 .sidebar {
   width: 260px;
   background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 32px;
   padding: 32px 16px;
@@ -89,12 +89,13 @@ h1, h2, h3 {
 }
 
 .nav-item.active {
-  background-color: var(--bg-secondary); /* Matches main content */
-  color: var(--accent);
+  background-color: #ffffff; /* Matches main content white */
+  color: #000000;
   font-weight: 600;
-  /* Elongate to the right to touch main content */
-  margin-right: -40px; 
-  padding-right: 40px;
+  /* Elongate to the right to securely overlap the 1px border and gap */
+  width: calc(100% + 42px); 
+  max-width: none;
+  padding-right: 42px;
   border-radius: 24px 0 0 24px;
   z-index: 30;
 }
@@ -113,14 +114,12 @@ h1, h2, h3 {
 
 .nav-item.active::before {
   top: -24px;
-  border-radius: 0 0 24px 0;
-  box-shadow: 10px 10px 0 0 var(--bg-secondary);
+  background: radial-gradient(circle at top left, transparent 24px, #ffffff 24.5px);
 }
 
 .nav-item.active::after {
   bottom: -24px;
-  border-radius: 0 24px 0 0;
-  box-shadow: 10px -10px 0 0 var(--bg-secondary);
+  background: radial-gradient(circle at bottom left, transparent 24px, #ffffff 24.5px);
 }
 
 .nav-item svg {
@@ -152,8 +151,16 @@ h1, h2, h3 {
 
 /* Main Content */
 .main-content {
+  /* Override variables for the white card area */
+  --bg-secondary: #ffffff;
+  --bg-card: #f9f9f9;
+  --border-color: #e5e5e5;
+  --text-primary: #111111;
+  --text-secondary: #555555;
+  
   flex: 1;
-  background-color: var(--bg-secondary); /* #111111 */
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   border-radius: 32px;
   padding: 40px 48px;
   overflow-y: auto;
@@ -167,6 +174,14 @@ h1, h2, h3 {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
+}
+
+.top-header h1 {
+  color: var(--text-primary) !important;
+}
+
+.top-header p {
+  color: var(--text-secondary) !important;
 }
 
 .user-profile {
