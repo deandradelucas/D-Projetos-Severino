@@ -1,4 +1,56 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+
+const CustomSelect = ({ name, value, onChange, options, placeholder }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const selected = options.find(o => String(o.id) === String(value))
+
+  return (
+    <div className={`custom-select ${isOpen ? 'open' : ''}`} ref={ref}>
+      <input type="text" name={name} value={value} readOnly required className="sr-only" style={{ opacity: 0, position: 'absolute', zIndex: -1, width: '100%', height: '100%', bottom: 0, left: 0 }} />
+      <div className="custom-select-trigger" onClick={() => setIsOpen(!isOpen)}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {selected?.cor && <div className="category-dot" style={{ backgroundColor: selected.cor }} />}
+          <span className={selected ? 'text-white' : 'text-placeholder'}>
+            {selected ? selected.nome : placeholder}
+          </span>
+        </div>
+        <svg className={`chevron ${isOpen ? 'rotate' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: '16px', height: '16px', transition: 'transform 0.2s' }}>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </div>
+      <div className="custom-select-dropdown">
+        <div className="custom-select-options">
+          <div 
+            className={`custom-select-option ${!value ? 'selected' : ''}`}
+            onClick={() => { onChange({ target: { name, value: '' } }); setIsOpen(false) }}
+          >
+            {placeholder}
+          </div>
+          {options.map(opt => (
+            <div 
+              key={opt.id} 
+              className={`custom-select-option ${String(value) === String(opt.id) ? 'selected' : ''}`}
+              onClick={() => { onChange({ target: { name, value: opt.id } }); setIsOpen(false) }}
+            >
+              {opt.cor && <div className="category-dot" style={{ backgroundColor: opt.cor }} />}
+              {opt.nome}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function TransactionModal({ isOpen, onClose, onSave, usuarioId }) {
   const [categorias, setCategorias] = useState([])
@@ -13,6 +65,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
     categoria_id: '',
     subcategoria_id: ''
   })
+  
+  const [displayValor, setDisplayValor] = useState('')
 
   const fetchCategorias = React.useCallback(async () => {
     setLoadingCats(true)
@@ -34,6 +88,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
   useEffect(() => {
     if (isOpen && usuarioId) {
       fetchCategorias()
+      // Reset form values on open if necessary, or just clear valor
+      setDisplayValor('')
+      setFormData(prev => ({ ...prev, valor: '', descricao: '', categoria_id: '', subcategoria_id: '' }))
     }
   }, [isOpen, usuarioId, fetchCategorias])
 
@@ -48,8 +105,38 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
     })
   }
 
+  const handleTypeChange = (newType) => {
+    if (formData.tipo !== newType) {
+      setFormData(prev => ({
+        ...prev,
+        tipo: newType,
+        categoria_id: '',
+        subcategoria_id: ''
+      }))
+    }
+  }
+
+  const handleCurrencyChange = (e) => {
+    let userInput = e.target.value.replace(/\D/g, "")
+    if (userInput === "") userInput = "0"
+    
+    const numValue = (parseInt(userInput, 10) / 100).toFixed(2)
+    const formatted = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(numValue)
+    
+    setDisplayValor(formatted)
+    setFormData(prev => ({ ...prev, valor: numValue }))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!formData.valor || parseFloat(formData.valor) <= 0) {
+      alert("Informe um valor válido maior que zero.")
+      return
+    }
+
     setSaving(true)
     try {
       const res = await fetch('/api/transacoes', {
@@ -90,20 +177,64 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group">
             <label>Tipo</label>
-            <select name="tipo" value={formData.tipo} onChange={handleChange} required>
-              <option value="DESPESA">Despesa</option>
-              <option value="RECEITA">Receita</option>
-            </select>
+            <div className="type-toggle">
+              <button 
+                type="button"
+                className={`type-btn despesa ${formData.tipo === 'DESPESA' ? 'active' : ''}`}
+                onClick={() => handleTypeChange('DESPESA')}
+              >
+                Despesa
+              </button>
+              <button 
+                type="button"
+                className={`type-btn receita ${formData.tipo === 'RECEITA' ? 'active' : ''}`}
+                onClick={() => handleTypeChange('RECEITA')}
+              >
+                Receita
+              </button>
+            </div>
           </div>
 
-          <div className="form-group">
+          <div className="form-group" style={{ opacity: loadingCats ? 0.5 : 1 }}>
+            <label>Categoria</label>
+            <CustomSelect 
+              name="categoria_id" 
+              value={formData.categoria_id} 
+              onChange={handleChange} 
+              options={categorias.filter(c => c.tipo === formData.tipo)} 
+              placeholder="Selecione..." 
+            />
+          </div>
+
+          {subcategorias.length > 0 && (
+            <div className="form-group slide-down">
+              <label>Subcategoria</label>
+              <CustomSelect 
+                name="subcategoria_id" 
+                value={formData.subcategoria_id} 
+                onChange={handleChange} 
+                options={subcategorias} 
+                placeholder="Selecione..." 
+              />
+            </div>
+          )}
+
+          <div className="form-group" style={{ marginTop: '12px' }}>
             <label>Descrição</label>
             <input type="text" name="descricao" value={formData.descricao} onChange={handleChange} required placeholder="Ex: Mercado" />
           </div>
 
           <div className="form-group">
             <label>Valor (R$)</label>
-            <input type="number" step="0.01" name="valor" value={formData.valor} onChange={handleChange} required placeholder="0.00" />
+            <input 
+              type="text" 
+              name="valorDisplay" 
+              value={displayValor} 
+              onChange={handleCurrencyChange} 
+              required 
+              placeholder="0,00" 
+              autoComplete="off"
+            />
           </div>
 
           <div className="form-group">
@@ -111,32 +242,10 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
             <input type="date" name="data_transacao" value={formData.data_transacao} onChange={handleChange} required />
           </div>
 
-          <div className="form-group" style={{ opacity: loadingCats ? 0.5 : 1 }}>
-            <label>Categoria</label>
-            <select name="categoria_id" value={formData.categoria_id} onChange={handleChange}>
-              <option value="">Selecione...</option>
-              {categorias.filter(c => c.tipo === formData.tipo).map(c => (
-                <option key={c.id} value={c.id}>{c.nome}</option>
-              ))}
-            </select>
-          </div>
-
-          {subcategorias.length > 0 && (
-            <div className="form-group">
-              <label>Subcategoria</label>
-              <select name="subcategoria_id" value={formData.subcategoria_id} onChange={handleChange}>
-                <option value="">Selecione...</option>
-                {subcategorias.map(s => (
-                  <option key={s.id} value={s.id}>{s.nome}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn-secondary" disabled={saving}>Cancelar</button>
             <button type="submit" className="btn-primary" disabled={saving}>
-              {saving ? 'Cobrindo...' : 'Salvar'}
+              {saving ? 'Salvando...' : 'Salvar Transação'}
             </button>
           </div>
         </form>
