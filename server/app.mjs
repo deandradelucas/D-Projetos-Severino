@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 import {
   authenticateUser,
   consumeResetToken,
@@ -14,6 +15,17 @@ import { getCategorias, inserirTransacao, getTransacoes, deletarTransacao } from
 import { askHorizon } from './lib/ai.mjs'
 
 const app = new Hono()
+
+// Permite requisições do frontend local em qualquer porta
+app.use('*', cors({
+  origin: (origin) => {
+    if (!origin) return '*'
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return origin
+    return null
+  },
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'x-user-id', 'Authorization'],
+}))
 
 app.get('/api/health', (c) => c.json({ ok: true }))
 
