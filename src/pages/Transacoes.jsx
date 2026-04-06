@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import TransactionModal from '../components/TransactionModal'
+import { useTheme } from '../context/ThemeContext'
 import './dashboard.css'
 
 export default function Transacoes() {
+  const { theme, privacyMode } = useTheme()
   const [usuario] = useState(() => {
     const saved = localStorage.getItem('horizonte_user')
     if (saved) {
@@ -134,7 +136,7 @@ export default function Transacoes() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
               </svg>
             </div>
-            <div className="kpi-value" style={{ color: 'var(--success)' }}>{formatCurrency(summary.receitas)}</div>
+            <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`} style={{ color: 'var(--success)' }}>{formatCurrency(summary.receitas)}</div>
           </div>
 
           <div className="kpi-card">
@@ -144,7 +146,7 @@ export default function Transacoes() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" />
               </svg>
             </div>
-            <div className="kpi-value" style={{ color: 'var(--danger)' }}>- {formatCurrency(summary.despesas)}</div>
+            <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`} style={{ color: 'var(--danger)' }}>- {formatCurrency(summary.despesas)}</div>
           </div>
 
           <div className="kpi-card accent">
@@ -154,7 +156,7 @@ export default function Transacoes() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
               </svg>
             </div>
-            <div className="kpi-value" style={{ color: summary.saldo >= 0 ? 'var(--text-primary)' : 'var(--danger)' }}>
+            <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`} style={{ color: summary.saldo >= 0 ? 'var(--text-primary)' : 'var(--danger)' }}>
               {formatCurrency(summary.saldo)}
             </div>
           </div>
@@ -268,14 +270,14 @@ export default function Transacoes() {
                          </div>
                        </td>
                       <td className={t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
-                          {t.tipo === 'RECEITA' ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--success)' }}><path d="m18 15-6-6-6 6"/></svg>
-                          ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--danger)' }}><path d="m6 9 6 6 6-6"/></svg>
-                          )}
-                          {formatCurrency(t.valor)}
-                        </span>
+                         <span className={`${privacyMode ? 'privacy-blur' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
+                           {t.tipo === 'RECEITA' ? (
+                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--success)' }}><path d="m18 15-6-6-6 6"/></svg>
+                           ) : (
+                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--danger)' }}><path d="m6 9 6 6 6-6"/></svg>
+                           )}
+                           {formatCurrency(t.valor)}
+                         </span>
                       </td>
                       <td>
                         <span className={`badge badge-${t.status?.toLowerCase() || 'efetivada'}`}>

@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
 import Sidebar from '../components/Sidebar'
+import { useTheme } from '../context/ThemeContext'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 
 const COLORS = ['#d4a84b', '#0f172a', '#1e293b', '#334155', '#475569', '#64748b']
 
 export default function Dashboard() {
+  const { privacyMode } = useTheme()
   const [usuario] = useState(() => {
     const saved = localStorage.getItem('horizonte_user')
     if (saved) {
@@ -129,7 +131,7 @@ export default function Dashboard() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
                   </svg>
                 </div>
-                <div className="kpi-value">{formatCurrency(saldoTotal)}</div>
+                <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(saldoTotal)}</div>
                 <div className="trend-up" style={{ color: 'var(--text-secondary)' }}>
                   {transacoes.length} transações registradas
                 </div>
@@ -142,7 +144,7 @@ export default function Dashboard() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
                   </svg>
                 </div>
-                <div className="kpi-value" style={{ color: 'var(--success)' }}>{formatCurrency(totalReceitas)}</div>
+                <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`} style={{ color: 'var(--success)' }}>{formatCurrency(totalReceitas)}</div>
                 <div className="trend-up" style={{ color: 'var(--text-secondary)' }}>
                   Ganhos acumulados
                 </div>
@@ -155,7 +157,7 @@ export default function Dashboard() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" />
                   </svg>
                 </div>
-                <div className="kpi-value" style={{ color: 'var(--danger)' }}>- {formatCurrency(totalDespesas)}</div>
+                <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`} style={{ color: 'var(--danger)' }}>- {formatCurrency(totalDespesas)}</div>
                 <div className="trend-down" style={{ color: 'var(--text-secondary)' }}>
                   Gastos registrados
                 </div>
@@ -218,7 +220,7 @@ export default function Dashboard() {
                               {t.subcategorias?.nome || ''}
                             </div>
                           </td>
-                          <td className={t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'} style={{ fontWeight: 600, textAlign: 'right' }}>
+                          <td className={`${t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'} ${privacyMode ? 'privacy-blur' : ''}`} style={{ fontWeight: 600, textAlign: 'right' }}>
                             {t.tipo === 'RECEITA' ? '+' : '-'} {formatCurrency(t.valor)}
                           </td>
                         </tr>
@@ -254,7 +256,7 @@ export default function Dashboard() {
                         ))}
                       </Pie>
                       <Tooltip 
-                        formatter={(value) => formatCurrency(value)}
+                        formatter={(value) => privacyMode ? 'R$ ••••••' : formatCurrency(value)}
                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                       />
                       <Legend verticalAlign="bottom" height={36}/>

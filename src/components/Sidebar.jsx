@@ -3,9 +3,12 @@ import { useTheme } from '../context/ThemeContext'
 
 export default function Sidebar({ menuAberto, setMenuAberto }) {
   const { theme } = useTheme()
-  const isDark = theme === 'dark' || theme === 'glass'
   
-  const logoSrc = isDark 
+  // No Modo Escuro, o menu é Branco (logo Escuro). 
+  // No Modo Claro, o menu é Escuro (logo Claro).
+  const isSidebarDark = theme === 'light' || theme === 'glass'
+  
+  const logoSrc = isSidebarDark 
     ? '/images/horizonte_fiel_original_logo_light.png' 
     : '/images/horizonte_fiel_original_logo_dark.png'
   return (
@@ -23,7 +26,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             className="brand-logo" 
           />
           <button className="mobile-close-btn" onClick={() => setMenuAberto(false)}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f5f5f5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
 
