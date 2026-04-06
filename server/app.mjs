@@ -10,6 +10,8 @@ import {
   sendResetEmail,
   storeResetToken,
 } from './lib/password-reset.mjs'
+import { getCategorias, inserirTransacao, getTransacoes, deletarTransacao } from './lib/transacoes.mjs'
+import { askHorizon } from './lib/ai.mjs'
 
 const app = new Hono()
 
@@ -117,8 +119,6 @@ app.post('/api/auth/reset-password', async (c) => {
 
 // Transaction and Category Routes
 
-import { getCategorias, inserirTransacao, getTransacoes, deletarTransacao } from './lib/transacoes.mjs'
-
 app.get('/api/categorias', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
@@ -196,7 +196,6 @@ app.delete('/api/transacoes/:id', async (c) => {
 })
 
 // AI Chat Route — Pergunte ao Horizon
-import { askHorizon } from './lib/ai.mjs'
 
 app.post('/api/ai/chat', async (c) => {
   try {

@@ -1272,3 +1272,490 @@ h3 {
 .switch-apple:checked::before {
   left: 22px;
 }
+
+/* =========================================
+   HORIZON CHAT — "Pergunte ao Horizon"
+   ========================================= */
+
+/* Variáveis do Chat */
+:root {
+  --chat-bg: #ffffff;
+  --chat-border: rgba(0, 0, 0, 0.08);
+  --chat-header-bg: #000000;
+  --chat-header-text: #ffffff;
+  --chat-msg-model-bg: #f4f4f5;
+  --chat-msg-model-text: #111111;
+  --chat-msg-user-bg: #000000;
+  --chat-msg-user-text: #ffffff;
+  --chat-input-bg: #f9f9f9;
+  --chat-input-border: rgba(0, 0, 0, 0.1);
+  --chat-input-text: #111111;
+  --chat-shadow: 0 24px 60px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] {
+  --chat-bg: #111111;
+  --chat-border: rgba(255, 255, 255, 0.1);
+  --chat-header-bg: #ffffff;
+  --chat-header-text: #000000;
+  --chat-msg-model-bg: #1a1a1a;
+  --chat-msg-model-text: #f5f5f5;
+  --chat-msg-user-bg: #d4a84b;
+  --chat-msg-user-text: #000000;
+  --chat-input-bg: #1a1a1a;
+  --chat-input-border: rgba(255, 255, 255, 0.08);
+  --chat-input-text: #f5f5f5;
+  --chat-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='glass'] {
+  --chat-bg: rgba(15, 15, 20, 0.85);
+  --chat-border: rgba(255, 255, 255, 0.12);
+  --chat-header-bg: rgba(255, 255, 255, 0.06);
+  --chat-header-text: #ffffff;
+  --chat-msg-model-bg: rgba(255, 255, 255, 0.06);
+  --chat-msg-model-text: #ffffff;
+  --chat-msg-user-bg: #d4a84b;
+  --chat-msg-user-text: #000000;
+  --chat-input-bg: rgba(255, 255, 255, 0.05);
+  --chat-input-border: rgba(255, 255, 255, 0.1);
+  --chat-input-text: #ffffff;
+  --chat-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* FAB Button */
+.horizon-chat-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: visible;
+}
+
+[data-theme='dark'] .horizon-chat-fab {
+  background: #d4a84b;
+  color: #000000;
+  box-shadow: 0 8px 24px rgba(212, 168, 75, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='glass'] .horizon-chat-fab {
+  background: rgba(212, 168, 75, 0.9);
+  color: #000000;
+  box-shadow: 0 8px 24px rgba(212, 168, 75, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.horizon-chat-fab:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.horizon-chat-fab:active {
+  transform: scale(0.95);
+}
+
+.chat-fab-active {
+  background: #374151 !important;
+  color: #ffffff !important;
+}
+
+/* Pulse ring on FAB */
+.horizon-fab-pulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0;
+  animation: fabPulse 2.5s ease-out infinite;
+}
+
+@keyframes fabPulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Chat Window */
+.horizon-chat-window {
+  position: fixed;
+  bottom: 96px;
+  right: 28px;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  max-height: 600px;
+  height: calc(100vh - 120px);
+  background: var(--chat-bg);
+  border: 1px solid var(--chat-border);
+  border-radius: 28px;
+  box-shadow: var(--chat-shadow);
+  display: flex;
+  flex-direction: column;
+  z-index: 8999;
+  overflow: hidden;
+  transform: scale(0.85) translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: bottom right;
+  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(40px);
+}
+
+.chat-window-open {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Header */
+.horizon-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  background: var(--chat-header-bg);
+  color: var(--chat-header-text);
+  flex-shrink: 0;
+}
+
+.horizon-chat-header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.horizon-avatar-dot {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(212, 168, 75, 0.2);
+  color: #d4a84b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(212, 168, 75, 0.4);
+}
+
+[data-theme='dark'] .horizon-avatar-dot {
+  background: rgba(0, 0, 0, 0.1);
+  color: #d4a84b;
+  border-color: rgba(212, 168, 75, 0.3);
+}
+
+.horizon-chat-name {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.horizon-chat-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  opacity: 0.65;
+  margin-top: 1px;
+}
+
+.horizon-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.horizon-chat-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: inherit;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.horizon-chat-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+[data-theme='dark'] .horizon-chat-close {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .horizon-chat-close:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* Messages Area */
+.horizon-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+}
+
+.horizon-chat-messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.horizon-chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.horizon-chat-messages::-webkit-scrollbar-thumb {
+  background: var(--chat-border);
+  border-radius: 4px;
+}
+
+.horizon-msg {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  animation: msgSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes msgSlideIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.horizon-msg-user {
+  flex-direction: row-reverse;
+}
+
+.horizon-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #d4a84b;
+  color: #000;
+  font-weight: 700;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.horizon-msg-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.horizon-msg-model .horizon-msg-bubble {
+  background: var(--chat-msg-model-bg);
+  color: var(--chat-msg-model-text);
+  border-bottom-left-radius: 4px;
+}
+
+.horizon-msg-user .horizon-msg-bubble {
+  background: var(--chat-msg-user-bg);
+  color: var(--chat-msg-user-text);
+  border-bottom-right-radius: 4px;
+}
+
+.horizon-msg-time {
+  font-size: 10px;
+  opacity: 0.5;
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* Typing indicator */
+.horizon-typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 16px !important;
+}
+
+.horizon-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.4;
+  animation: typingBounce 1.3s ease-in-out infinite;
+}
+
+.horizon-typing span:nth-child(2) { animation-delay: 0.15s; }
+.horizon-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* Error */
+.horizon-error-msg {
+  font-size: 12px;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 10px;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+/* Suggestions */
+.horizon-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 16px 12px;
+}
+
+.horizon-suggestion-chip {
+  background: transparent;
+  border: 1px solid var(--chat-input-border);
+  color: var(--chat-input-text);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.horizon-suggestion-chip:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  transform: translateY(-1px);
+}
+
+/* Input Area */
+.horizon-chat-input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--chat-border);
+  flex-shrink: 0;
+}
+
+.horizon-chat-input {
+  flex: 1;
+  background: var(--chat-input-bg);
+  border: 1px solid var(--chat-input-border);
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--chat-input-text);
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  line-height: 1.4;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.horizon-chat-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.1);
+}
+
+.horizon-chat-input::placeholder {
+  opacity: 0.5;
+}
+
+.horizon-send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme='dark'] .horizon-send-btn {
+  background: #d4a84b;
+  color: #000000;
+}
+
+[data-theme='glass'] .horizon-send-btn {
+  background: #d4a84b;
+  color: #000000;
+}
+
+.horizon-send-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.horizon-send-btn:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+.horizon-send-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: rotate 1s linear infinite;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .horizon-chat-fab {
+    bottom: 20px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .horizon-chat-window {
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 80vh;
+    height: 80vh;
+    border-radius: 28px 28px 0 0;
+    transform-origin: bottom center;
+  }
+}
+

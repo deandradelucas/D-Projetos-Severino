@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { useTheme } from '../context/ThemeContext'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -25,7 +24,6 @@ function MarkdownText({ text }) {
 }
 
 export default function HorizonChat() {
-  useTheme()
   const [aberto, setAberto] = useState(false)
   const [mensagens, setMensagens] = useState([
     {
