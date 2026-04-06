@@ -100,7 +100,7 @@ h3 {
 }
 
 .brand-logo {
-  width: 175px;
+  width: 185px;
   height: auto;
 }
 
@@ -1234,6 +1234,7 @@ h3 {
 /* Modos de Visualização */
 .privacy-blur {
   filter: blur(8px) !important;
+  -webkit-user-select: none;
   user-select: none;
   pointer-events: none;
   transition: filter 0.3s ease;
