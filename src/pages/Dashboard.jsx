@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
 import Sidebar from '../components/Sidebar'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+
+const COLORS = ['#d4a84b', '#0f172a', '#1e293b', '#334155', '#475569', '#64748b']
 
 export default function Dashboard() {
   const [usuario] = useState(() => {
@@ -24,6 +27,9 @@ export default function Dashboard() {
   const fetchTransacoes = React.useCallback(async () => {
     setLoading(true)
     try {
+      // Pequeno delay para mostrar o skeleton de forma elegante
+      await new Promise(r => setTimeout(r, 600))
+      
       const res = await fetch('/api/transacoes', {
         headers: { 'x-user-id': usuario.id }
       })
@@ -37,25 +43,6 @@ export default function Dashboard() {
       setLoading(false)
     }
   }, [usuario.id])
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('Tem certeza que deseja excluir esta transação?')) return
-
-    try {
-      const res = await fetch(`/api/transacoes/${id}`, {
-        method: 'DELETE',
-        headers: { 'x-user-id': usuario.id }
-      })
-      if (res.ok) {
-        fetchTransacoes()
-      } else {
-        alert('Erro ao excluir transação.')
-      }
-    } catch (err) {
-      console.error(err)
-      alert('Erro inesperado ao excluir transação.')
-    }
-  }
 
   useEffect(() => {
     if (usuario.id) {
@@ -75,6 +62,16 @@ export default function Dashboard() {
       }
       return acc
     }, { totalReceitas: 0, totalDespesas: 0, saldoTotal: 0 })
+  }, [transacoes])
+
+  const chartData = React.useMemo(() => {
+    const categories = {}
+    transacoes.filter(t => t.tipo === 'DESPESA').forEach(t => {
+      const catName = t.categorias?.nome || 'Outros'
+      categories[catName] = (categories[catName] || 0) + Math.abs(parseFloat(t.valor))
+    })
+    return Object.entries(categories).map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
   }, [transacoes])
 
   const formatCurrency = (val) => {
@@ -117,99 +114,151 @@ export default function Dashboard() {
 
         {/* KPIs */}
         <div className="kpi-grid">
-          <div className="kpi-card accent">
-            <div className="kpi-header">
-              <span>Saldo Total</span>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--accent)' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
-              </svg>
-            </div>
-            <div className="kpi-value">{formatCurrency(saldoTotal)}</div>
-            <div className="trend-up" style={{ color: 'var(--text-secondary)', opacity: transacoes.length > 0 ? 1 : 0.5 }}>
-              {transacoes.length > 0 ? `${transacoes.length} transações registradas` : 'Sem dados no período'}
-            </div>
-          </div>
+          {loading ? (
+            <>
+              <div className="skeleton skeleton-card"></div>
+              <div className="skeleton skeleton-card"></div>
+              <div className="skeleton skeleton-card"></div>
+            </>
+          ) : (
+            <>
+              <div className="kpi-card accent">
+                <div className="kpi-header">
+                  <span>Saldo Total</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--accent)' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
+                  </svg>
+                </div>
+                <div className="kpi-value">{formatCurrency(saldoTotal)}</div>
+                <div className="trend-up" style={{ color: 'var(--text-secondary)' }}>
+                  {transacoes.length} transações registradas
+                </div>
+              </div>
 
-          <div className="kpi-card">
-            <div className="kpi-header">
-              <span>Receitas</span>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--success)' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
-              </svg>
-            </div>
-            <div className="kpi-value" style={{ color: 'var(--success)' }}>{formatCurrency(totalReceitas)}</div>
-            <div className="trend-up" style={{ color: 'var(--text-secondary)', opacity: totalReceitas > 0 ? 1 : 0.5 }}>
-              {totalReceitas > 0 ? 'Rendimento positivo' : 'Sem receitas registradas'}
-            </div>
-          </div>
+              <div className="kpi-card">
+                <div className="kpi-header">
+                  <span>Receitas</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--success)' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+                  </svg>
+                </div>
+                <div className="kpi-value" style={{ color: 'var(--success)' }}>{formatCurrency(totalReceitas)}</div>
+                <div className="trend-up" style={{ color: 'var(--text-secondary)' }}>
+                  Ganhos acumulados
+                </div>
+              </div>
 
-          <div className="kpi-card">
-            <div className="kpi-header">
-              <span>Despesas</span>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--danger)' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" />
-              </svg>
-            </div>
-            <div className="kpi-value" style={{ color: 'var(--danger)' }}>- {formatCurrency(totalDespesas)}</div>
-            <div className="trend-down" style={{ color: 'var(--text-secondary)', opacity: totalDespesas > 0 ? 1 : 0.5 }}>
-              {totalDespesas > 0 ? 'Gastos acumulados' : 'Sem despesas registradas'}
-            </div>
-          </div>
+              <div className="kpi-card">
+                <div className="kpi-header">
+                  <span>Despesas</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--danger)' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" />
+                  </svg>
+                </div>
+                <div className="kpi-value" style={{ color: 'var(--danger)' }}>- {formatCurrency(totalDespesas)}</div>
+                <div className="trend-down" style={{ color: 'var(--text-secondary)' }}>
+                  Gastos registrados
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Recent Transactions Table */}
-        <section className="content-section">
-          <div className="section-header">
-            <h2 style={{ fontSize: '18px', fontWeight: 600 }}>Transações Recentes</h2>
-            <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Nova Transação</button>
+        {/* Main Grid: Charts & Table */}
+        {!loading && transacoes.length === 0 ? (
+          <div className="empty-state-container">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 010-4h14v4"/><path d="M3 5v14a2 2 0 002 2h16v-5"/><path d="M18 12a2 2 0 000 4h4v-4Z"/></svg>
+            <h2 className="empty-state-title">Nenhuma transação ainda</h2>
+            <p className="empty-state-text">Comece a organizar suas finanças agora mesmo adicionando sua primeira receita ou despesa.</p>
+            <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Criar Primeira Transação</button>
           </div>
+        ) : (
+          <div className="dashboard-grid-main">
+            {/* Table Section */}
+            <section className="content-section" style={{ marginBottom: 0 }}>
+              <div className="section-header">
+                <h2 style={{ fontSize: '18px', fontWeight: 600 }}>Últimas Atividades</h2>
+                <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Nova</button>
+              </div>
 
-          <div style={{ overflowX: 'auto', padding: '10px 0' }}>
-            {loading ? (
-              <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Carregando...</p>
-            ) : transacoes.length === 0 ? (
-              <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Nenhuma transação encontrada para este período.</p>
-            ) : (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Data</th>
-                    <th>Descrição</th>
-                    <th>Categoria</th>
-                    <th>Valor</th>
-                    <th>Status</th>
-                    <th style={{ textAlign: 'right' }}>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transacoes.map(t => (
-                    <tr key={t.id}>
-                      <td>{new Date(t.data_transacao).toLocaleDateString('pt-BR')}</td>
-                      <td>{t.descricao}</td>
-                      <td>
-                        {t.categorias?.nome}
-                        {t.subcategorias?.nome ? ` - ${t.subcategorias.nome}` : ''}
-                      </td>
-                      <td className={t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'}>
-                        {t.tipo === 'RECEITA' ? '+' : '-'} R$ {parseFloat(t.valor).toFixed(2)}
-                      </td>
-                      <td>
-                        <span className={`badge badge-${t.status?.toLowerCase() || 'efetivada'}`}>
-                          {t.status}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <button className="btn-delete" onClick={() => handleDelete(t.id)} title="Excluir Transação">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+              <div style={{ overflowX: 'auto' }}>
+                {loading ? (
+                  <>
+                    <div className="skeleton skeleton-row"></div>
+                    <div className="skeleton skeleton-row"></div>
+                    <div className="skeleton skeleton-row"></div>
+                    <div className="skeleton skeleton-row"></div>
+                  </>
+                ) : (
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Data</th>
+                        <th>Categoria</th>
+                        <th style={{ textAlign: 'right' }}>Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {transacoes.slice(0, 8).map(t => (
+                        <tr key={t.id}>
+                          <td style={{ fontSize: '13px' }}>{new Date(t.data_transacao).toLocaleDateString('pt-BR')}</td>
+                          <td>
+                            <div style={{ fontWeight: 500 }}>{t.categorias?.nome || 'Sem categoria'}</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                              {t.subcategorias?.nome || ''}
+                            </div>
+                          </td>
+                          <td className={t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'} style={{ fontWeight: 600, textAlign: 'right' }}>
+                            {t.tipo === 'RECEITA' ? '+' : '-'} {formatCurrency(t.valor)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </section>
+
+            {/* Chart Section */}
+            <div className="chart-card">
+              <div className="chart-header">
+                <h3>Despesas por Categoria</h3>
+              </div>
+              <div style={{ flex: 1, minHeight: '300px' }}>
+                {loading ? (
+                  <div className="skeleton skeleton-chart"></div>
+                ) : chartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value) => formatCurrency(value)}
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                      />
+                      <Legend verticalAlign="bottom" height={36}/>
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '14px' }}>
+                    Sem dados de despesa para exibir.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </section>
+        ) }
       </main>
 
       <TransactionModal 

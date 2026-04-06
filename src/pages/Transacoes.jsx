@@ -125,21 +125,38 @@ export default function Transacoes() {
           <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Nova Transação</button>
         </header>
 
-        {/* Summary Banner */}
-        <div className="summary-banner">
-          <div className="summary-item">
-            <span className="summary-label">Receitas</span>
-            <span className="summary-value income">{formatCurrency(summary.receitas)}</span>
+        {/* Summary KPIs */}
+        <div className="kpi-grid" style={{ marginBottom: '24px' }}>
+          <div className="kpi-card">
+            <div className="kpi-header">
+              <span>Receitas Filtradas</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--success)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+              </svg>
+            </div>
+            <div className="kpi-value" style={{ color: 'var(--success)' }}>{formatCurrency(summary.receitas)}</div>
           </div>
-          <div className="summary-item">
-            <span className="summary-label">Despesas</span>
-            <span className="summary-value expense">-{formatCurrency(summary.despesas)}</span>
+
+          <div className="kpi-card">
+            <div className="kpi-header">
+              <span>Despesas Filtradas</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--danger)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" />
+              </svg>
+            </div>
+            <div className="kpi-value" style={{ color: 'var(--danger)' }}>- {formatCurrency(summary.despesas)}</div>
           </div>
-          <div className="summary-item" style={{ borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '32px' }}>
-            <span className="summary-label">Balanço do Filtro</span>
-            <span className="summary-value" style={{ color: summary.saldo >= 0 ? '#4ade80' : '#f87171' }}>
+
+          <div className="kpi-card accent">
+            <div className="kpi-header">
+              <span>Balanço do Filtro</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--accent)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
+              </svg>
+            </div>
+            <div className="kpi-value" style={{ color: summary.saldo >= 0 ? 'var(--text-primary)' : 'var(--danger)' }}>
               {formatCurrency(summary.saldo)}
-            </span>
+            </div>
           </div>
         </div>
 
@@ -189,6 +206,15 @@ export default function Transacoes() {
             <label>Fim</label>
             <input type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={handleFilterChange} />
           </div>
+
+          <button 
+            type="button" 
+            className="btn-secondary" 
+            style={{ padding: '10px 16px', fontSize: '12px' }}
+            onClick={() => setFilters({ busca: '', tipo: '', status: '', categoria_id: '', dataInicio: '', dataFim: '' })}
+          >
+            Limpar
+          </button>
         </div>
 
         {/* Table Section */}
@@ -230,7 +256,14 @@ export default function Transacoes() {
                         </span>
                       </td>
                       <td className={t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'}>
-                        {t.tipo === 'RECEITA' ? '+' : '-'} {formatCurrency(t.valor)}
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
+                          {t.tipo === 'RECEITA' ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--success)' }}><path d="m18 15-6-6-6 6"/></svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--danger)' }}><path d="m6 9 6 6 6-6"/></svg>
+                          )}
+                          {formatCurrency(t.valor)}
+                        </span>
                       </td>
                       <td>
                         <span className={`badge badge-${t.status?.toLowerCase() || 'efetivada'}`}>
@@ -239,7 +272,7 @@ export default function Transacoes() {
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <button className="btn-delete" onClick={() => handleDelete(t.id)} title="Excluir">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                         </button>
                       </td>
                     </tr>

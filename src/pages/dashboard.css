@@ -919,18 +919,19 @@ h1, h2, h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  background: #f8fafc;
+  background: white;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  border-radius: 16px;
+  padding: 24px;
+  border-radius: 24px;
   margin-bottom: 24px;
   align-items: flex-end;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
   min-width: 140px;
 }
@@ -939,8 +940,8 @@ h1, h2, h3 {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #64748b;
-  letter-spacing: 0.05em;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
 }
 
 .filter-input {
@@ -1004,4 +1005,121 @@ h1, h2, h3 {
     padding: 16px;
   }
 }
+
+/* --- Dashboard Enhancements: Skeletons & Charts --- */
+
+.dashboard-grid-main {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-grid-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Skeleton Animations */
+@keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}
+
+.skeleton {
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-repeat: no-repeat;
+  background-size: 800px 100%;
+  border-radius: 12px;
+  animation: shimmer 1.5s infinite linear;
+}
+
+.skeleton-card { height: 140px; margin-bottom: 24px; }
+.skeleton-row { height: 60px; margin-bottom: 12px; border-radius: 8px; }
+.skeleton-chart { height: 350px; width: 100%; border-radius: 20px; }
+
+/* Empty State Styles */
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  text-align: center;
+  background: var(--bg-card);
+  border-radius: 24px;
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.empty-state-container svg {
+  color: var(--accent);
+  margin-bottom: 24px;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.empty-state-text {
+  color: var(--text-secondary);
+  font-size: 15px;
+  max-width: 320px;
+  margin-bottom: 24px;
+}
+
+/* Chart Styles */
+.chart-card {
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-header {
+  margin-bottom: 20px;
+}
+
+.chart-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Delete Button Redesign */
+.btn-delete {
+  background: transparent;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-delete:active {
+  transform: translateY(0);
+}
+
+
 
