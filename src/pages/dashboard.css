@@ -280,8 +280,8 @@ h1, h2, h3 {
     z-index: 50;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background-color: var(--bg-primary); /* Less transparency on mobile */
-    backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
+    backdrop-filter: blur(40px);
     width: 280px;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
   }
@@ -295,8 +295,8 @@ h1, h2, h3 {
     position: fixed;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     z-index: 40;
     animation: fadeIn 0.3s ease;
   }
@@ -604,7 +604,8 @@ h1, h2, h3 {
 }
 
 .modal-form input,
-.modal-form select {
+.modal-form select,
+.input-premium {
   padding: 14px 18px;
   border-radius: 14px;
   background: #f9f9f9;
@@ -615,10 +616,12 @@ h1, h2, h3 {
   outline: none;
   transition: all 0.2s ease;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+  width: 100%;
 }
 
 .modal-form input:focus,
-.modal-form select:focus {
+.modal-form select:focus,
+.input-premium:focus {
   border-color: var(--accent);
   background: #ffffff;
   box-shadow: 0 0 0 4px rgba(212, 168, 75, 0.15);
@@ -692,6 +695,36 @@ h1, h2, h3 {
   box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.18);
   animation: slideDownCustom 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-select-search {
+  padding: 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  background: #fdfdfd;
+}
+
+.custom-select-search input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.08);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.custom-select-search input:focus {
+  border-color: var(--accent);
+  background: #fff;
+}
+
+.custom-select-no-results {
+  padding: 20px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 14px;
 }
 
 @keyframes slideDownCustom {

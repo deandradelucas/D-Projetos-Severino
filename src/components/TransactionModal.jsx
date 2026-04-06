@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react'
 
 const CustomSelect = ({ name, value, onChange, options, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState('')
   const ref = useRef(null)
+  const searchInputRef = useRef(null)
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -11,6 +13,27 @@ const CustomSelect = ({ name, value, onChange, options, placeholder }) => {
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
+
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      searchInputRef.current.focus()
+    }
+    if (!isOpen) setSearch('')
+  }, [isOpen])
+
+  const filteredOptions = options.filter(o => 
+    o.nome.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && search && filteredOptions.length > 0) {
+      e.preventDefault();
+      onChange({ target: { name, value: filteredOptions[0].id } });
+      setIsOpen(false);
+    } else if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  }
 
   const selected = options.find(o => String(o.id) === String(value))
 
@@ -29,18 +52,29 @@ const CustomSelect = ({ name, value, onChange, options, placeholder }) => {
         </svg>
       </div>
       <div className="custom-select-dropdown">
+        <div className="custom-select-search">
+          <input 
+            type="text" 
+            placeholder="Procurar..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            onKeyDown={handleKeyDown}
+            ref={searchInputRef}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
         <div className="custom-select-options">
-          <div 
-            className={`custom-select-option ${!value ? 'selected' : ''}`}
-            onClick={() => { onChange({ target: { name, value: '' } }); setIsOpen(false) }}
-          >
-            {placeholder}
-          </div>
-          {options.map(opt => (
+          {filteredOptions.length === 0 && (
+            <div className="custom-select-no-results">Nenhum resultado</div>
+          )}
+          {filteredOptions.map(opt => (
             <div 
               key={opt.id} 
               className={`custom-select-option ${String(value) === String(opt.id) ? 'selected' : ''}`}
-              onClick={() => { onChange({ target: { name, value: opt.id } }); setIsOpen(false) }}
+              onClick={() => { 
+                onChange({ target: { name, value: opt.id } }); 
+                setIsOpen(false);
+              }}
             >
               {opt.cor && <div className="category-dot" style={{ backgroundColor: opt.cor }} />}
               {opt.nome}
@@ -67,6 +101,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
   })
   
   const [displayValor, setDisplayValor] = useState('')
+  const valorInputRef = useRef(null)
 
   const fetchCategorias = React.useCallback(async () => {
     setLoadingCats(true)
@@ -88,9 +123,20 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
   useEffect(() => {
     if (isOpen && usuarioId) {
       fetchCategorias()
-      // Reset form values on open if necessary, or just clear valor
       setDisplayValor('')
-      setFormData(prev => ({ ...prev, valor: '', descricao: '', categoria_id: '', subcategoria_id: '' }))
+      setFormData(prev => ({ 
+        ...prev, 
+        valor: '', 
+        descricao: '', 
+        categoria_id: '', 
+        subcategoria_id: '',
+        data_transacao: new Date().toISOString().split('T')[0]
+      }))
+      
+      // Auto focus valor field
+      setTimeout(() => {
+        if (valorInputRef.current) valorInputRef.current.focus()
+      }, 100)
     }
   }, [isOpen, usuarioId, fetchCategorias])
 
@@ -195,6 +241,33 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
             </div>
           </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="form-group">
+              <label>Valor (R$)</label>
+              <input 
+                type="text" 
+                name="valorDisplay" 
+                value={displayValor} 
+                onChange={handleCurrencyChange} 
+                ref={valorInputRef}
+                required 
+                placeholder="0,00" 
+                autoComplete="off"
+                className="input-premium"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Data</label>
+              <input type="date" name="data_transacao" value={formData.data_transacao} onChange={handleChange} required className="input-premium" />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Descrição</label>
+            <input type="text" name="descricao" value={formData.descricao} onChange={handleChange} required placeholder="O que você comprou?" className="input-premium" />
+          </div>
+
           <div className="form-group" style={{ opacity: loadingCats ? 0.5 : 1 }}>
             <label>Categoria</label>
             <CustomSelect 
@@ -202,7 +275,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
               value={formData.categoria_id} 
               onChange={handleChange} 
               options={categorias.filter(c => c.tipo === formData.tipo)} 
-              placeholder="Selecione..." 
+              placeholder="Pesquise..." 
             />
           </div>
 
@@ -214,33 +287,10 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
                 value={formData.subcategoria_id} 
                 onChange={handleChange} 
                 options={subcategorias} 
-                placeholder="Selecione..." 
+                placeholder="Pesquise..." 
               />
             </div>
           )}
-
-          <div className="form-group" style={{ marginTop: '12px' }}>
-            <label>Descrição</label>
-            <input type="text" name="descricao" value={formData.descricao} onChange={handleChange} required placeholder="Ex: Mercado" />
-          </div>
-
-          <div className="form-group">
-            <label>Valor (R$)</label>
-            <input 
-              type="text" 
-              name="valorDisplay" 
-              value={displayValor} 
-              onChange={handleCurrencyChange} 
-              required 
-              placeholder="0,00" 
-              autoComplete="off"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Data</label>
-            <input type="date" name="data_transacao" value={formData.data_transacao} onChange={handleChange} required />
-          </div>
 
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn-secondary" disabled={saving}>Cancelar</button>
