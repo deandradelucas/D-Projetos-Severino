@@ -1,24 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react'
 
-const CustomSelect = ({ name, value, onChange, options, placeholder }) => {
-  const [isOpen, setIsOpen] = useState(false)
+const CustomSelect = ({ name, value, onChange, options, placeholder, isOpen, onToggle, zIndex = 1 }) => {
   const [search, setSearch] = useState('')
   const ref = useRef(null)
   const searchInputRef = useRef(null)
 
   useEffect(() => {
     const handleClick = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false)
+      if (ref.current && !ref.current.contains(e.target)) {
+        if (isOpen) {
+          onToggle(null)
+          setSearch('')
+        }
+      }
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
+  }, [isOpen, onToggle])
 
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
-      searchInputRef.current.focus()
+      setTimeout(() => searchInputRef.current?.focus(), 50)
     }
-    if (!isOpen) setSearch('')
   }, [isOpen])
 
   const filteredOptions = options.filter(o => 
@@ -29,18 +32,20 @@ const CustomSelect = ({ name, value, onChange, options, placeholder }) => {
     if (e.key === 'Enter' && search && filteredOptions.length > 0) {
       e.preventDefault();
       onChange({ target: { name, value: filteredOptions[0].id } });
-      setIsOpen(false);
+      onToggle(null);
+      setSearch('');
     } else if (e.key === 'Escape') {
-      setIsOpen(false);
+      onToggle(null);
+      setSearch('');
     }
   }
 
   const selected = options.find(o => String(o.id) === String(value))
 
   return (
-    <div className={`custom-select ${isOpen ? 'open' : ''}`} ref={ref}>
+    <div className={`custom-select ${isOpen ? 'open' : ''}`} ref={ref} style={{ zIndex }}>
       <input type="text" name={name} value={value} readOnly required className="sr-only" style={{ opacity: 0, position: 'absolute', zIndex: -1, width: '100%', height: '100%', bottom: 0, left: 0 }} />
-      <div className="custom-select-trigger" onClick={() => setIsOpen(!isOpen)}>
+      <div className="custom-select-trigger" onClick={() => onToggle(isOpen ? null : name)}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {selected?.cor && <div className="category-dot" style={{ backgroundColor: selected.cor }} />}
           <span className={selected ? 'text-white' : 'text-placeholder'}>
@@ -73,7 +78,8 @@ const CustomSelect = ({ name, value, onChange, options, placeholder }) => {
               className={`custom-select-option ${String(value) === String(opt.id) ? 'selected' : ''}`}
               onClick={() => { 
                 onChange({ target: { name, value: opt.id } }); 
-                setIsOpen(false);
+                onToggle(null);
+                setSearch('');
               }}
             >
               {opt.cor && <div className="category-dot" style={{ backgroundColor: opt.cor }} />}
@@ -90,6 +96,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
   const [categorias, setCategorias] = useState([])
   const [loadingCats, setLoadingCats] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [activeSelect, setActiveSelect] = useState(null)
 
   const [formData, setFormData] = useState({
     descricao: '',
@@ -276,6 +283,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
               onChange={handleChange} 
               options={categorias.filter(c => c.tipo === formData.tipo)} 
               placeholder="Pesquise..." 
+              isOpen={activeSelect === 'categoria_id'}
+              onToggle={setActiveSelect}
+              zIndex={10}
             />
           </div>
 
@@ -288,6 +298,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
                 onChange={handleChange} 
                 options={subcategorias} 
                 placeholder="Pesquise..." 
+                isOpen={activeSelect === 'subcategoria_id'}
+                onToggle={setActiveSelect}
+                zIndex={5}
               />
             </div>
           )}
