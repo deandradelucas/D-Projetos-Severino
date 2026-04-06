@@ -9,8 +9,8 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const isSidebarDark = theme === 'light' || theme === 'glass'
   
   const logoSrc = isSidebarDark 
-    ? '/images/horizonte_fiel_original_logo_light.png' 
-    : '/images/horizonte_fiel_original_logo_dark.png'
+    ? '/images/horizonte_fiel_original_logo_dark.png' 
+    : '/images/horizonte_fiel_original_logo_light.png'
   return (
     <>
       {/* Mobile Backdrop */}
