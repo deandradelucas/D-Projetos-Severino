@@ -6,9 +6,10 @@ import { loadEnv } from './load-env.mjs'
 
 const execAsync = promisify(exec)
 
-const RCLONE_REMOTE = 'gdrive-backup'
+const DEFAULT_RCLONE_REMOTE = 'gdrive-backup'
 const BACKUP_DIR = '.backup-temp'
-const RCLONE_DEST = `${RCLONE_REMOTE}:1QA_b7h0BdJN0BNb6_DwJD7GkJeE-Clqa/backup - horizonte financeiro`
+const DEFAULT_RCLONE_DEST_PATH = 'Backup - Horizonte Financeiro'
+const DEFAULT_SUPABASE_TABLES = ['usuarios']
 
 function getEnv(name, { required = true, fallback = '' } = {}) {
   loadEnv()
@@ -17,6 +18,35 @@ function getEnv(name, { required = true, fallback = '' } = {}) {
     throw new Error(`Missing required environment variable: ${name}`)
   }
   return String(value).trim()
+}
+
+function getRcloneConfig() {
+  const remote = getEnv('RCLONE_REMOTE', {
+    required: false,
+    fallback: DEFAULT_RCLONE_REMOTE,
+  })
+  const destPath = getEnv('RCLONE_DEST_PATH', {
+    required: false,
+    fallback: DEFAULT_RCLONE_DEST_PATH,
+  })
+
+  return {
+    remote,
+    destPath,
+    destination: `${remote}:${destPath}`,
+  }
+}
+
+function getSupabaseBackupTables() {
+  const rawTables = getEnv('SUPABASE_BACKUP_TABLES', {
+    required: false,
+    fallback: DEFAULT_SUPABASE_TABLES.join(','),
+  })
+
+  return rawTables
+    .split(',')
+    .map((table) => table.trim())
+    .filter(Boolean)
 }
 
 async function execCommand(command, label) {
@@ -33,11 +63,16 @@ async function fetchDatabaseBackup() {
   const { getSupabaseAdmin } = await import('./supabase-admin.mjs')
   const supabase = getSupabaseAdmin()
 
-  const tables = ['usuarios']
+  const tables = getSupabaseBackupTables()
   const backup = {
     app: 'Horizonte Financeiro',
+    provider: 'Supabase',
     generatedAt: new Date().toISOString(),
-    tables: {}
+    tables: {},
+    summary: {
+      totalTables: tables.length,
+      rowsByTable: {},
+    },
   }
 
   for (const table of tables) {
@@ -45,8 +80,10 @@ async function fetchDatabaseBackup() {
     if (error) {
       console.warn(`[DB] Aviso ao buscar tabela ${table}: ${error.message}`)
       backup.tables[table] = []
+      backup.summary.rowsByTable[table] = 0
     } else {
       backup.tables[table] = data ?? []
+      backup.summary.rowsByTable[table] = backup.tables[table].length
     }
   }
 
@@ -61,9 +98,11 @@ async function createBackupArchive() {
     mkdirSync(BACKUP_DIR, { recursive: true })
   }
 
-  console.log('[FILES] Baixando dados do banco...')
+  console.log('[SUPABASE] Gerando snapshot do banco...')
   const dbBackup = await fetchDatabaseBackup()
-  const dbFile = join(BACKUP_DIR, 'database.json')
+  const supabaseDir = join(BACKUP_DIR, 'supabase')
+  mkdirSync(supabaseDir, { recursive: true })
+  const dbFile = join(supabaseDir, 'supabase-data.json')
   writeFileSync(dbFile, JSON.stringify(dbBackup, null, 2))
 
   console.log('[FILES] Copiando arquivos do projeto...')
@@ -82,8 +121,6 @@ async function createBackupArchive() {
 
   for (const item of filesToBackup) {
     const src = join(process.cwd(), item)
-    const dest = join(projectFilesDir, item === '.env' ? '.env' : item)
-    const itemDest = item.endsWith('/') ? projectFilesDir : projectFilesDir
 
     if (existsSync(src)) {
       const cpCmd = item.endsWith('/')
@@ -103,14 +140,20 @@ async function createBackupArchive() {
 
   console.log('[ARCHIVE] Criando arquivo compactado...')
   await execCommand(
-    `powershell -command "Compress-Archive -Path '${BACKUP_DIR}\\database.json','${BACKUP_DIR}\\project-files' -DestinationPath '${archivePath}' -Force"`,
+    `powershell -command "Compress-Archive -Path '${BACKUP_DIR}\\supabase','${BACKUP_DIR}\\project-files' -DestinationPath '${archivePath}' -Force"`,
     'ZIP'
   )
 
-  return { archivePath, backupName }
+  return {
+    archivePath,
+    backupName,
+    supabaseTables: Object.keys(dbBackup.tables),
+  }
 }
 
 async function uploadToGoogleDrive(archivePath) {
+  const rclone = getRcloneConfig()
+
   console.log('[DRIVE] Verificando configuração do rclone...')
 
   try {
@@ -118,33 +161,33 @@ async function uploadToGoogleDrive(archivePath) {
   } catch {
     throw new Error(
       'rclone não está configurado. Execute: rclone config\n' +
-      'Escolha "n" para novo remote, nomeie como "gdrive-backup", tipo "drive",\n' +
+      `Escolha "n" para novo remote, nomeie como "${rclone.remote}", tipo "drive",\n` +
       'e autentique com sua conta d.mestremente@gmail.com'
     )
   }
 
-  console.log('[DRIVE] Verificando remote gdrive-backup...')
+  console.log(`[DRIVE] Verificando remote ${rclone.remote}...`)
   try {
-    await execCommand(`rclone lsd ${RCLONE_REMOTE}:`, 'CHECK')
+    await execCommand(`rclone lsd ${rclone.remote}:`, 'CHECK')
   } catch {
     throw new Error(
-      `Remote "${RCLONE_REMOTE}" não encontrado. Execute: rclone config\n` +
-      `Crie um remote chamado "${RCLONE_REMOTE}" do tipo Google Drive`
+      `Remote "${rclone.remote}" não encontrado. Execute: rclone config\n` +
+      `Crie um remote chamado "${rclone.remote}" do tipo Google Drive`
     )
   }
 
   console.log('[DRIVE] Enviando para Google Drive...')
   const fileName = archivePath.split(/[/\\]/).pop()
   await execCommand(
-    `rclone copy "${archivePath}" "${RCLONE_DEST}/" --progress`,
+    `rclone copy "${archivePath}" "${rclone.destination}/" --progress`,
     'UPLOAD'
   )
 
   console.log('[DRIVE] Listando arquivos no Drive...')
-  const files = await execCommand(`rclone ls "${RCLONE_DEST}/"`, 'LIST')
+  const files = await execCommand(`rclone ls "${rclone.destination}/"`, 'LIST')
 
   return {
-    destination: RCLONE_DEST,
+    destination: rclone.destination,
     fileName,
     files: files.trim().split('\n').filter(Boolean)
   }
@@ -157,7 +200,7 @@ export async function runRcloneBackup() {
 
   let archivePath
   try {
-    const { archivePath: ap } = await createBackupArchive()
+    const { archivePath: ap, supabaseTables } = await createBackupArchive()
     archivePath = ap
 
     const result = await uploadToGoogleDrive(archivePath)
@@ -167,9 +210,13 @@ export async function runRcloneBackup() {
     console.log('='.repeat(50))
     console.log(`Destino: ${result.destination}`)
     console.log(`Arquivo: ${result.fileName}`)
+    console.log(`Tabelas Supabase: ${supabaseTables.join(', ')}`)
     console.log(`Arquivos no Drive: ${result.files.length}`)
 
-    return result
+    return {
+      ...result,
+      supabaseTables,
+    }
   } catch (error) {
     console.error('\n[ERRO] Falha no backup:', error.message)
     throw error
