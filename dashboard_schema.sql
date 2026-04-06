@@ -39,7 +39,7 @@ CREATE TABLE public.transacoes (
     subcategoria_id UUID REFERENCES public.subcategorias(id) ON DELETE SET NULL,
     tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('RECEITA', 'DESPESA')),
     valor DECIMAL(12, 2) NOT NULL,
-    descricao VARCHAR(255) NOT NULL,
+    descricao VARCHAR(255),
     data_transacao DATE NOT NULL,
     status VARCHAR(20) DEFAULT 'EFETIVADA' CHECK (status IN ('PENDENTE', 'EFETIVADA', 'CANCELADA')),
     criado_em TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,

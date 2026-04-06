@@ -248,33 +248,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div className="form-group">
-              <label>Valor (R$)</label>
-              <input 
-                type="text" 
-                name="valorDisplay" 
-                value={displayValor} 
-                onChange={handleCurrencyChange} 
-                ref={valorInputRef}
-                required 
-                placeholder="0,00" 
-                autoComplete="off"
-                className="input-premium"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Data</label>
-              <input type="date" name="data_transacao" value={formData.data_transacao} onChange={handleChange} required className="input-premium" />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Descrição</label>
-            <input type="text" name="descricao" value={formData.descricao} onChange={handleChange} required placeholder="O que você comprou?" className="input-premium" />
-          </div>
-
           <div className="form-group" style={{ opacity: loadingCats ? 0.5 : 1 }}>
             <label>Categoria</label>
             <CustomSelect 
@@ -305,10 +278,70 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
             </div>
           )}
 
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="form-group">
+              <label>Valor (R$)</label>
+              <input 
+                type="text" 
+                name="valorDisplay" 
+                value={displayValor} 
+                onChange={handleCurrencyChange} 
+                ref={valorInputRef}
+                required 
+                placeholder="0,00" 
+                autoComplete="off"
+                className="input-premium"
+              />
+            </div>
+
+            <div className="form-group">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label>Data</label>
+                <div className="date-shortcuts">
+                  <button 
+                    type="button" 
+                    className="date-shortcut-btn"
+                    onClick={() => {
+                      const today = new Date().toISOString().split('T')[0];
+                      setFormData(prev => ({ ...prev, data_transacao: today }));
+                    }}
+                  >
+                    Hoje
+                  </button>
+                  <button 
+                    type="button" 
+                    className="date-shortcut-btn"
+                    onClick={() => {
+                      const yesterday = new Date();
+                      yesterday.setDate(yesterday.getDate() - 1);
+                      const yStr = yesterday.toISOString().split('T')[0];
+                      setFormData(prev => ({ ...prev, data_transacao: yStr }));
+                    }}
+                  >
+                    Ontem
+                  </button>
+                </div>
+              </div>
+              <input type="date" name="data_transacao" value={formData.data_transacao} onChange={handleChange} required className="input-premium" />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Descrição <span style={{ fontSize: '11px', opacity: 0.7, fontWeight: 400, textTransform: 'lowercase' }}>(opcional)</span></label>
+            <input type="text" name="descricao" value={formData.descricao} onChange={handleChange} placeholder="O que você comprou?" className="input-premium" />
+          </div>
+
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn-secondary" disabled={saving}>Cancelar</button>
-            <button type="submit" className="btn-primary" disabled={saving}>
-              {saving ? 'Salvando...' : 'Salvar Transação'}
+            <button type="submit" className={`btn-primary ${saving ? 'loading' : ''}`} disabled={saving}>
+              {saving ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+                  <svg className="spinner" viewBox="0 0 24 24" style={{ width: '16px', height: '16px' }}>
+                    <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="3" />
+                  </svg>
+                  Salvando...
+                </div>
+              ) : 'Salvar Transação'}
             </button>
           </div>
         </form>

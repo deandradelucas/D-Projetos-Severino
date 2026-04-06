@@ -43,6 +43,27 @@ export default function Dashboard() {
     }
   }, [usuario.id, fetchTransacoes])
 
+  const { totalReceitas, totalDespesas, saldoTotal } = React.useMemo(() => {
+    return transacoes.reduce((acc, t) => {
+      const valor = parseFloat(t.valor) || 0
+      if (t.tipo === 'RECEITA') {
+        acc.totalReceitas += valor
+        acc.saldoTotal += valor
+      } else {
+        acc.totalDespesas += valor
+        acc.saldoTotal -= valor
+      }
+      return acc
+    }, { totalReceitas: 0, totalDespesas: 0, saldoTotal: 0 })
+  }, [transacoes])
+
+  const formatCurrency = (val) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(val)
+  }
+
   return (
     <div className="dashboard-container">
       {/* Mobile Backdrop */}
@@ -155,8 +176,10 @@ export default function Dashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
               </svg>
             </div>
-            <div className="kpi-value">R$ 0,00</div>
-            <div className="trend-up" style={{ color: 'var(--text-secondary)' }}>Sem dados no período</div>
+            <div className="kpi-value">{formatCurrency(saldoTotal)}</div>
+            <div className="trend-up" style={{ color: 'var(--text-secondary)', opacity: transacoes.length > 0 ? 1 : 0.5 }}>
+              {transacoes.length > 0 ? `${transacoes.length} transações registradas` : 'Sem dados no período'}
+            </div>
           </div>
 
           <div className="kpi-card">
@@ -166,8 +189,10 @@ export default function Dashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
               </svg>
             </div>
-            <div className="kpi-value">R$ 0,00</div>
-            <div className="trend-up" style={{ color: 'var(--text-secondary)' }}>Sem receitas cadastradas</div>
+            <div className="kpi-value" style={{ color: 'var(--success)' }}>{formatCurrency(totalReceitas)}</div>
+            <div className="trend-up" style={{ color: 'var(--text-secondary)', opacity: totalReceitas > 0 ? 1 : 0.5 }}>
+              {totalReceitas > 0 ? 'Rendimento positivo' : 'Sem receitas registradas'}
+            </div>
           </div>
 
           <div className="kpi-card">
@@ -177,8 +202,10 @@ export default function Dashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" />
               </svg>
             </div>
-            <div className="kpi-value">R$ 0,00</div>
-            <div className="trend-down" style={{ color: 'var(--text-secondary)' }}>Sem despesas cadastradas</div>
+            <div className="kpi-value" style={{ color: 'var(--danger)' }}>{formatCurrency(totalDespesas)}</div>
+            <div className="trend-down" style={{ color: 'var(--text-secondary)', opacity: totalDespesas > 0 ? 1 : 0.5 }}>
+              {totalDespesas > 0 ? 'Gastos acumulados' : 'Sem despesas registradas'}
+            </div>
           </div>
         </div>
 
