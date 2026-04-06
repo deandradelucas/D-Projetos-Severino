@@ -109,6 +109,25 @@ export async function findUserByEmail(email) {
   return data
 }
 
+export async function authenticateUser(email, password) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const normalizedEmail = String(email || '').trim().toLowerCase()
+  const normalizedPassword = String(password || '')
+
+  const { data, error } = await supabaseAdmin
+    .from('usuarios')
+    .select('id, email, nome')
+    .eq('email', normalizedEmail)
+    .eq('senha', normalizedPassword)
+    .maybeSingle()
+
+  if (error) {
+    throw error
+  }
+
+  return data
+}
+
 export async function storeResetToken({ email, tokenHash, expiresAt }) {
   const supabaseAdmin = getSupabaseAdmin()
   const { error } = await supabaseAdmin

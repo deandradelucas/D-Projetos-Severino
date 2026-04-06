@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getSupabaseErrorMessage, parseSupabaseResponse, supabaseKey, supabaseUrl } from '../lib/supabase'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
@@ -20,8 +19,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [requestingReset, setRequestingReset] = useState(false)
   const [showSenha, setShowSenha] = useState(false)
-  const inputsRef = useRef([])
-  const animate = true
 
   useEffect(() => {
     const savedEmail = window.localStorage.getItem(REMEMBER_EMAIL_KEY)
@@ -31,27 +28,6 @@ export default function Login() {
       setForgotEmail(savedEmail)
       setRememberEmail(true)
     }
-  }, [])
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Tab') {
-        const inputs = inputsRef.current.filter(input => input)
-        const firstInput = inputs[0]
-        const lastInput = inputs[inputs.length - 1]
-        
-        if (e.shiftKey && document.activeElement === firstInput) {
-          e.preventDefault()
-          lastInput?.focus()
-        } else if (!e.shiftKey && document.activeElement === lastInput) {
-          e.preventDefault()
-          firstInput?.focus()
-        }
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   useEffect(() => {
@@ -143,25 +119,21 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const response = await fetch(`${supabaseUrl}/rest/v1/usuarios?email=eq.${encodeURIComponent(email)}&senha=eq.${encodeURIComponent(senha)}`, {
-        method: 'GET',
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`
-        }
+        },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password: senha,
+        }),
       })
 
-      const data = await parseSupabaseResponse(response)
+      const data = await response.json()
 
       if (!response.ok) {
-        setMensagem({ texto: `Erro ao fazer login: ${getSupabaseErrorMessage(data)}`, tipo: 'erro' })
-        setLoading(false)
-        return
-      }
-
-      if (data.length === 0) {
-        setMensagem({ texto: 'E-mail ou senha incorretos', tipo: 'erro' })
+        setMensagem({ texto: data.message || 'Nao foi possivel fazer login agora.', tipo: 'erro' })
         setLoading(false)
         return
       }
@@ -180,7 +152,7 @@ export default function Login() {
   return (
     <div className="min-h-[100dvh] min-h-[100svh] flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-[360px]">
-        <div className={`bg-black/50 backdrop-blur-[2px] border border-white/20 rounded-2xl p-5 sm:p-6 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        <div className="bg-black/50 backdrop-blur-[2px] border border-white/20 rounded-2xl p-5 sm:p-6 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
             <div className="flex justify-center mb-5 sm:mb-6">
               <img 
                 src={BRAND_ASSETS.logoOnDark}
@@ -209,7 +181,6 @@ export default function Login() {
                 placeholder="seu@email.com"
                 required
                 autoComplete="email"
-                ref={el => inputsRef.current[0] = el}
                 className="w-full px-3 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-lg text-[#f5f5f5] placeholder-[#737373] text-sm focus:outline-none focus:border-[#d4a84b] focus:bg-white/10 transition-all duration-200"
               />
             </div>
@@ -227,12 +198,12 @@ export default function Login() {
                   placeholder="Sua senha"
                   required
                   autoComplete="current-password"
-                  ref={el => inputsRef.current[1] = el}
                   className="w-full px-3 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-lg text-[#f5f5f5] placeholder-[#737373] text-sm focus:outline-none focus:border-[#d4a84b] focus:bg-white/10 transition-all duration-200 pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowSenha(!showSenha)}
+                  aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[#737373] hover:text-[#a3a3a3] transition-colors"
                 >
                   {showSenha ? (
@@ -273,7 +244,7 @@ export default function Login() {
             {showForgotPassword && (
               <div className="rounded-xl border border-white/10 bg-white/5 p-3">
                 <p className="mb-2 text-[11px] text-[#cfcfcf]">
-                  Digite seu e-mail para receber um link seguro de redefinicao.
+                  Digite seu e-mail para receber um link seguro de redefinição.
                 </p>
 
                 <div className="space-y-2">
@@ -329,7 +300,7 @@ export default function Login() {
           </form>
 
           {mensagem.texto && (
-            <div className={`mt-3 p-2 rounded-lg text-center text-xs animate-pulse ${
+            <div className={`mt-3 p-2 rounded-lg text-center text-xs ${
               mensagem.tipo === 'sucesso' 
                 ? 'bg-[rgba(34,197,94,0.15)] text-[#22c55e] border border-[rgba(34,197,94,0.3)]'
                 : 'bg-[rgba(239,68,68,0.15)] text-[#ef4444] border border-[rgba(239,68,68,0.3)]'

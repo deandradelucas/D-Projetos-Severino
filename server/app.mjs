@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import {
+  authenticateUser,
   consumeResetToken,
   createResetToken,
   findUserByEmail,
@@ -13,6 +14,36 @@ import {
 const app = new Hono()
 
 app.get('/api/health', (c) => c.json({ ok: true }))
+
+app.post('/api/auth/login', async (c) => {
+  try {
+    const body = await c.req.json()
+    const email = String(body?.email || '').trim().toLowerCase()
+    const password = String(body?.password || '')
+
+    if (!isValidEmail(email)) {
+      return c.json({ message: 'Informe um e-mail valido.' }, 400)
+    }
+
+    if (!password) {
+      return c.json({ message: 'Preencha a senha.' }, 400)
+    }
+
+    const user = await authenticateUser(email, password)
+
+    if (!user) {
+      return c.json({ message: 'E-mail ou senha incorretos.' }, 401)
+    }
+
+    return c.json({
+      message: 'Login realizado com sucesso.',
+      user,
+    })
+  } catch (error) {
+    console.error('login failed', error)
+    return c.json({ message: 'Nao foi possivel fazer login agora. Tente novamente em instantes.' }, 500)
+  }
+})
 
 app.post('/api/auth/request-password-reset', async (c) => {
   try {
