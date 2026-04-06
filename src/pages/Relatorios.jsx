@@ -26,7 +26,15 @@ export default function Relatorios() {
   // States
   const [menuAberto, setMenuAberto] = useState(false)
   const [transacoes, setTransacoes] = useState([])
+  const [categorias, setCategorias] = useState([])
   const [loading, setLoading] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Filters State (default para o mês atual)
   const [filters, setFilters] = useState(() => {
@@ -36,8 +44,21 @@ export default function Relatorios() {
     return {
       dataInicio: firstDay,
       dataFim: lastDay,
+      categoria_id: ''
     }
   })
+
+  const fetchCategorias = useCallback(async () => {
+    try {
+      const res = await fetch('/api/categorias', {
+        headers: { 'x-user-id': usuario.id }
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setCategorias(data || [])
+      }
+    } catch (err) { console.error(err) }
+  }, [usuario.id])
 
   // Fetch Transacoes
   const fetchTransacoes = useCallback(async () => {
@@ -46,6 +67,7 @@ export default function Relatorios() {
       const params = new URLSearchParams()
       if (filters.dataInicio) params.append('dataInicio', filters.dataInicio)
       if (filters.dataFim) params.append('dataFim', filters.dataFim)
+      if (filters.categoria_id) params.append('categoria_id', filters.categoria_id)
       params.append('limit', '500')
       params.append('status', 'EFETIVADA') // Para relatórios, focamos nas efetivadas normalmente
 
@@ -65,9 +87,10 @@ export default function Relatorios() {
 
   useEffect(() => {
     if (usuario.id) {
+      fetchCategorias()
       fetchTransacoes()
     }
-  }, [usuario.id, fetchTransacoes])
+  }, [usuario.id, fetchCategorias, fetchTransacoes])
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target
@@ -237,6 +260,15 @@ export default function Relatorios() {
             <label>Data Fim</label>
             <input type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={handleFilterChange} />
           </div>
+          <div className="filter-group">
+            <label>Categoria</label>
+            <select name="categoria_id" className="filter-input" value={filters.categoria_id} onChange={handleFilterChange}>
+              <option value="">Todas</option>
+              {categorias.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.nome}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Summary KPIs */}
@@ -291,8 +323,8 @@ export default function Relatorios() {
                       formatter={(value) => formatCurrency(value)}
                     />
                     <Legend iconType="circle" wrapperStyle={{ paddingTop: '10px' }}/>
-                    <Bar dataKey="Receitas" fill="#2eb85c" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="Despesas" fill="#e55353" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Receitas" fill="#2eb85c" radius={isMobile ? [0, 0, 0, 0] : [4, 4, 0, 0]} stackId={isMobile ? "a" : undefined} />
+                    <Bar dataKey="Despesas" fill="#e55353" radius={isMobile ? [4, 4, 0, 0] : [4, 4, 0, 0]} stackId={isMobile ? "a" : undefined} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
