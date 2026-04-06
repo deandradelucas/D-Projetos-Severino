@@ -21,8 +21,11 @@ Variaveis opcionais:
 - `RCLONE_REMOTE` para trocar o nome do remote
 - `RCLONE_DEST_PATH` para trocar a pasta de destino no Drive
 - `SUPABASE_BACKUP_TABLES` para definir as tabelas do Supabase que entram no snapshot JSON
+- `SUPABASE_DB_URL` ou `DATABASE_URL` para gerar tambem um dump SQL completo via `pg_dump`
+- ou, em vez da URL, `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD` e `PGDATABASE`
 
 Estrutura do pacote:
 
 - `supabase/supabase-data.json` com o snapshot das tabelas do Supabase
+- `supabase/<timestamp>.sql` com dump SQL completo, quando a conexao Postgres estiver configurada
 - `project-files/` com os arquivos do projeto

@@ -1,10 +1,11 @@
-import { exec } from 'node:child_process'
+import { exec, execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import { existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { loadEnv } from './load-env.mjs'
 
 const execAsync = promisify(exec)
+const execFileAsync = promisify(execFile)
 
 const DEFAULT_RCLONE_REMOTE = 'gdrive-backup'
 const BACKUP_DIR = '.backup-temp'
@@ -49,6 +50,43 @@ function getSupabaseBackupTables() {
     .filter(Boolean)
 }
 
+function getPostgresDumpConfig() {
+  const databaseUrl =
+    getEnv('SUPABASE_DB_URL', { required: false }) ||
+    getEnv('DATABASE_URL', { required: false })
+
+  if (databaseUrl) {
+    return {
+      enabled: true,
+      mode: 'url',
+      databaseUrl,
+    }
+  }
+
+  const host = getEnv('PGHOST', { required: false })
+  const port = getEnv('PGPORT', { required: false, fallback: '5432' })
+  const user = getEnv('PGUSER', { required: false })
+  const password = getEnv('PGPASSWORD', { required: false })
+  const database = getEnv('PGDATABASE', { required: false })
+
+  if (host && user && password && database) {
+    return {
+      enabled: true,
+      mode: 'parts',
+      host,
+      port,
+      user,
+      password,
+      database,
+    }
+  }
+
+  return {
+    enabled: false,
+    reason: 'DATABASE_URL/SUPABASE_DB_URL or PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE not configured.',
+  }
+}
+
 async function execCommand(command, label) {
   console.log(`[${label}] Executando: ${command}`)
   const { stdout, stderr } = await execAsync(command, { shell: true })
@@ -90,6 +128,50 @@ async function fetchDatabaseBackup() {
   return backup
 }
 
+async function createPostgresSqlDump(supabaseDir, backupName) {
+  const dumpConfig = getPostgresDumpConfig()
+
+  if (!dumpConfig.enabled) {
+    console.warn(`[SUPABASE] Dump SQL completo ignorado: ${dumpConfig.reason}`)
+    return null
+  }
+
+  const sqlDumpPath = join(supabaseDir, `${backupName}.sql`)
+
+  try {
+    await execFileAsync('pg_dump', ['--version'])
+  } catch {
+    console.warn('[SUPABASE] Dump SQL completo ignorado: pg_dump nao encontrado no PATH.')
+    return null
+  }
+
+  console.log('[SUPABASE] Gerando dump SQL completo do Postgres...')
+
+  const args = [
+    '--format=plain',
+    '--no-owner',
+    '--no-privileges',
+    `--file=${sqlDumpPath}`,
+  ]
+
+  const env = { ...process.env }
+
+  if (dumpConfig.mode === 'url') {
+    args.push(`--dbname=${dumpConfig.databaseUrl}`)
+  } else {
+    args.push(
+      `--host=${dumpConfig.host}`,
+      `--port=${dumpConfig.port}`,
+      `--username=${dumpConfig.user}`,
+      `--dbname=${dumpConfig.database}`,
+    )
+    env.PGPASSWORD = dumpConfig.password
+  }
+
+  await execFileAsync('pg_dump', args, { env })
+  return sqlDumpPath
+}
+
 async function createBackupArchive() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
   const backupName = `backup-${timestamp}`
@@ -104,6 +186,7 @@ async function createBackupArchive() {
   mkdirSync(supabaseDir, { recursive: true })
   const dbFile = join(supabaseDir, 'supabase-data.json')
   writeFileSync(dbFile, JSON.stringify(dbBackup, null, 2))
+  const sqlDumpPath = await createPostgresSqlDump(supabaseDir, backupName)
 
   console.log('[FILES] Copiando arquivos do projeto...')
   const filesToBackup = [
@@ -148,6 +231,7 @@ async function createBackupArchive() {
     archivePath,
     backupName,
     supabaseTables: Object.keys(dbBackup.tables),
+    hasSqlDump: Boolean(sqlDumpPath),
   }
 }
 
@@ -200,7 +284,7 @@ export async function runRcloneBackup() {
 
   let archivePath
   try {
-    const { archivePath: ap, supabaseTables } = await createBackupArchive()
+    const { archivePath: ap, supabaseTables, hasSqlDump } = await createBackupArchive()
     archivePath = ap
 
     const result = await uploadToGoogleDrive(archivePath)
@@ -211,11 +295,13 @@ export async function runRcloneBackup() {
     console.log(`Destino: ${result.destination}`)
     console.log(`Arquivo: ${result.fileName}`)
     console.log(`Tabelas Supabase: ${supabaseTables.join(', ')}`)
+    console.log(`Dump SQL completo: ${hasSqlDump ? 'sim' : 'nao'}`)
     console.log(`Arquivos no Drive: ${result.files.length}`)
 
     return {
       ...result,
       supabaseTables,
+      hasSqlDump,
     }
   } catch (error) {
     console.error('\n[ERRO] Falha no backup:', error.message)
