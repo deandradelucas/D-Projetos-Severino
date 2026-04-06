@@ -6,6 +6,8 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#E67E22', '#E74C3C', '#9B59B6', '#34495E']
 
@@ -152,6 +154,51 @@ export default function Relatorios() {
     document.body.removeChild(link)
   }
 
+  const exportToPDF = () => {
+    if (transacoes.length === 0) return
+
+    const doc = new jsPDF()
+
+    // Título do Relatório
+    doc.setFontSize(18)
+    doc.text('Relatório Analítico de Transações', 14, 22)
+    doc.setFontSize(11)
+    doc.setTextColor(100)
+    doc.text(`Período: ${new Date(filters.dataInicio + 'T00:00:00').toLocaleDateString('pt-BR')} a ${new Date(filters.dataFim + 'T00:00:00').toLocaleDateString('pt-BR')}`, 14, 30)
+    
+    // Resumo Financeiro
+    doc.setFontSize(12)
+    doc.setTextColor(0)
+    doc.text(`Total de Receitas: ${formatCurrency(summary.receitas)}`, 14, 40)
+    doc.text(`Total de Despesas: ${formatCurrency(summary.despesas)}`, 14, 48)
+    doc.text(`Saldo Líquido: ${formatCurrency(summary.saldo)}`, 14, 56)
+
+    // Tabela
+    const tableColumn = ["Data", "Tipo", "Categoria", "Valor", "Status"]
+    const tableRows = []
+
+    transacoes.forEach(t => {
+      const dataStr = new Date(t.data_transacao).toLocaleDateString('pt-BR')
+      const tipo = t.tipo
+      const cat = t.categorias?.nome || 'Sem categoria'
+      const valor = formatCurrency(t.valor)
+      const status = t.status || ''
+
+      tableRows.push([dataStr, tipo, cat, valor, status])
+    })
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 65,
+      theme: 'grid',
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [44, 62, 80] }
+    })
+
+    doc.save(`relatorio_${filters.dataInicio}_a_${filters.dataFim}.pdf`)
+  }
+
   // Cores de acordo com o tema e acessibilidade
   const axisColor = theme === 'light' ? '#333333' : '#e0e0e0'
   const tooltipBg = theme === 'light' ? '#ffffff' : '#1e1e2d'
@@ -168,10 +215,16 @@ export default function Relatorios() {
             </button>
             <h1 style={{ fontSize: '24px', fontWeight: 700 }}>Relatórios Analíticos</h1>
           </div>
-          <button className="btn-secondary" onClick={exportToCSV} disabled={transacoes.length === 0} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-            Exportar CSV
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="btn-secondary" onClick={exportToCSV} disabled={transacoes.length === 0} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              Exportar CSV
+            </button>
+            <button className="btn-primary" onClick={exportToPDF} disabled={transacoes.length === 0} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Baixar PDF
+            </button>
+          </div>
         </header>
 
         {/* Filters Bar */}
