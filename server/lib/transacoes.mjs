@@ -113,9 +113,11 @@ export async function inserirTransacao({ usuario_id, conta_id, categoria_id, sub
   return data[0]
 }
 
-export async function getTransacoes(usuarioId) {
+export async function getTransacoes(usuarioId, filters = {}) {
   const supabaseAdmin = getSupabaseAdmin()
-  const { data, error } = await supabaseAdmin
+  const { dataInicio, dataFim, tipo, categoria_id, status, busca, limit = 500 } = filters
+
+  let query = supabaseAdmin
     .from('transacoes')
     .select(`
       id, tipo, valor, descricao, data_transacao, status,
@@ -123,10 +125,31 @@ export async function getTransacoes(usuarioId) {
       subcategorias(nome)
     `)
     .eq('usuario_id', usuarioId)
+
+  if (dataInicio) query = query.gte('data_transacao', dataInicio)
+  if (dataFim) query = query.lte('data_transacao', dataFim)
+  if (tipo) query = query.eq('tipo', tipo)
+  if (categoria_id) query = query.eq('categoria_id', categoria_id)
+  if (status) query = query.eq('status', status)
+  if (busca) query = query.ilike('descricao', `%${busca}%`)
+
+  const { data, error } = await query
     .order('data_transacao', { ascending: false })
-    .limit(50)
+    .limit(limit)
 
   if (error) throw error
 
   return data
+}
+
+export async function deletarTransacao(id, usuarioId) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const { error } = await supabaseAdmin
+    .from('transacoes')
+    .delete()
+    .eq('id', id)
+    .eq('usuario_id', usuarioId)
+
+  if (error) throw error
+  return true
 }

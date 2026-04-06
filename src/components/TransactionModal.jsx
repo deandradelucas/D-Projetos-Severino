@@ -104,7 +104,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
     tipo: 'DESPESA',
     data_transacao: new Date().toISOString().split('T')[0],
     categoria_id: '',
-    subcategoria_id: ''
+    subcategoria_id: '',
+    status: 'EFETIVADA'
   })
   
   const [displayValor, setDisplayValor] = useState('')
@@ -137,6 +138,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
         descricao: '', 
         categoria_id: '', 
         subcategoria_id: '',
+        status: 'EFETIVADA',
         data_transacao: new Date().toISOString().split('T')[0]
       }))
       
@@ -190,6 +192,13 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
       return
     }
 
+    let finalDescricao = formData.descricao;
+    if (!finalDescricao) {
+      const cat = categorias.find(c => c.id === formData.categoria_id);
+      const sub = cat?.subcategorias?.find(s => s.id === formData.subcategoria_id);
+      finalDescricao = sub?.nome || cat?.nome || '';
+    }
+
     setSaving(true)
     try {
       const res = await fetch('/api/transacoes', {
@@ -198,7 +207,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
           'Content-Type': 'application/json',
           'x-user-id': usuarioId
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ ...formData, descricao: finalDescricao })
       })
       if (res.ok) {
         onSave()
@@ -326,9 +335,33 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Descrição <span style={{ fontSize: '11px', opacity: 0.7, fontWeight: 400, textTransform: 'lowercase' }}>(opcional)</span></label>
-            <input type="text" name="descricao" value={formData.descricao} onChange={handleChange} placeholder="O que você comprou?" className="input-premium" />
+          <div style={{ display: 'grid', gridTemplateColumns: 'min-content 1fr', gap: '24px', alignItems: 'end', marginBottom: '8px' }}>
+            <div className="form-group">
+              <label>Status</label>
+              <div className="status-toggle">
+                <button 
+                  type="button"
+                  className={`status-btn ${formData.status === 'EFETIVADA' ? 'active' : ''}`}
+                  onClick={() => setFormData(prev => ({ ...prev, status: 'EFETIVADA' }))}
+                  title={formData.tipo === 'RECEITA' ? 'Recebido' : 'Pago'}
+                >
+                  {formData.tipo === 'RECEITA' ? 'Recebido' : 'Pago'}
+                </button>
+                <button 
+                  type="button"
+                  className={`status-btn ${formData.status === 'PENDENTE' ? 'active' : ''}`}
+                  onClick={() => setFormData(prev => ({ ...prev, status: 'PENDENTE' }))}
+                  title="Pendente"
+                >
+                  Pendente
+                </button>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Descrição <span style={{ fontSize: '11px', opacity: 0.7, fontWeight: 400, textTransform: 'lowercase' }}>(opcional)</span></label>
+              <input type="text" name="descricao" value={formData.descricao} onChange={handleChange} placeholder="O que você comprou?" className="input-premium" />
+            </div>
           </div>
 
           <div className="modal-actions">

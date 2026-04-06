@@ -117,7 +117,7 @@ app.post('/api/auth/reset-password', async (c) => {
 
 // Transaction and Category Routes
 
-import { getCategorias, inserirTransacao, getTransacoes } from './lib/transacoes.mjs'
+import { getCategorias, inserirTransacao, getTransacoes, deletarTransacao } from './lib/transacoes.mjs'
 
 app.get('/api/categorias', async (c) => {
   try {
@@ -141,7 +141,17 @@ app.get('/api/transacoes', async (c) => {
       return c.json({ message: 'Não autorizado.' }, 401)
     }
 
-    const data = await getTransacoes(usuarioId)
+    const filters = {
+      dataInicio: c.req.query('dataInicio'),
+      dataFim: c.req.query('dataFim'),
+      tipo: c.req.query('tipo'),
+      categoria_id: c.req.query('categoria_id'),
+      status: c.req.query('status'),
+      busca: c.req.query('busca'),
+      limit: c.req.query('limit') ? parseInt(c.req.query('limit')) : undefined
+    }
+
+    const data = await getTransacoes(usuarioId, filters)
     return c.json(data)
   } catch (error) {
     console.error('get transactions failed', error)
@@ -166,6 +176,22 @@ app.post('/api/transacoes', async (c) => {
   } catch (error) {
     console.error('insert transaction failed', error)
     return c.json({ message: error.message || 'Erro ao inserir transação.' }, 500)
+  }
+})
+
+app.delete('/api/transacoes/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) {
+      return c.json({ message: 'Não autorizado.' }, 401)
+    }
+
+    await deletarTransacao(id, usuarioId)
+    return c.json({ message: 'Transação excluída com sucesso.' })
+  } catch (error) {
+    console.error('delete transaction failed', error)
+    return c.json({ message: 'Erro ao excluir transação.' }, 500)
   }
 })
 
