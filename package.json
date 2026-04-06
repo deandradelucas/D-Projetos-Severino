@@ -10,7 +10,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "supabase:check": "node scripts/supabase-admin-check.mjs"
+    "supabase:check": "node scripts/supabase-admin-check.mjs",
+    "backup:drive": "node scripts/run-drive-backup.mjs"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.12",

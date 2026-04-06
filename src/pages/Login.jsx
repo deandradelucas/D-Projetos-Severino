@@ -20,12 +20,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [requestingReset, setRequestingReset] = useState(false)
   const [showSenha, setShowSenha] = useState(false)
-  const [animate, setAnimate] = useState(false)
   const inputsRef = useRef([])
-
-  useEffect(() => {
-    setAnimate(true)
-  }, [])
+  const animate = true
 
   useEffect(() => {
     const savedEmail = window.localStorage.getItem(REMEMBER_EMAIL_KEY)
@@ -87,11 +83,10 @@ export default function Login() {
     }
 
     setRequestingReset(true)
+    const controller = new AbortController()
+    const resetRequestTimeoutId = window.setTimeout(() => controller.abort(), 45000)
 
     try {
-      const controller = new AbortController()
-      const timeoutId = window.setTimeout(() => controller.abort(), 45000)
-
       const response = await fetch('/api/auth/request-password-reset', {
         method: 'POST',
         headers: {
@@ -120,7 +115,7 @@ export default function Login() {
 
       setForgotPasswordState({ text: 'Erro ao conectar com o servidor.', type: 'error', link: '' })
     } finally {
-      window.clearTimeout(timeoutId)
+      window.clearTimeout(resetRequestTimeoutId)
       setRequestingReset(false)
     }
   }
@@ -176,7 +171,7 @@ export default function Login() {
       setTimeout(() => {
         window.location.href = '/dashboard'
       }, 2000)
-    } catch (err) {
+    } catch {
       setMensagem({ texto: 'Erro ao conectar com o banco', tipo: 'erro' })
       setLoading(false)
     }

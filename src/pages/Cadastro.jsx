@@ -25,13 +25,9 @@ export default function Cadastro() {
   const [showSenha, setShowSenha] = useState(false)
   const [showConfirmarSenha, setShowConfirmarSenha] = useState(false)
   const [errors, setErrors] = useState({})
-  const [animate, setAnimate] = useState(false)
   const formRef = useRef(null)
   const inputsRef = useRef([])
-
-  useEffect(() => {
-    setAnimate(true)
-  }, [])
+  const animate = true
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -112,7 +108,7 @@ export default function Cadastro() {
       setTimeout(() => {
         window.location.href = '/login'
       }, 2000)
-    } catch (err) {
+    } catch {
       setMensagem({ texto: 'Erro ao conectar com o banco', tipo: 'erro' })
       setLoading(false)
     }

@@ -3,6 +3,7 @@ import {
   findUserByEmail,
   getExpiresAtIso,
   isValidEmail,
+  resolveAppBaseUrl,
   sendResetEmail,
   storeResetToken,
 } from '../../server/lib/password-reset.mjs'
@@ -10,19 +11,11 @@ import {
 export const runtime = 'nodejs'
 
 function getRequestOrigin(req) {
-  const explicitOrigin = req.headers.origin
-  if (explicitOrigin) {
-    return explicitOrigin
-  }
-
-  const host = req.headers['x-forwarded-host'] || req.headers.host
-  const protocol = req.headers['x-forwarded-proto'] || 'https'
-
-  if (host) {
-    return `${protocol}://${host}`
-  }
-
-  return 'http://localhost:3000'
+  return resolveAppBaseUrl({
+    explicitOrigin: req.headers.origin,
+    host: req.headers['x-forwarded-host'] || req.headers.host,
+    protocol: req.headers['x-forwarded-proto'] || 'https',
+  })
 }
 
 export default async function handler(req, res) {

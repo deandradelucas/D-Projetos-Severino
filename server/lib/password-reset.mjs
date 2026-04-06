@@ -2,6 +2,7 @@ import crypto from 'node:crypto'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 
 const RESET_WINDOW_MINUTES = 30
+const DEFAULT_PUBLIC_APP_URL = 'https://horizontefinanceiro.mestredamente.com'
 
 function sha256(value) {
   return crypto.createHash('sha256').update(value).digest('hex')
@@ -24,20 +25,73 @@ export function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-export function getRequestOrigin(c) {
-  const explicitOrigin = c.req.header('origin')
-  if (explicitOrigin) {
-    return explicitOrigin
+function normalizeBaseUrl(url) {
+  return String(url || '').trim().replace(/\/+$/, '')
+}
+
+function isLocalHost(hostname) {
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '0.0.0.0' ||
+    hostname === '::1'
+  )
+}
+
+function isPrivateIpv4(hostname) {
+  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) {
+    return false
   }
 
+  const parts = hostname.split('.').map(Number)
+
+  return (
+    parts[0] === 10 ||
+    (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
+    (parts[0] === 192 && parts[1] === 168)
+  )
+}
+
+export function resolveAppBaseUrl({ explicitOrigin, host, protocol = 'https' }) {
+  const configuredBaseUrl = normalizeBaseUrl(process.env.APP_BASE_URL || process.env.VITE_APP_BASE_URL)
+  if (configuredBaseUrl) {
+    return configuredBaseUrl
+  }
+
+  if (host) {
+    const hostname = String(host).split(':')[0].trim().toLowerCase()
+
+    if (!isLocalHost(hostname) && !isPrivateIpv4(hostname)) {
+      return `${protocol}://${host}`
+    }
+  }
+
+  if (explicitOrigin) {
+    try {
+      const url = new URL(explicitOrigin)
+      const hostname = url.hostname.trim().toLowerCase()
+
+      if (!isLocalHost(hostname) && !isPrivateIpv4(hostname)) {
+        return normalizeBaseUrl(explicitOrigin)
+      }
+    } catch {
+      // Ignore malformed origins and continue to fallback.
+    }
+  }
+
+  return DEFAULT_PUBLIC_APP_URL
+}
+
+export function getRequestOrigin(c) {
+  const explicitOrigin = c.req.header('origin')
   const host = c.req.header('x-forwarded-host') || c.req.header('host')
   const protocol = c.req.header('x-forwarded-proto') || 'https'
 
-  if (host) {
-    return `${protocol}://${host}`
-  }
-
-  return 'http://localhost:3000'
+  return resolveAppBaseUrl({
+    explicitOrigin,
+    host,
+    protocol,
+  })
 }
 
 export async function findUserByEmail(email) {

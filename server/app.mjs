@@ -9,10 +9,33 @@ import {
   sendResetEmail,
   storeResetToken,
 } from './lib/password-reset.mjs'
+import { runGoogleDriveBackup, validateBackupSecret } from './lib/google-drive-backup.mjs'
 
 const app = new Hono()
 
 app.get('/api/health', (c) => c.json({ ok: true }))
+
+app.post('/api/admin/run-backup', async (c) => {
+  const secret = c.req.header('x-backup-secret')
+
+  if (!validateBackupSecret(secret)) {
+    return c.json({ message: 'Unauthorized backup request.' }, 401)
+  }
+
+  try {
+    const result = await runGoogleDriveBackup({
+      requestedBy: 'local-api',
+    })
+
+    return c.json({
+      message: 'Backup enviado para o Google Drive com sucesso.',
+      backup: result,
+    })
+  } catch (error) {
+    console.error('run-backup failed', error)
+    return c.json({ message: 'Nao foi possivel concluir o backup no Google Drive.' }, 500)
+  }
+})
 
 app.post('/api/auth/request-password-reset', async (c) => {
   try {

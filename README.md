@@ -1,16 +1,40 @@
-# React + Vite
+# Horizonte Financeiro
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicacao React + Vite com autenticacao simples em Supabase, redefinicao de senha por e-mail e rotas server-side para operacoes administrativas.
 
-Currently, two official plugins are available:
+## Backup no Google Drive
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+O projeto agora possui backup server-side da tabela `usuarios` para um arquivo JSON no Google Drive.
 
-## React Compiler
+### Variaveis necessarias
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Adicione no ambiente:
 
-## Expanding the ESLint configuration
+- `GOOGLE_DRIVE_CLIENT_EMAIL`
+- `GOOGLE_DRIVE_PRIVATE_KEY`
+- `GOOGLE_DRIVE_FOLDER_ID`
+- `BACKUP_SECRET`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Observacao:
+- compartilhe a pasta do Google Drive com o e-mail da service account
+- em `GOOGLE_DRIVE_PRIVATE_KEY`, mantenha as quebras como `\n` no `.env`
+
+### Executar manualmente
+
+```bash
+npm run backup:drive
+```
+
+### Executar via API
+
+Endpoint:
+
+```bash
+POST /api/admin/run-backup
+```
+
+Header obrigatorio:
+
+```bash
+x-backup-secret: <BACKUP_SECRET>
+```
