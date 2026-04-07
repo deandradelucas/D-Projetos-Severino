@@ -55,16 +55,21 @@ export async function getPerfilUsuario(usuarioId) {
 export async function registrarLogWhatsApp(telefone, mensagem, status, detalhe, usuarioId = null) {
   const supabaseAdmin = getSupabaseAdmin()
   
-  // Fire and forget
-  supabaseAdmin.from('whatsapp_logs').insert({
-    telefone_remetente: telefone,
-    mensagem_recebida: mensagem,
-    status: status,
-    detalhe_erro: detalhe,
-    usuario_id: usuarioId
-  }).then(({error}) => {
-    if (error) console.error('[DB Log Error] falha ao salvar log do zap:', error)
-  })
+  try {
+    const { error } = await supabaseAdmin.from('whatsapp_logs').insert({
+      telefone_remetente: telefone,
+      mensagem_recebida: mensagem,
+      status: status,
+      detalhe_erro: detalhe,
+      usuario_id: usuarioId
+    })
+    
+    if (error) {
+      console.error('[DB Log Error] falha ao salvar log do zap:', error)
+    }
+  } catch (err) {
+    console.error('[DB Log Panic] erro inesperado ao salvar log:', err)
+  }
 }
 
 export async function getWhatsappLogs(limit = 50) {
