@@ -1,8 +1,9 @@
 /* Default Reset & Variables (Light Mode Glassmorphism) */
 :root {
   --bg-primary: #ecf0f1; 
-  --bg-secondary: #ecf0f1; /* Combina com o plano de fundo para criar a curva transparente */
+  --bg-secondary: #ecf0f1;
   --bg-card: #ffffff;
+  --active-bg: #ffffff; /* Fundo branco para item ativo */
   --border-color: rgba(0, 0, 0, 0.05);
   --text-primary: #0f172a;
   --text-secondary: #64748b;
@@ -11,13 +12,13 @@
   --success: #10b981;
   --danger: #ef4444;
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  --sidebar-bg: rgba(0, 0, 0, 0.85); /* Vitrificado preto profundo 85% */
+  --sidebar-bg: rgba(0, 0, 0, 0.85);
   --sidebar-text: #ffffff;
   --sidebar-text-muted: rgba(255, 255, 255, 0.5);
   --glass-blur: 2px;
   --sidebar-hover-bg: rgba(255, 255, 255, 0.1);
   --sidebar-border-color: #111111;
-  --content-shadow: none; /* Sem sombra no main-content transparente */
+  --content-shadow: none;
   --content-border-color: transparent;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.03);
   --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.06);
@@ -28,10 +29,11 @@
   --bg-primary: #0f172a;
   --bg-secondary: #0f172a;
   --bg-card: #1e293b;
+  --active-bg: #1e293b; /* Fundo do card para item ativo no dark */
   --border-color: rgba(255, 255, 255, 0.05);
   --text-primary: #ffffff;
   --text-secondary: #cbd5e1;
-  --sidebar-bg: rgba(0, 0, 0, 0.85); /* Vitrificado igual aos cards */
+  --sidebar-bg: rgba(0, 0, 0, 0.85);
   --sidebar-text: #ffffff;
   --sidebar-text-muted: rgba(255, 255, 255, 0.5);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
@@ -46,6 +48,7 @@
   --bg-primary: #05070a;
   --bg-secondary: rgba(255, 255, 255, 0.03);
   --bg-card: rgba(255, 255, 255, 0.05);
+  --active-bg: rgba(255, 255, 255, 0.08); /* Fundo mais claro para glass */
   --border-color: rgba(255, 255, 255, 0.1);
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.6);
@@ -256,27 +259,28 @@ h3 {
 
 .nav-item.active {
   font-weight: 700;
-  width: calc(100% + 26px);
-  margin-right: -26px; 
-  padding-right: 32px;
-  border-radius: 32px 0 0 32px;
+  width: calc(100% + 60px);
+  margin-right: -60px;
+  padding-right: 80px;
+  border-radius: 28px 0 0 28px;
   z-index: 30;
   box-shadow: none;
+  background-color: var(--active-bg);
 }
 
-/* Curvas líquidas moleculares precisas - Alinhadas com a borda da sidebar */
+/* Curvas líquidas suaves com boca mais aberta */
 .nav-item.active::before {
-  top: -24px;
-  background: var(--bg-secondary);
-  -webkit-mask-image: radial-gradient(circle at 0% 0%, transparent 24px, black 24.5px);
-  mask-image: radial-gradient(circle at 0% 0%, transparent 24px, black 24.5px);
+  top: -28px;
+  background: var(--active-bg);
+  -webkit-mask-image: radial-gradient(circle at 0% 100%, transparent 28px, black 28.5px);
+  mask-image: radial-gradient(circle at 0% 100%, transparent 28px, black 28.5px);
 }
 
 .nav-item.active::after {
-  bottom: -24px;
-  background: var(--bg-secondary);
-  -webkit-mask-image: radial-gradient(circle at 0% 100%, transparent 24px, black 24.5px);
-  mask-image: radial-gradient(circle at 0% 100%, transparent 24px, black 24.5px);
+  bottom: -28px;
+  background: var(--active-bg);
+  -webkit-mask-image: radial-gradient(circle at 0% 0%, transparent 28px, black 28.5px);
+  mask-image: radial-gradient(circle at 0% 0%, transparent 28px, black 28.5px);
 }
 
 .nav-item svg {
@@ -337,7 +341,7 @@ h3 {
 /* Main Content */
 .main-content {
   flex: 1;
-  background-color: transparent; /* Canvas Flutuante */
+  background-color: var(--bg-card); /* Fundo do card para combinar com o menu ativo */
   color: var(--text-primary);
   border: none;
   padding: 12px 24px 24px 24px;
@@ -345,6 +349,7 @@ h3 {
   position: relative;
   z-index: 10;
   box-shadow: none;
+  border-radius: 40px;
 }
 
 .top-header {
