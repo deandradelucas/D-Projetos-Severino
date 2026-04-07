@@ -1,7 +1,7 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { loadEnv } from './load-env.mjs'
 
-const GEMINI_MODEL = 'gemini-2.0-flash'
+const GEMINI_MODEL = 'gemini-2.5-flash'
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`
 
 /**
