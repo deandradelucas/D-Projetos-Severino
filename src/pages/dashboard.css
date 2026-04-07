@@ -267,7 +267,7 @@ h3 {
 
 .nav-item.active svg {
   opacity: 1;
-  color: #000000; /* Ícone preto no fundo claro da aba ativa */
+  color: var(--accent); /* Usando a cor de destaque para o ícone ativo */
 }
 
 /* Sidebar Logout Button */
@@ -309,10 +309,10 @@ h3 {
 }
 
 .nav-item.active .icon-wrap {
-  background: #000;
-  color: #fff;
+  background: rgba(212, 168, 75, 0.1); /* Fundo sutil com a cor de destaque */
+  color: var(--accent);
   opacity: 1;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(212, 168, 75, 0.1);
 }
 
 /* Main Content */
