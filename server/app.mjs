@@ -168,7 +168,8 @@ app.put('/api/usuarios/telefone', async (c) => {
 
 // Webhook Whatsapp Local Handler
 app.post('/api/whatsapp/webhook', async (c) => {
-  return handleWhatsAppWebhook(c.req)
+  const result = await handleWhatsAppWebhook(c.req)
+  return c.json(result.json, result.status)
 })
 
 // Webhook Logs Admin (Simplified Admin route based on user ID checking logic for the future, right now just returning all)
