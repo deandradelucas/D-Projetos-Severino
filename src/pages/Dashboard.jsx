@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, lazy, Suspense } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
@@ -52,50 +52,9 @@ const SkeletonChart = ({ ref: externalRef }) => (
   </div>
 )
 
-const LazyChart = lazy(() => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(import('../components/Charts/ExpenseChart'))
-    }, 100)
-  })
-})
 
-const ChartFallback = () => <SkeletonChart />
 
-const ChartSection = () => {
-  const [visible, setVisible] = useState(false)
-  const containerRef = useRef(null)
-  
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: '200px' }
-    )
-    
-    if (containerRef.current) {
-      observer.observe(containerRef.current)
-    }
-    
-    return () => observer.disconnect()
-  }, [])
-  
-  return (
-    <div ref={containerRef}>
-      {visible ? (
-        <Suspense fallback={<ChartFallback />}>
-          <LazyChart />
-        </Suspense>
-      ) : (
-        <ChartFallback />
-      )}
-    </div>
-  )
-}
+
 
 const COLORS = [] // Não mais usado no dashboard
 
@@ -326,8 +285,7 @@ export default function Dashboard() {
               </div>
             </section>
 
-            {/* Lazy-loaded Chart Section */}
-            {!loading && <ChartSection />}
+
           </div>
         ) }
       </main>
