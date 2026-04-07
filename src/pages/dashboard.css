@@ -3,7 +3,7 @@
   --bg-primary: #ecf0f1; 
   --bg-secondary: #ecf0f1;
   --bg-card: #ffffff;
-  --active-bg: rgba(255, 255, 255, 0.7); /* Vidro translúcido */
+  --active-bg: #ffffff; /* Volta ao branco sólido */
   --border-color: rgba(0, 0, 0, 0.05);
   --text-primary: #0f172a;
   --text-secondary: #64748b;
@@ -29,7 +29,7 @@
   --bg-primary: #0f172a;
   --bg-secondary: #0f172a;
   --bg-card: #1e293b;
-  --active-bg: rgba(30, 41, 59, 0.7); /* Vidro escuro */
+  --active-bg: #1e293b; /* Volta ao sólido no dark */
   --border-color: rgba(255, 255, 255, 0.05);
   --text-primary: #ffffff;
   --text-secondary: #cbd5e1;
@@ -235,23 +235,17 @@ h3 {
 
 .nav-item.active {
   font-weight: 700;
-  width: calc(100% + 60px);
-  margin-right: -60px;
+  width: calc(100% + 14px);
+  margin-right: -14px;
   background-color: var(--active-bg);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  backdrop-filter: blur(12px) saturate(180%);
   color: #000000 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-right: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* Curvas líquidas suaves com boca mais aberta */
 .nav-item.active::before {
   top: -28px;
   background: var(--active-bg);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  backdrop-filter: blur(12px) saturate(180%);
   -webkit-mask-image: radial-gradient(circle at 100% 0%, transparent 28px, black 28px);
   mask-image: radial-gradient(circle at 100% 0%, transparent 28px, black 28px);
 }
@@ -259,8 +253,6 @@ h3 {
 .nav-item.active::after {
   bottom: -28px;
   background: var(--active-bg);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  backdrop-filter: blur(12px) saturate(180%);
   -webkit-mask-image: radial-gradient(circle at 100% 100%, transparent 28px, black 28px);
   mask-image: radial-gradient(circle at 100% 100%, transparent 28px, black 28px);
 }
