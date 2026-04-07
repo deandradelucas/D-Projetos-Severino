@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -24,7 +26,9 @@ function MarkdownText({ text }) {
 }
 
 export default function HorizonChat() {
+  const location = useLocation()
   const [aberto, setAberto] = useState(false)
+
   const [mensagens, setMensagens] = useState([
     {
       id: 1,
@@ -99,7 +103,12 @@ export default function HorizonChat() {
     }
   }
 
+  if (['/login', '/cadastro', '/'].includes(location.pathname)) {
+    return null
+  }
+
   return (
+
     <>
       {/* Botão Flutuante */}
       <button

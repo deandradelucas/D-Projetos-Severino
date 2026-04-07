@@ -18,10 +18,12 @@
   --glass-blur: 2px;
   --sidebar-hover-bg: rgba(255, 255, 255, 0.1);
   --sidebar-border-color: #111111;
-  --content-shadow: none;
-  --content-border-color: transparent;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.06);
+  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --content-border-color: rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Dark Mode (Liquid Glassmorphism) */
@@ -63,14 +65,14 @@
 .dashboard-container {
   font-family: var(--font-family);
   background-color: var(--bg-primary);
-  /* #0a0a0a */
   color: var(--text-primary);
   display: flex;
   height: 100vh;
   overflow: hidden;
   width: 100%;
   padding: 24px;
-  gap: 0; /* Removido para permitir que o menu derreta no card */
+  gap: 24px;
+  position: relative;
 }
 
 /* Typography */
@@ -307,9 +309,10 @@ h3 {
 }
 
 .nav-item.active .icon-wrap {
-  background: rgba(212, 168, 75, 0.15);
-  color: var(--accent);
+  background: #000;
+  color: #fff;
   opacity: 1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Main Content */
@@ -322,8 +325,13 @@ h3 {
   overflow-y: auto;
   position: relative;
   z-index: 10;
-  box-shadow: none;
   border-radius: 40px;
+  animation: contentFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes contentFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .top-header {
@@ -520,8 +528,8 @@ h3 {
   top: 0; left: 0; right: 0; bottom: 0;
   background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.83v58.34h-58.34l-.83-.83A59.998 59.998 0 0054.627 0zM29.813 0l.83.83v28.34h-28.34l-.83-.83A29.998 29.998 0 0029.813 0z' fill='%23ffffff' fill-opacity='0.02' fill-rule='evenodd'/%3E%3C/svg%3E");
   pointer-events: none;
-  opacity: 0.5;
-  transition: opacity 0.3s ease;
+  opacity: 0.3;
+  transition: opacity 0.4s ease;
 }
 
 .kpi-card:hover {
@@ -591,10 +599,10 @@ h3 {
 .content-section {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 20px;
+  border-radius: 24px;
   padding: 32px;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.3s ease;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  transition: var(--transition-base);
 }
 
 .content-section:hover {
@@ -605,24 +613,36 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
 }
 
 .btn-primary {
   background: var(--accent);
   color: #000;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: 700;
   font-size: 13px;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(212, 168, 75, 0.2);
 }
 
 .btn-primary:hover {
   background: var(--accent-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(212, 168, 75, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .data-table {
@@ -639,10 +659,12 @@ h3 {
 
 .data-table th {
   color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .data-table td {
@@ -650,11 +672,17 @@ h3 {
 }
 
 .data-table tbody tr {
-  transition: background-color 0.2s ease;
+  transition: var(--transition-base);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .data-table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: rgba(0, 0, 0, 0.015);
+  transform: scale(1.002);
+}
+
+[data-theme='dark'] .data-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 .badge {

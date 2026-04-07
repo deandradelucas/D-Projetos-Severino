@@ -159,7 +159,7 @@ export default function Dashboard() {
             </button>
             <div>
               <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '8px', letterSpacing: '-0.02em' }}>
-                Dashboard
+                Olá, {usuario.nome}!
               </h1>
               <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>
                 Resumo geral deste mês
@@ -257,25 +257,41 @@ export default function Dashboard() {
                     <tbody>
                       {transacoes.slice(0, 8).map(t => (
                         <tr key={t.id}>
-                           <td style={{ minWidth: '85px' }}>
-                             <div style={{ fontSize: '13px', fontWeight: 500 }}>{new Date(t.data_transacao).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</div>
-                             <div style={{ fontSize: '11px', opacity: 0.6 }}>{new Date(t.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
+                           <td style={{ minWidth: '100px', padding: '16px 20px' }}>
+                             <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                               {new Date(t.data_transacao).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                             </div>
+                             <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                               {new Date(t.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                             </div>
                            </td>
-                          <td>
-                            <div style={{ fontWeight: 500 }}>
-                              {t.categorias?.nome || 'Sem categoria'}
-                              {t.recorrente_index && (
-                                <span style={{ marginLeft: '6px', fontSize: '10px', color: 'var(--accent)', fontWeight: 700 }}>
-                                  ({t.recorrente_index}/{t.recorrente_total})
-                                </span>
-                              )}
-                            </div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-                              {t.subcategorias?.nome || ''}
+                          <td style={{ padding: '16px 20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div style={{ 
+                                width: '8px', 
+                                height: '8px', 
+                                borderRadius: '50%', 
+                                background: t.categorias?.cor || 'var(--accent)',
+                                boxShadow: `0 0 8px ${t.categorias?.cor || 'var(--accent)'}40`
+                              }} />
+                              <div>
+                                <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>
+                                  {t.categorias?.nome || 'Sem categoria'}
+                                  {t.recorrente_index && (
+                                    <span style={{ marginLeft: '6px', fontSize: '10px', color: 'var(--accent)', fontWeight: 700, background: 'var(--accent)20', padding: '1px 5px', borderRadius: '4px' }}>
+                                      {t.recorrente_index}/{t.recorrente_total}
+                                    </span>
+                                  )}
+                                </div>
+                                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                  {t.subcategorias?.nome || 'Geral'}
+                                </div>
+                              </div>
                             </div>
                           </td>
-                          <td className={`${t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'} ${privacyMode ? 'privacy-blur' : ''}`} style={{ fontWeight: 600, textAlign: 'right' }}>
-                            {t.tipo === 'RECEITA' ? '+' : '-'} {formatCurrency(t.valor)}
+                          <td className={`${t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'} ${privacyMode ? 'privacy-blur' : ''}`} style={{ fontWeight: 700, textAlign: 'right', fontSize: '15px', padding: '16px 20px' }}>
+                            <span style={{ opacity: 0.8, fontSize: '12px', marginRight: '4px' }}>{t.tipo === 'RECEITA' ? '+' : '-'}</span> 
+                            {formatCurrency(t.valor)}
                           </td>
                         </tr>
                       ))}
