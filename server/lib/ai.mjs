@@ -150,3 +150,71 @@ ${contexto ? `--- DADOS FINANCEIROS ATUAIS DO USUÁRIO ---\n${contexto}\n--- FIM
 
   return text
 }
+
+/**
+ * Interpreta uma mensagem de texto (ex: WhatsApp) e a transforma em um objeto de transação.
+ * @param {string} message - A mensagem enviada pelo usuário
+ * @param {Array} categoriasUsuario - Array das categorias do usuário para mapeamento
+ * @returns {Promise<Object>} JSON estruturado
+ */
+export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
+  loadEnv()
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
+
+  // Mapeamos as categorias disponíveis para a IA de forma resumida
+  const catMap = categoriasUsuario.map(c => 
+    `Categoria: "${c.nome}" (Tipo: ${c.tipo}, ID: ${c.id}) | Subcategorias: ${c.subcategorias.map(s => `"${s.nome}" (ID: ${s.id})`).join(', ')}`
+  ).join('\n')
+
+  const systemPrompt = `Você é um robô de extração financeira. Seu papel é receber uma mensagem de texto de um usuário do WhatsApp e transformá-la num JSON estrito contendo os dados da transação financeira.
+
+REGRAS:
+1. Retorne APENAS um objeto JSON válido, sem \`\`\`json, sem textos extras em volta.
+2. Campos do JSON que você deve retornar:
+  - "tipo": "RECEITA" ou "DESPESA" (obrigatório)
+  - "valor": um número float representando o valor (obrigatório, se não achar tente deduzir, caso contrário retorne nulo)
+  - "descricao": uma breve string do que foi o gasto/receita (obrigatório)
+  - "categoria_id": a UUID da categoria mais próxima na lista fornecida. Se nenhuma bater, retorne null.
+  - "subcategoria_id": a UUID da subcategoria mais próxima. Se nenhuma bater, retorne null.
+
+DADOS DO USUÁRIO PARA MAPEAR:
+${catMap || 'O usuário não tem categorias configuradas.'}
+
+MENSAGEM RECEBIDA PARA ANÁLISE:
+"${message}"
+
+(Lembre-se: Retorne SOMENTE o JSON puro.)`
+
+  const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{
+        role: 'user',
+        parts: [{ text: systemPrompt }]
+      }],
+      generationConfig: {
+        maxOutputTokens: 500,
+        temperature: 0.2, // Baixa temperatura para ser o mais determinístico possível
+      }
+    })
+  })
+
+  if (!response.ok) {
+    throw new Error('Falha na API da IA ao analisar mensagem.')
+  }
+
+  const json = await response.json()
+  let text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+  
+  text = text.trim()
+  if (text.startsWith('\`\`\`json')) text = text.replace('\`\`\`json', '').replace('\`\`\`', '')
+  else if (text.startsWith('\`\`\`')) text = text.replace('\`\`\`', '').replace('\`\`\`', '')
+
+  try {
+    return JSON.parse(text.trim())
+  } catch (parseError) {
+    throw new Error('A IA não conseguiu estruturar os dados da mensagem (' + message + ') corretamente.')
+  }
+}
