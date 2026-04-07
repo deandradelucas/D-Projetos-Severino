@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react'
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
@@ -116,7 +116,6 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [transacoes, setTransacoes] = useState([])
   const [loading, setLoading] = useState(true)
-  const [chartVisible, setChartVisible] = useState(false)
   const chartRef = useRef(null)
 
   const fetchTransacoes = React.useCallback(async () => {
@@ -151,7 +150,6 @@ export default function Dashboard() {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setChartVisible(true)
           observer.disconnect()
         }
       },
@@ -193,7 +191,12 @@ export default function Dashboard() {
         <header className="top-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <button className="mobile-menu-btn" onClick={() => setMenuAberto(true)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="7" height="7" x="3" y="3" rx="1"/>
+                <rect width="7" height="7" x="14" y="3" rx="1"/>
+                <rect width="7" height="7" x="14" y="14" rx="1"/>
+                <rect width="7" height="7" x="3" y="14" rx="1"/>
+              </svg>
             </button>
             <div>
               <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '8px', letterSpacing: '-0.02em' }}>
