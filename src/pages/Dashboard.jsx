@@ -4,9 +4,8 @@ import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
 import Sidebar from '../components/Sidebar'
 import { useTheme } from '../context/ThemeContext'
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 
-const COLORS = ['#d4a84b', '#0f172a', '#1e293b', '#334155', '#475569', '#64748b']
+const COLORS = [] // Não mais usado no dashboard
 
 export default function Dashboard() {
   const { privacyMode } = useTheme()
@@ -64,16 +63,6 @@ export default function Dashboard() {
       }
       return acc
     }, { totalReceitas: 0, totalDespesas: 0, saldoTotal: 0 })
-  }, [transacoes])
-
-  const chartData = React.useMemo(() => {
-    const categories = {}
-    transacoes.filter(t => t.tipo === 'DESPESA').forEach(t => {
-      const catName = t.categorias?.nome || 'Outros'
-      categories[catName] = (categories[catName] || 0) + Math.abs(parseFloat(t.valor))
-    })
-    return Object.entries(categories).map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
   }, [transacoes])
 
   const formatCurrency = (val) => {
@@ -223,44 +212,7 @@ export default function Dashboard() {
               </div>
             </section>
 
-            {/* Chart Section */}
-            <div className="chart-card">
-              <div className="chart-header">
-                <h3>Despesas por Categoria</h3>
-              </div>
-              <div style={{ flex: 1, minHeight: '300px' }}>
-                {loading ? (
-                  <div className="skeleton skeleton-chart"></div>
-                ) : chartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={chartData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        formatter={(value) => privacyMode ? 'R$ ••••••' : formatCurrency(value)}
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                      />
-                      <Legend verticalAlign="bottom" height={36}/>
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '14px' }}>
-                    Sem dados de despesa para exibir.
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Chart Section removido a pedido do usuário */}
           </div>
         ) }
       </main>

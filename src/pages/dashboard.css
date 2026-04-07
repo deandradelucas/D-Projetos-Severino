@@ -11,10 +11,10 @@
   --success: #10b981;
   --danger: #ef4444;
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  --sidebar-bg: #050505; /* Full Black Solicitado */
+  --sidebar-bg: rgba(0, 0, 0, 0.85); /* Vitrificado preto profundo 85% */
   --sidebar-text: #ffffff;
   --sidebar-text-muted: rgba(255, 255, 255, 0.5);
-  --glass-blur: 0px;
+  --glass-blur: 2px;
   --sidebar-hover-bg: rgba(255, 255, 255, 0.1);
   --sidebar-border-color: #111111;
   --content-shadow: none; /* Sem sombra no main-content transparente */
@@ -31,7 +31,7 @@
   --border-color: rgba(255, 255, 255, 0.05);
   --text-primary: #ffffff;
   --text-secondary: #cbd5e1;
-  --sidebar-bg: #000000; /* Full Black Solicitado */
+  --sidebar-bg: rgba(0, 0, 0, 0.85); /* Vitrificado igual aos cards */
   --sidebar-text: #ffffff;
   --sidebar-text-muted: rgba(255, 255, 255, 0.5);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
@@ -82,8 +82,8 @@ h3 {
 .sidebar {
   width: 260px;
   background: var(--sidebar-bg);
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--sidebar-border-color);
   border-radius: 40px; /* Mais arredondado estilo cápsula */
   padding: 32px 14px;
@@ -91,6 +91,18 @@ h3 {
   flex-direction: column;
   position: relative;
   z-index: 20;
+  overflow: hidden; /* Para a textura não vazar */
+}
+
+/* Textura vitrificada para a Sidebar (igual aos cards) */
+.sidebar::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.83v58.34h-58.34l-.83-.83A59.998 59.998 0 0054.627 0zM29.813 0l.83.83v28.34h-28.34l-.83-.83A29.998 29.998 0 0029.813 0z' fill='%23ffffff' fill-opacity='0.02' fill-rule='evenodd'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: -1;
 }
 
 .brand-wrapper {
@@ -113,27 +125,27 @@ h3 {
   position: relative;
 }
 
-/* Bolinha indicadora animada que desce suavemente */
+/* Bolinha indicadora animada que desce suavemente (Bolinha Preta no Final) */
 .nav-menu::before {
   content: "";
   position: absolute;
-  left: 6px;
+  right: 16px; /* Ajustado um pouco para a esquerda para não ficar colado na borda */
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 8px rgba(212, 168, 75, 0.4);
-  transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #000000; /* Bolinha preta solicitada */
+  box-shadow: none; /* Removida sombra para ficar mais limpo */
+  transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Efeito de 'queda' e 'subida' com peso (Back Out) */
   z-index: 50;
-  top: 20px; /* Posição padrão (1º item) */
+  top: 28px; /* Centralizado no 1º item (64px height total / 2 - 4px dot) */
 }
 
 /* Posições da bolinha para cada item do menu */
 /* Cada item = 14px padding top + ~22px icon height/2 ≈ center. Item height ≈ 50px, gap = 8px */
-.nav-menu:has(li:nth-child(1) > .nav-item.active)::before { top: 20px; }
-.nav-menu:has(li:nth-child(2) > .nav-item.active)::before { top: 78px; }
-.nav-menu:has(li:nth-child(3) > .nav-item.active)::before { top: 136px; }
-.nav-menu:has(li:nth-child(4) > .nav-item.active)::before { top: 194px; }
+.nav-menu:has(li:nth-child(1) > .nav-item.active)::before { top: 28px; }
+.nav-menu:has(li:nth-child(2) > .nav-item.active)::before { top: 100px; }
+.nav-menu:has(li:nth-child(3) > .nav-item.active)::before { top: 172px; }
+.nav-menu:has(li:nth-child(4) > .nav-item.active)::before { top: 244px; }
 
 .nav-item {
   display: flex;
@@ -197,6 +209,32 @@ h3 {
 
 .nav-item.active svg {
   opacity: 1;
+  color: #000000; /* Ícone preto no fundo claro da aba ativa */
+}
+
+/* Sidebar Logout Button */
+.logout-btn {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px);
 }
 
 /* Icon Wrap effect for the image's sleek icons */
@@ -386,8 +424,10 @@ h3 {
 }
 
 .kpi-card {
-  background: #000000; /* Full Black Requested */
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.85); /* Vidro preto profundo */
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 24px;
   display: flex;
@@ -397,7 +437,7 @@ h3 {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  color: #ffffff; /* Text color for full black cards */
+  color: #ffffff;
 }
 
 /* Texture pattern for Aviation visual */
@@ -446,8 +486,8 @@ h3 {
 }
 
 .kpi-card.accent {
-  background: #000000;
-  border-color: rgba(212, 168, 75, 0.25);
+  background: rgba(0, 0, 0, 0.85);
+  border-color: rgba(212, 168, 75, 0.2);
   box-shadow: 0 10px 40px rgba(212, 168, 75, 0.05);
 }
 
@@ -1130,7 +1170,7 @@ h3 {
 
 .dashboard-grid-main {
   display: grid;
-  grid-template-columns: 1.8fr 1fr;
+  grid-template-columns: 1fr;
   gap: 24px;
   margin-bottom: 32px;
 }

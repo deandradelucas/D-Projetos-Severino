@@ -68,35 +68,10 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
 
         {/* Botão Sair — empurrado para o rodapé */}
         <button
+          className="logout-btn"
           onClick={() => {
             localStorage.removeItem('horizonte_user')
             window.location.href = '/'
-          }}
-          style={{
-            marginTop: 'auto',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '14px 20px',
-            borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.06)',
-            background: 'rgba(255,255,255,0.03)',
-            color: 'rgba(255,255,255,0.45)',
-            fontSize: '14px',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            width: '100%',
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.background = 'rgba(239,68,68,0.1)'
-            e.currentTarget.style.color = '#ef4444'
-            e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
-            e.currentTarget.style.color = 'rgba(255,255,255,0.45)'
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
           }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
