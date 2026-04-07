@@ -130,48 +130,109 @@ h3 {
   position: relative;
 }
 
-/* Bolinha indicadora animada que desce suavemente (Bolinha Preta no Final) */
+/* Bolinha indicadora animada com glow e trail effect */
 .nav-menu::before {
   content: "";
   position: absolute;
-  right: 16px; /* Ajustado um pouco para a esquerda para não ficar colado na borda */
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #111111 0%, #444444 50%, #111111 100%);
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s infinite linear, skeleton-pulse 2s infinite ease-in-out;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #000000;
+  box-shadow: 
+    0 0 8px 2px rgba(0, 0, 0, 0.8),
+    0 0 16px 4px rgba(0, 0, 0, 0.4),
+    0 0 32px 8px rgba(0, 0, 0, 0.2),
+    inset 0 0 4px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   z-index: 55;
   top: 28px;
-  right: 18px; /* Ajustada para ficar centralizada no novo item bridge */
+  right: 18px;
+  animation: dot-glow 2s infinite ease-in-out;
 }
 
-@keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+@keyframes dot-glow {
+  0%, 100% { 
+    box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.8), 0 0 16px 4px rgba(0, 0, 0, 0.4), 0 0 32px 8px rgba(0, 0, 0, 0.2);
+  }
+  50% { 
+    box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.9), 0 0 24px 6px rgba(0, 0, 0, 0.5), 0 0 40px 10px rgba(0, 0, 0, 0.3);
+  }
 }
 
-@keyframes skeleton-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.2); opacity: 1; }
+/* Trail effect - sombra que segue a bolinha */
+.nav-menu::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 
+    0 0 6px 2px rgba(0, 0, 0, 0.3),
+    0 0 12px 4px rgba(0, 0, 0, 0.15);
+  transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 54;
+  top: 30px;
+  right: 18px;
+  opacity: 0.6;
+  animation: dot-trail 2s infinite ease-in-out;
+}
+
+@keyframes dot-trail {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% { 
+    opacity: 0.6;
+    transform: scale(1);
+  }
 }
 
 /* Posições da bolinha para cada item do menu */
-/* Cada item = 14px padding top + ~22px icon height/2 ≈ center. Item height ≈ 50px, gap = 8px */
 .nav-menu:has(li:nth-child(1) > .nav-item.active)::before { top: 28px; }
+.nav-menu:has(li:nth-child(1) > .nav-item.active)::after { top: 30px; }
 .nav-menu:has(li:nth-child(2) > .nav-item.active)::before { top: 100px; }
+.nav-menu:has(li:nth-child(2) > .nav-item.active)::after { top: 102px; }
 .nav-menu:has(li:nth-child(3) > .nav-item.active)::before { top: 172px; }
+.nav-menu:has(li:nth-child(3) > .nav-item.active)::after { top: 174px; }
 .nav-menu:has(li:nth-child(4) > .nav-item.active)::before { top: 244px; }
+.nav-menu:has(li:nth-child(4) > .nav-item.active)::after { top: 246px; }
+
+/* Burst effect quando troca de menu */
+@keyframes dot-burst {
+  0% { 
+    transform: scale(1);
+    box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.8), 0 0 16px 4px rgba(0, 0, 0, 0.4), 0 0 32px 8px rgba(0, 0, 0, 0.2);
+  }
+  30% { 
+    transform: scale(1.6);
+    box-shadow: 0 0 16px 6px rgba(0, 0, 0, 0.95), 0 0 32px 12px rgba(0, 0, 0, 0.6), 0 0 48px 16px rgba(0, 0, 0, 0.3);
+  }
+  100% { 
+    transform: scale(1);
+    box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.8), 0 0 16px 4px rgba(0, 0, 0, 0.4), 0 0 32px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.nav-menu:has(li:nth-child(1) > .nav-item.active)::before,
+.nav-menu:has(li:nth-child(2) > .nav-item.active)::before,
+.nav-menu:has(li:nth-child(3) > .nav-item.active)::before,
+.nav-menu:has(li:nth-child(4) > .nav-item.active)::before {
+  animation: dot-burst 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
 
 /* Recharts Legend Dots (Bolinhas dos Gráficos) */
 .recharts-legend-item-marker {
-  animation: skeleton-pulse 2s infinite ease-in-out;
+  animation: pulse 2s infinite ease-in-out;
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.4));
 }
 
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
 
 .nav-item {
   display: flex;
@@ -220,12 +281,12 @@ h3 {
 
 .nav-item.active::before {
   top: -24px;
-  background: radial-gradient(circle at 100% 100%, transparent 24px, var(--bg-secondary) 24.5px);
+  background: radial-gradient(circle at 100% 100%, transparent 24px, var(--sidebar-bg) 24.5px);
 }
 
 .nav-item.active::after {
   bottom: -24px;
-  background: radial-gradient(circle at 100% 0%, transparent 24px, var(--bg-secondary) 24.5px);
+  background: radial-gradient(circle at 100% 0%, transparent 24px, var(--sidebar-bg) 24.5px);
 }
 
 .nav-item svg {
