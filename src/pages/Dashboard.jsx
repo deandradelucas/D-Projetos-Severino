@@ -96,21 +96,13 @@ export default function Dashboard() {
               <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
             </button>
             <div>
-              <h1 style={{ fontSize: '24px', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                Olá, {usuario.nome} 👋
+              <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '8px', letterSpacing: '-0.02em' }}>
+                Dashboard
               </h1>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-                Aqui está o resumo financeiro da sua conta.
+              <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>
+                Resumo geral deste mês
               </p>
             </div>
-          </div>
-          
-          <div className="user-profile">
-            <div style={{ textAlign: 'right', display: 'none' }} className="sm:block">
-              <div style={{ fontWeight: 500, fontSize: '14px' }}>{usuario.nome}</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{usuario.email || 'usuário autenticado'}</div>
-            </div>
-            <div className="avatar">{usuario.nome.charAt(0).toUpperCase()}</div>
           </div>
         </header>
 

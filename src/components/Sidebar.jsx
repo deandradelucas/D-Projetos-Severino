@@ -1,16 +1,8 @@
 import { NavLink } from 'react-router-dom'
-import { useTheme } from '../context/ThemeContext'
 
 export default function Sidebar({ menuAberto, setMenuAberto }) {
-  const { theme } = useTheme()
-  
-  // No Modo Escuro, o menu é Branco (logo Escuro). 
-  // No Modo Claro, o menu é Escuro (logo Claro).
-  const isSidebarDark = theme === 'light' || theme === 'glass'
-  
-  const logoSrc = isSidebarDark 
-    ? '/images/horizonte_fiel_original_logo_dark.png' 
-    : '/images/horizonte_fiel_original_logo_light.png'
+  // Sidebar agora é sempre Full Black, logo sempre usa a versão clara (branca)
+  const logoSrc = '/images/horizonte_fiel_original_logo_light.png'
   return (
     <>
       {/* Mobile Backdrop */}
@@ -19,7 +11,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
       )}
 
       <aside className={`sidebar ${menuAberto ? 'open' : ''}`}>
-        <div className="brand-wrapper">
+        <div className="brand-wrapper" style={{ marginBottom: '20px' }}>
           <img 
             src={logoSrc} 
             alt="Horizonte Financeiro" 
@@ -73,6 +65,47 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             </NavLink>
           </li>
         </ul>
+
+        {/* Botão Sair — empurrado para o rodapé */}
+        <button
+          onClick={() => {
+            localStorage.removeItem('horizonte_user')
+            window.location.href = '/'
+          }}
+          style={{
+            marginTop: 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '14px 20px',
+            borderRadius: '16px',
+            border: '1px solid rgba(255,255,255,0.06)',
+            background: 'rgba(255,255,255,0.03)',
+            color: 'rgba(255,255,255,0.45)',
+            fontSize: '14px',
+            fontWeight: 500,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            width: '100%',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = 'rgba(239,68,68,0.1)'
+            e.currentTarget.style.color = '#ef4444'
+            e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+            e.currentTarget.style.color = 'rgba(255,255,255,0.45)'
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+          }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" x2="9" y1="12" y2="12" />
+          </svg>
+          Sair
+        </button>
       </aside>
     </>
   )
