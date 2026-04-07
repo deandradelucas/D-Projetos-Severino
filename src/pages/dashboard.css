@@ -198,36 +198,35 @@ h3 {
   background-color: var(--bg-secondary); 
   color: var(--text-primary);
   font-weight: 700;
-  width: calc(100% + 15px); /* Ponte para o conteúdo */
-  margin-right: -15px; /* Puxa para a borda */
-  padding-right: 42px;
-  border-radius: 30px 0 0 30px;
+  width: calc(100% + 24px); /* Ponte exata para o conteúdo */
+  margin-right: -24px; /* Alinha com a borda da sidebar */
+  padding-right: 32px;
+  border-radius: 32px 0 0 32px;
   z-index: 30;
   box-shadow: none;
 }
-/* Liquid corners for a perfect molecular melt */
+
+/* Curvas líquidas moleculares precisas */
 .nav-item.active::before,
 .nav-item.active::after {
   content: "";
   position: absolute;
-  right: -1px; /* Alinhado exatamente na borda da sidebar */
-  width: 30px;
-  height: 30px;
+  right: 0;
+  width: 24px;
+  height: 24px;
   background-color: transparent;
   pointer-events: none;
-  z-index: 25;
+  z-index: 21;
 }
 
 .nav-item.active::before {
-  top: -30px;
-  border-bottom-right-radius: 30px;
-  box-shadow: 15px 15px 0 15px var(--bg-secondary);
+  top: -24px;
+  background: radial-gradient(circle at 0% 0%, transparent 24px, var(--bg-secondary) 24.5px);
 }
 
 .nav-item.active::after {
-  bottom: -30px;
-  border-top-right-radius: 30px;
-  box-shadow: 15px -15px 0 15px var(--bg-secondary);
+  bottom: -24px;
+  background: radial-gradient(circle at 100% 0%, transparent 24px, var(--bg-secondary) 24.5px);
 }
 
 .nav-item svg {
