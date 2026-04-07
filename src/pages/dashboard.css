@@ -133,11 +133,24 @@ h3 {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #000000; /* Bolinha preta solicitada */
-  box-shadow: none; /* Removida sombra para ficar mais limpo */
-  transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Efeito de 'queda' e 'subida' com peso (Back Out) */
+  background: linear-gradient(90deg, #000000 0%, #333333 50%, #000000 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite linear, skeleton-pulse 2s infinite ease-in-out;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Borda sutil para o efeito skeleton */
+  transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   z-index: 50;
-  top: 28px; /* Centralizado no 1º item (64px height total / 2 - 4px dot) */
+  top: 28px;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
 }
 
 /* Posições da bolinha para cada item do menu */
