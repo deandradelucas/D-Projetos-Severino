@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 
 export default function Sidebar({ menuAberto, setMenuAberto }) {
   // Sidebar agora é sempre Full Black, logo sempre usa a versão clara (branca)
-  const logoSrc = '/images/horizonte_fiel_original_logo_light.png'
+  const logoSrc = '/images/horizonte_fiel_original_logo_dark.png'
   return (
     <>
       {/* Mobile Backdrop */}
