@@ -255,11 +255,9 @@ h3 {
 }
 
 .nav-item.active {
-  background-color: var(--bg-secondary); 
-  color: var(--text-primary);
   font-weight: 700;
-  width: calc(100% + 24px); /* Ponte exata para o conteúdo */
-  margin-right: -24px; /* Alinha com a borda da sidebar */
+  width: calc(100% + 26px);
+  margin-right: -26px; 
   padding-right: 32px;
   border-radius: 32px 0 0 32px;
   z-index: 30;
@@ -267,26 +265,18 @@ h3 {
 }
 
 /* Curvas líquidas moleculares precisas - Alinhadas com a borda da sidebar */
-.nav-item.active::before,
-.nav-item.active::after {
-  content: "";
-  position: absolute;
-  right: 24px; /* Fixado: agora alinhado com o limite da sidebar, não do bridge! */
-  width: 24px;
-  height: 24px;
-  background-color: transparent;
-  pointer-events: none;
-  z-index: 21;
-}
-
 .nav-item.active::before {
   top: -24px;
-  background: radial-gradient(circle at 100% 100%, transparent 24px, var(--sidebar-bg) 24.5px);
+  background: var(--bg-secondary);
+  -webkit-mask-image: radial-gradient(circle at 0% 0%, transparent 24px, black 24.5px);
+  mask-image: radial-gradient(circle at 0% 0%, transparent 24px, black 24.5px);
 }
 
 .nav-item.active::after {
   bottom: -24px;
-  background: radial-gradient(circle at 100% 0%, transparent 24px, var(--sidebar-bg) 24.5px);
+  background: var(--bg-secondary);
+  -webkit-mask-image: radial-gradient(circle at 0% 100%, transparent 24px, black 24.5px);
+  mask-image: radial-gradient(circle at 0% 100%, transparent 24px, black 24.5px);
 }
 
 .nav-item svg {
@@ -1269,41 +1259,209 @@ h3 {
   }
 }
 
+/* =========================================
+   ENHANCED SKELETON LOADING SYSTEM
+   ========================================= */
+
 /* Skeleton Animations */
 @keyframes shimmer {
-  0% {
-    background-position: -468px 0;
-  }
-
-  100% {
-    background-position: 468px 0;
-  }
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
 }
 
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes skeleton-wave {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Base Skeleton */
 .skeleton {
-  background: #f6f7f8;
-  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-  background-repeat: no-repeat;
-  background-size: 800px 100%;
-  border-radius: 12px;
-  animation: shimmer 1.5s infinite linear;
+  background: var(--bg-card);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
 }
 
+.skeleton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  animation: skeleton-wave 1.5s infinite;
+}
+
+/* Skeleton Card - Realistic KPI Card */
 .skeleton-card {
   height: 140px;
-  margin-bottom: 24px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
+.skeleton-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skeleton-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.skeleton-text {
+  height: 12px;
+  width: 80px;
+  border-radius: 6px;
+}
+
+.skeleton-value {
+  height: 32px;
+  width: 60%;
+  border-radius: 8px;
+}
+
+.skeleton-badge {
+  height: 14px;
+  width: 50%;
+  border-radius: 7px;
+  margin-top: 4px;
+}
+
+/* Skeleton Row - Realistic Table Row */
 .skeleton-row {
   height: 60px;
   margin-bottom: 12px;
   border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
 }
 
+.skeleton-row-date {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 60px;
+}
+
+.skeleton-row-date span {
+  height: 10px;
+  width: 40px;
+  border-radius: 4px;
+}
+
+.skeleton-row-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skeleton-row-content span {
+  height: 12px;
+  border-radius: 6px;
+}
+
+.skeleton-row-value {
+  height: 16px;
+  width: 80px;
+  border-radius: 6px;
+  margin-left: auto;
+}
+
+/* Skeleton Chart */
 .skeleton-chart {
   height: 350px;
   width: 100%;
   border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 16px;
+}
+
+.skeleton-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skeleton-chart-title {
+  height: 20px;
+  width: 150px;
+  border-radius: 6px;
+}
+
+.skeleton-chart-legend {
+  display: flex;
+  gap: 16px;
+}
+
+.skeleton-chart-legend span {
+  height: 12px;
+  width: 60px;
+  border-radius: 6px;
+}
+
+.skeleton-chart-area {
+  flex: 1;
+  border-radius: 12px;
+  position: relative;
+}
+
+.skeleton-chart-bars {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 0 20px;
+}
+
+.skeleton-bar {
+  width: 40px;
+  border-radius: 8px 8px 0 0;
+}
+
+/* Staggered Animation for Multiple Skeletons */
+.skeleton-stagger > * {
+  animation: skeleton-fade-in 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+.skeleton-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.skeleton-stagger > *:nth-child(2) { animation-delay: 100ms; }
+.skeleton-stagger > *:nth-child(3) { animation-delay: 200ms; }
+.skeleton-stagger > *:nth-child(4) { animation-delay: 300ms; }
+.skeleton-stagger > *:nth-child(5) { animation-delay: 400ms; }
+.skeleton-stagger > *:nth-child(6) { animation-delay: 500ms; }
+
+@keyframes skeleton-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pulse variant for smaller elements */
+.skeleton-pulse {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
 /* Empty State Styles */

@@ -1,9 +1,101 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
 import Sidebar from '../components/Sidebar'
 import { useTheme } from '../context/ThemeContext'
+
+const SkeletonCard = () => (
+  <div className="skeleton skeleton-card">
+    <div className="skeleton-card-header">
+      <div className="skeleton skeleton-text"></div>
+      <div className="skeleton skeleton-icon"></div>
+    </div>
+    <div className="skeleton skeleton-value"></div>
+    <div className="skeleton skeleton-badge"></div>
+  </div>
+)
+
+const SkeletonRow = () => (
+  <div className="skeleton skeleton-row">
+    <div className="skeleton-row-date">
+      <span className="skeleton skeleton-pulse"></span>
+      <span className="skeleton skeleton-pulse" style={{ width: '30px', height: '8px' }}></span>
+    </div>
+    <div className="skeleton-row-content">
+      <span className="skeleton skeleton-pulse"></span>
+      <span className="skeleton skeleton-pulse" style={{ width: '60%', height: '10px' }}></span>
+    </div>
+    <div className="skeleton skeleton-row-value"></div>
+  </div>
+)
+
+const SkeletonChart = ({ ref: externalRef }) => (
+  <div className="skeleton skeleton-chart" ref={externalRef}>
+    <div className="skeleton-chart-header">
+      <div className="skeleton skeleton-chart-title"></div>
+      <div className="skeleton-chart-legend">
+        <span className="skeleton skeleton-pulse"></span>
+        <span className="skeleton skeleton-pulse"></span>
+      </div>
+    </div>
+    <div className="skeleton skeleton-chart-area">
+      <div className="skeleton-chart-bars">
+        {[65, 45, 80, 55, 90, 70, 85].map((h, i) => (
+          <div key={i} className="skeleton skeleton-bar" style={{ 
+            height: `${h}%`, 
+            animationDelay: `${i * 100}ms` 
+          }}></div>
+        ))}
+      </div>
+    </div>
+  </div>
+)
+
+const LazyChart = lazy(() => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(import('../components/Charts/ExpenseChart'))
+    }, 100)
+  })
+})
+
+const ChartFallback = () => <SkeletonChart />
+
+const ChartSection = () => {
+  const [visible, setVisible] = useState(false)
+  const containerRef = useRef(null)
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '200px' }
+    )
+    
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
+    
+    return () => observer.disconnect()
+  }, [])
+  
+  return (
+    <div ref={containerRef}>
+      {visible ? (
+        <Suspense fallback={<ChartFallback />}>
+          <LazyChart />
+        </Suspense>
+      ) : (
+        <ChartFallback />
+      )}
+    </div>
+  )
+}
 
 const COLORS = [] // Não mais usado no dashboard
 
@@ -23,7 +115,9 @@ export default function Dashboard() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [transacoes, setTransacoes] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [chartVisible, setChartVisible] = useState(false)
+  const chartRef = useRef(null)
 
   const fetchTransacoes = React.useCallback(async () => {
     setLoading(true)
@@ -50,6 +144,23 @@ export default function Dashboard() {
       fetchTransacoes()
     }
   }, [usuario.id, fetchTransacoes])
+
+  useEffect(() => {
+    if (!chartRef.current) return
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setChartVisible(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '100px' }
+    )
+    
+    observer.observe(chartRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   const { totalReceitas, totalDespesas, saldoTotal } = React.useMemo(() => {
     return transacoes.reduce((acc, t) => {
@@ -96,12 +207,12 @@ export default function Dashboard() {
         </header>
 
         {/* KPIs */}
-        <div className="kpi-grid">
+        <div className="kpi-grid skeleton-stagger">
           {loading ? (
             <>
-              <div className="skeleton skeleton-card"></div>
-              <div className="skeleton skeleton-card"></div>
-              <div className="skeleton skeleton-card"></div>
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
             </>
           ) : (
             <>
@@ -166,12 +277,12 @@ export default function Dashboard() {
 
               <div style={{ overflowX: 'auto' }}>
                 {loading ? (
-                  <>
-                    <div className="skeleton skeleton-row"></div>
-                    <div className="skeleton skeleton-row"></div>
-                    <div className="skeleton skeleton-row"></div>
-                    <div className="skeleton skeleton-row"></div>
-                  </>
+                  <div className="skeleton-stagger">
+                    <SkeletonRow />
+                    <SkeletonRow />
+                    <SkeletonRow />
+                    <SkeletonRow />
+                  </div>
                 ) : (
                   <table className="data-table">
                     <thead>
@@ -212,7 +323,8 @@ export default function Dashboard() {
               </div>
             </section>
 
-            {/* Chart Section removido a pedido do usuário */}
+            {/* Lazy-loaded Chart Section */}
+            {!loading && <ChartSection />}
           </div>
         ) }
       </main>
