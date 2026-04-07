@@ -12,7 +12,7 @@ import {
   storeResetToken,
 } from './lib/password-reset.mjs'
 import { getCategorias, inserirTransacao, getTransacoes, deletarTransacao } from './lib/transacoes.mjs'
-import { atualizarTelefoneUsuario, getPerfilUsuario } from './lib/usuarios.mjs'
+import { atualizarTelefoneUsuario, getPerfilUsuario, getWhatsappLogs } from './lib/usuarios.mjs'
 import { handleWhatsAppWebhook } from './lib/whatsapp.mjs'
 import { askHorizon } from './lib/ai.mjs'
 
@@ -169,6 +169,23 @@ app.put('/api/usuarios/telefone', async (c) => {
 // Webhook Whatsapp Local Handler
 app.post('/api/whatsapp/webhook', async (c) => {
   return handleWhatsAppWebhook(c.req)
+})
+
+// Webhook Logs Admin (Simplified Admin route based on user ID checking logic for the future, right now just returning all)
+app.get('/api/admin/whatsapp-logs', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) {
+      return c.json({ message: 'Não autorizado.' }, 401)
+    }
+    
+    // In a prod scenario we would verify if usuarioId role is Admin. For now, since user explicitly requested a dashboard for themselves, we allow authenticated.
+    const logs = await getWhatsappLogs()
+    return c.json(logs)
+  } catch (error) {
+    console.error('get admin logs failed', error)
+    return c.json({ message: 'Erro ao buscar logs do whatsapp.' }, 500)
+  }
 })
 
 // Transaction and Category Routes

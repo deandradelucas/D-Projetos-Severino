@@ -10,6 +10,7 @@ import Relatorios from './pages/Relatorios'
 import Background from './components/Background'
 import PwaInstallPrompt from './components/PwaInstallPrompt'
 import HorizonChat from './components/HorizonChat'
+import AdminWhatsApp from './pages/AdminWhatsApp'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/transacoes" element={<Transacoes />} />
           <Route path="/relatorios" element={<Relatorios />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
+          <Route path="/admin/whatsapp" element={<AdminWhatsApp />} />
           <Route path="/" element={<Login />} />
         </Routes>
       </BrowserRouter>
