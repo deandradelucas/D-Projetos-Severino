@@ -67,7 +67,7 @@
   overflow: hidden;
   width: 100%;
   padding: 24px;
-  gap: 24px;
+  gap: 0; /* Removido para permitir que o menu derreta no card */
 }
 
 /* Typography */
@@ -91,7 +91,7 @@ h3 {
   flex-direction: column;
   position: relative;
   z-index: 20;
-  overflow: hidden; /* Para a textura não vazar */
+  /* overflow: hidden; */ /* Removido para permitir que o 'melt' do menu flua para fora */
 }
 
 /* Textura vitrificada para a Sidebar (igual aos cards) */
@@ -113,8 +113,14 @@ h3 {
 }
 
 .brand-logo {
-  width: 185px;
+  width: 250px; /* Logo aumentada conforme pedido */
   height: auto;
+  filter: brightness(1.8) contrast(1.1); /* Tenta clarear a palavra HORIZONTE que está preta */
+  transition: transform 0.3s ease;
+}
+
+.brand-logo:hover {
+  transform: scale(1.05); /* Micro-interação premium */
 }
 
 .nav-menu {
@@ -133,14 +139,15 @@ h3 {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #000000 0%, #333333 50%, #000000 100%);
+  background: linear-gradient(90deg, #111111 0%, #444444 50%, #111111 100%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.5s infinite linear, skeleton-pulse 2s infinite ease-in-out;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.05); /* Borda sutil para o efeito skeleton */
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  z-index: 50;
+  z-index: 55; /* Acima das curvas */
   top: 28px;
+  right: 12px; /* Ajustado para acompanhar a nova curva */
 }
 
 @keyframes skeleton-shimmer {
@@ -159,6 +166,13 @@ h3 {
 .nav-menu:has(li:nth-child(2) > .nav-item.active)::before { top: 100px; }
 .nav-menu:has(li:nth-child(3) > .nav-item.active)::before { top: 172px; }
 .nav-menu:has(li:nth-child(4) > .nav-item.active)::before { top: 244px; }
+
+/* Recharts Legend Dots (Bolinhas dos Gráficos) */
+.recharts-legend-item-marker {
+  animation: skeleton-pulse 2s infinite ease-in-out;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.4));
+}
+
 
 .nav-item {
   display: flex;
@@ -183,41 +197,43 @@ h3 {
 .nav-item.active {
   background-color: var(--bg-secondary); 
   color: var(--text-primary);
-  font-weight: 600;
-  width: calc(100% + 42px); 
-  max-width: none;
+  font-weight: 700;
+  width: calc(100% + 15px); /* Ponte para o conteúdo */
+  margin-right: -15px; /* Puxa para a borda */
   padding-right: 42px;
-  border-radius: 24px 0 0 24px;
+  border-radius: 30px 0 0 30px;
   z-index: 30;
-  box-shadow: none; /* Removida sombra para fusão molecular perfeita */
+  box-shadow: none;
 }
-
-/* Liquid curves for the active item */
+/* Liquid corners for a perfect molecular melt */
 .nav-item.active::before,
 .nav-item.active::after {
   content: "";
   position: absolute;
-  right: 0;
-  width: 24px;
-  height: 24px;
+  right: -1px; /* Alinhado exatamente na borda da sidebar */
+  width: 30px;
+  height: 30px;
   background-color: transparent;
   pointer-events: none;
+  z-index: 25;
 }
 
 .nav-item.active::before {
-  top: -24px;
-  background: radial-gradient(circle at top left, transparent 24px, var(--bg-secondary) 24.5px);
+  top: -30px;
+  border-bottom-right-radius: 30px;
+  box-shadow: 15px 15px 0 15px var(--bg-secondary);
 }
 
 .nav-item.active::after {
-  bottom: -24px;
-  background: radial-gradient(circle at bottom left, transparent 24px, var(--bg-secondary) 24.5px);
+  bottom: -30px;
+  border-top-right-radius: 30px;
+  box-shadow: 15px -15px 0 15px var(--bg-secondary);
 }
 
 .nav-item svg {
   width: 22px;
   height: 22px;
-  opacity: 0.8;
+  opacity: 1; /* Icones totalmente visíveis */
 }
 
 .nav-item.active svg {
@@ -258,8 +274,8 @@ h3 {
   width: 36px;
   height: 36px;
   border-radius: 12px;
-  background: var(--sidebar-text-muted);
-  opacity: 0.1;
+  background: rgba(255, 255, 255, 0.08); /* Fundo mais visível */
+  color: rgba(255, 255, 255, 0.5); /* Icone mais claro */
   transition: all 0.2s ease;
 }
 
@@ -275,7 +291,7 @@ h3 {
   background-color: transparent; /* Canvas Flutuante */
   color: var(--text-primary);
   border: none;
-  padding: 12px 24px 24px 12px;
+  padding: 12px 24px 24px 24px;
   overflow-y: auto;
   position: relative;
   z-index: 10;
