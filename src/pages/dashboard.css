@@ -329,6 +329,8 @@ h3 {
 .nav-menu:has(li:nth-child(3) > .nav-item.active)::after { top: 174px; }
 .nav-menu:has(li:nth-child(4) > .nav-item.active)::before { top: 244px; }
 .nav-menu:has(li:nth-child(4) > .nav-item.active)::after { top: 246px; }
+.nav-menu:has(li:nth-child(5) > .nav-item.active)::before { top: 316px; }
+.nav-menu:has(li:nth-child(5) > .nav-item.active)::after { top: 318px; }
 
 /* Burst effect - suavizado */
 @keyframes dot-burst {
@@ -340,7 +342,8 @@ h3 {
 .nav-menu:has(li:nth-child(1) > .nav-item.active)::before,
 .nav-menu:has(li:nth-child(2) > .nav-item.active)::before,
 .nav-menu:has(li:nth-child(3) > .nav-item.active)::before,
-.nav-menu:has(li:nth-child(4) > .nav-item.active)::before {
+.nav-menu:has(li:nth-child(4) > .nav-item.active)::before,
+.nav-menu:has(li:nth-child(5) > .nav-item.active)::before {
   animation: dot-burst 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
