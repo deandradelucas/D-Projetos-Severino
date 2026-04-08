@@ -71,6 +71,32 @@ app.use('*', cors({
 
 app.get('/api/health', (c) => c.json({ ok: true }))
 
+/** Erros de configuração/rede do Supabase — retorna null se for falha genérica. */
+function mapSupabaseOrNetworkError(error) {
+  const raw = String(error?.message != null ? error.message : error || '')
+  if (raw.includes('Missing VITE_SUPABASE_URL') || raw.includes('SUPABASE_SERVICE_ROLE_KEY')) {
+    return {
+      status: 503,
+      message:
+        'Banco de dados não configurado no servidor. No Vercel, defina VITE_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY e faça um novo deploy.',
+    }
+  }
+  if (/Invalid API key|JWT expired|invalid value for JWT|API key/i.test(raw)) {
+    return {
+      status: 503,
+      message:
+        'Chave do Supabase inválida ou ausente. Confira SUPABASE_SERVICE_ROLE_KEY e VITE_SUPABASE_URL no servidor.',
+    }
+  }
+  if (/ENOTFOUND|ECONNREFUSED|fetch failed|NetworkError|Failed to fetch/i.test(raw)) {
+    return {
+      status: 503,
+      message: 'Não foi possível conectar ao banco de dados. Tente de novo em alguns instantes.',
+    }
+  }
+  return null
+}
+
 app.post('/api/auth/login', async (c) => {
   try {
     const body = await c.req.json()
@@ -78,7 +104,7 @@ app.post('/api/auth/login', async (c) => {
     const password = String(body?.password || '')
 
     if (!isValidEmail(email)) {
-      return c.json({ message: 'Informe um e-mail valido.' }, 400)
+      return c.json({ message: 'Informe um e-mail válido.' }, 400)
     }
 
     if (!password) {
@@ -97,7 +123,12 @@ app.post('/api/auth/login', async (c) => {
     })
   } catch (error) {
     console.error('login failed', error)
-    return c.json({ message: 'Nao foi possivel fazer login agora. Tente novamente em instantes.' }, 500)
+    const mapped = mapSupabaseOrNetworkError(error)
+    if (mapped) return c.json({ message: mapped.message }, mapped.status)
+    return c.json(
+      { message: 'Não foi possível fazer login agora. Tente novamente em alguns instantes.' },
+      500
+    )
   }
 })
 
@@ -107,7 +138,7 @@ app.post('/api/auth/request-password-reset', async (c) => {
     const email = String(body?.email || '').trim().toLowerCase()
 
     if (!isValidEmail(email)) {
-      return c.json({ message: 'Informe um e-mail valido.' }, 400)
+      return c.json({ message: 'Informe um e-mail válido.' }, 400)
     }
 
     const user = await findUserByEmail(email)
@@ -140,7 +171,12 @@ app.post('/api/auth/request-password-reset', async (c) => {
     })
   } catch (error) {
     console.error('request-password-reset failed', error)
-    return c.json({ message: 'Nao foi possivel enviar o link agora. Tente novamente em instantes.' }, 500)
+    const mapped = mapSupabaseOrNetworkError(error)
+    if (mapped) return c.json({ message: mapped.message }, mapped.status)
+    return c.json(
+      { message: 'Não foi possível enviar o link agora. Tente novamente em alguns instantes.' },
+      500
+    )
   }
 })
 
@@ -151,23 +187,25 @@ app.post('/api/auth/reset-password', async (c) => {
     const password = String(body?.password || '')
 
     if (!token) {
-      return c.json({ message: 'Token invalido.' }, 400)
+      return c.json({ message: 'Token inválido.' }, 400)
     }
 
     if (password.length < 6) {
-      return c.json({ message: 'A senha deve ter no minimo 6 caracteres.' }, 400)
+      return c.json({ message: 'A senha deve ter no mínimo 6 caracteres.' }, 400)
     }
 
     const updated = await consumeResetToken(token, password)
 
     if (!updated) {
-      return c.json({ message: 'Link invalido ou expirado.' }, 400)
+      return c.json({ message: 'Link inválido ou expirado.' }, 400)
     }
 
     return c.json({ message: 'Senha redefinida com sucesso.' })
   } catch (error) {
     console.error('reset-password failed', error)
-    return c.json({ message: 'Nao foi possivel redefinir a senha.' }, 500)
+    const mapped = mapSupabaseOrNetworkError(error)
+    if (mapped) return c.json({ message: mapped.message }, mapped.status)
+    return c.json({ message: 'Não foi possível redefinir a senha.' }, 500)
   }
 })
 

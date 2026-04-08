@@ -55,7 +55,7 @@ export default function Login() {
     const normalizedEmail = forgotEmail.trim().toLowerCase()
 
     if (!validateEmail(normalizedEmail)) {
-      setForgotPasswordState({ text: 'Informe um e-mail valido para recuperar a senha.', type: 'error', link: '' })
+      setForgotPasswordState({ text: 'Informe um e-mail válido para recuperar a senha.', type: 'error', link: '' })
       return
     }
 
