@@ -41,7 +41,8 @@ export async function getCategorias(usuarioId) {
     }
   })
 }
-const DEFAULT_CATEGORIES = [
+/** Fonte única para seed + fallback de IA (WhatsApp). Manter nomes alinhados. */
+export const DEFAULT_CATEGORIES = [
   // DESPESAS GERAIS
   { nome: 'Alimentação', tipo: 'DESPESA', cor: '#ef4444', subcategorias: ['Supermercado', 'Restaurantes e Lanches', 'Padaria e Cafeteira', 'Delivery (iFood, etc)', 'Feira e Sacolão', 'Açougue e Peixaria', 'Atacadista', 'Bebidas', 'Doces e Sobremesas', 'Fast Food', 'Hortifruti'] },
   { nome: 'Moradia', tipo: 'DESPESA', cor: '#f97316', subcategorias: ['Aluguel', 'Conta de Luz', 'Conta de Água', 'Condomínio', 'Internet e TV', 'Gás', 'IPTU', 'Manutenção e Reformas', 'Seguro Residencial', 'Material de Limpeza', 'Decoração de Interiores', 'Jardinagem/Paisagismo', 'Eletrodomésticos', 'Móveis'] },

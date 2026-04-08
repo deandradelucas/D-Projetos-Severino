@@ -22,39 +22,59 @@ export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
 }
 
 /**
+ * Celular BR completo: 55 + DDD(2) + 9 dígitos = 13 caracteres.
+ * Nunca aplicar slice(0,11) nesse formato — virava 55549969944 e sumia dígito (ex.: 54996994482).
+ */
+export function normalizarDigitosWhatsappLog(digitos) {
+  const d = String(digitos || '').replace(/\D/g, '')
+  if (!d) return ''
+  if (d.startsWith('55') && d.length === 13) return d
+  if (!d.startsWith('55') && d.length === 11 && /^\d{2}9\d{8}$/.test(d)) return `55${d}`
+  if (d.startsWith('55') && d.length > 13) return d.slice(0, 13)
+  return d
+}
+
+/**
  * Gera variantes com/sem DDI 55 para bater com o cadastro (ex.: 11999... vs 5511999...).
- * Inclui truncamento dos primeiros 11/13 dígitos (LID/@lid costuma vir com dígito extra).
+ * LID longo: truncar só quando não for E.164 BR 13 dígitos.
  */
 export function variantesTelefoneBrasil(digitos) {
   const d = String(digitos || '').replace(/\D/g, '')
   if (!d) return []
   const out = new Set([d])
 
-  if (d.startsWith('55') && d.length > 2) {
+  const isE164Br13 = d.startsWith('55') && d.length === 13
+  const nacional13 = isE164Br13 ? d.slice(2) : ''
+
+  if (isE164Br13) {
+    out.add(nacional13)
+  } else if (d.startsWith('55') && d.length > 2) {
     out.add(d.slice(2))
   }
+
   if (!d.startsWith('55') && d.length >= 10 && d.length <= 15) {
     out.add(`55${d}`)
   }
-  // Nacional 11 dígitos (DDD + celular) — primeiro bloco quando vem lixo no fim (ex.: LID 14+ dígitos)
-  if (d.length > 11) {
-    const head11 = d.slice(0, 11)
-    out.add(head11)
-    if (!d.startsWith('55')) out.add(`55${head11}`)
+
+  if (d.startsWith('55') && d.length > 13) {
+    const core = d.slice(0, 13)
+    out.add(core)
+    out.add(core.slice(2))
+  } else if (!d.startsWith('55') && d.length > 11) {
+    const h11 = d.slice(0, 11)
+    out.add(h11)
+    out.add(`55${h11}`)
   }
-  if (d.length > 13 && d.startsWith('55')) {
-    out.add(d.slice(0, 13))
-    out.add(d.slice(2, 13))
-  }
-  // Últimos 11 dígitos (DDD + celular)
+
   if (d.length >= 11) {
-    const tail11 = d.slice(-11)
-    out.add(tail11)
-    out.add(`55${tail11}`)
+    const t11 = d.slice(-11)
+    out.add(t11)
+    out.add(`55${t11}`)
   }
-  if (d.length >= 13 && d.startsWith('55')) {
+
+  if (!isE164Br13 && d.startsWith('55') && d.length >= 13) {
     const after55 = d.slice(2)
-    if (after55.length >= 11) {
+    if (after55.length > 11) {
       out.add(after55.slice(-11))
     }
   }
@@ -146,7 +166,7 @@ export async function getPerfilUsuario(usuarioId) {
   
   const { data, error } = await supabaseAdmin
     .from('usuarios')
-    .select('id, email, telefone')
+    .select('id, email, telefone, nome, role, is_active, last_login_at, created_at')
     .eq('id', usuarioId)
     .single()
 
@@ -194,11 +214,41 @@ export async function listUsuariosAdmin() {
   const supabaseAdmin = getSupabaseAdmin()
   const { data, error } = await supabaseAdmin
     .from('usuarios')
-    .select('id, email, telefone')
+    .select('id, nome, email, telefone, role, is_active, last_login_at, created_at')
     .order('email', { ascending: true })
 
   if (error) throw error
   return data || []
+}
+
+export async function updateUsuarioAdmin(id, payload) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const patch = {}
+  if (payload.nome !== undefined) patch.nome = payload.nome
+  if (payload.email !== undefined) patch.email = payload.email
+  if (payload.telefone !== undefined) patch.telefone = payload.telefone
+  if (payload.role !== undefined) patch.role = payload.role
+  if (payload.is_active !== undefined) patch.is_active = payload.is_active
+
+  const { data, error } = await supabaseAdmin
+    .from('usuarios')
+    .update(patch)
+    .eq('id', id)
+    .select('id, nome, email, telefone, role, is_active, last_login_at, created_at')
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+export async function deleteUsuarioAdmin(id) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const { error } = await supabaseAdmin
+    .from('usuarios')
+    .delete()
+    .eq('id', id)
+
+  if (error) throw error
 }
 
 export async function getWhatsappStatus() {

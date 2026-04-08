@@ -1,4 +1,4 @@
-import { buscarUsuarioPorTelefone, registrarLogWhatsApp } from './usuarios.mjs'
+import { buscarUsuarioPorTelefone, registrarLogWhatsApp, normalizarDigitosWhatsappLog } from './usuarios.mjs'
 import { getCategorias, inserirTransacao } from './transacoes.mjs'
 import { parseWhatsAppMessageWithAI } from './ai.mjs'
 
@@ -393,6 +393,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
   }
 
   let numeroRemetente = 'Desconhecido'
+  let telDisplay = 'Desconhecido'
   let mensagemRaw = 'Sem conteúdo'
   let usuarioTarget = null
 
@@ -478,7 +479,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
       let telForLog = '?'
       if (preview.remetenteRaw) {
         const digits = String(preview.remetenteRaw).replace(/\D/g, '')
-        if (digits) telForLog = digits
+        if (digits) telForLog = normalizarDigitosWhatsappLog(digits) || digits
       }
       const msgPrev = (preview.mensagemRaw || '').slice(0, 200)
       console.warn('[WhatsApp Webhook] Token inválido ou ausente para payload com possível mensagem.')
@@ -498,6 +499,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
     mensagemRaw = extracted.mensagemRaw || ''
 
     numeroRemetente = String(remetenteRaw || '').replace(/\D/g, '')
+    telDisplay = normalizarDigitosWhatsappLog(numeroRemetente) || numeroRemetente || 'Desconhecido'
 
     const tokenFromBodyBool = !!tokenFromBody
     const debugInfo = `Tokens: Query=${!!tokenFromQuery}, Body=${tokenFromBodyBool} | Msg: ${mensagemRaw.substring(0, 20)}`
@@ -514,7 +516,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
     }
 
     if (!mensagemRaw.trim()) {
-      await registrarLogWhatsApp(numeroRemetente, '(sem texto)', 'IGNORADO', `Mensagem vazia ou formato não suportado. ${debugInfo}`)
+      await registrarLogWhatsApp(telDisplay, '(sem texto)', 'IGNORADO', `Mensagem vazia ou formato não suportado. ${debugInfo}`)
       return { status: 200, json: { ok: true, warning: 'Sem texto de mensagem.' } }
     }
 
@@ -522,16 +524,16 @@ export async function handleWhatsAppWebhook(req, options = {}) {
     // Só ignorar eco/resposta enviada pela própria instância (fromMe), não um número fixo.
     const outboundFromMe = getFromMeFromBody(body)
     if (outboundFromMe === true) {
-      await registrarLogWhatsApp(numeroRemetente, mensagemRaw, 'IGNORADO', 'Mensagem outbound (fromMe); não é comando do usuário.')
+      await registrarLogWhatsApp(telDisplay, mensagemRaw, 'IGNORADO', 'Mensagem outbound (fromMe); não é comando do usuário.')
       return { status: 200, json: { ok: true, ignored: 'outbound_from_me' } }
     }
 
-    console.log(`[WhatsApp Webhook] Mensagem recebida de: ${numeroRemetente} -> "${mensagemRaw}"`)
+    console.log(`[WhatsApp Webhook] Mensagem recebida de: ${telDisplay} -> "${mensagemRaw}"`)
 
     usuarioTarget = await buscarUsuarioPorTelefone(numeroRemetente)
     if (!usuarioTarget) {
-      console.warn(`[WhatsApp Webhook] Telefone ${numeroRemetente} não possui usuário vinculado.`)
-      await registrarLogWhatsApp(numeroRemetente, mensagemRaw || '(sem texto)', 'IGNORADO', `Usuário não vinculado. ${debugInfo}`)
+      console.warn(`[WhatsApp Webhook] Telefone ${telDisplay} não possui usuário vinculado.`)
+      await registrarLogWhatsApp(telDisplay, mensagemRaw || '(sem texto)', 'IGNORADO', `Usuário não vinculado. ${debugInfo}`)
       return { status: 200, json: { ok: true, warning: 'Usuário não registrado com esse telefone.' } }
     }
 
@@ -563,7 +565,22 @@ export async function handleWhatsAppWebhook(req, options = {}) {
 
     console.log(`[WhatsApp Webhook] Transação salva com sucesso: ${transacaoSalva.id}`)
 
-    await registrarLogWhatsApp(numeroRemetente, mensagemRaw, 'SUCESSO', `Transação adicionada: ${extractedData.tipo} | R$${extractedData.valor}`, usuarioTarget.id)
+    let catNome = 'Sem categoria'
+    let subNome = ''
+    if (extractedData.categoria_id) {
+      const cat = categorias.find((c) => c.id === extractedData.categoria_id)
+      if (cat) {
+        catNome = cat.nome || catNome
+        if (extractedData.subcategoria_id && Array.isArray(cat.subcategorias)) {
+          const sub = cat.subcategorias.find((s) => s.id === extractedData.subcategoria_id)
+          if (sub) subNome = sub.nome
+        }
+      }
+    }
+    const valorNum = Number(extractedData.valor) || 0
+    const detalheSucesso = `Lançado: ${extractedData.tipo} R$${valorNum.toFixed(2)} - ${catNome}${subNome ? ' / ' + subNome : ''}`
+
+    await registrarLogWhatsApp(telDisplay, mensagemRaw, 'SUCESSO', detalheSucesso, usuarioTarget.id)
 
     return {
       status: 200,
@@ -576,7 +593,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
   } catch (error) {
     console.error('[WhatsApp Webhook] ERROR:', error)
 
-    await registrarLogWhatsApp(numeroRemetente, mensagemRaw, 'ERRO', error.message || 'Erro inesperado', usuarioTarget?.id)
+    await registrarLogWhatsApp(telDisplay, mensagemRaw, 'ERRO', error.message || 'Erro inesperado', usuarioTarget?.id)
 
     return { status: 200, json: { ok: false, error: error.message || 'Erro interno.' } }
   }

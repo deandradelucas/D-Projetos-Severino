@@ -116,7 +116,7 @@ export async function authenticateUser(email, password) {
 
   const { data, error } = await supabaseAdmin
     .from('usuarios')
-    .select('id, email, nome')
+    .select('id, email, nome, role, is_active, last_login_at')
     .eq('email', normalizedEmail)
     .eq('senha', normalizedPassword)
     .maybeSingle()
@@ -125,7 +125,22 @@ export async function authenticateUser(email, password) {
     throw error
   }
 
-  return data
+  if (!data) return null
+  if (data.is_active === false) {
+    return null
+  }
+
+  const nowIso = new Date().toISOString()
+  try {
+    await supabaseAdmin
+      .from('usuarios')
+      .update({ last_login_at: nowIso })
+      .eq('id', data.id)
+  } catch {
+    // logging opcional; não bloqueia login
+  }
+
+  return { ...data, last_login_at: nowIso }
 }
 
 export async function storeResetToken({ email, tokenHash, expiresAt }) {

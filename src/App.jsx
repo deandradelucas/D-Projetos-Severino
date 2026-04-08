@@ -11,6 +11,8 @@ import Background from './components/Background'
 import PwaInstallPrompt from './components/PwaInstallPrompt'
 import HorizonChat from './components/HorizonChat'
 import AdminWhatsApp from './pages/AdminWhatsApp'
+import AdminUsuarios from './pages/AdminUsuarios'
+import Pagamento from './pages/Pagamento'
 
 function App() {
   return (
@@ -27,7 +29,9 @@ function App() {
           <Route path="/transacoes" element={<Transacoes />} />
           <Route path="/relatorios" element={<Relatorios />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
+          <Route path="/pagamento" element={<Pagamento />} />
           <Route path="/admin/whatsapp" element={<AdminWhatsApp />} />
+          <Route path="/admin/usuarios" element={<AdminUsuarios />} />
           <Route path="/" element={<Login />} />
         </Routes>
       </BrowserRouter>

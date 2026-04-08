@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import {
@@ -17,9 +18,20 @@ import {
   getWhatsappLogs,
   getWhatsappStatus,
   listUsuariosAdmin,
+  updateUsuarioAdmin,
+  deleteUsuarioAdmin,
 } from './lib/usuarios.mjs'
 import { handleWhatsAppWebhook } from './lib/whatsapp.mjs'
 import { askHorizon } from './lib/ai.mjs'
+import {
+  buscarPagamentoPorId,
+  criarPreferenciaCheckout,
+  getMercadoPagoAccessToken,
+  getMercadoPagoPublicKey,
+  isMercadoPagoConfigured,
+  useSandboxCheckout,
+} from './lib/mercadopago.mjs'
+import { insertPreferenciaRecord, listPagamentosUsuario, upsertFromWebhookPayment } from './lib/pagamentos-mp.mjs'
 
 const app = new Hono()
 
@@ -228,6 +240,36 @@ app.get('/api/admin/usuarios', async (c) => {
   }
 })
 
+app.put('/api/admin/usuarios/:id', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+
+    const id = c.req.param('id')
+    const body = await c.req.json()
+    const updated = await updateUsuarioAdmin(id, body || {})
+    return c.json(updated)
+  } catch (error) {
+    console.error('update admin usuario failed', error)
+    const msg = error.code === '23505' ? 'E-mail ou telefone já utilizado em outra conta.' : 'Erro ao atualizar usuário.'
+    return c.json({ message: msg }, 500)
+  }
+})
+
+app.delete('/api/admin/usuarios/:id', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+
+    const id = c.req.param('id')
+    await deleteUsuarioAdmin(id)
+    return c.json({ message: 'Usuário excluído com sucesso.' })
+  } catch (error) {
+    console.error('delete admin usuario failed', error)
+    return c.json({ message: 'Erro ao excluir usuário.' }, 500)
+  }
+})
+
 // Transaction and Category Routes
 
 app.get('/api/categorias', async (c) => {
@@ -307,6 +349,134 @@ app.delete('/api/transacoes/:id', async (c) => {
 })
 
 // AI Chat Route — Pergunte ao Horizon
+
+// Mercado Pago — checkout e notificações
+app.get('/api/pagamentos/config', (c) => {
+  const pk = getMercadoPagoPublicKey()
+  return c.json({
+    publicKey: pk || null,
+    ready: isMercadoPagoConfigured(),
+  })
+})
+
+app.get('/api/pagamentos/minhas', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    const rows = await listPagamentosUsuario(usuarioId)
+    return c.json(rows)
+  } catch (error) {
+    console.error('list pagamentos failed', error)
+    return c.json({ message: 'Erro ao listar pagamentos.' }, 500)
+  }
+})
+
+app.post('/api/pagamentos/preferencia', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    if (!isMercadoPagoConfigured()) {
+      return c.json({ message: 'Pagamentos não configurados no servidor (MERCADO_PAGO_ACCESS_TOKEN).' }, 503)
+    }
+
+    const body = await c.req.json().catch(() => ({}))
+    const titulo = String(body?.titulo || 'Assinatura Horizonte Financeiro').trim() || 'Assinatura Horizonte Financeiro'
+    const valorRaw = body?.valor
+    const defaultPreco = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '29.9')
+    const valor = Number(valorRaw != null && valorRaw !== '' ? valorRaw : defaultPreco)
+    if (!Number.isFinite(valor) || valor <= 0) {
+      return c.json({ message: 'Valor inválido.' }, 400)
+    }
+
+    const perfil = await getPerfilUsuario(usuarioId)
+    if (!perfil?.email) {
+      return c.json({ message: 'Perfil sem e-mail. Atualize seu cadastro.' }, 400)
+    }
+
+    const baseUrl = getRequestOrigin(c).replace(/\/+$/, '')
+    const externalRef = `hf-${randomUUID()}`
+
+    const pref = await criarPreferenciaCheckout({
+      baseUrl,
+      usuarioId,
+      email: perfil.email,
+      title: titulo,
+      unitPrice: valor,
+      externalReference: externalRef,
+      quantity: 1,
+    })
+
+    await insertPreferenciaRecord({
+      usuario_id: usuarioId,
+      preference_id: String(pref.id),
+      external_reference: externalRef,
+      amount: valor,
+      description: titulo,
+    })
+
+    const token = getMercadoPagoAccessToken()
+    const useSandbox = useSandboxCheckout(token)
+
+    return c.json({
+      preference_id: pref.id,
+      init_point: pref.init_point,
+      sandbox_init_point: pref.sandbox_init_point,
+      use_sandbox: useSandbox,
+    })
+  } catch (error) {
+    console.error('criar preferencia mp failed', error)
+    return c.json({ message: error.message || 'Erro ao criar pagamento.' }, 500)
+  }
+})
+
+/** Mercado Pago envia notificações (IPN / webhooks). Responda 200 rápido. */
+app.get('/api/pagamentos/webhook', (c) => c.json({ ok: true }))
+
+app.post('/api/pagamentos/webhook', async (c) => {
+  let paymentId = null
+  try {
+    const url = new URL(c.req.url)
+    const qsTopic = url.searchParams.get('topic') || url.searchParams.get('type')
+    const qsId = url.searchParams.get('id') || url.searchParams.get('data.id')
+    if (qsTopic === 'payment' && qsId) paymentId = String(qsId)
+
+    if (!paymentId) {
+      const ct = c.req.header('content-type') || ''
+      if (ct.includes('application/json')) {
+        const body = await c.req.json()
+        if (body?.data?.id != null) {
+          paymentId = String(body.data.id)
+        }
+        if (!paymentId && body?.id && body?.topic === 'payment') {
+          paymentId = String(body.id)
+        }
+      } else {
+        const text = await c.req.text()
+        if (text) {
+          const params = new URLSearchParams(text)
+          if (params.get('topic') === 'payment' && params.get('id')) {
+            paymentId = String(params.get('id'))
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.error('[MP webhook] parse', e)
+  }
+
+  if (!paymentId) {
+    return c.json({ received: true })
+  }
+
+  try {
+    const payment = await buscarPagamentoPorId(paymentId)
+    await upsertFromWebhookPayment(payment)
+  } catch (e) {
+    console.error('[MP webhook] process', e)
+  }
+
+  return c.json({ ok: true })
+})
 
 app.post('/api/ai/chat', async (c) => {
   try {
