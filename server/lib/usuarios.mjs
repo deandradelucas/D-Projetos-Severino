@@ -163,18 +163,35 @@ export async function buscarUsuarioPorTelefone(telefoneLimpo, options = {}) {
 
 export async function getPerfilUsuario(usuarioId) {
   const supabaseAdmin = getSupabaseAdmin()
-  
-  const { data, error } = await supabaseAdmin
+
+  let res = await supabaseAdmin
     .from('usuarios')
     .select('id, email, telefone, nome, role, is_active, last_login_at, created_at')
     .eq('id', usuarioId)
     .single()
 
-  if (error || !data) {
-    return null
+  if (!res.error && res.data) {
+    return {
+      ...res.data,
+      role: res.data.role ?? 'USER',
+      is_active: res.data.is_active !== false,
+    }
   }
 
-  return data
+  res = await supabaseAdmin
+    .from('usuarios')
+    .select('id, email, telefone, nome, created_at')
+    .eq('id', usuarioId)
+    .single()
+
+  if (res.error || !res.data) return null
+
+  return {
+    ...res.data,
+    role: 'USER',
+    is_active: true,
+    last_login_at: null,
+  }
 }
 
 export async function registrarLogWhatsApp(telefone, mensagem, status, detalhe, usuarioId = null) {

@@ -141,7 +141,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container dashboard-page">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
 
@@ -157,11 +157,11 @@ export default function Dashboard() {
                 <rect width="7" height="7" x="3" y="14" rx="1"/>
               </svg>
             </button>
-            <div>
-              <h1 className="responsive-h1" style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px', letterSpacing: '-0.02em' }}>
+            <div className="dashboard-greeting">
+              <h1 className="responsive-h1 dashboard-greeting-title">
                 Olá, {usuario.nome}!
               </h1>
-              <p className="responsive-p" style={{ color: 'var(--text-secondary)' }}>
+              <p className="responsive-p dashboard-greeting-sub">
                 Resumo geral deste mês
               </p>
             </div>
@@ -231,13 +231,13 @@ export default function Dashboard() {
         ) : (
           <div className="dashboard-grid-main">
             {/* Table Section */}
-            <section className="content-section" style={{ marginBottom: 0 }}>
-              <div className="section-header">
-                <h1 className="responsive-h1" style={{ fontWeight: 700 }}>Minhas Transações</h1>
-                <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Transação</button>
+            <section className="content-section dashboard-transactions-card" style={{ marginBottom: 0 }}>
+              <div className="section-header dashboard-section-header">
+                <h1 className="responsive-h1 dashboard-section-title">Minhas Transações</h1>
+                <button type="button" className="btn-primary btn-primary-dashboard" onClick={() => setIsModalOpen(true)}>+ Transação</button>
               </div>
 
-              <div style={{ overflowX: 'auto' }}>
+              <div className="transactions-table-wrap">
                 {loading ? (
                   <div className="skeleton-stagger">
                     <SkeletonRow />

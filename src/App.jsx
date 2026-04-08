@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext'
+import RouteTransitionSkeleton from './components/RouteTransitionSkeleton'
 import Cadastro from './pages/Cadastro'
 import Login from './pages/Login'
 import RedefinirSenha from './pages/RedefinirSenha'
@@ -22,6 +23,7 @@ function App() {
         <Background />
         <PwaInstallPrompt />
         <HorizonChat />
+        <RouteTransitionSkeleton />
         <Routes>
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/login" element={<Login />} />
