@@ -13,7 +13,6 @@ import {
 } from './lib/password-reset.mjs'
 import { getCategorias, inserirTransacao, getTransacoes, deletarTransacao } from './lib/transacoes.mjs'
 import {
-  atualizarTelefoneUsuario,
   getPerfilUsuario,
   getWhatsappLogs,
   getWhatsappStatus,
@@ -148,27 +147,6 @@ app.get('/api/usuarios/perfil', async (c) => {
   } catch (error) {
     console.error('get perfil failed', error)
     return c.json({ message: 'Erro ao buscar perfil.' }, 500)
-  }
-})
-
-app.put('/api/usuarios/telefone', async (c) => {
-  try {
-    const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
-
-    const body = await c.req.json()
-    let telefone = String(body.telefone || '').replace(/\D/g, '')
-
-    if (telefone && telefone.length < 10) {
-      return c.json({ message: 'Número de telefone parece usar formato inválido.' }, 400)
-    }
-
-    const atualizado = await atualizarTelefoneUsuario(usuarioId, telefone || null)
-    return c.json({ message: 'Telefone atualizado com sucesso!', telefone: atualizado.telefone })
-
-  } catch (error) {
-    console.error('update telefone failed', error)
-    return c.json({ message: error.message || 'Erro ao atualizar telefone.' }, 500)
   }
 })
 

@@ -77,12 +77,12 @@ function buscarUsuarioPorSufixoUnico(digitos, allUsers) {
     if (matches.length === 1) return matches[0]
   }
 
-  for (const len of [11, 10]) {
-    if (d.length < len) continue
-    const pre = d.slice(0, len)
+  if (d.length >= 11) {
+    const pre11 = d.slice(0, 11)
     const matches = allUsers.filter((u) => {
       const uc = String(u.telefone).replace(/\D/g, '')
-      return uc === pre || uc.endsWith(pre) || pre.endsWith(uc) || uc.includes(pre)
+      const nacional = uc.startsWith('55') ? uc.slice(2) : uc
+      return nacional.slice(0, 11) === pre11 || nacional === pre11
     })
     if (matches.length === 1) return matches[0]
   }

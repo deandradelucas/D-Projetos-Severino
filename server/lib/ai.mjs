@@ -253,3 +253,64 @@ export function sanitizeTransacaoExtraidaIA(extractedData, categoriasUsuario) {
 
   return extractedData
 }
+
+/**
+ * Fallback: Gemini compara dígitos do webhook (LID/ruído) com telefones cadastrados no Supabase.
+ */
+export async function resolverUsuarioIdPorTelefoneGemini(digitosWebhook, usuarios) {
+  loadEnv()
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey || !digitosWebhook || !usuarios?.length) return null
+
+  const digitos = String(digitosWebhook).replace(/\D/g, '')
+  const lista = usuarios
+    .map((u, i) => `${i + 1}. usuario_id="${u.id}" telefone="${String(u.telefone || '').replace(/\D/g, '')}"`)
+    .join('\n')
+
+  const prompt = `Você faz pareamento de telefone entre um identificador vindo do WhatsApp (webhook Baileys/Telein) e usuários cadastrados no Brasil.
+
+DÍGITOS DO WEBHOOK (podem ter comprimento estranho por LID @lid, dígito extra, ou falta do 55):
+${digitos}
+
+USUÁRIOS CADASTRADOS (apenas dígitos do telefone):
+${lista}
+
+Regras:
+- Celular BR costuma ser: opcional DDI 55 + DDD (2 dígitos) + 9 dígitos (celular: primeiro dígito após DDD é 9).
+- O mesmo aparelho pode aparecer como 11999887766, 5511999887766, ou com sufixo/prefixo diferente por ID interno.
+- Escolha no máximo UM usuario_id que seja claramente o mesmo número físico.
+
+Responda APENAS JSON válido, sem markdown:
+{"usuario_id":"<uuid>"}
+ou
+{"usuario_id":null}`
+
+  try {
+    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 256, temperature: 0.1 },
+      }),
+    })
+
+    if (!response.ok) return null
+
+    const json = await response.json()
+    let text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    text = text.trim()
+    if (text.startsWith('```')) {
+      text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '')
+    }
+
+    const parsed = JSON.parse(text)
+    const id = parsed?.usuario_id
+    if (!id || typeof id !== 'string') return null
+
+    const valid = usuarios.find((u) => u.id === id)
+    return valid || null
+  } catch {
+    return null
+  }
+}

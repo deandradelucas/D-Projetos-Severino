@@ -91,7 +91,12 @@ export default function Cadastro() {
           'apikey': supabaseKey,
           'Authorization': `Bearer ${supabaseKey}`
         },
-        body: JSON.stringify({ nome, telefone, email, senha })
+        body: JSON.stringify({
+          nome,
+          telefone: telefone.replace(/\D/g, '') || null,
+          email,
+          senha,
+        })
       })
 
       const data = await parseSupabaseResponse(response)

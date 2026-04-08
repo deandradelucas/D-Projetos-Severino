@@ -155,7 +155,7 @@ export default function AdminWhatsApp() {
               URL do webhook (Chipmassa / Telein)
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px', maxWidth: '720px' }}>
-              {whatsappConfig.hint} O número em <strong>Telefone remetente</strong> só aparece quando o token está correto e o payload traz o JID; cadastre o mesmo número em Configurações.
+              {whatsappConfig.hint} O número em <strong>Telefone remetente</strong> deve coincidir com o <strong>telefone informado no cadastro da conta</strong> (criação de conta).
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
@@ -235,7 +235,7 @@ export default function AdminWhatsApp() {
             Controle de usuários
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-            Números cadastrados para o bot reconhecer despesas pelo WhatsApp (edição em Configurações).
+            Telefones da conta (cadastro inicial) usados pelo bot para vincular mensagens.
           </p>
           {loadingUsuarios ? (
             <p style={{ color: 'var(--text-secondary)' }}>Carregando usuários...</p>
