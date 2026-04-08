@@ -61,15 +61,19 @@ export async function handleWhatsAppWebhook(req) {
       return { status: 400, json: { error: 'Invalid Body' } }
     }
 
-    // 2. Validar Token (Headers ou Body)
-    const tokenFromBody = body.token || body.api_token || body.apikey || body.Token || ''
-    const finalToken = (rawAuth || tokenFromBody).replace('Bearer ', '').trim()
+    // 2. Validar Token (Headers, Body ou Query)
+    const url = new URL(typeof req.url === 'string' ? req.url : (req.raw ? req.raw.url : 'http://localhost'))
+    const tokenFromQuery = url.searchParams.get('token') || url.searchParams.get('api_token') || url.searchParams.get('key') || ''
+    
+    const tokenFromBody = body.token || body.api_token || body.apikey || body.Token || body.key || ''
+    const finalToken = (rawAuth || tokenFromQuery || tokenFromBody).replace('Bearer ', '').trim()
 
     if (!finalToken.includes(EXPECTED_TOKEN)) {
       console.warn('[WhatsApp Webhook] Token Inválido')
+      const bodyKeys = Object.keys(body).join(', ') || 'nenhum campo no body'
       const maskedToken = finalToken ? `${finalToken.substring(0, 4)}...` : 'ausente'
-      await registrarLogWhatsApp('?', 'Acesso não autorizado', 'ERRO', `Token recebido (${maskedToken}) não confere com o esperado.`)
-      return { status: 401, json: { error: 'Unauthorized' } }
+      await registrarLogWhatsApp('?', 'Acesso não autorizado', 'ERRO', `Token: ${maskedToken} | Campos recebidos: [${bodyKeys}]`)
+      return { status: 401, json: { error: 'Unauthorized', debug: bodyKeys } }
     }
 
     // Tentar extrair remetente básico para log preliminar
