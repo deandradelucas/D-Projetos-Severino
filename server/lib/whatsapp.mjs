@@ -102,6 +102,8 @@ function getFromMeFromBody(body) {
     body?.body?.key?.fromMe,
     body?.key?.fromMe,
     body?.data?.key?.fromMe,
+    body?.data?.messages?.[0]?.key?.fromMe,
+    body?.messages?.[0]?.key?.fromMe,
     body['body[key][fromMe]'],
   ]
   for (const v of candidates) {
@@ -479,8 +481,12 @@ export async function handleWhatsAppWebhook(req, options = {}) {
       return { status: 200, json: { ok: true, warning: 'Sem texto de mensagem.' } }
     }
 
-    if (numeroRemetente === '554799895014') {
-      return { status: 200, json: { ok: true, message: 'Ignorando o próprio número.' } }
+    // Linha Chipmassa/Telein (ex.: 554799895014) *recebe* as mensagens; o remetente deve ser o cliente.
+    // Só ignorar eco/resposta enviada pela própria instância (fromMe), não um número fixo.
+    const outboundFromMe = getFromMeFromBody(body)
+    if (outboundFromMe === true) {
+      await registrarLogWhatsApp(numeroRemetente, mensagemRaw, 'IGNORADO', 'Mensagem outbound (fromMe); não é comando do usuário.')
+      return { status: 200, json: { ok: true, ignored: 'outbound_from_me' } }
     }
 
     console.log(`[WhatsApp Webhook] Mensagem recebida de: ${numeroRemetente} -> "${mensagemRaw}"`)
