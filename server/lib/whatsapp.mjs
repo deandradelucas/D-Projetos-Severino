@@ -300,22 +300,37 @@ function firstRemoteJidFromMessagesArray(messages) {
 
 /**
  * Extrai telefone (só dígitos) e texto da mensagem para vários formatos (flat Telein, Evolution, Baileys).
+ * Prioriza remoteJidAlt e @s.whatsapp.net — @lid costuma não bater com telefone cadastrado.
  */
 function extractRemetenteEMensagem(body) {
   let remetenteRaw = ''
   let mensagemRaw = ''
 
   const roots = mergePayloadRoots(body)
+  const jidCandidates = []
+
+  const pushJid = (j) => {
+    if (j && typeof j === 'string') jidCandidates.push(j)
+  }
+
+  pushJid(body['body[key][remoteJidAlt]'])
+  pushJid(body['body[key][remoteJid]'])
+  pushJid(body['key[remoteJidAlt]'])
+  pushJid(body['key[remoteJid]'])
 
   for (const root of roots) {
-    if (!remetenteRaw) {
-      remetenteRaw =
-        root.phone ||
-        root.from ||
-        root.sender ||
-        root.participant ||
-        root.key?.remoteJid ||
-        firstRemoteJidFromMessagesArray(root.messages)
+    pushJid(root.phone)
+    pushJid(root.from)
+    pushJid(root.sender)
+    pushJid(root.participant)
+    pushJid(root.key?.remoteJidAlt)
+    pushJid(root.key?.remoteJid)
+    pushJid(firstRemoteJidFromMessagesArray(root.messages))
+    if (Array.isArray(root.messages)) {
+      for (const item of root.messages) {
+        pushJid(item?.key?.remoteJidAlt)
+        pushJid(item?.key?.remoteJid)
+      }
     }
     if (!mensagemRaw) {
       const direct =
@@ -335,28 +350,31 @@ function extractRemetenteEMensagem(body) {
       body['message[conversation]'] ||
       ''
   }
-  if (!remetenteRaw) {
-    remetenteRaw = body['body[key][remoteJid]'] || body['key[remoteJid]'] || ''
-  }
 
-  if (typeof remetenteRaw === 'object' && remetenteRaw?.remoteJid) {
-    remetenteRaw = remetenteRaw.remoteJid
-  }
-  if (typeof body.key === 'object' && body.key?.remoteJid && !remetenteRaw) {
-    remetenteRaw = body.key.remoteJid
+  if (typeof body.key === 'object') {
+    pushJid(body.key?.remoteJidAlt)
+    pushJid(body.key?.remoteJid)
   }
 
   // Evolution: mensagem em data.messages[]
-  if (!remetenteRaw && body.data?.messages?.[0]?.key?.remoteJid) {
-    remetenteRaw = body.data.messages[0].key.remoteJid
+  if (body.data?.messages?.[0]?.key) {
+    pushJid(body.data.messages[0].key.remoteJidAlt)
+    pushJid(body.data.messages[0].key.remoteJid)
   }
   if (!mensagemRaw && body.data?.messages?.[0]?.message) {
     const msg = body.data.messages[0].message
     mensagemRaw = msg.conversation || msg.extendedTextMessage?.text || msg.imageMessage?.caption || ''
   }
 
+  remetenteRaw = pickPreferredJidFromList(jidCandidates)
+
   if (!remetenteRaw) {
-    remetenteRaw = findAnyRemoteJidInPayload(body)
+    const fromDeep = collectRemoteJidsRecursive(body)
+    remetenteRaw = pickPreferredJidFromList(fromDeep)
+  }
+
+  if (typeof remetenteRaw === 'object' && remetenteRaw?.remoteJid) {
+    remetenteRaw = remetenteRaw.remoteJid
   }
 
   const msgFinal =
