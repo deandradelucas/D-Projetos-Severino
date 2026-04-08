@@ -51,29 +51,16 @@ export async function handleWhatsAppWebhook(req) {
     
     preRemetente = preRemetente.replace(/\D/g, '')
 
-    // 2. Extrair dados da mensagem conforme a API Evolution/Z-API
-    let remetenteRaw = ''
+    // 2. Extrair dados da mensagem conforme a API Evolution/Z-API/Telein
+    let remetenteRaw = body.phone || body.from || body.sender || (body.data && body.data.remoteJid) || ''
+    mensagemRaw = body.text || body.message || body.content || (body.data && body.data.message && (body.data.message.conversation || body.data.message.extendedTextMessage?.text)) || ''
 
-    if (body.data && body.data.remoteJid) {
-      remetenteRaw = body.data.remoteJid.split('@')[0]
-      mensagemRaw = body.data.message?.conversation || body.data.message?.extendedTextMessage?.text || ''
-    } else if (body.phone && body.text) {
-        remetenteRaw = String(body.phone)
-        mensagemRaw = String(body.text)
-    } else if (body.messages && body.messages[0]) {
-      remetenteRaw = body.messages[0].from
-      mensagemRaw = body.messages[0].text?.body || ''
-    } else {
-        remetenteRaw = String(body.from || body.sender || '')
-        mensagemRaw = String(body.text || body.message || '')
-    }
+    if (typeof remetenteRaw === 'object' && remetenteRaw.remoteJid) remetenteRaw = remetenteRaw.remoteJid
+    
+    numeroRemetente = String(remetenteRaw).replace(/\D/g, '')
 
-    if (!remetenteRaw || !mensagemRaw) {
-      console.log(`[WhatsApp Webhook] Payload vazio ou incompleto.`)
-      return { status: 200, json: { ok: true, message: 'Nenhuma mensagem recebida ou remetente ignorado.' } }
-    }
-
-    numeroRemetente = remetenteRaw.replace(/\D/g, '')
+    // Log de diagnóstico: se não achamos campos padrão, guardamos o que veio
+    const debugInfo = `Dados recebidos: ${JSON.stringify(body).substring(0, 500)}`
 
     if (numeroRemetente === '554799895014') {
         return { status: 200, json: { ok: true, message: 'Ignorando o próprio número.' } }
