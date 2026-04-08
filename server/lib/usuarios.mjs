@@ -1,4 +1,5 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
+import { resolverUsuarioIdPorTelefoneGemini } from './ai.mjs'
 
 export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
   const supabaseAdmin = getSupabaseAdmin()
@@ -22,6 +23,7 @@ export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
 
 /**
  * Gera variantes com/sem DDI 55 para bater com o cadastro (ex.: 11999... vs 5511999...).
+ * Inclui truncamento dos primeiros 11/13 dígitos (LID/@lid costuma vir com dígito extra).
  */
 export function variantesTelefoneBrasil(digitos) {
   const d = String(digitos || '').replace(/\D/g, '')
@@ -31,10 +33,20 @@ export function variantesTelefoneBrasil(digitos) {
   if (d.startsWith('55') && d.length > 2) {
     out.add(d.slice(2))
   }
-  if (!d.startsWith('55') && d.length >= 10 && d.length <= 13) {
+  if (!d.startsWith('55') && d.length >= 10 && d.length <= 15) {
     out.add(`55${d}`)
   }
-  // Últimos 11 dígitos (DDD + celular) — comum quando um lado tem LID ou prefixo extra
+  // Nacional 11 dígitos (DDD + celular) — primeiro bloco quando vem lixo no fim (ex.: LID 14+ dígitos)
+  if (d.length > 11) {
+    const head11 = d.slice(0, 11)
+    out.add(head11)
+    if (!d.startsWith('55')) out.add(`55${head11}`)
+  }
+  if (d.length > 13 && d.startsWith('55')) {
+    out.add(d.slice(0, 13))
+    out.add(d.slice(2, 13))
+  }
+  // Últimos 11 dígitos (DDD + celular)
   if (d.length >= 11) {
     const tail11 = d.slice(-11)
     out.add(tail11)
@@ -50,7 +62,39 @@ export function variantesTelefoneBrasil(digitos) {
   return [...out]
 }
 
-export async function buscarUsuarioPorTelefone(telefoneLimpo) {
+/** Quando só um usuário tem telefone que “casa” pelo sufixo (9–13 dígitos). */
+function buscarUsuarioPorSufixoUnico(digitos, allUsers) {
+  const d = String(digitos).replace(/\D/g, '')
+  if (d.length < 8 || !allUsers?.length) return null
+
+  for (const len of [13, 12, 11, 10, 9]) {
+    if (d.length < len) continue
+    const suf = d.slice(-len)
+    const matches = allUsers.filter((u) => {
+      const uc = String(u.telefone).replace(/\D/g, '')
+      return uc === suf || uc.endsWith(suf) || suf.endsWith(uc)
+    })
+    if (matches.length === 1) return matches[0]
+  }
+
+  for (const len of [11, 10]) {
+    if (d.length < len) continue
+    const pre = d.slice(0, len)
+    const matches = allUsers.filter((u) => {
+      const uc = String(u.telefone).replace(/\D/g, '')
+      return uc === pre || uc.endsWith(pre) || pre.endsWith(uc) || uc.includes(pre)
+    })
+    if (matches.length === 1) return matches[0]
+  }
+
+  return null
+}
+
+/**
+ * @param {string} telefoneLimpo
+ * @param {{ usarGemini?: boolean }} [options] — default usarGemini true se GEMINI_API_KEY existir
+ */
+export async function buscarUsuarioPorTelefone(telefoneLimpo, options = {}) {
   const supabaseAdmin = getSupabaseAdmin()
   const variants = variantesTelefoneBrasil(telefoneLimpo)
 
@@ -65,7 +109,6 @@ export async function buscarUsuarioPorTelefone(telefoneLimpo) {
     if (data) return data
   }
 
-  // Fallback: comparar só dígitos com todas as contas (telefone salvo com ou sem 55 / formatação)
   const { data: allUsers, error: errAll } = await supabaseAdmin
     .from('usuarios')
     .select('id, email, telefone')
@@ -75,17 +118,27 @@ export async function buscarUsuarioPorTelefone(telefoneLimpo) {
 
   const targetVariants = new Set(variantesTelefoneBrasil(telefoneLimpo))
 
-  return (
-    allUsers.find((u) => {
-      const uClean = String(u.telefone).replace(/\D/g, '')
-      if (targetVariants.has(uClean)) return true
-      const uVars = new Set(variantesTelefoneBrasil(uClean))
-      for (const t of targetVariants) {
-        if (uVars.has(t)) return true
-      }
-      return false
-    }) || null
-  )
+  const found = allUsers.find((u) => {
+    const uClean = String(u.telefone).replace(/\D/g, '')
+    if (targetVariants.has(uClean)) return true
+    const uVars = new Set(variantesTelefoneBrasil(uClean))
+    for (const t of targetVariants) {
+      if (uVars.has(t)) return true
+    }
+    return false
+  })
+  if (found) return found
+
+  const bySuffix = buscarUsuarioPorSufixoUnico(telefoneLimpo, allUsers)
+  if (bySuffix) return bySuffix
+
+  const usarGemini = options.usarGemini !== false
+  if (usarGemini) {
+    const geminiMatch = await resolverUsuarioIdPorTelefoneGemini(telefoneLimpo, allUsers)
+    if (geminiMatch) return geminiMatch
+  }
+
+  return null
 }
 
 export async function getPerfilUsuario(usuarioId) {
