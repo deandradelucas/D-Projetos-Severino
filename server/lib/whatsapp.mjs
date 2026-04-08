@@ -1,6 +1,6 @@
 import { buscarUsuarioPorTelefone, registrarLogWhatsApp } from './usuarios.mjs'
 import { getCategorias, inserirTransacao } from './transacoes.mjs'
-import { parseWhatsAppMessageWithAI } from './ai.mjs'
+import { parseWhatsAppMessageWithAI, sanitizeTransacaoExtraidaIA } from './ai.mjs'
 
 /** Headers comuns em provedores (Telein, Evolution, Z-API, etc.) */
 function collectTokenFromHeaders(getHeader) {
