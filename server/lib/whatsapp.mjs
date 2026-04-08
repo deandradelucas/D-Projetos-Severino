@@ -39,19 +39,44 @@ function parseWebhookRequestUrl(req) {
   }
 }
 
-/** Último recurso: qualquer remoteJid no JSON (Telein aninhado). */
-function findAnyRemoteJidInPayload(obj, depth = 0) {
-  if (!obj || depth > 16) return ''
-  if (typeof obj === 'string') {
-    return /@(s\.whatsapp\.net|c\.us|lid|g\.us)\b/.test(obj) ? obj : ''
+/** Quanto maior, melhor para identificar telefone real (LID não bate com cadastro). */
+function scoreJidQuality(jid) {
+  if (!jid || typeof jid !== 'string') return -1
+  if (jid.includes('@s.whatsapp.net')) return 100
+  if (jid.includes('@c.us')) return 80
+  if (jid.includes('@g.us')) return 30
+  if (jid.includes('@lid')) return 10
+  return 0
+}
+
+function pickBetterJid(a, b) {
+  if (!a) return b || ''
+  if (!b) return a
+  return scoreJidQuality(b) > scoreJidQuality(a) ? b : a
+}
+
+/** Coleta JIDs no JSON e escolhe o melhor (@s.whatsapp.net antes de @lid). */
+function collectRemoteJidsRecursive(obj, depth = 0, acc = []) {
+  if (!obj || depth > 16) return acc
+  if (typeof obj === 'string' && /@(s\.whatsapp\.net|c\.us|lid|g\.us)\b/.test(obj)) {
+    acc.push(obj)
+    return acc
   }
-  if (typeof obj !== 'object') return ''
-  if (typeof obj.remoteJid === 'string') return obj.remoteJid
+  if (typeof obj !== 'object') return acc
+  if (typeof obj.remoteJid === 'string') acc.push(obj.remoteJid)
+  if (typeof obj.remoteJidAlt === 'string') acc.push(obj.remoteJidAlt)
+  if (typeof obj.participant === 'string') acc.push(obj.participant)
   for (const v of Object.values(obj)) {
-    const r = findAnyRemoteJidInPayload(v, depth + 1)
-    if (r) return r
+    collectRemoteJidsRecursive(v, depth + 1, acc)
   }
-  return ''
+  return acc
+}
+
+function pickPreferredJidFromList(jids) {
+  const uniq = [...new Set(jids.filter(Boolean).map(String))]
+  if (uniq.length === 0) return ''
+  uniq.sort((a, b) => scoreJidQuality(b) - scoreJidQuality(a))
+  return uniq[0]
 }
 
 /**
