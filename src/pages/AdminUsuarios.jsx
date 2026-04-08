@@ -16,20 +16,29 @@ export default function AdminUsuarios() {
   const [editForm, setEditForm] = useState({})
   const [userFilter, setUserFilter] = useState('')
   const [userActionMessage, setUserActionMessage] = useState('')
+  const [loadError, setLoadError] = useState('')
 
   useEffect(() => {
     const load = async () => {
+      setLoadError('')
       try {
         const userSaved = localStorage.getItem('horizonte_user')
-        if (!userSaved) return
+        if (!userSaved) {
+          setLoadError('Faça login para carregar os usuários.')
+          return
+        }
         const u = JSON.parse(userSaved)
         const res = await fetch('/api/admin/usuarios', { headers: { 'x-user-id': u.id } })
+        const data = await res.json().catch(() => ({}))
         if (res.ok) {
-          const list = await res.json()
-          setUsuarios(Array.isArray(list) ? list : [])
+          setUsuarios(Array.isArray(data) ? data : [])
+        } else {
+          setUsuarios([])
+          setLoadError(data.message || `Erro ao buscar usuários (${res.status}).`)
         }
-      } catch {
-        /* ignore */
+      } catch (e) {
+        setUsuarios([])
+        setLoadError(e.message || 'Falha de rede ao carregar usuários.')
       } finally {
         setLoadingUsuarios(false)
       }
@@ -190,6 +199,12 @@ export default function AdminUsuarios() {
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
             Veja quem está conectado, ajuste papéis (roles), ative ou desative contas, edite dados e envie links de redefinição de senha.
           </p>
+
+          {loadError && (
+            <div style={{ marginBottom: '12px', padding: '10px 12px', borderRadius: '8px', background: 'rgba(239,68,68,0.12)', color: '#b91c1c', fontSize: '14px' }}>
+              {loadError}
+            </div>
+          )}
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
             <input

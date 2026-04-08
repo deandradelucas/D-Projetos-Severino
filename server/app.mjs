@@ -31,7 +31,12 @@ import {
   isMercadoPagoConfigured,
   useSandboxCheckout,
 } from './lib/mercadopago.mjs'
-import { insertPreferenciaRecord, listPagamentosUsuario, upsertFromWebhookPayment } from './lib/pagamentos-mp.mjs'
+import {
+  insertPreferenciaRecord,
+  listPagamentosUsuario,
+  listPagamentosAdmin,
+  upsertFromWebhookPayment,
+} from './lib/pagamentos-mp.mjs'
 
 const app = new Hono()
 
@@ -253,6 +258,19 @@ app.put('/api/admin/usuarios/:id', async (c) => {
     console.error('update admin usuario failed', error)
     const msg = error.code === '23505' ? 'E-mail ou telefone já utilizado em outra conta.' : 'Erro ao atualizar usuário.'
     return c.json({ message: msg }, 500)
+  }
+})
+
+app.get('/api/admin/pagamentos', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    const lim = Math.min(500, Math.max(1, parseInt(c.req.query('limit') || '200', 10) || 200))
+    const rows = await listPagamentosAdmin(lim)
+    return c.json(rows)
+  } catch (error) {
+    console.error('get admin pagamentos failed', error)
+    return c.json({ message: 'Erro ao listar pagamentos.' }, 500)
   }
 })
 

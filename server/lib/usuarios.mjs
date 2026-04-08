@@ -209,16 +209,56 @@ export async function getWhatsappLogs(limit = 50) {
   return data || []
 }
 
-/** Lista usuários para painel admin (telefone WhatsApp visível). */
+/** Lista todos os usuários para o painel admin. */
 export async function listUsuariosAdmin() {
   const supabaseAdmin = getSupabaseAdmin()
-  const { data, error } = await supabaseAdmin
-    .from('usuarios')
-    .select('id, nome, email, telefone, role, is_active, last_login_at, created_at')
-    .order('email', { ascending: true })
 
-  if (error) throw error
-  return data || []
+  const ordenar = (q) => q.order('email', { ascending: true })
+
+  let res = await ordenar(
+    supabaseAdmin.from('usuarios').select('id, nome, email, telefone, role, is_active, last_login_at, created_at')
+  )
+
+  if (!res.error) {
+    return (res.data || []).map((row) => ({
+      ...row,
+      nome: row.nome ?? '',
+      role: row.role ?? 'USER',
+      is_active: row.is_active !== false,
+      last_login_at: row.last_login_at ?? null,
+    }))
+  }
+
+  console.warn('[listUsuariosAdmin] select com colunas admin falhou (rode a migration 03?), tentando schema básico:', res.error.message)
+
+  res = await ordenar(
+    supabaseAdmin.from('usuarios').select('id, nome, email, telefone, created_at')
+  )
+
+  if (!res.error) {
+    return (res.data || []).map((row) => ({
+      ...row,
+      role: 'USER',
+      is_active: true,
+      last_login_at: null,
+    }))
+  }
+
+  console.warn('[listUsuariosAdmin] tentando sem created_at:', res.error.message)
+
+  res = await ordenar(supabaseAdmin.from('usuarios').select('id, nome, email, telefone'))
+
+  if (!res.error) {
+    return (res.data || []).map((row) => ({
+      ...row,
+      role: 'USER',
+      is_active: true,
+      last_login_at: null,
+      created_at: null,
+    }))
+  }
+
+  throw res.error
 }
 
 export async function updateUsuarioAdmin(id, payload) {

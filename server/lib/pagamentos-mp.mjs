@@ -25,19 +25,6 @@ export async function insertPreferenciaRecord({
   return data
 }
 
-export async function updatePagamentoByPaymentId(payment_id, patch) {
-  const supabase = getSupabaseAdmin()
-  const { error } = await supabase
-    .from('pagamentos_mercadopago')
-    .update({
-      ...patch,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('payment_id', payment_id)
-
-  if (error) throw error
-}
-
 /**
  * Atualiza registro criado na preferência ou insere se o webhook chegar primeiro (raro).
  */
@@ -99,4 +86,44 @@ export async function listPagamentosUsuario(usuario_id, limit = 20) {
 
   if (error) throw error
   return data || []
+}
+
+const COLS_FLAT = `
+  id,
+  usuario_id,
+  preference_id,
+  payment_id,
+  status,
+  status_detail,
+  amount,
+  currency_id,
+  description,
+  external_reference,
+  payer_email,
+  created_at,
+  updated_at
+`
+
+/** Painel admin: todos os registros (com e-mail do usuário quando o relacionamento existir no Supabase). */
+export async function listPagamentosAdmin(limit = 200) {
+  const supabase = getSupabaseAdmin()
+
+  const withUser = await supabase
+    .from('pagamentos_mercadopago')
+    .select(`${COLS_FLAT.trim()}, usuarios ( email, nome )`)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (!withUser.error) {
+    return withUser.data || []
+  }
+
+  const flat = await supabase
+    .from('pagamentos_mercadopago')
+    .select(COLS_FLAT.trim())
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (flat.error) throw flat.error
+  return flat.data || []
 }
