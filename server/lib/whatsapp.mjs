@@ -26,26 +26,38 @@ export async function handleWhatsAppWebhook(req) {
     // 1. Extrair Body de forma ultra-robusta
     let body = {}
     let rawText = ''
-    const contentType = getHeader('content-type')
+    const contentType = getHeader('content-type') || ''
     
     try {
       // Hono c.req.text() fallback to Request.text()
       rawText = await (typeof req.text === 'function' ? req.text() : (req.raw ? await req.raw.text() : ''))
       
-      if (!rawText || rawText.trim() === '') {
-        // Se texto vazio, tenta parseBody (caso seja form-data que o text() não pegou)
-        body = await req.parseBody()
-      } else {
-        try {
-          body = JSON.parse(rawText)
-        } catch (jsonErr) {
-          // Se não é JSON, tenta parseBody como fallback
-          body = await req.parseBody()
+      if (rawText && rawText.trim() !== '') {
+        if (contentType.includes('application/json')) {
+          try {
+            body = JSON.parse(rawText)
+          } catch (e) {
+            // Fallback: se o header diz que é JSON mas falhou o parse, tenta ver se é urlencoded
+            body = Object.fromEntries(new URLSearchParams(rawText))
+          }
+        } else if (contentType.includes('application/x-www-form-urlencoded')) {
+          body = Object.fromEntries(new URLSearchParams(rawText))
+        } else {
+          // Última tentativa: tenta JSON, se falhar tenta urlencoded
+          try {
+            body = JSON.parse(rawText)
+          } catch {
+            body = Object.fromEntries(new URLSearchParams(rawText))
+          }
         }
+      } else {
+        // Se texto vazio e for multipart, o text() pode não ter pego. Tenta parseBody() se o stream permitir
+        // Mas como já chamamos text(), o stream foi consumido. 
+        // Em Vercel/Hono, é melhor confiar no text() ou json()
       }
     } catch (e) {
       console.error('[WhatsApp Webhook] Erro crítico ao ler body:', e.message)
-      await registrarLogWhatsApp('?', 'Requisição Ilegível', 'ERRO', `CT: ${contentType} | Erro: ${e.message}`)
+      await registrarLogWhatsApp('?', 'Requisição Ilegível', 'ERRO', `CT: ${contentType} | Erro: ${e.message} | Raw: ${rawText.substring(0, 100)}`)
       return { status: 400, json: { error: 'Invalid Body' } }
     }
 
