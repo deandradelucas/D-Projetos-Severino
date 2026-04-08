@@ -23,16 +23,29 @@ export async function handleWhatsAppWebhook(req) {
 
     console.log(`[WhatsApp Webhook] Chamada recebida. Verificando Token...`)
 
-    // 1. Extrair Body (Hono c.req.json or Request.json)
-    let body
+    // 1. Extrair Body de forma ultra-robusta
+    let body = {}
+    let rawText = ''
+    const contentType = getHeader('content-type')
+    
     try {
-      // Tentar JSON primeiro, se falhar tenta ParseBody (forms)
-      body = await req.json().catch(() => req.parseBody())
-      if (!body) throw new Error('Body vazio')
+      // Hono c.req.text() fallback to Request.text()
+      rawText = await (typeof req.text === 'function' ? req.text() : (req.raw ? await req.raw.text() : ''))
+      
+      if (!rawText || rawText.trim() === '') {
+        // Se texto vazio, tenta parseBody (caso seja form-data que o text() não pegou)
+        body = await req.parseBody()
+      } else {
+        try {
+          body = JSON.parse(rawText)
+        } catch (jsonErr) {
+          // Se não é JSON, tenta parseBody como fallback
+          body = await req.parseBody()
+        }
+      }
     } catch (e) {
-      console.error('[WhatsApp Webhook] Erro ao ler body:', e.message)
-      // Logamos a tentativa de erro no banco para diagnóstico
-      await registrarLogWhatsApp('?', 'Requisição Inválida', 'ERRO', `Falha ao ler body: ${e.message}`)
+      console.error('[WhatsApp Webhook] Erro crítico ao ler body:', e.message)
+      await registrarLogWhatsApp('?', 'Requisição Ilegível', 'ERRO', `CT: ${contentType} | Erro: ${e.message}`)
       return { status: 400, json: { error: 'Invalid Body' } }
     }
 
