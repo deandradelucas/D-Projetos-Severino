@@ -7,6 +7,10 @@ export default function AdminWhatsApp() {
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [whatsappConfig, setWhatsappConfig] = useState(null)
+  const [usuarios, setUsuarios] = useState([])
+  const [loadingUsuarios, setLoadingUsuarios] = useState(true)
+  const [copyFeedback, setCopyFeedback] = useState('')
   const [status, setStatus] = useState({
     online: false,
     platform: 'Carregando...',
@@ -27,27 +31,48 @@ export default function AdminWhatsApp() {
     }
   }
 
+  const copyText = async (label, text) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopyFeedback(label)
+      setTimeout(() => setCopyFeedback(''), 2000)
+    } catch {
+      setCopyFeedback('Erro ao copiar')
+    }
+  }
+
   useEffect(() => {
     const fetchLogs = async () => {
       try {
         const userSaved = localStorage.getItem('horizonte_user')
         if (!userSaved) return // No user
         const u = JSON.parse(userSaved)
-        
-        // Fetch Status
-        fetch('/api/admin/whatsapp-status', {
-          headers: { 'x-user-id': u.id }
-        })
+        const headers = { 'x-user-id': u.id }
+
+        fetch('/api/admin/whatsapp-status', { headers })
           .then(r => r.json())
           .then(data => setStatus(data))
           .catch(e => console.error('Erro ao buscar status:', e))
 
-        // Fetch Logs
-        const res = await fetch('/api/admin/whatsapp-logs', {
-          headers: { 'x-user-id': u.id }
-        })
-        if (!res.ok) throw new Error('Falha ao carregar logs')
-        const data = await res.json()
+        const [resLogs, resCfg, resUsers] = await Promise.all([
+          fetch('/api/admin/whatsapp-logs', { headers }),
+          fetch('/api/admin/whatsapp-config', { headers }),
+          fetch('/api/admin/usuarios', { headers }),
+        ])
+
+        if (resCfg.ok) {
+          const cfg = await resCfg.json()
+          setWhatsappConfig(cfg)
+        }
+
+        if (resUsers.ok) {
+          const list = await resUsers.json()
+          setUsuarios(Array.isArray(list) ? list : [])
+        }
+        setLoadingUsuarios(false)
+
+        if (!resLogs.ok) throw new Error('Falha ao carregar logs')
+        const data = await resLogs.json()
         setLogs(Array.isArray(data) ? data : [])
       } catch (err) {
         setError(err.message)
