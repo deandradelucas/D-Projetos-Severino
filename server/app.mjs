@@ -71,9 +71,24 @@ app.use('*', cors({
 
 app.get('/api/health', (c) => c.json({ ok: true }))
 
+/** Texto útil a partir de Error, PostgrestError ou objeto genérico. */
+function errorToText(error) {
+  if (error == null) return ''
+  if (typeof error === 'string') return error
+  if (typeof error.message === 'string' && error.message) {
+    const bits = [error.message, error.details, error.hint, error.code].filter(Boolean)
+    return bits.join(' | ')
+  }
+  try {
+    return JSON.stringify(error)
+  } catch {
+    return String(error)
+  }
+}
+
 /** Erros de configuração/rede do Supabase — retorna null se for falha genérica. */
 function mapSupabaseOrNetworkError(error) {
-  const raw = String(error?.message != null ? error.message : error || '')
+  const raw = errorToText(error)
   if (raw.includes('Missing VITE_SUPABASE_URL') || raw.includes('SUPABASE_SERVICE_ROLE_KEY')) {
     return {
       status: 503,
@@ -81,17 +96,36 @@ function mapSupabaseOrNetworkError(error) {
         'Banco de dados não configurado no servidor. No Vercel, defina VITE_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY e faça um novo deploy.',
     }
   }
-  if (/Invalid API key|JWT expired|invalid value for JWT|API key/i.test(raw)) {
+  if (/Invalid API key|JWT expired|invalid value for JWT|JWT|API key/i.test(raw)) {
     return {
       status: 503,
       message:
         'Chave do Supabase inválida ou ausente. Confira SUPABASE_SERVICE_ROLE_KEY e VITE_SUPABASE_URL no servidor.',
     }
   }
-  if (/ENOTFOUND|ECONNREFUSED|fetch failed|NetworkError|Failed to fetch/i.test(raw)) {
+  if (/ENOTFOUND|ECONNREFUSED|fetch failed|NetworkError|Failed to fetch|getaddrinfo|certificate/i.test(raw)) {
     return {
       status: 503,
       message: 'Não foi possível conectar ao banco de dados. Tente de novo em alguns instantes.',
+    }
+  }
+  if (/relation.*does not exist|42P01/i.test(raw)) {
+    return {
+      status: 503,
+      message: 'Tabela de usuários não encontrada. Rode as migrations do Supabase neste projeto.',
+    }
+  }
+  if (/permission denied for table|42501/i.test(raw)) {
+    return {
+      status: 503,
+      message:
+        'Acesso negado ao banco. Confira SUPABASE_SERVICE_ROLE_KEY (service role) no Vercel.',
+    }
+  }
+  if (/PGRST116|multiple rows|more than one row/i.test(raw)) {
+    return {
+      status: 409,
+      message: 'Existem registros duplicados para este e-mail. Contate o suporte.',
     }
   }
   return null

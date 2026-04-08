@@ -114,17 +114,20 @@ export async function authenticateUser(email, password) {
   const normalizedEmail = String(email || '').trim().toLowerCase()
   const normalizedPassword = String(password || '')
 
-  const { data, error } = await supabaseAdmin
+  /* .maybeSingle() quebra com erro se existir mais de um registro (e-mail duplicado).
+     .limit(1) evita PGRST116 e usa a primeira linha. */
+  const { data: rows, error } = await supabaseAdmin
     .from('usuarios')
     .select('id, email, nome, role, is_active, last_login_at')
     .eq('email', normalizedEmail)
     .eq('senha', normalizedPassword)
-    .maybeSingle()
+    .limit(1)
 
   if (error) {
     throw error
   }
 
+  const data = rows?.[0] ?? null
   if (!data) return null
   if (data.is_active === false) {
     return null
