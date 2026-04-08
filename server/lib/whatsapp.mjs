@@ -76,25 +76,35 @@ export async function handleWhatsAppWebhook(req) {
       return { status: 401, json: { error: 'Unauthorized', debug: bodyKeys } }
     }
 
-    // Tentar extrair remetente básico para log preliminar
-    let preRemetente = 'Desconhecido'
-    if (body.phone) preRemetente = String(body.phone)
-    else if (body.from) preRemetente = String(body.from)
-    else if (body.sender) preRemetente = String(body.sender)
-    else if (body.data?.remoteJid) preRemetente = body.data.remoteJid.split('@')[0]
-    
-    preRemetente = preRemetente.replace(/\D/g, '')
+    // Melhora a extração de dados para campos "achatados" (ex: body[message][conversation])
+    const getDeepValue = (obj, path) => {
+        // Tenta achar a chave exata primeiro
+        if (obj[path]) return obj[path]
+        // Se não achar, tenta achar em chaves que contêm o caminho (ex: se path é 'conversation', procura em 'body[message][conversation]')
+        for (const key in obj) {
+            if (key.includes(`[${path}]`) || key.endsWith(path)) return obj[key]
+        }
+        return ''
+    }
 
-    // 2. Extrair dados da mensagem conforme a API Evolution/Z-API/Telein
-    let remetenteRaw = body.phone || body.from || body.sender || (body.data && body.data.remoteJid) || ''
-    mensagemRaw = body.text || body.message || body.content || (body.data && body.data.message && (body.data.message.conversation || body.data.message.extendedTextMessage?.text)) || ''
+    // 2. Extrair dados da mensagem conforme a API Evolution/Z-API/Telein (Flat & Deep)
+    let remetenteRaw = body.phone || body.from || body.sender || getDeepValue(body, 'remoteJid') || getDeepValue(body, 'participant') || ''
+    mensagemRaw = body.text || body.message || body.content || getDeepValue(body, 'conversation') || getDeepValue(body, 'text') || ''
+
+    // Se ainda estiver vazio, tenta uma busca exaustiva por qualquer campo que pareça mensagem
+    if (!mensagemRaw) {
+        mensagemRaw = body['body[message][conversation]'] || body['body[text]'] || ''
+    }
+    if (!remetenteRaw) {
+        remetenteRaw = body['body[key][remoteJid]'] || body['key'] || ''
+    }
 
     if (typeof remetenteRaw === 'object' && remetenteRaw.remoteJid) remetenteRaw = remetenteRaw.remoteJid
     
     numeroRemetente = String(remetenteRaw).replace(/\D/g, '')
 
-    // Log de diagnóstico: se não achamos campos padrão, guardamos o que veio
-    const debugInfo = `Dados recebidos: ${JSON.stringify(body).substring(0, 500)}`
+    // Log de diagnóstico atualizado
+    const debugInfo = `Tokens: Query=${!!tokenFromQuery}, Body=${!!tokenFromBody} | Msg: ${mensagemRaw.substring(0, 20)}`
 
     if (numeroRemetente === '554799895014') {
         return { status: 200, json: { ok: true, message: 'Ignorando o próprio número.' } }
@@ -102,12 +112,12 @@ export async function handleWhatsAppWebhook(req) {
 
     console.log(`[WhatsApp Webhook] Mensagem recebida de: ${numeroRemetente} -> "${mensagemRaw}"`)
 
-    // 3. Buscar no Banco pelo Usuario com aquele telefone
+    // ... Resto do processamento ...
     usuarioTarget = await buscarUsuarioPorTelefone(numeroRemetente)
     if (!usuarioTarget) {
       console.warn(`[WhatsApp Webhook] Telefone ${numeroRemetente} não possui usuário vinculado.`)
-      await registrarLogWhatsApp(numeroRemetente, mensagemRaw, 'IGNORADO', 'Usuário não registrado com esse telefone.')
-      return { status: 200, json: { ok: true, warning: 'Usuário não registrado com esse telefone. Mensagem ignorada.' } }
+      await registrarLogWhatsApp(numeroRemetente, mensagemRaw || '(sem texto)', 'IGNORADO', `Usuário não vinculado. ${debugInfo}`)
+      return { status: 200, json: { ok: true, warning: 'Usuário não registrado com esse telefone.' } }
     }
 
     // 4. Se Usuário achado, Pegar Categorias do Usuario
