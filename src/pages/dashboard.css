@@ -25,6 +25,11 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transacoes-balance-pos: #6366f1;
+  /* Áreas seguras (notch, home indicator, PWA) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
 .responsive-h1 {
@@ -951,15 +956,21 @@ h3 {
   }
 
   .dashboard-container {
-    padding: 12px;
+    padding: calc(10px + var(--safe-top)) calc(10px + var(--safe-right)) calc(10px + var(--safe-bottom))
+      calc(10px + var(--safe-left));
     gap: 0;
-    height: 100svh;
+    min-height: 100svh;
+    min-height: 100dvh;
+    box-sizing: border-box;
   }
 
   .main-content {
-    border-radius: 24px;
-    padding: 20px 16px;
+    border-radius: 22px;
+    padding: calc(16px + var(--safe-top) * 0.35) 14px calc(20px + var(--safe-bottom)) 14px;
     margin-top: 0;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    scroll-behavior: smooth;
   }
 
   .mobile-menu-btn {
@@ -998,14 +1009,20 @@ h3 {
     left: -100%;
     bottom: 0;
     z-index: 100;
-    transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: left 0.42s cubic-bezier(0.16, 1, 0.32, 1);
     background-color: var(--sidebar-bg);
     -webkit-backdrop-filter: blur(40px);
     backdrop-filter: blur(40px);
-    width: 85%;
+    width: min(88vw, 300px);
     max-width: 300px;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0 40px 40px 0;
+    border-radius: 0 36px 36px 0;
+    padding-top: calc(28px + var(--safe-top));
+    padding-bottom: calc(24px + var(--safe-bottom));
+    padding-left: 14px;
+    padding-right: 14px;
+    box-sizing: border-box;
+    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.35);
   }
 
   .sidebar.open {
@@ -1016,11 +1033,11 @@ h3 {
     display: block;
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    background: linear-gradient(105deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.45) 100%);
+    -webkit-backdrop-filter: blur(6px) saturate(1.1);
+    backdrop-filter: blur(6px) saturate(1.1);
     z-index: 40;
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.28s ease;
   }
 
   /* Reset nav-item for mobile (disable overlap hack and curves) */
