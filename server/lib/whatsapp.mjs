@@ -27,10 +27,38 @@ function mergePayloadRoots(body) {
   return roots
 }
 
-/** Texto útil de um nó `message` Baileys (objeto ou string). */
+/**
+ * Texto útil de um nó `message` Baileys.
+ * Em muitos webhooks o campo `message` vem como string de sistema ("notify", "append") — não é conversa; ignorar evita exigir token à toa.
+ */
 function textFromBaileysMessageNode(msg) {
   if (msg == null) return ''
-  if (typeof msg === 'string') return msg
+  if (typeof msg === 'string') {
+    const t = msg.trim()
+    if (!t) return ''
+    if (t.startsWith('{')) {
+      try {
+        return textFromBaileysMessageNode(JSON.parse(t))
+      } catch {
+        return ''
+      }
+    }
+    const low = t.toLowerCase()
+    const noise = new Set([
+      'notify',
+      'append',
+      'relay',
+      'receipt',
+      'ack',
+      'read',
+      'delivered',
+      'sender',
+      'receiver',
+      'protocolmessage',
+    ])
+    if (noise.has(low)) return ''
+    return msg
+  }
   if (typeof msg !== 'object') return ''
   return (
     (typeof msg.conversation === 'string' && msg.conversation) ||
@@ -117,12 +145,25 @@ function hasPresenceHints(keys) {
   })
 }
 
-/** Só metadados de chave (ack, sync, id) — típico `body[key][remoteJid]` sem `body[message]`. */
+/** Só metadados de chave (ack, sync, id) — típico `body[key][remoteJid]` sem `body[message]`. Telein pode acrescentar event/instance. */
 function looksLikeBaileysKeyMetadataOnly(keys) {
   if (hasChatContentHints(keys) || hasPresenceHints(keys)) return false
   if (keys.length === 0) return false
+  const extraMeta = new Set([
+    'event',
+    'instance',
+    'session',
+    'id',
+    'sender',
+    'receiver',
+    'trace',
+    'traceid',
+    'timestamp',
+    'ts',
+  ])
   return keys.every((k) => {
     if (k === 'key' || k === 'type') return true
+    if (extraMeta.has(k.toLowerCase())) return true
     if (k.startsWith('body[key]') || k === 'body[key]') return true
     return false
   })
