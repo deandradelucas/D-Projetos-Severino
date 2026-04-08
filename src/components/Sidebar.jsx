@@ -1,6 +1,36 @@
-import { NavLink } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
+
+/** Ordem vertical no menu (índice sobe/desce a bolinha) */
+const MENU_ORDER = [
+  '/dashboard',
+  '/transacoes',
+  '/relatorios',
+  '/pagamento',
+  '/configuracoes',
+  '/admin/whatsapp',
+  '/admin/usuarios',
+  '/admin/pagamentos',
+]
 
 export default function Sidebar({ menuAberto, setMenuAberto }) {
+  const location = useLocation()
+  const prevMenuIdx = useRef(-1)
+  const [dotMotion, setDotMotion] = useState(null)
+
+  useEffect(() => {
+    const idx = MENU_ORDER.indexOf(location.pathname)
+    if (idx < 0) return
+
+    if (prevMenuIdx.current >= 0 && prevMenuIdx.current !== idx) {
+      setDotMotion(idx > prevMenuIdx.current ? 'down' : 'up')
+      const t = window.setTimeout(() => setDotMotion(null), 680)
+      prevMenuIdx.current = idx
+      return () => window.clearTimeout(t)
+    }
+    prevMenuIdx.current = idx
+  }, [location.pathname])
+
   // Sidebar agora é sempre Full Black, logo sempre usa a versão clara (branca)
   const logoSrc = '/images/horizonte_fiel_original_logo_dark.png'
   return (
@@ -22,7 +52,10 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           </button>
         </div>
 
-        <ul className="nav-menu">
+        <ul
+          className="nav-menu"
+          data-dot-motion={dotMotion || undefined}
+        >
           <li>
             <NavLink 
               to="/dashboard" 
