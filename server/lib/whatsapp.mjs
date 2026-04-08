@@ -10,13 +10,15 @@ export async function handleWhatsAppWebhook(req) {
   try {
     // 0. Log preventivo para saber se o webhook foi atingido (Hono c.req.header or Request.headers.get)
     const getHeader = (name) => {
-      if (typeof req.header === 'function') return req.header(name)
-      if (req.headers && typeof req.headers.get === 'function') return req.headers.get(name)
-      return null
+      try {
+        return req.header(name) || ''
+      } catch {
+        // Fallback for non-Hono requests if any
+        return (req.headers && req.headers.get) ? req.headers.get(name) : (req.headers ? req.headers[name] : '')
+      }
     }
 
     const rawAuth = getHeader('authorization') || getHeader('x-api-key') || ''
-    const apiToken = rawAuth.replace('Bearer ', '').trim()
     const EXPECTED_TOKEN = process.env.WHATSAPP_WEBHOOK_TOKEN || 'ece58f64012d51028d28a04264d07131'
 
     console.log(`[WhatsApp Webhook] Chamada recebida. Verificando Token...`)
@@ -24,26 +26,30 @@ export async function handleWhatsAppWebhook(req) {
     // 1. Extrair Body (Hono c.req.json or Request.json)
     let body
     try {
-      body = typeof req.json === 'function' ? await req.json() : await req.parseBody()
+      // Tentar JSON primeiro, se falhar tenta ParseBody (forms)
+      body = await req.json().catch(() => req.parseBody())
+      if (!body) throw new Error('Body vazio')
     } catch (e) {
-      console.error('[WhatsApp Webhook] Erro ao ler body JSON:', e)
-      return { status: 400, json: { error: 'Invalid JSON Body' } }
+      console.error('[WhatsApp Webhook] Erro ao ler body:', e.message)
+      // Logamos a tentativa de erro no banco para diagnóstico
+      await registrarLogWhatsApp('?', 'Requisição Inválida', 'ERRO', `Falha ao ler body: ${e.message}`)
+      return { status: 400, json: { error: 'Invalid Body' } }
     }
 
-    // Tentar extrair remetente básico para log preliminar se token falhar
+    // 2. Validar Token
+    if (!rawAuth.includes(EXPECTED_TOKEN)) {
+      console.warn('[WhatsApp Webhook] Token Inválido')
+      await registrarLogWhatsApp('?', 'Acesso não autorizado', 'ERRO', 'Token de autorização inválido ou ausente')
+      return { status: 401, json: { error: 'Unauthorized' } }
+    }
+
+    // Tentar extrair remetente básico para log preliminar
     let preRemetente = 'Desconhecido'
     if (body.phone) preRemetente = String(body.phone)
     else if (body.data?.remoteJid) preRemetente = body.data.remoteJid.split('@')[0]
     else if (body.messages?.[0]?.from) preRemetente = body.messages[0].from
     
     preRemetente = preRemetente.replace(/\D/g, '')
-
-    // VALIDAR TOKEN
-    if (apiToken !== EXPECTED_TOKEN) {
-      console.warn(`[WhatsApp Webhook] Token Inválido! Recebido: "${apiToken}"`)
-      await registrarLogWhatsApp(preRemetente || '?', mensagemRaw, 'ERRO_TOKEN', `Tentativa de acesso com token inválido.`)
-      return { status: 401, json: { error: 'Token Inválido ou Ausente' } }
-    }
 
     // 2. Extrair dados da mensagem conforme a API Evolution/Z-API
     let remetenteRaw = ''

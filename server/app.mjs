@@ -172,6 +172,10 @@ app.post('/api/whatsapp/webhook', async (c) => {
   return c.json(result.json, result.status)
 })
 
+app.get('/api/whatsapp/webhook', (c) => {
+  return c.text('Webhook do WhatsApp está ativo! Utilize o método POST para enviar dados da plataforma.')
+})
+
 // Webhook Logs Admin (Simplified Admin route based on user ID checking logic for the future, right now just returning all)
 app.get('/api/admin/whatsapp-status', async (c) => {
   try {

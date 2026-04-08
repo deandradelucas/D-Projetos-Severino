@@ -23,14 +23,39 @@ export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
 export async function buscarUsuarioPorTelefone(telefoneLimpo) {
   const supabaseAdmin = getSupabaseAdmin()
   
-  const { data, error } = await supabaseAdmin
+  // Tentar busca exata primeiro
+  let { data, error } = await supabaseAdmin
     .from('usuarios')
     .select('id, email, telefone')
     .eq('telefone', telefoneLimpo)
-    .single()
+    .maybeSingle()
 
-  if (error || !data) {
-    return null
+  // Se não achou e o número tem 12 ou 13 dígitos (com 55), tenta buscar sem o 55
+  if (!data && (telefoneLimpo.startsWith('55') && telefoneLimpo.length >= 12)) {
+    const semDDI = telefoneLimpo.substring(2)
+    const { data: dataSemDDI } = await supabaseAdmin
+      .from('usuarios')
+      .select('id, email, telefone')
+      .eq('telefone', semDDI)
+      .maybeSingle()
+    
+    if (dataSemDDI) data = dataSemDDI
+  }
+
+  // Se ainda não achou, tenta uma busca mais "agressiva" limpando caracteres do banco (caso existam (, ), -, etc)
+  if (!error && !data) {
+    const { data: allUsers } = await supabaseAdmin
+      .from('usuarios')
+      .select('id, email, telefone')
+      .not('telefone', 'is', null)
+
+    if (allUsers) {
+      const target = telefoneLimpo.startsWith('55') ? telefoneLimpo.substring(2) : telefoneLimpo
+      data = allUsers.find(u => {
+        const uClean = u.telefone.replace(/\D/g, '')
+        return uClean === target || uClean === telefoneLimpo
+      }) || null
+    }
   }
 
   return data
