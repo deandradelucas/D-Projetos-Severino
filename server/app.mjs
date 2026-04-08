@@ -12,7 +12,13 @@ import {
   storeResetToken,
 } from './lib/password-reset.mjs'
 import { getCategorias, inserirTransacao, getTransacoes, deletarTransacao } from './lib/transacoes.mjs'
-import { atualizarTelefoneUsuario, getPerfilUsuario, getWhatsappLogs, getWhatsappStatus } from './lib/usuarios.mjs'
+import {
+  atualizarTelefoneUsuario,
+  getPerfilUsuario,
+  getWhatsappLogs,
+  getWhatsappStatus,
+  listUsuariosAdmin,
+} from './lib/usuarios.mjs'
 import { handleWhatsAppWebhook } from './lib/whatsapp.mjs'
 import { askHorizon } from './lib/ai.mjs'
 
@@ -166,7 +172,12 @@ app.put('/api/usuarios/telefone', async (c) => {
   }
 })
 
-// Webhook Whatsapp Local Handler
+// Webhook Whatsapp (token também pode ir no path: /api/whatsapp/webhook/SEU_TOKEN)
+app.post('/api/whatsapp/webhook/:pathToken', async (c) => {
+  const result = await handleWhatsAppWebhook(c.req, { pathToken: c.req.param('pathToken') })
+  return c.json(result.json, result.status)
+})
+
 app.post('/api/whatsapp/webhook', async (c) => {
   const result = await handleWhatsAppWebhook(c.req)
   return c.json(result.json, result.status)
@@ -203,6 +214,39 @@ app.get('/api/admin/whatsapp-logs', async (c) => {
   } catch (error) {
     console.error('get admin logs failed', error)
     return c.json({ message: 'Erro ao buscar logs do whatsapp.' }, 500)
+  }
+})
+
+app.get('/api/admin/whatsapp-config', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+
+    const origin = getRequestOrigin(c).replace(/\/$/, '')
+    const token = process.env.WHATSAPP_WEBHOOK_TOKEN || 'ece58f64012d51028d28a04264d07131'
+    const enc = encodeURIComponent(token)
+    return c.json({
+      webhookUrlQuery: `${origin}/api/whatsapp/webhook?token=${enc}`,
+      webhookUrlPath: `${origin}/api/whatsapp/webhook/${enc}`,
+      hint:
+        'Cole uma dessas URLs no painel Chipmassa/Telein (Webhook). Sem o token correto, mensagens com texto são rejeitadas.',
+    })
+  } catch (error) {
+    console.error('get whatsapp config failed', error)
+    return c.json({ message: 'Erro ao montar URL do webhook.' }, 500)
+  }
+})
+
+app.get('/api/admin/usuarios', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+
+    const usuarios = await listUsuariosAdmin()
+    return c.json(usuarios)
+  } catch (error) {
+    console.error('get admin usuarios failed', error)
+    return c.json({ message: 'Erro ao listar usuários.' }, 500)
   }
 })
 

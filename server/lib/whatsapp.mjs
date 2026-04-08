@@ -27,6 +27,33 @@ function mergePayloadRoots(body) {
   return roots
 }
 
+/** req.url pode vir só como `/api/whatsapp/webhook?token=x` — new URL(iso) quebra sem base. */
+function parseWebhookRequestUrl(req) {
+  const raw = typeof req.url === 'string' ? req.url : req.raw?.url || ''
+  if (!raw) return new URL('http://localhost/')
+  try {
+    if (/^https?:\/\//i.test(raw)) return new URL(raw)
+    return new URL(raw.startsWith('/') ? raw : `/${raw}`, 'http://localhost')
+  } catch {
+    return new URL('http://localhost/')
+  }
+}
+
+/** Último recurso: qualquer remoteJid no JSON (Telein aninhado). */
+function findAnyRemoteJidInPayload(obj, depth = 0) {
+  if (!obj || depth > 16) return ''
+  if (typeof obj === 'string') {
+    return /@(s\.whatsapp\.net|c\.us|lid|g\.us)\b/.test(obj) ? obj : ''
+  }
+  if (typeof obj !== 'object') return ''
+  if (typeof obj.remoteJid === 'string') return obj.remoteJid
+  for (const v of Object.values(obj)) {
+    const r = findAnyRemoteJidInPayload(v, depth + 1)
+    if (r) return r
+  }
+  return ''
+}
+
 /**
  * Texto útil de um nó `message` Baileys.
  * Em muitos webhooks o campo `message` vem como string de sistema ("notify", "append") — não é conversa; ignorar evita exigir token à toa.
@@ -301,6 +328,10 @@ function extractRemetenteEMensagem(body) {
     mensagemRaw = msg.conversation || msg.extendedTextMessage?.text || msg.imageMessage?.caption || ''
   }
 
+  if (!remetenteRaw) {
+    remetenteRaw = findAnyRemoteJidInPayload(body)
+  }
+
   const msgFinal =
     typeof mensagemRaw === 'string' ? mensagemRaw : textFromBaileysMessageNode(mensagemRaw)
   return { remetenteRaw, mensagemRaw: msgFinal || '' }
@@ -314,7 +345,14 @@ function tokenMatches(finalToken, expected) {
   return t === e
 }
 
-export async function handleWhatsAppWebhook(req) {
+export async function handleWhatsAppWebhook(req, options = {}) {
+  let pathToken = String(options.pathToken || '').trim()
+  try {
+    pathToken = decodeURIComponent(pathToken)
+  } catch {
+    /* mantém bruto */
+  }
+
   let numeroRemetente = 'Desconhecido'
   let mensagemRaw = 'Sem conteúdo'
   let usuarioTarget = null
@@ -374,7 +412,7 @@ export async function handleWhatsAppWebhook(req) {
       return { status: 200, json: { ok: true, ignored: 'no_inbound_chat_to_process' } }
     }
 
-    const url = new URL(typeof req.url === 'string' ? req.url : req.raw ? req.raw.url : 'http://localhost')
+    const url = parseWebhookRequestUrl(req)
     const tokenFromQuery =
       url.searchParams.get('token') ||
       url.searchParams.get('api_token') ||
@@ -394,13 +432,25 @@ export async function handleWhatsAppWebhook(req) {
       }
     }
 
-    const finalToken = (rawAuth || tokenFromQuery || tokenFromBody).replace(/^Bearer\s+/i, '').trim()
+    const finalToken = (pathToken || rawAuth || tokenFromQuery || tokenFromBody).replace(/^Bearer\s+/i, '').trim()
 
     if (!tokenMatches(finalToken, EXPECTED_TOKEN)) {
+      const preview = extractRemetenteEMensagem(body)
+      let telForLog = '?'
+      if (preview.remetenteRaw) {
+        const digits = String(preview.remetenteRaw).replace(/\D/g, '')
+        if (digits) telForLog = digits
+      }
+      const msgPrev = (preview.mensagemRaw || '').slice(0, 200)
       console.warn('[WhatsApp Webhook] Token inválido ou ausente para payload com possível mensagem.')
       const bodyKeys = Object.keys(body).join(', ')
       const maskedToken = finalToken ? `${finalToken.substring(0, 5)}...` : 'ausente'
-      await registrarLogWhatsApp('?', 'Acesso não autorizado', 'ERRO', `Token detectado: ${maskedToken} | Campos: [${bodyKeys.substring(0, 100)}]`)
+      await registrarLogWhatsApp(
+        telForLog,
+        'Acesso não autorizado',
+        'ERRO',
+        `Token detectado: ${maskedToken} | Texto: ${msgPrev || '(não extraído)'} | Campos: [${bodyKeys.slice(0, 160)}]`
+      )
       return { status: 401, json: { error: 'Unauthorized' } }
     }
 

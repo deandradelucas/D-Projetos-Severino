@@ -109,6 +109,18 @@ export async function getWhatsappLogs(limit = 50) {
   return data || []
 }
 
+/** Lista usuários para painel admin (telefone WhatsApp visível). */
+export async function listUsuariosAdmin() {
+  const supabaseAdmin = getSupabaseAdmin()
+  const { data, error } = await supabaseAdmin
+    .from('usuarios')
+    .select('id, email, telefone')
+    .order('email', { ascending: true })
+
+  if (error) throw error
+  return data || []
+}
+
 export async function getWhatsappStatus() {
   const supabaseAdmin = getSupabaseAdmin()
   
