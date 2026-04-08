@@ -12,7 +12,7 @@ import {
   storeResetToken,
 } from './lib/password-reset.mjs'
 import { getCategorias, inserirTransacao, getTransacoes, deletarTransacao } from './lib/transacoes.mjs'
-import { atualizarTelefoneUsuario, getPerfilUsuario, getWhatsappLogs } from './lib/usuarios.mjs'
+import { atualizarTelefoneUsuario, getPerfilUsuario, getWhatsappLogs, getWhatsappStatus } from './lib/usuarios.mjs'
 import { handleWhatsAppWebhook } from './lib/whatsapp.mjs'
 import { askHorizon } from './lib/ai.mjs'
 
@@ -173,6 +173,19 @@ app.post('/api/whatsapp/webhook', async (c) => {
 })
 
 // Webhook Logs Admin (Simplified Admin route based on user ID checking logic for the future, right now just returning all)
+app.get('/api/admin/whatsapp-status', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+
+    const status = await getWhatsappStatus()
+    return c.json(status)
+  } catch (error) {
+    console.error('get admin status failed', error)
+    return c.json({ message: 'Erro ao buscar status do whatsapp.' }, 500)
+  }
+})
+
 app.get('/api/admin/whatsapp-logs', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')

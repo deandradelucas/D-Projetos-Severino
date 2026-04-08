@@ -127,9 +127,9 @@ export default function Transacoes() {
                 <rect width="7" height="7" x="3" y="14" rx="1"/>
               </svg>
             </button>
-            <h1 style={{ fontSize: '24px', fontWeight: 700 }}>Minhas Transações</h1>
+            <h1 className="responsive-h1" style={{ fontWeight: 700 }}>Minhas Transações</h1>
           </div>
-          <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Nova Transação</button>
+          <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Transação</button>
         </header>
 
         {/* Summary KPIs */}

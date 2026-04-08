@@ -241,16 +241,16 @@ export default function Relatorios() {
                 <rect width="7" height="7" x="3" y="14" rx="1"/>
               </svg>
             </button>
-            <h1 style={{ fontSize: '24px', fontWeight: 700 }}>Relatórios Analíticos</h1>
+            <h1 className="responsive-h1" style={{ fontWeight: 700 }}>Relatórios Analíticos</h1>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <button className="btn-secondary" onClick={exportToCSV} disabled={transacoes.length === 0} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button className="btn-secondary mobile-icon-only" onClick={exportToCSV} disabled={transacoes.length === 0} title="Exportar CSV">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-              Exportar CSV
+              <span className="desktop-only" style={{ marginLeft: '4px' }}>CSV</span>
             </button>
-            <button className="btn-primary" onClick={exportToPDF} disabled={transacoes.length === 0} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button className="btn-primary mobile-icon-only" onClick={exportToPDF} disabled={transacoes.length === 0} title="Baixar PDF">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              Baixar PDF
+              <span className="desktop-only" style={{ marginLeft: '4px' }}>PDF</span>
             </button>
           </div>
         </header>
@@ -311,7 +311,7 @@ export default function Relatorios() {
         ) : transacoes.length === 0 ? (
            <p style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Nenhuma transação efetivada encontrada neste período para compor o relatório.</p>
         ) : (
-          <div className="charts-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '40px' }}>
+          <div className="charts-grid" style={{ marginBottom: '40px' }}>
             
             {/* Bar Chart Container */}
             <div className="kpi-card" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>

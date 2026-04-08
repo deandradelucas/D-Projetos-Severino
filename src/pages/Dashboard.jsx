@@ -158,10 +158,10 @@ export default function Dashboard() {
               </svg>
             </button>
             <div>
-              <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '8px', letterSpacing: '-0.02em' }}>
+              <h1 className="responsive-h1" style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px', letterSpacing: '-0.02em' }}>
                 Olá, {usuario.nome}!
               </h1>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>
+              <p className="responsive-p" style={{ color: 'var(--text-secondary)' }}>
                 Resumo geral deste mês
               </p>
             </div>
@@ -233,8 +233,8 @@ export default function Dashboard() {
             {/* Table Section */}
             <section className="content-section" style={{ marginBottom: 0 }}>
               <div className="section-header">
-                <h2 style={{ fontSize: '18px', fontWeight: 600 }}>Últimas Atividades</h2>
-                <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Nova</button>
+                <h1 className="responsive-h1" style={{ fontWeight: 700 }}>Minhas Transações</h1>
+                <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Transação</button>
               </div>
 
               <div style={{ overflowX: 'auto' }}>

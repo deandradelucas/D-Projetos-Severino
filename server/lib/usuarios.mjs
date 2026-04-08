@@ -84,3 +84,23 @@ export async function getWhatsappLogs(limit = 50) {
   return data || []
 }
 
+export async function getWhatsappStatus() {
+  const supabaseAdmin = getSupabaseAdmin()
+  
+  // Buscar contagem total e última data
+  const { data, error, count } = await supabaseAdmin
+    .from('whatsapp_logs')
+    .select('data_hora', { count: 'exact' })
+    .order('data_hora', { ascending: false })
+    .limit(1)
+
+  if (error) throw error
+
+  return {
+    platform: 'Chipmassa / Telein',
+    totalLogs: count || 0,
+    lastPulse: data && data.length > 0 ? data[0].data_hora : null,
+    online: true // Se chegamos aqui, a conexão com o banco/API está ok
+  }
+}
+

@@ -58,7 +58,8 @@ button {
   body {
     position: fixed;
     inset: 0;
-    touch-action: manipulation;
+    touch-action: pan-y pinch-zoom;
+    overflow: hidden;
   }
 
   input,

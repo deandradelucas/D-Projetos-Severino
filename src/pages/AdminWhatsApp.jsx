@@ -7,6 +7,12 @@ export default function AdminWhatsApp() {
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [status, setStatus] = useState({
+    online: false,
+    platform: 'Carregando...',
+    lastPulse: null,
+    totalLogs: 0
+  })
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -28,6 +34,15 @@ export default function AdminWhatsApp() {
         if (!userSaved) return // No user
         const u = JSON.parse(userSaved)
         
+        // Fetch Status
+        fetch('/api/admin/whatsapp-status', {
+          headers: { 'x-user-id': u.id }
+        })
+          .then(r => r.json())
+          .then(data => setStatus(data))
+          .catch(e => console.error('Erro ao buscar status:', e))
+
+        // Fetch Logs
         const res = await fetch('/api/admin/whatsapp-logs', {
           headers: { 'x-user-id': u.id }
         })
@@ -60,11 +75,54 @@ export default function AdminWhatsApp() {
               </svg>
             </button>
             <div>
-              <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px' }}>Logs do WhatsApp</h1>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Auditoria de mensagens recebidas pelo BOT</p>
+              <h1 className="responsive-h1" style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px' }}>Logs do WhatsApp</h1>
+              <p className="responsive-p" style={{ color: 'var(--text-secondary)' }}>Auditoria de mensagens recebidas pelo BOT</p>
             </div>
           </div>
         </header>
+
+        <section className="content-section" style={{ gridColumn: '1 / -1', marginBottom: '24px', background: 'transparent', border: 'none', boxShadow: 'none', padding: 0 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+            {/* Card Status Webhook */}
+            <div className="kpi-card" style={{ padding: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Integração</p>
+                  <h3 style={{ fontSize: '18px', fontWeight: '700' }}>{status.platform}</h3>
+                </div>
+                <div style={{ 
+                  width: '12px', 
+                  height: '12px', 
+                  borderRadius: '50%', 
+                  backgroundColor: status.online ? '#22c55e' : '#ef4444',
+                  boxShadow: status.online ? '0 0 12px #22c55e' : '0 0 12px #ef4444',
+                  animation: 'pulse 2s infinite'
+                }} title={status.online ? 'Conectado' : 'Desconectado'} />
+              </div>
+              <div style={{ marginTop: '16px', fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
+                Status: <span style={{ color: status.online ? '#22c55e' : '#ef4444', fontWeight: '600' }}>{status.online ? 'CONECTADO' : 'OFFLINE'}</span>
+              </div>
+            </div>
+
+            {/* Card Última Atividade */}
+            <div className="kpi-card" style={{ padding: '20px' }}>
+              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Última Atividade</p>
+              <h3 style={{ fontSize: '18px', fontWeight: '700' }}>
+                {status.lastPulse ? new Date(status.lastPulse).toLocaleTimeString('pt-BR') : '--:--'}
+              </h3>
+              <p style={{ marginTop: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                {status.lastPulse ? new Date(status.lastPulse).toLocaleDateString('pt-BR') : 'Sem registros recentes'}
+              </p>
+            </div>
+
+            {/* Card Total Mensagens */}
+            <div className="kpi-card" style={{ padding: '20px' }}>
+              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Total de Mensagens</p>
+              <h3 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--accent)' }}>{status.totalLogs}</h3>
+              <p style={{ marginTop: '4px', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Logs auditados</p>
+            </div>
+          </div>
+        </section>
 
         <section className="content-section" style={{ gridColumn: '1 / -1' }}>
           {error && <div style={{ color: 'var(--danger)', marginBottom: '16px' }}>{error}</div>}
