@@ -149,6 +149,44 @@ export default function AdminWhatsApp() {
           </div>
         </section>
 
+        {whatsappConfig && (
+          <section className="content-section" style={{ gridColumn: '1 / -1', marginBottom: '20px' }}>
+            <h2 className="responsive-h2" style={{ fontWeight: '700', marginBottom: '12px', color: 'var(--text-primary)' }}>
+              URL do webhook (Chipmassa / Telein)
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px', maxWidth: '720px' }}>
+              {whatsappConfig.hint} O número em <strong>Telefone remetente</strong> só aparece quando o token está correto e o payload traz o JID; cadastre o mesmo número em Configurações.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>Com ?token= (recomendado)</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+                  <code style={{ fontSize: '12px', padding: '8px 10px', background: 'var(--bg-secondary, rgba(0,0,0,.06))', borderRadius: '6px', wordBreak: 'break-all', flex: '1', minWidth: '200px' }}>
+                    {whatsappConfig.webhookUrlQuery}
+                  </code>
+                  <button type="button" className="btn-secondary" style={{ padding: '8px 14px', fontSize: '13px' }} onClick={() => copyText('query', whatsappConfig.webhookUrlQuery)}>
+                    Copiar
+                  </button>
+                </div>
+              </div>
+              <div>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>Token no path (alternativa)</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+                  <code style={{ fontSize: '12px', padding: '8px 10px', background: 'var(--bg-secondary, rgba(0,0,0,.06))', borderRadius: '6px', wordBreak: 'break-all', flex: '1', minWidth: '200px' }}>
+                    {whatsappConfig.webhookUrlPath}
+                  </code>
+                  <button type="button" className="btn-secondary" style={{ padding: '8px 14px', fontSize: '13px' }} onClick={() => copyText('path', whatsappConfig.webhookUrlPath)}>
+                    Copiar
+                  </button>
+                </div>
+              </div>
+            </div>
+            {copyFeedback && (
+              <p style={{ fontSize: '13px', color: 'var(--accent)', marginTop: '10px' }}>Copiado ({copyFeedback}).</p>
+            )}
+          </section>
+        )}
+
         <section className="content-section" style={{ gridColumn: '1 / -1' }}>
           {error && <div style={{ color: 'var(--danger)', marginBottom: '16px' }}>{error}</div>}
           
@@ -190,6 +228,41 @@ export default function AdminWhatsApp() {
               </table>
             )}
           </div>
+        </section>
+
+        <section className="content-section" style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
+          <h2 className="responsive-h2" style={{ fontWeight: '700', marginBottom: '16px', color: 'var(--text-primary)' }}>
+            Controle de usuários
+          </h2>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+            Números cadastrados para o bot reconhecer despesas pelo WhatsApp (edição em Configurações).
+          </p>
+          {loadingUsuarios ? (
+            <p style={{ color: 'var(--text-secondary)' }}>Carregando usuários...</p>
+          ) : usuarios.length === 0 ? (
+            <p style={{ color: 'var(--text-secondary)' }}>Nenhum usuário encontrado.</p>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>E-mail</th>
+                    <th>Telefone (WhatsApp)</th>
+                    <th style={{ width: '120px' }}>ID</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {usuarios.map((row) => (
+                    <tr key={row.id}>
+                      <td style={{ fontWeight: '600' }}>{row.email}</td>
+                      <td>{row.telefone || '—'}</td>
+                      <td style={{ fontSize: '12px', color: 'var(--text-secondary)', wordBreak: 'break-all' }}>{row.id}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
 
       </main>
