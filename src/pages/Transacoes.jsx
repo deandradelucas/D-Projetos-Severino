@@ -112,14 +112,17 @@ export default function Transacoes() {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)
   }
 
+  const clearFilters = () =>
+    setFilters({ busca: '', tipo: '', status: '', categoria_id: '', dataInicio: '', dataFim: '' })
+
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container page-transacoes">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content relative z-10">
-        <header className="top-header">
-           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button className="mobile-menu-btn" onClick={() => setMenuAberto(true)}>
+        <header className="top-header transacoes-page-header">
+           <div className="transacoes-page-header__titles">
+            <button type="button" className="mobile-menu-btn" onClick={() => setMenuAberto(true)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <rect width="7" height="7" x="3" y="3" rx="1"/>
                 <rect width="7" height="7" x="14" y="3" rx="1"/>
@@ -127,13 +130,16 @@ export default function Transacoes() {
                 <rect width="7" height="7" x="3" y="14" rx="1"/>
               </svg>
             </button>
-            <h1 className="responsive-h1" style={{ fontWeight: 700 }}>Minhas Transações</h1>
+            <div>
+              <h1 className="responsive-h1 transacoes-page-header__h1">Minhas Transações</h1>
+              <p className="transacoes-page-header__sub">Lista completa com filtros e totais do recorte</p>
+            </div>
           </div>
-          <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Transação</button>
+          <button type="button" className="btn-primary btn-primary-dashboard" onClick={() => setIsModalOpen(true)}>+ Transação</button>
         </header>
 
         {/* Summary KPIs */}
-        <div className="kpi-grid" style={{ marginBottom: '24px' }}>
+        <div className="kpi-grid transacoes-kpi-strip">
           <div className="kpi-card">
             <div className="kpi-header">
               <span>Receitas Filtradas</span>
@@ -161,125 +167,128 @@ export default function Transacoes() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
               </svg>
             </div>
-            <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`} style={{ color: summary.saldo >= 0 ? 'var(--text-primary)' : 'var(--danger)' }}>
+            <div
+              className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`}
+              style={{ color: summary.saldo >= 0 ? 'var(--transacoes-balance-pos)' : 'var(--danger)' }}
+            >
               {formatCurrency(summary.saldo)}
             </div>
           </div>
         </div>
 
-        {/* Filters Bar */}
-        <div className="filter-bar">
-          <div className="filter-group" style={{ flex: '2', minWidth: '200px' }}>
-            <label>Busca</label>
-            <input 
-              type="text" 
-              name="busca" 
-              placeholder="Ex: Aluguel, Supermercado..." 
-              className="filter-input" 
-              value={filters.busca}
-              onChange={handleFilterChange}
-            />
+        {/* Filters */}
+        <section className="transacoes-filter-shell" aria-label="Filtros de transações">
+          <div className="transacoes-filter-shell__head">
+            <div>
+              <h2 className="transacoes-filter-shell__title">Filtros</h2>
+              <p className="transacoes-filter-shell__hint">Busca, categoria, período e status</p>
+            </div>
+            <button type="button" className="transacoes-btn-clear" onClick={clearFilters}>
+              Limpar filtros
+            </button>
           </div>
-          <div className="filter-group">
-            <label>Categoria</label>
-            <select name="categoria_id" className="filter-input" value={filters.categoria_id} onChange={handleFilterChange}>
-              <option value="">Todas</option>
-              {categorias.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.nome}</option>
-              ))}
-            </select>
+          <div className="transacoes-filter-grid">
+            <div className="filter-group transacoes-filter-grid__search">
+              <label htmlFor="tx-busca">Busca</label>
+              <input
+                id="tx-busca"
+                type="text"
+                name="busca"
+                placeholder="Ex: Aluguel, Supermercado…"
+                className="filter-input"
+                value={filters.busca}
+                onChange={handleFilterChange}
+              />
+            </div>
+            <div className="filter-group">
+              <label htmlFor="tx-cat">Categoria</label>
+              <select id="tx-cat" name="categoria_id" className="filter-input" value={filters.categoria_id} onChange={handleFilterChange}>
+                <option value="">Todas</option>
+                {categorias.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.nome}</option>
+                ))}
+              </select>
+            </div>
+            <div className="filter-group">
+              <label htmlFor="tx-tipo">Tipo</label>
+              <select id="tx-tipo" name="tipo" className="filter-input" value={filters.tipo} onChange={handleFilterChange}>
+                <option value="">Todos</option>
+                <option value="RECEITA">Receitas</option>
+                <option value="DESPESA">Despesas</option>
+              </select>
+            </div>
+            <div className="filter-group">
+              <label htmlFor="tx-status">Status</label>
+              <select id="tx-status" name="status" className="filter-input" value={filters.status} onChange={handleFilterChange}>
+                <option value="">Todos</option>
+                <option value="EFETIVADA">Efetivadas</option>
+                <option value="PENDENTE">Pendentes</option>
+              </select>
+            </div>
+            <div className="filter-group">
+              <label htmlFor="tx-ini">Início</label>
+              <input id="tx-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
+            </div>
+            <div className="filter-group">
+              <label htmlFor="tx-fim">Fim</label>
+              <input id="tx-fim" type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={handleFilterChange} />
+            </div>
           </div>
-          <div className="filter-group">
-            <label>Tipo</label>
-            <select name="tipo" className="filter-input" value={filters.tipo} onChange={handleFilterChange}>
-              <option value="">Todos</option>
-              <option value="RECEITA">Receitas</option>
-              <option value="DESPESA">Despesas</option>
-            </select>
-          </div>
-          <div className="filter-group">
-            <label>Status</label>
-            <select name="status" className="filter-input" value={filters.status} onChange={handleFilterChange}>
-              <option value="">Todos</option>
-              <option value="EFETIVADA">Efetivadas</option>
-              <option value="PENDENTE">Pendentes</option>
-            </select>
-          </div>
-          <div className="filter-group">
-            <label>Início</label>
-            <input type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
-          </div>
-          <div className="filter-group">
-            <label>Fim</label>
-            <input type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={handleFilterChange} />
-          </div>
-
-          <button 
-            type="button" 
-            className="btn-secondary" 
-            style={{ padding: '10px 16px', fontSize: '12px' }}
-            onClick={() => setFilters({ busca: '', tipo: '', status: '', categoria_id: '', dataInicio: '', dataFim: '' })}
-          >
-            Limpar
-          </button>
-        </div>
+        </section>
 
         {/* Table Section */}
-        <section className="content-section">
-          <div style={{ overflowX: 'auto' }}>
+        <section className="content-section transacoes-table-card">
+          <div className="transacoes-table-scroll">
             {loading ? (
-              <p style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Filtrando transações...</p>
+              <p className="transacoes-loading-msg">Filtrando transações…</p>
             ) : transacoes.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>Nenhuma transação encontrada com os filtros atuais.</p>
-                <button 
-                  style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontWeight: 600 }}
-                  onClick={() => setFilters({ busca: '', tipo: '', status: '', categoria_id: '', dataInicio: '', dataFim: '' })}
-                >
+              <div className="transacoes-empty">
+                <p className="transacoes-empty__text">Nenhuma transação encontrada com os filtros atuais.</p>
+                <button type="button" className="transacoes-empty__action" onClick={clearFilters}>
                   Limpar todos os filtros
                 </button>
               </div>
             ) : (
-              <table className="data-table">
+              <table className="data-table transacoes-data-table">
                 <thead>
                   <tr>
                      <th>Data</th>
                      <th>Categoria</th>
                      <th>Valor</th>
                      <th>Status</th>
-                     <th style={{ textAlign: 'right' }}>Ações</th>
+                     <th className="transacoes-col-actions">Ações</th>
                    </tr>
                 </thead>
                 <tbody>
                   {transacoes.map(t => (
                     <tr key={t.id}>
-                       <td>
-                         <div style={{ fontSize: '13px', fontWeight: 500 }}>
+                       <td className="transacoes-cell-date">
+                         <div className="transacoes-cell-date__day">
                            {new Date(t.data_transacao).toLocaleDateString('pt-BR')}
                          </div>
-                         <div style={{ fontSize: '11px', opacity: 0.6 }}>
+                         <div className="transacoes-cell-date__time">
                            {new Date(t.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                          </div>
                        </td>
                        <td>
-                         <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                         <div className="transacoes-cell-cat-title">
                            {t.categorias?.nome || 'Sem categoria'}
                            {t.recorrente_index && (
-                             <span style={{ marginLeft: '8px', fontSize: '10px', color: 'var(--accent)', background: 'rgba(212, 168, 75, 0.1)', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                             <span className="transacoes-rec-badge">
                                {t.recorrente_index}/{t.recorrente_total}
                              </span>
                            )}
                          </div>
-                         <div style={{ fontSize: '11px', color: 'var(--text-secondary)', opacity: 0.8 }}>
+                         <div className="transacoes-cell-cat-sub">
                            {t.subcategorias?.nome || t.descricao || ''}
                          </div>
                        </td>
                       <td className={t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'}>
-                         <span className={`${privacyMode ? 'privacy-blur' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
+                         <span className={`transacoes-cell-val ${privacyMode ? 'privacy-blur' : ''}`}>
                            {t.tipo === 'RECEITA' ? (
-                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--success)' }}><path d="m18 15-6-6-6 6"/></svg>
+                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="transacoes-val-ico transacoes-val-ico--up"><path d="m18 15-6-6-6 6"/></svg>
                            ) : (
-                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--danger)' }}><path d="m6 9 6 6 6-6"/></svg>
+                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="transacoes-val-ico transacoes-val-ico--down"><path d="m6 9 6 6 6-6"/></svg>
                            )}
                            {formatCurrency(t.valor)}
                          </span>
@@ -289,8 +298,8 @@ export default function Transacoes() {
                           {t.status}
                         </span>
                       </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <button className="btn-delete" onClick={() => handleDelete(t.id)} title="Excluir">
+                      <td className="transacoes-col-actions">
+                        <button type="button" className="btn-delete" onClick={() => handleDelete(t.id)} title="Excluir">
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                         </button>
                       </td>

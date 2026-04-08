@@ -4,15 +4,17 @@ import '../pages/dashboard.css'
 
 const SHELL_PATH = /^\/(dashboard|transacoes|relatorios|configuracoes|pagamento|admin)/
 
+/** Evita flash de skeleton no 1º paint e com React Strict Mode (remount). */
+let routeTransitionBootstrapped = false
+
 export default function RouteTransitionSkeleton() {
   const location = useLocation()
   const [visible, setVisible] = useState(false)
-  const firstNav = useRef(true)
   const prevPath = useRef(location.pathname)
 
   useEffect(() => {
-    if (firstNav.current) {
-      firstNav.current = false
+    if (!routeTransitionBootstrapped) {
+      routeTransitionBootstrapped = true
       prevPath.current = location.pathname
       return
     }

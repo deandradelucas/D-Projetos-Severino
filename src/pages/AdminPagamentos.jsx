@@ -70,7 +70,7 @@ export default function AdminPagamentos() {
             </button>
             <div>
               <h1 className="responsive-h1" style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                Logs de pagamentos
+                Logs de Pagamentos
               </h1>
               <p className="responsive-p" style={{ color: 'var(--text-secondary)' }}>
                 Mercado Pago — preferências e status dos pagamentos

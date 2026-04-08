@@ -278,7 +278,7 @@ export default function Configuracoes() {
                 Logs usuários
               </Link>
               <Link className="config-btn-ghost" to="/admin/pagamentos" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
-                Logs pagamentos
+                Logs de Pagamentos
               </Link>
             </div>
           </section>

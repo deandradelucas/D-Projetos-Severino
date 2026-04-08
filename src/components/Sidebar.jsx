@@ -135,7 +135,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <line x1="2" x2="22" y1="10" y2="10" />
                 </svg>
               </span>
-              Logs de pagamentos
+              Logs de Pagamentos
             </NavLink>
           </li>
         </ul>
