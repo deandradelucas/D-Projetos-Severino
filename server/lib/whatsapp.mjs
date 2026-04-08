@@ -61,18 +61,23 @@ export async function handleWhatsAppWebhook(req) {
       return { status: 400, json: { error: 'Invalid Body' } }
     }
 
-    // 2. Validar Token
-    if (!rawAuth.includes(EXPECTED_TOKEN)) {
+    // 2. Validar Token (Headers ou Body)
+    const tokenFromBody = body.token || body.api_token || body.apikey || body.Token || ''
+    const finalToken = (rawAuth || tokenFromBody).replace('Bearer ', '').trim()
+
+    if (!finalToken.includes(EXPECTED_TOKEN)) {
       console.warn('[WhatsApp Webhook] Token Inválido')
-      await registrarLogWhatsApp('?', 'Acesso não autorizado', 'ERRO', 'Token de autorização inválido ou ausente')
+      const maskedToken = finalToken ? `${finalToken.substring(0, 4)}...` : 'ausente'
+      await registrarLogWhatsApp('?', 'Acesso não autorizado', 'ERRO', `Token recebido (${maskedToken}) não confere com o esperado.`)
       return { status: 401, json: { error: 'Unauthorized' } }
     }
 
     // Tentar extrair remetente básico para log preliminar
     let preRemetente = 'Desconhecido'
     if (body.phone) preRemetente = String(body.phone)
+    else if (body.from) preRemetente = String(body.from)
+    else if (body.sender) preRemetente = String(body.sender)
     else if (body.data?.remoteJid) preRemetente = body.data.remoteJid.split('@')[0]
-    else if (body.messages?.[0]?.from) preRemetente = body.messages[0].from
     
     preRemetente = preRemetente.replace(/\D/g, '')
 
