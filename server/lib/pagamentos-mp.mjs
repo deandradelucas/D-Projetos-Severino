@@ -108,14 +108,29 @@ const COLS_FLAT = `
 export async function listPagamentosAdmin(limit = 200) {
   const supabase = getSupabaseAdmin()
 
-  const withUser = await supabase
+  let withUser = await supabase
     .from('pagamentos_mercadopago')
     .select(`${COLS_FLAT.trim()}, usuarios ( email, nome )`)
     .order('created_at', { ascending: false })
     .limit(limit)
 
+  if (withUser.error) {
+    withUser = await supabase
+      .from('pagamentos_mercadopago')
+      .select(`${COLS_FLAT.trim()}, usuarios ( email, usuario )`)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+  }
+
   if (!withUser.error) {
-    return withUser.data || []
+    return (withUser.data || []).map((row) => {
+      const u = row.usuarios
+      if (!u || typeof u !== 'object') return row
+      return {
+        ...row,
+        usuarios: { email: u.email, nome: u.nome ?? u.usuario ?? '' },
+      }
+    })
   }
 
   const flat = await supabase

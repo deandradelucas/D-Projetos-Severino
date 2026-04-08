@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
+import { normalizeUsuarioRow, stripSenha } from './usuario-schema.mjs'
 
 const RESET_WINDOW_MINUTES = 30
 const DEFAULT_PUBLIC_APP_URL = 'https://horizontefinanceiro.mestredamente.com'
@@ -98,7 +99,7 @@ export async function findUserByEmail(email) {
   const supabaseAdmin = getSupabaseAdmin()
   const { data, error } = await supabaseAdmin
     .from('usuarios')
-    .select('id, email, nome')
+    .select('*')
     .eq('email', email)
     .maybeSingle()
 
@@ -106,7 +107,8 @@ export async function findUserByEmail(email) {
     throw error
   }
 
-  return data
+  if (!data) return data
+  return normalizeUsuarioRow(stripSenha(data))
 }
 
 export async function authenticateUser(email, password) {
@@ -118,7 +120,7 @@ export async function authenticateUser(email, password) {
      .limit(1) evita PGRST116 e usa a primeira linha. */
   const { data: rows, error } = await supabaseAdmin
     .from('usuarios')
-    .select('id, email, nome, role, is_active, last_login_at')
+    .select('*')
     .eq('email', normalizedEmail)
     .eq('senha', normalizedPassword)
     .limit(1)
@@ -127,9 +129,9 @@ export async function authenticateUser(email, password) {
     throw error
   }
 
-  const data = rows?.[0] ?? null
-  if (!data) return null
-  if (data.is_active === false) {
+  const raw = rows?.[0] ?? null
+  if (!raw) return null
+  if (raw.is_active === false) {
     return null
   }
 
@@ -138,12 +140,13 @@ export async function authenticateUser(email, password) {
     await supabaseAdmin
       .from('usuarios')
       .update({ last_login_at: nowIso })
-      .eq('id', data.id)
+      .eq('id', raw.id)
   } catch {
     // logging opcional; não bloqueia login
   }
 
-  return { ...data, last_login_at: nowIso }
+  const safe = normalizeUsuarioRow(stripSenha(raw))
+  return { ...safe, last_login_at: nowIso }
 }
 
 export async function storeResetToken({ email, tokenHash, expiresAt }) {

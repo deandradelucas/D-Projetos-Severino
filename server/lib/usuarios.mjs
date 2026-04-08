@@ -1,5 +1,6 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { resolverUsuarioIdPorTelefoneGemini } from './ai.mjs'
+import { normalizeUsuarioRow, stripSenha } from './usuario-schema.mjs'
 
 export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
   const supabaseAdmin = getSupabaseAdmin()
@@ -164,33 +165,20 @@ export async function buscarUsuarioPorTelefone(telefoneLimpo, options = {}) {
 export async function getPerfilUsuario(usuarioId) {
   const supabaseAdmin = getSupabaseAdmin()
 
-  let res = await supabaseAdmin
+  const res = await supabaseAdmin
     .from('usuarios')
-    .select('id, email, telefone, nome, role, is_active, last_login_at, created_at')
-    .eq('id', usuarioId)
-    .single()
-
-  if (!res.error && res.data) {
-    return {
-      ...res.data,
-      role: res.data.role ?? 'USER',
-      is_active: res.data.is_active !== false,
-    }
-  }
-
-  res = await supabaseAdmin
-    .from('usuarios')
-    .select('id, email, telefone, nome, created_at')
+    .select('*')
     .eq('id', usuarioId)
     .single()
 
   if (res.error || !res.data) return null
 
+  const row = normalizeUsuarioRow(stripSenha(res.data))
   return {
-    ...res.data,
-    role: 'USER',
-    is_active: true,
-    last_login_at: null,
+    ...row,
+    role: row.role ?? 'USER',
+    is_active: row.is_active !== false,
+    last_login_at: row.last_login_at ?? null,
   }
 }
 
@@ -230,52 +218,23 @@ export async function getWhatsappLogs(limit = 50) {
 export async function listUsuariosAdmin() {
   const supabaseAdmin = getSupabaseAdmin()
 
-  const ordenar = (q) => q.order('email', { ascending: true })
+  const res = await supabaseAdmin
+    .from('usuarios')
+    .select('*')
+    .order('email', { ascending: true })
 
-  let res = await ordenar(
-    supabaseAdmin.from('usuarios').select('id, nome, email, telefone, role, is_active, last_login_at, created_at')
-  )
+  if (res.error) throw res.error
 
-  if (!res.error) {
-    return (res.data || []).map((row) => ({
-      ...row,
-      nome: row.nome ?? '',
-      role: row.role ?? 'USER',
-      is_active: row.is_active !== false,
-      last_login_at: row.last_login_at ?? null,
-    }))
-  }
-
-  console.warn('[listUsuariosAdmin] select com colunas admin falhou (rode a migration 03?), tentando schema básico:', res.error.message)
-
-  res = await ordenar(
-    supabaseAdmin.from('usuarios').select('id, nome, email, telefone, created_at')
-  )
-
-  if (!res.error) {
-    return (res.data || []).map((row) => ({
-      ...row,
-      role: 'USER',
-      is_active: true,
-      last_login_at: null,
-    }))
-  }
-
-  console.warn('[listUsuariosAdmin] tentando sem created_at:', res.error.message)
-
-  res = await ordenar(supabaseAdmin.from('usuarios').select('id, nome, email, telefone'))
-
-  if (!res.error) {
-    return (res.data || []).map((row) => ({
-      ...row,
-      role: 'USER',
-      is_active: true,
-      last_login_at: null,
-      created_at: null,
-    }))
-  }
-
-  throw res.error
+  return (res.data || []).map((row) => {
+    const n = normalizeUsuarioRow(stripSenha(row))
+    return {
+      ...n,
+      nome: n.nome ?? '',
+      role: n.role ?? 'USER',
+      is_active: n.is_active !== false,
+      last_login_at: n.last_login_at ?? null,
+    }
+  })
 }
 
 export async function updateUsuarioAdmin(id, payload) {
@@ -291,11 +250,11 @@ export async function updateUsuarioAdmin(id, payload) {
     .from('usuarios')
     .update(patch)
     .eq('id', id)
-    .select('id, nome, email, telefone, role, is_active, last_login_at, created_at')
+    .select('*')
     .single()
 
   if (error) throw error
-  return data
+  return normalizeUsuarioRow(stripSenha(data))
 }
 
 export async function deleteUsuarioAdmin(id) {
