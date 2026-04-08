@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { apiUrl } from '../lib/apiUrl'
 
 function getUsuarioId() {
   try {
@@ -64,33 +62,54 @@ export default function HorizonChat() {
     setErro(null)
     setCarregando(true)
 
+    if (!usuarioId) {
+      setErro('Faça login novamente para o Horizon acessar seus dados.')
+      setCarregando(false)
+      return
+    }
+
     // Montar histórico (excluindo a mensagem welcome e mensagens de erro)
     const historico = mensagens
       .filter(m => m.id !== 1)
       .map(m => ({ role: m.role, text: m.text }))
 
     try {
-      const res = await fetch(`${API_URL}/api/ai/chat`, {
+      const res = await fetch(apiUrl('/api/ai/chat'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(usuarioId ? { 'x-user-id': usuarioId } : {})
+          ...(usuarioId ? { 'x-user-id': String(usuarioId) } : {})
         },
         body: JSON.stringify({ message: msg, historico })
       })
 
-      const data = await res.json()
+      const raw = await res.text()
+      let data = {}
+      try {
+        data = raw ? JSON.parse(raw) : {}
+      } catch {
+        throw new Error(raw ? raw.slice(0, 200) : `Resposta inválida (${res.status})`)
+      }
 
       if (!res.ok) {
-        throw new Error(data.message || 'Erro desconhecido')
+        throw new Error(data.message || `Erro ${res.status}`)
+      }
+
+      const resposta = data.resposta
+      if (typeof resposta !== 'string' || !resposta.trim()) {
+        throw new Error('Resposta vazia do assistente.')
       }
 
       setMensagens(prev => [
         ...prev,
-        { id: Date.now() + 1, role: 'model', text: data.resposta, ts: new Date() }
+        { id: Date.now() + 1, role: 'model', text: resposta, ts: new Date() }
       ])
     } catch (err) {
-      setErro(err.message)
+      const msg =
+        err instanceof TypeError && String(err.message).includes('fetch')
+          ? 'Sem conexão com o servidor. Confirme que o app está no ar e tente de novo.'
+          : err.message || 'Erro ao enviar mensagem.'
+      setErro(msg)
     } finally {
       setCarregando(false)
     }

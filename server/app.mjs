@@ -37,16 +37,34 @@ import {
   listPagamentosAdmin,
   upsertFromWebhookPayment,
 } from './lib/pagamentos-mp.mjs'
+import { loadEnv } from './lib/load-env.mjs'
+
+loadEnv()
 
 const app = new Hono()
 
-// Permite requisições do frontend local em qualquer porta
+function corsAllowedOrigin(origin) {
+  if (!origin) return '*'
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return origin
+  // Testes no celular na rede local (Vite em outro IP da LAN)
+  if (
+    /^https?:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin) ||
+    /^https?:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin) ||
+    /^https?:\/\/172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin)
+  ) {
+    return origin
+  }
+  const extra = (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+  if (extra.includes(origin)) return origin
+  return null
+}
+
+// Permite localhost, LAN (PWA no celular) e origens em CORS_ORIGINS (produção com front separado)
 app.use('*', cors({
-  origin: (origin) => {
-    if (!origin) return '*'
-    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return origin
-    return null
-  },
+  origin: (origin) => corsAllowedOrigin(origin),
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'x-user-id', 'Authorization'],
 }))
@@ -400,7 +418,7 @@ app.post('/api/pagamentos/preferencia', async (c) => {
     const body = await c.req.json().catch(() => ({}))
     const titulo = String(body?.titulo || 'Assinatura Horizonte Financeiro').trim() || 'Assinatura Horizonte Financeiro'
     const valorRaw = body?.valor
-    const defaultPreco = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '29.9')
+    const defaultPreco = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
     const valor = Number(valorRaw != null && valorRaw !== '' ? valorRaw : defaultPreco)
     if (!Number.isFinite(valor) || valor <= 0) {
       return c.json({ message: 'Valor inválido.' }, 400)

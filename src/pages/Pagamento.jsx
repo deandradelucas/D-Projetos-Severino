@@ -20,7 +20,7 @@ export default function Pagamento() {
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
-  const [valor, setValor] = useState('29.90')
+  const [valor, setValor] = useState('10.00')
   const [titulo, setTitulo] = useState('Assinatura Horizonte Financeiro')
 
   const statusUrl = searchParams.get('status')

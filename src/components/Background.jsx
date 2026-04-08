@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTheme } from '../context/ThemeContext'
 
 const images = [
   '/images/horizons/horizon-001.jpg',
@@ -48,6 +49,7 @@ function getRandomImage() {
 }
 
 export default function Background() {
+  const { theme } = useTheme()
   const [currentImage, setCurrentImage] = useState(() => getRandomImage())
 
   useEffect(() => {
@@ -69,7 +71,21 @@ export default function Background() {
         transition: 'background-image 0.5s ease-in-out',
       }}
     >
-      <div className="absolute inset-0 bg-black/60" />
+      <div
+        className={`absolute inset-0 transition-colors duration-500 ${
+          theme === 'dark' ? 'bg-black/72' : 'bg-black/60'
+        }`}
+      />
+      {theme === 'dark' && (
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(5,6,7,0.55) 0%, transparent 38%, transparent 62%, rgba(5,6,7,0.65) 100%), radial-gradient(ellipse 80% 50% at 50% 100%, rgba(212,168,75,0.06), transparent 70%)',
+          }}
+          aria-hidden
+        />
+      )}
     </div>
   )
 }

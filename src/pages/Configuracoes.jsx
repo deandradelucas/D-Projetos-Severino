@@ -114,8 +114,8 @@ export default function Configuracoes() {
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content config-page" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <header className="top-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <header className="top-header config-page-header">
+          <div className="config-page-header__titles">
             <button type="button" className="mobile-menu-btn" onClick={() => setMenuAberto(true)} aria-label="Abrir menu">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <rect width="7" height="7" x="3" y="3" rx="1" />
@@ -124,15 +124,16 @@ export default function Configuracoes() {
                 <rect width="7" height="7" x="3" y="14" rx="1" />
               </svg>
             </button>
+            <div>
+              <h1 className="responsive-h1" style={{ margin: 0, fontWeight: 800, color: 'var(--text-primary)' }}>
+                Configurações
+              </h1>
+              <p style={{ margin: '4px 0 0', fontSize: '14px', color: 'var(--text-secondary)' }}>
+                Perfil, tema, privacidade e dados
+              </p>
+            </div>
           </div>
         </header>
-
-        <div className="config-hero">
-          <h1 style={{ margin: '0 0 8px', fontWeight: 800, color: 'var(--text-primary)' }}>Configurações</h1>
-          <p className="config-hero-sub" style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '15px' }}>
-            Personalize o Horizonte, gerencie privacidade, atalhos e dados — tudo em um só lugar.
-          </p>
-        </div>
 
         {toast && <div className="config-toast">{toast}</div>}
 

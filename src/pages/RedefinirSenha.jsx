@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
+import { apiUrl } from '../lib/apiUrl'
 
 export default function RedefinirSenha() {
   const [searchParams] = useSearchParams()
@@ -32,7 +33,7 @@ export default function RedefinirSenha() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch(apiUrl('/api/auth/reset-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

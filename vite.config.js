@@ -15,4 +15,15 @@ export default defineConfig({
       },
     },
   },
+  /* `vite preview` (build + teste mobile na rede) — mesmo proxy que o dev server */
+  preview: {
+    host: true,
+    port: 4173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
+  },
 })

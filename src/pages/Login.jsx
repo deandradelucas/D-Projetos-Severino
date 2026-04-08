@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
+import { apiUrl } from '../lib/apiUrl'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
 
@@ -63,7 +64,7 @@ export default function Login() {
     const resetRequestTimeoutId = window.setTimeout(() => controller.abort(), 45000)
 
     try {
-      const response = await fetch('/api/auth/request-password-reset', {
+      const response = await fetch(apiUrl('/api/auth/request-password-reset'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +120,7 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +131,19 @@ export default function Login() {
         }),
       })
 
-      const data = await response.json()
+      const raw = await response.text()
+      let data = {}
+      try {
+        data = raw ? JSON.parse(raw) : {}
+      } catch {
+        setMensagem({
+          texto:
+            'Resposta inválida do servidor. Em produção, confira se a API está no mesmo domínio ou defina VITE_API_URL no build.',
+          tipo: 'erro',
+        })
+        setLoading(false)
+        return
+      }
 
       if (!response.ok) {
         setMensagem({ texto: data.message || 'Nao foi possivel fazer login agora.', tipo: 'erro' })
@@ -138,16 +151,18 @@ export default function Login() {
         return
       }
 
-      setMensagem({ texto: 'Login realizado com sucesso!', tipo: 'sucesso' })
       if (data.user) {
         window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
       }
-      setLoading(false)
-      setTimeout(() => {
-        window.location.href = '/dashboard'
-      }, 2000)
-    } catch {
-      setMensagem({ texto: 'Erro ao conectar com o banco', tipo: 'erro' })
+
+      /* Redirecionamento imediato evita estado pendurado no PWA / teclado mobile */
+      window.location.replace('/dashboard')
+    } catch (err) {
+      const net =
+        err instanceof TypeError && String(err?.message || '').toLowerCase().includes('fetch')
+          ? 'Sem conexão com o servidor. Verifique a internet e se a API está acessível neste endereço.'
+          : 'Erro ao conectar com o servidor.'
+      setMensagem({ texto: net, tipo: 'erro' })
       setLoading(false)
     }
   }
@@ -171,7 +186,7 @@ export default function Login() {
             Faça login para continuar
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-3" noValidate>
             <div>
               <label className="block text-[#a3a3a3] text-xs font-medium mb-1" htmlFor="email">
                 E-mail
