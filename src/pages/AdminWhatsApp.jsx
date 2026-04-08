@@ -151,7 +151,7 @@ export default function AdminWhatsApp() {
 
         {whatsappConfig && (
           <section className="content-section" style={{ gridColumn: '1 / -1', marginBottom: '20px' }}>
-            <h2 className="responsive-h2" style={{ fontWeight: '700', marginBottom: '12px', color: 'var(--text-primary)' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '12px', color: 'var(--text-primary)' }}>
               URL do webhook (Chipmassa / Telein)
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px', maxWidth: '720px' }}>
@@ -231,7 +231,7 @@ export default function AdminWhatsApp() {
         </section>
 
         <section className="content-section" style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
-          <h2 className="responsive-h2" style={{ fontWeight: '700', marginBottom: '16px', color: 'var(--text-primary)' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '16px', color: 'var(--text-primary)' }}>
             Controle de usuários
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
