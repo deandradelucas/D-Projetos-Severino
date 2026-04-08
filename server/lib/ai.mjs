@@ -175,8 +175,16 @@ REGRAS:
   - "tipo": "RECEITA" ou "DESPESA" (obrigatório)
   - "valor": um número float representando o valor (obrigatório, se não achar tente deduzir, caso contrário retorne nulo)
   - "descricao": uma breve string do que foi o gasto/receita (obrigatório)
-  - "categoria_id": a UUID da categoria mais próxima na lista fornecida. Se nenhuma bater, retorne null.
-  - "subcategoria_id": a UUID da subcategoria mais próxima. Se nenhuma bater, retorne null.
+  - "categoria_id": UUID EXATO de uma categoria da lista abaixo cujo "Tipo" seja igual a "tipo" (DESPESA ou RECEITA). Se nenhuma servir, null.
+  - "subcategoria_id": UUID EXATO de uma subcategoria que pertença à categoria escolhida (mesma linha na lista). Se não houver subcategoria adequada ou categoria_id for null, use null.
+
+3. A subcategoria_id DEVE ser filha da categoria_id (ambos da mesma categoria na lista). Nunca misture subcategoria de outra categoria.
+
+4. Dicas de mapeamento (mensagem em português):
+   - mercado, supermercado, feira, padaria (compra de comida) → DESPESA: Alimentação; sub "Supermercado", "Padaria e Cafeteira" ou "Feira e Sacolão" conforme o texto.
+   - combustível, gasolina, etanol, posto → DESPESA: Transporte; sub "Combustível".
+   - Uber, 99, táxi → Transporte; "App de Transporte (Uber, 99)" ou "Táxi".
+   - restaurante, iFood, lanche → Alimentação; sub adequada (Restaurantes, Delivery, Fast Food).
 
 DADOS DO USUÁRIO PARA MAPEAR:
 ${catMap || 'O usuário não tem categorias configuradas.'}
@@ -212,9 +220,36 @@ MENSAGEM RECEBIDA PARA ANÁLISE:
   if (text.startsWith('\`\`\`json')) text = text.replace('\`\`\`json', '').replace('\`\`\`', '')
   else if (text.startsWith('\`\`\`')) text = text.replace('\`\`\`', '').replace('\`\`\`', '')
 
+  let parsed
   try {
-    return JSON.parse(text.trim())
+    parsed = JSON.parse(text.trim())
   } catch (parseError) {
     throw new Error('A IA não conseguiu estruturar os dados da mensagem (' + message + ') corretamente.')
   }
+
+  return sanitizeTransacaoExtraidaIA(parsed, categoriasUsuario)
+}
+
+/**
+ * Garante que categoria/subcategoria existem, batem com o tipo e a sub pertence à categoria.
+ */
+export function sanitizeTransacaoExtraidaIA(extractedData, categoriasUsuario) {
+  if (!extractedData || typeof extractedData !== 'object') return extractedData
+
+  const tipo = extractedData.tipo
+  if (tipo !== 'DESPESA' && tipo !== 'RECEITA') return extractedData
+
+  const cat = categoriasUsuario.find((c) => c.id === extractedData.categoria_id)
+  if (!cat || cat.tipo !== tipo) {
+    extractedData.categoria_id = null
+    extractedData.subcategoria_id = null
+    return extractedData
+  }
+
+  if (extractedData.subcategoria_id) {
+    const subOk = cat.subcategorias?.some((s) => s.id === extractedData.subcategoria_id)
+    if (!subOk) extractedData.subcategoria_id = null
+  }
+
+  return extractedData
 }

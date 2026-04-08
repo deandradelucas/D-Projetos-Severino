@@ -1,6 +1,6 @@
 import { buscarUsuarioPorTelefone, registrarLogWhatsApp } from './usuarios.mjs'
 import { getCategorias, inserirTransacao } from './transacoes.mjs'
-import { parseWhatsAppMessageWithAI, sanitizeTransacaoExtraidaIA } from './ai.mjs'
+import { parseWhatsAppMessageWithAI } from './ai.mjs'
 
 /** Headers comuns em provedores (Telein, Evolution, Z-API, etc.) */
 function collectTokenFromHeaders(getHeader) {
@@ -47,12 +47,6 @@ function scoreJidQuality(jid) {
   if (jid.includes('@g.us')) return 30
   if (jid.includes('@lid')) return 10
   return 0
-}
-
-function pickBetterJid(a, b) {
-  if (!a) return b || ''
-  if (!b) return a
-  return scoreJidQuality(b) > scoreJidQuality(a) ? b : a
 }
 
 /** Coleta JIDs no JSON e escolhe o melhor (@s.whatsapp.net antes de @lid). */
