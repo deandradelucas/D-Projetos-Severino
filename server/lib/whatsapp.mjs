@@ -63,17 +63,29 @@ export async function handleWhatsAppWebhook(req) {
 
     // 2. Validar Token (Headers, Body ou Query)
     const url = new URL(typeof req.url === 'string' ? req.url : (req.raw ? req.raw.url : 'http://localhost'))
-    const tokenFromQuery = url.searchParams.get('token') || url.searchParams.get('api_token') || url.searchParams.get('key') || ''
+    const tokenFromQuery = url.searchParams.get('token') || url.searchParams.get('api_token') || url.searchParams.get('apiKey') || ''
     
-    const tokenFromBody = body.token || body.api_token || body.apikey || body.Token || body.key || ''
+    // Procura o token especificamente em campos de token, IGNORANDO o campo 'key' que a Telein usa pra ID de sessão
+    let tokenFromBody = body.token || body.api_token || body.apiKey || body.auth || body.Token || ''
+    
+    // Se não achou em campos óbvios, faz uma busca exaustiva por QUALQUER campo que contenha o valor esperado
+    if (!tokenFromBody || tokenFromBody === '') {
+        for (const k in body) {
+            if (String(body[k]) === EXPECTED_TOKEN) {
+                tokenFromBody = body[k]
+                break
+            }
+        }
+    }
+
     const finalToken = (rawAuth || tokenFromQuery || tokenFromBody).replace('Bearer ', '').trim()
 
     if (!finalToken.includes(EXPECTED_TOKEN)) {
       console.warn('[WhatsApp Webhook] Token Inválido')
-      const bodyKeys = Object.keys(body).join(', ') || 'nenhum campo no body'
-      const maskedToken = finalToken ? `${finalToken.substring(0, 4)}...` : 'ausente'
-      await registrarLogWhatsApp('?', 'Acesso não autorizado', 'ERRO', `Token: ${maskedToken} | Campos recebidos: [${bodyKeys}]`)
-      return { status: 401, json: { error: 'Unauthorized', debug: bodyKeys } }
+      const bodyKeys = Object.keys(body).join(', ')
+      const maskedToken = finalToken ? `${finalToken.substring(0, 5)}...` : 'ausente'
+      await registrarLogWhatsApp('?', 'Acesso não autorizado', 'ERRO', `Token detectado: ${maskedToken} | Campos: [${bodyKeys.substring(0, 100)}]`)
+      return { status: 401, json: { error: 'Unauthorized' } }
     }
 
     // Melhora a extração de dados para campos "achatados" (ex: body[message][conversation])
