@@ -966,7 +966,7 @@ h3 {
 
   .main-content {
     border-radius: 22px;
-    padding: calc(16px + var(--safe-top) * 0.35) 14px calc(20px + var(--safe-bottom)) 14px;
+    padding: 16px 14px calc(20px + var(--safe-bottom)) 14px;
     margin-top: 0;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
