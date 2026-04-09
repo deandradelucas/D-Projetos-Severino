@@ -37,7 +37,11 @@ import {
   listPagamentosAdmin,
   upsertFromWebhookPayment,
 } from './lib/pagamentos-mp.mjs'
-import { buildAssinaturaUsuarioPayload, marcarBemVindoPagamentoVisto } from './lib/assinatura.mjs'
+import {
+  assertAcessoAppUsuario,
+  buildAssinaturaUsuarioPayload,
+  marcarBemVindoPagamentoVisto,
+} from './lib/assinatura.mjs'
 import { isSuperAdminEmail } from './lib/super-admin.mjs'
 import { loadEnv } from './lib/load-env.mjs'
 
@@ -307,6 +311,9 @@ app.get('/api/usuarios/perfil', async (c) => {
     const usuarioId = c.req.header('x-user-id')
     if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
 
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
     const perfil = await getPerfilUsuario(usuarioId)
     return c.json({ perfil })
   } catch (error) {
@@ -456,6 +463,9 @@ app.get('/api/categorias', async (c) => {
       return c.json({ message: 'Não autorizado.' }, 401)
     }
 
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
     const data = await getCategorias(usuarioId)
     return c.json(data)
   } catch (error) {
@@ -470,6 +480,9 @@ app.get('/api/transacoes', async (c) => {
     if (!usuarioId) {
       return c.json({ message: 'Não autorizado.' }, 401)
     }
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
 
     const filters = {
       dataInicio: c.req.query('dataInicio'),
@@ -496,6 +509,9 @@ app.post('/api/transacoes', async (c) => {
       return c.json({ message: 'Não autorizado.' }, 401)
     }
 
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
     const body = await c.req.json()
     
     // Vincula o usuario logado
@@ -516,6 +532,9 @@ app.delete('/api/transacoes/:id', async (c) => {
     if (!usuarioId) {
       return c.json({ message: 'Não autorizado.' }, 401)
     }
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
 
     await deletarTransacao(id, usuarioId)
     return c.json({ message: 'Transação excluída com sucesso.' })
@@ -677,6 +696,9 @@ app.post('/api/ai/chat', async (c) => {
     if (!usuarioId) {
       return c.json({ message: 'Não autorizado.' }, 401)
     }
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
 
     const body = await c.req.json()
     const message = String(body?.message || '').trim()

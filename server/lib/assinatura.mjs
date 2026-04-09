@@ -107,3 +107,49 @@ export async function marcarBemVindoPagamentoVisto(usuarioId) {
   if (error) throw error
   return nowIso
 }
+
+/**
+ * Verifica trial/pagamento/isento/super-admin (sem alterar trial — isso ocorre no login).
+ * @returns {null | { status: number, message: string }}
+ */
+export async function assertAcessoAppUsuario(usuarioId) {
+  if (!usuarioId) return { status: 401, message: 'Não autorizado.' }
+
+  const supabase = getSupabaseAdmin()
+  const { data: row, error } = await supabase
+    .from('usuarios')
+    .select('email, trial_ends_at, isento_pagamento')
+    .eq('id', usuarioId)
+    .maybeSingle()
+
+  if (error) {
+    console.error('assertAcessoAppUsuario select', error)
+    return { status: 500, message: 'Erro ao verificar assinatura.' }
+  }
+  if (!row) return { status: 401, message: 'Não autorizado.' }
+
+  let hasPay = false
+  try {
+    hasPay = await usuarioTemPagamentoAprovado(usuarioId)
+  } catch (e) {
+    console.error('assertAcessoAppUsuario pagamentos', e)
+    return { status: 500, message: 'Erro ao verificar assinatura.' }
+  }
+
+  const flags = computeAssinaturaFlags({
+    email: row.email,
+    isento_pagamento: row.isento_pagamento === true,
+    trial_ends_at: row.trial_ends_at,
+    bem_vindo_pagamento_visto_at: true,
+    assinatura_paga: hasPay,
+  })
+
+  if (!flags.acesso_app_liberado) {
+    return {
+      status: 403,
+      message:
+        'Assinatura inativa ou período de teste encerrado. Conclua o pagamento no aplicativo para continuar.',
+    }
+  }
+  return null
+}
