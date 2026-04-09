@@ -3,11 +3,10 @@ import { Link } from 'react-router-dom'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
-import ExecutiveMobileNav from '../components/ExecutiveMobileNav'
 import { useTheme } from '../context/ThemeContext'
 
 export default function Configuracoes() {
-  const { theme, toggleTheme, privacyMode, togglePrivacy } = useTheme()
+  const { privacyMode, togglePrivacy } = useTheme()
   const [menuAberto, setMenuAberto] = useState(false)
 
   const [perfil, setPerfil] = useState(() => {
@@ -105,33 +104,11 @@ export default function Configuracoes() {
     }
   }
 
-  /** Chaves alinhadas ao CSS (.config-theme-preview--*) para o audit de classes estático. */
-  const THEME_PREVIEW_CLASS = {
-    light: 'config-theme-preview--light',
-    dark: 'config-theme-preview--dark',
-    glass: 'config-theme-preview--glass',
-    cyberpunk: 'config-theme-preview--cyberpunk',
-    'off-white': 'config-theme-preview--off-white',
-  }
-
-  const themes = [
-    { id: 'light', name: 'Claro', desc: 'Visual limpo e profissional', prev: 'light' },
-    { id: 'dark', name: 'Escuro', desc: 'Conforto visual à noite', prev: 'dark' },
-    { id: 'glass', name: 'Vitrificado', desc: 'Camadas translúcidas', prev: 'glass' },
-    { id: 'cyberpunk', name: 'Cyberpunk', desc: 'Néon ciano e magenta', prev: 'cyberpunk' },
-    {
-      id: 'off-white',
-      name: 'Off-white',
-      desc: 'Noir premium: preto absoluto e cinzas — sem cores de destaque',
-      prev: 'off-white',
-    },
-  ]
-
   return (
     <div className="dashboard-container">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content config-page premium-main" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <main className="main-content config-page" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <header className="top-header config-page-header">
           <div className="config-page-header__titles">
             <MobileMenuButton onClick={() => setMenuAberto(true)} aria-label="Abrir menu" />
@@ -140,12 +117,11 @@ export default function Configuracoes() {
                 Configurações
               </h1>
               <p style={{ margin: '4px 0 0', fontSize: '14px', color: 'var(--text-secondary)' }}>
-                Perfil, tema, privacidade e dados
+                Perfil, privacidade e dados
               </p>
             </div>
           </div>
         </header>
-        <ExecutiveMobileNav />
 
         {toast && <div className="config-toast">{toast}</div>}
 
@@ -268,41 +244,6 @@ export default function Configuracoes() {
           </section>
         )}
 
-        <section className="config-card">
-          <h2 className="config-card-title">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <circle cx="12" cy="12" r="4" />
-              <path d="M12 2v2" />
-              <path d="M12 20v2" />
-              <path d="m4.93 4.93 1.41 1.41" />
-              <path d="m17.66 17.66 1.41 1.41" />
-              <path d="M2 12h2" />
-              <path d="M20 12h2" />
-              <path d="m6.34 17.66-1.41 1.41" />
-              <path d="m19.07 4.93-1.41 1.41" />
-            </svg>
-            Aparência do sistema
-          </h2>
-          <p style={{ margin: '0 0 18px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-            Escolha o tema que combina com o seu momento do dia.
-          </p>
-          <div className="config-themes">
-            {themes.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                className={`config-theme-card ${theme === t.id ? 'is-active' : ''}`}
-                onClick={() => toggleTheme(t.id)}
-              >
-                <div className={`config-theme-preview ${THEME_PREVIEW_CLASS[t.id]}`} aria-hidden />
-                <div className="config-theme-body">
-                  <h4>{t.name}</h4>
-                  <p>{t.desc}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
       </main>
     </div>
   )

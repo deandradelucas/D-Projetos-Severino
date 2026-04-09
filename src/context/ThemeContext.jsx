@@ -1,21 +1,23 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
+const FIXED_THEME = 'light';
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => localStorage.getItem('horizonte_theme') || 'light');
+  const [theme] = useState(FIXED_THEME);
   const [privacyMode, setPrivacyMode] = useState(() => localStorage.getItem('horizonte_privacy') === 'true');
 
   useEffect(() => {
-    document.body.setAttribute('data-theme', theme);
-    localStorage.setItem('horizonte_theme', theme);
+    document.body.setAttribute('data-theme', FIXED_THEME);
+    localStorage.setItem('horizonte_theme', FIXED_THEME);
   }, [theme]);
 
   useEffect(() => {
     localStorage.setItem('horizonte_privacy', privacyMode);
   }, [privacyMode]);
 
-  const toggleTheme = (newTheme) => setTheme(newTheme);
+  // Temas removidos: mantemos função por compatibilidade com componentes existentes.
+  const toggleTheme = () => {};
   const togglePrivacy = () => setPrivacyMode(prev => !prev);
 
   return (
