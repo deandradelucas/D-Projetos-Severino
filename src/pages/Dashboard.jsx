@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
 import Sidebar from '../components/Sidebar'
+import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
+import { apiUrl } from '../lib/apiUrl'
+import { readHorizonteUser } from '../lib/horizonteSession'
 
 const SkeletonCard = () => (
   <div className="skeleton skeleton-card">
@@ -60,48 +63,69 @@ const COLORS = [] // Não mais usado no dashboard
 
 export default function Dashboard() {
   const { privacyMode } = useTheme()
-  const [usuario] = useState(() => {
-    const saved = localStorage.getItem('horizonte_user')
-    if (saved) {
-      try {
-        return JSON.parse(saved) || { nome: 'Usuário', email: '' }
-      } catch (e) {
-        console.error('Error parsing user', e)
-      }
-    }
-    return { nome: 'Usuário', email: '' }
-  })
+  const [usuario, setUsuario] = useState(() => readHorizonteUser() || { nome: 'Usuário', email: '', id: '' })
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [transacoes, setTransacoes] = useState([])
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState('')
   const chartRef = useRef(null)
+
+  useEffect(() => {
+    const u = readHorizonteUser()
+    if (u) setUsuario((prev) => ({ ...prev, ...u }))
+  }, [])
 
   const fetchTransacoes = React.useCallback(async () => {
     setLoading(true)
+    setFetchError('')
+    const session = readHorizonteUser()
+    if (!session?.id) {
+      setLoading(false)
+      setTransacoes([])
+      setFetchError('Sessão inválida. Faça login novamente.')
+      return
+    }
     try {
-      // Pequeno delay para mostrar o skeleton de forma elegante
-      await new Promise(r => setTimeout(r, 600))
-      
-      const res = await fetch('/api/transacoes', {
-        headers: { 'x-user-id': usuario.id }
+      await new Promise((r) => setTimeout(r, 600))
+
+      const res = await fetch(apiUrl('/api/transacoes'), {
+        headers: { 'x-user-id': String(session.id).trim() },
+        cache: 'no-store',
       })
+
+      if (res.status === 403) {
+        window.location.replace('/pagamento?expirado=1')
+        return
+      }
+
       if (res.ok) {
         const data = await res.json()
-        setTransacoes(data || [])
+        setTransacoes(Array.isArray(data) ? data : [])
+        return
       }
+
+      const errBody = await res.json().catch(() => ({}))
+      setTransacoes([])
+      setFetchError(errBody.message || `Não foi possível carregar transações (${res.status}).`)
     } catch (err) {
       console.error(err)
+      setTransacoes([])
+      setFetchError('Sem conexão com a API. Verifique a internet e se VITE_API_URL aponta para o servidor.')
     } finally {
       setLoading(false)
     }
-  }, [usuario.id])
+  }, [])
 
   useEffect(() => {
-    if (usuario.id) {
+    const u = readHorizonteUser()
+    if (u?.id) {
       fetchTransacoes()
+    } else {
+      setLoading(false)
+      setFetchError('Faça login para ver suas transações.')
     }
-  }, [usuario.id, fetchTransacoes])
+  }, [fetchTransacoes])
 
   useEffect(() => {
     if (!chartRef.current) return
@@ -149,14 +173,7 @@ export default function Dashboard() {
       <main className="main-content relative z-10">
         <header className="top-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button className="mobile-menu-btn" onClick={() => setMenuAberto(true)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="7" height="7" x="3" y="3" rx="1"/>
-                <rect width="7" height="7" x="14" y="3" rx="1"/>
-                <rect width="7" height="7" x="14" y="14" rx="1"/>
-                <rect width="7" height="7" x="3" y="14" rx="1"/>
-              </svg>
-            </button>
+            <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div className="dashboard-greeting">
               <h1 className="responsive-h1 dashboard-greeting-title">
                 Olá, {usuario.nome}!
@@ -167,6 +184,24 @@ export default function Dashboard() {
             </div>
           </div>
         </header>
+
+        {fetchError && (
+          <div
+            className="content-section"
+            style={{
+              marginBottom: '12px',
+              padding: '12px 14px',
+              borderRadius: '12px',
+              background: 'rgba(239,68,68,0.1)',
+              border: '1px solid rgba(239,68,68,0.25)',
+              color: 'var(--text-primary)',
+              fontSize: '14px',
+            }}
+            role="alert"
+          >
+            {fetchError}
+          </div>
+        )}
 
         {/* KPIs */}
         <div className="kpi-grid skeleton-stagger">
@@ -306,11 +341,11 @@ export default function Dashboard() {
         ) }
       </main>
 
-      <TransactionModal 
+      <TransactionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={fetchTransacoes}
-        usuarioId={usuario.id}
+        usuarioId={readHorizonteUser()?.id || usuario.id}
       />
     </div>
   )

@@ -1,6 +1,6 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { isSuperAdminEmail } from './super-admin.mjs'
-import { usuarioTemPagamentoAprovado } from './pagamentos-mp.mjs'
+import { sincronizarPagamentosPendentesDoUsuario, usuarioTemPagamentoAprovado } from './pagamentos-mp.mjs'
 
 export const TRIAL_DIAS = Number.parseInt(process.env.HORIZONTE_TRIAL_DIAS || '7', 10) || 7
 
@@ -14,32 +14,53 @@ function addDaysIso(days) {
  * No primeiro acesso após login, define trial_ends_at = agora + TRIAL_DIAS (UTC).
  */
 export async function ensureTrialIniciado(usuarioId) {
+  const uid = String(usuarioId || '').trim()
+  if (!uid) throw new Error('usuarioId inválido')
   const supabase = getSupabaseAdmin()
   const { data: row, error: selErr } = await supabase
     .from('usuarios')
     .select('trial_ends_at')
-    .eq('id', usuarioId)
+    .eq('id', uid)
     .maybeSingle()
 
   if (selErr) throw selErr
   if (row?.trial_ends_at) return String(row.trial_ends_at)
 
   const ends = addDaysIso(TRIAL_DIAS)
-  const { error: upErr } = await supabase.from('usuarios').update({ trial_ends_at: ends }).eq('id', usuarioId)
+  const { error: upErr } = await supabase.from('usuarios').update({ trial_ends_at: ends }).eq('id', uid)
   if (upErr) throw upErr
   return ends
 }
 
+/** Campos de assinatura sem falhar se colunas trial/bem_vindo ainda não existirem no banco. */
 export async function fetchAssinaturaCamposUsuario(usuarioId) {
+  const uid = String(usuarioId || '').trim()
+  if (!uid) return {}
   const supabase = getSupabaseAdmin()
-  const { data, error } = await supabase
-    .from('usuarios')
-    .select('trial_ends_at, bem_vindo_pagamento_visto_at, isento_pagamento, email')
-    .eq('id', usuarioId)
-    .maybeSingle()
 
-  if (error) throw error
-  return data || {}
+  const base = await supabase.from('usuarios').select('email, isento_pagamento').eq('id', uid).maybeSingle()
+  if (base.error) {
+    console.warn('[fetchAssinaturaCamposUsuario] base:', base.error.message || base.error)
+    return {}
+  }
+  if (!base.data) return {}
+
+  const out = {
+    email: base.data.email,
+    isento_pagamento: base.data.isento_pagamento,
+    trial_ends_at: null,
+    bem_vindo_pagamento_visto_at: null,
+  }
+
+  const tTrial = await supabase.from('usuarios').select('trial_ends_at').eq('id', uid).maybeSingle()
+  if (!tTrial.error && tTrial.data?.trial_ends_at != null) out.trial_ends_at = tTrial.data.trial_ends_at
+
+  const tBv = await supabase.from('usuarios').select('bem_vindo_pagamento_visto_at').eq('id', uid).maybeSingle()
+  if (!tBv.error && tBv.data?.bem_vindo_pagamento_visto_at != null) {
+    out.bem_vindo_pagamento_visto_at = tBv.data.bem_vindo_pagamento_visto_at
+  }
+
+  return out
 }
 
 export function computeAssinaturaFlags({
@@ -60,7 +81,9 @@ export function computeAssinaturaFlags({
   const trialEnd = trial_ends_at ? new Date(trial_ends_at) : null
   const trialActive = trialEnd != null && !Number.isNaN(trialEnd.getTime()) && trialEnd > new Date()
   const acesso = assinatura_paga === true || trialActive
-  const mostrarBemVindo = acesso && !bem_vindo_pagamento_visto_at
+  /* Tela de boas-vindas é para trial / antes de concluir o fluxo; quem já pagou não deve ver ao abrir o app. */
+  const mostrarBemVindo =
+    acesso && !bem_vindo_pagamento_visto_at && assinatura_paga !== true
 
   return {
     assinatura_paga: assinatura_paga === true,
@@ -73,11 +96,23 @@ export function computeAssinaturaFlags({
  * Garante trial, lê campos e retorna objeto para merge no JSON do usuário (login / status).
  */
 export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {}) {
-  const trialEnds = await ensureTrialIniciado(usuarioId)
-  const row = await fetchAssinaturaCamposUsuario(usuarioId)
+  const uid = String(usuarioId || '').trim()
+  let trialEnds = null
+  try {
+    trialEnds = await ensureTrialIniciado(uid)
+  } catch (e) {
+    console.warn('[buildAssinaturaUsuarioPayload] trial:', e?.message || e)
+  }
+
+  const row = await fetchAssinaturaCamposUsuario(uid)
   const email = partialUser.email ?? row.email ?? ''
   const isento = partialUser.isento_pagamento === true || row.isento_pagamento === true
-  const hasPay = await usuarioTemPagamentoAprovado(usuarioId)
+
+  await sincronizarPagamentosPendentesDoUsuario(uid).catch((e) =>
+    console.warn('[buildAssinaturaUsuarioPayload] sync MP:', e?.message || e)
+  )
+
+  const hasPay = await usuarioTemPagamentoAprovado(uid, email)
   const flags = computeAssinaturaFlags({
     email,
     isento_pagamento: isento,
@@ -87,7 +122,7 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   })
 
   return {
-    trial_ends_at: trialEnds,
+    trial_ends_at: trialEnds || row.trial_ends_at || null,
     bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at || null,
     assinatura_paga: flags.assinatura_paga,
     acesso_app_liberado: flags.acesso_app_liberado,
@@ -97,12 +132,13 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
 }
 
 export async function marcarBemVindoPagamentoVisto(usuarioId) {
+  const uid = String(usuarioId || '').trim()
   const supabase = getSupabaseAdmin()
   const nowIso = new Date().toISOString()
   const { error } = await supabase
     .from('usuarios')
     .update({ bem_vindo_pagamento_visto_at: nowIso })
-    .eq('id', usuarioId)
+    .eq('id', uid)
 
   if (error) throw error
   return nowIso
@@ -113,33 +149,39 @@ export async function marcarBemVindoPagamentoVisto(usuarioId) {
  * @returns {null | { status: number, message: string }}
  */
 export async function assertAcessoAppUsuario(usuarioId) {
-  if (!usuarioId) return { status: 401, message: 'Não autorizado.' }
+  const uid = String(usuarioId || '').trim()
+  if (!uid) return { status: 401, message: 'Não autorizado.' }
+
+  try {
+    await ensureTrialIniciado(uid)
+  } catch (e) {
+    console.warn('[assertAcessoAppUsuario] ensureTrialIniciado:', e?.message || e)
+  }
 
   const supabase = getSupabaseAdmin()
-  const { data: row, error } = await supabase
+  const { data: urow, error: uerr } = await supabase
     .from('usuarios')
-    .select('email, trial_ends_at, isento_pagamento')
-    .eq('id', usuarioId)
+    .select('email, isento_pagamento')
+    .eq('id', uid)
     .maybeSingle()
 
-  if (error) {
-    console.error('assertAcessoAppUsuario select', error)
-    return { status: 500, message: 'Erro ao verificar assinatura.' }
+  if (uerr) {
+    console.warn('[assertAcessoAppUsuario] leitura usuarios:', uerr.message || uerr)
+    return null
   }
-  if (!row) return { status: 401, message: 'Não autorizado.' }
+  if (!urow) return { status: 401, message: 'Não autorizado.' }
 
-  let hasPay = false
-  try {
-    hasPay = await usuarioTemPagamentoAprovado(usuarioId)
-  } catch (e) {
-    console.error('assertAcessoAppUsuario pagamentos', e)
-    return { status: 500, message: 'Erro ao verificar assinatura.' }
-  }
+  let trial_ends_at = null
+  const tr = await supabase.from('usuarios').select('trial_ends_at').eq('id', uid).maybeSingle()
+  if (!tr.error && tr.data?.trial_ends_at != null) trial_ends_at = tr.data.trial_ends_at
+
+  const email = urow.email ?? ''
+  const hasPay = await usuarioTemPagamentoAprovado(uid, email)
 
   const flags = computeAssinaturaFlags({
-    email: row.email,
-    isento_pagamento: row.isento_pagamento === true,
-    trial_ends_at: row.trial_ends_at,
+    email,
+    isento_pagamento: urow.isento_pagamento === true,
+    trial_ends_at,
     bem_vindo_pagamento_visto_at: true,
     assinatura_paga: hasPay,
   })

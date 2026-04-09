@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
+import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
@@ -24,6 +25,24 @@ import autoTable from 'jspdf-autotable'
 
 const COLORS_DESP = ['#38bdf8', '#34d399', '#fbbf24', '#fb923c', '#a78bfa', '#f472b6', '#94a3b8', '#64748b']
 const COLORS_REC = ['#4ade80', '#22d3ee', '#fcd34d', '#a78bfa', '#f472b6', '#94a3b8', '#64748b']
+
+function transacaoDiaKey(dataTransacao) {
+  if (dataTransacao == null) return ''
+  const s = String(dataTransacao).trim()
+  if (!s) return ''
+  const head = s.includes('T') ? s.split('T')[0] : s.slice(0, 10)
+  return /^\d{4}-\d{2}-\d{2}$/.test(head) ? head : ''
+}
+
+function labelDiaBr(isoYmd) {
+  const [y, m, d] = String(isoYmd).split('-').map(Number)
+  if (!y || !m || !d) return String(isoYmd)
+  return new Date(y, m - 1, d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+}
+
+function tipoNormalizado(tipo) {
+  return String(tipo || '').trim().toUpperCase()
+}
 
 function RelatoriosTooltip({ active, payload, label, formatCurrency }) {
   if (!active || !payload?.length) return null
@@ -143,23 +162,26 @@ export default function Relatorios() {
     const recCatMap = {}
 
     transacoes.forEach((t) => {
-      const val = parseFloat(t.valor) || 0
-      const dRaw = t.data_transacao.split('T')[0]
+      const dRaw = transacaoDiaKey(t.data_transacao)
+      if (!dRaw) return
+      const val = Number(t.valor)
+      const valorNum = Number.isFinite(val) ? val : parseFloat(String(t.valor).replace(',', '.')) || 0
+      const tipo = tipoNormalizado(t.tipo)
 
       if (!dataMap[dRaw]) {
         dataMap[dRaw] = { raw: dRaw, Receitas: 0, Despesas: 0 }
       }
 
-      if (t.tipo === 'RECEITA') {
-        receitas += val
-        dataMap[dRaw].Receitas += val
+      if (tipo === 'RECEITA') {
+        receitas += valorNum
+        dataMap[dRaw].Receitas += valorNum
         const cn = t.categorias?.nome || 'Sem categoria'
-        recCatMap[cn] = (recCatMap[cn] || 0) + val
+        recCatMap[cn] = (recCatMap[cn] || 0) + valorNum
       } else {
-        despesas += val
-        dataMap[dRaw].Despesas += val
+        despesas += valorNum
+        dataMap[dRaw].Despesas += valorNum
         const catName = t.categorias?.nome || 'Sem categoria'
-        catMap[catName] = (catMap[catName] || 0) + val
+        catMap[catName] = (catMap[catName] || 0) + valorNum
       }
     })
 
@@ -168,7 +190,7 @@ export default function Relatorios() {
     const chartDataPorData = sortedKeys.map((k) => {
       const row = dataMap[k]
       return {
-        name: new Date(k).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+        name: labelDiaBr(k),
         Receitas: row.Receitas,
         Despesas: row.Despesas,
       }
@@ -180,7 +202,7 @@ export default function Relatorios() {
       const net = row.Receitas - row.Despesas
       run += net
       return {
-        name: new Date(k).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+        name: labelDiaBr(k),
         saldo: run,
         liquidoDia: net,
       }
@@ -295,14 +317,7 @@ export default function Relatorios() {
       <main className="main-content relative z-10">
         <header className="top-header relatorios-page-header">
           <div className="relatorios-page-header__titles">
-            <button type="button" className="mobile-menu-btn" onClick={() => setMenuAberto(true)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="7" height="7" x="3" y="3" rx="1"/>
-                <rect width="7" height="7" x="14" y="3" rx="1"/>
-                <rect width="7" height="7" x="14" y="14" rx="1"/>
-                <rect width="7" height="7" x="3" y="14" rx="1"/>
-              </svg>
-            </button>
+            <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div>
               <h1 className="responsive-h1 relatorios-page-header__h1">Relatórios Analíticos</h1>
               <p className="relatorios-page-header__sub">Receitas, despesas e composição por categoria no período</p>
@@ -391,7 +406,7 @@ export default function Relatorios() {
                 <p className="relatorios-chart-card__desc">Receitas e despesas por dia no período selecionado</p>
               </div>
               <div className="relatorios-chart-card__body">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={isMobile ? 260 : 320} debounce={50}>
                   <BarChart data={chartDataPorData} margin={{ top: 12, right: 12, left: 4, bottom: 4 }} barGap={2} barCategoryGap="18%">
                     <defs>
                       <linearGradient id="relGradRec" x1="0" y1="0" x2="0" y2="1">
@@ -424,7 +439,7 @@ export default function Relatorios() {
                 <p className="relatorios-chart-card__desc">Resultado líquido dia a dia no período (linha de referência em zero)</p>
               </div>
               <div className="relatorios-chart-card__body relatorios-chart-card__body--area">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={isMobile ? 260 : 320} debounce={50}>
                   <AreaChart data={chartDataSaldoCum} margin={{ top: 12, right: 12, left: 4, bottom: 4 }}>
                     <defs>
                       <linearGradient id="relGradSaldo" x1="0" y1="0" x2="0" y2="1">

@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
+import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
 import { useTheme } from '../context/ThemeContext'
+import { apiUrl } from '../lib/apiUrl'
+import { readHorizonteUser } from '../lib/horizonteSession'
 import './dashboard.css'
 
 export default function Transacoes() {
   const { privacyMode } = useTheme()
-  const [usuario] = useState(() => {
-    const saved = localStorage.getItem('horizonte_user')
-    if (saved) {
-      try {
-        return JSON.parse(saved) || { nome: 'Usuário', id: '' }
-      } catch (e) { console.error(e) }
-    }
-    return { nome: 'Usuário', id: '' }
-  })
+  const [usuario, setUsuario] = useState(() => readHorizonteUser() || { nome: 'Usuário', id: '' })
+
+  useEffect(() => {
+    const u = readHorizonteUser()
+    if (u) setUsuario((prev) => ({ ...prev, ...u }))
+  }, [])
 
   // States
   const [menuAberto, setMenuAberto] = useState(false)
@@ -34,19 +34,32 @@ export default function Transacoes() {
   })
 
   const fetchCategorias = useCallback(async () => {
+    const session = readHorizonteUser()
+    if (!session?.id) return
     try {
-      const res = await fetch('/api/categorias', {
-        headers: { 'x-user-id': usuario.id }
+      const res = await fetch(apiUrl('/api/categorias'), {
+        headers: { 'x-user-id': session.id },
       })
+      if (res.status === 403) {
+        window.location.replace('/pagamento?expirado=1')
+        return
+      }
       if (res.ok) {
         const data = await res.json()
         setCategorias(data || [])
       }
-    } catch (err) { console.error(err) }
-  }, [usuario.id])
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
 
   const fetchTransacoes = useCallback(async () => {
     setLoading(true)
+    const session = readHorizonteUser()
+    if (!session?.id) {
+      setLoading(false)
+      return
+    }
     try {
       const params = new URLSearchParams()
       if (filters.busca) params.append('busca', filters.busca)
@@ -57,26 +70,31 @@ export default function Transacoes() {
       if (filters.dataFim) params.append('dataFim', filters.dataFim)
       params.append('limit', '500')
 
-      const res = await fetch(`/api/transacoes?${params.toString()}`, {
-        headers: { 'x-user-id': usuario.id }
+      const res = await fetch(apiUrl(`/api/transacoes?${params.toString()}`), {
+        headers: { 'x-user-id': session.id },
       })
+      if (res.status === 403) {
+        window.location.replace('/pagamento?expirado=1')
+        return
+      }
       if (res.ok) {
         const data = await res.json()
-        setTransacoes(data || [])
+        setTransacoes(Array.isArray(data) ? data : [])
       }
     } catch (err) {
       console.error(err)
     } finally {
       setLoading(false)
     }
-  }, [usuario.id, filters])
+  }, [filters])
 
   useEffect(() => {
-    if (usuario.id) {
+    const session = readHorizonteUser()
+    if (session?.id) {
       fetchCategorias()
       fetchTransacoes()
     }
-  }, [usuario.id, fetchCategorias, fetchTransacoes])
+  }, [fetchCategorias, fetchTransacoes])
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target
@@ -85,13 +103,17 @@ export default function Transacoes() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Deseja realmente excluir esta transação?')) return
+    const session = readHorizonteUser()
+    if (!session?.id) return
     try {
-      const res = await fetch(`/api/transacoes/${id}`, {
+      const res = await fetch(apiUrl(`/api/transacoes/${id}`), {
         method: 'DELETE',
-        headers: { 'x-user-id': usuario.id }
+        headers: { 'x-user-id': session.id },
       })
       if (res.ok) fetchTransacoes()
-    } catch (err) { console.error(err) }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   const summary = useMemo(() => {
@@ -122,14 +144,7 @@ export default function Transacoes() {
       <main className="main-content relative z-10">
         <header className="top-header transacoes-page-header">
            <div className="transacoes-page-header__titles">
-            <button type="button" className="mobile-menu-btn" onClick={() => setMenuAberto(true)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="7" height="7" x="3" y="3" rx="1"/>
-                <rect width="7" height="7" x="14" y="3" rx="1"/>
-                <rect width="7" height="7" x="14" y="14" rx="1"/>
-                <rect width="7" height="7" x="3" y="14" rx="1"/>
-              </svg>
-            </button>
+            <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div>
               <h1 className="responsive-h1 transacoes-page-header__h1">Minhas Transações</h1>
               <p className="transacoes-page-header__sub">Lista completa com filtros e totais do recorte</p>
@@ -316,7 +331,7 @@ export default function Transacoes() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={fetchTransacoes}
-        usuarioId={usuario.id}
+        usuarioId={readHorizonteUser()?.id || usuario.id}
       />
     </div>
   )

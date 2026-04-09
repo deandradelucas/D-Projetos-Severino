@@ -1,4 +1,9 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
+import {
+  buscarPagamentoPorId,
+  buscarPagamentosPorExternalReference,
+  isMercadoPagoConfigured,
+} from './mercadopago.mjs'
 
 export async function insertPreferenciaRecord({
   usuario_id,
@@ -73,36 +78,152 @@ export async function upsertFromWebhookPayment(payment) {
   if (error) throw error
 }
 
+const STATUS_FINAL_OK = new Set(['approved', 'authorized', 'accredited'])
+const STATUS_FINAL_RUIM = new Set(['rejected', 'cancelled', 'refunded', 'charged_back'])
+
+function escolherMelhorPagamentoMp(results) {
+  if (!results?.length) return null
+  const ok = results.filter((p) => STATUS_FINAL_OK.has(String(p.status || '').toLowerCase()))
+  const pool = ok.length ? ok : results
+  return pool.sort(
+    (a, b) =>
+      new Date(b.date_approved || b.date_last_updated || b.date_created || 0) -
+      new Date(a.date_approved || a.date_last_updated || a.date_created || 0)
+  )[0]
+}
+
+function precisaSincronizarStatus(status) {
+  const s = String(status || '').toLowerCase()
+  if (STATUS_FINAL_OK.has(s) || STATUS_FINAL_RUIM.has(s)) return false
+  return true
+}
+
+/**
+ * Atualiza no Supabase o status real vindo do MP (webhook às vezes não chega em produção).
+ */
+export async function sincronizarPagamentosPendentesDoUsuario(usuario_id) {
+  const uid = String(usuario_id || '').trim()
+  if (!uid || !isMercadoPagoConfigured()) return
+
+  const supabase = getSupabaseAdmin()
+  const { data: rows, error } = await supabase
+    .from('pagamentos_mercadopago')
+    .select('id, preference_id, payment_id, external_reference, status')
+    .eq('usuario_id', uid)
+    .order('created_at', { ascending: false })
+    .limit(25)
+
+  if (error || !rows?.length) return
+
+  for (const row of rows) {
+    if (!precisaSincronizarStatus(row.status)) continue
+
+    try {
+      if (row.payment_id) {
+        const payment = await buscarPagamentoPorId(String(row.payment_id).trim())
+        await upsertFromWebhookPayment(payment)
+        continue
+      }
+
+      if (row.external_reference) {
+        const results = await buscarPagamentosPorExternalReference(row.external_reference)
+        const best = escolherMelhorPagamentoMp(results)
+        if (best) await upsertFromWebhookPayment(best)
+      }
+    } catch (e) {
+      console.warn('[sincronizarPagamentosPendentesDoUsuario]', row.external_reference || row.id, e?.message || e)
+    }
+  }
+}
+
 export async function listPagamentosUsuario(usuario_id, limit = 20) {
+  const uid = String(usuario_id || '').trim()
+  if (!uid) return []
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
     .from('pagamentos_mercadopago')
     .select(
       'id, preference_id, payment_id, status, status_detail, amount, currency_id, description, external_reference, payer_email, created_at, updated_at'
     )
-    .eq('usuario_id', usuario_id)
+    .eq('usuario_id', uid)
     .order('created_at', { ascending: false })
     .limit(limit)
 
-  if (error) throw error
+  if (error) {
+    console.warn('[listPagamentosUsuario]', error.message || error)
+    return []
+  }
   return data || []
 }
 
-const STATUS_PAGAMENTO_OK = new Set(['approved', 'authorized'])
+/** Status MP que liberam assinatura (pagamento concluído ou autorizado). */
+export const STATUS_PAGAMENTO_LIBERA_ACESSO = new Set([
+  'approved',
+  'authorized',
+  'accredited', // algumas respostas / contas MP
+])
 
-/** Pelo menos um registro em pagamentos_mercadopago com status aprovado/autorizado. */
-export async function usuarioTemPagamentoAprovado(usuario_id) {
-  if (!usuario_id) return false
+function linhaPagamentoAprovada(row) {
+  return STATUS_PAGAMENTO_LIBERA_ACESSO.has(String(row?.status || '').toLowerCase())
+}
+
+/**
+ * Pagamento aprovado vinculado ao usuário OU ao e-mail do pagador (MP às vezes grava payer_email antes de usuario_id).
+ * Nunca lança — falhas de tabela/rede retornam false (evita 500 no app).
+ */
+export async function usuarioTemPagamentoAprovado(usuario_id, payerEmail = null) {
+  const uid = String(usuario_id || '').trim()
+  if (!uid) return false
+
   const supabase = getSupabaseAdmin()
-  const { data, error } = await supabase
-    .from('pagamentos_mercadopago')
-    .select('id, status')
-    .eq('usuario_id', usuario_id)
-    .limit(50)
 
-  if (error) throw error
-  const rows = data || []
-  return rows.some((r) => STATUS_PAGAMENTO_OK.has(String(r.status || '').toLowerCase()))
+  try {
+    const { data, error } = await supabase
+      .from('pagamentos_mercadopago')
+      .select('id, status')
+      .eq('usuario_id', uid)
+      .limit(50)
+
+    if (error) {
+      console.warn('[usuarioTemPagamentoAprovado] por usuario_id:', error.message || error)
+    } else if ((data || []).some(linhaPagamentoAprovada)) {
+      return true
+    }
+
+    const em = String(payerEmail || '').trim().toLowerCase()
+    if (!em) return false
+
+    const r2 = await supabase
+      .from('pagamentos_mercadopago')
+      .select('id, status, usuario_id, payer_email')
+      .ilike('payer_email', em)
+      .limit(80)
+
+    if (r2.error) {
+      console.warn('[usuarioTemPagamentoAprovado] por payer_email:', r2.error.message || r2.error)
+      return false
+    }
+
+    const candidatos = (r2.data || []).filter(
+      (row) =>
+        linhaPagamentoAprovada(row) &&
+        (!row.usuario_id || String(row.usuario_id).trim() === uid)
+    )
+    if (candidatos.length === 0) return false
+
+    const semVinculo = candidatos.find((row) => !row.usuario_id && row.id)
+    if (semVinculo) {
+      const { error: upErr } = await supabase
+        .from('pagamentos_mercadopago')
+        .update({ usuario_id: uid })
+        .eq('id', semVinculo.id)
+      if (upErr) console.warn('[usuarioTemPagamentoAprovado] vincular usuario_id:', upErr.message || upErr)
+    }
+    return true
+  } catch (e) {
+    console.warn('[usuarioTemPagamentoAprovado]', e?.message || e)
+    return false
+  }
 }
 
 /**
@@ -113,20 +234,21 @@ export async function usuarioTemPagamentoAprovado(usuario_id) {
 export async function resumoPagamentosPorUsuarioIds(userIds) {
   const latestByUser = new Map()
   const approvedIds = new Set()
-  if (!userIds?.length) return { latestByUser, approvedIds }
+  const ids = [...new Set((userIds || []).map((id) => String(id || '').trim()).filter(Boolean))]
+  if (!ids.length) return { latestByUser, approvedIds }
 
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
     .from('pagamentos_mercadopago')
     .select('usuario_id, status, amount, updated_at, created_at, status_detail')
-    .in('usuario_id', userIds)
+    .in('usuario_id', ids)
 
   if (error) throw error
   const rows = data || []
   for (const r of rows) {
     const uid = r.usuario_id
     if (!uid) continue
-    if (STATUS_PAGAMENTO_OK.has(String(r.status || '').toLowerCase())) approvedIds.add(uid)
+    if (STATUS_PAGAMENTO_LIBERA_ACESSO.has(String(r.status || '').toLowerCase())) approvedIds.add(uid)
   }
   rows.sort((a, b) => {
     const tb = new Date(b.updated_at || b.created_at || 0).getTime()

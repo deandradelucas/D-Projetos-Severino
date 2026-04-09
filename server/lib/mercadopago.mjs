@@ -113,3 +113,35 @@ export async function buscarPagamentoPorId(paymentId) {
   }
   return json
 }
+
+/**
+ * Lista pagamentos no MP pelo external_reference da preferência (quando o webhook não atualizou o banco).
+ * @see https://www.mercadopago.com.br/developers/pt/reference/payments/_payments_search/get
+ */
+export async function buscarPagamentosPorExternalReference(externalReference) {
+  const accessToken = getMercadoPagoAccessToken()
+  if (!accessToken) {
+    throw new Error('MERCADO_PAGO_ACCESS_TOKEN não configurada.')
+  }
+
+  const ref = String(externalReference || '').trim()
+  if (!ref) return []
+
+  const qs = new URLSearchParams({
+    sort: 'date_created',
+    criteria: 'desc',
+    external_reference: ref,
+  })
+
+  const res = await fetch(`${MP_API}/v1/payments/search?${qs.toString()}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    const msg = json.message || json.error || res.statusText
+    throw new Error(`Mercado Pago busca pagamentos: ${msg}`)
+  }
+
+  return Array.isArray(json.results) ? json.results : []
+}

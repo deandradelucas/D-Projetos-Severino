@@ -2,22 +2,25 @@ import { getSupabaseAdmin } from './supabase-admin.mjs'
 
 export async function getCategorias(usuarioId) {
   const supabaseAdmin = getSupabaseAdmin()
+  const uid = String(usuarioId || '').trim()
+  if (!uid) return []
+
   let { data: categorias, error: catError } = await supabaseAdmin
     .from('categorias')
     .select('id, nome, tipo, cor')
-    .eq('usuario_id', usuarioId)
+    .eq('usuario_id', uid)
 
   if (catError) throw catError
 
   if (!categorias || categorias.length === 0) {
     // Self-healing: if user has no categories, seed them automatically
-    await _seedCategoriesForUser(usuarioId, supabaseAdmin)
+    await _seedCategoriesForUser(uid, supabaseAdmin)
     
     // Fetch again after seed
     const { data: newCats, error: newErr } = await supabaseAdmin
       .from('categorias')
       .select('id, nome, tipo, cor')
-      .eq('usuario_id', usuarioId)
+      .eq('usuario_id', uid)
       
     if (newErr) throw newErr
     if (!newCats || newCats.length === 0) return []
@@ -146,42 +149,89 @@ export async function inserirTransacao({ usuario_id, conta_id, categoria_id, sub
   return data[0]
 }
 
+async function enrichTransacoesComCategorias(supabaseAdmin, rows) {
+  if (!rows?.length) return []
+  const catIds = [...new Set(rows.map((r) => r.categoria_id).filter(Boolean))]
+  const subIds = [...new Set(rows.map((r) => r.subcategoria_id).filter(Boolean))]
+  const catMap = new Map()
+  const subMap = new Map()
+  if (catIds.length) {
+    const { data: cats } = await supabaseAdmin.from('categorias').select('id, nome, cor').in('id', catIds)
+    for (const c of cats || []) catMap.set(c.id, { nome: c.nome, cor: c.cor })
+  }
+  if (subIds.length) {
+    const { data: subs } = await supabaseAdmin.from('subcategorias').select('id, nome').in('id', subIds)
+    for (const s of subs || []) subMap.set(s.id, { nome: s.nome })
+  }
+  return rows.map((r) => ({
+    id: r.id,
+    tipo: r.tipo,
+    valor: r.valor,
+    descricao: r.descricao,
+    data_transacao: r.data_transacao,
+    status: r.status,
+    categorias: r.categoria_id ? catMap.get(r.categoria_id) ?? null : null,
+    subcategorias: r.subcategoria_id ? subMap.get(r.subcategoria_id) ?? null : null,
+  }))
+}
+
 export async function getTransacoes(usuarioId, filters = {}) {
   const supabaseAdmin = getSupabaseAdmin()
-  const { dataInicio, dataFim, tipo, categoria_id, status, busca, limit = 500 } = filters
+  const uid = String(usuarioId || '').trim()
+  if (!uid) return []
 
-  let query = supabaseAdmin
-    .from('transacoes')
-    .select(`
+  const { dataInicio, dataFim, tipo, categoria_id, status, busca } = filters
+  let lim =
+    filters.limit !== undefined && filters.limit !== null && filters.limit !== ''
+      ? parseInt(String(filters.limit), 10)
+      : 500
+  if (!Number.isFinite(lim) || lim < 1) lim = 500
+  lim = Math.min(lim, 2000)
+
+  const applyFilters = (q) => {
+    let query = q.eq('usuario_id', uid)
+    if (dataInicio) query = query.gte('data_transacao', dataInicio)
+    if (dataFim) query = query.lte('data_transacao', dataFim)
+    if (tipo) query = query.eq('tipo', tipo)
+    if (categoria_id) query = query.eq('categoria_id', categoria_id)
+    if (status) query = query.eq('status', status)
+    if (busca) query = query.ilike('descricao', `%${busca}%`)
+    return query
+  }
+
+  const selectComEmbed = `
       id, tipo, valor, descricao, data_transacao, status,
       categorias(nome, cor),
       subcategorias(nome)
-    `)
-    .eq('usuario_id', usuarioId)
+    `
 
-  if (dataInicio) query = query.gte('data_transacao', dataInicio)
-  if (dataFim) query = query.lte('data_transacao', dataFim)
-  if (tipo) query = query.eq('tipo', tipo)
-  if (categoria_id) query = query.eq('categoria_id', categoria_id)
-  if (status) query = query.eq('status', status)
-  if (busca) query = query.ilike('descricao', `%${busca}%`)
+  let query = applyFilters(supabaseAdmin.from('transacoes').select(selectComEmbed))
 
-  const { data, error } = await query
-    .order('data_transacao', { ascending: false })
-    .limit(limit)
+  const { data, error } = await query.order('data_transacao', { ascending: false }).limit(lim)
 
-  if (error) throw error
+  if (error) {
+    console.warn('[getTransacoes] embed falhou, fallback sem join:', error.message || error)
+    const qFlat = applyFilters(
+      supabaseAdmin
+        .from('transacoes')
+        .select('id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id')
+    )
+    const r2 = await qFlat.order('data_transacao', { ascending: false }).limit(lim)
+    if (r2.error) throw r2.error
+    return enrichTransacoesComCategorias(supabaseAdmin, r2.data || [])
+  }
 
-  return data
+  return Array.isArray(data) ? data : []
 }
 
 export async function deletarTransacao(id, usuarioId) {
   const supabaseAdmin = getSupabaseAdmin()
+  const uid = String(usuarioId || '').trim()
   const { error } = await supabaseAdmin
     .from('transacoes')
     .delete()
     .eq('id', id)
-    .eq('usuario_id', usuarioId)
+    .eq('usuario_id', uid)
 
   if (error) throw error
   return true

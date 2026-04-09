@@ -36,11 +36,13 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
       }
       try {
         const res = await fetch(apiUrl('/api/assinatura/status'), {
-          headers: { 'x-user-id': u.id },
+          headers: { 'x-user-id': String(u.id).trim() },
+          cache: 'no-store',
         })
         if (res.ok) {
           const assinatura = await res.json()
           const merged = { ...u, ...assinatura }
+          if (merged.acesso_app_liberado === undefined) merged.acesso_app_liberado = true
           localStorage.setItem('horizonte_user', JSON.stringify(merged))
           if (!cancelled) setState({ loading: false, user: merged })
           return

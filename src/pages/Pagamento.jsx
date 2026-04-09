@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
+import MobileMenuButton from '../components/MobileMenuButton'
+import MpStatusBadge from '../components/MpStatusBadge'
 import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
 
@@ -141,14 +143,7 @@ export default function Pagamento() {
       <main className="main-content">
         <header className="top-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button className="mobile-menu-btn" onClick={() => setMenuAberto(true)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect width="7" height="7" x="3" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="14" rx="1" />
-                <rect width="7" height="7" x="3" y="14" rx="1" />
-              </svg>
-            </button>
+            <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div>
               <h1 className="responsive-h1" style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px' }}>
                 Pagamento
@@ -315,7 +310,9 @@ export default function Pagamento() {
                       <td>
                         {row.amount != null ? `R$ ${Number(row.amount).toFixed(2)}` : '—'}
                       </td>
-                      <td>{statusLabel(row.status)}</td>
+                      <td>
+                        <MpStatusBadge status={row.status} label={statusLabel(row.status)} />
+                      </td>
                       <td style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '220px' }}>
                         {row.status_detail || row.description || '—'}
                       </td>

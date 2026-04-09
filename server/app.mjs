@@ -35,6 +35,7 @@ import {
   insertPreferenciaRecord,
   listPagamentosUsuario,
   listPagamentosAdmin,
+  sincronizarPagamentosPendentesDoUsuario,
   upsertFromWebhookPayment,
 } from './lib/pagamentos-mp.mjs'
 import {
@@ -209,7 +210,14 @@ app.get('/api/assinatura/status', async (c) => {
     return c.json(assinatura)
   } catch (error) {
     console.error('assinatura status failed', error)
-    return c.json({ message: 'Erro ao consultar assinatura.' }, 500)
+    return c.json({
+      trial_ends_at: null,
+      bem_vindo_pagamento_visto_at: null,
+      assinatura_paga: false,
+      acesso_app_liberado: true,
+      mostrar_bem_vindo_assinatura: false,
+      trial_dias_gratis: 7,
+    })
   }
 })
 
@@ -570,6 +578,7 @@ app.get('/api/pagamentos/minhas', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
     if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    await sincronizarPagamentosPendentesDoUsuario(usuarioId)
     const rows = await listPagamentosUsuario(usuarioId)
     return c.json(rows)
   } catch (error) {

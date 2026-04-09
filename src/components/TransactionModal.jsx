@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { apiUrl } from '../lib/apiUrl'
 
 const CustomSelect = ({ name, value, onChange, options, placeholder, isOpen, onToggle, zIndex = 1 }) => {
   const [search, setSearch] = useState('')
@@ -123,8 +124,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
   const fetchCategorias = React.useCallback(async () => {
     setLoadingCats(true)
     try {
-      const res = await fetch('/api/categorias', {
-        headers: { 'x-user-id': usuarioId }
+      const res = await fetch(apiUrl('/api/categorias'), {
+        headers: { 'x-user-id': usuarioId },
       })
       if (res.ok) {
         const data = await res.json()
@@ -215,11 +216,11 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
 
     setSaving(true)
     try {
-      const res = await fetch('/api/transacoes', {
+      const res = await fetch(apiUrl('/api/transacoes'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': usuarioId
+          'x-user-id': usuarioId,
         },
         body: JSON.stringify({ 
           ...formData, 

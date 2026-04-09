@@ -39,6 +39,31 @@ export default function BemVindoAssinatura() {
     }
   }, [navigate])
 
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const u = readUser()
+      if (!u?.id) return
+      try {
+        const res = await fetch(apiUrl('/api/assinatura/status'), {
+          headers: { 'x-user-id': String(u.id).trim() },
+          cache: 'no-store',
+        })
+        if (!res.ok || cancelled) return
+        const a = await res.json()
+        mergeUser(a)
+        if (a.mostrar_bem_vindo_assinatura === false) {
+          navigate('/dashboard', { replace: true })
+        }
+      } catch {
+        /* mantém fluxo local */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [navigate])
+
   const handleEntrarNoApp = async () => {
     setErr('')
     const u = readUser()

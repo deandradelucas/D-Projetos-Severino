@@ -1,22 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import Sidebar from '../components/Sidebar'
+import MobileMenuButton from '../components/MobileMenuButton'
+import MpStatusBadge from '../components/MpStatusBadge'
 import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
-
-function badgeStatus(status) {
-  const s = String(status || 'pending').toLowerCase()
-  const base = { padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }
-  if (s === 'approved' || s === 'authorized') {
-    return <span style={{ ...base, backgroundColor: 'rgba(34,197,94,0.12)', color: '#16a34a' }}>{status || '—'}</span>
-  }
-  if (s === 'pending' || s === 'in_process' || s === 'in_mediation') {
-    return <span style={{ ...base, backgroundColor: 'rgba(234,179,8,0.12)', color: '#ca8a04' }}>{status || '—'}</span>
-  }
-  if (['rejected', 'cancelled', 'refunded', 'charged_back'].includes(s)) {
-    return <span style={{ ...base, backgroundColor: 'rgba(220,38,38,0.12)', color: '#dc2626' }}>{status || '—'}</span>
-  }
-  return <span style={{ ...base, backgroundColor: 'rgba(100,100,100,0.1)', color: '#666' }}>{status || '—'}</span>
-}
 
 export default function AdminPagamentos() {
   const [menuAberto, setMenuAberto] = useState(false)
@@ -112,14 +99,7 @@ export default function AdminPagamentos() {
       <main className="main-content">
         <header className="top-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button className="mobile-menu-btn" onClick={() => setMenuAberto(true)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect width="7" height="7" x="3" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="14" rx="1" />
-                <rect width="7" height="7" x="3" y="14" rx="1" />
-              </svg>
-            </button>
+            <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div>
               <h1 className="responsive-h1" style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px' }}>
                 Logs de Pagamentos
@@ -204,7 +184,9 @@ export default function AdminPagamentos() {
                         )}
                       </td>
                       <td>{row.amount != null ? `R$ ${Number(row.amount).toFixed(2)}` : '—'}</td>
-                      <td>{badgeStatus(row.status)}</td>
+                      <td>
+                        <MpStatusBadge status={row.status} />
+                      </td>
                       <td style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '160px' }}>
                         {row.status_detail || row.description || '—'}
                       </td>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
+import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
 
 export default function Configuracoes() {
@@ -116,14 +117,7 @@ export default function Configuracoes() {
       <main className="main-content config-page" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <header className="top-header config-page-header">
           <div className="config-page-header__titles">
-            <button type="button" className="mobile-menu-btn" onClick={() => setMenuAberto(true)} aria-label="Abrir menu">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect width="7" height="7" x="3" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="14" rx="1" />
-                <rect width="7" height="7" x="3" y="14" rx="1" />
-              </svg>
-            </button>
+            <MobileMenuButton onClick={() => setMenuAberto(true)} aria-label="Abrir menu" />
             <div>
               <h1 className="responsive-h1" style={{ margin: 0, fontWeight: 800, color: 'var(--text-primary)' }}>
                 Configurações
@@ -211,35 +205,6 @@ export default function Configuracoes() {
             </div>
           </section>
         </div>
-
-        <section className="config-card">
-          <div className="config-section-label">Atalhos</div>
-          <h2 className="config-card-title" style={{ marginTop: 0 }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
-            Navegação rápida
-          </h2>
-          <div className="config-quick-grid">
-            <Link className="config-quick-link" to="/dashboard" onClick={() => setMenuAberto(false)}>
-              Visão geral
-              <small>Dashboard</small>
-            </Link>
-            <Link className="config-quick-link" to="/transacoes" onClick={() => setMenuAberto(false)}>
-              Transações
-              <small>Lançamentos</small>
-            </Link>
-            <Link className="config-quick-link" to="/relatorios" onClick={() => setMenuAberto(false)}>
-              Relatórios
-              <small>Análises</small>
-            </Link>
-            <Link className="config-quick-link" to="/pagamento" onClick={() => setMenuAberto(false)}>
-              Pagamento
-              <small>Mercado Pago</small>
-            </Link>
-          </div>
-        </section>
 
         <section className="config-card">
           <div className="config-section-label">Dados</div>

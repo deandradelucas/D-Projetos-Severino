@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
+import MobileMenuButton from '../components/MobileMenuButton'
 import './dashboard.css'
 
 export default function AdminWhatsApp() {
@@ -82,14 +83,7 @@ export default function AdminWhatsApp() {
       <main className="main-content">
         <header className="top-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button className="mobile-menu-btn" onClick={() => setMenuAberto(true)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="7" height="7" x="3" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="14" rx="1" />
-                <rect width="7" height="7" x="3" y="14" rx="1" />
-              </svg>
-            </button>
+            <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div>
               <h1 className="responsive-h1" style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px' }}>
                 Logs do WhatsApp
