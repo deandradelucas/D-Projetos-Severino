@@ -15,6 +15,33 @@ function statusLabel(status) {
   return status
 }
 
+function situacaoAssinaturaLabel(code) {
+  const m = {
+    admin: 'Administrador',
+    isento: 'Conta isenta de pagamento',
+    trial: 'Período de teste',
+    ativo: 'Assinatura ativa',
+    pausada: 'Assinatura pausada no Mercado Pago',
+    cancelada: 'Assinatura cancelada no Mercado Pago',
+    inativa: 'Sem assinatura ativa',
+  }
+  return m[code] || ''
+}
+
+function painelAssinaturaFromUser(u) {
+  if (!u) {
+    return { situacao: null, label: '', mpUrl: '', bloqueada: false, motivo: '' }
+  }
+  const code = u.assinatura_situacao
+  return {
+    situacao: code != null ? String(code) : null,
+    label: code ? situacaoAssinaturaLabel(String(code)) : '',
+    mpUrl: typeof u.mp_gerenciar_url === 'string' ? u.mp_gerenciar_url.trim() : '',
+    bloqueada: !!u.assinatura_mp_bloqueada,
+    motivo: typeof u.motivo_bloqueio_acesso === 'string' ? u.motivo_bloqueio_acesso : '',
+  }
+}
+
 export default function Pagamento() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -27,6 +54,7 @@ export default function Pagamento() {
   const [titulo] = useState('Assinatura mensal Horizonte Financeiro')
   const [proximaCobranca, setProximaCobranca] = useState(null)
   const [precoMensal, setPrecoMensal] = useState(10)
+  const [painelAssinatura, setPainelAssinatura] = useState(() => painelAssinaturaFromUser(null))
 
   const statusUrl = searchParams.get('status')
   const mpSub = searchParams.get('mp')
@@ -47,6 +75,7 @@ export default function Pagamento() {
         const cfgHeaders = uid ? { 'x-user-id': uid } : {}
 
         if (uid && u) {
+          setPainelAssinatura(painelAssinaturaFromUser(u))
           if (u.assinatura_proxima_cobranca) setProximaCobranca(u.assinatura_proxima_cobranca)
           if (u.plano_preco_mensal != null) {
             const p = Number(u.plano_preco_mensal)
@@ -56,8 +85,10 @@ export default function Pagamento() {
             const stRes = await fetch(apiUrl('/api/assinatura/status'), { headers: { 'x-user-id': uid } })
             if (stRes.ok) {
               const assinatura = await stRes.json()
-              localStorage.setItem('horizonte_user', JSON.stringify({ ...u, ...assinatura }))
+              const merged = { ...u, ...assinatura }
+              localStorage.setItem('horizonte_user', JSON.stringify(merged))
               window.dispatchEvent(new Event('horizonte-session-refresh'))
+              setPainelAssinatura(painelAssinaturaFromUser(merged))
               if (assinatura.assinatura_proxima_cobranca) {
                 setProximaCobranca(assinatura.assinatura_proxima_cobranca)
               }
@@ -120,10 +151,14 @@ export default function Pagamento() {
         const stRes = await fetch(apiUrl('/api/assinatura/status'), { headers: { 'x-user-id': u.id }, cache: 'no-store' })
         if (stRes.ok) {
           const assinatura = await stRes.json()
-          localStorage.setItem('horizonte_user', JSON.stringify({ ...u, ...assinatura }))
+          const merged = { ...u, ...assinatura }
+          localStorage.setItem('horizonte_user', JSON.stringify(merged))
           window.dispatchEvent(new Event('horizonte-session-refresh'))
-          if (!cancelled && assinatura.assinatura_proxima_cobranca) {
-            setProximaCobranca(assinatura.assinatura_proxima_cobranca)
+          if (!cancelled) {
+            setPainelAssinatura(painelAssinaturaFromUser(merged))
+            if (assinatura.assinatura_proxima_cobranca) {
+              setProximaCobranca(assinatura.assinatura_proxima_cobranca)
+            }
           }
         }
         const hRes = await fetch(apiUrl('/api/pagamentos/minhas'), { headers: { 'x-user-id': u.id }, cache: 'no-store' })
@@ -260,6 +295,45 @@ export default function Pagamento() {
           </div>
         )}
 
+        {!loading &&
+          (painelAssinatura.label || proximaCobranca || painelAssinatura.mpUrl || painelAssinatura.bloqueada) && (
+          <section className="content-section pagamento-assinatura-panel" style={{ gridColumn: '1 / -1', maxWidth: '520px' }} aria-labelledby="pagamento-assinatura-heading">
+            <h2 id="pagamento-assinatura-heading" className="pagamento-assinatura-panel__title">
+              Status da assinatura
+            </h2>
+            {painelAssinatura.label ? (
+              <p className="pagamento-assinatura-panel__status">{painelAssinatura.label}</p>
+            ) : null}
+            {painelAssinatura.bloqueada && painelAssinatura.motivo ? (
+              <p className="pagamento-assinatura-panel__alert">{painelAssinatura.motivo}</p>
+            ) : null}
+            {proximaCobranca ? (
+              <div className="pagamento-assinatura-panel__cobranca">
+                <div className="pagamento-assinatura-panel__cobranca-label">Próxima cobrança</div>
+                <div className="pagamento-assinatura-panel__cobranca-data">
+                  {new Date(proximaCobranca).toLocaleString('pt-BR', {
+                    dateStyle: 'long',
+                    timeStyle: 'short',
+                  })}
+                </div>
+                <p style={{ margin: '8px 0 0', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                  Data informada pelo Mercado Pago após a autorização da assinatura. Atualiza automaticamente após cada pagamento.
+                </p>
+              </div>
+            ) : null}
+            {painelAssinatura.mpUrl ? (
+              <a
+                className="pagamento-assinatura-panel__link"
+                href={painelAssinatura.mpUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Gerenciar no Mercado Pago
+              </a>
+            ) : null}
+          </section>
+        )}
+
         <section className="content-section" style={{ gridColumn: '1 / -1', maxWidth: '520px' }}>
           {!config.ready && !loading && (
             <p style={{ color: 'var(--danger)', fontSize: '14px', marginBottom: '12px' }}>
@@ -303,31 +377,6 @@ export default function Pagamento() {
               Valor: <strong style={{ color: 'var(--text-primary)' }}>R$ {precoMensal.toFixed(2).replace('.', ',')} / mês</strong>
             </div>
           </div>
-
-          {proximaCobranca && (
-            <div
-              style={{
-                marginBottom: '16px',
-                padding: '12px 14px',
-                borderRadius: '10px',
-                background: 'rgba(212, 168, 75, 0.1)',
-                border: '1px solid rgba(212, 168, 75, 0.28)',
-              }}
-            >
-              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Próxima cobrança
-              </div>
-              <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
-                {new Date(proximaCobranca).toLocaleString('pt-BR', {
-                  dateStyle: 'long',
-                  timeStyle: 'short',
-                })}
-              </div>
-              <p style={{ margin: '8px 0 0', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
-                Data informada pelo Mercado Pago após a autorização da assinatura. Atualiza automaticamente após cada pagamento.
-              </p>
-            </div>
-          )}
 
           {error && <p style={{ color: 'var(--danger)', fontSize: '13px', marginBottom: '10px' }}>{error}</p>}
 
