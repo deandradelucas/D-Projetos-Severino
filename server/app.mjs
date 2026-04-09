@@ -181,6 +181,19 @@ function mapSupabaseOrNetworkError(error) {
       message: 'Existem registros duplicados para este e-mail. Contate o suporte.',
     }
   }
+  if (/column .* does not exist|Could not find the .*column/i.test(raw)) {
+    return {
+      status: 503,
+      message:
+        'O banco está desatualizado em relação ao app. Rode as migrations em scripts/migrations/ no SQL Editor do Supabase.',
+    }
+  }
+  if (/PGRST301|JWT expired|expired|timeout|ETIMEDOUT|connect ECONNREFUSED|socket hang up/i.test(raw)) {
+    return {
+      status: 503,
+      message: 'Serviço de dados temporariamente indisponível. Tente de novo em alguns instantes.',
+    }
+  }
   return null
 }
 
@@ -190,7 +203,12 @@ app.post('/api/auth/login', async (c) => {
     if (!rateLimitTake(`login:${ip}`, 25, 60_000)) {
       return c.json({ message: 'Muitas tentativas. Aguarde cerca de um minuto e tente de novo.' }, 429)
     }
-    const body = await c.req.json()
+    let body
+    try {
+      body = await c.req.json()
+    } catch {
+      return c.json({ message: 'Corpo da requisição inválido. Envie JSON.' }, 400)
+    }
     const email = String(body?.email || '').trim().toLowerCase()
     const password = String(body?.password || '')
 
@@ -202,7 +220,23 @@ app.post('/api/auth/login', async (c) => {
       return c.json({ message: 'Preencha a senha.' }, 400)
     }
 
-    const user = await authenticateUser(email, password)
+    let user
+    try {
+      user = await authenticateUser(email, password)
+    } catch (authErr) {
+      log.error('authenticateUser failed', authErr)
+      const mapped = mapSupabaseOrNetworkError(authErr)
+      if (mapped) {
+        return c.json({ message: mapped.message }, mapped.status)
+      }
+      return c.json(
+        {
+          message:
+            'Não foi possível validar o login (banco ou rede). Confira VITE_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no servidor e tente de novo.',
+        },
+        503
+      )
+    }
 
     if (!user) {
       return c.json({ message: 'E-mail ou senha incorretos.' }, 401)
