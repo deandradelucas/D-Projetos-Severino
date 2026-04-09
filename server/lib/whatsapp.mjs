@@ -436,7 +436,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
         }
       }
     } catch (e) {
-      console.error('[WhatsApp Webhook] Erro crítico ao ler body:', e.message)
+      log.error('[WhatsApp Webhook] Erro crítico ao ler body:', e.message)
       await registrarLogWhatsApp('?', 'Requisição Ilegível', 'ERRO', `CT: ${contentType} | Erro: ${e.message} | Raw: ${rawText.substring(0, 100)}`)
       return { status: 400, json: { error: 'Invalid Body' } }
     }
@@ -592,7 +592,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
       },
     }
   } catch (error) {
-    console.error('[WhatsApp Webhook] ERROR:', error)
+    log.error('[WhatsApp Webhook] ERROR:', error)
 
     await registrarLogWhatsApp(telDisplay, mensagemRaw, 'ERRO', error.message || 'Erro inesperado', usuarioTarget?.id)
 
