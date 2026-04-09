@@ -1,6 +1,45 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { isSuperAdminSession } from '../lib/superAdmin'
+
+function situacaoAssinaturaLabel(code) {
+  const m = {
+    admin: 'Administrador',
+    isento: 'Isento',
+    trial: 'Período de teste',
+    ativo: 'Assinatura ativa',
+    pausada: 'Assinatura pausada (MP)',
+    cancelada: 'Assinatura cancelada (MP)',
+    inativa: 'Sem assinatura ativa',
+  }
+  return m[code] || ''
+}
+
+function readAssinaturaStripFromStorage() {
+  try {
+    const raw = localStorage.getItem('horizonte_user')
+    const u = raw ? JSON.parse(raw) : null
+    const situacao = u?.assinatura_situacao
+    const assinaturaBadge = situacao ? situacaoAssinaturaLabel(String(situacao)) : ''
+    const assinaturaManageUrl =
+      typeof u?.mp_gerenciar_url === 'string' ? u.mp_gerenciar_url.trim() : ''
+    const d = u?.assinatura_proxima_cobranca
+    if (!d) {
+      return { assinaturaBadge, assinaturaManageUrl, pagamentoSub: '' }
+    }
+    const dt = new Date(d)
+    if (Number.isNaN(dt.getTime())) {
+      return { assinaturaBadge, assinaturaManageUrl, pagamentoSub: '' }
+    }
+    return {
+      assinaturaBadge,
+      assinaturaManageUrl,
+      pagamentoSub: `Próx. cobrança ${dt.toLocaleDateString('pt-BR')}`,
+    }
+  } catch {
+    return { assinaturaBadge: '', assinaturaManageUrl: '', pagamentoSub: '' }
+  }
+}
 
 /** Ordem vertical no menu (índice sobe/desce a bolinha) */
 const MENU_ORDER = [
