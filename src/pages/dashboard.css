@@ -1360,6 +1360,97 @@ h3 {
   background-color: rgba(255, 255, 255, 0.03);
 }
 
+/* Admin — usuários: tabela compacta, assinatura e último acesso */
+.page-admin-usuarios .admin-usuarios-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.page-admin-usuarios .admin-usuarios-table th,
+.page-admin-usuarios .admin-usuarios-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: top;
+}
+
+.page-admin-usuarios .admin-usuarios-table th {
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.page-admin-usuarios .admin-usuarios-table td {
+  font-size: 13px;
+}
+
+.page-admin-usuarios .admin-usuarios-table .cell-nome {
+  max-width: 130px;
+  font-weight: 600;
+}
+
+.page-admin-usuarios .admin-usuarios-table .cell-email {
+  max-width: 200px;
+  word-break: break-word;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.page-admin-usuarios .admin-usuarios-table .cell-fone {
+  white-space: nowrap;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.page-admin-usuarios .admin-usuarios-table .cell-assinatura {
+  min-width: 168px;
+  max-width: 240px;
+}
+
+.page-admin-usuarios .admin-usuarios-table .cell-acesso {
+  min-width: 150px;
+  max-width: 200px;
+}
+
+.page-admin-usuarios .admin-usuarios-table .cell-acoes {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.page-admin-usuarios .admin-usuarios-table .cell-acoes .admin-acoes-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+
+@media (min-width: 1200px) {
+  .page-admin-usuarios .admin-usuarios-table .cell-acoes .admin-acoes-btns {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.page-admin-usuarios .admin-pill {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.page-admin-usuarios .admin-subline {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
 .badge {
   display: inline-block;
   padding: 4px 8px;

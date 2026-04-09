@@ -105,6 +105,41 @@ export async function usuarioTemPagamentoAprovado(usuario_id) {
   return rows.some((r) => STATUS_PAGAMENTO_OK.has(String(r.status || '').toLowerCase()))
 }
 
+/**
+ * Último registro MP por usuário + conjunto de quem tem pagamento aprovado/autorizado.
+ * @param {string[]} userIds
+ * @returns {Promise<{ latestByUser: Map<string, object>, approvedIds: Set<string> }>}
+ */
+export async function resumoPagamentosPorUsuarioIds(userIds) {
+  const latestByUser = new Map()
+  const approvedIds = new Set()
+  if (!userIds?.length) return { latestByUser, approvedIds }
+
+  const supabase = getSupabaseAdmin()
+  const { data, error } = await supabase
+    .from('pagamentos_mercadopago')
+    .select('usuario_id, status, amount, updated_at, created_at, status_detail')
+    .in('usuario_id', userIds)
+
+  if (error) throw error
+  const rows = data || []
+  for (const r of rows) {
+    const uid = r.usuario_id
+    if (!uid) continue
+    if (STATUS_PAGAMENTO_OK.has(String(r.status || '').toLowerCase())) approvedIds.add(uid)
+  }
+  rows.sort((a, b) => {
+    const tb = new Date(b.updated_at || b.created_at || 0).getTime()
+    const ta = new Date(a.updated_at || a.created_at || 0).getTime()
+    return tb - ta
+  })
+  for (const r of rows) {
+    const uid = r.usuario_id
+    if (uid && !latestByUser.has(uid)) latestByUser.set(uid, r)
+  }
+  return { latestByUser, approvedIds }
+}
+
 const COLS_FLAT = `
   id,
   usuario_id,

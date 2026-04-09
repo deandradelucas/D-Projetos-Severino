@@ -11,6 +11,142 @@ const ROLE_OPTIONS = [
 
 const ROLE_OPTIONS_SEM_ADMIN = ROLE_OPTIONS.filter((o) => o.value !== 'ADMIN')
 
+function mpStatusLabel(status) {
+  if (!status) return '—'
+  const s = String(status).toLowerCase()
+  if (s === 'approved' || s === 'authorized') return 'Aprovado'
+  if (s === 'pending' || s === 'in_process' || s === 'in_mediation') return 'Pendente'
+  if (s === 'rejected' || s === 'cancelled' || s === 'refunded' || s === 'charged_back') return 'Recusado / estornado'
+  return String(status)
+}
+
+function formatRelativeAgo(date) {
+  const diffMin = (Date.now() - date.getTime()) / 60000
+  if (diffMin < 1) return 'agora'
+  if (diffMin < 60) return `há ${Math.floor(diffMin)} min`
+  if (diffMin < 1440) return `há ${Math.floor(diffMin / 60)} h`
+  return `há ${Math.floor(diffMin / 1440)} d`
+}
+
+function AssinaturaPagamentoCell({ row, isEditing, editForm, onField }) {
+  if (isEditing) {
+    return (
+      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer' }}>
+        <input type="checkbox" checked={!!editForm.isento_pagamento} onChange={(e) => onField('isento_pagamento', e.target.checked)} />
+        Isento de pagamento
+      </label>
+    )
+  }
+
+  if (row.isento_pagamento === true) {
+    return (
+      <div>
+        <span className="admin-pill" style={{ backgroundColor: 'rgba(34,197,94,0.15)', color: '#16a34a' }}>
+          Isento
+        </span>
+        <div className="admin-subline">Sem cobrança Mercado Pago</div>
+      </div>
+    )
+  }
+
+  if (row.pagamento_aprovado) {
+    const amt =
+      row.mp_ultimo_amount != null && row.mp_ultimo_amount !== ''
+        ? `R$ ${Number(row.mp_ultimo_amount).toFixed(2)}`
+        : null
+    const quando = row.mp_ultimo_em ? new Date(row.mp_ultimo_em) : null
+    return (
+      <div>
+        <span className="admin-pill" style={{ backgroundColor: 'rgba(34,197,94,0.15)', color: '#15803d' }}>
+          Assinatura paga
+        </span>
+        {amt && <div className="admin-subline">{amt}</div>}
+        {quando && !Number.isNaN(quando.getTime()) && (
+          <div className="admin-subline">Atualizado {quando.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</div>
+        )}
+      </div>
+    )
+  }
+
+  const trialEnd = row.trial_ends_at ? new Date(row.trial_ends_at) : null
+  const trialValid = trialEnd && !Number.isNaN(trialEnd.getTime())
+
+  if (!trialValid) {
+    return (
+      <div>
+        <span className="admin-pill" style={{ backgroundColor: 'rgba(148,163,184,0.2)', color: 'var(--text-secondary)' }}>
+          Sem trial
+        </span>
+        <div className="admin-subline">Ainda sem período de teste (ex.: primeiro login não registrou)</div>
+        {row.mp_ultimo_status && (
+          <div className="admin-subline">Último MP: {mpStatusLabel(row.mp_ultimo_status)}</div>
+        )}
+      </div>
+    )
+  }
+
+  const trialActive = trialEnd > new Date()
+  if (trialActive) {
+    return (
+      <div>
+        <span className="admin-pill" style={{ backgroundColor: 'rgba(99,102,241,0.18)', color: '#4f46e5' }}>
+          Teste ativo
+        </span>
+        <div className="admin-subline">Até {trialEnd.toLocaleDateString('pt-BR', { dateStyle: 'long' })}</div>
+        {row.mp_ultimo_status && (
+          <div className="admin-subline">Último MP: {mpStatusLabel(row.mp_ultimo_status)}</div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <span className="admin-pill" style={{ backgroundColor: 'rgba(234,179,8,0.2)', color: '#a16207' }}>
+        Teste encerrado
+      </span>
+      <div className="admin-subline">Sem pagamento aprovado</div>
+      {row.mp_ultimo_status && (
+        <div className="admin-subline">Último MP: {mpStatusLabel(row.mp_ultimo_status)}</div>
+      )}
+    </div>
+  )
+}
+
+function UltimoAcessoCell({ row, getUserConnectionBadge }) {
+  if (!row.last_login_at) {
+    return (
+      <div>
+        <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-secondary)' }}>Nunca acessou</div>
+        <div className="admin-subline">Nenhum login registrado no sistema</div>
+      </div>
+    )
+  }
+
+  const when = new Date(row.last_login_at)
+  if (Number.isNaN(when.getTime())) {
+    const badgeBad = getUserConnectionBadge(row)
+    return (
+      <div>
+        <div style={{ fontWeight: 600, fontSize: '13px' }}>Data inválida</div>
+        {badgeBad ? <div style={{ marginTop: 8 }}>{badgeBad}</div> : null}
+      </div>
+    )
+  }
+
+  const formatted = when.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+  const rel = formatRelativeAgo(when)
+  const badge = getUserConnectionBadge(row)
+
+  return (
+    <div>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-primary)' }}>{formatted}</div>
+      <div className="admin-subline">{rel}</div>
+      {badge ? <div style={{ marginTop: 8 }}>{badge}</div> : null}
+    </div>
+  )
+}
+
 export default function AdminUsuarios() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [usuarios, setUsuarios] = useState([])
@@ -160,7 +296,7 @@ export default function AdminUsuarios() {
       fontWeight: '600',
     }
     if (!user.last_login_at) {
-      return <span style={{ ...baseStyle, backgroundColor: 'rgba(148,163,184,0.15)', color: '#94a3b8' }}>Nunca logou</span>
+      return null
     }
     const last = new Date(user.last_login_at)
     const diffMin = (Date.now() - last.getTime()) / 60000
@@ -174,7 +310,7 @@ export default function AdminUsuarios() {
   }
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container page-admin-usuarios">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content">
@@ -238,18 +374,17 @@ export default function AdminUsuarios() {
             <p style={{ color: 'var(--text-secondary)' }}>Nenhum usuário encontrado.</p>
           ) : (
             <div style={{ overflowX: 'auto' }}>
-              <table className="data-table">
+              <table className="admin-usuarios-table">
                 <thead>
                   <tr>
-                    <th>Nome</th>
-                    <th>E-mail</th>
-                    <th>Telefone (WhatsApp)</th>
+                    <th className="cell-nome">Nome</th>
+                    <th className="cell-email">E-mail</th>
+                    <th className="cell-fone">Telefone</th>
                     <th>Role</th>
-                    <th>Status</th>
-                    <th>Pagamento</th>
-                    <th>Último login</th>
-                    <th>Conexão</th>
-                    <th style={{ width: '170px' }}>Ações</th>
+                    <th>Conta</th>
+                    <th className="cell-assinatura">Assinatura / pagamento</th>
+                    <th className="cell-acesso">Último acesso</th>
+                    <th className="cell-acoes">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -258,7 +393,7 @@ export default function AdminUsuarios() {
                     const isPrincipal = isSuperAdminEmail(row.email)
                     return (
                       <tr key={row.id}>
-                        <td>
+                        <td className="cell-nome">
                           {isEditing ? (
                             <input
                               type="text"
@@ -270,7 +405,7 @@ export default function AdminUsuarios() {
                             <span style={{ fontWeight: '600' }}>{row.nome || '—'}</span>
                           )}
                         </td>
-                        <td>
+                        <td className="cell-email">
                           {isEditing ? (
                             <input
                               type="email"
@@ -281,10 +416,10 @@ export default function AdminUsuarios() {
                               title={isPrincipal ? 'E-mail da conta administradora principal não pode ser alterado.' : undefined}
                             />
                           ) : (
-                            row.email
+                            <span title={row.email}>{row.email}</span>
                           )}
                         </td>
-                        <td>
+                        <td className="cell-fone">
                           {isEditing ? (
                             <input
                               type="text"
@@ -319,7 +454,7 @@ export default function AdminUsuarios() {
                             <span style={{ fontSize: '12px', fontWeight: '600' }}>{row.role || 'USER'}</span>
                           )}
                         </td>
-                        <td>
+                        <td style={{ whiteSpace: 'nowrap' }}>
                           {isEditing ? (
                             <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
                               <input
@@ -357,39 +492,19 @@ export default function AdminUsuarios() {
                             </span>
                           )}
                         </td>
-                        <td>
-                          {isEditing ? (
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
-                              <input
-                                type="checkbox"
-                                checked={!!editForm.isento_pagamento}
-                                onChange={(e) => handleChangeField('isento_pagamento', e.target.checked)}
-                              />
-                              Isento
-                            </label>
-                          ) : row.isento_pagamento === true ? (
-                            <span
-                              style={{
-                                padding: '4px 8px',
-                                borderRadius: '999px',
-                                fontSize: '11px',
-                                fontWeight: '600',
-                                backgroundColor: 'rgba(34,197,94,0.12)',
-                                color: '#16a34a',
-                              }}
-                            >
-                              Isento
-                            </span>
-                          ) : (
-                            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>—</span>
-                          )}
+                        <td className="cell-assinatura">
+                          <AssinaturaPagamentoCell
+                            row={row}
+                            isEditing={isEditing}
+                            editForm={editForm}
+                            onField={handleChangeField}
+                          />
                         </td>
-                        <td style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                          {row.last_login_at ? new Date(row.last_login_at).toLocaleString('pt-BR') : '—'}
+                        <td className="cell-acesso">
+                          <UltimoAcessoCell row={row} getUserConnectionBadge={getUserConnectionBadge} />
                         </td>
-                        <td>{getUserConnectionBadge(row)}</td>
-                        <td>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                        <td className="cell-acoes">
+                          <div className="admin-acoes-btns">
                             {isEditing ? (
                               <>
                                 <button type="button" className="btn-primary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={handleSaveUser}>

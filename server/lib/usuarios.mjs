@@ -1,4 +1,5 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
+import { resumoPagamentosPorUsuarioIds } from './pagamentos-mp.mjs'
 import { resolverUsuarioIdPorTelefoneGemini } from './ai.mjs'
 import { normalizeUsuarioRow, stripSenha } from './usuario-schema.mjs'
 import { isSuperAdminEmail, superAdminEmail } from './super-admin.mjs'
@@ -216,6 +217,27 @@ export async function getWhatsappLogs(limit = 50) {
   return data || []
 }
 
+function toAdminUsuarioDto(rawRow, latestByUser, approvedIds) {
+  const n = normalizeUsuarioRow(stripSenha(rawRow))
+  const id = n.id
+  const latest = id ? latestByUser.get(id) : null
+  return {
+    ...n,
+    nome: n.nome ?? '',
+    role: n.role ?? 'USER',
+    is_active: n.is_active !== false,
+    last_login_at: n.last_login_at ?? null,
+    isento_pagamento: n.isento_pagamento === true,
+    trial_ends_at: n.trial_ends_at ?? null,
+    bem_vindo_pagamento_visto_at: n.bem_vindo_pagamento_visto_at ?? null,
+    pagamento_aprovado: id ? approvedIds.has(id) : false,
+    mp_ultimo_status: latest?.status ?? null,
+    mp_ultimo_amount: latest?.amount ?? null,
+    mp_ultimo_em: latest?.updated_at ?? latest?.created_at ?? null,
+    mp_ultimo_detalhe: latest?.status_detail ?? null,
+  }
+}
+
 /** Lista todos os usuários para o painel admin. */
 export async function listUsuariosAdmin() {
   const supabaseAdmin = getSupabaseAdmin()
@@ -227,17 +249,10 @@ export async function listUsuariosAdmin() {
 
   if (res.error) throw res.error
 
-  return (res.data || []).map((row) => {
-    const n = normalizeUsuarioRow(stripSenha(row))
-    return {
-      ...n,
-      nome: n.nome ?? '',
-      role: n.role ?? 'USER',
-      is_active: n.is_active !== false,
-      last_login_at: n.last_login_at ?? null,
-      isento_pagamento: n.isento_pagamento === true,
-    }
-  })
+  const rawRows = res.data || []
+  const ids = rawRows.map((r) => r.id).filter(Boolean)
+  const { latestByUser, approvedIds } = await resumoPagamentosPorUsuarioIds(ids)
+  return rawRows.map((row) => toAdminUsuarioDto(row, latestByUser, approvedIds))
 }
 
 export async function updateUsuarioAdmin(id, payload) {
@@ -290,7 +305,8 @@ export async function updateUsuarioAdmin(id, payload) {
     .single()
 
   if (error) throw error
-  return normalizeUsuarioRow(stripSenha(data))
+  const mp = await resumoPagamentosPorUsuarioIds([data.id])
+  return toAdminUsuarioDto(data, mp.latestByUser, mp.approvedIds)
 }
 
 export async function deleteUsuarioAdmin(id) {
