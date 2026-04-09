@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
 import Sidebar from '../components/Sidebar'
@@ -7,17 +6,6 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { readHorizonteUser } from '../lib/horizonteSession'
-
-const SkeletonCard = () => (
-  <div className="skeleton skeleton-card">
-    <div className="skeleton-card-header">
-      <div className="skeleton skeleton-text"></div>
-      <div className="skeleton skeleton-icon"></div>
-    </div>
-    <div className="skeleton skeleton-value"></div>
-    <div className="skeleton skeleton-badge"></div>
-  </div>
-)
 
 const SkeletonRow = () => (
   <div className="skeleton skeleton-row">
@@ -164,26 +152,38 @@ export default function Dashboard() {
     }).format(val)
   }
 
+  const ultimasReceitas = React.useMemo(
+    () => transacoes.filter((t) => t.tipo === 'RECEITA').slice(0, 3),
+    [transacoes]
+  )
+  const ultimasDespesas = React.useMemo(
+    () => transacoes.filter((t) => t.tipo !== 'RECEITA').slice(0, 2),
+    [transacoes]
+  )
+  const progressoContas = Math.max(8, Math.min(100, Math.round((transacoes.length / 16) * 100)))
+
   return (
     <div className="dashboard-container dashboard-page">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
 
       {/* Main Content */}
-      <main className="main-content relative z-10">
-        <header className="top-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <main className="main-content relative z-10 exec-main-shell">
+        <header className="exec-topbar">
+          <div className="exec-topbar-left">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
-            <div className="dashboard-greeting">
-              <h1 className="responsive-h1 dashboard-greeting-title">
-                Olá, {usuario.nome}!
-              </h1>
-              <p className="responsive-p dashboard-greeting-sub">
-                Resumo geral deste mês
-              </p>
+            <div className="exec-search-shell">
+              <span className="exec-search-icon">⌕</span>
+              <input className="exec-search-input" placeholder="Search" />
             </div>
           </div>
+          <div className="exec-topbar-right">
+            <button type="button" className="exec-icon-btn" aria-label="Conversas">◌</button>
+            <button type="button" className="exec-icon-btn" aria-label="Notificações">◍</button>
+          </div>
         </header>
+
+        <h1 className="exec-page-title">Dashboard</h1>
         {fetchError && (
           <div
             className="content-section"
@@ -202,147 +202,105 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* KPIs */}
-        <div className="kpi-grid skeleton-stagger">
-          {loading ? (
-            <>
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
-            </>
-          ) : (
-            <>
-              <div className="kpi-card accent">
-                <div className="kpi-header">
-                  <span>Saldo Total</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--accent)' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
-                  </svg>
+        <section className="exec-grid-shell">
+          <div className="exec-grid-left">
+            <div className="exec-grid-topcards">
+              <article className="exec-card exec-card--wallet">
+                <p className="exec-card-label">Wallet</p>
+                <p className={`exec-card-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(saldoTotal)}</p>
+                <div className="exec-card-minirow">
+                  <span className="exec-chip exec-chip--green">{formatCurrency(totalReceitas)}</span>
+                  <span className="exec-chip exec-chip--rose">{formatCurrency(totalDespesas)}</span>
                 </div>
-                <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(saldoTotal)}</div>
-                <div className="trend-up" style={{ color: 'var(--text-secondary)' }}>
-                  {transacoes.length} transações registradas
+              </article>
+              <article className="exec-card exec-card--monthly">
+                <div className="exec-card-head">
+                  <p className="exec-card-title">Monthly earnings</p>
+                  <span className="exec-card-sub">Income ↗</span>
                 </div>
-              </div>
+                <svg viewBox="0 0 240 90" className="exec-line-svg" aria-hidden>
+                  <path d="M0 66 C20 46, 45 28, 72 45 C98 61, 122 70, 148 52 C172 35, 197 62, 240 40" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                </svg>
+              </article>
+            </div>
 
-              <div className="kpi-card">
-                <div className="kpi-header">
-                  <span>Receitas</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--success)' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
-                  </svg>
-                </div>
-                <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`} style={{ color: 'var(--success)' }}>{formatCurrency(totalReceitas)}</div>
-                <div className="trend-up" style={{ color: 'var(--text-secondary)' }}>
-                  Ganhos acumulados
-                </div>
+            <article className="exec-card exec-card--table">
+              <div className="exec-card-head">
+                <p className="exec-card-title">Transactions</p>
+                <button type="button" className="exec-add-btn" onClick={() => setIsModalOpen(true)}>+ Add</button>
               </div>
-
-              <div className="kpi-card">
-                <div className="kpi-header">
-                  <span>Despesas</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" style={{ width: '20px', height: '20px', color: 'var(--danger)' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" />
-                  </svg>
+              {loading ? (
+                <div className="skeleton-stagger">
+                  <SkeletonRow />
+                  <SkeletonRow />
+                  <SkeletonRow />
                 </div>
-                <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`} style={{ color: 'var(--danger)' }}>- {formatCurrency(totalDespesas)}</div>
-                <div className="trend-down" style={{ color: 'var(--text-secondary)' }}>
-                  Gastos registrados
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Main Grid: Charts & Table */}
-        {!loading && transacoes.length === 0 ? (
-          <div className="empty-state-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 010-4h14v4"/><path d="M3 5v14a2 2 0 002 2h16v-5"/><path d="M18 12a2 2 0 000 4h4v-4Z"/></svg>
-            <h2 className="empty-state-title">Nenhuma transação ainda</h2>
-            <p className="empty-state-text">Comece a organizar suas finanças agora mesmo adicionando sua primeira receita ou despesa.</p>
-            <button className="btn-primary" onClick={() => setIsModalOpen(true)}>+ Criar Primeira Transação</button>
-          </div>
-        ) : (
-          <div className="dashboard-grid-main">
-            {/* Table Section */}
-            <section className="content-section dashboard-transactions-card" style={{ marginBottom: 0 }}>
-              <div className="section-header dashboard-section-header">
-                <h1 className="responsive-h1 dashboard-section-title">Minhas Transações</h1>
-                <button type="button" className="btn-primary btn-primary-dashboard" onClick={() => setIsModalOpen(true)}>+ Transação</button>
-              </div>
-
-              <div className="transactions-table-wrap">
-                {loading ? (
-                  <div className="skeleton-stagger">
-                    <SkeletonRow />
-                    <SkeletonRow />
-                    <SkeletonRow />
-                    <SkeletonRow />
-                  </div>
-                ) : (
-                  <table className="data-table dashboard-overview-table">
-                    <thead>
+              ) : (
+                <table className="exec-table">
+                  <tbody>
+                    {transacoes.length === 0 ? (
                       <tr>
-                        <th className="dashboard-overview-th-date">Data</th>
-                        <th className="dashboard-overview-th-cat">Categoria</th>
-                        <th className="dashboard-overview-th-val" style={{ textAlign: 'right' }}>
-                          Valor
-                        </th>
+                        <td colSpan={4} className="exec-table-empty">
+                          Nenhuma transação registrada ainda.
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {transacoes.slice(0, 8).map(t => (
+                    ) : (
+                      transacoes.slice(0, 9).map((t) => (
                         <tr key={t.id}>
-                          <td className="dashboard-overview-td-date">
-                            <div className="dashboard-tx-date-stack">
-                              <div className="dashboard-tx-date-day">
-                                {new Date(t.data_transacao).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
-                              </div>
-                              <div className="dashboard-tx-date-time">
-                                {new Date(t.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="dashboard-overview-td-cat">
-                            <div className="dashboard-tx-cat-row">
-                              <div
-                                className="dashboard-tx-dot"
-                                style={{
-                                  background: t.categorias?.cor || 'var(--accent)',
-                                  boxShadow: `0 0 8px ${t.categorias?.cor || 'var(--accent)'}40`,
-                                }}
-                              />
-                              <div className="dashboard-tx-cat-text">
-                                <div className="dashboard-tx-cat-name">
-                                  {t.categorias?.nome || 'Sem categoria'}
-                                  {t.recorrente_index && (
-                                    <span className="dashboard-tx-recorrente-badge">
-                                      {t.recorrente_index}/{t.recorrente_total}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="dashboard-tx-cat-sub">{t.subcategorias?.nome || 'Geral'}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td
-                            className={`dashboard-overview-td-val ${t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'} ${privacyMode ? 'privacy-blur' : ''}`}
-                            style={{ fontWeight: 700, textAlign: 'right', fontSize: '15px' }}
-                          >
-                            <span className="dashboard-tx-val-sign">{t.tipo === 'RECEITA' ? '+' : '-'}</span>
-                            {formatCurrency(t.valor)}
-                          </td>
+                          <td className="exec-table-icon">↘</td>
+                          <td className="exec-table-cat break-words">{t.categorias?.nome || 'Sem categoria'}</td>
+                          <td className="exec-table-date">{new Date(t.data_transacao).toLocaleDateString('pt-BR')}</td>
+                          <td className={`exec-table-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(t.valor)}</td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </section>
-
-
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              )}
+            </article>
           </div>
-        ) }
+
+          <aside className="exec-grid-right">
+            <article className="exec-card exec-card--payable">
+              <p className="exec-card-title">Payable Accounts</p>
+              <p className="exec-card-muted">Keep your accounts up to date to avoid issues.</p>
+              <p className="exec-progress-label">{Math.round((progressoContas / 100) * 16)} OUT OF 16</p>
+              <div className="exec-progress">
+                <span style={{ width: `${progressoContas}%` }} />
+              </div>
+            </article>
+
+            <article className="exec-card exec-card--list">
+              <p className="exec-card-title">Receipts</p>
+              <div className="exec-list">
+                {(ultimasReceitas.length ? ultimasReceitas : transacoes.slice(0, 3)).map((t) => (
+                  <div key={`r-${t.id}`} className="exec-list-item">
+                    <span className="exec-list-icon">↗</span>
+                    <div className="min-w-0">
+                      <p className={`exec-list-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(t.valor)}</p>
+                      <p className="exec-list-sub break-words">{t.categorias?.nome || 'Receita'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="exec-card exec-card--list">
+              <p className="exec-card-title">Payables</p>
+              <div className="exec-list">
+                {(ultimasDespesas.length ? ultimasDespesas : transacoes.slice(0, 2)).map((t) => (
+                  <div key={`d-${t.id}`} className="exec-list-item">
+                    <span className="exec-list-icon">≋</span>
+                    <div className="min-w-0">
+                      <p className={`exec-list-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(t.valor)}</p>
+                      <p className="exec-list-sub break-words">{t.categorias?.nome || 'Despesa'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </aside>
+        </section>
       </main>
 
       <TransactionModal

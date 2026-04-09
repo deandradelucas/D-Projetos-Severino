@@ -20,6 +20,17 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const prevMenuIdx = useRef(-1)
   const [dotMotion, setDotMotion] = useState(null)
   const principalAdmin = isSuperAdminSession()
+  const [perfil, setPerfil] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('horizonte_user') || '{}')
+      return {
+        nome: u.nome || u.usuario || 'Usuário',
+        role: u.role || 'USER',
+      }
+    } catch {
+      return { nome: 'Usuário', role: 'USER' }
+    }
+  })
 
   useEffect(() => {
     const idx = MENU_ORDER.indexOf(location.pathname)
@@ -37,6 +48,22 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     prevMenuIdx.current = idx
   }, [location.pathname])
 
+  useEffect(() => {
+    const onStorage = () => {
+      try {
+        const u = JSON.parse(localStorage.getItem('horizonte_user') || '{}')
+        setPerfil({
+          nome: u.nome || u.usuario || 'Usuário',
+          role: u.role || 'USER',
+        })
+      } catch {
+        setPerfil({ nome: 'Usuário', role: 'USER' })
+      }
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
+
   // Sidebar agora é sempre Full Black, logo sempre usa a versão clara (branca)
   const logoSrc = '/images/horizonte_fiel_original_logo_dark.png'
   return (
@@ -47,6 +74,14 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
       )}
 
       <aside className={`sidebar ${menuAberto ? 'open' : ''}`}>
+        <div className="exec-profile-card">
+          <div className="exec-profile-avatar" aria-hidden>
+            {(perfil.nome || 'U').charAt(0).toUpperCase()}
+          </div>
+          <p className="exec-profile-name">{perfil.nome}</p>
+          <p className="exec-profile-role">{String(perfil.role || 'USER').toUpperCase()}</p>
+        </div>
+
         <div className="brand-wrapper">
           <img 
             src={logoSrc} 
@@ -82,7 +117,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <rect width="7" height="7" x="3" y="14" rx="1"/>
                 </svg>
               </span>
-              Visão Geral
+              Dashboard
             </NavLink>
           </li>
           <li>
@@ -99,7 +134,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <path d="M12 18V6"/>
                 </svg>
               </span>
-              Transações
+              Wallet
             </NavLink>
           </li>
           <li>
@@ -117,7 +152,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <path d="M22 12A10 10 0 0 0 12 2v10z" />
                 </svg>
               </span>
-              Relatórios
+              Revenue analytics
             </NavLink>
           </li>
           <li>
@@ -134,7 +169,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <line x1="2" x2="22" y1="10" y2="10" />
                 </svg>
               </span>
-              Pagamento
+              Payables
             </NavLink>
           </li>
           <li>
@@ -150,7 +185,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
               </span>
-              Configurações
+              Search
             </NavLink>
           </li>
 
@@ -212,7 +247,17 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           )}
         </ul>
 
-        {/* Botão Sair — empurrado para o rodapé */}
+        <div className="exec-sidebar-secondary">
+          <NavLink to="/configuracoes" className="nav-item" onClick={() => setMenuAberto(false)}>
+            <span className="icon-wrap">⚙</span>
+            Setting
+          </NavLink>
+          <button type="button" className="nav-item exec-help-btn">
+            <span className="icon-wrap">?</span>
+            Help
+          </button>
+        </div>
+
         <button
           className="logout-btn"
           onClick={() => {
