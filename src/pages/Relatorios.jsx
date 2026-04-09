@@ -467,81 +467,179 @@ export default function Relatorios() {
           <p className="relatorios-empty-msg">Nenhuma transação efetivada neste período para compor o relatório.</p>
         ) : (
           <div className="relatorios-charts">
-            <article className="relatorios-chart-card relatorios-chart-card--wide">
-              <div className="relatorios-chart-card__head">
-                <h2 className="relatorios-chart-card__title">Evolução diária</h2>
-                <p className="relatorios-chart-card__desc">Receitas e despesas por dia no período selecionado</p>
-              </div>
-              <div className="relatorios-chart-card__body">
-                <ResponsiveContainer width="100%" height={isMobile ? 260 : 320} debounce={50}>
-                  <BarChart data={chartDataPorData} margin={{ top: 12, right: 12, left: 4, bottom: 4 }} barGap={2} barCategoryGap="18%">
-                    <defs>
-                      <linearGradient id="relGradRec" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#4ade80" stopOpacity={1} />
-                        <stop offset="100%" stopColor="#059669" stopOpacity={0.92} />
-                      </linearGradient>
-                      <linearGradient id="relGradDes" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#fb7185" stopOpacity={1} />
-                        <stop offset="100%" stopColor="#dc2626" stopOpacity={0.9} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.12} vertical={false} />
-                    <XAxis dataKey="name" stroke={chartAxis} fontSize={11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
-                    <YAxis stroke={chartAxis} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} />
-                    <Tooltip
-                      content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />}
-                      cursor={{ fill: 'rgba(212, 168, 75, 0.06)' }}
-                    />
-                    <Legend iconType="circle" wrapperStyle={{ paddingTop: 16, color: legendColor, fontSize: 13 }} />
-                    <Bar dataKey="Receitas" fill="url(#relGradRec)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={36} />
-                    <Bar dataKey="Despesas" fill="url(#relGradDes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={36} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </article>
+            <section className="relatorios-charts__section" aria-labelledby="rel-diary-heading">
+              <h3 id="rel-diary-heading" className="relatorios-charts__section-title">
+                Visão diária
+              </h3>
+              <div className="relatorios-charts__section-grid">
+                <article className="relatorios-chart-card relatorios-chart-card--wide">
+                  <div className="relatorios-chart-card__head">
+                    <h2 className="relatorios-chart-card__title">Evolução diária</h2>
+                    <p className="relatorios-chart-card__desc">Receitas e despesas por dia no período selecionado</p>
+                  </div>
+                  <div className="relatorios-chart-card__body">
+                    <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
+                      <BarChart data={chartDataPorData} margin={{ top: 12, right: 8, left: 0, bottom: 4 }} barGap={2} barCategoryGap="18%">
+                        <defs>
+                          <linearGradient id="relGradRec" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#4ade80" stopOpacity={1} />
+                            <stop offset="100%" stopColor="#059669" stopOpacity={0.92} />
+                          </linearGradient>
+                          <linearGradient id="relGradDes" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#fb7185" stopOpacity={1} />
+                            <stop offset="100%" stopColor="#dc2626" stopOpacity={0.9} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
+                        <XAxis dataKey="name" stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
+                        <YAxis stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} width={isMobile ? 56 : 64} />
+                        <Tooltip
+                          content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />}
+                          cursor={{ fill: 'rgba(15, 23, 42, 0.06)' }}
+                        />
+                        <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: legendColor, fontSize: 12 }} />
+                        <Bar dataKey="Receitas" fill="url(#relGradRec)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={36} />
+                        <Bar dataKey="Despesas" fill="url(#relGradDes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={36} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </article>
 
-            <article className="relatorios-chart-card relatorios-chart-card--wide">
-              <div className="relatorios-chart-card__head">
-                <h2 className="relatorios-chart-card__title">Saldo acumulado</h2>
-                <p className="relatorios-chart-card__desc">Resultado líquido dia a dia no período (linha de referência em zero)</p>
+                <article className="relatorios-chart-card relatorios-chart-card--wide">
+                  <div className="relatorios-chart-card__head">
+                    <h2 className="relatorios-chart-card__title">Saldo acumulado</h2>
+                    <p className="relatorios-chart-card__desc">Resultado líquido dia a dia no período (referência em zero)</p>
+                  </div>
+                  <div className="relatorios-chart-card__body relatorios-chart-card__body--area">
+                    <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
+                      <AreaChart data={chartDataSaldoCum} margin={{ top: 12, right: 8, left: 0, bottom: 4 }}>
+                        <defs>
+                          <linearGradient id="relGradSaldo" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.55} />
+                            <stop offset="100%" stopColor="#6366f1" stopOpacity={0.05} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
+                        <XAxis dataKey="name" stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
+                        <YAxis stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => formatCurrency(v)} width={isMobile ? 68 : 72} />
+                        <ReferenceLine y={0} stroke="rgba(100, 116, 139, 0.45)" strokeDasharray="4 4" />
+                        <Tooltip
+                          content={({ active, payload, label }) => {
+                            if (!active || !payload?.length) return null
+                            const row = payload[0]?.payload
+                            return (
+                              <div className="relatorios-tooltip">
+                                <div className="relatorios-tooltip__label">{label}</div>
+                                <div className="relatorios-tooltip__row">
+                                  <span className="relatorios-tooltip__name">Acumulado</span>
+                                  <span className="relatorios-tooltip__val">{formatCurrency(row?.saldo)}</span>
+                                </div>
+                                <div className="relatorios-tooltip__row relatorios-tooltip__row--muted">
+                                  <span className="relatorios-tooltip__name">No dia</span>
+                                  <span className="relatorios-tooltip__val">{formatCurrency(row?.liquidoDia)}</span>
+                                </div>
+                              </div>
+                            )
+                          }}
+                        />
+                        <Area type="monotone" dataKey="saldo" stroke="#a78bfa" strokeWidth={2.5} fill="url(#relGradSaldo)" dot={{ r: 3, fill: '#c4b5fd', strokeWidth: 0 }} activeDot={{ r: 5 }} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </article>
               </div>
-              <div className="relatorios-chart-card__body relatorios-chart-card__body--area">
-                <ResponsiveContainer width="100%" height={isMobile ? 260 : 320} debounce={50}>
-                  <AreaChart data={chartDataSaldoCum} margin={{ top: 12, right: 12, left: 4, bottom: 4 }}>
-                    <defs>
-                      <linearGradient id="relGradSaldo" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.55} />
-                        <stop offset="100%" stopColor="#6366f1" stopOpacity={0.05} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.12} vertical={false} />
-                    <XAxis dataKey="name" stroke={chartAxis} fontSize={11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
-                    <YAxis stroke={chartAxis} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => formatCurrency(v)} width={72} />
-                    <ReferenceLine y={0} stroke="rgba(212,168,75,0.35)" strokeDasharray="4 4" />
-                    <Tooltip
-                      content={({ active, payload, label }) => {
-                        if (!active || !payload?.length) return null
-                        const row = payload[0]?.payload
-                        return (
-                          <div className="relatorios-tooltip">
-                            <div className="relatorios-tooltip__label">{label}</div>
-                            <div className="relatorios-tooltip__row">
-                              <span className="relatorios-tooltip__name">Acumulado</span>
-                              <span className="relatorios-tooltip__val">{formatCurrency(row?.saldo)}</span>
-                            </div>
-                            <div className="relatorios-tooltip__row relatorios-tooltip__row--muted">
-                              <span className="relatorios-tooltip__name">No dia</span>
-                              <span className="relatorios-tooltip__val">{formatCurrency(row?.liquidoDia)}</span>
-                            </div>
-                          </div>
-                        )
-                      }}
-                    />
-                    <Area type="monotone" dataKey="saldo" stroke="#a78bfa" strokeWidth={2.5} fill="url(#relGradSaldo)" dot={{ r: 3, fill: '#c4b5fd', strokeWidth: 0 }} activeDot={{ r: 5 }} />
-                  </AreaChart>
-                </ResponsiveContainer>
+            </section>
+
+            <section className="relatorios-charts__section" aria-labelledby="rel-month-heading">
+              <h3 id="rel-month-heading" className="relatorios-charts__section-title">
+                Visão mensal
+              </h3>
+              <div className="relatorios-charts__section-grid">
+                <article className="relatorios-chart-card relatorios-chart-card--wide">
+                  <div className="relatorios-chart-card__head">
+                    <h2 className="relatorios-chart-card__title">Evolução mensal</h2>
+                    <p className="relatorios-chart-card__desc">Receitas e despesas agregadas por mês no período</p>
+                  </div>
+                  <div className="relatorios-chart-card__body">
+                    {chartDataPorMes.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
+                        <BarChart data={chartDataPorMes} margin={{ top: 12, right: 8, left: 0, bottom: 4 }} barGap={2} barCategoryGap="20%">
+                          <defs>
+                            <linearGradient id="relGradRecMes" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#4ade80" stopOpacity={1} />
+                              <stop offset="100%" stopColor="#059669" stopOpacity={0.92} />
+                            </linearGradient>
+                            <linearGradient id="relGradDesMes" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#fb7185" stopOpacity={1} />
+                              <stop offset="100%" stopColor="#dc2626" stopOpacity={0.9} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
+                          <XAxis dataKey="name" stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? 'end' : 'middle'} height={isMobile ? 56 : 32} />
+                          <YAxis stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} width={isMobile ? 56 : 64} />
+                          <Tooltip
+                            content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />}
+                            cursor={{ fill: 'rgba(15, 23, 42, 0.06)' }}
+                          />
+                          <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: legendColor, fontSize: 12 }} />
+                          <Bar dataKey="Receitas" fill="url(#relGradRecMes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={40} />
+                          <Bar dataKey="Despesas" fill="url(#relGradDesMes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={40} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="relatorios-chart-empty">Sem dados mensais no período.</div>
+                    )}
+                  </div>
+                </article>
+
+                <article className="relatorios-chart-card relatorios-chart-card--wide">
+                  <div className="relatorios-chart-card__head">
+                    <h2 className="relatorios-chart-card__title">Saldo acumulado (mensal)</h2>
+                    <p className="relatorios-chart-card__desc">Resultado líquido mês a mês no período (referência em zero)</p>
+                  </div>
+                  <div className="relatorios-chart-card__body relatorios-chart-card__body--area">
+                    {chartDataSaldoCumMes.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
+                        <AreaChart data={chartDataSaldoCumMes} margin={{ top: 12, right: 8, left: 0, bottom: 4 }}>
+                          <defs>
+                            <linearGradient id="relGradSaldoMes" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.55} />
+                              <stop offset="100%" stopColor="#6366f1" stopOpacity={0.05} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
+                          <XAxis dataKey="name" stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? 'end' : 'middle'} height={isMobile ? 56 : 32} />
+                          <YAxis stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => formatCurrency(v)} width={isMobile ? 68 : 72} />
+                          <ReferenceLine y={0} stroke="rgba(100, 116, 139, 0.45)" strokeDasharray="4 4" />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (!active || !payload?.length) return null
+                              const row = payload[0]?.payload
+                              return (
+                                <div className="relatorios-tooltip">
+                                  <div className="relatorios-tooltip__label">{label}</div>
+                                  <div className="relatorios-tooltip__row">
+                                    <span className="relatorios-tooltip__name">Acumulado</span>
+                                    <span className="relatorios-tooltip__val">{formatCurrency(row?.saldo)}</span>
+                                  </div>
+                                  <div className="relatorios-tooltip__row relatorios-tooltip__row--muted">
+                                    <span className="relatorios-tooltip__name">No mês</span>
+                                    <span className="relatorios-tooltip__val">{formatCurrency(row?.liquidoMes)}</span>
+                                  </div>
+                                </div>
+                              )
+                            }}
+                          />
+                          <Area type="monotone" dataKey="saldo" stroke="#a78bfa" strokeWidth={2.5} fill="url(#relGradSaldoMes)" dot={{ r: 3, fill: '#c4b5fd', strokeWidth: 0 }} activeDot={{ r: 5 }} />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="relatorios-chart-empty">Sem dados mensais no período.</div>
+                    )}
+                  </div>
+                </article>
               </div>
-            </article>
+            </section>
 
             <div className="relatorios-charts__pair">
               <article className="relatorios-chart-card">
@@ -557,8 +655,8 @@ export default function Relatorios() {
                           data={chartDataPorCategoria}
                           cx="50%"
                           cy="50%"
-                          innerRadius={68}
-                          outerRadius={102}
+                          innerRadius={isMobile ? 52 : 68}
+                          outerRadius={isMobile ? 80 : 102}
                           paddingAngle={3}
                           dataKey="value"
                           stroke="rgba(0,0,0,0.25)"
@@ -609,8 +707,8 @@ export default function Relatorios() {
                           data={chartDataReceitasPorCategoria}
                           cx="50%"
                           cy="50%"
-                          innerRadius={68}
-                          outerRadius={102}
+                          innerRadius={isMobile ? 52 : 68}
+                          outerRadius={isMobile ? 80 : 102}
                           paddingAngle={3}
                           dataKey="value"
                           stroke="rgba(0,0,0,0.25)"
