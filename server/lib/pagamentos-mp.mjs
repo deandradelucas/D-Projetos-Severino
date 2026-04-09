@@ -2,12 +2,14 @@ import { getSupabaseAdmin } from './supabase-admin.mjs'
 import {
   buscarPagamentoPorId,
   buscarPagamentosPorExternalReference,
+  buscarPreapprovalPorId,
   isMercadoPagoConfigured,
 } from './mercadopago.mjs'
 
 export async function insertPreferenciaRecord({
   usuario_id,
-  preference_id,
+  preference_id = null,
+  preapproval_id = null,
   external_reference,
   amount,
   description,
@@ -18,6 +20,7 @@ export async function insertPreferenciaRecord({
     .insert({
       usuario_id,
       preference_id,
+      preapproval_id,
       external_reference,
       amount,
       description,
@@ -31,21 +34,84 @@ export async function insertPreferenciaRecord({
 }
 
 /**
- * Atualiza registro criado na preferência ou insere se o webhook chegar primeiro (raro).
+ * Atualiza usuário com dados do preapproval (próxima cobrança, status).
  */
-export async function upsertFromWebhookPayment(payment) {
-  const ref = payment.external_reference
-  if (!ref) return
+export async function atualizarUsuarioDePreapprovalResponse(usuarioId, pre) {
+  const uid = String(usuarioId || '').trim()
+  if (!uid || !pre?.id) return
+  const supabase = getSupabaseAdmin()
+  let nextIso = null
+  if (pre.next_payment_date) {
+    const d = new Date(pre.next_payment_date)
+    if (!Number.isNaN(d.getTime())) nextIso = d.toISOString()
+  }
+  const st = String(pre.status || '').toLowerCase() || null
+  const { error } = await supabase
+    .from('usuarios')
+    .update({
+      mp_preapproval_id: String(pre.id),
+      assinatura_mp_status: st,
+      assinatura_proxima_cobranca: nextIso,
+    })
+    .eq('id', uid)
+
+  if (error) console.warn('[atualizarUsuarioDePreapprovalResponse]', error.message || error)
+}
+
+export async function sincronizarPreapprovalUsuario(usuario_id) {
+  const uid = String(usuario_id || '').trim()
+  if (!uid || !isMercadoPagoConfigured()) return
 
   const supabase = getSupabaseAdmin()
-  const { data: row } = await supabase
-    .from('pagamentos_mercadopago')
-    .select('id, usuario_id')
-    .eq('external_reference', String(ref))
+  const { data: row, error } = await supabase
+    .from('usuarios')
+    .select('mp_preapproval_id')
+    .eq('id', uid)
     .maybeSingle()
 
+  if (error || !row?.mp_preapproval_id) return
+
+  try {
+    const pre = await buscarPreapprovalPorId(row.mp_preapproval_id)
+    await atualizarUsuarioDePreapprovalResponse(uid, pre)
+  } catch (e) {
+    console.warn('[sincronizarPreapprovalUsuario]', row.mp_preapproval_id, e?.message || e)
+  }
+}
+
+/** Webhook topic preapproval: atualiza próxima cobrança no usuário. */
+export async function sincronizarPreapprovalPorIdFromWebhook(preapprovalId) {
+  const id = String(preapprovalId || '').trim()
+  if (!id || !isMercadoPagoConfigured()) return
+
+  try {
+    const pre = await buscarPreapprovalPorId(id)
+    const supabase = getSupabaseAdmin()
+    let uid =
+      pre.metadata?.usuario_id ||
+      pre.metadata?.usuarioId ||
+      null
+    if (!uid) {
+      const { data } = await supabase.from('usuarios').select('id').eq('mp_preapproval_id', id).maybeSingle()
+      uid = data?.id || null
+    }
+    if (uid) await atualizarUsuarioDePreapprovalResponse(uid, pre)
+  } catch (e) {
+    console.warn('[sincronizarPreapprovalPorIdFromWebhook]', id, e?.message || e)
+  }
+}
+
+/**
+ * Atualiza registro criado na preferência/preapproval ou insere se o webhook chegar primeiro.
+ */
+export async function upsertFromWebhookPayment(payment) {
+  if (payment?.id == null) return
+
+  const supabase = getSupabaseAdmin()
+  const pid = String(payment.id)
+
   const payload = {
-    payment_id: String(payment.id),
+    payment_id: pid,
     status: payment.status,
     status_detail: payment.status_detail || null,
     amount: payment.transaction_amount,
@@ -55,9 +121,38 @@ export async function upsertFromWebhookPayment(payment) {
     updated_at: new Date().toISOString(),
   }
 
+  const { data: byPayment } = await supabase
+    .from('pagamentos_mercadopago')
+    .select('id, usuario_id')
+    .eq('payment_id', pid)
+    .maybeSingle()
+
+  if (byPayment?.id) {
+    const { error } = await supabase.from('pagamentos_mercadopago').update(payload).eq('id', byPayment.id)
+    if (error) throw error
+    if (byPayment.usuario_id) void sincronizarPreapprovalUsuario(String(byPayment.usuario_id)).catch(() => {})
+    return
+  }
+
+  const ref =
+    payment.external_reference != null && String(payment.external_reference).trim() !== ''
+      ? String(payment.external_reference)
+      : null
+
+  let row = null
+  if (ref) {
+    const { data } = await supabase
+      .from('pagamentos_mercadopago')
+      .select('id, usuario_id')
+      .eq('external_reference', ref)
+      .maybeSingle()
+    row = data
+  }
+
   if (row?.id) {
     const { error } = await supabase.from('pagamentos_mercadopago').update(payload).eq('id', row.id)
     if (error) throw error
+    if (row.usuario_id) void sincronizarPreapprovalUsuario(String(row.usuario_id)).catch(() => {})
     return
   }
 
@@ -68,14 +163,17 @@ export async function upsertFromWebhookPayment(payment) {
       ? Object.values(payment.metadata).find((v) => typeof v === 'string' && v.length === 36)
       : null)
 
+  const externalRefInsert = ref || `mp-pay-${pid}`
+
   const { error } = await supabase.from('pagamentos_mercadopago').insert({
-    external_reference: String(ref),
+    external_reference: externalRefInsert,
     usuario_id: metaUid || null,
     preference_id: payment.preference_id ? String(payment.preference_id) : null,
     ...payload,
   })
 
   if (error) throw error
+  if (metaUid) void sincronizarPreapprovalUsuario(String(metaUid)).catch(() => {})
 }
 
 const STATUS_FINAL_OK = new Set(['approved', 'authorized', 'accredited'])
@@ -143,7 +241,7 @@ export async function listPagamentosUsuario(usuario_id, limit = 20) {
   const { data, error } = await supabase
     .from('pagamentos_mercadopago')
     .select(
-      'id, preference_id, payment_id, status, status_detail, amount, currency_id, description, external_reference, payer_email, created_at, updated_at'
+      'id, preference_id, preapproval_id, payment_id, status, status_detail, amount, currency_id, description, external_reference, payer_email, created_at, updated_at'
     )
     .eq('usuario_id', uid)
     .order('created_at', { ascending: false })
@@ -266,6 +364,7 @@ const COLS_FLAT = `
   id,
   usuario_id,
   preference_id,
+  preapproval_id,
   payment_id,
   status,
   status_detail,

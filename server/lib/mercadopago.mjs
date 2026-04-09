@@ -145,3 +145,92 @@ export async function buscarPagamentosPorExternalReference(externalReference) {
 
   return Array.isArray(json.results) ? json.results : []
 }
+
+/**
+ * Assinatura mensal (preapproval): cobrança recorrente no cartão, valor creditado na conta Mercado Pago do vendedor.
+ * @see https://www.mercadopago.com.br/developers/pt/reference/subscriptions/_preapproval/post
+ */
+export async function criarPreapprovalAssinaturaMensal(opts) {
+  const accessToken = getMercadoPagoAccessToken()
+  if (!accessToken) {
+    throw new Error('MERCADO_PAGO_ACCESS_TOKEN não configurada no servidor.')
+  }
+
+  const {
+    baseUrl,
+    usuarioId,
+    email,
+    title,
+    unitPrice,
+    externalReference,
+  } = opts
+
+  const cleanBase = String(baseUrl || '').replace(/\/+$/, '')
+  const notificationUrl = `${cleanBase}/api/pagamentos/webhook`
+
+  const start = new Date()
+  start.setMinutes(start.getMinutes() + 15)
+  const end = new Date()
+  end.setFullYear(end.getFullYear() + 5)
+
+  const body = {
+    reason: String(title || 'Assinatura mensal Horizonte Financeiro'),
+    external_reference: String(externalReference),
+    payer_email: String(email || '').trim(),
+    auto_recurring: {
+      frequency: 1,
+      frequency_type: 'months',
+      transaction_amount: Number(Number(unitPrice).toFixed(2)),
+      currency_id: 'BRL',
+      start_date: start.toISOString(),
+      end_date: end.toISOString(),
+    },
+    back_url: `${cleanBase}/pagamento?mp=sub_ok`,
+    notification_url: notificationUrl,
+    metadata: {
+      usuario_id: String(usuarioId),
+    },
+    status: 'pending',
+  }
+
+  const res = await fetch(`${MP_API}/preapproval`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    const msg = json.message || json.cause?.[0]?.description || json.error || res.statusText
+    throw new Error(`Mercado Pago assinatura: ${msg}`)
+  }
+
+  return {
+    id: json.id,
+    init_point: json.init_point,
+    sandbox_init_point: json.sandbox_init_point,
+    status: json.status,
+    next_payment_date: json.next_payment_date,
+  }
+}
+
+export async function buscarPreapprovalPorId(preapprovalId) {
+  const accessToken = getMercadoPagoAccessToken()
+  if (!accessToken) {
+    throw new Error('MERCADO_PAGO_ACCESS_TOKEN não configurada.')
+  }
+
+  const res = await fetch(`${MP_API}/preapproval/${encodeURIComponent(String(preapprovalId).trim())}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    const msg = json.message || json.error || res.statusText
+    throw new Error(`Mercado Pago preapproval: ${msg}`)
+  }
+  return json
+}
