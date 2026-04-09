@@ -283,7 +283,10 @@ export default function Relatorios() {
   const saldoPositivo = summary.saldo >= 0
 
   return (
-    <div className="dashboard-container page-relatorios">
+    <div
+      className="dashboard-container page-relatorios"
+      style={{ '--rel-tooltip-bg': tooltipBg }}
+    >
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content relative z-10">

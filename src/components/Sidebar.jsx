@@ -23,10 +23,13 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     if (idx < 0) return
 
     if (prevMenuIdx.current >= 0 && prevMenuIdx.current !== idx) {
-      setDotMotion(idx > prevMenuIdx.current ? 'down' : 'up')
-      const t = window.setTimeout(() => setDotMotion(null), 680)
+      const timeouts = []
+      timeouts.push(
+        window.setTimeout(() => setDotMotion(idx > prevMenuIdx.current ? 'down' : 'up'), 0)
+      )
+      timeouts.push(window.setTimeout(() => setDotMotion(null), 680))
       prevMenuIdx.current = idx
-      return () => window.clearTimeout(t)
+      return () => timeouts.forEach((id) => window.clearTimeout(id))
     }
     prevMenuIdx.current = idx
   }, [location.pathname])

@@ -2551,12 +2551,14 @@ h3 {
 }
 
 .relatorios-tooltip {
-  background: rgba(15, 23, 42, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  background: var(--rel-tooltip-bg, rgba(15, 23, 42, 0.94));
+  border: 1px solid rgba(212, 168, 75, 0.22);
+  border-radius: 14px;
   padding: 12px 14px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(8px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 18px 48px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
   min-width: 160px;
 }
 

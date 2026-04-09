@@ -168,9 +168,17 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-[100dvh] min-h-[100svh] flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-[360px]">
-        <div className="bg-black/50 backdrop-blur-[2px] border border-white/20 rounded-2xl p-5 sm:p-6 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+    <div className="min-h-[100dvh] min-h-[100svh] flex items-center justify-center p-4 sm:p-6 relative">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-40"
+        aria-hidden
+        style={{
+          background:
+            'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212,168,75,0.12), transparent), radial-gradient(ellipse 60% 40% at 100% 100%, rgba(99,102,241,0.06), transparent)',
+        }}
+      />
+      <div className="w-full max-w-[380px] relative z-[1]">
+        <div className="rounded-3xl border border-white/[0.12] bg-black/55 p-6 sm:p-8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.65)] backdrop-blur-md ring-1 ring-white/[0.06]">
             <div className="flex justify-center mb-5 sm:mb-6">
               <img 
                 src={BRAND_ASSETS.logoOnDark}

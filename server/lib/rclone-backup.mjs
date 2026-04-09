@@ -311,7 +311,9 @@ export async function runRcloneBackup() {
       console.log('[CLEANUP] Limpando arquivos temporários...')
       try {
         rmSync(BACKUP_DIR, { recursive: true, force: true })
-      } catch { }
+      } catch {
+        /* limpeza best-effort */
+      }
     }
   }
 }

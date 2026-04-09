@@ -25,4 +25,6 @@ export function ThemeProvider({ children }) {
   );
 }
 
+// Hook separado do Provider: fast refresh exige arquivo só com componentes.
+// eslint-disable-next-line react-refresh/only-export-components -- hook do mesmo contexto
 export const useTheme = () => useContext(ThemeContext);

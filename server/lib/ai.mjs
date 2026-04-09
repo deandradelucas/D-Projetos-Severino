@@ -218,13 +218,13 @@ MENSAGEM RECEBIDA PARA ANÁLISE:
   let text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''
   
   text = text.trim()
-  if (text.startsWith('\`\`\`json')) text = text.replace('\`\`\`json', '').replace('\`\`\`', '')
-  else if (text.startsWith('\`\`\`')) text = text.replace('\`\`\`', '').replace('\`\`\`', '')
+  if (text.startsWith('```json')) text = text.replace('```json', '').replace('```', '')
+  else if (text.startsWith('```')) text = text.replace('```', '').replace('```', '')
 
   let parsed
   try {
     parsed = JSON.parse(text.trim())
-  } catch (parseError) {
+  } catch {
     // Fallback 1: tentar extrair apenas o bloco JSON de dentro do texto retornado
     try {
       const firstBrace = text.indexOf('{')

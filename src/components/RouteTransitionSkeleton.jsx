@@ -22,9 +22,14 @@ export default function RouteTransitionSkeleton() {
 
     prevPath.current = location.pathname
 
+    const timeouts = []
+    const defer = (fn) => {
+      timeouts.push(window.setTimeout(fn, 0))
+    }
+
     if (!SHELL_PATH.test(location.pathname)) {
-      setVisible(false)
-      return
+      defer(() => setVisible(false))
+      return () => timeouts.forEach((id) => window.clearTimeout(id))
     }
 
     const reduceMotion =
@@ -34,10 +39,9 @@ export default function RouteTransitionSkeleton() {
       return
     }
 
-    setVisible(true)
-    const ms = 380
-    const id = window.setTimeout(() => setVisible(false), ms)
-    return () => window.clearTimeout(id)
+    defer(() => setVisible(true))
+    timeouts.push(window.setTimeout(() => setVisible(false), 380))
+    return () => timeouts.forEach((id) => window.clearTimeout(id))
   }, [location.pathname])
 
   if (!visible) return null
