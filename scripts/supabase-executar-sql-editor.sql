@@ -43,3 +43,15 @@ ALTER TABLE public.usuarios
 
 COMMENT ON COLUMN public.usuarios.trial_ends_at IS 'Fim do período de teste (7 dias a partir do primeiro login); NULL até o primeiro login.';
 COMMENT ON COLUMN public.usuarios.bem_vindo_pagamento_visto_at IS 'Quando o usuário dispensou a tela de boas-vindas / assinatura.';
+
+-- ----- BLOCO C: assinatura mensal MP (preapproval) + coluna em pagamentos -----
+ALTER TABLE public.usuarios
+  ADD COLUMN IF NOT EXISTS mp_preapproval_id VARCHAR(64),
+  ADD COLUMN IF NOT EXISTS assinatura_proxima_cobranca TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS assinatura_mp_status VARCHAR(32);
+
+ALTER TABLE public.pagamentos_mercadopago
+  ADD COLUMN IF NOT EXISTS preapproval_id VARCHAR(64);
+
+CREATE INDEX IF NOT EXISTS idx_pagamentos_mp_preapproval ON public.pagamentos_mercadopago(preapproval_id);
+CREATE INDEX IF NOT EXISTS idx_usuarios_mp_preapproval ON public.usuarios(mp_preapproval_id);
