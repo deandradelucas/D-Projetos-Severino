@@ -23,31 +23,35 @@ function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
-        <Background />
-        <PwaInstallPrompt />
-        <HorizonChat />
-        <RouteTransitionSkeleton />
-        <Routes>
-          <Route path="/cadastro" element={<Cadastro />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/redefinir-senha" element={<RedefinirSenha />} />
-          <Route element={<AppSessionOutlet requireAppAccess={false} />}>
-            <Route path="/bem-vindo-assinatura" element={<BemVindoAssinatura />} />
-            <Route path="/pagamento" element={<Pagamento />} />
-          </Route>
-          <Route element={<AppSessionOutlet requireAppAccess />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transacoes" element={<Transacoes />} />
-            <Route path="/relatorios" element={<Relatorios />} />
-            <Route path="/configuracoes" element={<Configuracoes />} />
-          </Route>
-          <Route element={<SuperAdminOutlet />}>
-            <Route path="/admin/whatsapp" element={<AdminWhatsApp />} />
-            <Route path="/admin/usuarios" element={<AdminUsuarios />} />
-            <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
-          </Route>
-          <Route path="/" element={<Login />} />
-        </Routes>
+        <div className="app-layout-shell">
+          <Background />
+          <PwaInstallPrompt />
+          <HorizonChat />
+          <RouteTransitionSkeleton />
+          <div className="app-routes-grow">
+            <Routes>
+              <Route path="/cadastro" element={<Cadastro />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+              <Route element={<AppSessionOutlet requireAppAccess={false} />}>
+                <Route path="/bem-vindo-assinatura" element={<BemVindoAssinatura />} />
+                <Route path="/pagamento" element={<Pagamento />} />
+              </Route>
+              <Route element={<AppSessionOutlet requireAppAccess />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/transacoes" element={<Transacoes />} />
+                <Route path="/relatorios" element={<Relatorios />} />
+                <Route path="/configuracoes" element={<Configuracoes />} />
+              </Route>
+              <Route element={<SuperAdminOutlet />}>
+                <Route path="/admin/whatsapp" element={<AdminWhatsApp />} />
+                <Route path="/admin/usuarios" element={<AdminUsuarios />} />
+                <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
+              </Route>
+              <Route path="/" element={<Login />} />
+            </Routes>
+          </div>
+        </div>
       </BrowserRouter>
     </ThemeProvider>
   )

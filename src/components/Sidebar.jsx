@@ -19,10 +19,62 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const prevMenuIdx = useRef(-1)
   const [dotMotion, setDotMotion] = useState(null)
   const [principalAdmin, setPrincipalAdmin] = useState(() => isSuperAdminSession())
+  const [pagamentoSub, setPagamentoSub] = useState('')
+  const [assinaturaBadge, setAssinaturaBadge] = useState('')
+  const [assinaturaManageUrl, setAssinaturaManageUrl] = useState('')
+
+  const situacaoLabel = (code) => {
+    const m = {
+      admin: 'Administrador',
+      isento: 'Isento',
+      trial: 'Período de teste',
+      ativo: 'Assinatura ativa',
+      pausada: 'Assinatura pausada (MP)',
+      cancelada: 'Assinatura cancelada (MP)',
+      inativa: 'Sem assinatura ativa',
+    }
+    return m[code] || ''
+  }
+
+  const refreshPagamentoSub = () => {
+    try {
+      const raw = localStorage.getItem('horizonte_user')
+      const u = raw ? JSON.parse(raw) : null
+      const situacao = u?.assinatura_situacao
+      setAssinaturaBadge(situacao ? situacaoLabel(String(situacao)) : '')
+      setAssinaturaManageUrl(typeof u?.mp_gerenciar_url === 'string' ? u.mp_gerenciar_url.trim() : '')
+
+      const d = u?.assinatura_proxima_cobranca
+      if (!d) {
+        setPagamentoSub('')
+        return
+      }
+      const dt = new Date(d)
+      if (Number.isNaN(dt.getTime())) {
+        setPagamentoSub('')
+        return
+      }
+      setPagamentoSub(`Próx. cobrança ${dt.toLocaleDateString('pt-BR')}`)
+    } catch {
+      setPagamentoSub('')
+      setAssinaturaBadge('')
+      setAssinaturaManageUrl('')
+    }
+  }
 
   useEffect(() => {
     setPrincipalAdmin(isSuperAdminSession())
   }, [location.pathname])
+
+  useEffect(() => {
+    refreshPagamentoSub()
+  }, [location.pathname])
+
+  useEffect(() => {
+    const h = () => refreshPagamentoSub()
+    window.addEventListener('horizonte-session-refresh', h)
+    return () => window.removeEventListener('horizonte-session-refresh', h)
+  }, [])
 
   useEffect(() => {
     const idx = MENU_ORDER.indexOf(location.pathname)
@@ -56,10 +108,37 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             alt="Horizonte Financeiro" 
             className="brand-logo" 
           />
-          <button className="mobile-close-btn" onClick={() => setMenuAberto(false)}>
+          <button
+            type="button"
+            className="mobile-close-btn"
+            aria-label="Fechar menu"
+            onClick={() => setMenuAberto(false)}
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
+
+        {(assinaturaBadge || assinaturaManageUrl || pagamentoSub) && (
+          <div className="sidebar-assinatura" aria-live="polite">
+            {assinaturaBadge ? (
+              <div className="sidebar-assinatura__badge" title="Status da sua assinatura">
+                {assinaturaBadge}
+              </div>
+            ) : null}
+            {pagamentoSub ? <div className="sidebar-assinatura__line">{pagamentoSub}</div> : null}
+            {assinaturaManageUrl ? (
+              <a
+                className="sidebar-assinatura__link"
+                href={assinaturaManageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Abre o Mercado Pago para gerenciar débitos e assinatura"
+              >
+                Gerenciar no Mercado Pago
+              </a>
+            ) : null}
+          </div>
+        )}
 
         <ul
           className="nav-menu"
@@ -118,6 +197,10 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           <li>
             <NavLink
               to="/pagamento"
+              title={
+                [assinaturaBadge, pagamentoSub].filter(Boolean).join(' — ') ||
+                'Assinatura mensal Mercado Pago'
+              }
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={() => setMenuAberto(false)}
             >
@@ -127,7 +210,10 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <line x1="2" x2="22" y1="10" y2="10" />
                 </svg>
               </span>
-              Pagamento
+              <span className="nav-item__label">
+                <span className="nav-item__title">Pagamento</span>
+                {pagamentoSub ? <span className="nav-item__sub">{pagamentoSub}</span> : null}
+              </span>
             </NavLink>
           </li>
           <li>

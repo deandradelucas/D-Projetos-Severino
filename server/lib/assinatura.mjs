@@ -1,8 +1,43 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { isSuperAdminEmail } from './super-admin.mjs'
-import { sincronizarPagamentosPendentesDoUsuario, usuarioTemPagamentoAprovado } from './pagamentos-mp.mjs'
+import {
+  sincronizarPagamentosPendentesDoUsuario,
+  sincronizarPreapprovalUsuario,
+  usuarioTemPagamentoAprovado,
+} from './pagamentos-mp.mjs'
 
 export const TRIAL_DIAS = Number.parseInt(process.env.HORIZONTE_TRIAL_DIAS || '7', 10) || 7
+
+/** Status MP em que a assinatura não cobra / não mantém acesso pago. */
+const MP_STATUS_BLOQUEIA_ACESSO = new Set(['paused', 'cancelled', 'canceled'])
+
+export function mpStatusBloqueiaAcesso(status) {
+  const s = String(status || '').trim().toLowerCase()
+  return s !== '' && MP_STATUS_BLOQUEIA_ACESSO.has(s)
+}
+
+export function mensagemBloqueioAssinaturaMp(status) {
+  const s = String(status || '').trim().toLowerCase()
+  if (s === 'paused') {
+    return 'Sua assinatura está pausada no Mercado Pago. Reative o débito em Pagamento ou no site do MP para continuar.'
+  }
+  if (s === 'cancelled' || s === 'canceled') {
+    return 'Sua assinatura foi cancelada. Acesse Pagamento para assinar novamente e voltar a usar o app.'
+  }
+  return 'Assinatura inativa ou período de teste encerrado. Conclua o pagamento no aplicativo para continuar.'
+}
+
+function situacaoAssinatura({ trialActive, assinatura_paga_efetiva, assinatura_mp_status, mpBloqueia }) {
+  if (trialActive && !assinatura_paga_efetiva) return 'trial'
+  if (mpBloqueia) return String(assinatura_mp_status || '').toLowerCase() === 'paused' ? 'pausada' : 'cancelada'
+  if (assinatura_paga_efetiva) return 'ativo'
+  if (trialActive) return 'trial'
+  return 'inativa'
+}
+
+export function urlGerenciarMercadoPagoPadrão() {
+  return String(process.env.MERCADO_PAGO_URL_GESTAO || 'https://www.mercadopago.com.br/subscriptions').trim()
+}
 
 function addDaysIso(days) {
   const d = new Date()
@@ -60,6 +95,17 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
     out.bem_vindo_pagamento_visto_at = tBv.data.bem_vindo_pagamento_visto_at
   }
 
+  const tMp = await supabase
+    .from('usuarios')
+    .select('mp_preapproval_id, assinatura_proxima_cobranca, assinatura_mp_status')
+    .eq('id', uid)
+    .maybeSingle()
+  if (!tMp.error && tMp.data) {
+    out.mp_preapproval_id = tMp.data.mp_preapproval_id ?? null
+    out.assinatura_proxima_cobranca = tMp.data.assinatura_proxima_cobranca ?? null
+    out.assinatura_mp_status = tMp.data.assinatura_mp_status ?? null
+  }
+
   return out
 }
 
@@ -69,26 +115,51 @@ export function computeAssinaturaFlags({
   trial_ends_at,
   bem_vindo_pagamento_visto_at,
   assinatura_paga,
+  assinatura_mp_status,
 }) {
   if (isSuperAdminEmail(email) || isento_pagamento === true) {
     return {
       assinatura_paga: true,
       acesso_app_liberado: true,
       mostrar_bem_vindo_assinatura: false,
+      assinatura_mp_bloqueada: false,
+      motivo_bloqueio_acesso: null,
+      assinatura_situacao: isento_pagamento === true ? 'isento' : 'admin',
     }
   }
 
   const trialEnd = trial_ends_at ? new Date(trial_ends_at) : null
   const trialActive = trialEnd != null && !Number.isNaN(trialEnd.getTime()) && trialEnd > new Date()
-  const acesso = assinatura_paga === true || trialActive
-  /* Tela de boas-vindas é para trial / antes de concluir o fluxo; quem já pagou não deve ver ao abrir o app. */
+  const mpBloqueia = mpStatusBloqueiaAcesso(assinatura_mp_status)
+  const pagoHistorico = assinatura_paga === true
+  const pagoEfetivo = pagoHistorico && !mpBloqueia
+
+  let acesso = pagoEfetivo || trialActive
+  if (mpBloqueia && !trialActive) acesso = false
+
+  /* Boas-vindas: com acesso (trial ou similar) e ainda sem pagamento efetivo; não exibir se MP bloqueou (vai para /pagamento). */
   const mostrarBemVindo =
-    acesso && !bem_vindo_pagamento_visto_at && assinatura_paga !== true
+    acesso &&
+    !bem_vindo_pagamento_visto_at &&
+    !pagoEfetivo &&
+    !mpBloqueia
+
+  const motivoBloqueio = !acesso && mpBloqueia && !trialActive ? mensagemBloqueioAssinaturaMp(assinatura_mp_status) : null
+
+  const situacao = situacaoAssinatura({
+    trialActive,
+    assinatura_paga_efetiva: pagoEfetivo,
+    assinatura_mp_status,
+    mpBloqueia,
+  })
 
   return {
-    assinatura_paga: assinatura_paga === true,
+    assinatura_paga: pagoEfetivo,
     acesso_app_liberado: acesso,
     mostrar_bem_vindo_assinatura: mostrarBemVindo,
+    assinatura_mp_bloqueada: mpBloqueia && !trialActive,
+    motivo_bloqueio_acesso: motivoBloqueio,
+    assinatura_situacao: situacao,
   }
 }
 
@@ -104,13 +175,18 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     console.warn('[buildAssinaturaUsuarioPayload] trial:', e?.message || e)
   }
 
-  const row = await fetchAssinaturaCamposUsuario(uid)
+  let row = await fetchAssinaturaCamposUsuario(uid)
   const email = partialUser.email ?? row.email ?? ''
   const isento = partialUser.isento_pagamento === true || row.isento_pagamento === true
 
   await sincronizarPagamentosPendentesDoUsuario(uid).catch((e) =>
     console.warn('[buildAssinaturaUsuarioPayload] sync MP:', e?.message || e)
   )
+  await sincronizarPreapprovalUsuario(uid).catch((e) =>
+    console.warn('[buildAssinaturaUsuarioPayload] sync preapproval:', e?.message || e)
+  )
+
+  row = await fetchAssinaturaCamposUsuario(uid)
 
   const hasPay = await usuarioTemPagamentoAprovado(uid, email)
   const flags = computeAssinaturaFlags({
@@ -119,7 +195,14 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     trial_ends_at: trialEnds || row.trial_ends_at,
     bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at,
     assinatura_paga: hasPay,
+    assinatura_mp_status: row.assinatura_mp_status,
   })
+
+  const precoMensal = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
+  const planoPreco = Number.isFinite(precoMensal) && precoMensal > 0 ? precoMensal : 10
+
+  const mpLink =
+    !isento && !isSuperAdminEmail(email) ? urlGerenciarMercadoPagoPadrão() : null
 
   return {
     trial_ends_at: trialEnds || row.trial_ends_at || null,
@@ -128,6 +211,13 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     acesso_app_liberado: flags.acesso_app_liberado,
     mostrar_bem_vindo_assinatura: flags.mostrar_bem_vindo_assinatura,
     trial_dias_gratis: TRIAL_DIAS,
+    assinatura_proxima_cobranca: row.assinatura_proxima_cobranca ?? null,
+    assinatura_mp_status: row.assinatura_mp_status ?? null,
+    plano_preco_mensal: planoPreco,
+    assinatura_situacao: flags.assinatura_situacao,
+    assinatura_mp_bloqueada: flags.assinatura_mp_bloqueada,
+    motivo_bloqueio_acesso: flags.motivo_bloqueio_acesso,
+    mp_gerenciar_url: mpLink,
   }
 }
 
@@ -161,7 +251,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
   const supabase = getSupabaseAdmin()
   const { data: urow, error: uerr } = await supabase
     .from('usuarios')
-    .select('email, isento_pagamento')
+    .select('email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_mp_status')
     .eq('id', uid)
     .maybeSingle()
 
@@ -171,9 +261,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
   }
   if (!urow) return { status: 401, message: 'Não autorizado.' }
 
-  let trial_ends_at = null
-  const tr = await supabase.from('usuarios').select('trial_ends_at').eq('id', uid).maybeSingle()
-  if (!tr.error && tr.data?.trial_ends_at != null) trial_ends_at = tr.data.trial_ends_at
+  const trial_ends_at = urow.trial_ends_at ?? null
 
   const email = urow.email ?? ''
   const hasPay = await usuarioTemPagamentoAprovado(uid, email)
@@ -182,14 +270,16 @@ export async function assertAcessoAppUsuario(usuarioId) {
     email,
     isento_pagamento: urow.isento_pagamento === true,
     trial_ends_at,
-    bem_vindo_pagamento_visto_at: true,
+    bem_vindo_pagamento_visto_at: urow.bem_vindo_pagamento_visto_at,
     assinatura_paga: hasPay,
+    assinatura_mp_status: urow.assinatura_mp_status,
   })
 
   if (!flags.acesso_app_liberado) {
     return {
       status: 403,
       message:
+        flags.motivo_bloqueio_acesso ||
         'Assinatura inativa ou período de teste encerrado. Conclua o pagamento no aplicativo para continuar.',
     }
   }

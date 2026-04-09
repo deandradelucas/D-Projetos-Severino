@@ -25,7 +25,7 @@ import { handleWhatsAppWebhook } from './lib/whatsapp.mjs'
 import { askHorizon } from './lib/ai.mjs'
 import {
   buscarPagamentoPorId,
-  criarPreferenciaCheckout,
+  criarPreapprovalAssinaturaMensal,
   getMercadoPagoAccessToken,
   getMercadoPagoPublicKey,
   isMercadoPagoConfigured,
@@ -36,6 +36,9 @@ import {
   listPagamentosUsuario,
   listPagamentosAdmin,
   sincronizarPagamentosPendentesDoUsuario,
+  sincronizarPreapprovalUsuario,
+  sincronizarPreapprovalPorIdFromWebhook,
+  atualizarUsuarioDePreapprovalResponse,
   upsertFromWebhookPayment,
 } from './lib/pagamentos-mp.mjs'
 import {
@@ -45,6 +48,8 @@ import {
 } from './lib/assinatura.mjs'
 import { isSuperAdminEmail } from './lib/super-admin.mjs'
 import { loadEnv } from './lib/load-env.mjs'
+import { rateLimitTake, clientKeyFromHono } from './lib/rate-limit.mjs'
+import { logMpWebhook } from './lib/mp-webhook-log.mjs'
 
 loadEnv()
 
@@ -86,7 +91,31 @@ app.use('*', cors({
   allowHeaders: ['Content-Type', 'x-user-id', 'Authorization'],
 }))
 
-app.get('/api/health', (c) => c.json({ ok: true }))
+app.get('/api/health', (c) =>
+  c.json({
+    ok: true,
+    t: new Date().toISOString(),
+    mercadopago: { configured: isMercadoPagoConfigured() },
+  })
+)
+
+/** Painel interno: token MP configurado e path do webhook (sem segredos). */
+app.get('/api/admin/mp-saude', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
+    return c.json({
+      mercado_pago_access_token_configured: isMercadoPagoConfigured(),
+      webhook_get_post: '/api/pagamentos/webhook',
+      nota:
+        'No painel Mercado Pago, a URL de notificação deve apontar para este path e responder 200. Logs estruturados: svc=mercadopago-webhook no stdout.',
+    })
+  } catch (error) {
+    console.error('mp-saude failed', error)
+    return c.json({ message: 'Erro ao montar painel.' }, 500)
+  }
+})
 
 /** Texto útil a partir de Error, PostgrestError ou objeto genérico. */
 function errorToText(error) {
@@ -150,6 +179,10 @@ function mapSupabaseOrNetworkError(error) {
 
 app.post('/api/auth/login', async (c) => {
   try {
+    const ip = clientKeyFromHono(c)
+    if (!rateLimitTake(`login:${ip}`, 25, 60_000)) {
+      return c.json({ message: 'Muitas tentativas. Aguarde cerca de um minuto e tente de novo.' }, 429)
+    }
     const body = await c.req.json()
     const email = String(body?.email || '').trim().toLowerCase()
     const password = String(body?.password || '')
@@ -182,6 +215,13 @@ app.post('/api/auth/login', async (c) => {
         acesso_app_liberado: true,
         mostrar_bem_vindo_assinatura: false,
         trial_dias_gratis: 7,
+        assinatura_proxima_cobranca: null,
+        assinatura_mp_status: null,
+        plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
+        assinatura_situacao: 'inativa',
+        assinatura_mp_bloqueada: false,
+        motivo_bloqueio_acesso: null,
+        mp_gerenciar_url: null,
       }
     }
 
@@ -217,6 +257,13 @@ app.get('/api/assinatura/status', async (c) => {
       acesso_app_liberado: true,
       mostrar_bem_vindo_assinatura: false,
       trial_dias_gratis: 7,
+      assinatura_proxima_cobranca: null,
+      assinatura_mp_status: null,
+      plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
+      assinatura_situacao: 'inativa',
+      assinatura_mp_bloqueada: false,
+      motivo_bloqueio_acesso: null,
+      mp_gerenciar_url: null,
     })
   }
 })
@@ -238,6 +285,10 @@ app.post('/api/assinatura/bem-vindo-visto', async (c) => {
 
 app.post('/api/auth/request-password-reset', async (c) => {
   try {
+    const ip = clientKeyFromHono(c)
+    if (!rateLimitTake(`pw-req:${ip}`, 5, 15 * 60_000)) {
+      return c.json({ message: 'Muitas solicitações. Tente de novo em alguns minutos.' }, 429)
+    }
     const body = await c.req.json()
     const email = String(body?.email || '').trim().toLowerCase()
 
@@ -286,6 +337,10 @@ app.post('/api/auth/request-password-reset', async (c) => {
 
 app.post('/api/auth/reset-password', async (c) => {
   try {
+    const ip = clientKeyFromHono(c)
+    if (!rateLimitTake(`pw-reset:${ip}`, 20, 15 * 60_000)) {
+      return c.json({ message: 'Muitas tentativas. Aguarde alguns minutos.' }, 429)
+    }
     const body = await c.req.json()
     const token = String(body?.token || '').trim()
     const password = String(body?.password || '')
@@ -579,6 +634,7 @@ app.get('/api/pagamentos/minhas', async (c) => {
     const usuarioId = c.req.header('x-user-id')
     if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
     await sincronizarPagamentosPendentesDoUsuario(usuarioId)
+    await sincronizarPreapprovalUsuario(usuarioId).catch(() => {})
     const rows = await listPagamentosUsuario(usuarioId)
     return c.json(rows)
   } catch (error) {
@@ -591,6 +647,10 @@ app.post('/api/pagamentos/preferencia', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
     if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    const ip = clientKeyFromHono(c)
+    if (!rateLimitTake(`mp-pref:${usuarioId}:${ip}`, 15, 60 * 60_000)) {
+      return c.json({ message: 'Limite de solicitações de pagamento. Tente de novo em até uma hora.' }, 429)
+    }
     if (!isMercadoPagoConfigured()) {
       return c.json({ message: 'Pagamentos não configurados no servidor (MERCADO_PAGO_ACCESS_TOKEN).' }, 503)
     }
@@ -617,31 +677,39 @@ app.post('/api/pagamentos/preferencia', async (c) => {
     const baseUrl = getRequestOrigin(c).replace(/\/+$/, '')
     const externalRef = `hf-${randomUUID()}`
 
-    const pref = await criarPreferenciaCheckout({
+    const pre = await criarPreapprovalAssinaturaMensal({
       baseUrl,
       usuarioId,
       email: perfil.email,
-      title: titulo,
+      title: `${titulo} (mensal)`,
       unitPrice: valor,
       externalReference: externalRef,
-      quantity: 1,
     })
 
     await insertPreferenciaRecord({
       usuario_id: usuarioId,
-      preference_id: String(pref.id),
+      preference_id: null,
+      preapproval_id: String(pre.id),
       external_reference: externalRef,
       amount: valor,
-      description: titulo,
+      description: `${titulo} — assinatura mensal`,
+    })
+
+    await atualizarUsuarioDePreapprovalResponse(usuarioId, {
+      id: pre.id,
+      status: pre.status,
+      next_payment_date: pre.next_payment_date,
+      metadata: { usuario_id: usuarioId },
     })
 
     const token = getMercadoPagoAccessToken()
     const useSandbox = useSandboxCheckout(token)
 
     return c.json({
-      preference_id: pref.id,
-      init_point: pref.init_point,
-      sandbox_init_point: pref.sandbox_init_point,
+      preapproval_id: pre.id,
+      preference_id: null,
+      init_point: pre.init_point,
+      sandbox_init_point: pre.sandbox_init_point,
       use_sandbox: useSandbox,
     })
   } catch (error) {
@@ -655,34 +723,73 @@ app.get('/api/pagamentos/webhook', (c) => c.json({ ok: true }))
 
 app.post('/api/pagamentos/webhook', async (c) => {
   let paymentId = null
+  let preapprovalWebhookId = null
+  let qsTopic = ''
   try {
     const url = new URL(c.req.url)
-    const qsTopic = url.searchParams.get('topic') || url.searchParams.get('type')
+    qsTopic = (url.searchParams.get('topic') || url.searchParams.get('type') || '').toLowerCase()
     const qsId = url.searchParams.get('id') || url.searchParams.get('data.id')
     if (qsTopic === 'payment' && qsId) paymentId = String(qsId)
+    if (
+      (qsTopic === 'preapproval' || qsTopic === 'subscription_preapproval' || qsTopic === 'subscription') &&
+      qsId
+    ) {
+      preapprovalWebhookId = String(qsId)
+    }
 
-    if (!paymentId) {
-      const ct = c.req.header('content-type') || ''
-      if (ct.includes('application/json')) {
-        const body = await c.req.json()
-        if (body?.data?.id != null) {
-          paymentId = String(body.data.id)
-        }
-        if (!paymentId && body?.id && body?.topic === 'payment') {
-          paymentId = String(body.id)
-        }
-      } else {
-        const text = await c.req.text()
-        if (text) {
-          const params = new URLSearchParams(text)
-          if (params.get('topic') === 'payment' && params.get('id')) {
-            paymentId = String(params.get('id'))
-          }
+    const ct = c.req.header('content-type') || ''
+    if (ct.includes('application/json')) {
+      const body = await c.req.json().catch(() => ({}))
+      const t = String(body?.type || body?.topic || body?.action || '').toLowerCase()
+      if (!paymentId && body?.data?.id != null && t === 'payment') {
+        paymentId = String(body.data.id)
+      }
+      if (!paymentId && body?.id && (t === 'payment' || String(body?.topic || '').toLowerCase() === 'payment')) {
+        paymentId = String(body.id)
+      }
+      if (!paymentId && body?.data?.id != null) {
+        const action = String(body?.action || '').toLowerCase()
+        if (action.includes('payment')) paymentId = String(body.data.id)
+      }
+      if (
+        !preapprovalWebhookId &&
+        (t === 'preapproval' || t === 'subscription_preapproval' || t === 'subscription')
+      ) {
+        const pid = body?.data?.id ?? body?.id
+        if (pid != null) preapprovalWebhookId = String(pid)
+      }
+    } else if (!paymentId && !preapprovalWebhookId) {
+      const text = await c.req.text()
+      if (text) {
+        const params = new URLSearchParams(text)
+        const tp = (params.get('topic') || '').toLowerCase()
+        if (tp === 'payment' && params.get('id')) paymentId = String(params.get('id'))
+        if ((tp === 'preapproval' || tp === 'subscription_preapproval') && params.get('id')) {
+          preapprovalWebhookId = String(params.get('id'))
         }
       }
     }
   } catch (e) {
+    logMpWebhook({ stage: 'parse_error', err: errorToText(e) })
     console.error('[MP webhook] parse', e)
+  }
+
+  logMpWebhook({
+    stage: 'received',
+    topic: qsTopic || undefined,
+    payment_id: paymentId || undefined,
+    preapproval_id: preapprovalWebhookId || undefined,
+  })
+
+  if (preapprovalWebhookId) {
+    try {
+      await sincronizarPreapprovalPorIdFromWebhook(preapprovalWebhookId)
+      logMpWebhook({ stage: 'preapproval_ok', preapproval_id: preapprovalWebhookId })
+    } catch (e) {
+      logMpWebhook({ stage: 'preapproval_error', preapproval_id: preapprovalWebhookId, err: errorToText(e) })
+      console.error('[MP webhook] preapproval', e)
+    }
+    return c.json({ ok: true })
   }
 
   if (!paymentId) {
@@ -691,8 +798,22 @@ app.post('/api/pagamentos/webhook', async (c) => {
 
   try {
     const payment = await buscarPagamentoPorId(paymentId)
+    const extRef =
+      payment?.external_reference != null
+        ? String(payment.external_reference)
+        : payment?.metadata?.external_reference != null
+          ? String(payment.metadata.external_reference)
+          : undefined
+    logMpWebhook({
+      stage: 'payment_fetch_ok',
+      payment_id: paymentId,
+      external_reference: extRef,
+      status: payment?.status != null ? String(payment.status) : undefined,
+    })
     await upsertFromWebhookPayment(payment)
+    logMpWebhook({ stage: 'payment_upsert_ok', payment_id: paymentId })
   } catch (e) {
+    logMpWebhook({ stage: 'payment_error', payment_id: paymentId, err: errorToText(e) })
     console.error('[MP webhook] process', e)
   }
 

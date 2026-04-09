@@ -23,10 +23,13 @@ export default function Pagamento() {
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
-  const [valor, setValor] = useState('10.00')
-  const [titulo, setTitulo] = useState('Assinatura Horizonte Financeiro')
+  const [valor] = useState('10.00')
+  const [titulo] = useState('Assinatura mensal Horizonte Financeiro')
+  const [proximaCobranca, setProximaCobranca] = useState(null)
+  const [precoMensal, setPrecoMensal] = useState(10)
 
   const statusUrl = searchParams.get('status')
+  const mpSub = searchParams.get('mp')
   const expirado = searchParams.get('expirado') === '1'
 
   useEffect(() => {
@@ -44,11 +47,24 @@ export default function Pagamento() {
         const cfgHeaders = uid ? { 'x-user-id': uid } : {}
 
         if (uid && u) {
+          if (u.assinatura_proxima_cobranca) setProximaCobranca(u.assinatura_proxima_cobranca)
+          if (u.plano_preco_mensal != null) {
+            const p = Number(u.plano_preco_mensal)
+            if (Number.isFinite(p) && p > 0) setPrecoMensal(p)
+          }
           try {
             const stRes = await fetch(apiUrl('/api/assinatura/status'), { headers: { 'x-user-id': uid } })
             if (stRes.ok) {
               const assinatura = await stRes.json()
               localStorage.setItem('horizonte_user', JSON.stringify({ ...u, ...assinatura }))
+              window.dispatchEvent(new Event('horizonte-session-refresh'))
+              if (assinatura.assinatura_proxima_cobranca) {
+                setProximaCobranca(assinatura.assinatura_proxima_cobranca)
+              }
+              if (assinatura.plano_preco_mensal != null) {
+                const p = Number(assinatura.plano_preco_mensal)
+                if (Number.isFinite(p) && p > 0) setPrecoMensal(p)
+              }
             }
           } catch {
             /* ignore */
@@ -93,6 +109,48 @@ export default function Pagamento() {
     load()
   }, [])
 
+  useEffect(() => {
+    if (mpSub !== 'sub_ok') return
+    let cancelled = false
+    const sync = async () => {
+      try {
+        const raw = localStorage.getItem('horizonte_user')
+        const u = raw ? JSON.parse(raw) : null
+        if (!u?.id) return
+        const stRes = await fetch(apiUrl('/api/assinatura/status'), { headers: { 'x-user-id': u.id }, cache: 'no-store' })
+        if (stRes.ok) {
+          const assinatura = await stRes.json()
+          localStorage.setItem('horizonte_user', JSON.stringify({ ...u, ...assinatura }))
+          window.dispatchEvent(new Event('horizonte-session-refresh'))
+          if (!cancelled && assinatura.assinatura_proxima_cobranca) {
+            setProximaCobranca(assinatura.assinatura_proxima_cobranca)
+          }
+        }
+        const hRes = await fetch(apiUrl('/api/pagamentos/minhas'), { headers: { 'x-user-id': u.id }, cache: 'no-store' })
+        if (hRes.ok && !cancelled) {
+          const h = await hRes.json()
+          setHistorico(Array.isArray(h) ? h : [])
+        }
+      } catch {
+        /* ignore */
+      }
+      if (!cancelled) {
+        setSearchParams(
+          (prev) => {
+            const next = new URLSearchParams(prev)
+            next.delete('mp')
+            return next
+          },
+          { replace: true }
+        )
+      }
+    }
+    sync()
+    return () => {
+      cancelled = true
+    }
+  }, [mpSub, setSearchParams])
+
   const handlePagar = async () => {
     setError('')
     setPaying(true)
@@ -116,7 +174,7 @@ export default function Pagamento() {
           'Content-Type': 'application/json',
           'x-user-id': u.id,
         },
-        body: JSON.stringify({ valor: v, titulo: titulo.trim() || 'Assinatura Horizonte Financeiro' }),
+        body: JSON.stringify({ valor: v, titulo: titulo.trim() || 'Assinatura mensal Horizonte Financeiro' }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Não foi possível iniciar o pagamento.')
@@ -149,7 +207,7 @@ export default function Pagamento() {
                 Pagamento
               </h1>
               <p className="responsive-p" style={{ color: 'var(--text-secondary)' }}>
-                Checkout seguro via Mercado Pago (cartão, Pix e outros meios disponíveis na sua conta MP).
+                Assinatura mensal de <strong>R$ {precoMensal.toFixed(2).replace('.', ',')}</strong> — cobrança automática todo mês no cartão; o valor cai na conta Mercado Pago do aplicativo. Você autoriza uma vez no checkout do MP.
               </p>
             </div>
           </div>
@@ -229,43 +287,47 @@ export default function Pagamento() {
             </div>
           )}
 
-          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '6px' }}>Descrição</label>
-          <input
-            type="text"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
-            disabled={!config.ready || paying || config.isento_pagamento}
+          <div
             style={{
-              width: '100%',
               marginBottom: '14px',
-              padding: '10px 12px',
-              borderRadius: '8px',
-              border: '1px solid rgba(148,163,184,0.35)',
+              padding: '12px 14px',
+              borderRadius: '10px',
               background: 'var(--bg-secondary)',
-              color: 'var(--text-primary)',
+              border: '1px solid rgba(148,163,184,0.25)',
               fontSize: '14px',
+              color: 'var(--text-primary)',
             }}
-          />
+          >
+            <strong>{titulo}</strong>
+            <div style={{ marginTop: '6px', color: 'var(--text-secondary)', fontSize: '13px' }}>
+              Valor: <strong style={{ color: 'var(--text-primary)' }}>R$ {precoMensal.toFixed(2).replace('.', ',')} / mês</strong>
+            </div>
+          </div>
 
-          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '6px' }}>Valor (R$)</label>
-          <input
-            type="text"
-            inputMode="decimal"
-            value={valor}
-            onChange={(e) => setValor(e.target.value)}
-            disabled={!config.ready || paying || config.isento_pagamento}
-            style={{
-              width: '100%',
-              maxWidth: '200px',
-              marginBottom: '16px',
-              padding: '10px 12px',
-              borderRadius: '8px',
-              border: '1px solid rgba(148,163,184,0.35)',
-              background: 'var(--bg-secondary)',
-              color: 'var(--text-primary)',
-              fontSize: '14px',
-            }}
-          />
+          {proximaCobranca && (
+            <div
+              style={{
+                marginBottom: '16px',
+                padding: '12px 14px',
+                borderRadius: '10px',
+                background: 'rgba(212, 168, 75, 0.1)',
+                border: '1px solid rgba(212, 168, 75, 0.28)',
+              }}
+            >
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Próxima cobrança
+              </div>
+              <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
+                {new Date(proximaCobranca).toLocaleString('pt-BR', {
+                  dateStyle: 'long',
+                  timeStyle: 'short',
+                })}
+              </div>
+              <p style={{ margin: '8px 0 0', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                Data informada pelo Mercado Pago após a autorização da assinatura. Atualiza automaticamente após cada pagamento.
+              </p>
+            </div>
+          )}
 
           {error && <p style={{ color: 'var(--danger)', fontSize: '13px', marginBottom: '10px' }}>{error}</p>}
 
@@ -276,7 +338,7 @@ export default function Pagamento() {
             onClick={handlePagar}
             style={{ padding: '12px 20px' }}
           >
-            {paying ? 'Redirecionando…' : 'Pagar com Mercado Pago'}
+            {paying ? 'Redirecionando…' : 'Assinar e autorizar no Mercado Pago'}
           </button>
 
           {config.publicKey && (

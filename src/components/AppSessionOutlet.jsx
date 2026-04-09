@@ -44,6 +44,7 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
           const merged = { ...u, ...assinatura }
           if (merged.acesso_app_liberado === undefined) merged.acesso_app_liberado = true
           localStorage.setItem('horizonte_user', JSON.stringify(merged))
+          window.dispatchEvent(new Event('horizonte-session-refresh'))
           if (!cancelled) setState({ loading: false, user: merged })
           return
         }

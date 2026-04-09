@@ -55,37 +55,41 @@ export default function Background() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImage(getRandomImage())
-    }, 60000)
+    }, 90000)
 
     return () => clearInterval(interval)
   }, [])
 
   return (
-    <div 
-      className="fixed inset-0 -z-10"
-      style={{
-        backgroundImage: `url(${currentImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        transition: 'background-image 0.5s ease-in-out',
-      }}
-    >
+    <div className="app-background-root" aria-hidden>
       <div
-        className={`absolute inset-0 transition-colors duration-500 ${
-          theme === 'dark' ? 'bg-black/72' : 'bg-black/60'
-        }`}
+        className="app-background-root__image"
+        style={{
+          backgroundImage: `url(${currentImage})`,
+        }}
+      />
+      <div
+        className={`app-background-root__tint ${theme === 'dark' ? 'app-background-root__tint--dark' : 'app-background-root__tint--light'}`}
       />
       {theme === 'dark' && (
         <div
-          className="pointer-events-none absolute inset-0"
+          className="app-background-root__wash"
           style={{
             background:
-              'linear-gradient(180deg, rgba(5,6,7,0.55) 0%, transparent 38%, transparent 62%, rgba(5,6,7,0.65) 100%), radial-gradient(ellipse 80% 50% at 50% 100%, rgba(212,168,75,0.06), transparent 70%)',
+              'linear-gradient(165deg, rgba(4,5,7,0.72) 0%, rgba(6,8,12,0.38) 42%, rgba(4,5,8,0.78) 100%), radial-gradient(ellipse 100% 55% at 50% 100%, rgba(212,168,75,0.07), transparent 62%)',
           }}
-          aria-hidden
         />
       )}
+      <div
+        className="app-background-root__vignette"
+        style={{
+          background:
+            theme === 'dark'
+              ? 'radial-gradient(ellipse 85% 70% at 50% 45%, transparent 20%, rgba(2,3,5,0.88) 100%)'
+              : 'radial-gradient(ellipse 90% 75% at 50% 40%, transparent 25%, rgba(12,14,18,0.55) 100%)',
+        }}
+      />
+      <div className="app-background-root__noise" />
     </div>
   )
 }
