@@ -8,47 +8,6 @@ import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { readHorizonteUser } from '../lib/horizonteSession'
 
-/** Linha do gráfico: despesas por dia no mês corrente */
-function buildSpendLinePath(transacoes) {
-  const now = new Date()
-  const y = now.getFullYear()
-  const mo = now.getMonth()
-  const daysInMonth = new Date(y, mo + 1, 0).getDate()
-  const daily = Array.from({ length: daysInMonth }, () => 0)
-
-  transacoes.forEach((t) => {
-    const tipo = String(t.tipo || '').toUpperCase()
-    if (tipo !== 'DESPESA') return
-    const d = new Date(t.data_transacao)
-    if (Number.isNaN(d.getTime())) return
-    if (d.getFullYear() !== y || d.getMonth() !== mo) return
-    const dayIdx = d.getDate() - 1
-    if (dayIdx >= 0 && dayIdx < daysInMonth) {
-      daily[dayIdx] += parseFloat(t.valor) || 0
-    }
-  })
-
-  const w = 320
-  const h = 100
-  const pad = 8
-  const max = Math.max(...daily, 1)
-  const step = daysInMonth > 1 ? (w - pad * 2) / (daysInMonth - 1) : 0
-
-  const points = daily.map((v, i) => {
-    const x = pad + i * step
-    const yn = h - pad - (v / max) * (h - pad * 2)
-    return [x, yn]
-  })
-
-  if (points.length === 0) return { d: '', w, h }
-
-  let d = `M ${points[0][0].toFixed(1)} ${points[0][1].toFixed(1)}`
-  for (let i = 1; i < points.length; i++) {
-    d += ` L ${points[i][0].toFixed(1)} ${points[i][1].toFixed(1)}`
-  }
-  return { d, w, h }
-}
-
 const SkeletonRow = () => (
   <div className="skeleton skeleton-row">
     <div className="skeleton-row-date">
@@ -151,20 +110,6 @@ export default function Dashboard() {
     )
   }, [transacoes])
 
-  const fluxoLiquido = totalReceitas - totalDespesas
-
-  const mesLabel = useMemo(
-    () => new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }),
-    []
-  )
-
-  const linePath = useMemo(() => buildSpendLinePath(transacoes), [transacoes])
-
-  const receitasDestaque = useMemo(
-    () => transacoes.filter((t) => t.tipo === 'RECEITA').slice(0, 4),
-    [transacoes]
-  )
-
   const txRecentes = useMemo(() => transacoes.slice(0, 8), [transacoes])
 
   const formatCurrency = (val) => {
@@ -175,56 +120,15 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="dashboard-container dashboard-page ref-dashboard">
-      <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
+    <div className="dashboard-container dashboard-page ref-dashboard app-horizon-shell">
+      <div className="ref-dashboard-shell">
+        <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content relative z-10 ref-dashboard-main">
+        <main className="main-content relative z-10 ref-dashboard-main">
         <div className="ref-dashboard-inner">
         <div className="ref-dashboard-top">
           <div className="ref-dashboard-top__left">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
-          </div>
-          <div className="ref-ai-banner" role="region" aria-label="Assistente">
-            <div className="ref-ai-banner__lead">
-              <p className="ref-ai-banner__text">Horizonte — Agente de inteligência financeira</p>
-              <div className="ref-ai-banner__metrics">
-                <span className="ref-ai-banner__metric">
-                  Gasto{' '}
-                  <strong className={privacyMode ? 'privacy-blur' : ''}>{formatCurrency(totalDespesas)}</strong>
-                </span>
-                <span className="ref-ai-banner__metric">
-                  Fluxo{' '}
-                  <strong className={privacyMode ? 'privacy-blur' : ''}>{formatCurrency(fluxoLiquido)}</strong>
-                </span>
-              </div>
-            </div>
-            <div className="ref-ai-banner__actions">
-              <button type="button" className="ref-ai-banner__falar">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                  <line x1="12" y1="19" x2="12" y2="23" />
-                  <line x1="8" y1="23" x2="16" y2="23" />
-                </svg>
-                Falar
-              </button>
-              <button type="button" className="ref-ai-banner__perguntar">
-                Perguntar
-              </button>
-            </div>
-          </div>
-          <div className="ref-dashboard-top__icons">
-            <button type="button" className="ref-icon-circle" aria-label="Conversas">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
-            </button>
-            <button type="button" className="ref-icon-circle" aria-label="Notificações">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-            </button>
           </div>
         </div>
 
@@ -274,25 +178,9 @@ export default function Dashboard() {
               <p className="ref-kpi-card__hint">Receitas do período</p>
             </div>
           </article>
-          <article className="ref-kpi-card ref-kpi-card--invest">
-            <div className="ref-kpi-card__icon" aria-hidden>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 3v18h18" />
-                <path d="M7 15l3-3 3 2 5-6 3 3" />
-                <circle cx="7" cy="15" r="1.2" fill="currentColor" />
-                <circle cx="13" cy="14" r="1.2" fill="currentColor" />
-                <circle cx="18" cy="8" r="1.2" fill="currentColor" />
-              </svg>
-            </div>
-            <div className="ref-kpi-card__body">
-              <p className="ref-kpi-card__label">Investimentos</p>
-              <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(0)}</p>
-              <p className="ref-kpi-card__hint">Em breve no app</p>
-            </div>
-          </article>
         </section>
 
-        <section className="ref-bottom-grid">
+        <section className="ref-bottom-grid ref-bottom-grid--single" aria-label="Transações recentes">
           <article className="ref-panel ref-panel--transactions">
             <div className="ref-panel__head">
               <h2 className="ref-panel__title">Transações</h2>
@@ -340,90 +228,6 @@ export default function Dashboard() {
               )}
             </div>
           </article>
-
-          <article className="ref-panel ref-panel--chart">
-            <div className="ref-panel__head">
-              <div>
-                <h2 className="ref-panel__title">Mapa de gastos do mês</h2>
-                <p className="ref-panel__subtitle">{mesLabel}</p>
-              </div>
-            </div>
-            <div className="ref-chart-wrap">
-              {loading ? (
-                <div className="skeleton skeleton-chart-area ref-chart-skeleton" />
-              ) : (
-                <svg
-                  className="ref-chart-svg"
-                  viewBox={`0 0 ${linePath.w || 320} ${linePath.h || 100}`}
-                  preserveAspectRatio="none"
-                  aria-hidden
-                >
-                  <path
-                    d={linePath.d}
-                    fill="none"
-                    stroke="#111827"
-                    strokeWidth="2.25"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                </svg>
-              )}
-            </div>
-          </article>
-
-          <article className="ref-panel ref-panel--receipts">
-            <div className="ref-panel__head">
-              <div>
-                <h2 className="ref-panel__title">Recibos</h2>
-                <p className="ref-panel__subtitle">
-                  {mesLabel}
-                  {receitasDestaque.length > 0 ? ` · ${receitasDestaque.length} lançamentos` : ''}
-                </p>
-              </div>
-            </div>
-            <div className="ref-receipt-list">
-              {loading ? (
-                <div className="skeleton-stagger">
-                  <div className="ref-receipt-row">
-                    <span className="skeleton skeleton-pulse ref-receipt-row__icon-skel" aria-hidden />
-                    <div className="ref-receipt-row__mid">
-                      <span className="skeleton skeleton-pulse ref-receipt-row__line-skel" />
-                      <span className="skeleton skeleton-pulse ref-receipt-row__line-skel ref-receipt-row__line-skel--short" />
-                    </div>
-                    <span className="skeleton skeleton-pulse ref-receipt-row__val-skel" aria-hidden />
-                  </div>
-                  <div className="ref-receipt-row">
-                    <span className="skeleton skeleton-pulse ref-receipt-row__icon-skel" aria-hidden />
-                    <div className="ref-receipt-row__mid">
-                      <span className="skeleton skeleton-pulse ref-receipt-row__line-skel" />
-                      <span className="skeleton skeleton-pulse ref-receipt-row__line-skel ref-receipt-row__line-skel--short" />
-                    </div>
-                    <span className="skeleton skeleton-pulse ref-receipt-row__val-skel" aria-hidden />
-                  </div>
-                </div>
-              ) : receitasDestaque.length === 0 ? (
-                <p className="ref-empty">Sem receitas no período.</p>
-              ) : (
-                receitasDestaque.map((t) => (
-                  <div key={t.id} className="ref-receipt-row">
-                    <div className="ref-receipt-row__icon" aria-hidden>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
-                      </svg>
-                    </div>
-                    <div className="ref-receipt-row__mid min-w-0">
-                      <p className="ref-receipt-row__cat break-words">{t.categorias?.nome || 'Receita'}</p>
-                    </div>
-                    <span className={`ref-receipt-row__val ${privacyMode ? 'privacy-blur' : ''}`}>
-                      {formatCurrency(parseFloat(t.valor) || 0)}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-          </article>
         </section>
 
         <div className="ref-fab-wrap">
@@ -432,7 +236,8 @@ export default function Dashboard() {
           </button>
         </div>
         </div>
-      </main>
+        </main>
+      </div>
 
       <TransactionModal
         isOpen={isModalOpen}

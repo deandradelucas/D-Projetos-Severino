@@ -149,6 +149,13 @@ function mapSupabaseOrNetworkError(error) {
         'Banco de dados não configurado. Em desenvolvimento, crie um arquivo .env na raiz do projeto com VITE_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY (copie de env.example). No Vercel, defina as mesmas variáveis no projeto e faça um novo deploy.',
     }
   }
+  if (/Invalid supabaseUrl|Invalid VITE_SUPABASE_URL|Must be a valid HTTP or HTTPS URL/i.test(raw)) {
+    return {
+      status: 503,
+      message:
+        'URL do Supabase inválida. No .env, defina VITE_SUPABASE_URL como a URL do projeto (https://….supabase.co), sem aspas nem espaços — copie de Settings → API no painel do Supabase.',
+    }
+  }
   if (/Invalid API key|JWT expired|invalid value for JWT|JWT|API key/i.test(raw)) {
     return {
       status: 503,

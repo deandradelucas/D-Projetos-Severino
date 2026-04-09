@@ -177,6 +177,16 @@ body[data-theme='light'] {
     linear-gradient(168deg, #9eb6e0 0%, #7d9ad0 42%, #6d8ec4 100%);
 }
 
+/* App autenticado (tema claro): sem gradiente do body — a foto vem do Background (horizons) atrás do app */
+body[data-theme='light']:has(.app-horizon-shell) {
+  background-color: transparent;
+  background-image: none;
+}
+
+html:has(body[data-theme='light']:has(.app-horizon-shell)) {
+  background-color: transparent;
+}
+
 input,
 textarea,
 select,

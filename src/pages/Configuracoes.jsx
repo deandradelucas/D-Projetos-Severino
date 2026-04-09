@@ -105,7 +105,7 @@ export default function Configuracoes() {
   }
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container app-horizon-shell">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content config-page" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

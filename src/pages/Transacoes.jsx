@@ -138,7 +138,7 @@ export default function Transacoes() {
     setFilters({ busca: '', tipo: '', categoria_id: '', dataInicio: '', dataFim: '' })
 
   return (
-    <div className="dashboard-container page-transacoes">
+    <div className="dashboard-container page-transacoes app-horizon-shell">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content relative z-10">

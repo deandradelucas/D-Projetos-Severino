@@ -93,7 +93,7 @@ export default function AdminPagamentos() {
   }
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container app-horizon-shell">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content">

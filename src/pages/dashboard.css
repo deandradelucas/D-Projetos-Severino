@@ -5051,27 +5051,6 @@ body[data-theme='light'] .config-theme-preview {
 }
 
 /* ===== Executive 1:1 refinement ===== */
-body[data-theme='light'] .exec-profile-card {
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  background: linear-gradient(160deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 24px;
-  padding: 14px;
-  margin-bottom: 16px;
-  text-align: center;
-}
-body[data-theme='light'] .exec-profile-avatar {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 8px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  color: #0f172a;
-  background: linear-gradient(135deg, #dbeafe 0%, #c7d2fe 100%);
-}
-body[data-theme='light'] .exec-profile-name { margin: 0; font-size: 13px; font-weight: 700; color: #0f172a; }
-body[data-theme='light'] .exec-profile-role { margin: 3px 0 0; font-size: 10px; letter-spacing: 0.12em; color: #64748b; }
 body[data-theme='light'] .exec-sidebar-secondary { margin-top: 8px; display: grid; gap: 8px; }
 body[data-theme='light'] .exec-help-btn { width: 100%; border: 0; cursor: pointer; }
 
@@ -5295,19 +5274,10 @@ body[data-theme='light'] .dashboard-container {
 }
 
 body[data-theme='light'] .sidebar {
-  width: 188px;
   border-radius: 24px;
   padding: 16px 10px 14px;
   box-shadow: 0 10px 30px -22px rgba(15, 23, 42, 0.28);
 }
-body[data-theme='light'] .exec-profile-card {
-  border-radius: 18px;
-  padding: 12px 10px;
-  margin-bottom: 12px;
-}
-body[data-theme='light'] .exec-profile-avatar { width: 44px; height: 44px; font-size: 13px; }
-body[data-theme='light'] .exec-profile-name { font-size: 12px; }
-body[data-theme='light'] .exec-profile-role { font-size: 11px; letter-spacing: 0; }
 body[data-theme='light'] .brand-wrapper { margin-bottom: 10px; }
 body[data-theme='light'] .brand-logo { width: 136px; }
 body[data-theme='light'] .nav-menu { gap: 6px; }
@@ -5381,7 +5351,14 @@ body[data-theme='light'] .relatorios-loading-shell {
 }
 
 @media (max-width: 1200px) {
-  body[data-theme='light'] .sidebar { width: 176px; }
+  body[data-theme='light'] {
+    --app-sidebar-width: 200px;
+    --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 52px);
+  }
+  body[data-theme='light'] .sidebar {
+    width: var(--app-sidebar-width);
+    min-width: var(--app-sidebar-width);
+  }
   body[data-theme='light'] .exec-grid-shell { grid-template-columns: 1fr; }
   body[data-theme='light'] .exec-grid-right { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
@@ -5557,7 +5534,7 @@ body[data-theme='light'] .ref-alert {
 
 body[data-theme='light'] .ref-kpi-row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -5582,9 +5559,6 @@ body[data-theme='light'] .ref-kpi-card--expense {
 body[data-theme='light'] .ref-kpi-card--income {
   background: linear-gradient(145deg, #ecfdf3 0%, #e8faf0 100%);
 }
-body[data-theme='light'] .ref-kpi-card--invest {
-  background: linear-gradient(145deg, #f4f0ff 0%, #f0edff 100%);
-}
 
 body[data-theme='light'] .ref-kpi-card--balance .ref-kpi-card__icon {
   background: rgba(255, 255, 255, 0.85);
@@ -5602,12 +5576,6 @@ body[data-theme='light'] .ref-kpi-card--income .ref-kpi-card__icon {
   background: rgba(187, 247, 208, 0.65);
   border: 1px solid rgba(34, 197, 94, 0.22);
   color: #15803d;
-}
-
-body[data-theme='light'] .ref-kpi-card--invest .ref-kpi-card__icon {
-  background: rgba(233, 213, 255, 0.7);
-  border: 1px solid rgba(168, 85, 247, 0.2);
-  color: #7c3aed;
 }
 
 body[data-theme='light'] .ref-kpi-card__icon {
@@ -5647,6 +5615,10 @@ body[data-theme='light'] .ref-bottom-grid {
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) minmax(0, 0.95fr);
   gap: 14px;
   align-items: stretch;
+}
+
+body[data-theme='light'] .ref-bottom-grid.ref-bottom-grid--single {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 body[data-theme='light'] .ref-panel {
@@ -5920,6 +5892,11 @@ body[data-theme='light'] {
   --pf-sh-float: 0 28px 56px -34px rgba(15, 23, 42, 0.16);
   --pf-sh-soft: 0 8px 24px -12px rgba(15, 23, 42, 0.1);
   --pf-focus: 0 0 0 3px rgba(59, 130, 246, 0.32);
+  /* Menu lateral — largura única (demais regras usam estes tokens) */
+  --app-sidebar-width: 240px;
+  --app-sidebar-pad: 20px 16px 18px;
+  --app-shell-inner-max: 1180px;
+  --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 52px);
 }
 
 /* Shell: uma única leitura visual (resolve conflitos entre blocos antigos) */
@@ -5937,16 +5914,16 @@ body[data-theme='light'] .dashboard-container {
 }
 
 body[data-theme='light'] .sidebar {
-  width: 226px;
-  min-width: 226px;
-  padding: 22px 14px 18px;
+  width: var(--app-sidebar-width);
+  min-width: var(--app-sidebar-width);
+  padding: var(--app-sidebar-pad);
   background: linear-gradient(180deg, #eef2f8 0%, #e6eaf3 100%);
   border-right: 1px solid var(--pf-line);
   border-radius: var(--pf-r-xl) 0 0 var(--pf-r-xl);
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.65);
 }
 
-body[data-theme='light'] .dashboard-container > .main-content {
+body[data-theme='light'] .dashboard-container .main-content {
   background:
     radial-gradient(ellipse 85% 55% at 100% -8%, rgba(59, 130, 246, 0.055), transparent 48%),
     linear-gradient(180deg, #f9fafc 0%, #f3f5f9 100%);
@@ -5956,17 +5933,17 @@ body[data-theme='light'] .dashboard-container > .main-content {
   scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
 }
 
-body[data-theme='light'] .dashboard-container > .main-content::-webkit-scrollbar {
+body[data-theme='light'] .dashboard-container .main-content::-webkit-scrollbar {
   width: 9px;
   height: 9px;
 }
-body[data-theme='light'] .dashboard-container > .main-content::-webkit-scrollbar-thumb {
+body[data-theme='light'] .dashboard-container .main-content::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.45);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
-body[data-theme='light'] .dashboard-container > .main-content::-webkit-scrollbar-track {
+body[data-theme='light'] .dashboard-container .main-content::-webkit-scrollbar-track {
   background: transparent;
 }
 
@@ -5992,6 +5969,47 @@ body[data-theme='light'] .ref-dashboard-inner {
   min-height: 0;
 }
 
+/* Menu + painel claro com a mesma largura máxima (encolhe junto ao conteúdo central) */
+@media (min-width: 769px) {
+  .dashboard-container.ref-dashboard {
+    justify-content: center;
+  }
+
+  .ref-dashboard-shell {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: min(var(--app-shell-max), 100%);
+    max-width: var(--app-shell-max);
+    margin-left: auto;
+    margin-right: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .ref-dashboard-shell .main-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ref-dashboard-shell .sidebar {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .ref-dashboard-shell {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: none;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+  }
+}
+
 body[data-theme='light'] .ref-dashboard-inner .ref-page-title {
   text-align: center;
 }
@@ -6000,14 +6018,74 @@ body[data-theme='light'] .ref-dashboard-inner .ref-alert {
   text-align: center;
 }
 
-/* Perfil + pill — profundidade suave */
-body[data-theme='light'] .exec-profile-card {
-  border-color: var(--pf-line-soft);
-  box-shadow: var(--pf-sh-inset), var(--pf-sh-soft);
+/* Shell app (tema claro): sem painel branco em tela cheia — fotos Horizonte + menu vidro (todas as páginas com .app-horizon-shell) */
+body[data-theme='light'] .dashboard-container.app-horizon-shell {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
+body[data-theme='light'] .dashboard-container.app-horizon-shell .main-content,
+body[data-theme='light'] .dashboard-container.app-horizon-shell .ref-dashboard .main-content.ref-dashboard-main {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
+  background: rgba(255, 255, 255, 0.42);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
+}
+
+@media (min-width: 769px) {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .main-content::before {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell {
+    background: transparent !important;
+  }
+}
+
+/* Pill decorativa — profundidade suave */
 body[data-theme='light'] .sidebar-ref-pill {
   box-shadow: var(--pf-sh-inset), 0 6px 16px -10px rgba(139, 92, 246, 0.35);
+}
+
+/* Menu lateral — itens, ícones e botão sair (tema claro) */
+body[data-theme='light'] .sidebar .nav-menu {
+  gap: 8px;
+}
+
+body[data-theme='light'] .sidebar .nav-item {
+  gap: 10px;
+  min-height: 44px;
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: var(--pf-r-md);
+}
+
+body[data-theme='light'] .sidebar .icon-wrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+}
+
+body[data-theme='light'] .sidebar .icon-wrap svg {
+  width: 17px;
+  height: 17px;
+}
+
+body[data-theme='light'] .sidebar .logout-btn {
+  margin-top: 12px;
+  min-height: 44px;
+  padding: 12px 14px;
+  font-size: 13px;
 }
 
 /* Navegação: feedback tátil leve */
@@ -6225,7 +6303,7 @@ body[data-theme='light'] .global-skeleton {
     box-shadow: none;
   }
 
-  body[data-theme='light'] .dashboard-container > .main-content {
+  body[data-theme='light'] .dashboard-container .main-content {
     border-radius: 0;
     padding: 16px 14px max(20px, env(safe-area-inset-bottom));
   }

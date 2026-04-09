@@ -20,26 +20,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const prevMenuIdx = useRef(-1)
   const [dotMotion, setDotMotion] = useState(null)
   const principalAdmin = isSuperAdminSession()
-  const [perfil, setPerfil] = useState(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem('horizonte_user') || '{}')
-      return {
-        nome: u.nome || u.usuario || 'Usuário',
-        role: u.role || 'USER',
-      }
-    } catch {
-      return { nome: 'Usuário', role: 'USER' }
-    }
-  })
-
-  const iniciaisAvatar = (() => {
-    const nome = String(perfil.nome || 'U').trim()
-    const partes = nome.split(/\s+/).filter(Boolean)
-    if (partes.length >= 2) {
-      return `${partes[0][0]}${partes[partes.length - 1][0]}`.toUpperCase()
-    }
-    return nome.slice(0, 2).toUpperCase() || 'U'
-  })()
 
   useEffect(() => {
     const idx = MENU_ORDER.indexOf(location.pathname)
@@ -57,22 +37,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     prevMenuIdx.current = idx
   }, [location.pathname])
 
-  useEffect(() => {
-    const onStorage = () => {
-      try {
-        const u = JSON.parse(localStorage.getItem('horizonte_user') || '{}')
-        setPerfil({
-          nome: u.nome || u.usuario || 'Usuário',
-          role: u.role || 'USER',
-        })
-      } catch {
-        setPerfil({ nome: 'Usuário', role: 'USER' })
-      }
-    }
-    window.addEventListener('storage', onStorage)
-    return () => window.removeEventListener('storage', onStorage)
-  }, [])
-
   // Sidebar agora é sempre Full Black, logo sempre usa a versão clara (branca)
   const logoSrc = '/images/horizonte_fiel_original_logo_dark.png'
   return (
@@ -83,16 +47,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
       )}
 
       <aside className={`sidebar ${menuAberto ? 'open' : ''}`}>
-        <div className="exec-profile-card">
-          <div className="exec-profile-avatar" aria-hidden>
-            {iniciaisAvatar}
-          </div>
-          <p className="exec-profile-name">{perfil.nome}</p>
-          <p className="exec-profile-role">
-            {String(perfil.role || '').toUpperCase() === 'ADMIN' ? 'Administrador' : 'Conta pessoal'}
-          </p>
-        </div>
-
         <div className="brand-wrapper">
           <img 
             src={logoSrc} 
