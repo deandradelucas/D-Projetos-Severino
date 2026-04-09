@@ -110,6 +110,7 @@ export default function Configuracoes() {
     dark: 'config-theme-preview--dark',
     glass: 'config-theme-preview--glass',
     cyberpunk: 'config-theme-preview--cyberpunk',
+    'off-white': 'config-theme-preview--off-white',
   }
 
   const themes = [
@@ -117,6 +118,12 @@ export default function Configuracoes() {
     { id: 'dark', name: 'Escuro', desc: 'Conforto visual à noite', prev: 'dark' },
     { id: 'glass', name: 'Vitrificado', desc: 'Camadas translúcidas', prev: 'glass' },
     { id: 'cyberpunk', name: 'Cyberpunk', desc: 'Néon ciano e magenta', prev: 'cyberpunk' },
+    {
+      id: 'off-white',
+      name: 'Off-white',
+      desc: 'Noir premium: preto absoluto e cinzas — sem cores de destaque',
+      prev: 'off-white',
+    },
   ]
 
   return (

@@ -22,6 +22,8 @@ import {
 } from 'recharts'
 const COLORS_DESP = ['#38bdf8', '#34d399', '#fbbf24', '#fb923c', '#a78bfa', '#f472b6', '#94a3b8', '#64748b']
 const COLORS_REC = ['#4ade80', '#22d3ee', '#fcd34d', '#a78bfa', '#f472b6', '#94a3b8', '#64748b']
+const COLORS_PIE_MONO_DESP = ['#3a3a3a', '#4a4a4a', '#5a5a5a', '#6b6b6b', '#7c7c7c', '#8e8e8e', '#a1a1a1', '#b5b5b5']
+const COLORS_PIE_MONO_REC = ['#e5e5e5', '#d0d0d0', '#bbbbbb', '#a6a6a6', '#919191', '#7d7d7d', '#696969', '#565656']
 
 function transacaoDiaKey(dataTransacao) {
   if (dataTransacao == null) return ''
@@ -71,7 +73,8 @@ function RelatoriosTooltip({ active, payload, label, formatCurrency }) {
 }
 
 export default function Relatorios() {
-  const { privacyMode } = useTheme()
+  const { privacyMode, theme } = useTheme()
+  const chartMono = theme === 'off-white'
   const [usuario] = useState(() => {
     const saved = localStorage.getItem('horizonte_user')
     if (saved) {
@@ -360,11 +363,26 @@ export default function Relatorios() {
     }
   }
 
-  /* Cards de gráfico em fundo branco: eixos sempre legíveis (slate). */
-  const chartAxis = '#94a3b8'
-  const chartTickFill = '#475569'
-  const legendColor = '#334155'
-  const tooltipBg = '#ffffff'
+  /* Cards de gráfico: eixos legíveis; off-white = só cinzas */
+  const chartAxis = chartMono ? '#525252' : '#94a3b8'
+  const chartTickFill = chartMono ? '#a3a3a3' : '#475569'
+  const legendColor = chartMono ? '#d4d4d4' : '#334155'
+  const tooltipBg = chartMono ? '#0a0a0a' : '#ffffff'
+  const pieColorsDesp = chartMono ? COLORS_PIE_MONO_DESP : COLORS_DESP
+  const pieColorsRec = chartMono ? COLORS_PIE_MONO_REC : COLORS_REC
+  const pieStroke = chartMono ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)'
+  const chartCursorFill = chartMono ? 'rgba(255,255,255,0.05)' : 'rgba(15, 23, 42, 0.06)'
+  const refLineStroke = chartMono ? 'rgba(255,255,255,0.28)' : 'rgba(100, 116, 139, 0.45)'
+  const barRecTop = chartMono ? '#d4d4d4' : '#4ade80'
+  const barRecBot = chartMono ? '#525252' : '#059669'
+  const barDesTop = chartMono ? '#9ca3af' : '#fb7185'
+  const barDesBot = chartMono ? '#404040' : '#dc2626'
+  const saldoStop0 = chartMono ? '#d4d4d4' : '#a78bfa'
+  const saldoStop0Op = chartMono ? 0.48 : 0.55
+  const saldoStop1 = chartMono ? '#525252' : '#6366f1'
+  const saldoStop1Op = chartMono ? 0.1 : 0.05
+  const saldoLine = chartMono ? '#c4c4c4' : '#a78bfa'
+  const saldoDot = chartMono ? '#dedede' : '#c4b5fd'
 
   const saldoPositivo = summary.saldo >= 0
 
@@ -482,12 +500,12 @@ export default function Relatorios() {
                       <BarChart data={chartDataPorData} margin={{ top: 12, right: 8, left: 0, bottom: 4 }} barGap={2} barCategoryGap="18%">
                         <defs>
                           <linearGradient id="relGradRec" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#4ade80" stopOpacity={1} />
-                            <stop offset="100%" stopColor="#059669" stopOpacity={0.92} />
+                            <stop offset="0%" stopColor={barRecTop} stopOpacity={1} />
+                            <stop offset="100%" stopColor={barRecBot} stopOpacity={0.92} />
                           </linearGradient>
                           <linearGradient id="relGradDes" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#fb7185" stopOpacity={1} />
-                            <stop offset="100%" stopColor="#dc2626" stopOpacity={0.9} />
+                            <stop offset="0%" stopColor={barDesTop} stopOpacity={1} />
+                            <stop offset="100%" stopColor={barDesBot} stopOpacity={0.9} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
@@ -495,7 +513,7 @@ export default function Relatorios() {
                         <YAxis stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} width={isMobile ? 56 : 64} />
                         <Tooltip
                           content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />}
-                          cursor={{ fill: 'rgba(15, 23, 42, 0.06)' }}
+                          cursor={{ fill: chartCursorFill }}
                         />
                         <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: legendColor, fontSize: 12 }} />
                         <Bar dataKey="Receitas" fill="url(#relGradRec)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={36} />
@@ -515,14 +533,14 @@ export default function Relatorios() {
                       <AreaChart data={chartDataSaldoCum} margin={{ top: 12, right: 8, left: 0, bottom: 4 }}>
                         <defs>
                           <linearGradient id="relGradSaldo" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.55} />
-                            <stop offset="100%" stopColor="#6366f1" stopOpacity={0.05} />
+                            <stop offset="0%" stopColor={saldoStop0} stopOpacity={saldoStop0Op} />
+                            <stop offset="100%" stopColor={saldoStop1} stopOpacity={saldoStop1Op} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
                         <XAxis dataKey="name" stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
                         <YAxis stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => formatCurrency(v)} width={isMobile ? 68 : 72} />
-                        <ReferenceLine y={0} stroke="rgba(100, 116, 139, 0.45)" strokeDasharray="4 4" />
+                        <ReferenceLine y={0} stroke={refLineStroke} strokeDasharray="4 4" />
                         <Tooltip
                           content={({ active, payload, label }) => {
                             if (!active || !payload?.length) return null
@@ -542,7 +560,7 @@ export default function Relatorios() {
                             )
                           }}
                         />
-                        <Area type="monotone" dataKey="saldo" stroke="#a78bfa" strokeWidth={2.5} fill="url(#relGradSaldo)" dot={{ r: 3, fill: '#c4b5fd', strokeWidth: 0 }} activeDot={{ r: 5 }} />
+                        <Area type="monotone" dataKey="saldo" stroke={saldoLine} strokeWidth={2.5} fill="url(#relGradSaldo)" dot={{ r: 3, fill: saldoDot, strokeWidth: 0 }} activeDot={{ r: 5 }} />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
@@ -566,12 +584,12 @@ export default function Relatorios() {
                         <BarChart data={chartDataPorMes} margin={{ top: 12, right: 8, left: 0, bottom: 4 }} barGap={2} barCategoryGap="20%">
                           <defs>
                             <linearGradient id="relGradRecMes" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#4ade80" stopOpacity={1} />
-                              <stop offset="100%" stopColor="#059669" stopOpacity={0.92} />
+                              <stop offset="0%" stopColor={barRecTop} stopOpacity={1} />
+                              <stop offset="100%" stopColor={barRecBot} stopOpacity={0.92} />
                             </linearGradient>
                             <linearGradient id="relGradDesMes" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#fb7185" stopOpacity={1} />
-                              <stop offset="100%" stopColor="#dc2626" stopOpacity={0.9} />
+                              <stop offset="0%" stopColor={barDesTop} stopOpacity={1} />
+                              <stop offset="100%" stopColor={barDesBot} stopOpacity={0.9} />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
@@ -579,7 +597,7 @@ export default function Relatorios() {
                           <YAxis stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} width={isMobile ? 56 : 64} />
                           <Tooltip
                             content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />}
-                            cursor={{ fill: 'rgba(15, 23, 42, 0.06)' }}
+                            cursor={{ fill: chartCursorFill }}
                           />
                           <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: legendColor, fontSize: 12 }} />
                           <Bar dataKey="Receitas" fill="url(#relGradRecMes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={40} />
@@ -603,14 +621,14 @@ export default function Relatorios() {
                         <AreaChart data={chartDataSaldoCumMes} margin={{ top: 12, right: 8, left: 0, bottom: 4 }}>
                           <defs>
                             <linearGradient id="relGradSaldoMes" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.55} />
-                              <stop offset="100%" stopColor="#6366f1" stopOpacity={0.05} />
+                              <stop offset="0%" stopColor={saldoStop0} stopOpacity={saldoStop0Op} />
+                              <stop offset="100%" stopColor={saldoStop1} stopOpacity={saldoStop1Op} />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
                           <XAxis dataKey="name" stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? 'end' : 'middle'} height={isMobile ? 56 : 32} />
                           <YAxis stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => formatCurrency(v)} width={isMobile ? 68 : 72} />
-                          <ReferenceLine y={0} stroke="rgba(100, 116, 139, 0.45)" strokeDasharray="4 4" />
+                          <ReferenceLine y={0} stroke={refLineStroke} strokeDasharray="4 4" />
                           <Tooltip
                             content={({ active, payload, label }) => {
                               if (!active || !payload?.length) return null
@@ -630,7 +648,7 @@ export default function Relatorios() {
                               )
                             }}
                           />
-                          <Area type="monotone" dataKey="saldo" stroke="#a78bfa" strokeWidth={2.5} fill="url(#relGradSaldoMes)" dot={{ r: 3, fill: '#c4b5fd', strokeWidth: 0 }} activeDot={{ r: 5 }} />
+                          <Area type="monotone" dataKey="saldo" stroke={saldoLine} strokeWidth={2.5} fill="url(#relGradSaldoMes)" dot={{ r: 3, fill: saldoDot, strokeWidth: 0 }} activeDot={{ r: 5 }} />
                         </AreaChart>
                       </ResponsiveContainer>
                     ) : (
@@ -659,11 +677,11 @@ export default function Relatorios() {
                           outerRadius={isMobile ? 80 : 102}
                           paddingAngle={3}
                           dataKey="value"
-                          stroke="rgba(0,0,0,0.25)"
+                          stroke={pieStroke}
                           strokeWidth={1}
                         >
                           {chartDataPorCategoria.map((_, index) => (
-                            <Cell key={`desp-${index}`} fill={COLORS_DESP[index % COLORS_DESP.length]} />
+                            <Cell key={`desp-${index}`} fill={pieColorsDesp[index % pieColorsDesp.length]} />
                           ))}
                         </Pie>
                         <Tooltip
@@ -711,11 +729,11 @@ export default function Relatorios() {
                           outerRadius={isMobile ? 80 : 102}
                           paddingAngle={3}
                           dataKey="value"
-                          stroke="rgba(0,0,0,0.25)"
+                          stroke={pieStroke}
                           strokeWidth={1}
                         >
                           {chartDataReceitasPorCategoria.map((_, index) => (
-                            <Cell key={`rec-${index}`} fill={COLORS_REC[index % COLORS_REC.length]} />
+                            <Cell key={`rec-${index}`} fill={pieColorsRec[index % pieColorsRec.length]} />
                           ))}
                         </Pie>
                         <Tooltip

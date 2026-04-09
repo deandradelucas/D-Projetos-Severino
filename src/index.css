@@ -127,6 +127,10 @@ body {
   background-color: rgba(0, 0, 0, 0.74);
 }
 
+.app-background-root__tint--off-white {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
 .app-background-root__tint--light {
   background-color: rgba(8, 10, 14, 0.58);
 }
@@ -164,6 +168,10 @@ body {
     background-color: rgba(0, 0, 0, 0.78);
   }
 
+  .app-background-root__tint--off-white {
+    background-color: rgba(0, 0, 0, 0.92);
+  }
+
   .app-background-root__noise {
     opacity: 0.06;
   }
@@ -184,6 +192,14 @@ body[data-theme='cyberpunk'] {
     radial-gradient(ellipse 100% 70% at 80% -10%, rgba(0, 229, 204, 0.18), transparent 55%),
     radial-gradient(ellipse 80% 60% at 0% 100%, rgba(192, 38, 211, 0.14), transparent 50%),
     radial-gradient(ellipse 60% 50% at 50% 100%, rgba(59, 130, 246, 0.08), transparent 48%);
+}
+
+body[data-theme='off-white'] {
+  background-color: #000000;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% -28%, rgba(255, 255, 255, 0.045), transparent 58%),
+    radial-gradient(ellipse 90% 70% at 100% 100%, rgba(255, 255, 255, 0.02), transparent 52%),
+    radial-gradient(ellipse 70% 50% at 0% 85%, rgba(255, 255, 255, 0.018), transparent 46%);
 }
 
 /* Tema claro — fundo premium para telas públicas */
@@ -321,6 +337,14 @@ button {
     --sb-thumb-hover: #1a1248;
     --sb-thumb-border: rgba(0, 229, 204, 0.18);
     --sb-thumb-inset: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+
+  body[data-theme='off-white'] {
+    --sb-track: #050505;
+    --sb-thumb: #141414;
+    --sb-thumb-hover: #1c1c1c;
+    --sb-thumb-border: rgba(255, 255, 255, 0.08);
+    --sb-thumb-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   body[data-theme='glass'] {
