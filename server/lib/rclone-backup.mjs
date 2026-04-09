@@ -92,7 +92,7 @@ async function execCommand(command, label) {
   log.info(`[${label}] Executando: ${command}`)
   const { stdout, stderr } = await execAsync(command, { shell: true })
   if (stderr && !stderr.includes('Progress')) {
-    console.warn(`[${label}] Aviso: ${stderr}`)
+    log.warn(`[${label}] Aviso: ${stderr}`)
   }
   return stdout
 }
@@ -117,7 +117,7 @@ async function fetchDatabaseBackup() {
   for (const table of tables) {
     const { data, error } = await supabase.from(table).select('*')
     if (error) {
-      console.warn(`[DB] Aviso ao buscar tabela ${table}: ${error.message}`)
+      log.warn(`[DB] Aviso ao buscar tabela ${table}: ${error.message}`)
       backup.tables[table] = []
       backup.summary.rowsByTable[table] = 0
     } else {
@@ -133,7 +133,7 @@ async function createPostgresSqlDump(supabaseDir, backupName) {
   const dumpConfig = getPostgresDumpConfig()
 
   if (!dumpConfig.enabled) {
-    console.warn(`[SUPABASE] Dump SQL completo ignorado: ${dumpConfig.reason}`)
+    log.warn(`[SUPABASE] Dump SQL completo ignorado: ${dumpConfig.reason}`)
     return null
   }
 
@@ -142,7 +142,7 @@ async function createPostgresSqlDump(supabaseDir, backupName) {
   try {
     await execFileAsync('pg_dump', ['--version'])
   } catch {
-    console.warn('[SUPABASE] Dump SQL completo ignorado: pg_dump nao encontrado no PATH.')
+    log.warn('[SUPABASE] Dump SQL completo ignorado: pg_dump nao encontrado no PATH.')
     return null
   }
 
@@ -214,7 +214,7 @@ async function createBackupArchive() {
       try {
         await execCommand(cpCmd, 'COPY')
       } catch (e) {
-        console.warn(`[COPY] Aviso ao copiar ${item}: ${e.message}`)
+        log.warn(`[COPY] Aviso ao copiar ${item}: ${e.message}`)
       }
     }
   }
@@ -305,7 +305,7 @@ export async function runRcloneBackup() {
       hasSqlDump,
     }
   } catch (error) {
-    console.error('\n[ERRO] Falha no backup:', error.message)
+    log.error('\n[ERRO] Falha no backup:', error.message)
     throw error
   } finally {
     if (archivePath && existsSync(BACKUP_DIR)) {
