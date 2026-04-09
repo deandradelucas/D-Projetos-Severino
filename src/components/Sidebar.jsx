@@ -57,60 +57,16 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const location = useLocation()
   const prevMenuIdx = useRef(-1)
   const [dotMotion, setDotMotion] = useState(null)
-  const [principalAdmin, setPrincipalAdmin] = useState(() => isSuperAdminSession())
-  const [pagamentoSub, setPagamentoSub] = useState('')
-  const [assinaturaBadge, setAssinaturaBadge] = useState('')
-  const [assinaturaManageUrl, setAssinaturaManageUrl] = useState('')
+  const [sessionTick, setSessionTick] = useState(0)
+  const principalAdmin = isSuperAdminSession()
 
-  const situacaoLabel = (code) => {
-    const m = {
-      admin: 'Administrador',
-      isento: 'Isento',
-      trial: 'Período de teste',
-      ativo: 'Assinatura ativa',
-      pausada: 'Assinatura pausada (MP)',
-      cancelada: 'Assinatura cancelada (MP)',
-      inativa: 'Sem assinatura ativa',
-    }
-    return m[code] || ''
-  }
-
-  const refreshPagamentoSub = () => {
-    try {
-      const raw = localStorage.getItem('horizonte_user')
-      const u = raw ? JSON.parse(raw) : null
-      const situacao = u?.assinatura_situacao
-      setAssinaturaBadge(situacao ? situacaoLabel(String(situacao)) : '')
-      setAssinaturaManageUrl(typeof u?.mp_gerenciar_url === 'string' ? u.mp_gerenciar_url.trim() : '')
-
-      const d = u?.assinatura_proxima_cobranca
-      if (!d) {
-        setPagamentoSub('')
-        return
-      }
-      const dt = new Date(d)
-      if (Number.isNaN(dt.getTime())) {
-        setPagamentoSub('')
-        return
-      }
-      setPagamentoSub(`Próx. cobrança ${dt.toLocaleDateString('pt-BR')}`)
-    } catch {
-      setPagamentoSub('')
-      setAssinaturaBadge('')
-      setAssinaturaManageUrl('')
-    }
-  }
+  const { assinaturaBadge, assinaturaManageUrl, pagamentoSub } = useMemo(
+    () => readAssinaturaStripFromStorage(),
+    [location.pathname, sessionTick]
+  )
 
   useEffect(() => {
-    setPrincipalAdmin(isSuperAdminSession())
-  }, [location.pathname])
-
-  useEffect(() => {
-    refreshPagamentoSub()
-  }, [location.pathname])
-
-  useEffect(() => {
-    const h = () => refreshPagamentoSub()
+    const h = () => setSessionTick((n) => n + 1)
     window.addEventListener('horizonte-session-refresh', h)
     return () => window.removeEventListener('horizonte-session-refresh', h)
   }, [])
