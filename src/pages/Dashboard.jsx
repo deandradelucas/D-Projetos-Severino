@@ -281,51 +281,56 @@ export default function Dashboard() {
                     <SkeletonRow />
                   </div>
                 ) : (
-                  <table className="data-table">
+                  <table className="data-table dashboard-overview-table">
                     <thead>
                       <tr>
-                        <th>Data</th>
-                        <th>Categoria</th>
-                        <th style={{ textAlign: 'right' }}>Valor</th>
+                        <th className="dashboard-overview-th-date">Data</th>
+                        <th className="dashboard-overview-th-cat">Categoria</th>
+                        <th className="dashboard-overview-th-val" style={{ textAlign: 'right' }}>
+                          Valor
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {transacoes.slice(0, 8).map(t => (
                         <tr key={t.id}>
-                           <td style={{ minWidth: '100px', padding: '16px 20px' }}>
-                             <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                               {new Date(t.data_transacao).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
-                             </div>
-                             <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                               {new Date(t.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                             </div>
-                           </td>
-                          <td style={{ padding: '16px 20px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <div style={{ 
-                                width: '8px', 
-                                height: '8px', 
-                                borderRadius: '50%', 
-                                background: t.categorias?.cor || 'var(--accent)',
-                                boxShadow: `0 0 8px ${t.categorias?.cor || 'var(--accent)'}40`
-                              }} />
-                              <div>
-                                <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>
+                          <td className="dashboard-overview-td-date">
+                            <div className="dashboard-tx-date-stack">
+                              <div className="dashboard-tx-date-day">
+                                {new Date(t.data_transacao).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                              </div>
+                              <div className="dashboard-tx-date-time">
+                                {new Date(t.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="dashboard-overview-td-cat">
+                            <div className="dashboard-tx-cat-row">
+                              <div
+                                className="dashboard-tx-dot"
+                                style={{
+                                  background: t.categorias?.cor || 'var(--accent)',
+                                  boxShadow: `0 0 8px ${t.categorias?.cor || 'var(--accent)'}40`,
+                                }}
+                              />
+                              <div className="dashboard-tx-cat-text">
+                                <div className="dashboard-tx-cat-name">
                                   {t.categorias?.nome || 'Sem categoria'}
                                   {t.recorrente_index && (
-                                    <span style={{ marginLeft: '6px', fontSize: '10px', color: 'var(--accent)', fontWeight: 700, background: 'var(--accent)20', padding: '1px 5px', borderRadius: '4px' }}>
+                                    <span className="dashboard-tx-recorrente-badge">
                                       {t.recorrente_index}/{t.recorrente_total}
                                     </span>
                                   )}
                                 </div>
-                                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                                  {t.subcategorias?.nome || 'Geral'}
-                                </div>
+                                <div className="dashboard-tx-cat-sub">{t.subcategorias?.nome || 'Geral'}</div>
                               </div>
                             </div>
                           </td>
-                          <td className={`${t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'} ${privacyMode ? 'privacy-blur' : ''}`} style={{ fontWeight: 700, textAlign: 'right', fontSize: '15px', padding: '16px 20px' }}>
-                            <span style={{ opacity: 0.8, fontSize: '12px', marginRight: '4px' }}>{t.tipo === 'RECEITA' ? '+' : '-'}</span> 
+                          <td
+                            className={`dashboard-overview-td-val ${t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'} ${privacyMode ? 'privacy-blur' : ''}`}
+                            style={{ fontWeight: 700, textAlign: 'right', fontSize: '15px' }}
+                          >
+                            <span className="dashboard-tx-val-sign">{t.tipo === 'RECEITA' ? '+' : '-'}</span>
                             {formatCurrency(t.valor)}
                           </td>
                         </tr>

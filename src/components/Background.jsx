@@ -60,6 +60,8 @@ export default function Background() {
     return () => clearInterval(interval)
   }, [])
 
+  const darkShell = theme === 'dark' || theme === 'cyberpunk'
+
   return (
     <div className="app-background-root" aria-hidden>
       <div
@@ -69,14 +71,16 @@ export default function Background() {
         }}
       />
       <div
-        className={`app-background-root__tint ${theme === 'dark' ? 'app-background-root__tint--dark' : 'app-background-root__tint--light'}`}
+        className={`app-background-root__tint ${darkShell ? 'app-background-root__tint--dark' : 'app-background-root__tint--light'}`}
       />
-      {theme === 'dark' && (
+      {darkShell && (
         <div
           className="app-background-root__wash"
           style={{
             background:
-              'linear-gradient(165deg, rgba(4,5,7,0.72) 0%, rgba(6,8,12,0.38) 42%, rgba(4,5,8,0.78) 100%), radial-gradient(ellipse 100% 55% at 50% 100%, rgba(212,168,75,0.07), transparent 62%)',
+              theme === 'cyberpunk'
+                ? 'linear-gradient(165deg, rgba(8,4,28,0.78) 0%, rgba(4,2,18,0.45) 42%, rgba(6,2,24,0.82) 100%), radial-gradient(ellipse 100% 55% at 50% 100%, rgba(0,229,204,0.09), transparent 62%), radial-gradient(ellipse 80% 40% at 100% 0%, rgba(192,38,211,0.08), transparent 55%)'
+                : 'linear-gradient(165deg, rgba(4,5,7,0.72) 0%, rgba(6,8,12,0.38) 42%, rgba(4,5,8,0.78) 100%), radial-gradient(ellipse 100% 55% at 50% 100%, rgba(212,168,75,0.07), transparent 62%)',
           }}
         />
       )}
@@ -84,8 +88,10 @@ export default function Background() {
         className="app-background-root__vignette"
         style={{
           background:
-            theme === 'dark'
-              ? 'radial-gradient(ellipse 85% 70% at 50% 45%, transparent 20%, rgba(2,3,5,0.88) 100%)'
+            darkShell
+              ? theme === 'cyberpunk'
+                ? 'radial-gradient(ellipse 85% 70% at 50% 45%, transparent 18%, rgba(3,2,12,0.92) 100%)'
+                : 'radial-gradient(ellipse 85% 70% at 50% 45%, transparent 20%, rgba(2,3,5,0.88) 100%)'
               : 'radial-gradient(ellipse 90% 75% at 50% 40%, transparent 25%, rgba(12,14,18,0.55) 100%)',
         }}
       />

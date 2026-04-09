@@ -108,6 +108,7 @@ export default function Configuracoes() {
     { id: 'light', name: 'Claro', desc: 'Visual limpo e profissional', prev: 'light' },
     { id: 'dark', name: 'Escuro', desc: 'Conforto visual à noite', prev: 'dark' },
     { id: 'glass', name: 'Vitrificado', desc: 'Camadas translúcidas', prev: 'glass' },
+    { id: 'cyberpunk', name: 'Cyberpunk', desc: 'Néon ciano e magenta', prev: 'cyberpunk' },
   ]
 
   return (

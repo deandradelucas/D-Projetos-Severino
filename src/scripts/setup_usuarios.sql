@@ -21,19 +21,14 @@ DROP POLICY IF EXISTS "Permitir inserção" ON public.usuarios;
 DROP POLICY IF EXISTS "Permitir leitura" ON public.usuarios;
 DROP POLICY IF EXISTS "Permitir atualização" ON public.usuarios;
 DROP POLICY IF EXISTS "Permitir delete" ON public.usuarios;
+DROP POLICY IF EXISTS "Anon pode cadastrar usuário" ON public.usuarios;
+DROP POLICY IF EXISTS "Authenticated pode cadastrar usuário" ON public.usuarios;
 
-CREATE POLICY "Permitir inserção" ON public.usuarios
-  FOR INSERT
+-- Cadastro público; leitura/alteração de perfil só pela API (service role).
+CREATE POLICY "Anon pode cadastrar usuário" ON public.usuarios
+  FOR INSERT TO anon
   WITH CHECK (true);
 
-CREATE POLICY "Permitir leitura" ON public.usuarios
-  FOR SELECT
-  USING (true);
-
-CREATE POLICY "Permitir atualização" ON public.usuarios
-  FOR UPDATE
-  USING (true);
-
-CREATE POLICY "Permitir delete" ON public.usuarios
-  FOR DELETE
-  USING (true);
+CREATE POLICY "Authenticated pode cadastrar usuário" ON public.usuarios
+  FOR INSERT TO authenticated
+  WITH CHECK (true);

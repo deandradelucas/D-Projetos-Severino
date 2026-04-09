@@ -30,9 +30,11 @@ CREATE INDEX IF NOT EXISTS idx_pagamentos_mp_usuario ON public.pagamentos_mercad
 ALTER TABLE public.pagamentos_mercadopago ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Permitir SELECT pagamentos autenticados" ON public.pagamentos_mercadopago;
+DROP POLICY IF EXISTS "Pagamentos leitura só do dono" ON public.pagamentos_mercadopago;
 
-CREATE POLICY "Permitir SELECT pagamentos autenticados"
-  ON public.pagamentos_mercadopago FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Pagamentos leitura só do dono"
+  ON public.pagamentos_mercadopago FOR SELECT TO authenticated
+  USING (usuario_id IS NOT NULL AND auth.uid() = usuario_id);
 
 COMMENT ON TABLE public.pagamentos_mercadopago IS 'Registros de preferências e pagamentos Mercado Pago';
 

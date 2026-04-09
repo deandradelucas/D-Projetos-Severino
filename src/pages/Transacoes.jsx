@@ -27,7 +27,6 @@ export default function Transacoes() {
   const [filters, setFilters] = useState({
     busca: '',
     tipo: '',
-    status: '',
     categoria_id: '',
     dataInicio: '',
     dataFim: ''
@@ -64,7 +63,6 @@ export default function Transacoes() {
       const params = new URLSearchParams()
       if (filters.busca) params.append('busca', filters.busca)
       if (filters.tipo) params.append('tipo', filters.tipo)
-      if (filters.status) params.append('status', filters.status)
       if (filters.categoria_id) params.append('categoria_id', filters.categoria_id)
       if (filters.dataInicio) params.append('dataInicio', filters.dataInicio)
       if (filters.dataFim) params.append('dataFim', filters.dataFim)
@@ -135,7 +133,7 @@ export default function Transacoes() {
   }
 
   const clearFilters = () =>
-    setFilters({ busca: '', tipo: '', status: '', categoria_id: '', dataInicio: '', dataFim: '' })
+    setFilters({ busca: '', tipo: '', categoria_id: '', dataInicio: '', dataFim: '' })
 
   return (
     <div className="dashboard-container page-transacoes">
@@ -196,7 +194,7 @@ export default function Transacoes() {
           <div className="transacoes-filter-shell__head">
             <div>
               <h2 className="transacoes-filter-shell__title">Filtros</h2>
-              <p className="transacoes-filter-shell__hint">Busca, categoria, período e status</p>
+              <p className="transacoes-filter-shell__hint">Busca, categoria e período</p>
             </div>
             <button type="button" className="transacoes-btn-clear" onClick={clearFilters}>
               Limpar filtros
@@ -233,14 +231,6 @@ export default function Transacoes() {
               </select>
             </div>
             <div className="filter-group">
-              <label htmlFor="tx-status">Status</label>
-              <select id="tx-status" name="status" className="filter-input" value={filters.status} onChange={handleFilterChange}>
-                <option value="">Todos</option>
-                <option value="EFETIVADA">Efetivadas</option>
-                <option value="PENDENTE">Pendentes</option>
-              </select>
-            </div>
-            <div className="filter-group">
               <label htmlFor="tx-ini">Início</label>
               <input id="tx-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
             </div>
@@ -270,7 +260,6 @@ export default function Transacoes() {
                      <th>Data</th>
                      <th>Categoria</th>
                      <th>Valor</th>
-                     <th>Status</th>
                      <th className="transacoes-col-actions">Ações</th>
                    </tr>
                 </thead>
@@ -307,11 +296,6 @@ export default function Transacoes() {
                            )}
                            {formatCurrency(t.valor)}
                          </span>
-                      </td>
-                      <td>
-                        <span className={`badge badge-${t.status?.toLowerCase() || 'efetivada'}`}>
-                          {t.status}
-                        </span>
                       </td>
                       <td className="transacoes-col-actions">
                         <button type="button" className="btn-delete" onClick={() => handleDelete(t.id)} title="Excluir">

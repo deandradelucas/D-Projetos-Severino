@@ -178,6 +178,14 @@ body[data-theme='dark'] {
     radial-gradient(ellipse 70% 50% at 0% 80%, rgba(212, 168, 75, 0.03), transparent 45%);
 }
 
+body[data-theme='cyberpunk'] {
+  background-color: #050218;
+  background-image:
+    radial-gradient(ellipse 100% 70% at 80% -10%, rgba(0, 229, 204, 0.18), transparent 55%),
+    radial-gradient(ellipse 80% 60% at 0% 100%, rgba(192, 38, 211, 0.14), transparent 50%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(59, 130, 246, 0.08), transparent 48%);
+}
+
 /* Tema claro — fundo premium para telas públicas */
 body[data-theme='light'] {
   background-color: #f4f1eb;
