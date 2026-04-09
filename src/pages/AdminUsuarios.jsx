@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
+import { isSuperAdminEmail } from '../lib/superAdmin'
 import './dashboard.css'
 
 const ROLE_OPTIONS = [
@@ -7,6 +8,8 @@ const ROLE_OPTIONS = [
   { value: 'ADMIN', label: 'Admin' },
   { value: 'READONLY', label: 'Somente leitura' },
 ]
+
+const ROLE_OPTIONS_SEM_ADMIN = ROLE_OPTIONS.filter((o) => o.value !== 'ADMIN')
 
 export default function AdminUsuarios() {
   const [menuAberto, setMenuAberto] = useState(false)
@@ -54,6 +57,7 @@ export default function AdminUsuarios() {
       telefone: user.telefone || '',
       role: user.role || 'USER',
       is_active: user.is_active !== false,
+      isento_pagamento: user.isento_pagamento === true,
     })
     setUserActionMessage('')
   }
@@ -242,6 +246,7 @@ export default function AdminUsuarios() {
                     <th>Telefone (WhatsApp)</th>
                     <th>Role</th>
                     <th>Status</th>
+                    <th>Pagamento</th>
                     <th>Último login</th>
                     <th>Conexão</th>
                     <th style={{ width: '170px' }}>Ações</th>
@@ -250,6 +255,7 @@ export default function AdminUsuarios() {
                 <tbody>
                   {filtrarUsuarios().map((row) => {
                     const isEditing = editingUserId === row.id
+                    const isPrincipal = isSuperAdminEmail(row.email)
                     return (
                       <tr key={row.id}>
                         <td>
@@ -271,6 +277,8 @@ export default function AdminUsuarios() {
                               value={editForm.email}
                               onChange={(e) => handleChangeField('email', e.target.value)}
                               style={{ width: '100%', fontSize: '13px' }}
+                              disabled={isPrincipal}
+                              title={isPrincipal ? 'E-mail da conta administradora principal não pode ser alterado.' : undefined}
                             />
                           ) : (
                             row.email
@@ -290,17 +298,23 @@ export default function AdminUsuarios() {
                         </td>
                         <td>
                           {isEditing ? (
-                            <select
-                              value={editForm.role}
-                              onChange={(e) => handleChangeField('role', e.target.value)}
-                              style={{ fontSize: '13px' }}
-                            >
-                              {ROLE_OPTIONS.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                  {opt.label}
-                                </option>
-                              ))}
-                            </select>
+                            isPrincipal ? (
+                              <span style={{ fontSize: '12px', fontWeight: '600' }} title="A conta principal permanece como administradora.">
+                                Admin
+                              </span>
+                            ) : (
+                              <select
+                                value={editForm.role === 'ADMIN' ? 'USER' : editForm.role}
+                                onChange={(e) => handleChangeField('role', e.target.value)}
+                                style={{ fontSize: '13px' }}
+                              >
+                                {ROLE_OPTIONS_SEM_ADMIN.map((opt) => (
+                                  <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </option>
+                                ))}
+                              </select>
+                            )
                           ) : (
                             <span style={{ fontSize: '12px', fontWeight: '600' }}>{row.role || 'USER'}</span>
                           )}
@@ -343,6 +357,33 @@ export default function AdminUsuarios() {
                             </span>
                           )}
                         </td>
+                        <td>
+                          {isEditing ? (
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
+                              <input
+                                type="checkbox"
+                                checked={!!editForm.isento_pagamento}
+                                onChange={(e) => handleChangeField('isento_pagamento', e.target.checked)}
+                              />
+                              Isento
+                            </label>
+                          ) : row.isento_pagamento === true ? (
+                            <span
+                              style={{
+                                padding: '4px 8px',
+                                borderRadius: '999px',
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                backgroundColor: 'rgba(34,197,94,0.12)',
+                                color: '#16a34a',
+                              }}
+                            >
+                              Isento
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>—</span>
+                          )}
+                        </td>
                         <td style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                           {row.last_login_at ? new Date(row.last_login_at).toLocaleString('pt-BR') : '—'}
                         </td>
@@ -371,14 +412,16 @@ export default function AdminUsuarios() {
                             >
                               Resetar senha
                             </button>
-                            <button
-                              type="button"
-                              className="btn-secondary"
-                              style={{ padding: '4px 8px', fontSize: '11px', color: '#ef4444', borderColor: 'rgba(239,68,68,0.6)' }}
-                              onClick={() => handleDeleteUser(row)}
-                            >
-                              Excluir
-                            </button>
+                            {!isPrincipal && (
+                              <button
+                                type="button"
+                                className="btn-secondary"
+                                style={{ padding: '4px 8px', fontSize: '11px', color: '#ef4444', borderColor: 'rgba(239,68,68,0.6)' }}
+                                onClick={() => handleDeleteUser(row)}
+                              >
+                                Excluir
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>

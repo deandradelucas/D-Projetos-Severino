@@ -1,6 +1,7 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { resolverUsuarioIdPorTelefoneGemini } from './ai.mjs'
 import { normalizeUsuarioRow, stripSenha } from './usuario-schema.mjs'
+import { isSuperAdminEmail, superAdminEmail } from './super-admin.mjs'
 
 export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
   const supabaseAdmin = getSupabaseAdmin()
@@ -179,6 +180,7 @@ export async function getPerfilUsuario(usuarioId) {
     role: row.role ?? 'USER',
     is_active: row.is_active !== false,
     last_login_at: row.last_login_at ?? null,
+    isento_pagamento: row.isento_pagamento === true,
   }
 }
 
@@ -233,18 +235,52 @@ export async function listUsuariosAdmin() {
       role: n.role ?? 'USER',
       is_active: n.is_active !== false,
       last_login_at: n.last_login_at ?? null,
+      isento_pagamento: n.isento_pagamento === true,
     }
   })
 }
 
 export async function updateUsuarioAdmin(id, payload) {
   const supabaseAdmin = getSupabaseAdmin()
+
+  const { data: targetRow, error: fetchErr } = await supabaseAdmin
+    .from('usuarios')
+    .select('email')
+    .eq('id', id)
+    .single()
+  if (fetchErr || !targetRow) {
+    throw fetchErr || Object.assign(new Error('Usuário não encontrado.'), { statusCode: 404 })
+  }
+  const targetEmail = String(targetRow.email || '').trim().toLowerCase()
+
+  if (payload.email !== undefined) {
+    const newEmail = String(payload.email).trim().toLowerCase()
+    if (targetEmail === superAdminEmail() && newEmail !== superAdminEmail()) {
+      const e = new Error('O e-mail da conta administradora principal não pode ser alterado.')
+      e.statusCode = 403
+      throw e
+    }
+  }
+  if (payload.role !== undefined) {
+    if (payload.role === 'ADMIN' && targetEmail !== superAdminEmail()) {
+      const e = new Error('Somente a conta administradora principal pode ter role ADMIN.')
+      e.statusCode = 403
+      throw e
+    }
+    if (targetEmail === superAdminEmail() && payload.role !== 'ADMIN') {
+      const e = new Error('A role da conta administradora principal deve permanecer ADMIN.')
+      e.statusCode = 403
+      throw e
+    }
+  }
+
   const patch = {}
   if (payload.nome !== undefined) patch.nome = payload.nome
   if (payload.email !== undefined) patch.email = payload.email
   if (payload.telefone !== undefined) patch.telefone = payload.telefone
   if (payload.role !== undefined) patch.role = payload.role
   if (payload.is_active !== undefined) patch.is_active = payload.is_active
+  if (payload.isento_pagamento !== undefined) patch.isento_pagamento = !!payload.isento_pagamento
 
   const { data, error } = await supabaseAdmin
     .from('usuarios')
@@ -259,11 +295,13 @@ export async function updateUsuarioAdmin(id, payload) {
 
 export async function deleteUsuarioAdmin(id) {
   const supabaseAdmin = getSupabaseAdmin()
-  const { error } = await supabaseAdmin
-    .from('usuarios')
-    .delete()
-    .eq('id', id)
-
+  const { data: t } = await supabaseAdmin.from('usuarios').select('email').eq('id', id).single()
+  if (t?.email && isSuperAdminEmail(t.email)) {
+    const e = new Error('Não é possível excluir a conta administradora principal.')
+    e.statusCode = 403
+    throw e
+  }
+  const { error } = await supabaseAdmin.from('usuarios').delete().eq('id', id)
   if (error) throw error
 }
 

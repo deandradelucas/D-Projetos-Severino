@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
+import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
 
 function statusLabel(status) {
@@ -15,7 +16,7 @@ function statusLabel(status) {
 export default function Pagamento() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
-  const [config, setConfig] = useState({ ready: false, publicKey: null })
+  const [config, setConfig] = useState({ ready: false, publicKey: null, isento_pagamento: false })
   const [historico, setHistorico] = useState([])
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(false)
@@ -28,19 +29,31 @@ export default function Pagamento() {
   useEffect(() => {
     const load = async () => {
       try {
+        const userSaved = localStorage.getItem('horizonte_user')
+        let uid = ''
+        try {
+          uid = userSaved ? JSON.parse(userSaved).id : ''
+        } catch {
+          uid = ''
+        }
+        const cfgHeaders = uid ? { 'x-user-id': uid } : {}
+
         const [cfgRes, histRes] = await Promise.all([
-          fetch('/api/pagamentos/config'),
+          fetch(apiUrl('/api/pagamentos/config'), { headers: cfgHeaders }),
           (async () => {
-            const userSaved = localStorage.getItem('horizonte_user')
             if (!userSaved) return { ok: false }
             const u = JSON.parse(userSaved)
-            return fetch('/api/pagamentos/minhas', { headers: { 'x-user-id': u.id } })
+            return fetch(apiUrl('/api/pagamentos/minhas'), { headers: { 'x-user-id': u.id } })
           })(),
         ])
 
         if (cfgRes.ok) {
           const c = await cfgRes.json()
-          setConfig({ ready: !!c.ready, publicKey: c.publicKey })
+          setConfig({
+            ready: !!c.ready,
+            publicKey: c.publicKey,
+            isento_pagamento: !!c.isento_pagamento,
+          })
         }
 
         if (histRes.ok) {
@@ -73,7 +86,7 @@ export default function Pagamento() {
         return
       }
 
-      const res = await fetch('/api/pagamentos/preferencia', {
+      const res = await fetch(apiUrl('/api/pagamentos/preferencia'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,12 +172,31 @@ export default function Pagamento() {
             </p>
           )}
 
+          {config.isento_pagamento && !loading && (
+            <div
+              style={{
+                marginBottom: '16px',
+                padding: '14px 16px',
+                borderRadius: '12px',
+                background: 'rgba(34,197,94,0.12)',
+                border: '1px solid rgba(34,197,94,0.25)',
+              }}
+            >
+              <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Sua conta está isenta de pagamento.
+              </p>
+              <p style={{ margin: '8px 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                Não é necessário concluir o checkout do Mercado Pago. Em caso de dúvida, fale com o suporte.
+              </p>
+            </div>
+          )}
+
           <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '6px' }}>Descrição</label>
           <input
             type="text"
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
-            disabled={!config.ready || paying}
+            disabled={!config.ready || paying || config.isento_pagamento}
             style={{
               width: '100%',
               marginBottom: '14px',
@@ -183,7 +215,7 @@ export default function Pagamento() {
             inputMode="decimal"
             value={valor}
             onChange={(e) => setValor(e.target.value)}
-            disabled={!config.ready || paying}
+            disabled={!config.ready || paying || config.isento_pagamento}
             style={{
               width: '100%',
               maxWidth: '200px',
@@ -199,7 +231,13 @@ export default function Pagamento() {
 
           {error && <p style={{ color: 'var(--danger)', fontSize: '13px', marginBottom: '10px' }}>{error}</p>}
 
-          <button type="button" className="btn-primary" disabled={!config.ready || paying || loading} onClick={handlePagar} style={{ padding: '12px 20px' }}>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={!config.ready || paying || loading || config.isento_pagamento}
+            onClick={handlePagar}
+            style={{ padding: '12px 20px' }}
+          >
             {paying ? 'Redirecionando…' : 'Pagar com Mercado Pago'}
           </button>
 

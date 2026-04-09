@@ -88,6 +88,23 @@ export async function listPagamentosUsuario(usuario_id, limit = 20) {
   return data || []
 }
 
+const STATUS_PAGAMENTO_OK = new Set(['approved', 'authorized'])
+
+/** Pelo menos um registro em pagamentos_mercadopago com status aprovado/autorizado. */
+export async function usuarioTemPagamentoAprovado(usuario_id) {
+  if (!usuario_id) return false
+  const supabase = getSupabaseAdmin()
+  const { data, error } = await supabase
+    .from('pagamentos_mercadopago')
+    .select('id, status')
+    .eq('usuario_id', usuario_id)
+    .limit(50)
+
+  if (error) throw error
+  const rows = data || []
+  return rows.some((r) => STATUS_PAGAMENTO_OK.has(String(r.status || '').toLowerCase()))
+}
+
 const COLS_FLAT = `
   id,
   usuario_id,
@@ -110,14 +127,14 @@ export async function listPagamentosAdmin(limit = 200) {
 
   let withUser = await supabase
     .from('pagamentos_mercadopago')
-    .select(`${COLS_FLAT.trim()}, usuarios ( email, nome )`)
+    .select(`${COLS_FLAT.trim()}, usuarios ( email, nome, isento_pagamento )`)
     .order('created_at', { ascending: false })
     .limit(limit)
 
   if (withUser.error) {
     withUser = await supabase
       .from('pagamentos_mercadopago')
-      .select(`${COLS_FLAT.trim()}, usuarios ( email, usuario )`)
+      .select(`${COLS_FLAT.trim()}, usuarios ( email, usuario, isento_pagamento )`)
       .order('created_at', { ascending: false })
       .limit(limit)
   }
@@ -128,7 +145,11 @@ export async function listPagamentosAdmin(limit = 200) {
       if (!u || typeof u !== 'object') return row
       return {
         ...row,
-        usuarios: { email: u.email, nome: u.nome ?? u.usuario ?? '' },
+        usuarios: {
+          email: u.email,
+          nome: u.nome ?? u.usuario ?? '',
+          isento_pagamento: u.isento_pagamento === true,
+        },
       }
     })
   }

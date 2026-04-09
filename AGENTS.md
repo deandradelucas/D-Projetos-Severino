@@ -15,6 +15,7 @@
 | `npm run build` | Build de produção do front |
 | `npm run lint` | ESLint (browser: `src/`; Node: `api/`, `server/`, `scripts/`) |
 | `npm run test` | `build` + `lint` (smoke de integridade) |
+| `npm run audit:dashboard-css` | Lista classes em `dashboard.css` sem uso aparente em `src/` (há safelist para Recharts e previews de tema) |
 
 ## Rotas da API (Hono)
 

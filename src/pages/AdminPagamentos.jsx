@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Sidebar from '../components/Sidebar'
+import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
 
 function badgeStatus(status) {
@@ -22,25 +23,76 @@ export default function AdminPagamentos() {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [actionMsg, setActionMsg] = useState('')
+  const [togglingUserId, setTogglingUserId] = useState(null)
+
+  const load = useCallback(async () => {
+    setError('')
+    try {
+      const userSaved = localStorage.getItem('horizonte_user')
+      if (!userSaved) return
+      const u = JSON.parse(userSaved)
+      const res = await fetch(apiUrl('/api/admin/pagamentos'), { headers: { 'x-user-id': u.id } })
+      if (!res.ok) throw new Error('Falha ao carregar logs de pagamento.')
+      const data = await res.json()
+      setRows(Array.isArray(data) ? data : [])
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const userSaved = localStorage.getItem('horizonte_user')
-        if (!userSaved) return
-        const u = JSON.parse(userSaved)
-        const res = await fetch('/api/admin/pagamentos', { headers: { 'x-user-id': u.id } })
-        if (!res.ok) throw new Error('Falha ao carregar logs de pagamento.')
-        const data = await res.json()
-        setRows(Array.isArray(data) ? data : [])
-      } catch (e) {
-        setError(e.message)
-      } finally {
-        setLoading(false)
-      }
-    }
     load()
-  }, [])
+  }, [load])
+
+  const isentoDoUsuario = (row) => {
+    const rel = row.usuarios
+    if (rel && typeof rel === 'object' && !Array.isArray(rel)) {
+      return rel.isento_pagamento === true
+    }
+    return false
+  }
+
+  const alternarIsencao = async (usuarioId, proximo) => {
+    if (!usuarioId) return
+    setActionMsg('')
+    setTogglingUserId(usuarioId)
+    try {
+      const userSaved = localStorage.getItem('horizonte_user')
+      if (!userSaved) throw new Error('Sessão expirada.')
+      const u = JSON.parse(userSaved)
+      const res = await fetch(apiUrl(`/api/admin/usuarios/${usuarioId}`), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': u.id,
+        },
+        body: JSON.stringify({ isento_pagamento: proximo }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.message || 'Não foi possível atualizar a isenção.')
+      setRows((prev) =>
+        prev.map((r) => {
+          if (r.usuario_id !== usuarioId) return r
+          const rel = r.usuarios
+          if (rel && typeof rel === 'object' && !Array.isArray(rel)) {
+            return { ...r, usuarios: { ...rel, isento_pagamento: proximo } }
+          }
+          return {
+            ...r,
+            usuarios: { email: '', nome: '', isento_pagamento: proximo },
+          }
+        })
+      )
+      setActionMsg(proximo ? 'Usuário marcado como isento de pagamento.' : 'Isenção removida.')
+    } catch (e) {
+      setActionMsg(e.message || 'Erro ao salvar.')
+    } finally {
+      setTogglingUserId(null)
+    }
+  }
 
   const usuarioLabel = (row) => {
     const rel = row.usuarios
@@ -81,6 +133,11 @@ export default function AdminPagamentos() {
 
         <section className="content-section" style={{ gridColumn: '1 / -1' }}>
           {error && <div style={{ color: 'var(--danger)', marginBottom: '12px' }}>{error}</div>}
+          {actionMsg && (
+            <div style={{ color: 'var(--accent)', marginBottom: '12px', fontSize: '13px', fontWeight: 600 }}>
+              {actionMsg}
+            </div>
+          )}
           {loading ? (
             <p style={{ color: 'var(--text-secondary)' }}>Carregando…</p>
           ) : rows.length === 0 ? (
@@ -91,7 +148,9 @@ export default function AdminPagamentos() {
                 <thead>
                   <tr>
                     <th>Data</th>
+                    <th>ID usuário</th>
                     <th>Usuário</th>
+                    <th>Isenção</th>
                     <th>Valor</th>
                     <th>Status</th>
                     <th>Detalhe</th>
@@ -105,8 +164,44 @@ export default function AdminPagamentos() {
                       <td style={{ fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                         {row.created_at ? new Date(row.created_at).toLocaleString('pt-BR') : '—'}
                       </td>
+                      <td
+                        style={{ fontSize: '11px', fontFamily: 'monospace', maxWidth: '120px', wordBreak: 'break-all' }}
+                        title={row.usuario_id || ''}
+                      >
+                        {row.usuario_id || '—'}
+                      </td>
                       <td style={{ fontSize: '13px', maxWidth: '200px' }} title={row.usuario_id || ''}>
                         {usuarioLabel(row)}
+                      </td>
+                      <td style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>
+                        {row.usuario_id ? (
+                          <>
+                            <span
+                              style={{
+                                padding: '3px 8px',
+                                borderRadius: '999px',
+                                fontSize: '10px',
+                                fontWeight: 700,
+                                marginRight: '8px',
+                                backgroundColor: isentoDoUsuario(row) ? 'rgba(34,197,94,0.15)' : 'rgba(148,163,184,0.2)',
+                                color: isentoDoUsuario(row) ? '#16a34a' : '#64748b',
+                              }}
+                            >
+                              {isentoDoUsuario(row) ? 'Isento' : 'Não isento'}
+                            </span>
+                            <button
+                              type="button"
+                              className="btn-secondary"
+                              style={{ padding: '4px 10px', fontSize: '11px', fontWeight: 600 }}
+                              disabled={togglingUserId === row.usuario_id}
+                              onClick={() => alternarIsencao(row.usuario_id, !isentoDoUsuario(row))}
+                            >
+                              {togglingUserId === row.usuario_id ? '…' : isentoDoUsuario(row) ? 'Remover' : 'Isentar'}
+                            </button>
+                          </>
+                        ) : (
+                          <span style={{ color: 'var(--text-secondary)' }}>—</span>
+                        )}
                       </td>
                       <td>{row.amount != null ? `R$ ${Number(row.amount).toFixed(2)}` : '—'}</td>
                       <td>{badgeStatus(row.status)}</td>

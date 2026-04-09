@@ -37,11 +37,22 @@ import {
   listPagamentosAdmin,
   upsertFromWebhookPayment,
 } from './lib/pagamentos-mp.mjs'
+import { isSuperAdminEmail } from './lib/super-admin.mjs'
 import { loadEnv } from './lib/load-env.mjs'
 
 loadEnv()
 
 const app = new Hono()
+
+/** Apenas mestredamente@mestredamente.com (ou SUPER_ADMIN_EMAIL) acessa /api/admin/*. */
+async function assertPrincipalAdmin(usuarioId) {
+  if (!usuarioId) return { status: 401, message: 'Não autorizado.' }
+  const perfil = await getPerfilUsuario(usuarioId)
+  if (!isSuperAdminEmail(perfil?.email)) {
+    return { status: 403, message: 'Acesso restrito ao administrador principal.' }
+  }
+  return null
+}
 
 function corsAllowedOrigin(origin) {
   if (!origin) return '*'
@@ -276,7 +287,8 @@ app.get('/api/whatsapp/webhook', (c) => {
 app.get('/api/admin/whatsapp-status', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
 
     const status = await getWhatsappStatus()
     return c.json(status)
@@ -289,11 +301,9 @@ app.get('/api/admin/whatsapp-status', async (c) => {
 app.get('/api/admin/whatsapp-logs', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) {
-      return c.json({ message: 'Não autorizado.' }, 401)
-    }
-    
-    // In a prod scenario we would verify if usuarioId role is Admin. For now, since user explicitly requested a dashboard for themselves, we allow authenticated.
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
+
     const logs = await getWhatsappLogs()
     return c.json(logs)
   } catch (error) {
@@ -305,7 +315,8 @@ app.get('/api/admin/whatsapp-logs', async (c) => {
 app.get('/api/admin/whatsapp-config', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
 
     const origin = getRequestOrigin(c).replace(/\/$/, '')
     const token = process.env.WHATSAPP_WEBHOOK_TOKEN || 'ece58f64012d51028d28a04264d07131'
@@ -325,7 +336,8 @@ app.get('/api/admin/whatsapp-config', async (c) => {
 app.get('/api/admin/usuarios', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
 
     const usuarios = await listUsuariosAdmin()
     return c.json(usuarios)
@@ -338,7 +350,8 @@ app.get('/api/admin/usuarios', async (c) => {
 app.put('/api/admin/usuarios/:id', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
 
     const id = c.req.param('id')
     const body = await c.req.json()
@@ -346,6 +359,9 @@ app.put('/api/admin/usuarios/:id', async (c) => {
     return c.json(updated)
   } catch (error) {
     console.error('update admin usuario failed', error)
+    if (error.statusCode === 403 || error.statusCode === 404) {
+      return c.json({ message: error.message }, error.statusCode)
+    }
     const msg = error.code === '23505' ? 'E-mail ou telefone já utilizado em outra conta.' : 'Erro ao atualizar usuário.'
     return c.json({ message: msg }, 500)
   }
@@ -354,7 +370,9 @@ app.put('/api/admin/usuarios/:id', async (c) => {
 app.get('/api/admin/pagamentos', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
+
     const lim = Math.min(500, Math.max(1, parseInt(c.req.query('limit') || '200', 10) || 200))
     const rows = await listPagamentosAdmin(lim)
     return c.json(rows)
@@ -367,13 +385,17 @@ app.get('/api/admin/pagamentos', async (c) => {
 app.delete('/api/admin/usuarios/:id', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
 
     const id = c.req.param('id')
     await deleteUsuarioAdmin(id)
     return c.json({ message: 'Usuário excluído com sucesso.' })
   } catch (error) {
     console.error('delete admin usuario failed', error)
+    if (error.statusCode === 403) {
+      return c.json({ message: error.message }, 403)
+    }
     return c.json({ message: 'Erro ao excluir usuário.' }, 500)
   }
 })
@@ -459,11 +481,22 @@ app.delete('/api/transacoes/:id', async (c) => {
 // AI Chat Route — Pergunte ao Horizon
 
 // Mercado Pago — checkout e notificações
-app.get('/api/pagamentos/config', (c) => {
+app.get('/api/pagamentos/config', async (c) => {
   const pk = getMercadoPagoPublicKey()
+  let isento_pagamento = false
+  const uid = c.req.header('x-user-id')
+  if (uid) {
+    try {
+      const perfil = await getPerfilUsuario(uid)
+      isento_pagamento = perfil?.isento_pagamento === true
+    } catch {
+      /* ignore */
+    }
+  }
   return c.json({
     publicKey: pk || null,
     ready: isMercadoPagoConfigured(),
+    isento_pagamento,
   })
 })
 
@@ -499,6 +532,11 @@ app.post('/api/pagamentos/preferencia', async (c) => {
     const perfil = await getPerfilUsuario(usuarioId)
     if (!perfil?.email) {
       return c.json({ message: 'Perfil sem e-mail. Atualize seu cadastro.' }, 400)
+    }
+    if (perfil.isento_pagamento === true) {
+      return c.json({
+        message: 'Sua conta está marcada como isenta de pagamento. Não é necessário concluir o checkout.',
+      }, 403)
     }
 
     const baseUrl = getRequestOrigin(c).replace(/\/+$/, '')

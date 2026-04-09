@@ -9,6 +9,7 @@
     "dev:api": "node server/index.mjs",
     "build": "vite build",
     "test": "npm run build && npm run lint",
+    "audit:dashboard-css": "node scripts/find-unused-dashboard-css.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "supabase:check": "node scripts/supabase-admin-check.mjs",

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext'
 import RouteTransitionSkeleton from './components/RouteTransitionSkeleton'
+import SuperAdminOutlet from './components/SuperAdminOutlet'
 import Cadastro from './pages/Cadastro'
 import Login from './pages/Login'
 import RedefinirSenha from './pages/RedefinirSenha'
@@ -33,9 +34,11 @@ function App() {
           <Route path="/relatorios" element={<Relatorios />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
           <Route path="/pagamento" element={<Pagamento />} />
-          <Route path="/admin/whatsapp" element={<AdminWhatsApp />} />
-          <Route path="/admin/usuarios" element={<AdminUsuarios />} />
-          <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
+          <Route element={<SuperAdminOutlet />}>
+            <Route path="/admin/whatsapp" element={<AdminWhatsApp />} />
+            <Route path="/admin/usuarios" element={<AdminUsuarios />} />
+            <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
+          </Route>
           <Route path="/" element={<Login />} />
         </Routes>
       </BrowserRouter>

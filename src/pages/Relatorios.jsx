@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useTheme } from '../context/ThemeContext'
+import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
 import {
   BarChart,
@@ -79,7 +80,7 @@ export default function Relatorios() {
 
   const fetchCategorias = useCallback(async () => {
     try {
-      const res = await fetch('/api/categorias', {
+      const res = await fetch(apiUrl('/api/categorias'), {
         headers: { 'x-user-id': usuario.id }
       })
       if (res.ok) {
@@ -100,7 +101,7 @@ export default function Relatorios() {
       params.append('limit', '500')
       params.append('status', 'EFETIVADA') // Para relatórios, focamos nas efetivadas normalmente
 
-      const res = await fetch(`/api/transacoes?${params.toString()}`, {
+      const res = await fetch(apiUrl(`/api/transacoes?${params.toString()}`), {
         headers: { 'x-user-id': usuario.id }
       })
       if (res.ok) {
@@ -276,8 +277,10 @@ export default function Relatorios() {
     doc.save(`relatorio_${filters.dataInicio}_a_${filters.dataFim}.pdf`)
   }
 
-  // Cores de acordo com o tema e acessibilidade
-  const axisColor = theme === 'light' ? '#333333' : '#e0e0e0'
+  /* Eixos e legendas: tema claro precisa de ticks escuros (antes ficavam brancos). */
+  const axisColor = theme === 'light' ? '#475569' : '#cbd5e1'
+  const chartTickFill = theme === 'light' ? '#64748b' : 'rgba(255,255,255,0.45)'
+  const legendColor = theme === 'light' ? 'rgba(15,23,42,0.82)' : 'rgba(255,255,255,0.82)'
   const tooltipBg = theme === 'light' ? '#ffffff' : '#1e1e2d'
 
   const saldoPositivo = summary.saldo >= 0
@@ -318,6 +321,12 @@ export default function Relatorios() {
         </header>
 
         <section className="relatorios-filter-shell" aria-label="Período e categoria">
+          <div className="relatorios-filter-shell__head">
+            <div>
+              <h2 className="relatorios-filter-shell__title">Filtros do relatório</h2>
+              <p className="relatorios-filter-shell__hint">Período e categoria · apenas transações efetivadas</p>
+            </div>
+          </div>
           <div className="relatorios-filter-grid">
             <div className="filter-group">
               <label htmlFor="rel-ini">Data início</label>
@@ -395,13 +404,13 @@ export default function Relatorios() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="4 8" stroke={axisColor} strokeOpacity={0.12} vertical={false} />
-                    <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickMargin={8} tick={{ fill: 'rgba(255,255,255,0.45)' }} axisLine={false} tickLine={false} />
-                    <YAxis stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.45)' }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} />
+                    <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
+                    <YAxis stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} />
                     <Tooltip
                       content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />}
                       cursor={{ fill: 'rgba(212, 168, 75, 0.06)' }}
                     />
-                    <Legend iconType="circle" wrapperStyle={{ paddingTop: 16, color: 'rgba(255,255,255,0.8)', fontSize: 13 }} />
+                    <Legend iconType="circle" wrapperStyle={{ paddingTop: 16, color: legendColor, fontSize: 13 }} />
                     <Bar dataKey="Receitas" fill="url(#relGradRec)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={36} />
                     <Bar dataKey="Despesas" fill="url(#relGradDes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={36} />
                   </BarChart>
@@ -424,8 +433,8 @@ export default function Relatorios() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="4 8" stroke={axisColor} strokeOpacity={0.12} vertical={false} />
-                    <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickMargin={8} tick={{ fill: 'rgba(255,255,255,0.45)' }} axisLine={false} tickLine={false} />
-                    <YAxis stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.45)' }} tickFormatter={(v) => formatCurrency(v)} width={72} />
+                    <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
+                    <YAxis stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => formatCurrency(v)} width={72} />
                     <ReferenceLine y={0} stroke="rgba(212,168,75,0.35)" strokeDasharray="4 4" />
                     <Tooltip
                       content={({ active, payload, label }) => {
@@ -495,7 +504,7 @@ export default function Relatorios() {
                           layout="vertical"
                           align="right"
                           verticalAlign="middle"
-                          wrapperStyle={{ fontSize: 12, color: 'rgba(255,255,255,0.82)', paddingLeft: 8 }}
+                          wrapperStyle={{ fontSize: 12, color: legendColor, paddingLeft: 8 }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
@@ -547,7 +556,7 @@ export default function Relatorios() {
                           layout="vertical"
                           align="right"
                           verticalAlign="middle"
-                          wrapperStyle={{ fontSize: 12, color: 'rgba(255,255,255,0.82)', paddingLeft: 8 }}
+                          wrapperStyle={{ fontSize: 12, color: legendColor, paddingLeft: 8 }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
