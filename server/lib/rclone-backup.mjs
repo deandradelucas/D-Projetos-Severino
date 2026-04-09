@@ -3,6 +3,7 @@ import { promisify } from 'node:util'
 import { existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { loadEnv } from './load-env.mjs'
+import { log } from './logger.mjs'
 
 const execAsync = promisify(exec)
 const execFileAsync = promisify(execFile)
@@ -88,7 +89,7 @@ function getPostgresDumpConfig() {
 }
 
 async function execCommand(command, label) {
-  console.log(`[${label}] Executando: ${command}`)
+  log.info(`[${label}] Executando: ${command}`)
   const { stdout, stderr } = await execAsync(command, { shell: true })
   if (stderr && !stderr.includes('Progress')) {
     console.warn(`[${label}] Aviso: ${stderr}`)
@@ -97,7 +98,7 @@ async function execCommand(command, label) {
 }
 
 async function fetchDatabaseBackup() {
-  console.log('[DB] Buscando dados do banco Supabase...')
+  log.info('[DB] Buscando dados do banco Supabase...')
   const { getSupabaseAdmin } = await import('./supabase-admin.mjs')
   const supabase = getSupabaseAdmin()
 
@@ -145,7 +146,7 @@ async function createPostgresSqlDump(supabaseDir, backupName) {
     return null
   }
 
-  console.log('[SUPABASE] Gerando dump SQL completo do Postgres...')
+  log.info('[SUPABASE] Gerando dump SQL completo do Postgres...')
 
   const args = [
     '--format=plain',
@@ -180,7 +181,7 @@ async function createBackupArchive() {
     mkdirSync(BACKUP_DIR, { recursive: true })
   }
 
-  console.log('[SUPABASE] Gerando snapshot do banco...')
+  log.info('[SUPABASE] Gerando snapshot do banco...')
   const dbBackup = await fetchDatabaseBackup()
   const supabaseDir = join(BACKUP_DIR, 'supabase')
   mkdirSync(supabaseDir, { recursive: true })
@@ -188,7 +189,7 @@ async function createBackupArchive() {
   writeFileSync(dbFile, JSON.stringify(dbBackup, null, 2))
   const sqlDumpPath = await createPostgresSqlDump(supabaseDir, backupName)
 
-  console.log('[FILES] Copiando arquivos do projeto...')
+  log.info('[FILES] Copiando arquivos do projeto...')
   const filesToBackup = [
     'package.json',
     'package-lock.json',
@@ -221,7 +222,7 @@ async function createBackupArchive() {
   const archiveName = `${backupName}.zip`
   const archivePath = join(BACKUP_DIR, archiveName)
 
-  console.log('[ARCHIVE] Criando arquivo compactado...')
+  log.info('[ARCHIVE] Criando arquivo compactado...')
   await execCommand(
     `powershell -command "Compress-Archive -Path '${BACKUP_DIR}\\supabase','${BACKUP_DIR}\\project-files' -DestinationPath '${archivePath}' -Force"`,
     'ZIP'
@@ -238,7 +239,7 @@ async function createBackupArchive() {
 async function uploadToGoogleDrive(archivePath) {
   const rclone = getRcloneConfig()
 
-  console.log('[DRIVE] Verificando configuração do rclone...')
+  log.info('[DRIVE] Verificando configuração do rclone...')
 
   try {
     await execCommand(`rclone listremotes`, 'RCLONE')
@@ -250,7 +251,7 @@ async function uploadToGoogleDrive(archivePath) {
     )
   }
 
-  console.log(`[DRIVE] Verificando remote ${rclone.remote}...`)
+  log.info(`[DRIVE] Verificando remote ${rclone.remote}...`)
   try {
     await execCommand(`rclone lsd ${rclone.remote}:`, 'CHECK')
   } catch {
@@ -260,14 +261,14 @@ async function uploadToGoogleDrive(archivePath) {
     )
   }
 
-  console.log('[DRIVE] Enviando para Google Drive...')
+  log.info('[DRIVE] Enviando para Google Drive...')
   const fileName = archivePath.split(/[/\\]/).pop()
   await execCommand(
     `rclone copy "${archivePath}" "${rclone.destination}/" --progress`,
     'UPLOAD'
   )
 
-  console.log('[DRIVE] Listando arquivos no Drive...')
+  log.info('[DRIVE] Listando arquivos no Drive...')
   const files = await execCommand(`rclone ls "${rclone.destination}/"`, 'LIST')
 
   return {
@@ -278,9 +279,9 @@ async function uploadToGoogleDrive(archivePath) {
 }
 
 export async function runRcloneBackup() {
-  console.log('='.repeat(50))
-  console.log('HORIZONTE FINANCEIRO - BACKUP')
-  console.log('='.repeat(50))
+  log.info('='.repeat(50))
+  log.info('HORIZONTE FINANCEIRO - BACKUP')
+  log.info('='.repeat(50))
 
   let archivePath
   try {
@@ -289,14 +290,14 @@ export async function runRcloneBackup() {
 
     const result = await uploadToGoogleDrive(archivePath)
 
-    console.log('\n' + '='.repeat(50))
-    console.log('BACKUP CONCLUÍDO COM SUCESSO!')
-    console.log('='.repeat(50))
-    console.log(`Destino: ${result.destination}`)
-    console.log(`Arquivo: ${result.fileName}`)
-    console.log(`Tabelas Supabase: ${supabaseTables.join(', ')}`)
-    console.log(`Dump SQL completo: ${hasSqlDump ? 'sim' : 'nao'}`)
-    console.log(`Arquivos no Drive: ${result.files.length}`)
+    log.info('\n' + '='.repeat(50))
+    log.info('BACKUP CONCLUÍDO COM SUCESSO!')
+    log.info('='.repeat(50))
+    log.info(`Destino: ${result.destination}`)
+    log.info(`Arquivo: ${result.fileName}`)
+    log.info(`Tabelas Supabase: ${supabaseTables.join(', ')}`)
+    log.info(`Dump SQL completo: ${hasSqlDump ? 'sim' : 'nao'}`)
+    log.info(`Arquivos no Drive: ${result.files.length}`)
 
     return {
       ...result,
@@ -308,7 +309,7 @@ export async function runRcloneBackup() {
     throw error
   } finally {
     if (archivePath && existsSync(BACKUP_DIR)) {
-      console.log('[CLEANUP] Limpando arquivos temporários...')
+      log.info('[CLEANUP] Limpando arquivos temporários...')
       try {
         rmSync(BACKUP_DIR, { recursive: true, force: true })
       } catch {
