@@ -5969,13 +5969,14 @@ body[data-theme='light'] .ref-dashboard-inner {
   min-height: 0;
 }
 
-/* Menu + painel claro com a mesma largura máxima (encolhe junto ao conteúdo central) */
+/* Menu + painel: largura máxima conjunta e centralizada no viewport (fundo Horizonte nas laterais) */
 @media (min-width: 769px) {
-  .dashboard-container.ref-dashboard {
+  .dashboard-container.app-horizon-shell {
     justify-content: center;
+    align-items: stretch;
   }
 
-  .ref-dashboard-shell {
+  .app-horizon-inner {
     display: flex;
     flex-direction: row;
     align-items: stretch;
@@ -5988,18 +5989,18 @@ body[data-theme='light'] .ref-dashboard-inner {
     min-height: 0;
   }
 
-  .ref-dashboard-shell .main-content {
+  .app-horizon-inner .main-content {
     flex: 1;
     min-width: 0;
   }
 
-  .ref-dashboard-shell .sidebar {
+  .app-horizon-inner .sidebar {
     flex-shrink: 0;
   }
 }
 
 @media (max-width: 768px) {
-  .ref-dashboard-shell {
+  .app-horizon-inner {
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -6023,6 +6024,14 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+@media (min-width: 769px) {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell {
+    /* Respiro lateral: conjunto menu + conteúdo centralizado sobre o fundo Horizonte */
+    margin-left: clamp(14px, 4.5vw, 64px);
+    margin-right: clamp(14px, 4.5vw, 64px);
+  }
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .main-content,

@@ -138,7 +138,9 @@ export default function Transacoes() {
     setFilters({ busca: '', tipo: '', categoria_id: '', dataInicio: '', dataFim: '' })
 
   return (
+    <>
     <div className="dashboard-container page-transacoes app-horizon-shell">
+      <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content relative z-10">
@@ -337,17 +339,19 @@ export default function Transacoes() {
           </div>
         </section>
       </main>
-
-      <TransactionModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setEditingTransaction(null)
-        }}
-        onSave={fetchTransacoes}
-        usuarioId={readHorizonteUser()?.id || usuario.id}
-        editingTransaction={editingTransaction}
-      />
+      </div>
     </div>
+
+    <TransactionModal
+      isOpen={isModalOpen}
+      onClose={() => {
+        setIsModalOpen(false)
+        setEditingTransaction(null)
+      }}
+      onSave={fetchTransacoes}
+      usuarioId={readHorizonteUser()?.id || usuario.id}
+      editingTransaction={editingTransaction}
+    />
+    </>
   )
 }

@@ -120,8 +120,9 @@ export default function Dashboard() {
   }
 
   return (
+    <>
     <div className="dashboard-container dashboard-page ref-dashboard app-horizon-shell">
-      <div className="ref-dashboard-shell">
+      <div className="app-horizon-inner">
         <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
         <main className="main-content relative z-10 ref-dashboard-main">
@@ -131,8 +132,6 @@ export default function Dashboard() {
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
           </div>
         </div>
-
-        <h1 className="ref-page-title">Dashboard</h1>
 
         {fetchError && (
           <div className="ref-alert" role="alert">
@@ -238,13 +237,14 @@ export default function Dashboard() {
         </div>
         </main>
       </div>
-
-      <TransactionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={fetchTransacoes}
-        usuarioId={readHorizonteUser()?.id || usuario.id}
-      />
     </div>
+
+    <TransactionModal
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      onSave={fetchTransacoes}
+      usuarioId={readHorizonteUser()?.id || usuario.id}
+    />
+    </>
   )
 }

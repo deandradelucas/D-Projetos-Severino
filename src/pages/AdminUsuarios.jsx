@@ -312,6 +312,7 @@ export default function AdminUsuarios() {
 
   return (
     <div className="dashboard-container page-admin-usuarios app-horizon-shell">
+      <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content">
@@ -542,6 +543,7 @@ export default function AdminUsuarios() {
           )}
         </section>
       </main>
+      </div>
     </div>
   )
 }

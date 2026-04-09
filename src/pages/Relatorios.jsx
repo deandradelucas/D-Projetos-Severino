@@ -392,6 +392,7 @@ export default function Relatorios() {
       className="dashboard-container page-relatorios app-horizon-shell"
       style={{ '--rel-tooltip-bg': tooltipBg }}
     >
+      <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content relative z-10">
@@ -771,6 +772,7 @@ export default function Relatorios() {
           </div>
         )}
       </main>
+      </div>
     </div>
   )
 }

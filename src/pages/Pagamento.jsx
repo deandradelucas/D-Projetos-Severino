@@ -231,6 +231,7 @@ export default function Pagamento() {
 
   return (
     <div className="dashboard-container app-horizon-shell">
+      <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content">
@@ -435,6 +436,7 @@ export default function Pagamento() {
           )}
         </section>
       </main>
+      </div>
     </div>
   )
 }

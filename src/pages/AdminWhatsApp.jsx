@@ -78,6 +78,7 @@ export default function AdminWhatsApp() {
 
   return (
     <div className="dashboard-container app-horizon-shell">
+      <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content">
@@ -230,6 +231,7 @@ export default function AdminWhatsApp() {
           </div>
         </section>
       </main>
+      </div>
     </div>
   )
 }

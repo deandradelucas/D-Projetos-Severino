@@ -94,6 +94,7 @@ export default function AdminPagamentos() {
 
   return (
     <div className="dashboard-container app-horizon-shell">
+      <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content">
@@ -204,6 +205,7 @@ export default function AdminPagamentos() {
           )}
         </section>
       </main>
+      </div>
     </div>
   )
 }
