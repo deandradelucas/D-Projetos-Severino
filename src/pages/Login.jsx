@@ -177,16 +177,19 @@ export default function Login() {
   }
 
   return (
-    <div className="fixed inset-0 z-[1] flex items-center justify-center overflow-hidden bg-transparent p-3 pb-[max(12px,env(safe-area-inset-bottom))] sm:p-6 md:p-8 relative">
+    <div
+      className="fixed inset-0 z-[20] grid min-h-dvh w-full place-items-center overflow-y-auto overflow-x-hidden bg-transparent p-3 pt-[max(12px,env(safe-area-inset-top))] pb-[max(12px,env(safe-area-inset-bottom))] sm:p-6 md:p-8"
+      role="presentation"
+    >
       <div
-        className="pointer-events-none absolute inset-0 opacity-30"
+        className="pointer-events-none fixed inset-0 z-0 opacity-30"
         aria-hidden
         style={{
           background:
             'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212,168,75,0.12), transparent), radial-gradient(ellipse 60% 40% at 100% 100%, rgba(99,102,241,0.06), transparent)',
         }}
       />
-      <div className="w-full max-w-[420px] relative z-[1]">
+      <div className="relative z-[1] my-auto w-full max-w-[420px] py-2 sm:py-4">
         <div className="rounded-2xl sm:rounded-3xl border border-white/[0.16] bg-black/65 px-4 py-5 sm:p-8 shadow-[0_28px_56px_-20px_rgba(0,0,0,0.7)] sm:shadow-[0_36px_74px_-20px_rgba(0,0,0,0.72)] backdrop-blur-lg ring-1 ring-white/[0.08]">
             <div className="flex justify-center mb-4 sm:mb-6">
               <img 
