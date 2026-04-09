@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
+import GlobalSkeleton from '../components/GlobalSkeleton'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { readHorizonteUser } from '../lib/horizonteSession'
@@ -255,7 +256,7 @@ export default function Transacoes() {
         <section className="content-section transacoes-table-card">
           <div className="transacoes-table-scroll">
             {loading ? (
-              <p className="transacoes-loading-msg">Filtrando transações…</p>
+              <GlobalSkeleton variant="table" rows={7} />
             ) : transacoes.length === 0 ? (
               <div className="transacoes-empty">
                 <p className="transacoes-empty__text">Nenhuma transação encontrada com os filtros atuais.</p>

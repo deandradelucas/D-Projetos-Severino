@@ -146,14 +146,14 @@ function mapSupabaseOrNetworkError(error) {
     return {
       status: 503,
       message:
-        'Banco de dados não configurado no servidor. No Vercel, defina VITE_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY e faça um novo deploy.',
+        'Banco de dados não configurado. Em desenvolvimento, crie um arquivo .env na raiz do projeto com VITE_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY (copie de env.example). No Vercel, defina as mesmas variáveis no projeto e faça um novo deploy.',
     }
   }
   if (/Invalid API key|JWT expired|invalid value for JWT|JWT|API key/i.test(raw)) {
     return {
       status: 503,
       message:
-        'Chave do Supabase inválida ou ausente. Confira SUPABASE_SERVICE_ROLE_KEY e VITE_SUPABASE_URL no servidor.',
+        'Chave do Supabase inválida ou ausente. Confira SUPABASE_SERVICE_ROLE_KEY e VITE_SUPABASE_URL no .env (local) ou nas variáveis do Vercel.',
     }
   }
   if (/ENOTFOUND|ECONNREFUSED|fetch failed|NetworkError|Failed to fetch|getaddrinfo|certificate/i.test(raw)) {
@@ -172,7 +172,7 @@ function mapSupabaseOrNetworkError(error) {
     return {
       status: 503,
       message:
-        'Acesso negado ao banco. Confira SUPABASE_SERVICE_ROLE_KEY (service role) no Vercel.',
+        'Acesso negado ao banco. Confira SUPABASE_SERVICE_ROLE_KEY (service role) no .env local ou no Vercel.',
     }
   }
   if (/PGRST116|multiple rows|more than one row/i.test(raw)) {

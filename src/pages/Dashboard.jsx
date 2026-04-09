@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
 import Sidebar from '../components/Sidebar'
@@ -21,34 +22,6 @@ const SkeletonRow = () => (
   </div>
 )
 
-const SkeletonChart = ({ ref: externalRef }) => (
-  <div className="skeleton skeleton-chart" ref={externalRef}>
-    <div className="skeleton-chart-header">
-      <div className="skeleton skeleton-chart-title"></div>
-      <div className="skeleton-chart-legend">
-        <span className="skeleton skeleton-pulse"></span>
-        <span className="skeleton skeleton-pulse"></span>
-      </div>
-    </div>
-    <div className="skeleton skeleton-chart-area">
-      <div className="skeleton-chart-bars">
-        {[65, 45, 80, 55, 90, 70, 85].map((h, i) => (
-          <div key={i} className="skeleton skeleton-bar" style={{ 
-            height: `${h}%`, 
-            animationDelay: `${i * 100}ms` 
-          }}></div>
-        ))}
-      </div>
-    </div>
-  </div>
-)
-
-
-
-
-
-const COLORS = [] // Não mais usado no dashboard
-
 export default function Dashboard() {
   const { privacyMode } = useTheme()
   const [usuario, setUsuario] = useState(() => readHorizonteUser() || { nome: 'Usuário', email: '', id: '' })
@@ -57,7 +30,6 @@ export default function Dashboard() {
   const [transacoes, setTransacoes] = useState([])
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState('')
-  const chartRef = useRef(null)
 
   useEffect(() => {
     const u = readHorizonteUser()
@@ -75,7 +47,7 @@ export default function Dashboard() {
       return
     }
     try {
-      await new Promise((r) => setTimeout(r, 600))
+      await new Promise((r) => setTimeout(r, 400))
 
       const res = await fetch(apiUrl('/api/transacoes'), {
         headers: { 'x-user-id': String(session.id).trim() },
@@ -115,35 +87,24 @@ export default function Dashboard() {
     }
   }, [fetchTransacoes])
 
-  useEffect(() => {
-    if (!chartRef.current) return
-    
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          observer.disconnect()
+  const { totalReceitas, totalDespesas, saldoTotal } = useMemo(() => {
+    return transacoes.reduce(
+      (acc, t) => {
+        const valor = parseFloat(t.valor) || 0
+        if (t.tipo === 'RECEITA') {
+          acc.totalReceitas += valor
+          acc.saldoTotal += valor
+        } else {
+          acc.totalDespesas += valor
+          acc.saldoTotal -= valor
         }
+        return acc
       },
-      { rootMargin: '100px' }
+      { totalReceitas: 0, totalDespesas: 0, saldoTotal: 0 }
     )
-    
-    observer.observe(chartRef.current)
-    return () => observer.disconnect()
-  }, [])
-
-  const { totalReceitas, totalDespesas, saldoTotal } = React.useMemo(() => {
-    return transacoes.reduce((acc, t) => {
-      const valor = parseFloat(t.valor) || 0
-      if (t.tipo === 'RECEITA') {
-        acc.totalReceitas += valor
-        acc.saldoTotal += valor
-      } else {
-        acc.totalDespesas += valor
-        acc.saldoTotal -= valor
-      }
-      return acc
-    }, { totalReceitas: 0, totalDespesas: 0, saldoTotal: 0 })
   }, [transacoes])
+
+  const txRecentes = useMemo(() => transacoes.slice(0, 8), [transacoes])
 
   const formatCurrency = (val) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -152,155 +113,165 @@ export default function Dashboard() {
     }).format(val)
   }
 
-  const ultimasReceitas = React.useMemo(
-    () => transacoes.filter((t) => t.tipo === 'RECEITA').slice(0, 3),
-    [transacoes]
-  )
-  const ultimasDespesas = React.useMemo(
-    () => transacoes.filter((t) => t.tipo !== 'RECEITA').slice(0, 2),
-    [transacoes]
-  )
-  const progressoContas = Math.max(8, Math.min(100, Math.round((transacoes.length / 16) * 100)))
-
   return (
-    <div className="dashboard-container dashboard-page">
+    <div className="dashboard-container dashboard-page ref-dashboard">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-
-      {/* Main Content */}
-      <main className="main-content relative z-10 exec-main-shell">
-        <header className="exec-topbar">
-          <div className="exec-topbar-left">
+      <main className="main-content relative z-10 ref-dashboard-main">
+        <div className="ref-dashboard-top">
+          <div className="ref-dashboard-top__left">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
-            <div className="exec-search-shell">
-              <span className="exec-search-icon">⌕</span>
-              <input className="exec-search-input" placeholder="Search" />
+          </div>
+          <div className="ref-ai-banner" role="region" aria-label="Assistente">
+            <p className="ref-ai-banner__text">
+              Horizonte — Agente de inteligência financeira
+            </p>
+            <div className="ref-ai-banner__actions">
+              <button type="button" className="ref-ai-banner__falar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="23" />
+                  <line x1="8" y1="23" x2="16" y2="23" />
+                </svg>
+                Falar
+              </button>
+              <button type="button" className="ref-ai-banner__perguntar">
+                Perguntar
+              </button>
             </div>
           </div>
-          <div className="exec-topbar-right">
-            <button type="button" className="exec-icon-btn" aria-label="Conversas">◌</button>
-            <button type="button" className="exec-icon-btn" aria-label="Notificações">◍</button>
+          <div className="ref-dashboard-top__icons">
+            <button type="button" className="ref-icon-circle" aria-label="Conversas">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </button>
+            <button type="button" className="ref-icon-circle" aria-label="Notificações">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+            </button>
           </div>
-        </header>
+        </div>
 
-        <h1 className="exec-page-title">Dashboard</h1>
+        <h1 className="ref-page-title">Dashboard</h1>
+
         {fetchError && (
-          <div
-            className="content-section"
-            style={{
-              marginBottom: '12px',
-              padding: '12px 14px',
-              borderRadius: '12px',
-              background: 'rgba(239,68,68,0.1)',
-              border: '1px solid rgba(239,68,68,0.25)',
-              color: 'var(--text-primary)',
-              fontSize: '14px',
-            }}
-            role="alert"
-          >
+          <div className="ref-alert" role="alert">
             {fetchError}
           </div>
         )}
 
-        <section className="exec-grid-shell">
-          <div className="exec-grid-left">
-            <div className="exec-grid-topcards">
-              <article className="exec-card exec-card--wallet">
-                <p className="exec-card-label">Wallet</p>
-                <p className={`exec-card-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(saldoTotal)}</p>
-                <div className="exec-card-minirow">
-                  <span className="exec-chip exec-chip--green">{formatCurrency(totalReceitas)}</span>
-                  <span className="exec-chip exec-chip--rose">{formatCurrency(totalDespesas)}</span>
-                </div>
-              </article>
-              <article className="exec-card exec-card--monthly">
-                <div className="exec-card-head">
-                  <p className="exec-card-title">Monthly earnings</p>
-                  <span className="exec-card-sub">Income ↗</span>
-                </div>
-                <svg viewBox="0 0 240 90" className="exec-line-svg" aria-hidden>
-                  <path d="M0 66 C20 46, 45 28, 72 45 C98 61, 122 70, 148 52 C172 35, 197 62, 240 40" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                </svg>
-              </article>
+        <section className="ref-kpi-row" aria-label="Resumo financeiro">
+          <article className="ref-kpi-card ref-kpi-card--balance">
+            <div className="ref-kpi-card__icon" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
             </div>
+            <div className="ref-kpi-card__body">
+              <p className="ref-kpi-card__label">Saldo em conta</p>
+              <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(saldoTotal)}</p>
+              <p className="ref-kpi-card__hint">Disponível agora</p>
+            </div>
+          </article>
+          <article className="ref-kpi-card ref-kpi-card--expense">
+            <div className="ref-kpi-card__icon" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </div>
+            <div className="ref-kpi-card__body">
+              <p className="ref-kpi-card__label">Despesas</p>
+              <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(totalDespesas)}</p>
+              <p className="ref-kpi-card__hint">No período</p>
+            </div>
+          </article>
+          <article className="ref-kpi-card ref-kpi-card--income">
+            <div className="ref-kpi-card__icon" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                <path d="M12 19V5M5 12l7-7 7 7" />
+              </svg>
+            </div>
+            <div className="ref-kpi-card__body">
+              <p className="ref-kpi-card__label">Receitas</p>
+              <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(totalReceitas)}</p>
+              <p className="ref-kpi-card__hint">Entradas</p>
+            </div>
+          </article>
+          <article className="ref-kpi-card ref-kpi-card--invest">
+            <div className="ref-kpi-card__icon" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                <path d="M3 3v18h18" />
+                <path d="M7 12l4-4 4 4 6-6" />
+              </svg>
+            </div>
+            <div className="ref-kpi-card__body">
+              <p className="ref-kpi-card__label">Investimentos</p>
+              <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(0)}</p>
+              <p className="ref-kpi-card__hint">Em breve no app</p>
+            </div>
+          </article>
+        </section>
 
-            <article className="exec-card exec-card--table">
-              <div className="exec-card-head">
-                <p className="exec-card-title">Transactions</p>
-                <button type="button" className="exec-add-btn" onClick={() => setIsModalOpen(true)}>+ Add</button>
-              </div>
+        <section className="ref-bottom-grid">
+          <article className="ref-panel ref-panel--transactions">
+            <div className="ref-panel__head">
+              <h2 className="ref-panel__title">Transações</h2>
+              <Link to="/transacoes" className="ref-panel__link">
+                Ver todas
+              </Link>
+            </div>
+            <div className="ref-tx-list">
               {loading ? (
                 <div className="skeleton-stagger">
                   <SkeletonRow />
                   <SkeletonRow />
                   <SkeletonRow />
                 </div>
+              ) : txRecentes.length === 0 ? (
+                <p className="ref-empty">Nenhuma transação ainda.</p>
               ) : (
-                <table className="exec-table">
-                  <tbody>
-                    {transacoes.length === 0 ? (
-                      <tr>
-                        <td colSpan={4} className="exec-table-empty">
-                          Nenhuma transação registrada ainda.
-                        </td>
-                      </tr>
-                    ) : (
-                      transacoes.slice(0, 9).map((t) => (
-                        <tr key={t.id}>
-                          <td className="exec-table-icon">↘</td>
-                          <td className="exec-table-cat break-words">{t.categorias?.nome || 'Sem categoria'}</td>
-                          <td className="exec-table-date">{new Date(t.data_transacao).toLocaleDateString('pt-BR')}</td>
-                          <td className={`exec-table-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(t.valor)}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                txRecentes.map((t) => {
+                  const isRec = t.tipo === 'RECEITA'
+                  const dt = new Date(t.data_transacao)
+                  const line1 = dt.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+                  const line2 = String(dt.getFullYear())
+                  return (
+                    <div key={t.id} className="ref-tx-row">
+                      <span className={`ref-tx-arrow ${isRec ? 'ref-tx-arrow--up' : 'ref-tx-arrow--down'}`} aria-hidden>
+                        {isRec ? '↗' : '↘'}
+                      </span>
+                      <div className="ref-tx-mid min-w-0">
+                        <p className="ref-tx-name break-words">{t.categorias?.nome || 'Sem categoria'}</p>
+                        <p className="ref-tx-date">
+                          {line1}
+                          <br />
+                          {line2}
+                        </p>
+                      </div>
+                      <span
+                        className={`ref-tx-val ${isRec ? 'ref-tx-val--pos' : 'ref-tx-val--neg'} ${privacyMode ? 'privacy-blur' : ''}`}
+                      >
+                        {isRec ? '+' : '−'}
+                        {formatCurrency(Math.abs(parseFloat(t.valor) || 0))}
+                      </span>
+                    </div>
+                  )
+                })
               )}
-            </article>
-          </div>
-
-          <aside className="exec-grid-right">
-            <article className="exec-card exec-card--payable">
-              <p className="exec-card-title">Payable Accounts</p>
-              <p className="exec-card-muted">Keep your accounts up to date to avoid issues.</p>
-              <p className="exec-progress-label">{Math.round((progressoContas / 100) * 16)} OUT OF 16</p>
-              <div className="exec-progress">
-                <span style={{ width: `${progressoContas}%` }} />
-              </div>
-            </article>
-
-            <article className="exec-card exec-card--list">
-              <p className="exec-card-title">Receipts</p>
-              <div className="exec-list">
-                {(ultimasReceitas.length ? ultimasReceitas : transacoes.slice(0, 3)).map((t) => (
-                  <div key={`r-${t.id}`} className="exec-list-item">
-                    <span className="exec-list-icon">↗</span>
-                    <div className="min-w-0">
-                      <p className={`exec-list-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(t.valor)}</p>
-                      <p className="exec-list-sub break-words">{t.categorias?.nome || 'Receita'}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </article>
-
-            <article className="exec-card exec-card--list">
-              <p className="exec-card-title">Payables</p>
-              <div className="exec-list">
-                {(ultimasDespesas.length ? ultimasDespesas : transacoes.slice(0, 2)).map((t) => (
-                  <div key={`d-${t.id}`} className="exec-list-item">
-                    <span className="exec-list-icon">≋</span>
-                    <div className="min-w-0">
-                      <p className={`exec-list-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(t.valor)}</p>
-                      <p className="exec-list-sub break-words">{t.categorias?.nome || 'Despesa'}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </article>
-          </aside>
+            </div>
+          </article>
         </section>
+
+        <div className="ref-fab-wrap">
+          <button type="button" className="ref-fab" onClick={() => setIsModalOpen(true)} title="Nova transação">
+            +
+          </button>
+        </div>
       </main>
 
       <TransactionModal

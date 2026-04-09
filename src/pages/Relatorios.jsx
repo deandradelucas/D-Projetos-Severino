@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import GlobalSkeleton from '../components/GlobalSkeleton'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
@@ -480,7 +481,10 @@ export default function Relatorios() {
         </div>
 
         {loading ? (
-          <p className="relatorios-loading-msg">Carregando dados do relatório…</p>
+          <div className="relatorios-loading-shell">
+            <GlobalSkeleton variant="cards" />
+            <GlobalSkeleton variant="table" rows={6} />
+          </div>
         ) : transacoes.length === 0 ? (
           <p className="relatorios-empty-msg">Nenhuma transação efetivada neste período para compor o relatório.</p>
         ) : (

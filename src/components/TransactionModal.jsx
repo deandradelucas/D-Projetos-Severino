@@ -437,35 +437,21 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
 
           {/* Recurrence — apenas ao criar */}
           {!isEditMode && (
-          <div className="recorrencia-wrapper" style={{ 
-            background: 'linear-gradient(135deg, rgba(212, 168, 75, 0.08) 0%, rgba(212, 168, 75, 0.03) 100%)', 
-            padding: '20px', 
-            borderRadius: '24px', 
-            border: '1px solid rgba(212, 168, 75, 0.15)',
-            marginBottom: '28px',
-            transition: 'all 0.3s ease',
-            boxShadow: formData.recorrencia.ativo ? '0 10px 20px -10px rgba(212, 168, 75, 0.2)' : 'none'
-          }}>
-            <label className="checkbox-container" style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer', userSelect: 'none', width: '100%' }}>
-              <div style={{ 
-                width: '40px', 
-                height: '40px', 
-                borderRadius: '12px', 
-                background: formData.recorrencia.ativo ? 'var(--accent)' : 'rgba(0,0,0,0.05)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.3s ease',
-                color: formData.recorrencia.ativo ? '#000' : '#666'
-              }}>
+          <div
+            className={`modal-recorrencia-panel${formData.recorrencia.ativo ? ' modal-recorrencia-panel--active' : ''}`}
+          >
+            <label className="checkbox-container modal-recorrencia-panel__label">
+              <div
+                className={`modal-recorrencia-panel__icon${formData.recorrencia.ativo ? ' modal-recorrencia-panel__icon--on' : ''}`}
+              >
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16 15l-4 4-4-4M8 9l4-4 4 4" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M20 12a8 8 0 11-16 0 8 8 0 0116 0z" />
                 </svg>
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a1a', marginBottom: '2px' }}>Repetir esta transação</div>
-                <div style={{ fontSize: '12px', color: '#666', opacity: 0.8 }}>Parcele suas contas ou crie assinaturas fixas.</div>
+              <div className="modal-recorrencia-panel__copy">
+                <div className="modal-recorrencia-panel__title">Repetir esta transação</div>
+                <div className="modal-recorrencia-panel__hint">Parcele suas contas ou crie assinaturas fixas.</div>
               </div>
               <input 
                 type="checkbox" 
@@ -474,14 +460,14 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   ...prev, 
                   recorrencia: { ...prev.recorrencia, ativo: e.target.checked }
                 }))}
-                style={{ width: '22px', height: '22px', accentColor: 'var(--accent)', cursor: 'pointer' }}
+                className="modal-recorrencia-panel__checkbox"
               />
             </label>
 
             {formData.recorrencia.ativo && (
-              <div className="slide-down" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '20px', paddingTop: '20px', borderTop: '1px dashed rgba(212, 168, 75, 0.2)' }}>
+              <div className="slide-down modal-recorrencia-panel__grid">
                 <div className="form-group">
-                  <label style={{ fontSize: '11px', color: '#888' }}>Frequência</label>
+                  <label className="modal-recorrencia-panel__field-label">Frequência</label>
                   <select 
                     className="input-premium" 
                     value={formData.recorrencia.frequencia}
@@ -489,7 +475,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                       ...prev,
                       recorrencia: { ...prev.recorrencia, frequencia: e.target.value }
                     }))}
-                    style={{ background: '#fff' }}
                   >
                     <option value="MENSAL">Mensal</option>
                     <option value="SEMANAL">Semanal</option>
@@ -497,7 +482,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   </select>
                 </div>
                 <div className="form-group">
-                  <label style={{ fontSize: '11px', color: '#888' }}>Quantidade (Parcelas)</label>
+                  <label className="modal-recorrencia-panel__field-label">Quantidade (parcelas)</label>
                   <input 
                     type="number" 
                     min="2" 
@@ -508,7 +493,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                       ...prev,
                       recorrencia: { ...prev.recorrencia, quantidade: e.target.value }
                     }))}
-                    style={{ background: '#fff' }}
                   />
                 </div>
               </div>

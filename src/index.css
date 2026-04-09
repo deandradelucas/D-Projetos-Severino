@@ -167,12 +167,14 @@ body {
   }
 }
 
-/* Tema único — fundo premium para telas públicas */
+/* Tema único — fundo premium (camada atrás do shell do app) */
 body[data-theme='light'] {
-  background-color: #7da2dd;
+  color-scheme: light;
+  background-color: #8ca8d4;
   background-image:
-    radial-gradient(ellipse 120% 80% at 10% -10%, rgba(255, 255, 255, 0.2), transparent 55%),
-    radial-gradient(ellipse 120% 80% at 90% 110%, rgba(255, 255, 255, 0.16), transparent 62%);
+    radial-gradient(ellipse 100% 70% at 15% -5%, rgba(255, 255, 255, 0.42), transparent 52%),
+    radial-gradient(ellipse 90% 60% at 95% 105%, rgba(79, 70, 229, 0.07), transparent 48%),
+    linear-gradient(168deg, #9eb6e0 0%, #7d9ad0 42%, #6d8ec4 100%);
 }
 
 input,

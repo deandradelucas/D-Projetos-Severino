@@ -28,3 +28,4 @@ nul
 
 # Backup temp
 .backup-temp/
+.env*.local

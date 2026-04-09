@@ -1,3 +1,4 @@
+import './lib/load-env.mjs'
 import { serve } from '@hono/node-server'
 import app from './app.mjs'
 import { log } from './lib/logger.mjs'

@@ -79,7 +79,9 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             {(perfil.nome || 'U').charAt(0).toUpperCase()}
           </div>
           <p className="exec-profile-name">{perfil.nome}</p>
-          <p className="exec-profile-role">{String(perfil.role || 'USER').toUpperCase()}</p>
+          <p className="exec-profile-role">
+            {String(perfil.role || '').toUpperCase() === 'ADMIN' ? 'Administrador' : 'Conta pessoal'}
+          </p>
         </div>
 
         <div className="brand-wrapper">
@@ -134,7 +136,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <path d="M12 18V6"/>
                 </svg>
               </span>
-              Wallet
+              Carteira
             </NavLink>
           </li>
           <li>
@@ -152,7 +154,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <path d="M22 12A10 10 0 0 0 12 2v10z" />
                 </svg>
               </span>
-              Revenue analytics
+              Relatórios
             </NavLink>
           </li>
           <li>
@@ -169,7 +171,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <line x1="2" x2="22" y1="10" y2="10" />
                 </svg>
               </span>
-              Payables
+              Pagamento
             </NavLink>
           </li>
           <li>
@@ -185,7 +187,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
               </span>
-              Search
+              Ajustes
             </NavLink>
           </li>
 
@@ -247,16 +249,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           )}
         </ul>
 
-        <div className="exec-sidebar-secondary">
-          <NavLink to="/configuracoes" className="nav-item" onClick={() => setMenuAberto(false)}>
-            <span className="icon-wrap">⚙</span>
-            Setting
-          </NavLink>
-          <button type="button" className="nav-item exec-help-btn">
-            <span className="icon-wrap">?</span>
-            Help
-          </button>
-        </div>
+        <div className="sidebar-ref-pill" aria-hidden />
 
         <button
           className="logout-btn"
