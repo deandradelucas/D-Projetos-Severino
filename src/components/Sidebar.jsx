@@ -1,45 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { isSuperAdminSession } from '../lib/superAdmin'
-
-function situacaoAssinaturaLabel(code) {
-  const m = {
-    admin: 'Administrador',
-    isento: 'Isento',
-    trial: 'Período de teste',
-    ativo: 'Assinatura ativa',
-    pausada: 'Assinatura pausada (MP)',
-    cancelada: 'Assinatura cancelada (MP)',
-    inativa: 'Sem assinatura ativa',
-  }
-  return m[code] || ''
-}
-
-function readAssinaturaStripFromStorage() {
-  try {
-    const raw = localStorage.getItem('horizonte_user')
-    const u = raw ? JSON.parse(raw) : null
-    const situacao = u?.assinatura_situacao
-    const assinaturaBadge = situacao ? situacaoAssinaturaLabel(String(situacao)) : ''
-    const assinaturaManageUrl =
-      typeof u?.mp_gerenciar_url === 'string' ? u.mp_gerenciar_url.trim() : ''
-    const d = u?.assinatura_proxima_cobranca
-    if (!d) {
-      return { assinaturaBadge, assinaturaManageUrl, pagamentoSub: '' }
-    }
-    const dt = new Date(d)
-    if (Number.isNaN(dt.getTime())) {
-      return { assinaturaBadge, assinaturaManageUrl, pagamentoSub: '' }
-    }
-    return {
-      assinaturaBadge,
-      assinaturaManageUrl,
-      pagamentoSub: `Próx. cobrança ${dt.toLocaleDateString('pt-BR')}`,
-    }
-  } catch {
-    return { assinaturaBadge: '', assinaturaManageUrl: '', pagamentoSub: '' }
-  }
-}
 
 /** Ordem vertical no menu (índice sobe/desce a bolinha) */
 const MENU_ORDER = [
@@ -57,20 +18,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const location = useLocation()
   const prevMenuIdx = useRef(-1)
   const [dotMotion, setDotMotion] = useState(null)
-  const [sessionTick, setSessionTick] = useState(0)
   const principalAdmin = isSuperAdminSession()
-
-  const { assinaturaBadge, assinaturaManageUrl, pagamentoSub } = useMemo(() => {
-    void location.pathname
-    void sessionTick
-    return readAssinaturaStripFromStorage()
-  }, [location.pathname, sessionTick])
-
-  useEffect(() => {
-    const h = () => setSessionTick((n) => n + 1)
-    window.addEventListener('horizonte-session-refresh', h)
-    return () => window.removeEventListener('horizonte-session-refresh', h)
-  }, [])
 
   useEffect(() => {
     const idx = MENU_ORDER.indexOf(location.pathname)
@@ -113,28 +61,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
-
-        {(assinaturaBadge || assinaturaManageUrl || pagamentoSub) && (
-          <div className="sidebar-assinatura" aria-live="polite">
-            {assinaturaBadge ? (
-              <div className="sidebar-assinatura__badge" title="Status da sua assinatura">
-                {assinaturaBadge}
-              </div>
-            ) : null}
-            {pagamentoSub ? <div className="sidebar-assinatura__line">{pagamentoSub}</div> : null}
-            {assinaturaManageUrl ? (
-              <a
-                className="sidebar-assinatura__link"
-                href={assinaturaManageUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Abre o Mercado Pago para gerenciar débitos e assinatura"
-              >
-                Gerenciar no Mercado Pago
-              </a>
-            ) : null}
-          </div>
-        )}
 
         <ul
           className="nav-menu"
@@ -193,10 +119,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           <li>
             <NavLink
               to="/pagamento"
-              title={
-                [assinaturaBadge, pagamentoSub].filter(Boolean).join(' — ') ||
-                'Assinatura mensal Mercado Pago'
-              }
+              title="Assinatura mensal Mercado Pago"
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={() => setMenuAberto(false)}
             >
@@ -206,10 +129,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <line x1="2" x2="22" y1="10" y2="10" />
                 </svg>
               </span>
-              <span className="nav-item__label">
-                <span className="nav-item__title">Pagamento</span>
-                {pagamentoSub ? <span className="nav-item__sub">{pagamentoSub}</span> : null}
-              </span>
+              Pagamento
             </NavLink>
           </li>
           <li>
