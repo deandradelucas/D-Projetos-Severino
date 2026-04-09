@@ -60,10 +60,11 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const [sessionTick, setSessionTick] = useState(0)
   const principalAdmin = isSuperAdminSession()
 
-  const { assinaturaBadge, assinaturaManageUrl, pagamentoSub } = useMemo(
-    () => readAssinaturaStripFromStorage(),
-    [location.pathname, sessionTick]
-  )
+  const { assinaturaBadge, assinaturaManageUrl, pagamentoSub } = useMemo(() => {
+    void location.pathname
+    void sessionTick
+    return readAssinaturaStripFromStorage()
+  }, [location.pathname, sessionTick])
 
   useEffect(() => {
     const h = () => setSessionTick((n) => n + 1)
