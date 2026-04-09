@@ -127,7 +127,10 @@ export default function Dashboard() {
         void fetchTransacoes()
       })
     } else {
-      queueMicrotask(() => setFetchError('Faça login para ver suas transações.'))
+      queueMicrotask(() => {
+        setLoading(false)
+        setFetchError('Faça login para ver suas transações.')
+      })
     }
   }, [fetchTransacoes])
 
@@ -176,6 +179,7 @@ export default function Dashboard() {
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content relative z-10 ref-dashboard-main">
+        <div className="ref-dashboard-inner">
         <div className="ref-dashboard-top">
           <div className="ref-dashboard-top__left">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
@@ -378,27 +382,43 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
-            <div className="ref-receipt-stack">
+            <div className="ref-receipt-list">
               {loading ? (
                 <div className="skeleton-stagger">
-                  <div className="skeleton skeleton-card ref-receipt-skel" />
-                  <div className="skeleton skeleton-card ref-receipt-skel" />
+                  <div className="ref-receipt-row">
+                    <span className="skeleton skeleton-pulse ref-receipt-row__icon-skel" aria-hidden />
+                    <div className="ref-receipt-row__mid">
+                      <span className="skeleton skeleton-pulse ref-receipt-row__line-skel" />
+                      <span className="skeleton skeleton-pulse ref-receipt-row__line-skel ref-receipt-row__line-skel--short" />
+                    </div>
+                    <span className="skeleton skeleton-pulse ref-receipt-row__val-skel" aria-hidden />
+                  </div>
+                  <div className="ref-receipt-row">
+                    <span className="skeleton skeleton-pulse ref-receipt-row__icon-skel" aria-hidden />
+                    <div className="ref-receipt-row__mid">
+                      <span className="skeleton skeleton-pulse ref-receipt-row__line-skel" />
+                      <span className="skeleton skeleton-pulse ref-receipt-row__line-skel ref-receipt-row__line-skel--short" />
+                    </div>
+                    <span className="skeleton skeleton-pulse ref-receipt-row__val-skel" aria-hidden />
+                  </div>
                 </div>
               ) : receitasDestaque.length === 0 ? (
                 <p className="ref-empty">Sem receitas no período.</p>
               ) : (
                 receitasDestaque.map((t) => (
-                  <div key={t.id} className="ref-receipt-card">
-                    <div className="ref-receipt-card__icon" aria-hidden>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                  <div key={t.id} className="ref-receipt-row">
+                    <div className="ref-receipt-row__icon" aria-hidden>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                         <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
                       </svg>
                     </div>
-                    <div className="ref-receipt-card__text min-w-0">
-                      <p className={`ref-receipt-card__val ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(t.valor)}</p>
-                      <p className="ref-receipt-card__cat break-words">{t.categorias?.nome || 'Receita'}</p>
+                    <div className="ref-receipt-row__mid min-w-0">
+                      <p className="ref-receipt-row__cat break-words">{t.categorias?.nome || 'Receita'}</p>
                     </div>
+                    <span className={`ref-receipt-row__val ${privacyMode ? 'privacy-blur' : ''}`}>
+                      {formatCurrency(parseFloat(t.valor) || 0)}
+                    </span>
                   </div>
                 ))
               )}
@@ -410,6 +430,7 @@ export default function Dashboard() {
           <button type="button" className="ref-fab" onClick={() => setIsModalOpen(true)} title="Nova transação">
             +
           </button>
+        </div>
         </div>
       </main>
 
