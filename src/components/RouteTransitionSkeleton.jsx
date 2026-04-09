@@ -40,7 +40,7 @@ export default function RouteTransitionSkeleton() {
     }
 
     defer(() => setVisible(true))
-    timeouts.push(window.setTimeout(() => setVisible(false), 380))
+    timeouts.push(window.setTimeout(() => setVisible(false), 140))
     return () => timeouts.forEach((id) => window.clearTimeout(id))
   }, [location.pathname])
 

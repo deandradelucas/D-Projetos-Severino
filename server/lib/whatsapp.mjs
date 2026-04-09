@@ -1,3 +1,4 @@
+import { log } from './logger.mjs'
 import { buscarUsuarioPorTelefone, registrarLogWhatsApp, normalizarDigitosWhatsappLog } from './usuarios.mjs'
 import { getCategorias, inserirTransacao } from './transacoes.mjs'
 import { parseWhatsAppMessageWithAI } from './ai.mjs'
@@ -409,7 +410,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
     const rawAuth = collectTokenFromHeaders(getHeader)
     const EXPECTED_TOKEN = process.env.WHATSAPP_WEBHOOK_TOKEN || 'ece58f64012d51028d28a04264d07131'
 
-    console.log('[WhatsApp Webhook] Chamada recebida.')
+    log.info('[WhatsApp Webhook] Chamada recebida.')
 
     let body = {}
     let rawText = ''
@@ -442,13 +443,13 @@ export async function handleWhatsAppWebhook(req, options = {}) {
 
     // Heartbeat / conexão / QR explícitos
     if (isIgnorableProviderEvent(body)) {
-      console.log('[WhatsApp Webhook] Evento de sistema/conexão ignorado (OK).')
+      log.info('[WhatsApp Webhook] Evento de sistema/conexão ignorado (OK).')
       return { status: 200, json: { ok: true, ignored: 'system_or_connection_event' } }
     }
 
     // Telein manda JSON aninhado (só key/type/body) — não é "mensagem" com texto; não exige token nem grava ERRO
     if (!hasInboundChatTextToAuthenticate(body)) {
-      console.log('[WhatsApp Webhook] Sem texto de conversa inbound — ignorado (sync/presença/ack).')
+      log.info('[WhatsApp Webhook] Sem texto de conversa inbound — ignorado (sync/presença/ack).')
       return { status: 200, json: { ok: true, ignored: 'no_inbound_chat_to_process' } }
     }
 
@@ -482,7 +483,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
         if (digits) telForLog = normalizarDigitosWhatsappLog(digits) || digits
       }
       const msgPrev = (preview.mensagemRaw || '').slice(0, 200)
-      console.warn('[WhatsApp Webhook] Token inválido ou ausente para payload com possível mensagem.')
+      log.warn('[WhatsApp Webhook] Token inválido ou ausente para payload com possível mensagem.')
       const bodyKeys = Object.keys(body).join(', ')
       const maskedToken = finalToken ? `${finalToken.substring(0, 5)}...` : 'ausente'
       await registrarLogWhatsApp(
@@ -506,7 +507,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
 
     // Payload autenticado mas sem dados de conversa (ex.: ack, reaction)
     if (!numeroRemetente && !mensagemRaw.trim()) {
-      console.log('[WhatsApp Webhook] Autenticado; sem remetente/mensagem — ignorando.')
+      log.info('[WhatsApp Webhook] Autenticado; sem remetente/mensagem — ignorando.')
       return { status: 200, json: { ok: true, ignored: 'no_chat_payload' } }
     }
 
@@ -528,11 +529,11 @@ export async function handleWhatsAppWebhook(req, options = {}) {
       return { status: 200, json: { ok: true, ignored: 'outbound_from_me' } }
     }
 
-    console.log(`[WhatsApp Webhook] Mensagem recebida de: ${telDisplay} -> "${mensagemRaw}"`)
+    log.info(`[WhatsApp Webhook] Mensagem recebida de: ${telDisplay} -> "${mensagemRaw}"`)
 
     usuarioTarget = await buscarUsuarioPorTelefone(numeroRemetente)
     if (!usuarioTarget) {
-      console.warn(`[WhatsApp Webhook] Telefone ${telDisplay} não possui usuário vinculado.`)
+      log.warn(`[WhatsApp Webhook] Telefone ${telDisplay} não possui usuário vinculado.`)
       await registrarLogWhatsApp(telDisplay, mensagemRaw || '(sem texto)', 'IGNORADO', `Usuário não vinculado. ${debugInfo}`)
       return { status: 200, json: { ok: true, warning: 'Usuário não registrado com esse telefone.' } }
     }
@@ -542,7 +543,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
       throw new Error('Usuário sem categorias no sistema para mapear a despesa.')
     }
 
-    console.log(`[WhatsApp Webhook] Passando p/ AI... usuário: ${usuarioTarget.email}`)
+    log.info(`[WhatsApp Webhook] Passando p/ AI... usuário: ${usuarioTarget.email}`)
     const extractedData = await parseWhatsAppMessageWithAI(mensagemRaw, categorias)
 
     if (!extractedData.tipo || !extractedData.valor) {
@@ -563,7 +564,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
 
     const transacaoSalva = await inserirTransacao(payLoadTransacao)
 
-    console.log(`[WhatsApp Webhook] Transação salva com sucesso: ${transacaoSalva.id}`)
+    log.info(`[WhatsApp Webhook] Transação salva com sucesso: ${transacaoSalva.id}`)
 
     let catNome = 'Sem categoria'
     let subNome = ''

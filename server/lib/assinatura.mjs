@@ -1,3 +1,4 @@
+import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { isSuperAdminEmail } from './super-admin.mjs'
 import {
@@ -75,7 +76,7 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
 
   const base = await supabase.from('usuarios').select('email, isento_pagamento').eq('id', uid).maybeSingle()
   if (base.error) {
-    console.warn('[fetchAssinaturaCamposUsuario] base:', base.error.message || base.error)
+    log.warn('[fetchAssinaturaCamposUsuario] base:', base.error.message || base.error)
     return {}
   }
   if (!base.data) return {}
@@ -172,7 +173,7 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   try {
     trialEnds = await ensureTrialIniciado(uid)
   } catch (e) {
-    console.warn('[buildAssinaturaUsuarioPayload] trial:', e?.message || e)
+    log.warn('[buildAssinaturaUsuarioPayload] trial:', e?.message || e)
   }
 
   let row = await fetchAssinaturaCamposUsuario(uid)
@@ -180,10 +181,10 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   const isento = partialUser.isento_pagamento === true || row.isento_pagamento === true
 
   await sincronizarPagamentosPendentesDoUsuario(uid).catch((e) =>
-    console.warn('[buildAssinaturaUsuarioPayload] sync MP:', e?.message || e)
+    log.warn('[buildAssinaturaUsuarioPayload] sync MP:', e?.message || e)
   )
   await sincronizarPreapprovalUsuario(uid).catch((e) =>
-    console.warn('[buildAssinaturaUsuarioPayload] sync preapproval:', e?.message || e)
+    log.warn('[buildAssinaturaUsuarioPayload] sync preapproval:', e?.message || e)
   )
 
   row = await fetchAssinaturaCamposUsuario(uid)
@@ -245,7 +246,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
   try {
     await ensureTrialIniciado(uid)
   } catch (e) {
-    console.warn('[assertAcessoAppUsuario] ensureTrialIniciado:', e?.message || e)
+    log.warn('[assertAcessoAppUsuario] ensureTrialIniciado:', e?.message || e)
   }
 
   const supabase = getSupabaseAdmin()
@@ -256,7 +257,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
     .maybeSingle()
 
   if (uerr) {
-    console.warn('[assertAcessoAppUsuario] leitura usuarios:', uerr.message || uerr)
+    log.warn('[assertAcessoAppUsuario] leitura usuarios:', uerr.message || uerr)
     return null
   }
   if (!urow) return { status: 401, message: 'Não autorizado.' }

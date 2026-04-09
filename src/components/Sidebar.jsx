@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { isSuperAdminSession } from '../lib/superAdmin'
+import { navPrefetchHandlers } from '../lazyRoutes'
 
 /** Ordem vertical no menu (índice sobe/desce a bolinha) */
 const MENU_ORDER = [
@@ -69,6 +70,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           <li>
             <NavLink 
               to="/dashboard" 
+              {...navPrefetchHandlers('/dashboard')}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} 
               onClick={() => setMenuAberto(false)}
             >
@@ -86,6 +88,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           <li>
             <NavLink 
               to="/transacoes" 
+              {...navPrefetchHandlers('/transacoes')}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} 
               onClick={() => setMenuAberto(false)}
             >
@@ -102,6 +105,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           <li>
             <NavLink
               to="/relatorios"
+              {...navPrefetchHandlers('/relatorios')}
               end
               title="Gráficos, resumo do período e exportação CSV ou PDF"
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
@@ -119,6 +123,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           <li>
             <NavLink
               to="/pagamento"
+              {...navPrefetchHandlers('/pagamento')}
               title="Assinatura mensal Mercado Pago"
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={() => setMenuAberto(false)}
@@ -135,6 +140,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           <li>
             <NavLink
               to="/configuracoes"
+              {...navPrefetchHandlers('/configuracoes')}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={() => setMenuAberto(false)}
             >
@@ -156,6 +162,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               <li>
                 <NavLink
                   to="/admin/whatsapp"
+                  {...navPrefetchHandlers('/admin/whatsapp')}
                   className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
                   onClick={() => setMenuAberto(false)}
                 >
@@ -170,6 +177,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               <li>
                 <NavLink
                   to="/admin/usuarios"
+                  {...navPrefetchHandlers('/admin/usuarios')}
                   className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
                   onClick={() => setMenuAberto(false)}
                 >
@@ -187,6 +195,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               <li>
                 <NavLink
                   to="/admin/pagamentos"
+                  {...navPrefetchHandlers('/admin/pagamentos')}
                   className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
                   onClick={() => setMenuAberto(false)}
                 >

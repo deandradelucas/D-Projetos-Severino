@@ -1,3 +1,4 @@
+import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import {
   buscarPagamentoPorId,
@@ -55,7 +56,7 @@ export async function atualizarUsuarioDePreapprovalResponse(usuarioId, pre) {
     })
     .eq('id', uid)
 
-  if (error) console.warn('[atualizarUsuarioDePreapprovalResponse]', error.message || error)
+  if (error) log.warn('[atualizarUsuarioDePreapprovalResponse]', error.message || error)
 }
 
 export async function sincronizarPreapprovalUsuario(usuario_id) {
@@ -75,7 +76,7 @@ export async function sincronizarPreapprovalUsuario(usuario_id) {
     const pre = await buscarPreapprovalPorId(row.mp_preapproval_id)
     await atualizarUsuarioDePreapprovalResponse(uid, pre)
   } catch (e) {
-    console.warn('[sincronizarPreapprovalUsuario]', row.mp_preapproval_id, e?.message || e)
+    log.warn('[sincronizarPreapprovalUsuario]', row.mp_preapproval_id, e?.message || e)
   }
 }
 
@@ -97,7 +98,7 @@ export async function sincronizarPreapprovalPorIdFromWebhook(preapprovalId) {
     }
     if (uid) await atualizarUsuarioDePreapprovalResponse(uid, pre)
   } catch (e) {
-    console.warn('[sincronizarPreapprovalPorIdFromWebhook]', id, e?.message || e)
+    log.warn('[sincronizarPreapprovalPorIdFromWebhook]', id, e?.message || e)
   }
 }
 
@@ -229,7 +230,7 @@ export async function sincronizarPagamentosPendentesDoUsuario(usuario_id) {
         if (best) await upsertFromWebhookPayment(best)
       }
     } catch (e) {
-      console.warn('[sincronizarPagamentosPendentesDoUsuario]', row.external_reference || row.id, e?.message || e)
+      log.warn('[sincronizarPagamentosPendentesDoUsuario]', row.external_reference || row.id, e?.message || e)
     }
   }
 }
@@ -248,7 +249,7 @@ export async function listPagamentosUsuario(usuario_id, limit = 20) {
     .limit(limit)
 
   if (error) {
-    console.warn('[listPagamentosUsuario]', error.message || error)
+    log.warn('[listPagamentosUsuario]', error.message || error)
     return []
   }
   return data || []
@@ -283,7 +284,7 @@ export async function usuarioTemPagamentoAprovado(usuario_id, payerEmail = null)
       .limit(50)
 
     if (error) {
-      console.warn('[usuarioTemPagamentoAprovado] por usuario_id:', error.message || error)
+      log.warn('[usuarioTemPagamentoAprovado] por usuario_id:', error.message || error)
     } else if ((data || []).some(linhaPagamentoAprovada)) {
       return true
     }
@@ -298,7 +299,7 @@ export async function usuarioTemPagamentoAprovado(usuario_id, payerEmail = null)
       .limit(80)
 
     if (r2.error) {
-      console.warn('[usuarioTemPagamentoAprovado] por payer_email:', r2.error.message || r2.error)
+      log.warn('[usuarioTemPagamentoAprovado] por payer_email:', r2.error.message || r2.error)
       return false
     }
 
@@ -315,11 +316,11 @@ export async function usuarioTemPagamentoAprovado(usuario_id, payerEmail = null)
         .from('pagamentos_mercadopago')
         .update({ usuario_id: uid })
         .eq('id', semVinculo.id)
-      if (upErr) console.warn('[usuarioTemPagamentoAprovado] vincular usuario_id:', upErr.message || upErr)
+      if (upErr) log.warn('[usuarioTemPagamentoAprovado] vincular usuario_id:', upErr.message || upErr)
     }
     return true
   } catch (e) {
-    console.warn('[usuarioTemPagamentoAprovado]', e?.message || e)
+    log.warn('[usuarioTemPagamentoAprovado]', e?.message || e)
     return false
   }
 }

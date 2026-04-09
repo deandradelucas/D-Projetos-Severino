@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { Hono } from 'hono'
+import { log } from './lib/logger.mjs'
 import { cors } from 'hono/cors'
 import {
   authenticateUser,
@@ -112,7 +113,7 @@ app.get('/api/admin/mp-saude', async (c) => {
         'No painel Mercado Pago, a URL de notificação deve apontar para este path e responder 200. Logs estruturados: svc=mercadopago-webhook no stdout.',
     })
   } catch (error) {
-    console.error('mp-saude failed', error)
+    log.error('mp-saude failed', error)
     return c.json({ message: 'Erro ao montar painel.' }, 500)
   }
 })
@@ -206,7 +207,7 @@ app.post('/api/auth/login', async (c) => {
       const assinatura = await buildAssinaturaUsuarioPayload(user.id, user)
       payloadUser = { ...user, ...assinatura }
     } catch (err) {
-      console.error('assinatura no login (confira migration 07_trial_bem_vindo_assinatura)', err)
+      log.error('assinatura no login (confira migration 07_trial_bem_vindo_assinatura)', err)
       payloadUser = {
         ...user,
         trial_ends_at: null,
@@ -230,7 +231,7 @@ app.post('/api/auth/login', async (c) => {
       user: payloadUser,
     })
   } catch (error) {
-    console.error('login failed', error)
+    log.error('login failed', error)
     const mapped = mapSupabaseOrNetworkError(error)
     if (mapped) return c.json({ message: mapped.message }, mapped.status)
     return c.json(
@@ -249,7 +250,7 @@ app.get('/api/assinatura/status', async (c) => {
     const assinatura = await buildAssinaturaUsuarioPayload(usuarioId, perfil)
     return c.json(assinatura)
   } catch (error) {
-    console.error('assinatura status failed', error)
+    log.error('assinatura status failed', error)
     return c.json({
       trial_ends_at: null,
       bem_vindo_pagamento_visto_at: null,
@@ -278,7 +279,7 @@ app.post('/api/assinatura/bem-vindo-visto', async (c) => {
     const assinatura = await buildAssinaturaUsuarioPayload(usuarioId, perfil)
     return c.json({ ok: true, ...assinatura })
   } catch (error) {
-    console.error('bem-vindo-visto failed', error)
+    log.error('bem-vindo-visto failed', error)
     return c.json({ message: 'Erro ao atualizar.' }, 500)
   }
 })
@@ -325,7 +326,7 @@ app.post('/api/auth/request-password-reset', async (c) => {
       devResetUrl: emailResult.devResetUrl || null,
     })
   } catch (error) {
-    console.error('request-password-reset failed', error)
+    log.error('request-password-reset failed', error)
     const mapped = mapSupabaseOrNetworkError(error)
     if (mapped) return c.json({ message: mapped.message }, mapped.status)
     return c.json(
@@ -361,7 +362,7 @@ app.post('/api/auth/reset-password', async (c) => {
 
     return c.json({ message: 'Senha redefinida com sucesso.' })
   } catch (error) {
-    console.error('reset-password failed', error)
+    log.error('reset-password failed', error)
     const mapped = mapSupabaseOrNetworkError(error)
     if (mapped) return c.json({ message: mapped.message }, mapped.status)
     return c.json({ message: 'Não foi possível redefinir a senha.' }, 500)
@@ -380,7 +381,7 @@ app.get('/api/usuarios/perfil', async (c) => {
     const perfil = await getPerfilUsuario(usuarioId)
     return c.json({ perfil })
   } catch (error) {
-    console.error('get perfil failed', error)
+    log.error('get perfil failed', error)
     return c.json({ message: 'Erro ao buscar perfil.' }, 500)
   }
 })
@@ -410,7 +411,7 @@ app.get('/api/admin/whatsapp-status', async (c) => {
     const status = await getWhatsappStatus()
     return c.json(status)
   } catch (error) {
-    console.error('get admin status failed', error)
+    log.error('get admin status failed', error)
     return c.json({ message: 'Erro ao buscar status do whatsapp.' }, 500)
   }
 })
@@ -424,7 +425,7 @@ app.get('/api/admin/whatsapp-logs', async (c) => {
     const logs = await getWhatsappLogs()
     return c.json(logs)
   } catch (error) {
-    console.error('get admin logs failed', error)
+    log.error('get admin logs failed', error)
     return c.json({ message: 'Erro ao buscar logs do whatsapp.' }, 500)
   }
 })
@@ -445,7 +446,7 @@ app.get('/api/admin/whatsapp-config', async (c) => {
         'Cole uma dessas URLs no painel Chipmassa/Telein (Webhook). Sem o token correto, mensagens com texto são rejeitadas.',
     })
   } catch (error) {
-    console.error('get whatsapp config failed', error)
+    log.error('get whatsapp config failed', error)
     return c.json({ message: 'Erro ao montar URL do webhook.' }, 500)
   }
 })
@@ -459,7 +460,7 @@ app.get('/api/admin/usuarios', async (c) => {
     const usuarios = await listUsuariosAdmin()
     return c.json(usuarios)
   } catch (error) {
-    console.error('get admin usuarios failed', error)
+    log.error('get admin usuarios failed', error)
     return c.json({ message: 'Erro ao listar usuários.' }, 500)
   }
 })
@@ -475,7 +476,7 @@ app.put('/api/admin/usuarios/:id', async (c) => {
     const updated = await updateUsuarioAdmin(id, body || {})
     return c.json(updated)
   } catch (error) {
-    console.error('update admin usuario failed', error)
+    log.error('update admin usuario failed', error)
     if (error.statusCode === 403 || error.statusCode === 404) {
       return c.json({ message: error.message }, error.statusCode)
     }
@@ -494,7 +495,7 @@ app.get('/api/admin/pagamentos', async (c) => {
     const rows = await listPagamentosAdmin(lim)
     return c.json(rows)
   } catch (error) {
-    console.error('get admin pagamentos failed', error)
+    log.error('get admin pagamentos failed', error)
     return c.json({ message: 'Erro ao listar pagamentos.' }, 500)
   }
 })
@@ -509,7 +510,7 @@ app.delete('/api/admin/usuarios/:id', async (c) => {
     await deleteUsuarioAdmin(id)
     return c.json({ message: 'Usuário excluído com sucesso.' })
   } catch (error) {
-    console.error('delete admin usuario failed', error)
+    log.error('delete admin usuario failed', error)
     if (error.statusCode === 403) {
       return c.json({ message: error.message }, 403)
     }
@@ -532,7 +533,7 @@ app.get('/api/categorias', async (c) => {
     const data = await getCategorias(usuarioId)
     return c.json(data)
   } catch (error) {
-    console.error('get categories failed', error)
+    log.error('get categories failed', error)
     return c.json({ message: 'Erro ao buscar categorias.' }, 500)
   }
 })
@@ -560,7 +561,7 @@ app.get('/api/transacoes', async (c) => {
     const data = await getTransacoes(usuarioId, filters)
     return c.json(data)
   } catch (error) {
-    console.error('get transactions failed', error)
+    log.error('get transactions failed', error)
     return c.json({ message: 'Erro ao buscar transaçoes.' }, 500)
   }
 })
@@ -583,7 +584,7 @@ app.post('/api/transacoes', async (c) => {
     const data = await inserirTransacao(body)
     return c.json({ message: 'Transação inserida com sucesso.', data }, 201)
   } catch (error) {
-    console.error('insert transaction failed', error)
+    log.error('insert transaction failed', error)
     return c.json({ message: error.message || 'Erro ao inserir transação.' }, 500)
   }
 })
@@ -602,7 +603,7 @@ app.delete('/api/transacoes/:id', async (c) => {
     await deletarTransacao(id, usuarioId)
     return c.json({ message: 'Transação excluída com sucesso.' })
   } catch (error) {
-    console.error('delete transaction failed', error)
+    log.error('delete transaction failed', error)
     return c.json({ message: 'Erro ao excluir transação.' }, 500)
   }
 })
@@ -638,7 +639,7 @@ app.get('/api/pagamentos/minhas', async (c) => {
     const rows = await listPagamentosUsuario(usuarioId)
     return c.json(rows)
   } catch (error) {
-    console.error('list pagamentos failed', error)
+    log.error('list pagamentos failed', error)
     return c.json({ message: 'Erro ao listar pagamentos.' }, 500)
   }
 })
@@ -713,7 +714,7 @@ app.post('/api/pagamentos/preferencia', async (c) => {
       use_sandbox: useSandbox,
     })
   } catch (error) {
-    console.error('criar preferencia mp failed', error)
+    log.error('criar preferencia mp failed', error)
     return c.json({ message: error.message || 'Erro ao criar pagamento.' }, 500)
   }
 })
@@ -771,7 +772,7 @@ app.post('/api/pagamentos/webhook', async (c) => {
     }
   } catch (e) {
     logMpWebhook({ stage: 'parse_error', err: errorToText(e) })
-    console.error('[MP webhook] parse', e)
+    log.error('[MP webhook] parse', e)
   }
 
   logMpWebhook({
@@ -787,7 +788,7 @@ app.post('/api/pagamentos/webhook', async (c) => {
       logMpWebhook({ stage: 'preapproval_ok', preapproval_id: preapprovalWebhookId })
     } catch (e) {
       logMpWebhook({ stage: 'preapproval_error', preapproval_id: preapprovalWebhookId, err: errorToText(e) })
-      console.error('[MP webhook] preapproval', e)
+      log.error('[MP webhook] preapproval', e)
     }
     return c.json({ ok: true })
   }
@@ -814,7 +815,7 @@ app.post('/api/pagamentos/webhook', async (c) => {
     logMpWebhook({ stage: 'payment_upsert_ok', payment_id: paymentId })
   } catch (e) {
     logMpWebhook({ stage: 'payment_error', payment_id: paymentId, err: errorToText(e) })
-    console.error('[MP webhook] process', e)
+    log.error('[MP webhook] process', e)
   }
 
   return c.json({ ok: true })
@@ -842,7 +843,7 @@ app.post('/api/ai/chat', async (c) => {
 
     return c.json({ resposta })
   } catch (error) {
-    console.error('ai chat failed', error)
+    log.error('ai chat failed', error)
     const msg = error.message?.includes('GEMINI_API_KEY')
       ? 'Chave de API do Gemini não configurada. Adicione GEMINI_API_KEY no .env do servidor.'
       : 'Não foi possível processar sua pergunta agora. Tente novamente.'

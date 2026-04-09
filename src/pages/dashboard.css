@@ -3253,7 +3253,7 @@ body[data-theme='light'] .page-relatorios .relatorios-chart-empty {
   right: 24px;
   bottom: 24px;
   left: calc(24px + 260px);
-  animation: route-skeleton-enter 0.28s ease-out both;
+  animation: route-skeleton-enter 0.14s ease-out both;
 }
 
 @keyframes route-skeleton-enter {

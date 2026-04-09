@@ -1,5 +1,5 @@
 {
-  "name": "horizonte-temp",
+  "name": "horizonte-financeiro",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,6 +10,7 @@
     "build": "vite build",
     "test:unit": "vitest run",
     "test": "npm run test:unit && npm run lint && npm run build",
+    "ci": "npm run test:unit && npm run lint && npm run build && npm run audit:dashboard-css",
     "audit:dashboard-css": "node scripts/find-unused-dashboard-css.mjs",
     "lint": "eslint .",
     "preview": "vite preview",

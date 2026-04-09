@@ -1,3 +1,5 @@
+import { log } from './logger.mjs'
+
 /** Log estruturado para grep / agregador (Datadog, etc.). */
 export function logMpWebhook(event) {
   const line = {
@@ -5,5 +7,5 @@ export function logMpWebhook(event) {
     t: new Date().toISOString(),
     ...event,
   }
-  console.log(JSON.stringify(line))
+  log.jsonLine(line)
 }

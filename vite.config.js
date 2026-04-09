@@ -4,6 +4,18 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+          if (id.includes('recharts')) return 'vendor-recharts'
+          if (id.includes('jspdf')) return 'vendor-jspdf'
+          if (id.includes('html2canvas') || id.includes('canvg')) return 'vendor-canvas'
+        },
+      },
+    },
+  },
   server: {
     host: true,
     port: 3000,

@@ -1,3 +1,4 @@
+import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { resumoPagamentosPorUsuarioIds } from './pagamentos-mp.mjs'
 import { resolverUsuarioIdPorTelefoneGemini } from './ai.mjs'
@@ -198,10 +199,10 @@ export async function registrarLogWhatsApp(telefone, mensagem, status, detalhe, 
     })
     
     if (error) {
-      console.error('[DB Log Error] falha ao salvar log do zap:', error)
+      log.error('[DB Log Error] falha ao salvar log do zap:', error)
     }
   } catch (err) {
-    console.error('[DB Log Panic] erro inesperado ao salvar log:', err)
+    log.error('[DB Log Panic] erro inesperado ao salvar log:', err)
   }
 }
 

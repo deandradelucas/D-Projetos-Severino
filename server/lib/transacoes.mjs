@@ -1,3 +1,4 @@
+import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 
 export async function getCategorias(usuarioId) {
@@ -210,7 +211,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
   const { data, error } = await query.order('data_transacao', { ascending: false }).limit(lim)
 
   if (error) {
-    console.warn('[getTransacoes] embed falhou, fallback sem join:', error.message || error)
+    log.warn('[getTransacoes] embed falhou, fallback sem join:', error.message || error)
     const qFlat = applyFilters(
       supabaseAdmin
         .from('transacoes')

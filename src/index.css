@@ -243,3 +243,51 @@ button {
     max-width: 100%;
   }
 }
+
+/* Suspense fallback — carregamento de rota (lazy) */
+.route-page-fallback {
+  flex: 1;
+  min-height: min(45vh, 360px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.route-page-fallback__bar {
+  width: min(120px, 40vw);
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-accent-gold, #d4a84b),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: route-page-fallback-shimmer 0.9s ease-in-out infinite;
+}
+
+@keyframes route-page-fallback-shimmer {
+  0% {
+    background-position: 100% 0;
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    background-position: -100% 0;
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-page-fallback__bar {
+    animation: none;
+    opacity: 0.75;
+  }
+}

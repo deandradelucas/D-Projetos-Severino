@@ -20,9 +20,6 @@ import {
   Area,
   ReferenceLine,
 } from 'recharts'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
-
 const COLORS_DESP = ['#38bdf8', '#34d399', '#fbbf24', '#fb923c', '#a78bfa', '#f472b6', '#94a3b8', '#64748b']
 const COLORS_REC = ['#4ade80', '#22d3ee', '#fcd34d', '#a78bfa', '#f472b6', '#94a3b8', '#64748b']
 
@@ -77,6 +74,7 @@ export default function Relatorios() {
   const [transacoes, setTransacoes] = useState([])
   const [categorias, setCategorias] = useState([])
   const [loading, setLoading] = useState(false)
+  const [pdfExportLoading, setPdfExportLoading] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
   useEffect(() => {
@@ -254,49 +252,60 @@ export default function Relatorios() {
     document.body.removeChild(link)
   }
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     if (transacoes.length === 0) return
 
-    const doc = new jsPDF()
+    setPdfExportLoading(true)
+    try {
+      const [{ default: jsPDF }, autoTableMod] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable'),
+      ])
+      const autoTable = autoTableMod.default
 
-    // Título do Relatório
-    doc.setFontSize(18)
-    doc.text('Relatório Analítico de Transações', 14, 22)
-    doc.setFontSize(11)
-    doc.setTextColor(100)
-    doc.text(`Período: ${new Date(filters.dataInicio + 'T00:00:00').toLocaleDateString('pt-BR')} a ${new Date(filters.dataFim + 'T00:00:00').toLocaleDateString('pt-BR')}`, 14, 30)
-    
-    // Resumo Financeiro
-    doc.setFontSize(12)
-    doc.setTextColor(0)
-    doc.text(`Total de Receitas: ${formatCurrency(summary.receitas)}`, 14, 40)
-    doc.text(`Total de Despesas: ${formatCurrency(summary.despesas)}`, 14, 48)
-    doc.text(`Saldo Líquido: ${formatCurrency(summary.saldo)}`, 14, 56)
+      const doc = new jsPDF()
 
-    // Tabela
-    const tableColumn = ["Data", "Tipo", "Categoria", "Valor", "Status"]
-    const tableRows = []
+      // Título do Relatório
+      doc.setFontSize(18)
+      doc.text('Relatório Analítico de Transações', 14, 22)
+      doc.setFontSize(11)
+      doc.setTextColor(100)
+      doc.text(`Período: ${new Date(filters.dataInicio + 'T00:00:00').toLocaleDateString('pt-BR')} a ${new Date(filters.dataFim + 'T00:00:00').toLocaleDateString('pt-BR')}`, 14, 30)
 
-    transacoes.forEach(t => {
-      const dataStr = new Date(t.data_transacao).toLocaleDateString('pt-BR')
-      const tipo = t.tipo
-      const cat = t.categorias?.nome || 'Sem categoria'
-      const valor = formatCurrency(t.valor)
-      const status = t.status || ''
+      // Resumo Financeiro
+      doc.setFontSize(12)
+      doc.setTextColor(0)
+      doc.text(`Total de Receitas: ${formatCurrency(summary.receitas)}`, 14, 40)
+      doc.text(`Total de Despesas: ${formatCurrency(summary.despesas)}`, 14, 48)
+      doc.text(`Saldo Líquido: ${formatCurrency(summary.saldo)}`, 14, 56)
 
-      tableRows.push([dataStr, tipo, cat, valor, status])
-    })
+      // Tabela
+      const tableColumn = ['Data', 'Tipo', 'Categoria', 'Valor', 'Status']
+      const tableRows = []
 
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 65,
-      theme: 'grid',
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [44, 62, 80] }
-    })
+      transacoes.forEach((t) => {
+        const dataStr = new Date(t.data_transacao).toLocaleDateString('pt-BR')
+        const tipo = t.tipo
+        const cat = t.categorias?.nome || 'Sem categoria'
+        const valor = formatCurrency(t.valor)
+        const status = t.status || ''
 
-    doc.save(`relatorio_${filters.dataInicio}_a_${filters.dataFim}.pdf`)
+        tableRows.push([dataStr, tipo, cat, valor, status])
+      })
+
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 65,
+        theme: 'grid',
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [44, 62, 80] },
+      })
+
+      doc.save(`relatorio_${filters.dataInicio}_a_${filters.dataFim}.pdf`)
+    } finally {
+      setPdfExportLoading(false)
+    }
   }
 
   /* Eixos e legendas: tema claro precisa de ticks escuros (antes ficavam brancos). */
@@ -328,9 +337,15 @@ export default function Relatorios() {
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
               <span className="desktop-only">CSV</span>
             </button>
-            <button type="button" className="btn-primary btn-primary-dashboard relatorios-btn-export" onClick={exportToPDF} disabled={transacoes.length === 0} title="Baixar PDF">
+            <button
+              type="button"
+              className="btn-primary btn-primary-dashboard relatorios-btn-export"
+              onClick={exportToPDF}
+              disabled={transacoes.length === 0 || pdfExportLoading}
+              title={pdfExportLoading ? 'Gerando PDF…' : 'Baixar PDF'}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              <span className="desktop-only">PDF</span>
+              <span className="desktop-only">{pdfExportLoading ? '…' : 'PDF'}</span>
             </button>
           </div>
         </header>
