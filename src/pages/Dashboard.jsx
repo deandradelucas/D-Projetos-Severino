@@ -167,52 +167,38 @@ export default function Dashboard() {
         <section className="ref-kpi-row" aria-label="Resumo financeiro">
           <article className="ref-kpi-card ref-kpi-card--balance">
             <div className="ref-kpi-card__icon" aria-hidden>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 21h18M5 21V9.5l7-4.5 7 4.5V21M9 21v-5h6v5" />
               </svg>
             </div>
             <div className="ref-kpi-card__body">
-              <p className="ref-kpi-card__label">Saldo em conta</p>
+              <p className="ref-kpi-card__label">Saldo em Conta</p>
               <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(saldoTotal)}</p>
               <p className="ref-kpi-card__hint">Disponível agora</p>
             </div>
           </article>
           <article className="ref-kpi-card ref-kpi-card--expense">
             <div className="ref-kpi-card__icon" aria-hidden>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                <path d="M12 5v14M5 12h14" />
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 7 L7 11 L11 5 L15 13 L19 8 L21 6" />
               </svg>
             </div>
             <div className="ref-kpi-card__body">
-              <p className="ref-kpi-card__label">Despesas</p>
+              <p className="ref-kpi-card__label">Saída</p>
               <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(totalDespesas)}</p>
-              <p className="ref-kpi-card__hint">No período</p>
+              <p className="ref-kpi-card__hint">Despesas do período</p>
             </div>
           </article>
           <article className="ref-kpi-card ref-kpi-card--income">
             <div className="ref-kpi-card__icon" aria-hidden>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                <path d="M12 19V5M5 12l7-7 7 7" />
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 15 L7 9 L11 15 L15 7 L19 12 L21 14" />
               </svg>
             </div>
             <div className="ref-kpi-card__body">
-              <p className="ref-kpi-card__label">Receitas</p>
+              <p className="ref-kpi-card__label">Entrada</p>
               <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(totalReceitas)}</p>
-              <p className="ref-kpi-card__hint">Entradas</p>
-            </div>
-          </article>
-          <article className="ref-kpi-card ref-kpi-card--invest">
-            <div className="ref-kpi-card__icon" aria-hidden>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                <path d="M3 3v18h18" />
-                <path d="M7 12l4-4 4 4 6-6" />
-              </svg>
-            </div>
-            <div className="ref-kpi-card__body">
-              <p className="ref-kpi-card__label">Investimentos</p>
-              <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(0)}</p>
-              <p className="ref-kpi-card__hint">Em breve no app</p>
+              <p className="ref-kpi-card__hint">Receitas do período</p>
             </div>
           </article>
         </section>
