@@ -5530,8 +5530,20 @@ body[data-theme='light'] .ref-dashboard-greeting__name {
     border-radius: 18px;
   }
 
+  body[data-theme='light'] .ref-dashboard-header__actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+
   body[data-theme='light'] .ref-dashboard-greeting {
     font-size: clamp(19px, 5.2vw, 26px);
+    flex: 1 1 calc(100% - 56px);
+  }
+
+  body[data-theme='light'] .ref-dashboard-header__btn-tx {
+    padding: 9px 14px;
+    font-size: 12px;
   }
 }
 
