@@ -273,8 +273,11 @@ export default function Dashboard() {
           <article className="ref-kpi-card ref-kpi-card--invest">
             <div className="ref-kpi-card__icon" aria-hidden>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 5c-1.5 0-2.8 1.1-3 2.5-.2-1.4-1.5-2.5-3-2.5-1.3 0-2.4.8-3 2-.6-1.2-1.7-2-3-2C5.6 5 4 6.7 4 9c0 3.4 4 6.9 7 10 3-3.1 7-6.6 7-10 0-2.3-1.6-4-4-4z" />
-                <path d="M12 18c-1-1.2-2.3-2.5-3.5-4" />
+                <path d="M3 3v18h18" />
+                <path d="M7 15l3-3 3 2 5-6 3 3" />
+                <circle cx="7" cy="15" r="1.2" fill="currentColor" />
+                <circle cx="13" cy="14" r="1.2" fill="currentColor" />
+                <circle cx="18" cy="8" r="1.2" fill="currentColor" />
               </svg>
             </div>
             <div className="ref-kpi-card__body">

@@ -32,6 +32,15 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     }
   })
 
+  const iniciaisAvatar = (() => {
+    const nome = String(perfil.nome || 'U').trim()
+    const partes = nome.split(/\s+/).filter(Boolean)
+    if (partes.length >= 2) {
+      return `${partes[0][0]}${partes[partes.length - 1][0]}`.toUpperCase()
+    }
+    return nome.slice(0, 2).toUpperCase() || 'U'
+  })()
+
   useEffect(() => {
     const idx = MENU_ORDER.indexOf(location.pathname)
     if (idx < 0) return
@@ -76,7 +85,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
       <aside className={`sidebar ${menuAberto ? 'open' : ''}`}>
         <div className="exec-profile-card">
           <div className="exec-profile-avatar" aria-hidden>
-            {(perfil.nome || 'U').charAt(0).toUpperCase()}
+            {iniciaisAvatar}
           </div>
           <p className="exec-profile-name">{perfil.nome}</p>
           <p className="exec-profile-role">
