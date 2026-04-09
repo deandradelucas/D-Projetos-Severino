@@ -22,10 +22,7 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
   }))
 
   useEffect(() => {
-    if (!requireAppAccess) {
-      setState({ loading: false, user: readUser() })
-      return
-    }
+    if (!requireAppAccess) return
 
     let cancelled = false
     ;(async () => {
