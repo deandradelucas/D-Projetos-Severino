@@ -4443,43 +4443,6 @@ body[data-theme='light'] .relatorios-kpi-saldo--neg {
   box-shadow: 0 0 0 1px rgba(212, 168, 75, 0.25);
 }
 
-.config-theme-preview {
-  height: 56px;
-  width: 100%;
-}
-
-.config-theme-preview--light {
-  background: linear-gradient(180deg, #faf8f5 0%, #ece8e0 100%);
-}
-
-.config-theme-preview--dark {
-  background: linear-gradient(180deg, #2a2824 0%, #121110 100%);
-}
-
-.config-theme-preview--glass {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
-  backdrop-filter: blur(8px);
-}
-
-.config-theme-preview--cyberpunk {
-  background:
-    linear-gradient(145deg, rgba(0, 229, 204, 0.35) 0%, transparent 42%),
-    linear-gradient(220deg, rgba(192, 38, 211, 0.4) 0%, transparent 48%),
-    linear-gradient(180deg, #0a0428 0%, #040214 100%);
-}
-
-.config-theme-preview--off-white {
-  background:
-    linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 38%, #000000 100%),
-    repeating-linear-gradient(
-      -12deg,
-      transparent,
-      transparent 5px,
-      rgba(255, 255, 255, 0.03) 5px,
-      rgba(255, 255, 255, 0.03) 6px
-    );
-}
-
 .config-theme-body {
   padding: 14px 16px 16px;
 }
