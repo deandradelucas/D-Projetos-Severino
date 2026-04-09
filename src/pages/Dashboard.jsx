@@ -152,11 +152,13 @@ export default function Dashboard() {
         <div className="ref-dashboard-inner">
         <header className="ref-dashboard-header">
           <MobileMenuButton onClick={() => setMenuAberto(true)} />
-          <h1 className="ref-dashboard-greeting">
-            <span className="ref-dashboard-greeting__prefix">Olá,</span>
-            {` `}
-            <span className={`ref-dashboard-greeting__name ${privacyMode ? 'privacy-blur' : ''}`}>{nomeExibicao}</span>
-          </h1>
+          <div className="ref-dashboard-header__lead">
+            <h1 className="ref-dashboard-greeting">
+              <span className="ref-dashboard-greeting__prefix">Olá,</span>
+              {` `}
+              <span className={`ref-dashboard-greeting__name ${privacyMode ? 'privacy-blur' : ''}`}>{nomeExibicao}</span>
+            </h1>
+          </div>
           <div className="ref-dashboard-header__actions">
             <button type="button" className="ref-dashboard-header__btn-tx" onClick={() => setIsModalOpen(true)}>
               Nova transação
@@ -335,17 +337,6 @@ export default function Dashboard() {
           </article>
         </section>
 
-        <div className="ref-fab-wrap">
-          <button
-            type="button"
-            className="ref-fab"
-            onClick={() => setIsModalOpen(true)}
-            title="Nova transação"
-            aria-label="Nova transação"
-          >
-            +
-          </button>
-        </div>
         </div>
         </main>
       </div>

@@ -134,8 +134,8 @@ export default function HorizonChat() {
         id="horizon-chat-btn"
         className={`horizon-chat-fab ${aberto ? 'chat-fab-active' : ''}`}
         onClick={() => setAberto(v => !v)}
-        title="Pergunte ao Horizon"
-        aria-label="Abrir assistente Horizon"
+        title="Horizon IA"
+        aria-label="Abrir Horizon IA"
       >
         {aberto ? (
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -167,10 +167,10 @@ export default function HorizonChat() {
               </svg>
             </div>
             <div>
-              <div className="horizon-chat-name">Pergunte ao Horizon</div>
+              <div className="horizon-chat-name">Horizon IA</div>
               <div className="horizon-chat-status">
                 <span className="horizon-status-dot" />
-                IA Financeira · Gemini
+                Assistente financeiro · Gemini
               </div>
             </div>
           </div>
@@ -224,7 +224,30 @@ export default function HorizonChat() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
+        {/* Sugestões rápidas (acima do campo, padrão chat) */}
+        {mensagens.length <= 2 && !carregando && (
+          <div className="horizon-suggestions">
+            {[
+              'Qual é meu saldo atual?',
+              'Onde estou gastando mais?',
+              'Como posso economizar?',
+            ].map(s => (
+              <button
+                key={s}
+                type="button"
+                className="horizon-suggestion-chip"
+                onClick={() => {
+                  setInput(s)
+                  setTimeout(() => inputRef.current?.focus(), 50)
+                }}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Campo de mensagem */}
         <div className="horizon-chat-input-area">
           <textarea
             ref={inputRef}
@@ -239,6 +262,7 @@ export default function HorizonChat() {
             aria-label="Mensagem para o Horizon"
           />
           <button
+            type="button"
             className={`horizon-send-btn ${carregando || !input.trim() ? 'horizon-send-disabled' : ''}`}
             onClick={enviarMensagem}
             disabled={carregando || !input.trim()}
@@ -255,28 +279,6 @@ export default function HorizonChat() {
             )}
           </button>
         </div>
-
-        {/* Sugestões Rápidas */}
-        {mensagens.length <= 2 && !carregando && (
-          <div className="horizon-suggestions">
-            {[
-              'Qual é meu saldo atual?',
-              'Onde estou gastando mais?',
-              'Como posso economizar?',
-            ].map(s => (
-              <button
-                key={s}
-                className="horizon-suggestion-chip"
-                onClick={() => {
-                  setInput(s)
-                  setTimeout(() => inputRef.current?.focus(), 50)
-                }}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </>
   )
