@@ -104,6 +104,14 @@ export default function Configuracoes() {
     }
   }
 
+  /** Chaves alinhadas ao CSS (.config-theme-preview--*) para o audit de classes estático. */
+  const THEME_PREVIEW_CLASS = {
+    light: 'config-theme-preview--light',
+    dark: 'config-theme-preview--dark',
+    glass: 'config-theme-preview--glass',
+    cyberpunk: 'config-theme-preview--cyberpunk',
+  }
+
   const themes = [
     { id: 'light', name: 'Claro', desc: 'Visual limpo e profissional', prev: 'light' },
     { id: 'dark', name: 'Escuro', desc: 'Conforto visual à noite', prev: 'dark' },
@@ -277,7 +285,7 @@ export default function Configuracoes() {
                 className={`config-theme-card ${theme === t.id ? 'is-active' : ''}`}
                 onClick={() => toggleTheme(t.id)}
               >
-                <div className={`config-theme-preview config-theme-preview--${t.prev}`} aria-hidden />
+                <div className={`config-theme-preview ${THEME_PREVIEW_CLASS[t.id]}`} aria-hidden />
                 <div className="config-theme-body">
                   <h4>{t.name}</h4>
                   <p>{t.desc}</p>

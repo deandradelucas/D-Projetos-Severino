@@ -690,31 +690,6 @@ h3 {
   white-space: nowrap;
 }
 
-.nav-item__label {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  min-width: 0;
-  white-space: normal;
-}
-
-.nav-item__title {
-  line-height: 1.2;
-}
-
-.nav-item__sub {
-  font-size: 11px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.42);
-  line-height: 1.25;
-  max-width: 168px;
-}
-
-.nav-item.active .nav-item__sub {
-  color: rgba(0, 0, 0, 0.52);
-}
-
 .nav-item:hover:not(.active) {
   background-color: var(--sidebar-hover-bg);
   color: var(--sidebar-text);
@@ -4329,40 +4304,6 @@ body[data-theme='light'] .page-relatorios .relatorios-chart-empty {
   color: var(--text-secondary);
   margin-top: 4px;
   display: block;
-}
-
-.config-quick-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-}
-
-.config-quick-link {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  padding: 14px 14px;
-  border-radius: 14px;
-  text-decoration: none;
-  color: var(--text-primary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  font-size: 13px;
-  font-weight: 600;
-  transition: transform 0.2s, border-color 0.2s, background 0.2s;
-}
-
-.config-quick-link:hover {
-  border-color: rgba(212, 168, 75, 0.45);
-  background: rgba(212, 168, 75, 0.06);
-  transform: translateY(-2px);
-}
-
-.config-quick-link small {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-secondary);
 }
 
 .config-section-label {
