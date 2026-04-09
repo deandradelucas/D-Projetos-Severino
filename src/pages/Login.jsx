@@ -43,10 +43,8 @@ export default function Login() {
   }, [email, rememberEmail])
 
   useEffect(() => {
-    if (!forgotEmail && email) {
-      setForgotEmail(email)
-    }
-  }, [email, forgotEmail])
+    setForgotEmail(email)
+  }, [email])
 
   async function handleForgotPassword(event) {
     event.preventDefault()
@@ -108,6 +106,10 @@ export default function Login() {
 
     if (!senha) {
       setMensagem({ texto: 'Preencha a senha', tipo: 'erro' })
+      return
+    }
+    if (senha.length < 6) {
+      setMensagem({ texto: 'A senha deve ter no mínimo 6 caracteres', tipo: 'erro' })
       return
     }
 
@@ -175,33 +177,33 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-[100dvh] min-h-[100svh] flex items-center justify-center p-4 sm:p-6 relative">
+    <div className="fixed inset-0 z-[1] flex items-center justify-center overflow-hidden bg-transparent p-3 pb-[max(12px,env(safe-area-inset-bottom))] sm:p-6 md:p-8 relative">
       <div
-        className="pointer-events-none absolute inset-0 opacity-40"
+        className="pointer-events-none absolute inset-0 opacity-30"
         aria-hidden
         style={{
           background:
             'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212,168,75,0.12), transparent), radial-gradient(ellipse 60% 40% at 100% 100%, rgba(99,102,241,0.06), transparent)',
         }}
       />
-      <div className="w-full max-w-[380px] relative z-[1]">
-        <div className="rounded-3xl border border-white/[0.12] bg-black/55 p-6 sm:p-8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.65)] backdrop-blur-md ring-1 ring-white/[0.06]">
-            <div className="flex justify-center mb-5 sm:mb-6">
+      <div className="w-full max-w-[420px] relative z-[1]">
+        <div className="rounded-2xl sm:rounded-3xl border border-white/[0.16] bg-black/65 px-4 py-5 sm:p-8 shadow-[0_28px_56px_-20px_rgba(0,0,0,0.7)] sm:shadow-[0_36px_74px_-20px_rgba(0,0,0,0.72)] backdrop-blur-lg ring-1 ring-white/[0.08]">
+            <div className="flex justify-center mb-4 sm:mb-6">
               <img 
                 src={BRAND_ASSETS.logoOnDark}
                 alt="Horizonte Financeiro" 
-                className="mx-auto block h-auto w-[230px] sm:w-[270px] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
+                className="mx-auto block h-auto w-[210px] sm:w-[270px] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
               />
             </div>
 
-          <h1 className="text-xl font-semibold text-center text-[#f5f5f5] mb-1">
+          <h1 className="text-[22px] sm:text-2xl font-semibold text-center text-[#f5f5f5] mb-1">
             Entrar
           </h1>
-          <p className="text-center text-[#a3a3a3] mb-4 text-xs">
+          <p className="text-center text-[#b5b5b5] mb-4 sm:mb-5 text-[13px] sm:text-sm">
             Faça login para continuar
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-3" noValidate>
+          <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3" noValidate>
             <div>
               <label className="block text-[#a3a3a3] text-xs font-medium mb-1" htmlFor="email">
                 E-mail
@@ -228,8 +230,9 @@ export default function Login() {
                   type={showSenha ? 'text' : 'password'}
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  placeholder="Sua senha"
+                  placeholder="Mínimo 6 caracteres"
                   required
+                  minLength={6}
                   autoComplete="current-password"
                   className="w-full px-3 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-lg text-[#f5f5f5] placeholder-[#737373] text-sm focus:outline-none focus:border-[#d4a84b] focus:bg-white/10 transition-all duration-200 pr-10"
                 />
@@ -250,7 +253,7 @@ export default function Login() {
                   )}
                 </button>
               </div>
-              <div className="mt-2 flex items-center justify-between gap-3">
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
                 <label className="flex items-center gap-2 text-[11px] font-medium text-[#cfcfcf]">
                   <input
                     type="checkbox"
@@ -265,6 +268,7 @@ export default function Login() {
                   onClick={(event) => {
                     event.preventDefault()
                     setShowForgotPassword((current) => !current)
+                    setForgotEmail(email)
                     setForgotPasswordState({ text: '', type: '', link: '' })
                   }}
                   className="text-[11px] font-medium text-[#d4a84b] transition-colors hover:text-[#b8923f] hover:underline"

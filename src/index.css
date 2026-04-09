@@ -21,6 +21,7 @@
 html {
   min-height: 100%;
   height: 100%;
+  background-color: #050607;
   -webkit-text-size-adjust: 100%;
   overflow-x: clip;
 }
@@ -35,6 +36,7 @@ body,
 body {
   font-family: var(--font-family-sans);
   background: #050607;
+  background-color: #050607;
   margin: 0;
   overflow-x: clip;
   -webkit-tap-highlight-color: rgba(212, 168, 75, 0.12);
@@ -221,35 +223,53 @@ button {
   html {
     overflow: hidden;
     overflow-x: clip;
-    height: 100%;
+    min-height: 100dvh;
+    height: 100dvh;
     overscroll-behavior: none;
+    background-color: #050607;
   }
 
   body,
   #root {
     width: 100%;
     max-width: 100%;
-    height: 100%;
+    height: 100dvh;
     max-height: 100dvh;
-    min-height: 0;
+    min-height: 100dvh;
     overflow: hidden;
     overflow-x: clip;
     overscroll-behavior: none;
     touch-action: pan-y;
+    background-color: #050607;
   }
 
   #root {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    min-height: 0;
+    height: 100dvh;
+    min-height: 100dvh;
     flex: 1;
   }
 
   body {
     position: fixed;
     inset: 0;
+    width: 100vw;
+    height: 100dvh;
     overscroll-behavior-y: none;
+  }
+
+  /* iOS safe-area paint: evita faixa clara residual no rodapé */
+  body::after {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: max(12px, env(safe-area-inset-bottom));
+    background: #050607;
+    pointer-events: none;
+    z-index: 9999;
   }
 
   input,
@@ -257,6 +277,23 @@ button {
   select {
     font-size: 16px;
     max-width: 100%;
+  }
+}
+
+/* Safari iOS (iPhone 16 Pro incluso): fixa variação de viewport dinâmica */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    html,
+    body,
+    #root {
+      min-height: -webkit-fill-available;
+      height: -webkit-fill-available;
+    }
+
+    .app-background-root {
+      min-height: -webkit-fill-available;
+      height: -webkit-fill-available;
+    }
   }
 }
 

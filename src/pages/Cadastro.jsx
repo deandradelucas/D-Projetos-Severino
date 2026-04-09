@@ -14,6 +14,14 @@ function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
+function validatePassword(password) {
+  const value = String(password || '')
+  if (value.length < 6) {
+    return 'Mínimo 6 caracteres'
+  }
+  return ''
+}
+
 export default function Cadastro() {
   const [nome, setNome] = useState('')
   const [telefone, setTelefone] = useState('')
@@ -28,6 +36,7 @@ export default function Cadastro() {
   const formRef = useRef(null)
   const inputsRef = useRef([])
   const animate = true
+  const senhaLengthOk = senha.length >= 6
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -56,13 +65,14 @@ export default function Cadastro() {
     if (field === 'email' && value) {
       newErrors.email = validateEmail(value) ? '' : 'E-mail inválido'
     }
-    if (field === 'senha' && value && value.length < 6) {
-      newErrors.senha = 'Mínimo 6 caracteres'
+    if (field === 'senha') {
+      newErrors.senha = value ? validatePassword(value) : ''
+      if (confirmarSenha) {
+        newErrors.confirmarSenha = value === confirmarSenha ? '' : 'As senhas não coincidem'
+      }
     }
-    if (field === 'confirmarSenha' && value !== senha) {
-      newErrors.confirmarSenha = 'As senhas não coincidem'
-    } else if (field === 'confirmarSenha') {
-      newErrors.confirmarSenha = ''
+    if (field === 'confirmarSenha') {
+      newErrors.confirmarSenha = value && value !== senha ? 'As senhas não coincidem' : ''
     }
     
     setErrors(newErrors)
@@ -74,6 +84,11 @@ export default function Cadastro() {
 
     if (!validateEmail(email)) {
       setMensagem({ texto: 'E-mail inválido', tipo: 'erro' })
+      return
+    }
+    const senhaError = validatePassword(senha)
+    if (senhaError) {
+      setMensagem({ texto: senhaError, tipo: 'erro' })
       return
     }
     if (senha !== confirmarSenha) {
@@ -120,7 +135,7 @@ export default function Cadastro() {
   }
 
   return (
-    <div className="min-h-[100dvh] min-h-[100svh] flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-[1] flex items-center justify-center overflow-hidden p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-[360px]">
         <div className={`bg-black/50 backdrop-blur-[2px] border border-white/20 rounded-2xl p-5 sm:p-6 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="flex justify-center mb-5 sm:mb-6">
@@ -212,13 +227,16 @@ export default function Cadastro() {
                   type={showSenha ? 'text' : 'password'}
                   value={senha}
                   onChange={(e) => {
-                    setSenha(e.target.value)
-                    validateField('senha', e.target.value)
+                    const nextSenha = e.target.value
+                    setSenha(nextSenha)
+                    validateField('senha', nextSenha)
                   }}
                   onBlur={(e) => validateField('senha', e.target.value)}
                   placeholder="Mínimo 6 caracteres"
                   required
                   minLength={6}
+                  pattern=".{6,}"
+                  title="A senha deve ter no mínimo 6 caracteres."
                   autoComplete="new-password"
                   ref={el => inputsRef.current[3] = el}
                   className={`w-full px-3 py-2.5 sm:py-3 bg-white/5 border rounded-lg text-[#f5f5f5] placeholder-[#737373] text-sm focus:outline-none focus:bg-white/10 transition-all duration-200 pr-10 ${
@@ -242,6 +260,12 @@ export default function Cadastro() {
                     </svg>
                   )}
                 </button>
+              </div>
+              <div className="mt-2 space-y-1">
+                <p className={`text-[10px] flex items-center gap-1.5 ${senhaLengthOk ? 'text-[#86efac]' : 'text-[#737373]'}`}>
+                  <span aria-hidden>{senhaLengthOk ? '✓' : '•'}</span>
+                  <span>Pelo menos 6 caracteres</span>
+                </p>
               </div>
               {errors.senha && (
                 <p className="text-red-400 text-[10px] mt-1">{errors.senha}</p>
