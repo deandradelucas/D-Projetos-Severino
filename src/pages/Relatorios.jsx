@@ -37,6 +37,19 @@ function labelDiaBr(isoYmd) {
   return new Date(y, m - 1, d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
 }
 
+/** YYYY-MM a partir da data da transação */
+function transacaoMesKey(dataTransacao) {
+  const d = transacaoDiaKey(dataTransacao)
+  if (!d) return ''
+  return d.slice(0, 7)
+}
+
+function labelMesBr(ym) {
+  const [y, m] = String(ym).split('-').map(Number)
+  if (!y || !m) return String(ym)
+  return new Date(y, m - 1, 15).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+}
+
 function tipoNormalizado(tipo) {
   return String(tipo || '').trim().toUpperCase()
 }
@@ -58,7 +71,7 @@ function RelatoriosTooltip({ active, payload, label, formatCurrency }) {
 }
 
 export default function Relatorios() {
-  const { theme, privacyMode } = useTheme()
+  const { privacyMode } = useTheme()
   const [usuario] = useState(() => {
     const saved = localStorage.getItem('horizonte_user')
     if (saved) {
@@ -148,14 +161,17 @@ export default function Relatorios() {
   const {
     summary,
     chartDataPorData,
+    chartDataPorMes,
     chartDataPorCategoria,
     chartDataReceitasPorCategoria,
     chartDataSaldoCum,
+    chartDataSaldoCumMes,
   } = useMemo(() => {
     let receitas = 0
     let despesas = 0
 
     const dataMap = {}
+    const mesMap = {}
     const catMap = {}
     const recCatMap = {}
 
@@ -168,6 +184,18 @@ export default function Relatorios() {
 
       if (!dataMap[dRaw]) {
         dataMap[dRaw] = { raw: dRaw, Receitas: 0, Despesas: 0 }
+      }
+
+      const mRaw = transacaoMesKey(t.data_transacao)
+      if (mRaw) {
+        if (!mesMap[mRaw]) {
+          mesMap[mRaw] = { Receitas: 0, Despesas: 0 }
+        }
+        if (tipo === 'RECEITA') {
+          mesMap[mRaw].Receitas += valorNum
+        } else {
+          mesMap[mRaw].Despesas += valorNum
+        }
       }
 
       if (tipo === 'RECEITA') {
@@ -206,6 +234,28 @@ export default function Relatorios() {
       }
     })
 
+    const sortedMesKeys = Object.keys(mesMap).sort()
+    const chartDataPorMes = sortedMesKeys.map((k) => {
+      const row = mesMap[k]
+      return {
+        name: labelMesBr(k),
+        Receitas: row.Receitas,
+        Despesas: row.Despesas,
+      }
+    })
+
+    let runMes = 0
+    const chartDataSaldoCumMes = sortedMesKeys.map((k) => {
+      const row = mesMap[k]
+      const net = row.Receitas - row.Despesas
+      runMes += net
+      return {
+        name: labelMesBr(k),
+        saldo: runMes,
+        liquidoMes: net,
+      }
+    })
+
     const chartDataPorCategoria = Object.entries(catMap)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
@@ -217,9 +267,11 @@ export default function Relatorios() {
     return {
       summary: { receitas, despesas, saldo: receitas - despesas },
       chartDataPorData,
+      chartDataPorMes,
       chartDataPorCategoria,
       chartDataReceitasPorCategoria,
       chartDataSaldoCum,
+      chartDataSaldoCumMes,
     }
   }, [transacoes])
 
@@ -308,11 +360,11 @@ export default function Relatorios() {
     }
   }
 
-  /* Eixos e legendas: tema claro precisa de ticks escuros (antes ficavam brancos). */
-  const axisColor = theme === 'light' ? '#475569' : '#cbd5e1'
-  const chartTickFill = theme === 'light' ? '#64748b' : 'rgba(255,255,255,0.45)'
-  const legendColor = theme === 'light' ? 'rgba(15,23,42,0.82)' : 'rgba(255,255,255,0.82)'
-  const tooltipBg = theme === 'light' ? '#ffffff' : '#1e1e2d'
+  /* Cards de gráfico em fundo branco: eixos sempre legíveis (slate). */
+  const chartAxis = '#94a3b8'
+  const chartTickFill = '#475569'
+  const legendColor = '#334155'
+  const tooltipBg = '#ffffff'
 
   const saldoPositivo = summary.saldo >= 0
 
@@ -433,9 +485,9 @@ export default function Relatorios() {
                         <stop offset="100%" stopColor="#dc2626" stopOpacity={0.9} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="4 8" stroke={axisColor} strokeOpacity={0.12} vertical={false} />
-                    <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
-                    <YAxis stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} />
+                    <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.12} vertical={false} />
+                    <XAxis dataKey="name" stroke={chartAxis} fontSize={11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
+                    <YAxis stroke={chartAxis} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} />
                     <Tooltip
                       content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />}
                       cursor={{ fill: 'rgba(212, 168, 75, 0.06)' }}
@@ -462,9 +514,9 @@ export default function Relatorios() {
                         <stop offset="100%" stopColor="#6366f1" stopOpacity={0.05} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="4 8" stroke={axisColor} strokeOpacity={0.12} vertical={false} />
-                    <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
-                    <YAxis stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => formatCurrency(v)} width={72} />
+                    <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.12} vertical={false} />
+                    <XAxis dataKey="name" stroke={chartAxis} fontSize={11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} />
+                    <YAxis stroke={chartAxis} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => formatCurrency(v)} width={72} />
                     <ReferenceLine y={0} stroke="rgba(212,168,75,0.35)" strokeDasharray="4 4" />
                     <Tooltip
                       content={({ active, payload, label }) => {

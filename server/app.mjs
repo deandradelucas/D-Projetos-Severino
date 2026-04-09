@@ -13,7 +13,13 @@ import {
   sendResetEmail,
   storeResetToken,
 } from './lib/password-reset.mjs'
-import { getCategorias, inserirTransacao, getTransacoes, deletarTransacao } from './lib/transacoes.mjs'
+import {
+  getCategorias,
+  inserirTransacao,
+  getTransacoes,
+  atualizarTransacao,
+  deletarTransacao,
+} from './lib/transacoes.mjs'
 import {
   getPerfilUsuario,
   getWhatsappLogs,
@@ -586,6 +592,26 @@ app.post('/api/transacoes', async (c) => {
   } catch (error) {
     log.error('insert transaction failed', error)
     return c.json({ message: error.message || 'Erro ao inserir transação.' }, 500)
+  }
+})
+
+app.put('/api/transacoes/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) {
+      return c.json({ message: 'Não autorizado.' }, 401)
+    }
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
+    const body = await c.req.json()
+    await atualizarTransacao(id, usuarioId, body)
+    return c.json({ message: 'Transação atualizada com sucesso.' })
+  } catch (error) {
+    log.error('update transaction failed', error)
+    return c.json({ message: error.message || 'Erro ao atualizar transação.' }, 500)
   }
 })
 

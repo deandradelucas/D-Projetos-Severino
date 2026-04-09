@@ -171,6 +171,8 @@ async function enrichTransacoesComCategorias(supabaseAdmin, rows) {
     descricao: r.descricao,
     data_transacao: r.data_transacao,
     status: r.status,
+    categoria_id: r.categoria_id,
+    subcategoria_id: r.subcategoria_id,
     categorias: r.categoria_id ? catMap.get(r.categoria_id) ?? null : null,
     subcategorias: r.subcategoria_id ? subMap.get(r.subcategoria_id) ?? null : null,
   }))
@@ -201,7 +203,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
   }
 
   const selectComEmbed = `
-      id, tipo, valor, descricao, data_transacao, status,
+      id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id,
       categorias(nome, cor),
       subcategorias(nome)
     `
@@ -223,6 +225,37 @@ export async function getTransacoes(usuarioId, filters = {}) {
   }
 
   return Array.isArray(data) ? data : []
+}
+
+export async function atualizarTransacao(id, usuarioId, body) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const uid = String(usuarioId || '').trim()
+  const valNum = parseFloat(body.valor)
+  if (isNaN(valNum) || valNum <= 0) {
+    throw new Error('Valor inválido.')
+  }
+
+  const update = {
+    tipo: body.tipo,
+    valor: valNum,
+    descricao: body.descricao ?? '',
+    data_transacao: body.data_transacao,
+    status: body.status || 'EFETIVADA',
+    categoria_id: body.categoria_id || null,
+    subcategoria_id: body.subcategoria_id || null,
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('transacoes')
+    .update(update)
+    .eq('id', id)
+    .eq('usuario_id', uid)
+    .select('id')
+    .maybeSingle()
+
+  if (error) throw error
+  if (!data) throw new Error('Transação não encontrada.')
+  return data
 }
 
 export async function deletarTransacao(id, usuarioId) {

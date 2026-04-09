@@ -93,7 +93,7 @@ const CustomSelect = ({ name, value, onChange, options, placeholder, isOpen, onT
   )
 }
 
-export default function TransactionModal({ isOpen, onClose, onSave, usuarioId }) {
+export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, editingTransaction = null }) {
   const [categorias, setCategorias] = useState([])
   const [loadingCats, setLoadingCats] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -138,31 +138,65 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
     }
   }, [usuarioId])
 
+  const isEditMode = Boolean(editingTransaction?.id)
+
   useEffect(() => {
-    if (isOpen && usuarioId) {
-      fetchCategorias()
-      setDisplayValor('')
-      setFormData(prev => ({ 
-        ...prev, 
-        valor: '', 
-        descricao: '', 
-        categoria_id: '', 
-        subcategoria_id: '',
-        status: 'EFETIVADA',
-        data_transacao: (() => {
-          const now = new Date();
-          const offset = now.getTimezoneOffset() * 60000;
-          return new Date(now - offset).toISOString().slice(0, 16);
-        })(),
-        recorrencia: { ativo: false, frequencia: 'MENSAL', quantidade: 12 }
-      }))
-      
-      // Auto focus valor field
-      setTimeout(() => {
-        if (valorInputRef.current) valorInputRef.current.focus()
-      }, 100)
+    if (!isOpen || !usuarioId) return
+
+    fetchCategorias()
+
+    if (editingTransaction?.id) {
+      const t = editingTransaction
+      const val = parseFloat(t.valor) || 0
+      const numValue = Number(val.toFixed(2))
+      const formatted = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      }).format(numValue)
+      setDisplayValor(formatted)
+
+      let dtStr = ''
+      if (t.data_transacao) {
+        const d = new Date(t.data_transacao)
+        if (!Number.isNaN(d.getTime())) {
+          const offset = d.getTimezoneOffset() * 60000
+          dtStr = new Date(d.getTime() - offset).toISOString().slice(0, 16)
+        }
+      }
+
+      setFormData({
+        descricao: t.descricao || '',
+        valor: String(numValue),
+        tipo: t.tipo || 'DESPESA',
+        data_transacao: dtStr,
+        categoria_id: t.categoria_id != null ? String(t.categoria_id) : '',
+        subcategoria_id: t.subcategoria_id != null ? String(t.subcategoria_id) : '',
+        status: t.status || 'EFETIVADA',
+        recorrencia: { ativo: false, frequencia: 'MENSAL', quantidade: 12 },
+      })
+      return
     }
-  }, [isOpen, usuarioId, fetchCategorias])
+
+    setDisplayValor('')
+    setFormData((prev) => ({
+      ...prev,
+      valor: '',
+      descricao: '',
+      categoria_id: '',
+      subcategoria_id: '',
+      status: 'EFETIVADA',
+      data_transacao: (() => {
+        const now = new Date()
+        const offset = now.getTimezoneOffset() * 60000
+        return new Date(now - offset).toISOString().slice(0, 16)
+      })(),
+      recorrencia: { ativo: false, frequencia: 'MENSAL', quantidade: 12 },
+    }))
+
+    setTimeout(() => {
+      if (valorInputRef.current) valorInputRef.current.focus()
+    }, 100)
+  }, [isOpen, usuarioId, editingTransaction?.id, fetchCategorias])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -216,21 +250,32 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
 
     setSaving(true)
     try {
-      const res = await fetch(apiUrl('/api/transacoes'), {
-        method: 'POST',
+      const payload = {
+        ...formData,
+        data_transacao: new Date(formData.data_transacao).toISOString(),
+        descricao: finalDescricao,
+      }
+      if (!isEditMode) {
+        payload.recorrencia = formData.recorrencia.ativo
+          ? {
+              frequencia: formData.recorrencia.frequencia,
+              quantidade: parseInt(formData.recorrencia.quantidade, 10),
+            }
+          : null
+      }
+
+      const url = isEditMode
+        ? apiUrl(`/api/transacoes/${editingTransaction.id}`)
+        : apiUrl('/api/transacoes')
+      const method = isEditMode ? 'PUT' : 'POST'
+
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'x-user-id': usuarioId,
         },
-        body: JSON.stringify({ 
-          ...formData, 
-          data_transacao: new Date(formData.data_transacao).toISOString(),
-          descricao: finalDescricao,
-          recorrencia: formData.recorrencia.ativo ? {
-            frequencia: formData.recorrencia.frequencia,
-            quantidade: parseInt(formData.recorrencia.quantidade, 10)
-          } : null
-        })
+        body: JSON.stringify(payload),
       })
       if (res.ok) {
         onSave()
@@ -256,7 +301,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
     <div className="modal-backdrop">
       <div className="modal-content">
         <div className="modal-header">
-          <h3>Nova Transação</h3>
+          <h3>{isEditMode ? 'Editar Transação' : 'Nova Transação'}</h3>
           <button onClick={onClose} className="close-btn">&times;</button>
         </div>
         <form onSubmit={handleSubmit} className="modal-form">
@@ -390,7 +435,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
             </div>
           </div>
 
-          {/* Recurrence Section */}
+          {/* Recurrence — apenas ao criar */}
+          {!isEditMode && (
           <div className="recorrencia-wrapper" style={{ 
             background: 'linear-gradient(135deg, rgba(212, 168, 75, 0.08) 0%, rgba(212, 168, 75, 0.03) 100%)', 
             padding: '20px', 
@@ -468,6 +514,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
               </div>
             )}
           </div>
+          )}
 
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn-secondary" disabled={saving}>Cancelar</button>
@@ -479,7 +526,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId })
                   </svg>
                   Salvando...
                 </div>
-              ) : 'Salvar Transação'}
+              ) : isEditMode ? 'Salvar alterações' : 'Salvar Transação'}
             </button>
           </div>
         </form>

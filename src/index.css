@@ -291,3 +291,79 @@ button {
     opacity: 0.75;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Barras de rolagem — desktop (mesma linguagem dos cards: fundo + bloco elevado)
+   Cores alinhadas a dashboard.css (--bg-secondary, --bg-card-elevated, bordas).
+   Mobile: inalterado.
+   -------------------------------------------------------------------------- */
+@media (min-width: 769px) {
+  :root {
+    /* Light — canal = área ao redor do painel; thumb = superfície tipo card */
+    --sb-track: #e4e9ef;
+    --sb-thumb: #ffffff;
+    --sb-thumb-hover: #f8fafc;
+    --sb-thumb-border: rgba(15, 23, 42, 0.09);
+    --sb-thumb-inset: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+
+  body[data-theme='dark'] {
+    --sb-track: #080a0e;
+    --sb-thumb: #141820;
+    --sb-thumb-hover: #1a1f2a;
+    --sb-thumb-border: rgba(255, 255, 255, 0.09);
+    --sb-thumb-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  body[data-theme='cyberpunk'] {
+    --sb-track: #0a0628;
+    --sb-thumb: #140f3d;
+    --sb-thumb-hover: #1a1248;
+    --sb-thumb-border: rgba(0, 229, 204, 0.18);
+    --sb-thumb-inset: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+
+  body[data-theme='glass'] {
+    --sb-track: rgba(255, 255, 255, 0.04);
+    --sb-thumb: rgba(255, 255, 255, 0.1);
+    --sb-thumb-hover: rgba(255, 255, 255, 0.16);
+    --sb-thumb-border: rgba(255, 255, 255, 0.12);
+    --sb-thumb-inset: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-thumb) var(--sb-track);
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--sb-track);
+    border-radius: 8px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--sb-thumb);
+    border-radius: 8px;
+    border: 1px solid var(--sb-thumb-border);
+    box-shadow: var(--sb-thumb-inset);
+    background-clip: padding-box;
+    min-height: 36px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--sb-thumb-hover);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: var(--sb-track);
+  }
+}

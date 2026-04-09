@@ -2674,7 +2674,15 @@ h3 {
 
 .transacoes-col-actions {
   text-align: right;
-  width: 72px;
+  width: 96px;
+  white-space: nowrap;
+}
+
+.transacoes-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
 }
 
 .transacoes-cell-date__day {
@@ -3609,7 +3617,33 @@ body[data-theme='light'] .page-relatorios .relatorios-chart-empty {
   margin-bottom: 24px;
 }
 
-/* Delete Button Redesign */
+/* Editar / excluir — histórico de transações */
+.btn-edit {
+  background: transparent;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.btn-edit:hover {
+  background: var(--accent-muted, rgba(212, 168, 75, 0.12));
+  color: var(--accent);
+  border-color: rgba(212, 168, 75, 0.2);
+}
+
+[data-theme='cyberpunk'] .btn-edit:hover {
+  border-color: rgba(0, 229, 204, 0.35);
+  box-shadow: 0 0 0 1px rgba(0, 229, 204, 0.12);
+}
+
 .btn-delete {
   background: transparent;
   width: 32px;
