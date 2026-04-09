@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import ExecutiveMobileNav from '../components/ExecutiveMobileNav'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
@@ -393,7 +394,7 @@ export default function Relatorios() {
     >
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content relative z-10">
+      <main className="main-content relative z-10 premium-main">
         <header className="top-header relatorios-page-header">
           <div className="relatorios-page-header__titles">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
@@ -419,6 +420,7 @@ export default function Relatorios() {
             </button>
           </div>
         </header>
+        <ExecutiveMobileNav />
 
         <section className="relatorios-filter-shell" aria-label="Período e categoria">
           <div className="relatorios-filter-shell__head">

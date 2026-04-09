@@ -4,6 +4,7 @@ import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import ExecutiveMobileNav from '../components/ExecutiveMobileNav'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { readHorizonteUser } from '../lib/horizonteSession'
@@ -157,6 +158,18 @@ export default function Dashboard() {
     }, { totalReceitas: 0, totalDespesas: 0, saldoTotal: 0 })
   }, [transacoes])
 
+  const topCategorias = React.useMemo(() => {
+    const acc = new Map()
+    for (const t of transacoes) {
+      const nome = t?.categorias?.nome || 'Sem categoria'
+      const atual = acc.get(nome) || { nome, valor: 0, qtd: 0 }
+      atual.valor += Number(t?.valor || 0)
+      atual.qtd += 1
+      acc.set(nome, atual)
+    }
+    return [...acc.values()].sort((a, b) => b.valor - a.valor).slice(0, 4)
+  }, [transacoes])
+
   const formatCurrency = (val) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -170,7 +183,7 @@ export default function Dashboard() {
 
 
       {/* Main Content */}
-      <main className="main-content relative z-10">
+      <main className="main-content relative z-10 premium-main">
         <header className="top-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
@@ -184,6 +197,21 @@ export default function Dashboard() {
             </div>
           </div>
         </header>
+        <ExecutiveMobileNav />
+
+        <section className="premium-surface premium-hero">
+          <div className="premium-hero__main min-w-0">
+            <h2 className="premium-hero__title">Painel Executivo Financeiro</h2>
+            <p className="premium-hero__desc break-words">
+              Acompanhe performance, riscos e oportunidade de caixa em um único fluxo visual, com prioridade para decisões rápidas.
+            </p>
+          </div>
+          <div className="premium-hero__status">
+            <span className="premium-status-chip premium-status-chip--ok">Fluxo saudável</span>
+            <span className="premium-status-chip premium-status-chip--monitor">Monitoramento ativo</span>
+            <span className="premium-status-chip premium-status-chip--intel">Insights inteligentes</span>
+          </div>
+        </section>
 
         {fetchError && (
           <div
@@ -254,6 +282,78 @@ export default function Dashboard() {
             </>
           )}
         </div>
+
+        <section className="premium-quick-grid">
+          <button type="button" className="premium-quick-card" onClick={() => setIsModalOpen(true)}>
+            <span className="premium-quick-card__icon">+</span>
+            <div className="min-w-0">
+              <h3 className="premium-quick-card__title">Nova transação</h3>
+              <p className="premium-quick-card__sub break-words">Registrar entrada ou saída agora</p>
+            </div>
+          </button>
+          <Link to="/relatorios" className="premium-quick-card">
+            <span className="premium-quick-card__icon">◔</span>
+            <div className="min-w-0">
+              <h3 className="premium-quick-card__title">Análise avançada</h3>
+              <p className="premium-quick-card__sub break-words">Evolução diária e mensal consolidada</p>
+            </div>
+          </Link>
+          <Link to="/transacoes" className="premium-quick-card">
+            <span className="premium-quick-card__icon">$</span>
+            <div className="min-w-0">
+              <h3 className="premium-quick-card__title">Filtrar lançamentos</h3>
+              <p className="premium-quick-card__sub break-words">Ajuste período, tipo e categoria</p>
+            </div>
+          </Link>
+        </section>
+
+        <section className="premium-master-detail">
+          <article className="premium-surface premium-master-card">
+            <header className="premium-section-header">
+              <h3 className="premium-section-title">Categorias dominantes</h3>
+              <span className="premium-section-meta">Mestre</span>
+            </header>
+            <ul className="premium-master-list">
+              {topCategorias.length === 0 ? (
+                <li className="premium-master-list__empty">Sem dados para análise.</li>
+              ) : (
+                topCategorias.map((item) => (
+                  <li key={item.nome} className="premium-master-list__item">
+                    <div className="min-w-0">
+                      <p className="premium-master-list__name break-words">{item.nome}</p>
+                      <p className="premium-master-list__meta">{item.qtd} movimentações</p>
+                    </div>
+                    <strong className="premium-master-list__value">{formatCurrency(item.valor)}</strong>
+                  </li>
+                ))
+              )}
+            </ul>
+          </article>
+          <article className="premium-surface premium-detail-card">
+            <header className="premium-section-header">
+              <h3 className="premium-section-title">Leitura executiva</h3>
+              <span className="premium-section-meta">Detalhe</span>
+            </header>
+            <div className="premium-detail-grid">
+              <div className="premium-detail-item">
+                <span className="premium-detail-item__label">Saldo líquido</span>
+                <strong className="premium-detail-item__value">{formatCurrency(saldoTotal)}</strong>
+              </div>
+              <div className="premium-detail-item">
+                <span className="premium-detail-item__label">Receitas acumuladas</span>
+                <strong className="premium-detail-item__value">{formatCurrency(totalReceitas)}</strong>
+              </div>
+              <div className="premium-detail-item">
+                <span className="premium-detail-item__label">Despesas acumuladas</span>
+                <strong className="premium-detail-item__value">{formatCurrency(totalDespesas)}</strong>
+              </div>
+              <div className="premium-detail-item">
+                <span className="premium-detail-item__label">Cobertura operacional</span>
+                <strong className="premium-detail-item__value">{transacoes.length} eventos</strong>
+              </div>
+            </div>
+          </article>
+        </section>
 
         {/* Main Grid: Charts & Table */}
         {!loading && transacoes.length === 0 ? (

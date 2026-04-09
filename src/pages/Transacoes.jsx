@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import ExecutiveMobileNav from '../components/ExecutiveMobileNav'
 import TransactionModal from '../components/TransactionModal'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
@@ -140,7 +141,7 @@ export default function Transacoes() {
     <div className="dashboard-container page-transacoes">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content relative z-10">
+      <main className="main-content relative z-10 premium-main">
         <header className="top-header transacoes-page-header">
            <div className="transacoes-page-header__titles">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
@@ -160,6 +161,7 @@ export default function Transacoes() {
             + Transação
           </button>
         </header>
+        <ExecutiveMobileNav />
 
         {/* Summary KPIs */}
         <div className="kpi-grid transacoes-kpi-strip">

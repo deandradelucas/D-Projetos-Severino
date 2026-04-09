@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import ExecutiveMobileNav from '../components/ExecutiveMobileNav'
 import { useTheme } from '../context/ThemeContext'
 
 export default function Configuracoes() {
@@ -130,7 +131,7 @@ export default function Configuracoes() {
     <div className="dashboard-container">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content config-page" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <main className="main-content config-page premium-main" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <header className="top-header config-page-header">
           <div className="config-page-header__titles">
             <MobileMenuButton onClick={() => setMenuAberto(true)} aria-label="Abrir menu" />
@@ -144,6 +145,7 @@ export default function Configuracoes() {
             </div>
           </div>
         </header>
+        <ExecutiveMobileNav />
 
         {toast && <div className="config-toast">{toast}</div>}
 
