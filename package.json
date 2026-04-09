@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm:dev:web\" \"npm:dev:api\"",
+    "dev": "node scripts/dev.mjs",
     "dev:web": "vite",
     "dev:api": "node server/index.mjs",
     "build": "vite build",

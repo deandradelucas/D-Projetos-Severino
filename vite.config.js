@@ -29,7 +29,8 @@ function createApiProxy(apiTarget) {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const apiPort = env.API_PORT || process.env.API_PORT || '3001'
+  /* process.env primeiro: scripts/dev.mjs define API_PORT dinâmico antes de subir o Vite */
+  const apiPort = process.env.API_PORT || env.API_PORT || '3001'
   const apiTarget = `http://127.0.0.1:${apiPort}`
 
   return {
