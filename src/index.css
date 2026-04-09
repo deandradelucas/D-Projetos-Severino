@@ -48,6 +48,14 @@ body[data-theme='dark'] {
     radial-gradient(ellipse 70% 50% at 0% 80%, rgba(212, 168, 75, 0.03), transparent 45%);
 }
 
+/* Tema claro — fundo premium para telas públicas */
+body[data-theme='light'] {
+  background-color: #f4f1eb;
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(212, 168, 75, 0.14), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 100% 100%, rgba(148, 163, 184, 0.12), transparent 50%);
+}
+
 input,
 textarea,
 select,
