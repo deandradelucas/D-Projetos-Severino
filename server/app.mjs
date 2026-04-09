@@ -106,6 +106,17 @@ app.get('/api/health', (c) =>
   })
 )
 
+/** Contato WhatsApp (link ou número) — público; use quando o front não tiver VITE_WHATSAPP_*. */
+function whatsappContactUrlFromEnv() {
+  const link = process.env.WHATSAPP_CONTACT_LINK?.trim()
+  if (link) return link
+  const phone = String(process.env.WHATSAPP_CONTACT_PHONE || '').replace(/\D/g, '')
+  if (phone) return `https://wa.me/${phone}`
+  return 'https://wa.me/5547999895014'
+}
+
+app.get('/api/public/whatsapp-contact', (c) => c.json({ url: whatsappContactUrlFromEnv() }))
+
 /** Painel interno: token MP configurado e path do webhook (sem segredos). */
 app.get('/api/admin/mp-saude', async (c) => {
   try {

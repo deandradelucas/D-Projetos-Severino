@@ -99,7 +99,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <path d="M12 18V6"/>
                 </svg>
               </span>
-              Carteira
+              Transações
             </NavLink>
           </li>
           <li>
@@ -211,8 +211,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             </>
           )}
         </ul>
-
-        <div className="sidebar-ref-pill" aria-hidden />
 
         <button
           className="logout-btn"

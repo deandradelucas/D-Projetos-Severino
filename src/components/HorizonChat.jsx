@@ -1,6 +1,110 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
+
+/** Ancora FAB + janela ao `main.main-content` do app shell (canto inferior direito “dentro” do painel). */
+function useHorizonShellDock() {
+  const location = useLocation()
+  const [dock, setDock] = useState(null)
+
+  useLayoutEffect(() => {
+    const excluded = ['/login', '/cadastro', '/'].includes(location.pathname)
+    if (excluded) {
+      queueMicrotask(() => setDock(null))
+      return
+    }
+
+    let raf = 0
+    let ro = null
+
+    const run = () => {
+      const main = document.querySelector('.dashboard-container.app-horizon-shell main.main-content')
+      if (!main) {
+        setDock(null)
+        return
+      }
+      const r = main.getBoundingClientRect()
+      const mobile = window.matchMedia('(max-width: 768px)').matches
+      const fabSize = mobile ? 52 : 56
+      const edge = mobile ? 14 : 20
+      const gap = 12
+
+      const fabBottom = Math.max(edge, window.innerHeight - r.bottom + edge)
+      const fabRight = Math.max(edge, window.innerWidth - r.right + edge)
+
+      if (mobile) {
+        const w = Math.min(r.width, window.innerWidth - Math.max(0, r.left))
+        setDock({
+          fabStyle: { position: 'fixed', bottom: fabBottom, right: fabRight },
+          winStyle: {
+            position: 'fixed',
+            left: Math.max(0, r.left),
+            width: w,
+            right: 'auto',
+            bottom: 0,
+            maxWidth: 'none',
+            maxHeight: '80vh',
+          },
+        })
+        return
+      }
+
+      const winBottom = fabBottom + fabSize + gap
+      const maxW = Math.min(380, Math.max(260, r.width - edge * 2))
+      const winH = Math.min(600, Math.max(300, window.innerHeight - winBottom - 24))
+      setDock({
+        fabStyle: { position: 'fixed', bottom: fabBottom, right: fabRight },
+        winStyle: {
+          position: 'fixed',
+          bottom: winBottom,
+          right: fabRight,
+          left: 'auto',
+          width: `${maxW}px`,
+          maxWidth: `${maxW}px`,
+          height: `${winH}px`,
+          maxHeight: `${winH}px`,
+        },
+      })
+    }
+
+    const schedule = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(run)
+    }
+
+    const connectRo = () => {
+      const mainEl = document.querySelector('.dashboard-container.app-horizon-shell main.main-content')
+      if (!mainEl || ro) return
+      ro = new ResizeObserver(schedule)
+      ro.observe(mainEl)
+    }
+
+    schedule()
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        schedule()
+        connectRo()
+      })
+    })
+    const fallback = window.setTimeout(() => {
+      schedule()
+      connectRo()
+    }, 160)
+
+    window.addEventListener('resize', schedule)
+    window.addEventListener('scroll', schedule, true)
+
+    return () => {
+      window.clearTimeout(fallback)
+      cancelAnimationFrame(raf)
+      ro?.disconnect()
+      window.removeEventListener('resize', schedule)
+      window.removeEventListener('scroll', schedule, true)
+    }
+  }, [location.pathname])
+
+  return dock
+}
 
 function getUsuarioId() {
   try {
@@ -25,6 +129,7 @@ function MarkdownText({ text }) {
 
 export default function HorizonChat() {
   const location = useLocation()
+  const shellDock = useHorizonShellDock()
   const [aberto, setAberto] = useState(false)
 
   const [mensagens, setMensagens] = useState([
@@ -132,7 +237,9 @@ export default function HorizonChat() {
       {/* Botão Flutuante */}
       <button
         id="horizon-chat-btn"
-        className={`horizon-chat-fab ${aberto ? 'chat-fab-active' : ''}`}
+        type="button"
+        className={`horizon-chat-fab ${aberto ? 'chat-fab-active' : ''} ${shellDock ? 'horizon-chat-fab--shell-dock' : ''}`}
+        style={shellDock?.fabStyle}
         onClick={() => setAberto(v => !v)}
         title="Horizon IA"
         aria-label="Abrir Horizon IA"
@@ -155,7 +262,8 @@ export default function HorizonChat() {
       {/* Janela de Chat */}
       <div
         id="horizon-chat-window"
-        className={`horizon-chat-window ${aberto ? 'chat-window-open' : ''}`}
+        className={`horizon-chat-window ${aberto ? 'chat-window-open' : ''} ${shellDock ? 'horizon-chat-window--shell-dock' : ''}`}
+        style={shellDock?.winStyle}
         aria-hidden={!aberto}
       >
         {/* Header */}
