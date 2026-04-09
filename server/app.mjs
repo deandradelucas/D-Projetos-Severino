@@ -37,6 +37,7 @@ import {
   listPagamentosAdmin,
   upsertFromWebhookPayment,
 } from './lib/pagamentos-mp.mjs'
+import { buildAssinaturaUsuarioPayload, marcarBemVindoPagamentoVisto } from './lib/assinatura.mjs'
 import { isSuperAdminEmail } from './lib/super-admin.mjs'
 import { loadEnv } from './lib/load-env.mjs'
 
@@ -162,9 +163,26 @@ app.post('/api/auth/login', async (c) => {
       return c.json({ message: 'E-mail ou senha incorretos.' }, 401)
     }
 
+    let payloadUser = { ...user }
+    try {
+      const assinatura = await buildAssinaturaUsuarioPayload(user.id, user)
+      payloadUser = { ...user, ...assinatura }
+    } catch (err) {
+      console.error('assinatura no login (confira migration 07_trial_bem_vindo_assinatura)', err)
+      payloadUser = {
+        ...user,
+        trial_ends_at: null,
+        bem_vindo_pagamento_visto_at: null,
+        assinatura_paga: false,
+        acesso_app_liberado: true,
+        mostrar_bem_vindo_assinatura: false,
+        trial_dias_gratis: 7,
+      }
+    }
+
     return c.json({
       message: 'Login realizado com sucesso.',
-      user,
+      user: payloadUser,
     })
   } catch (error) {
     console.error('login failed', error)
@@ -174,6 +192,35 @@ app.post('/api/auth/login', async (c) => {
       { message: 'Não foi possível fazer login agora. Tente novamente em alguns instantes.' },
       500
     )
+  }
+})
+
+app.get('/api/assinatura/status', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    const perfil = await getPerfilUsuario(usuarioId)
+    if (!perfil) return c.json({ message: 'Perfil não encontrado.' }, 404)
+    const assinatura = await buildAssinaturaUsuarioPayload(usuarioId, perfil)
+    return c.json(assinatura)
+  } catch (error) {
+    console.error('assinatura status failed', error)
+    return c.json({ message: 'Erro ao consultar assinatura.' }, 500)
+  }
+})
+
+app.post('/api/assinatura/bem-vindo-visto', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    await marcarBemVindoPagamentoVisto(usuarioId)
+    const perfil = await getPerfilUsuario(usuarioId)
+    if (!perfil) return c.json({ message: 'Perfil não encontrado.' }, 404)
+    const assinatura = await buildAssinaturaUsuarioPayload(usuarioId, perfil)
+    return c.json({ ok: true, ...assinatura })
+  } catch (error) {
+    console.error('bem-vindo-visto failed', error)
+    return c.json({ message: 'Erro ao atualizar.' }, 500)
   }
 })
 

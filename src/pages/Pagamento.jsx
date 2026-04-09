@@ -25,25 +25,47 @@ export default function Pagamento() {
   const [titulo, setTitulo] = useState('Assinatura Horizonte Financeiro')
 
   const statusUrl = searchParams.get('status')
+  const expirado = searchParams.get('expirado') === '1'
 
   useEffect(() => {
     const load = async () => {
       try {
         const userSaved = localStorage.getItem('horizonte_user')
         let uid = ''
+        let u = null
         try {
-          uid = userSaved ? JSON.parse(userSaved).id : ''
+          u = userSaved ? JSON.parse(userSaved) : null
+          uid = u?.id || ''
         } catch {
           uid = ''
         }
         const cfgHeaders = uid ? { 'x-user-id': uid } : {}
 
+        if (uid && u) {
+          try {
+            const stRes = await fetch(apiUrl('/api/assinatura/status'), { headers: { 'x-user-id': uid } })
+            if (stRes.ok) {
+              const assinatura = await stRes.json()
+              localStorage.setItem('horizonte_user', JSON.stringify({ ...u, ...assinatura }))
+            }
+          } catch {
+            /* ignore */
+          }
+        }
+
+        const savedAfterAssinatura = localStorage.getItem('horizonte_user')
+        let uidHistorico = ''
+        try {
+          uidHistorico = savedAfterAssinatura ? JSON.parse(savedAfterAssinatura).id : ''
+        } catch {
+          uidHistorico = ''
+        }
+
         const [cfgRes, histRes] = await Promise.all([
           fetch(apiUrl('/api/pagamentos/config'), { headers: cfgHeaders }),
           (async () => {
-            if (!userSaved) return { ok: false }
-            const u = JSON.parse(userSaved)
-            return fetch(apiUrl('/api/pagamentos/minhas'), { headers: { 'x-user-id': u.id } })
+            if (!uidHistorico) return { ok: false }
+            return fetch(apiUrl('/api/pagamentos/minhas'), { headers: { 'x-user-id': uidHistorico } })
           })(),
         ])
 
@@ -137,6 +159,27 @@ export default function Pagamento() {
             </div>
           </div>
         </header>
+
+        {expirado && (
+          <div
+            className="content-section"
+            style={{
+              marginBottom: '16px',
+              padding: '14px 16px',
+              borderRadius: '12px',
+              background: 'rgba(239,68,68,0.1)',
+              border: '1px solid rgba(239,68,68,0.25)',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+              Seu período de teste terminou ou a assinatura não está ativa.
+            </p>
+            <p style={{ margin: '8px 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
+              Conclua o pagamento abaixo pelo Mercado Pago para voltar a usar o aplicativo. Após a aprovação, atualize a
+              página ou faça login novamente.
+            </p>
+          </div>
+        )}
 
         {statusUrl && (
           <div

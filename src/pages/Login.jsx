@@ -155,8 +155,15 @@ export default function Login() {
         window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
       }
 
+      const u = data.user || {}
       /* Redirecionamento imediato evita estado pendurado no PWA / teclado mobile */
-      window.location.replace('/dashboard')
+      if (u.mostrar_bem_vindo_assinatura) {
+        window.location.replace('/bem-vindo-assinatura')
+      } else if (u.acesso_app_liberado === false) {
+        window.location.replace('/pagamento?expirado=1')
+      } else {
+        window.location.replace('/dashboard')
+      }
     } catch (err) {
       const net =
         err instanceof TypeError && String(err?.message || '').toLowerCase().includes('fetch')

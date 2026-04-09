@@ -87,11 +87,12 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   })
 
   return {
-    trial_ends_at: trialEnds || row.trial_ends_at || null,
+    trial_ends_at: trialEnds,
     bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at || null,
     assinatura_paga: flags.assinatura_paga,
     acesso_app_liberado: flags.acesso_app_liberado,
     mostrar_bem_vindo_assinatura: flags.mostrar_bem_vindo_assinatura,
+    trial_dias_gratis: TRIAL_DIAS,
   }
 }
 
