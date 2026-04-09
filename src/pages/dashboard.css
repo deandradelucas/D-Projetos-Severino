@@ -5649,7 +5649,7 @@ body[data-theme='light'] .ref-kpi-card__hint {
 
 body[data-theme='light'] .ref-bottom-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) minmax(0, 0.95fr);
   gap: 14px;
   align-items: stretch;
 }
