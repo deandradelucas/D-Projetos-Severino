@@ -1146,21 +1146,6 @@ h3 {
   opacity: 1;
 }
 
-.kpi-card.accent {
-  background: rgba(0, 0, 0, 0.85);
-  border-color: rgba(212, 168, 75, 0.2);
-  box-shadow: 0 10px 40px rgba(212, 168, 75, 0.05);
-}
-
-.kpi-card.accent::before {
-  /* Accent has a yellowish tint topographic */
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.83v58.34h-58.34l-.83-.83A59.998 59.998 0 0054.627 0zM29.813 0l.83.83v28.34h-28.34l-.83-.83A29.998 29.998 0 0029.813 0z' fill='%23d4a84b' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
-}
-
-.kpi-card.accent:hover {
-  box-shadow: 0 15px 40px rgba(212, 168, 75, 0.1);
-}
-
 /* Table Section & Content Block */
 .content-section {
   background: var(--bg-card);
@@ -4198,11 +4183,6 @@ body[data-theme='light'] .config-card {
   border: 1px solid rgba(148, 163, 184, 0.18);
   background: #eef2fa;
   box-shadow: 0 26px 46px -34px rgba(15, 23, 42, 0.32);
-}
-
-body[data-theme='light'] .kpi-card.accent {
-  background: #e8effc;
-  border-color: rgba(59, 130, 246, 0.2);
 }
 
 body[data-theme='light'] .btn-primary,
