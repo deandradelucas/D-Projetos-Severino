@@ -2179,8 +2179,28 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
 }
 
 @media (max-width: 768px) {
+  /* Relatórios: coluna única com espaço explícito (evita sobreposição filtros ↔ KPIs ↔ gráficos no mobile) */
+  body[data-theme='light'] .dashboard-container.page-relatorios.app-horizon-shell .ref-dashboard-inner,
+  .dashboard-container.page-relatorios.app-horizon-shell .ref-dashboard-inner {
+    gap: 18px;
+    align-items: stretch;
+    min-height: 0;
+  }
+
+  .page-relatorios.app-horizon-shell .page-relatorios-ref-filters {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 0;
+    overflow: visible;
+  }
+
   .page-transacoes.app-horizon-shell .ref-kpi-row,
   .page-relatorios.app-horizon-shell .ref-kpi-row {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    min-width: 0;
     gap: 12px;
   }
 
@@ -2194,6 +2214,8 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
   .page-relatorios.app-horizon-shell .page-relatorios-filter-grid {
     grid-template-columns: 1fr;
     gap: 12px;
+    align-items: stretch;
+    align-content: start;
   }
 
   .page-relatorios.app-horizon-shell .relatorios-filter-grid__wide {
@@ -2214,6 +2236,11 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
   }
 
   .page-relatorios.app-horizon-shell .relatorios-charts {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    min-width: 0;
     gap: 22px;
     margin-bottom: 24px;
   }
@@ -4556,6 +4583,52 @@ body[data-theme='light'] .ref-dashboard-header__btn-wa--disabled {
   filter: grayscale(0.25);
 }
 
+/* Dashboard: saldo em bloco próprio (após o card Nova transação + WhatsApp) */
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-saldo-card {
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+  position: relative;
+  z-index: 0;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-saldo-card .ref-kpi-card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Dashboard: card compacto com Nova transação + WhatsApp */
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-actions-card {
+  flex-shrink: 0;
+  min-height: 0;
+  position: relative;
+  z-index: 0;
+}
+
+.ref-dashboard-actions-card__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+body[data-theme='light'] .ref-dashboard-actions-card {
+  min-height: 0;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+@media (min-width: 769px) {
+  body[data-theme='light'] .ref-dashboard-actions-card {
+    padding: 14px 18px;
+    border-radius: 22px;
+  }
+}
+
 body[data-theme='light'] .ref-dashboard-greeting {
   margin: 0;
   width: 100%;
@@ -4584,37 +4657,93 @@ body[data-theme='light'] .ref-dashboard-greeting__name {
 @media (max-width: 768px) {
   body[data-theme='light'] .ref-dashboard-header {
     margin: 0;
-    padding: 15px 16px;
-    border-radius: 20px;
-  }
-
-  body[data-theme='light'] .ref-dashboard-header__actions {
-    width: 100%;
-    margin-left: 0;
-    justify-content: flex-end;
-    padding: 0;
-  }
-
-  body[data-theme='light'] .ref-dashboard-header__lead {
-    flex: 1 1 calc(100% - 56px);
-    min-width: 0;
-  }
-
-  body[data-theme='light'] .ref-dashboard-greeting {
-    font-size: clamp(19px, 5.2vw, 26px);
-  }
-
-  body[data-theme='light'] .ref-dashboard-header__btn-tx {
-    padding: 9px 15px;
-    font-size: 12px;
+    align-items: flex-start;
+    gap: 10px;
+    row-gap: 12px;
+    padding: 11px 12px;
+    border-radius: 16px;
+    overflow: visible;
   }
 
   body[data-theme='light'] .ref-dashboard-header .mobile-menu-btn {
-    border-radius: 13px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 1px;
+    border-radius: 12px;
     border-color: rgba(148, 163, 184, 0.35);
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.9) inset,
       0 4px 14px -6px rgba(15, 23, 42, 0.12);
+  }
+
+  body[data-theme='light'] .ref-dashboard-header__lead {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: calc(100% - 52px);
+    padding-right: 2px;
+  }
+
+  body[data-theme='light'] .ref-dashboard-greeting {
+    font-size: clamp(17px, 4.9vw, 22px);
+    line-height: 1.22;
+    letter-spacing: -0.03em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+
+  body[data-theme='light'] .ref-dashboard-greeting__prefix {
+    font-size: 0.76em;
+  }
+
+  body[data-theme='light'] .ref-dashboard-header__actions {
+    width: 100%;
+    flex-basis: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 0;
+  }
+
+  body[data-theme='light'] .ref-dashboard-header__btn-tx {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 12px;
+    border-radius: 12px;
+  }
+
+  body[data-theme='light'] .ref-dashboard-header__btn-wa {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  body[data-theme='light'] .ref-dashboard-actions-card {
+    padding: 10px 12px;
+    border-radius: 16px;
+  }
+
+  body[data-theme='light'] .ref-dashboard-actions-card__toolbar {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  body[data-theme='light'] .ref-dashboard-header {
+    padding: 10px 10px;
+    border-radius: 14px;
+  }
+
+  body[data-theme='light'] .ref-dashboard-greeting {
+    font-size: clamp(16px, 5vw, 20px);
+  }
+
+  body[data-theme='light'] .ref-dashboard-header__btn-tx {
+    padding: 0 12px;
+    font-size: 11px;
   }
 }
 
@@ -4771,6 +4900,11 @@ body[data-theme='light'] .ref-kpi-row {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin: 0;
+}
+
+/* Linha só com Entrada / Saída (Saldo ficou em ref-dashboard-saldo-card) */
+body[data-theme='light'] .ref-kpi-row.ref-kpi-row--secondary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 body[data-theme='light'] .ref-kpi-card {
@@ -6013,9 +6147,11 @@ body[data-theme='light'] .page-configuracoes.app-horizon-shell .page-configuraco
   text-transform: none;
 }
 
-body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-charts {
-  gap: 14px;
-  margin-bottom: 0;
+@media (min-width: 769px) {
+  body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-charts {
+    gap: 14px;
+    margin-bottom: 0;
+  }
 }
 
 [data-theme='dark'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
@@ -6864,7 +7000,115 @@ body[data-theme='light'] .global-skeleton {
 
   body[data-theme='light'] .dashboard-container .main-content {
     border-radius: 0;
-    padding: 16px 14px max(20px, env(safe-area-inset-bottom));
+    padding: max(8px, env(safe-area-inset-top, 0px)) 12px max(24px, env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Evita “corte” do cartão do topo no scroll; ritmo um pouco mais fechado entre blocos */
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .ref-dashboard-inner {
+    gap: 12px;
+    padding-top: 2px;
+  }
+
+  /* Home: ações + saldo + KPIs em coluna com respiro (sem sobreposição) */
+  body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-inner {
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  /* KPIs: menos altura em coluna, ícone menor — lista sobe no fold */
+  body[data-theme='light'] .ref-kpi-row {
+    gap: 10px;
+  }
+
+  body[data-theme='light'] .ref-kpi-card {
+    min-height: 0;
+    align-items: center;
+    padding: 10px 12px;
+    gap: 12px;
+    border-radius: 16px;
+  }
+
+  body[data-theme='light'] .ref-kpi-card__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  body[data-theme='light'] .ref-kpi-card__label {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  body[data-theme='light'] .ref-kpi-card__value {
+    margin: 2px 0 0;
+    font-size: clamp(15px, 4vw, 17px);
+  }
+
+  body[data-theme='light'] .ref-kpi-card--hero .ref-kpi-card__value {
+    font-size: clamp(16px, 4.2vw, 18px);
+  }
+
+  body[data-theme='light'] .ref-panel {
+    min-height: 0;
+    padding: 12px 12px 10px;
+    border-radius: 18px;
+  }
+
+  body[data-theme='light'] .ref-panel.ref-panel--transactions {
+    min-height: min(220px, 42vh);
+    flex: 1 1 auto;
+  }
+
+  body[data-theme='light'] .ref-panel__head {
+    margin-bottom: 0;
+    padding-bottom: 8px;
+    gap: 10px;
+  }
+
+  body[data-theme='light'] .ref-panel__title {
+    font-size: 15px;
+  }
+
+  body[data-theme='light'] .ref-panel__link {
+    padding: 6px 10px 6px 12px;
+    font-size: 11px;
+  }
+
+  /* Lista: respiro para o FAB do chat não cobrir a última linha */
+  body[data-theme='light'] .ref-tx-list {
+    padding: 0 0 max(72px, calc(env(safe-area-inset-bottom, 0px) + 56px));
+  }
+
+  body[data-theme='light'] .ref-tx-row {
+    gap: 4px 10px;
+    padding: 10px 10px 11px 10px;
+  }
+
+  body[data-theme='light'] .ref-tx-row::after {
+    left: 10px;
+    right: 10px;
+  }
+
+  body[data-theme='light'] .ref-tx-val {
+    padding: 5px 8px;
+    font-size: 13px;
+  }
+
+  body[data-theme='light'] .ref-tx-arrow-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  body[data-theme='light'] .ref-kpi-skel-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .horizon-chat-fab {
+    bottom: max(14px, calc(env(safe-area-inset-bottom, 0px) + 10px));
+    right: max(12px, env(safe-area-inset-right, 0px));
   }
 }
 
