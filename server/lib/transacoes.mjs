@@ -195,6 +195,15 @@ export async function getTransacoes(usuarioId, filters = {}) {
   if (!Number.isFinite(lim) || lim < 1) lim = 500
   lim = Math.min(lim, 2000)
 
+  let off =
+    filters.offset !== undefined && filters.offset !== null && filters.offset !== ''
+      ? parseInt(String(filters.offset), 10)
+      : 0
+  if (!Number.isFinite(off) || off < 0) off = 0
+  off = Math.min(off, 50_000)
+
+  const rangeEnd = off + lim - 1
+
   const applyFilters = (q) => {
     let query = q.eq('usuario_id', uid)
     if (dataInicio) query = query.gte('data_transacao', dataInicio)
@@ -215,7 +224,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
 
   let query = applyFilters(supabaseAdmin.from('transacoes').select(selectComEmbed))
 
-  const { data, error } = await query.order('data_transacao', { ascending: false }).limit(lim)
+  const { data, error } = await query.order('data_transacao', { ascending: false }).range(off, rangeEnd)
 
   if (error) {
     log.warn('[getTransacoes] embed falhou, fallback sem join:', error.message || error)
@@ -225,7 +234,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
     let qFlat = applyFilters(
       supabaseAdmin.from('transacoes').select(`${baseCols}, recorrencia_mensal_id`)
     )
-    let r2 = await qFlat.order('data_transacao', { ascending: false }).limit(lim)
+    let r2 = await qFlat.order('data_transacao', { ascending: false }).range(off, rangeEnd)
 
     if (r2.error) {
       log.warn(
@@ -233,7 +242,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
         r2.error.message || r2.error
       )
       qFlat = applyFilters(supabaseAdmin.from('transacoes').select(baseCols))
-      r2 = await qFlat.order('data_transacao', { ascending: false }).limit(lim)
+      r2 = await qFlat.order('data_transacao', { ascending: false }).range(off, rangeEnd)
       if (r2.error) throw r2.error
       const rows = (r2.data || []).map((r) => ({ ...r, recorrencia_mensal_id: null }))
       return enrichTransacoesComCategorias(supabaseAdmin, rows)

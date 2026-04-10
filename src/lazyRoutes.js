@@ -59,6 +59,30 @@ export function prefetchRoute(path) {
   })
 }
 
+/** Rotas do menu principal (shell autenticado) — pré-carrega para troca de aba rápida. */
+const APP_NAV_PATHS = ['/dashboard', '/transacoes', '/relatorios', '/configuracoes']
+
+/** Dispara `import()` de todas as telas do menu (deduplicado). Útil ao abrir o menu no mobile. */
+export function prefetchAppNavChunksNow() {
+  for (const path of APP_NAV_PATHS) {
+    prefetchRoute(path)
+  }
+}
+
+/**
+ * Agenda o mesmo prefetch em idle (não compete com hidratação / primeiro paint).
+ * `prefetchRoute` deduplica; seguro chamar após login.
+ */
+export function warmAuthenticatedNavChunks() {
+  if (typeof window === 'undefined') return
+  const run = () => prefetchAppNavChunksNow()
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(run, { timeout: 1800 })
+  } else {
+    setTimeout(run, 180)
+  }
+}
+
 /** Props para NavLink: desktop (hover), teclado (focus), mobile (pointer antes do clique). */
 export function navPrefetchHandlers(path) {
   const run = () => prefetchRoute(path)

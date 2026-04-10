@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
+import AuthenticatedNavPrefetch from './AuthenticatedNavPrefetch'
 
 function readUser() {
   try {
@@ -130,5 +131,10 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
     return <Navigate to="/pagamento?expirado=1" replace />
   }
 
-  return <Outlet />
+  return (
+    <>
+      {requireAppAccess ? <AuthenticatedNavPrefetch /> : null}
+      <Outlet />
+    </>
+  )
 }

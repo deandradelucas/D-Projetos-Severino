@@ -615,6 +615,7 @@ app.get('/api/transacoes', async (c) => {
     const gate = await assertAcessoAppUsuario(usuarioId)
     if (gate) return c.json({ message: gate.message }, gate.status)
 
+    const qOff = c.req.query('offset')
     const filters = {
       dataInicio: c.req.query('dataInicio'),
       dataFim: c.req.query('dataFim'),
@@ -622,7 +623,8 @@ app.get('/api/transacoes', async (c) => {
       categoria_id: c.req.query('categoria_id'),
       status: c.req.query('status'),
       busca: c.req.query('busca'),
-      limit: c.req.query('limit') ? parseInt(c.req.query('limit')) : undefined
+      limit: c.req.query('limit') ? parseInt(c.req.query('limit')) : undefined,
+      offset: qOff !== undefined && qOff !== '' ? parseInt(String(qOff), 10) : undefined,
     }
 
     const data = await getTransacoes(usuarioId, filters)

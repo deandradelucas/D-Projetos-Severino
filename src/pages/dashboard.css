@@ -2256,6 +2256,28 @@ body[data-theme='light'] .form-group--recorrencia-on label.modal-recorrencia-tog
   }
 }
 
+.page-transacoes-load-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 12px 4px;
+  border-top: 1px solid var(--border-color, rgba(148, 163, 184, 0.2));
+}
+
+.page-transacoes-tx-meta {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.35;
+}
+
+.page-transacoes-load-more .btn-secondary {
+  min-width: min(260px, 100%);
+}
+
 .transacoes-filter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));

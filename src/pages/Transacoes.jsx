@@ -12,6 +12,9 @@ import { getWhatsAppContactUrl } from '../lib/whatsappContactUrl'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import './dashboard.css'
 
+/** Itens por requisição — menos DOM inicial; “Carregar mais” busca o restante. */
+const TX_PAGE_SIZE = 80
+
 const SkeletonTxRow = () => (
   <div className="ref-tx-row ref-tx-row--skeleton" aria-hidden>
     <div className="ref-tx-icon-cell">
@@ -49,6 +52,8 @@ export default function Transacoes() {
   const [transacoes, setTransacoes] = useState([])
   const [categorias, setCategorias] = useState([])
   const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
   const [filtrosAbertos, setFiltrosAbertos] = useState(false)
   const [recorrencias, setRecorrencias] = useState([])
 
@@ -101,8 +106,24 @@ export default function Transacoes() {
     }
   }, [])
 
+  const buildTxQuery = useCallback(
+    (offset) => {
+      const params = new URLSearchParams()
+      if (filters.busca) params.append('busca', filters.busca)
+      if (filters.tipo) params.append('tipo', filters.tipo)
+      if (filters.categoria_id) params.append('categoria_id', filters.categoria_id)
+      if (filters.dataInicio) params.append('dataInicio', filters.dataInicio)
+      if (filters.dataFim) params.append('dataFim', filters.dataFim)
+      params.append('limit', String(TX_PAGE_SIZE))
+      params.append('offset', String(offset))
+      return params
+    },
+    [filters]
+  )
+
   const fetchTransacoes = useCallback(async () => {
     setLoading(true)
+    setHasMore(false)
     const session = readHorizonteUser()
     if (!session?.id) {
       setLoading(false)
@@ -110,15 +131,7 @@ export default function Transacoes() {
     }
     try {
       await syncRecorrenciasMensais(session.id)
-      const params = new URLSearchParams()
-      if (filters.busca) params.append('busca', filters.busca)
-      if (filters.tipo) params.append('tipo', filters.tipo)
-      if (filters.categoria_id) params.append('categoria_id', filters.categoria_id)
-      if (filters.dataInicio) params.append('dataInicio', filters.dataInicio)
-      if (filters.dataFim) params.append('dataFim', filters.dataFim)
-      params.append('limit', '500')
-
-      const res = await fetchWithRetry(apiUrl(`/api/transacoes?${params.toString()}`), {
+      const res = await fetchWithRetry(apiUrl(`/api/transacoes?${buildTxQuery(0).toString()}`), {
         headers: { 'x-user-id': String(session.id).trim() },
         cache: 'no-store',
       })
@@ -128,14 +141,44 @@ export default function Transacoes() {
       }
       if (res.ok) {
         const data = await res.json()
-        setTransacoes(Array.isArray(data) ? data : [])
+        const rows = Array.isArray(data) ? data : []
+        setTransacoes(rows)
+        setHasMore(rows.length === TX_PAGE_SIZE)
       }
     } catch (err) {
       console.error(err)
     } finally {
       setLoading(false)
     }
-  }, [filters])
+  }, [filters, buildTxQuery])
+
+  const loadMoreTransacoes = useCallback(async () => {
+    if (loading || loadingMore || !hasMore) return
+    const session = readHorizonteUser()
+    if (!session?.id) return
+    setLoadingMore(true)
+    try {
+      const offset = transacoes.length
+      const res = await fetchWithRetry(apiUrl(`/api/transacoes?${buildTxQuery(offset).toString()}`), {
+        headers: { 'x-user-id': String(session.id).trim() },
+        cache: 'no-store',
+      })
+      if (res.status === 403) {
+        window.location.replace('/pagamento?expirado=1')
+        return
+      }
+      if (res.ok) {
+        const data = await res.json()
+        const rows = Array.isArray(data) ? data : []
+        setTransacoes((prev) => [...prev, ...rows])
+        setHasMore(rows.length === TX_PAGE_SIZE)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [loading, loadingMore, hasMore, transacoes.length, buildTxQuery])
 
   useEffect(() => {
     const session = readHorizonteUser()
@@ -403,6 +446,7 @@ export default function Transacoes() {
                 </button>
               </div>
             ) : (
+              <>
               <div className="ref-tx-table-subgrid ref-tx-table-subgrid--actions">
                 <div className="ref-tx-list-head">
                   <span className="ref-tx-list-head__icon" aria-hidden />
@@ -519,6 +563,24 @@ export default function Transacoes() {
                   )
                 })}
               </div>
+              <div className="page-transacoes-load-more">
+                <p className="page-transacoes-tx-meta" aria-live="polite">
+                  Mostrando {transacoes.length}{' '}
+                  {transacoes.length === 1 ? 'transação' : 'transações'}
+                  {hasMore ? ' · há mais com os filtros atuais' : ' · fim da lista'}
+                </p>
+                {hasMore ? (
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    disabled={loadingMore}
+                    onClick={() => void loadMoreTransacoes()}
+                  >
+                    {loadingMore ? 'Carregando…' : 'Carregar mais'}
+                  </button>
+                ) : null}
+              </div>
+              </>
             )}
           </div>
         </article>

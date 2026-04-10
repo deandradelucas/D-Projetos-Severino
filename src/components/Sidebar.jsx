@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { isSuperAdminSession } from '../lib/superAdmin'
-import { navPrefetchHandlers } from '../lazyRoutes'
+import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
 import { useTheme } from '../context/ThemeContext'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 
@@ -25,6 +25,11 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const navMenuRef = useRef(null)
   const [activeDotTop, setActiveDotTop] = useState(null)
   const principalAdmin = isSuperAdminSession()
+
+  /* Mobile: ao abrir o drawer, baixa chunks do menu em paralelo (clique na rota fica instantâneo). */
+  useEffect(() => {
+    if (menuAberto) prefetchAppNavChunksNow()
+  }, [menuAberto])
 
   useEffect(() => {
     const idx = MENU_ORDER.indexOf(location.pathname)
