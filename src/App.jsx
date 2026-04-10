@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext'
-import RouteTransitionSkeleton from './components/RouteTransitionSkeleton'
 import RoutePageFallback from './components/RoutePageFallback'
 import SuperAdminOutlet from './components/SuperAdminOutlet'
 import AppSessionOutlet from './components/AppSessionOutlet'
@@ -31,7 +30,6 @@ function App() {
           <Background />
           <PwaInstallPrompt />
           <HorizonChat />
-          <RouteTransitionSkeleton />
           <div className="app-routes-grow">
             <Suspense fallback={<RoutePageFallback />}>
               <Routes>
