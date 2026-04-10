@@ -2122,7 +2122,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 22px;
+  margin-bottom: 0;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border-color);
 }
@@ -2178,25 +2178,10 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
   gap: 10px;
 }
 
-@media (min-width: 769px) {
-  .page-transacoes.app-horizon-shell .ref-kpi-row,
-  .page-relatorios.app-horizon-shell .ref-kpi-row {
-    margin-bottom: 18px;
-  }
-}
-
 @media (max-width: 768px) {
   .page-transacoes.app-horizon-shell .ref-kpi-row,
   .page-relatorios.app-horizon-shell .ref-kpi-row {
     gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .page-transacoes.app-horizon-shell .ref-dashboard-header,
-  .page-relatorios.app-horizon-shell .ref-dashboard-header {
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    gap: 10px;
   }
 
   .page-relatorios.app-horizon-shell .page-relatorios-header-sub {
@@ -4457,7 +4442,7 @@ body[data-theme='light'] .ref-dashboard-header {
   align-items: center;
   gap: 12px 16px;
   row-gap: 14px;
-  margin: 0 0 18px;
+  margin: 0;
   padding: 16px 20px;
   min-width: 0;
   background: #ffffff;
@@ -4598,7 +4583,7 @@ body[data-theme='light'] .ref-dashboard-greeting__name {
 
 @media (max-width: 768px) {
   body[data-theme='light'] .ref-dashboard-header {
-    margin-bottom: 14px;
+    margin: 0;
     padding: 15px 16px;
     border-radius: 20px;
   }
@@ -4640,7 +4625,7 @@ body[data-theme='light'] .ref-dashboard-greeting__name {
     align-items: center;
     row-gap: 0;
     column-gap: 20px;
-    margin-bottom: 20px;
+    margin: 0;
     padding: 18px 24px;
     border-radius: 20px;
   }
@@ -4785,7 +4770,7 @@ body[data-theme='light'] .ref-kpi-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
-  margin-bottom: 18px;
+  margin: 0;
 }
 
 body[data-theme='light'] .ref-kpi-card {
@@ -4877,7 +4862,7 @@ body[data-theme='light'] .ref-kpi-card__value {
 @media (min-width: 769px) {
   body[data-theme='light'] .ref-kpi-row {
     gap: 16px;
-    margin-bottom: 20px;
+    margin: 0;
   }
 
   body[data-theme='light'] .ref-kpi-card {
@@ -5733,6 +5718,8 @@ body[data-theme='light'] {
   --app-sidebar-col-h: calc(
     100dvh - max(20px, env(safe-area-inset-top, 0px)) - max(16px, env(safe-area-inset-bottom, 0px)) - 32px
   );
+  /* Espaço entre topo (ref-dashboard-header) e blocos abaixo — mesmo em Dashboard, Transações, etc. */
+  --ref-shell-stack-gap: 16px;
 }
 
 /* Shell: uma única leitura visual (resolve conflitos entre blocos antigos) */
@@ -5803,6 +5790,11 @@ body[data-theme='light'] .ref-dashboard-inner {
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+
+/* Uma pilha só: o espaçamento entre topo, KPIs, filtros e painéis vem do gap (não de margins soltas). */
+.dashboard-container.app-horizon-shell .ref-dashboard-inner {
+  gap: var(--ref-shell-stack-gap, 14px);
 }
 
 /* Menu + painel: largura máxima conjunta e centralizada no viewport (fundo Horizonte nas laterais) */
@@ -5972,6 +5964,14 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .ref-dashboard .
   box-shadow: none !important;
 }
 
+/* Mesmo recuo interno no desktop/tablet (mobile continua com o padding compacto do @media max-width 768) */
+@media (min-width: 769px) {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner > .main-content.ref-dashboard-main {
+    padding: 22px clamp(18px, 2.2vw, 26px) 28px;
+    box-sizing: border-box;
+  }
+}
+
 /* Transações, Relatórios, Pagamento, Configurações: coluna principal alinhada ao dashboard */
 body[data-theme='light'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='light'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
@@ -5996,7 +5996,6 @@ body[data-theme='light'] .page-configuracoes.app-horizon-shell .main-content.ref
   flex-direction: column;
   min-height: 0;
   flex: 1 1 auto;
-  gap: 14px;
 }
 
 body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-panel.page-relatorios-chart-panel {
@@ -6071,10 +6070,6 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-charts {
 
 body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-loading-panel {
   min-height: 0;
-}
-
-body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-dashboard-inner {
-  gap: 14px;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
