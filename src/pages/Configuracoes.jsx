@@ -105,22 +105,21 @@ export default function Configuracoes() {
   }
 
   return (
-    <div className="dashboard-container app-horizon-shell">
+    <div className="dashboard-container page-configuracoes app-horizon-shell">
       <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content config-page" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <header className="top-header config-page-header">
-          <div className="config-page-header__titles">
-            <MobileMenuButton onClick={() => setMenuAberto(true)} aria-label="Abrir menu" />
-            <div>
-              <h1 className="responsive-h1" style={{ margin: 0, fontWeight: 800, color: 'var(--text-primary)' }}>
-                Configurações
-              </h1>
-              <p style={{ margin: '4px 0 0', fontSize: '14px', color: 'var(--text-secondary)' }}>
-                Perfil, privacidade e dados
-              </p>
-            </div>
+      <main className="main-content relative z-10 ref-dashboard-main config-page">
+        <div className="ref-dashboard-inner">
+        <header className="ref-dashboard-header">
+          <MobileMenuButton onClick={() => setMenuAberto(true)} aria-label="Abrir menu" />
+          <div className="ref-dashboard-header__lead">
+            <h1 className="ref-dashboard-greeting">
+              <span className="ref-dashboard-greeting__name">Configurações</span>
+            </h1>
+            <p className="ref-panel__subtitle page-configuracoes-header-sub">
+              Perfil, privacidade e dados
+            </p>
           </div>
         </header>
 
@@ -245,6 +244,7 @@ export default function Configuracoes() {
           </section>
         )}
 
+        </div>
       </main>
       </div>
     </div>

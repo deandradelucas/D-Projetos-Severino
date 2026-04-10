@@ -2939,10 +2939,16 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
 
 [data-theme='dark'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header,
 [data-theme='dark'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header,
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header,
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header,
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header,
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header,
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header {
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -2955,10 +2961,16 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
 
 [data-theme='dark'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead,
 [data-theme='dark'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__lead,
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header__lead,
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header__lead,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__lead,
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header__lead,
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header__lead,
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__lead {
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__lead,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header__lead,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header__lead {
   flex: 1 1 200px;
   min-width: 0;
 }
@@ -7536,9 +7548,11 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .ref-dashboard .
   box-shadow: none !important;
 }
 
-/* Transações / Relatórios: sem painel claro atrás dos cards — fundo do Horizonte visível */
+/* Transações, Relatórios, Pagamento, Configurações: coluna principal alinhada ao dashboard */
 body[data-theme='light'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
-body[data-theme='light'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main {
+body[data-theme='light'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
+body[data-theme='light'] .page-pagamento.app-horizon-shell .main-content.ref-dashboard-main,
+body[data-theme='light'] .page-configuracoes.app-horizon-shell .main-content.ref-dashboard-main {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -7548,8 +7562,9 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell .main-content.ref-da
   box-shadow: none !important;
 }
 
-/* Relatórios (shell): mesma coluna central que dashboard / transações */
-.page-relatorios.app-horizon-shell .ref-dashboard-inner {
+.page-relatorios.app-horizon-shell .ref-dashboard-inner,
+.page-pagamento.app-horizon-shell .ref-dashboard-inner,
+.page-configuracoes.app-horizon-shell .ref-dashboard-inner {
   width: 100%;
   max-width: min(1180px, 100%);
   margin-inline: auto;
@@ -7568,7 +7583,9 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-ref
   min-height: 0;
 }
 
-body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-header-sub {
+body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-header-sub,
+body[data-theme='light'] .page-pagamento.app-horizon-shell .page-pagamento-header-sub,
+body[data-theme='light'] .page-configuracoes.app-horizon-shell .page-configuracoes-header-sub {
   margin: 4px 0 0;
   text-transform: none;
 }
@@ -7588,7 +7605,13 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-charts {
 [data-theme='off-white'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
 [data-theme='dark'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
 [data-theme='cyberpunk'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
-[data-theme='off-white'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main {
+[data-theme='off-white'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='dark'] .page-pagamento.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='cyberpunk'] .page-pagamento.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='off-white'] .page-pagamento.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='dark'] .page-configuracoes.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='cyberpunk'] .page-configuracoes.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='off-white'] .page-configuracoes.app-horizon-shell .main-content.ref-dashboard-main {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;

@@ -230,22 +230,21 @@ export default function Pagamento() {
   }
 
   return (
-    <div className="dashboard-container app-horizon-shell">
+    <div className="dashboard-container page-pagamento app-horizon-shell">
       <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content">
-        <header className="top-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <MobileMenuButton onClick={() => setMenuAberto(true)} />
-            <div>
-              <h1 className="responsive-h1" style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                Pagamento
-              </h1>
-              <p className="responsive-p" style={{ color: 'var(--text-secondary)' }}>
-                Assinatura mensal de <strong>R$ {precoMensal.toFixed(2).replace('.', ',')}</strong> — cobrança automática todo mês no cartão; o valor cai na conta Mercado Pago do aplicativo. Você autoriza uma vez no checkout do MP.
-              </p>
-            </div>
+      <main className="main-content relative z-10 ref-dashboard-main">
+        <div className="ref-dashboard-inner">
+        <header className="ref-dashboard-header">
+          <MobileMenuButton onClick={() => setMenuAberto(true)} />
+          <div className="ref-dashboard-header__lead">
+            <h1 className="ref-dashboard-greeting">
+              <span className="ref-dashboard-greeting__name">Pagamento</span>
+            </h1>
+            <p className="ref-panel__subtitle page-pagamento-header-sub">
+              Assinatura mensal de <strong>R$ {precoMensal.toFixed(2).replace('.', ',')}</strong> — cobrança automática todo mês no cartão; o valor cai na conta Mercado Pago do aplicativo. Você autoriza uma vez no checkout do MP.
+            </p>
           </div>
         </header>
 
@@ -435,6 +434,7 @@ export default function Pagamento() {
             </div>
           )}
         </section>
+        </div>
       </main>
       </div>
     </div>
