@@ -857,18 +857,20 @@ h3 {
 
 @media (max-width: 768px) {
   .top-header {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     flex-wrap: wrap;
     gap: 10px;
+    row-gap: 12px;
   }
-  
+
   .top-header h1 {
     font-size: 20px !important;
     letter-spacing: -0.03em;
+    line-height: 1.25;
   }
-  
+
   .top-header p {
-    font-size: 12px !important;
+    font-size: 13px !important;
     line-height: 1.45;
   }
 }
@@ -968,19 +970,18 @@ h3 {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    border-radius: 18px;
-    padding: 12px 11px calc(12px + var(--safe-bottom)) 11px;
+    border-radius: 16px;
+    padding: 12px 14px calc(14px + var(--safe-bottom)) 14px;
     margin-top: 0;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     scroll-behavior: smooth;
     overflow-x: clip;
     overflow-y: auto;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.07);
     box-shadow:
-      0 0 0 1px rgba(0, 0, 0, 0.35) inset,
-      0 18px 48px -28px rgba(0, 0, 0, 0.65),
-      0 2px 24px rgba(212, 168, 75, 0.04);
+      0 0 0 1px rgba(0, 0, 0, 0.2) inset,
+      0 14px 36px -22px rgba(0, 0, 0, 0.55);
   }
 
   [data-theme='light'] .main-content {
@@ -1092,6 +1093,42 @@ h3 {
   .nav-item.active::after {
     display: none;
   }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-primary-dashboard,
+  .relatorios-btn-export {
+    min-height: 48px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+
+  .btn-primary:active,
+  .btn-secondary:active,
+  .btn-primary-dashboard:active {
+    transform: scale(0.97);
+    transition: transform 0.12s ease;
+  }
+
+  .section-header {
+    gap: 12px;
+  }
+
+  .data-table {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .kpi-card,
+  .page-transacoes .kpi-card {
+    padding: 18px 16px;
+  }
+
+  .btn-delete {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
 }
 
 @keyframes fadeIn {
@@ -1158,8 +1195,8 @@ h3 {
 
 @media (max-width: 768px) {
   .content-section {
-    padding: 20px 16px;
-    border-radius: 20px;
+    padding: 18px 16px;
+    border-radius: 18px;
   }
 }
 
@@ -4013,68 +4050,20 @@ body[data-theme='off-white'] .relatorios-kpi-saldo--neg {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
-/* ========== Mobile & PWA — toques premium ========== */
-@media (max-width: 768px) {
-  .btn-primary,
-  .btn-secondary,
-  .btn-primary-dashboard,
-  .relatorios-btn-export {
-    min-height: 48px;
-    min-width: 44px;
-    touch-action: manipulation;
-  }
-
-  .btn-primary:active,
-  .btn-secondary:active,
-  .btn-primary-dashboard:active {
-    transform: scale(0.97);
-    transition: transform 0.12s ease;
-  }
-
-  .top-header {
-    gap: 10px;
-    row-gap: 12px;
-  }
-
-  .section-header {
-    gap: 12px;
-  }
-
-  .data-table {
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-  }
-
-  .content-section {
-    border-radius: 18px;
-  }
-
-  .kpi-card,
-  .page-transacoes .kpi-card {
-    padding: 18px 16px;
-  }
-
-  .btn-delete {
-    min-width: 44px;
-    min-height: 44px;
-    padding: 10px;
-  }
-}
-
 @media (max-width: 380px) {
   .responsive-h1 {
     font-size: 17px !important;
   }
 
   .dashboard-container {
-    padding: calc(2px + var(--safe-top)) calc(2px + var(--safe-right)) calc(2px + var(--safe-bottom))
-      calc(2px + var(--safe-left));
+    padding: calc(4px + var(--safe-top)) calc(4px + var(--safe-right)) calc(4px + var(--safe-bottom))
+      calc(4px + var(--safe-left));
   }
 
   .main-content {
-    padding-left: 9px;
-    padding-right: 9px;
-    border-radius: 16px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 14px;
   }
 }
 
