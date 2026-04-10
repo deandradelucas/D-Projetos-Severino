@@ -427,23 +427,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
             <div
               className={`modal-recorrencia-panel ${formData.recorrencia_dia_1 ? 'modal-recorrencia-panel--active' : ''}`}
             >
-              <label className="modal-recorrencia-panel__label" htmlFor="tx-recorrencia-dia-1">
-                <span
-                  className={`modal-recorrencia-panel__icon ${formData.recorrencia_dia_1 ? 'modal-recorrencia-panel__icon--on' : ''}`}
-                  aria-hidden
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 8v4l3 3" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="12" cy="12" r="9" />
-                  </svg>
-                </span>
-                <span className="modal-recorrencia-panel__copy">
-                  <span className="modal-recorrencia-panel__title">Repetir todo dia 1</span>
-                  <span className="modal-recorrencia-panel__hint">
-                    No primeiro dia de cada mês o sistema lança esta mesma conta ou receita automaticamente (fuso
-                    Brasil).
-                  </span>
-                </span>
+              <label className="modal-recorrencia-panel__label modal-recorrencia-panel__label--inline" htmlFor="tx-recorrencia-dia-1">
+                <span className="modal-recorrencia-panel__title">Repetir todo dia 1</span>
                 <input
                   id="tx-recorrencia-dia-1"
                   type="checkbox"

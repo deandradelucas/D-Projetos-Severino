@@ -340,10 +340,10 @@ export default function Transacoes() {
         </article>
 
         {recorrencias.length > 0 && (
-          <article className="ref-panel page-transacoes-ref-recorrencias" aria-label="Recorrências mensais">
-            <div className="ref-panel__head">
-              <h2 className="ref-panel__title">Recorrentes (dia 1)</h2>
-              <span className="ref-panel__subtitle">Lançamento automático no início de cada mês</span>
+          <article className="ref-panel page-transacoes-ref-recorrencias" aria-label="Lançamentos recorrentes">
+            <div className="ref-panel__head page-transacoes-rec-head">
+              <h2 className="ref-panel__title">Lançamentos recorrentes</h2>
+              <span className="page-transacoes-rec-head__flag">Dia 1</span>
             </div>
             <ul className="page-transacoes-recorrencias-list">
               {recorrencias.map((r) => {
@@ -353,10 +353,12 @@ export default function Transacoes() {
                 return (
                   <li key={r.id} className="page-transacoes-recorrencia-row">
                     <div className="page-transacoes-recorrencia-row__main">
-                      <span className={`page-transacoes-recorrencia-row__tipo ${isRec ? 'page-transacoes-recorrencia-row__tipo--rec' : ''}`}>
-                        {isRec ? 'Receita' : 'Despesa'}
-                      </span>
-                      <span className="page-transacoes-recorrencia-row__desc break-words">{label}</span>
+                      <div className="page-transacoes-recorrencia-row__text">
+                        <span className={`page-transacoes-recorrencia-row__tipo ${isRec ? 'page-transacoes-recorrencia-row__tipo--rec' : ''}`}>
+                          {isRec ? 'Receita' : 'Despesa'}
+                        </span>
+                        <span className="page-transacoes-recorrencia-row__desc break-words">{label}</span>
+                      </div>
                       <span className={`page-transacoes-recorrencia-row__val ${privacyMode ? 'privacy-blur' : ''}`}>
                         {isRec ? '+' : '−'}
                         {formatCurrency(valorAbs)}
