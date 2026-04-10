@@ -4597,6 +4597,37 @@ body[data-theme='light'] .ref-dashboard-header__btn-wa--disabled {
   box-sizing: border-box;
 }
 
+/* Conteúdo do saldo centralizado no card (vertical + horizontal) */
+body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-card,
+body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-card--skeleton {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-skel-body {
+  flex: 0 1 auto;
+  align-items: center;
+  width: 100%;
+}
+
+body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-skel-line--label,
+body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-skel-line--value {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Dashboard: card compacto com Nova transação + WhatsApp */
 .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-actions-card {
   flex-shrink: 0;
@@ -4608,24 +4639,55 @@ body[data-theme='light'] .ref-dashboard-header__btn-wa--disabled {
 .ref-dashboard-actions-card__toolbar {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
 body[data-theme='light'] .ref-dashboard-actions-card {
   min-height: 0;
-  padding: 12px 14px;
+  padding: 16px 16px;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 0;
+}
+
+/* Botões maiores só neste card (o cabeçalho / Transações mantêm o tamanho padrão) */
+body[data-theme='light'] .ref-dashboard-actions-card .ref-dashboard-header__btn-tx {
+  min-height: 52px;
+  padding: 0 24px;
+  font-size: 15px;
+  border-radius: 14px;
+}
+
+body[data-theme='light'] .ref-dashboard-actions-card .ref-dashboard-header__btn-wa {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+}
+
+body[data-theme='light'] .ref-dashboard-actions-card .ref-dashboard-header__btn-wa svg {
+  width: 24px;
+  height: 24px;
 }
 
 @media (min-width: 769px) {
   body[data-theme='light'] .ref-dashboard-actions-card {
-    padding: 14px 18px;
+    padding: 18px 20px;
     border-radius: 22px;
+  }
+
+  body[data-theme='light'] .ref-dashboard-actions-card .ref-dashboard-header__btn-tx {
+    min-height: 54px;
+    padding: 0 28px;
+    font-size: 15px;
+  }
+
+  body[data-theme='light'] .ref-dashboard-actions-card .ref-dashboard-header__btn-wa {
+    width: 54px;
+    height: 54px;
   }
 }
 
@@ -4722,12 +4784,13 @@ body[data-theme='light'] .ref-dashboard-greeting__name {
   }
 
   body[data-theme='light'] .ref-dashboard-actions-card {
-    padding: 10px 12px;
+    padding: 14px 14px;
     border-radius: 16px;
   }
 
   body[data-theme='light'] .ref-dashboard-actions-card__toolbar {
-    gap: 8px;
+    gap: 12px;
+    justify-content: center;
   }
 }
 
