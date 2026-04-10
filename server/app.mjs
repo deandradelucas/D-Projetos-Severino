@@ -63,6 +63,12 @@ import {
 import { isSuperAdminEmail } from './lib/super-admin.mjs'
 import { loadEnv } from './lib/load-env.mjs'
 import { rateLimitTake, clientKeyFromHono } from './lib/rate-limit.mjs'
+import {
+  validateNovaTransacaoBody,
+  validateAtualizacaoTransacaoBody,
+  validateTransacoesListQuery,
+  isUuidString,
+} from './lib/transacao-validate.mjs'
 import { logMpWebhook } from './lib/mp-webhook-log.mjs'
 
 loadEnv()
@@ -615,6 +621,19 @@ app.get('/api/transacoes', async (c) => {
     const gate = await assertAcessoAppUsuario(usuarioId)
     if (gate) return c.json({ message: gate.message }, gate.status)
 
+    const listQ = validateTransacoesListQuery({
+      limit: c.req.query('limit'),
+      offset: c.req.query('offset'),
+    })
+    if (!listQ.ok) {
+      return c.json({ message: listQ.message }, 400)
+    }
+
+    const ip = clientKeyFromHono(c)
+    if (!rateLimitTake(`tx-list:${usuarioId}:${ip}`, 240, 60_000)) {
+      return c.json({ message: 'Muitas consultas. Aguarde um momento.' }, 429)
+    }
+
     const qOff = c.req.query('offset')
     const filters = {
       dataInicio: c.req.query('dataInicio'),
@@ -645,8 +664,22 @@ app.post('/api/transacoes', async (c) => {
     const gate = await assertAcessoAppUsuario(usuarioId)
     if (gate) return c.json({ message: gate.message }, gate.status)
 
-    const body = await c.req.json()
-    
+    if (!rateLimitTake(`tx-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
+    }
+
+    let body
+    try {
+      body = await c.req.json()
+    } catch {
+      return c.json({ message: 'JSON inválido.' }, 400)
+    }
+
+    const val = validateNovaTransacaoBody(body)
+    if (!val.ok) {
+      return c.json({ message: val.message }, 400)
+    }
+
     // Vincula o usuario logado
     body.usuario_id = usuarioId
 
@@ -760,7 +793,26 @@ app.put('/api/transacoes/:id', async (c) => {
     const gate = await assertAcessoAppUsuario(usuarioId)
     if (gate) return c.json({ message: gate.message }, gate.status)
 
-    const body = await c.req.json()
+    if (!isUuidString(id)) {
+      return c.json({ message: 'ID inválido.' }, 400)
+    }
+
+    if (!rateLimitTake(`tx-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
+    }
+
+    let body
+    try {
+      body = await c.req.json()
+    } catch {
+      return c.json({ message: 'JSON inválido.' }, 400)
+    }
+
+    const vBody = validateAtualizacaoTransacaoBody(body)
+    if (!vBody.ok) {
+      return c.json({ message: vBody.message }, 400)
+    }
+
     await atualizarTransacao(id, usuarioId, body)
     return c.json({ message: 'Transação atualizada com sucesso.' })
   } catch (error) {

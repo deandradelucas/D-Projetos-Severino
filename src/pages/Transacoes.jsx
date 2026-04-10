@@ -150,7 +150,7 @@ export default function Transacoes() {
     } finally {
       setLoading(false)
     }
-  }, [filters, buildTxQuery])
+  }, [buildTxQuery])
 
   const loadMoreTransacoes = useCallback(async () => {
     if (loading || loadingMore || !hasMore) return
