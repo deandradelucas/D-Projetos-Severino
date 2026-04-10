@@ -1842,6 +1842,7 @@ h3 {
 
   /* Nova transação — compacto: menos altura, botões em linha, sem scroll interno no corpo */
   .modal-content--nova-tx {
+    --keyboard-overlap: 0px;
     width: 100%;
     max-width: none;
     max-height: min(94dvh, 100dvh - env(safe-area-inset-top, 0px));
@@ -1854,7 +1855,10 @@ h3 {
     overscroll-behavior: contain;
     border-radius: 18px 18px 0 0;
     margin: 0;
-    padding: max(10px, env(safe-area-inset-top, 0px)) 14px max(8px, env(safe-area-inset-bottom, 0px)) 14px;
+    padding-top: max(10px, env(safe-area-inset-top, 0px));
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-bottom: calc(max(8px, env(safe-area-inset-bottom, 0px)) + var(--keyboard-overlap, 0px));
     box-shadow:
       0 -8px 40px rgba(0, 0, 0, 0.18),
       0 32px 80px -24px rgba(0, 0, 0, 0.35),
@@ -1964,6 +1968,12 @@ h3 {
     max-width: 100%;
     padding: 9px 12px;
     border-radius: 12px;
+  }
+
+  /* Valor: teclado numérico (inputMode decimal) + leitura estável no mobile */
+  .modal-content--nova-tx .input-valor-novo-tx.input-premium {
+    font-variant-numeric: tabular-nums;
+    min-height: 44px;
   }
 
   .modal-content--nova-tx .modal-form input[type='datetime-local'].input-premium {

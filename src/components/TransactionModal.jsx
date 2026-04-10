@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { apiUrl } from '../lib/apiUrl'
 import RecorrenciaArrowIcon from './RecorrenciaArrowIcon'
 
@@ -117,6 +117,18 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   
   const [displayValor, setDisplayValor] = useState('')
   const valorInputRef = useRef(null)
+  const modalSheetRef = useRef(null)
+
+  const scrollValorIntoView = useCallback(() => {
+    const el = valorInputRef.current
+    if (!el) return
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    })
+    window.setTimeout(() => {
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }, 320)
+  }, [])
 
   const fetchCategorias = React.useCallback(async () => {
     setLoadingCats(true)
@@ -191,9 +203,41 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     }))
 
     setTimeout(() => {
-      if (valorInputRef.current) valorInputRef.current.focus()
-    }, 100)
-  }, [isOpen, usuarioId, editingTransaction?.id, fetchCategorias])
+      const el = valorInputRef.current
+      if (!el) return
+      el.focus()
+      scrollValorIntoView()
+    }, 120)
+  }, [isOpen, usuarioId, editingTransaction?.id, fetchCategorias, scrollValorIntoView])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen || typeof window === 'undefined') return
+    const vv = window.visualViewport
+    if (!vv) return
+    const sheet = modalSheetRef.current
+    const update = () => {
+      if (!sheet) return
+      const overlap = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+      sheet.style.setProperty('--keyboard-overlap', `${overlap}px`)
+    }
+    update()
+    vv.addEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+      sheet?.style.removeProperty('--keyboard-overlap')
+    }
+  }, [isOpen])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -296,7 +340,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
 
   return (
     <div className="modal-backdrop">
-      <div className="modal-content modal-content--nova-tx">
+      <div className="modal-content modal-content--nova-tx" ref={modalSheetRef}>
         <div className="modal-header">
           <h3>{isEditMode ? 'Editar Transação' : 'Nova Transação'}</h3>
           <button type="button" onClick={onClose} className="close-btn" aria-label="Fechar">
@@ -371,8 +415,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
           </div>
 
           <div className="form-group">
-            <label>Valor (R$)</label>
+            <label htmlFor="tx-valor">Valor (R$)</label>
             <input
+              id="tx-valor"
               type="text"
               name="valorDisplay"
               value={displayValor}
@@ -381,7 +426,13 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               required
               placeholder="0,00"
               autoComplete="off"
-              className="input-premium"
+              inputMode="decimal"
+              enterKeyHint="done"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              onFocus={scrollValorIntoView}
+              className="input-premium input-valor-novo-tx"
             />
           </div>
 
