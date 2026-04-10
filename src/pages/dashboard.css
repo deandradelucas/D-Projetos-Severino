@@ -1508,7 +1508,7 @@ h3 {
   }
 
   .sidebar .logout-btn {
-    margin-top: 0;
+    margin-top: auto;
     flex-shrink: 0;
   }
 
@@ -5637,7 +5637,13 @@ body[data-theme='light'] .nav-menu { gap: 6px; }
 body[data-theme='light'] .nav-item { gap: 12px; min-height: 40px; padding: 10px 12px; border-radius: 12px; }
 body[data-theme='light'] .icon-wrap { width: 28px; height: 28px; border-radius: 9px; }
 body[data-theme='light'] .icon-wrap svg { width: 16px; height: 16px; }
-body[data-theme='light'] .logout-btn { margin-top: 8px; min-height: 40px; border-radius: 12px; padding: 10px 12px; font-size: 13px; }
+body[data-theme='light'] .sidebar .logout-btn {
+  margin-top: auto;
+  min-height: 40px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
 
 body[data-theme='light'] .main-content {
   border-radius: 24px;
@@ -5767,6 +5773,7 @@ body[data-theme='light'] .sidebar .brand-wrapper {
   overflow: visible;
   padding-bottom: 14px;
   position: relative;
+  flex-shrink: 0;
 }
 
 body[data-theme='light'] .sidebar .brand-wrapper .mobile-close-btn {
@@ -7248,7 +7255,7 @@ body[data-theme='light'] .ref-dashboard-inner {
   }
 
   .app-horizon-inner .sidebar .logout-btn {
-    margin-top: 0;
+    margin-top: auto;
     flex-shrink: 0;
   }
 }
@@ -7320,26 +7327,29 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar {
-    height: auto;
-    max-height: calc(100dvh - max(20px, env(safe-area-inset-top, 0px)) - max(16px, env(safe-area-inset-bottom, 0px)));
-    min-height: 0;
     align-self: flex-start;
     position: sticky;
     top: max(14px, env(safe-area-inset-top, 0px));
+    min-height: var(--app-sidebar-col-h);
+    max-height: var(--app-sidebar-col-h);
+    height: var(--app-sidebar-col-h);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .nav-menu {
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .nav-menu {
-    flex: none;
-    overflow: visible;
-    overflow-y: visible;
-    min-height: 0;
-  }
-
   body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .logout-btn {
-    margin-top: 18px;
+    margin-top: auto;
     flex-shrink: 0;
   }
 
@@ -7480,17 +7490,16 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
-  margin-top: 0;
-  padding-top: 12px;
+  margin-top: auto;
   min-height: 46px;
   padding: 12px 16px;
   border-radius: 14px;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  background: rgba(255, 255, 255, 0.38);
-  color: #475569;
-  font-size: 13px;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  font-size: clamp(12px, 0.35vw + 11px, 14px);
   font-weight: 600;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.65) inset;
   transform: none;
   transition:
     background-color 0.2s var(--pf-ease, ease),
@@ -7499,15 +7508,20 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.78);
-  border-color: rgba(148, 163, 184, 0.35);
-  color: #ef4444;
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #dc2626;
   transform: none;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.38);
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn svg {
+  color: inherit;
+  stroke: currentColor;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label {
@@ -7519,6 +7533,26 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-se
 }
 
 @media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
+    min-height: 100%;
+    max-height: none;
+    height: auto;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
+    margin-top: auto;
+  }
+
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
     border-radius: 12px;
@@ -7547,7 +7581,7 @@ body[data-theme='light'] .sidebar .nav-item {
   gap: 10px;
   min-height: 44px;
   padding: 12px 14px;
-  font-size: 14px;
+  font-size: clamp(13px, 0.4vw + 11.5px, 15px);
   border-radius: var(--pf-r-md);
 }
 
@@ -7563,10 +7597,30 @@ body[data-theme='light'] .sidebar .icon-wrap svg {
 }
 
 body[data-theme='light'] .sidebar .logout-btn {
-  margin-top: 12px;
+  margin-top: auto;
   min-height: 44px;
   padding: 12px 14px;
-  font-size: 13px;
+  font-size: clamp(12px, 0.35vw + 11px, 14px);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  font-weight: 600;
+}
+
+body[data-theme='light'] .sidebar .logout-btn:hover {
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #dc2626;
+}
+
+body[data-theme='light'] .sidebar .logout-btn svg {
+  color: inherit;
+  stroke: currentColor;
+}
+
+body[data-theme='light'] .sidebar .logout-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.38);
 }
 
 /* Navegação: feedback tátil leve */
@@ -7589,11 +7643,6 @@ body[data-theme='light'] .nav-item.active {
 
 body[data-theme='light'] .logout-btn {
   transition: background-color 0.2s var(--pf-ease), border-color 0.2s var(--pf-ease), color 0.2s var(--pf-ease);
-}
-
-body[data-theme='light'] .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.65);
-  border-color: var(--pf-line);
 }
 
 /* Botões primários — press e foco */
