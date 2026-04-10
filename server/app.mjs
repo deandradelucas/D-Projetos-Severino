@@ -211,6 +211,13 @@ function mapSupabaseOrNetworkError(error) {
       message: 'Não foi possível conectar ao banco de dados. Tente de novo em alguns instantes.',
     }
   }
+  if (/webauthn_credentials|webauthn_challenges/i.test(raw) && /does not exist|42P01/i.test(raw)) {
+    return {
+      status: 503,
+      message:
+        'As tabelas de biometria ainda não existem no banco. No Supabase (SQL Editor), execute o arquivo scripts/migrations/13_webauthn.sql deste projeto.',
+    }
+  }
   if (/relation.*does not exist|42P01/i.test(raw)) {
     return {
       status: 503,
@@ -484,7 +491,9 @@ app.get('/api/auth/webauthn/credentials', async (c) => {
     return c.json({ credentials: rows })
   } catch (error) {
     log.error('webauthn list credentials', error)
-    return c.json({ message: 'Erro ao listar.' }, 500)
+    const mapped = mapSupabaseOrNetworkError(error)
+    if (mapped) return c.json({ message: mapped.message }, mapped.status)
+    return c.json({ message: 'Erro ao listar credenciais biométricas.' }, 500)
   }
 })
 

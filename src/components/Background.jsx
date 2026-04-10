@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 
 const images = [
@@ -50,7 +51,9 @@ function getRandomImage() {
 
 export default function Background() {
   const { theme } = useTheme()
+  const { pathname } = useLocation()
   const [currentImage, setCurrentImage] = useState(() => getRandomImage())
+  const settingsPlainBg = pathname === '/configuracoes'
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -59,6 +62,17 @@ export default function Background() {
 
     return () => clearInterval(interval)
   }, [])
+
+  if (settingsPlainBg) {
+    return (
+      <div
+        className={`app-background-root app-background-root--plain${theme === 'dark' ? ' app-background-root--plain-dark' : ' app-background-root--plain-light'}`}
+        aria-hidden
+      >
+        <div className="app-background-root__plain-fill" />
+      </div>
+    )
+  }
 
   return (
     <div className="app-background-root" aria-hidden>

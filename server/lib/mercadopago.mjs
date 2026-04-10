@@ -2,6 +2,23 @@ import { loadEnv } from './load-env.mjs'
 
 const MP_API = 'https://api.mercadopago.com'
 
+/**
+ * Erro da API MP com `mpHttpStatus` (ex.: 403 = Forbidden — token/ambiente/recurso incompatível).
+ * @param {Response} res
+ * @param {object} json
+ * @param {string} prefix
+ */
+export function mercadoPagoHttpError(res, json, prefix) {
+  const msg = json?.message || json?.error || res.statusText || 'erro'
+  const e = new Error(`${prefix}: ${msg}`)
+  e.mpHttpStatus = res.status
+  return e
+}
+
+export function isMercadoPagoForbiddenError(err) {
+  return Boolean(err && err.mpHttpStatus === 403)
+}
+
 export function getMercadoPagoAccessToken() {
   loadEnv()
   return process.env.MERCADO_PAGO_ACCESS_TOKEN || ''
@@ -85,8 +102,7 @@ export async function criarPreferenciaCheckout(opts) {
 
   const json = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const msg = json.message || json.error || res.statusText
-    throw new Error(`Mercado Pago: ${msg}`)
+    throw mercadoPagoHttpError(res, json, 'Mercado Pago')
   }
 
   return {
@@ -108,8 +124,7 @@ export async function buscarPagamentoPorId(paymentId) {
 
   const json = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const msg = json.message || json.error || res.statusText
-    throw new Error(`Mercado Pago pagamento: ${msg}`)
+    throw mercadoPagoHttpError(res, json, 'Mercado Pago pagamento')
   }
   return json
 }
@@ -139,8 +154,7 @@ export async function buscarPagamentosPorExternalReference(externalReference) {
 
   const json = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const msg = json.message || json.error || res.statusText
-    throw new Error(`Mercado Pago busca pagamentos: ${msg}`)
+    throw mercadoPagoHttpError(res, json, 'Mercado Pago busca pagamentos')
   }
 
   return Array.isArray(json.results) ? json.results : []
@@ -204,8 +218,8 @@ export async function criarPreapprovalAssinaturaMensal(opts) {
 
   const json = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const msg = json.message || json.cause?.[0]?.description || json.error || res.statusText
-    throw new Error(`Mercado Pago assinatura: ${msg}`)
+    const detail = json.message || json.cause?.[0]?.description || json.error || res.statusText
+    throw mercadoPagoHttpError(res, { message: detail }, 'Mercado Pago assinatura')
   }
 
   return {
@@ -229,8 +243,7 @@ export async function buscarPreapprovalPorId(preapprovalId) {
 
   const json = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const msg = json.message || json.error || res.statusText
-    throw new Error(`Mercado Pago preapproval: ${msg}`)
+    throw mercadoPagoHttpError(res, json, 'Mercado Pago preapproval')
   }
   return json
 }

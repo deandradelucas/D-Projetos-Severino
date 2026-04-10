@@ -110,6 +110,22 @@ body {
   pointer-events: none;
 }
 
+/* Página Configurações: fundo sólido (sem foto Horizonte), alinhado a UI “papel” branca */
+.app-background-root__plain-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.app-background-root--plain-light .app-background-root__plain-fill {
+  background: #ffffff;
+}
+
+.app-background-root--plain-dark .app-background-root__plain-fill {
+  background: #0f172a;
+}
+
 .app-background-root__image {
   position: absolute;
   inset: 0;

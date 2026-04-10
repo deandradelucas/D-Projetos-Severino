@@ -23,7 +23,6 @@ export default function Configuracoes() {
 
   const [emailDigest, setEmailDigest] = useState(() => localStorage.getItem('horizonte_email_digest') === 'true')
   const [toast, setToast] = useState('')
-  const [exporting, setExporting] = useState(false)
   const [resetSending, setResetSending] = useState(false)
   const [webauthnList, setWebauthnList] = useState([])
   const [webauthnLoading, setWebauthnLoading] = useState(false)
@@ -156,27 +155,6 @@ export default function Configuracoes() {
     }
   }
 
-  const exportarTransacoesJson = async () => {
-    if (!usuarioIdHeader) return
-    setExporting(true)
-    try {
-      const res = await fetch('/api/transacoes?limit=5000', { headers: { 'x-user-id': usuarioIdHeader } })
-      if (!res.ok) throw new Error('Falha ao buscar transações.')
-      const rows = await res.json()
-      const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json;charset=utf-8' })
-      const a = document.createElement('a')
-      a.href = URL.createObjectURL(blob)
-      a.download = `horizonte-transacoes-${new Date().toISOString().slice(0, 10)}.json`
-      a.click()
-      URL.revokeObjectURL(a.href)
-      showToast('Arquivo JSON baixado.')
-    } catch (e) {
-      showToast(e.message || 'Erro ao exportar.')
-    } finally {
-      setExporting(false)
-    }
-  }
-
   return (
     <div className="dashboard-container page-configuracoes app-horizon-shell">
       <div className="app-horizon-inner">
@@ -191,7 +169,7 @@ export default function Configuracoes() {
               <span className="ref-dashboard-greeting__name">Configurações</span>
             </h1>
             <p className="ref-panel__subtitle page-configuracoes-header-sub">
-              Perfil, privacidade e dados
+              Perfil, preferências e segurança
             </p>
           </div>
         </header>
@@ -376,49 +354,31 @@ export default function Configuracoes() {
             )}
           </section>
 
-        <section className="config-card config-card--full">
-          <div className="config-section-label">Dados</div>
-          <h2 className="config-card-title" style={{ marginTop: 0 }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" x2="12" y1="15" y2="3" />
-            </svg>
-            Exportar transações
-          </h2>
-          <p style={{ margin: '0 0 14px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-            Baixe um arquivo JSON com até 5.000 lançamentos para backup ou análise externa.
-          </p>
-          <button type="button" className="btn-primary" style={{ padding: '10px 18px', fontSize: '14px' }} disabled={exporting || !usuarioIdHeader} onClick={exportarTransacoesJson}>
-            {exporting ? 'Gerando…' : 'Baixar JSON'}
-          </button>
-        </section>
-
-        {isAdmin && (
-          <section className="config-card config-card--full">
-            <div className="config-section-label">Administração</div>
-            <h2 className="config-card-title" style={{ marginTop: 0 }}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
-              Painel admin
-            </h2>
-            <p style={{ margin: '0 0 14px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Acesso a logs e usuários (conta com perfil administrador).
-            </p>
-            <div className="config-admin-strip">
-              <Link className="config-btn-ghost" to="/admin/whatsapp" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
-                Logs WhatsApp
-              </Link>
-              <Link className="config-btn-ghost" to="/admin/usuarios" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
-                Logs usuários
-              </Link>
-              <Link className="config-btn-ghost" to="/admin/pagamentos" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
-                Logs de Pagamentos
-              </Link>
-            </div>
-          </section>
-        )}
+          {isAdmin && (
+            <section className="config-card config-card--full">
+              <div className="config-section-label">Administração</div>
+              <h2 className="config-card-title" style={{ marginTop: 0 }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                Painel admin
+              </h2>
+              <p style={{ margin: '0 0 14px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                Acesso a logs e usuários (conta com perfil administrador).
+              </p>
+              <div className="config-admin-strip">
+                <Link className="config-btn-ghost" to="/admin/whatsapp" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
+                  Logs WhatsApp
+                </Link>
+                <Link className="config-btn-ghost" to="/admin/usuarios" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
+                  Logs usuários
+                </Link>
+                <Link className="config-btn-ghost" to="/admin/pagamentos" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
+                  Logs de Pagamentos
+                </Link>
+              </div>
+            </section>
+          )}
         </div>
 
         </div>

@@ -10,6 +10,10 @@ export const log = {
   info(...args) {
     console.log(ts(), '[info]', ...args)
   },
+  /** Detalhe baixo ruído (ex.: MP 403 esperado em dev com token/recurso incompatível). */
+  debug(...args) {
+    console.log(ts(), '[debug]', ...args)
+  },
   warn(...args) {
     console.warn(ts(), '[warn]', ...args)
   },

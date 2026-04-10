@@ -5,7 +5,21 @@ import {
   buscarPagamentosPorExternalReference,
   buscarPreapprovalPorId,
   isMercadoPagoConfigured,
+  isMercadoPagoForbiddenError,
 } from './mercadopago.mjs'
+
+/** 403: token TEST vs produção, outra conta MP, ou recurso de outro vendedor — não poluir logs com [warn]. */
+function logMercadoPagoSyncIssue(contexto, idRef, err) {
+  if (isMercadoPagoForbiddenError(err)) {
+    log.debug(
+      contexto,
+      idRef,
+      'MP 403 Forbidden — use MERCADO_PAGO_ACCESS_TOKEN da mesma conta/ambiente dos pagamentos no banco.'
+    )
+    return
+  }
+  log.warn(contexto, idRef, err?.message || err)
+}
 
 export async function insertPreferenciaRecord({
   usuario_id,
@@ -76,7 +90,7 @@ export async function sincronizarPreapprovalUsuario(usuario_id) {
     const pre = await buscarPreapprovalPorId(row.mp_preapproval_id)
     await atualizarUsuarioDePreapprovalResponse(uid, pre)
   } catch (e) {
-    log.warn('[sincronizarPreapprovalUsuario]', row.mp_preapproval_id, e?.message || e)
+    logMercadoPagoSyncIssue('[sincronizarPreapprovalUsuario]', row.mp_preapproval_id, e)
   }
 }
 
@@ -98,7 +112,7 @@ export async function sincronizarPreapprovalPorIdFromWebhook(preapprovalId) {
     }
     if (uid) await atualizarUsuarioDePreapprovalResponse(uid, pre)
   } catch (e) {
-    log.warn('[sincronizarPreapprovalPorIdFromWebhook]', id, e?.message || e)
+    logMercadoPagoSyncIssue('[sincronizarPreapprovalPorIdFromWebhook]', id, e)
   }
 }
 
@@ -230,7 +244,7 @@ export async function sincronizarPagamentosPendentesDoUsuario(usuario_id) {
         if (best) await upsertFromWebhookPayment(best)
       }
     } catch (e) {
-      log.warn('[sincronizarPagamentosPendentesDoUsuario]', row.external_reference || row.id, e?.message || e)
+      logMercadoPagoSyncIssue('[sincronizarPagamentosPendentesDoUsuario]', row.external_reference || row.id, e)
     }
   }
 }
