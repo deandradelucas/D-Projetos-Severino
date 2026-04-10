@@ -6,6 +6,8 @@ import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
 import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
 
+const ADMIN_DOCS_URL = import.meta.env.VITE_ADMIN_DOCS_URL || ''
+
 const PAGAMENTOS_LOG_HEADERS = [
   'Data',
   'ID usuário',
@@ -154,6 +156,13 @@ export default function AdminPagamentos() {
                 <p className="ref-panel__subtitle page-admin-header-sub">
                   Mercado Pago — preferências e status dos pagamentos
                 </p>
+                {ADMIN_DOCS_URL ? (
+                  <p className="page-admin-doc-link-wrap">
+                    <a className="page-admin-doc-link" href={ADMIN_DOCS_URL} target="_blank" rel="noreferrer">
+                      Documentação / runbook interno
+                    </a>
+                  </p>
+                ) : null}
               </div>
             </header>
 

@@ -31,14 +31,22 @@ export async function insertAdminAuditLog(row) {
 }
 
 export async function listAdminAuditLog(limit = 80) {
-  const supabaseAdmin = getSupabaseAdmin()
-  const lim = Math.min(500, Math.max(1, Number(limit) || 80))
-  const { data, error } = await supabaseAdmin
-    .from('admin_audit_log')
-    .select('id, created_at, actor_user_id, action, target_user_id, target_email, detail, client_ip')
-    .order('created_at', { ascending: false })
-    .limit(lim)
+  try {
+    const supabaseAdmin = getSupabaseAdmin()
+    const lim = Math.min(500, Math.max(1, Number(limit) || 80))
+    const { data, error } = await supabaseAdmin
+      .from('admin_audit_log')
+      .select('id, created_at, actor_user_id, action, target_user_id, target_email, detail, client_ip')
+      .order('created_at', { ascending: false })
+      .limit(lim)
 
-  if (error) throw error
-  return data || []
+    if (error) {
+      log.error('[admin_audit] list falhou (migration 13 aplicada?):', error)
+      return []
+    }
+    return data || []
+  } catch (e) {
+    log.error('[admin_audit] list exceção:', e)
+    return []
+  }
 }

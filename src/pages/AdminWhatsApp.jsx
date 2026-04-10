@@ -6,6 +6,8 @@ import './dashboard.css'
 
 const WHATSAPP_LOG_HEADERS = ['Data', 'Telefone remetente', 'Mensagem dita', 'Status', 'Resultado / detalhe']
 
+const ADMIN_DOCS_URL = import.meta.env.VITE_ADMIN_DOCS_URL || ''
+
 export default function AdminWhatsApp() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [logs, setLogs] = useState([])
@@ -96,6 +98,13 @@ export default function AdminWhatsApp() {
                 <p className="ref-panel__subtitle page-admin-header-sub">
                   Auditoria de mensagens recebidas pelo BOT
                 </p>
+                {ADMIN_DOCS_URL ? (
+                  <p className="page-admin-doc-link-wrap">
+                    <a className="page-admin-doc-link" href={ADMIN_DOCS_URL} target="_blank" rel="noreferrer">
+                      Documentação / runbook interno
+                    </a>
+                  </p>
+                ) : null}
               </div>
             </header>
 

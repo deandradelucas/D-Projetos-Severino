@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
@@ -420,7 +420,6 @@ export default function AdminUsuarios() {
         setSessionBanner('')
       }
 
-      setListaUsuarios((prev) => prev.map((row) => (row.id === editingUserId ? data : row)))
       setUserActionMessage('Usuário atualizado com sucesso.')
       setEditingUserId(null)
       setEditForm({})
@@ -531,7 +530,7 @@ export default function AdminUsuarios() {
                     Cadastros e acessos
                   </h2>
                   <p className="ref-panel__subtitle page-admin-usuarios-intro">
-                    Filtre por texto, papel e status da conta. Edite linhas, redefina senha ou exclua contas (exceto a administradora principal).
+                    Filtre por texto, papel e status da conta. Apenas o administrador principal pode promover alguém a Admin. Edite linhas, redefina senha ou exclua contas (exceto a administradora principal).
                   </p>
                 </div>
                 <div className="page-admin-usuarios-head-actions">
@@ -542,7 +541,48 @@ export default function AdminUsuarios() {
               </div>
 
               {loadError ? <div className="page-admin-alert">{loadError}</div> : null}
+              {sessionBanner ? (
+                <div className="page-admin-session-banner" role="status">
+                  {sessionBanner}
+                  <button type="button" className="page-admin-session-banner-dismiss" onClick={() => setSessionBanner('')}>
+                    Fechar
+                  </button>
+                </div>
+              ) : null}
               {userActionMessage ? <div className="page-admin-toast-msg">{userActionMessage}</div> : null}
+
+              {stats && !loadError ? (
+                <section className="ref-kpi-row page-admin-kpi-row" aria-label="Indicadores do cadastro">
+                  <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
+                    <div className="ref-kpi-card__body">
+                      <p className="ref-kpi-card__label">Cadastros</p>
+                      <p className="ref-kpi-card__value">{stats.total}</p>
+                      <p className="page-admin-kpi-sub">Total no sistema</p>
+                    </div>
+                  </article>
+                  <article className="ref-kpi-card ref-kpi-card--income">
+                    <div className="ref-kpi-card__body">
+                      <p className="ref-kpi-card__label">Contas ativas</p>
+                      <p className="ref-kpi-card__value">{stats.ativos}</p>
+                      <p className="page-admin-kpi-sub">Podem acessar o app</p>
+                    </div>
+                  </article>
+                  <article className="ref-kpi-card ref-kpi-card--expense">
+                    <div className="ref-kpi-card__body">
+                      <p className="ref-kpi-card__label">Admins</p>
+                      <p className="ref-kpi-card__value">{stats.admins}</p>
+                      <p className="page-admin-kpi-sub">Papel Admin no banco</p>
+                    </div>
+                  </article>
+                  <article className="ref-kpi-card ref-kpi-card--balance">
+                    <div className="ref-kpi-card__body">
+                      <p className="ref-kpi-card__label">Trial ativo</p>
+                      <p className="ref-kpi-card__value">{stats.trial_ativos}</p>
+                      <p className="page-admin-kpi-sub">Teste vigente (data futura)</p>
+                    </div>
+                  </article>
+                </section>
+              ) : null}
 
               <div className="page-admin-users-toolbar page-admin-users-toolbar--grid">
                 <div className="page-admin-search-wrap">
@@ -588,6 +628,14 @@ export default function AdminUsuarios() {
                   <button type="button" className="btn-secondary page-admin-toolbar-btn" disabled={loadingUsuarios} onClick={() => void refreshUsuarios()}>
                     {loadingUsuarios ? 'Atualizando…' : 'Atualizar lista'}
                   </button>
+                  <button
+                    type="button"
+                    className="btn-secondary page-admin-toolbar-btn"
+                    disabled={exportingCsv || loadingUsuarios}
+                    onClick={() => void exportarCsv()}
+                  >
+                    {exportingCsv ? 'Exportando…' : 'Exportar CSV'}
+                  </button>
                   <button type="button" className="btn-secondary page-admin-toolbar-btn" onClick={clearFilters}>
                     Limpar filtros
                   </button>
@@ -597,16 +645,28 @@ export default function AdminUsuarios() {
               <p className="page-admin-usuarios-meta" aria-live="polite">
                 {loadingUsuarios
                   ? 'Carregando…'
-                  : `${totalFiltrados} ${totalFiltrados === 1 ? 'usuário' : 'usuários'}${totalFiltrados !== usuarios.length ? ` (de ${usuarios.length} no total)` : ''}`}
+                  : (() => {
+                      const base = `${totalLista} ${totalLista === 1 ? 'resultado' : 'resultados'} nesta página`
+                      if (!stats) return base
+                      return `${base} · ${stats.total} cadastro(s) no sistema`
+                    })()}
               </p>
 
               <div className="page-admin-table-scroll">
                 {loadingUsuarios ? (
                   <AdminDataTableSkeleton headers={USUARIOS_TABLE_HEADERS} rows={10} tableClassName="admin-usuarios-table" />
-                ) : usuarios.length === 0 ? (
-                  <p className="page-admin-empty">Nenhum usuário encontrado.</p>
-                ) : totalFiltrados === 0 ? (
-                  <p className="page-admin-empty">Nenhum resultado com os filtros atuais.</p>
+                ) : !loadingUsuarios && totalLista === 0 && stats && stats.total === 0 ? (
+                  <div className="page-admin-empty-block">
+                    <p className="page-admin-empty">Nenhum usuário cadastrado ainda.</p>
+                    <p className="page-admin-empty-hint">Use &quot;Nova conta&quot; ou peça para alguém se cadastrar.</p>
+                  </div>
+                ) : !loadingUsuarios && totalLista === 0 ? (
+                  <div className="page-admin-empty-block">
+                    <p className="page-admin-empty">Nenhum resultado com os filtros atuais.</p>
+                    <button type="button" className="btn-secondary page-admin-empty-clear" onClick={clearFilters}>
+                      Limpar filtros
+                    </button>
+                  </div>
                 ) : (
                   <table className="admin-usuarios-table">
                     <thead>
@@ -681,7 +741,7 @@ export default function AdminUsuarios() {
                                     value={editForm.role || 'USER'}
                                     onChange={(e) => handleChangeField('role', e.target.value)}
                                   >
-                                    {ROLE_OPTIONS.map((opt) => (
+                                    {roleOptionsEdit.map((opt) => (
                                       <option key={opt.value} value={opt.value}>
                                         {opt.label}
                                       </option>
@@ -722,7 +782,38 @@ export default function AdminUsuarios() {
                               <UltimoAcessoCell row={row} getUserConnectionBadge={getUserConnectionBadge} />
                             </td>
                             <td className="cell-acoes">
-                              <div className="admin-acoes-btns">
+                              <details className="page-admin-acoes-dd">
+                                <summary className="page-admin-acoes-dd-summary">Ações</summary>
+                                <div className="page-admin-acoes-dd-body">
+                                  {isEditing ? (
+                                    <>
+                                      <button type="button" className="btn-primary admin-acoes-btn" onClick={handleSaveUser}>
+                                        Salvar
+                                      </button>
+                                      <button type="button" className="btn-secondary admin-acoes-btn" onClick={handleCancelEdit}>
+                                        Cancelar
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleEditUser(row)}>
+                                      Editar
+                                    </button>
+                                  )}
+                                  <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleResetPassword(row)}>
+                                    Senha
+                                  </button>
+                                  {isPrincipal ? (
+                                    <span className="admin-acoes-protegido" title="A conta administradora principal não pode ser excluída pelo painel.">
+                                      Protegido
+                                    </span>
+                                  ) : (
+                                    <button type="button" className="btn-secondary admin-acoes-btn admin-acoes-btn--danger" onClick={() => handleDeleteUser(row)}>
+                                      Excluir
+                                    </button>
+                                  )}
+                                </div>
+                              </details>
+                              <div className="admin-acoes-btns page-admin-acoes-desktop">
                                 {isEditing ? (
                                   <>
                                     <button type="button" className="btn-primary admin-acoes-btn" onClick={handleSaveUser}>
@@ -762,12 +853,12 @@ export default function AdminUsuarios() {
                 )}
               </div>
 
-              {!loadingUsuarios && totalFiltrados > 0 ? (
+              {!loadingUsuarios && totalLista > 0 ? (
                 <nav className="page-admin-pagination" aria-label="Paginação da lista de usuários">
                   <span className="page-admin-pagination-info">
-                    {totalFiltrados === 0
+                    {totalLista === 0
                       ? '—'
-                      : `${start + 1}–${Math.min(start + PAGE_SIZE, totalFiltrados)} de ${totalFiltrados}`}
+                      : `${start + 1}–${Math.min(start + PAGE_SIZE, totalLista)} de ${totalLista}`}
                   </span>
                   <div className="page-admin-pagination-btns">
                     <button
@@ -792,6 +883,28 @@ export default function AdminUsuarios() {
                   </div>
                 </nav>
               ) : null}
+
+              <details className="page-admin-audit-block" onToggle={(e) => setAuditOpen(e.target.open)}>
+                <summary className="page-admin-audit-summary">Auditoria recente (ações registradas no servidor)</summary>
+                {auditLoading ? (
+                  <p className="page-admin-audit-loading">Carregando…</p>
+                ) : auditRows.length === 0 ? (
+                  <p className="page-admin-audit-empty">
+                    Nenhum registro ainda. Se acabou de subir o projeto, rode a migration <code>13_admin_audit_log.sql</code> no Supabase.
+                  </p>
+                ) : (
+                  <ul className="page-admin-audit-list">
+                    {auditRows.map((row) => (
+                      <li key={row.id} className="page-admin-audit-item">
+                        <span className="page-admin-audit-time">{new Date(row.created_at).toLocaleString('pt-BR')}</span>
+                        <span className="page-admin-audit-action">{row.action}</span>
+                        <span className="page-admin-audit-target">{row.target_email || row.target_user_id || '—'}</span>
+                        {row.client_ip ? <span className="page-admin-audit-ip">{row.client_ip}</span> : null}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </details>
             </article>
           </div>
         </main>

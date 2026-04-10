@@ -327,9 +327,15 @@ export async function updateUsuarioAdmin(id, payload, ctx = {}) {
     }
   }
   if (payload.role !== undefined) {
+    const prevRole = normalizeRoleKey(beforeRow.role)
     const newRole = normalizeRoleKey(payload.role)
     if (newRole === 'ADMIN' && !actorCanAssignAdminRole(actorEmail)) {
       const e = new Error('Apenas o administrador principal pode atribuir o papel Admin.')
+      e.statusCode = 403
+      throw e
+    }
+    if (prevRole === 'ADMIN' && newRole !== 'ADMIN' && !actorCanAssignAdminRole(actorEmail)) {
+      const e = new Error('Apenas o administrador principal pode rebaixar outro administrador.')
       e.statusCode = 403
       throw e
     }
@@ -396,6 +402,9 @@ export async function deleteUsuarioAdmin(id, ctx = {}) {
     e.statusCode = 403
     throw e
   }
+  const { error } = await supabaseAdmin.from('usuarios').delete().eq('id', id)
+  if (error) throw error
+
   await insertAdminAuditLog({
     actorUserId: actorUserId || null,
     action: 'usuario_excluido',
@@ -403,8 +412,6 @@ export async function deleteUsuarioAdmin(id, ctx = {}) {
     targetEmail: t?.email || null,
     clientIp: clientIp || null,
   })
-  const { error } = await supabaseAdmin.from('usuarios').delete().eq('id', id)
-  if (error) throw error
 }
 
 export async function getWhatsappStatus() {
