@@ -69,7 +69,13 @@ export default function Background() {
         }}
       />
       <div
-        className={`app-background-root__tint ${theme === 'dark' ? 'app-background-root__tint--dark' : 'app-background-root__tint--light'}`}
+        className={`app-background-root__tint ${
+          theme === 'dark'
+            ? 'app-background-root__tint--dark'
+            : theme === 'glass'
+              ? 'app-background-root__tint--glass'
+              : 'app-background-root__tint--light'
+        }`}
       />
       <div
         className="app-background-root__vignette"

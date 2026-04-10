@@ -180,7 +180,7 @@ export default function Configuracoes() {
             <div className="config-theme-picker-block">
               <div className="config-pref-label config-pref-label--block">
                 <strong>Aparência</strong>
-                <span>Tema claro ou escuro em todo o aplicativo (salvo neste navegador)</span>
+                <span>Claro, escuro ou vitrificado — salvo neste navegador</span>
               </div>
               <div className="config-themes" role="group" aria-label="Tema da interface">
                 <button
@@ -205,6 +205,18 @@ export default function Configuracoes() {
                   <div className="config-theme-body">
                     <h4>Escuro</h4>
                     <p>Modo escuro para ambientes com pouca luz.</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  className={`config-theme-card ${theme === 'glass' ? 'is-active' : ''}`}
+                  onClick={() => setTheme('glass')}
+                  aria-pressed={theme === 'glass'}
+                >
+                  <div className="config-theme-preview config-theme-preview--glass" aria-hidden />
+                  <div className="config-theme-body">
+                    <h4>Vitrificado</h4>
+                    <p>Painéis translúcidos com desfoque sobre o fundo Horizonte.</p>
                   </div>
                 </button>
               </div>

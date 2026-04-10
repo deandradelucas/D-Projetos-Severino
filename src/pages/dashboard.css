@@ -224,8 +224,8 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-[data-theme='dark'] .modal-form input, [data-theme='cyberpunk'] .modal-form input,
-[data-theme='dark'] .modal-form select, [data-theme='cyberpunk'] .modal-form select,
+[data-theme='dark'] .modal-form input, [data-theme='cyberpunk'] .modal-form input, [data-theme='glass'] .modal-form input,
+[data-theme='dark'] .modal-form select, [data-theme='cyberpunk'] .modal-form select, [data-theme='glass'] .modal-form select,
 [data-theme='dark'] .input-premium, [data-theme='cyberpunk'] .input-premium, [data-theme='off-white'] .input-premium, [data-theme='glass'] .input-premium {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.09);
@@ -233,8 +233,8 @@
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
-[data-theme='dark'] .modal-form input:focus, [data-theme='cyberpunk'] .modal-form input:focus,
-[data-theme='dark'] .modal-form select:focus, [data-theme='cyberpunk'] .modal-form select:focus,
+[data-theme='dark'] .modal-form input:focus, [data-theme='cyberpunk'] .modal-form input:focus, [data-theme='glass'] .modal-form input:focus,
+[data-theme='dark'] .modal-form select:focus, [data-theme='cyberpunk'] .modal-form select:focus, [data-theme='glass'] .modal-form select:focus,
 [data-theme='dark'] .input-premium:focus, [data-theme='cyberpunk'] .input-premium:focus, [data-theme='off-white'] .input-premium:focus, [data-theme='glass'] .input-premium:focus {
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--accent);
@@ -2889,7 +2889,8 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-fil
 
 [data-theme='dark'] .dashboard-container.app-horizon-shell.page-transacoes .page-transacoes-filters-toggle:focus-visible,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-transacoes .page-transacoes-filters-toggle:focus-visible,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .page-transacoes-filters-toggle:focus-visible {
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .page-transacoes-filters-toggle:focus-visible,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-transacoes .page-transacoes-filters-toggle:focus-visible {
   outline: 2px solid var(--accent-color, #38bdf8);
   outline-offset: 2px;
 }
@@ -2952,7 +2953,12 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header,
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header,
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header {
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-header,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -2977,7 +2983,12 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead,
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__lead,
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header__lead,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header__lead {
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header__lead,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-header__lead,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__lead,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header__lead,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header__lead {
   flex: 1 1 200px;
   min-width: 0;
 }
@@ -2996,7 +3007,12 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__actions,
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__actions,
 [data-theme='off-white'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header__actions,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header__actions {
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header__actions,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-header__actions,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__actions,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__actions,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-pagamento .ref-dashboard-header__actions,
+[data-theme='glass'] .dashboard-container.app-horizon-shell.page-configuracoes .ref-dashboard-header__actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -4828,7 +4844,7 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
 
 .config-themes {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
 }
 
@@ -4877,6 +4893,14 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
 
 .config-theme-preview--dark {
   background: linear-gradient(135deg, #080a0e 0%, #1a1f2a 100%);
+}
+
+.config-theme-preview--glass {
+  background:
+    linear-gradient(125deg, rgba(255, 255, 255, 0.14) 0%, transparent 42%),
+    linear-gradient(135deg, rgba(12, 18, 32, 0.75) 0%, rgba(6, 10, 18, 0.45) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .config-theme-picker-block {
@@ -7737,6 +7761,39 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-charts {
   box-shadow: none !important;
 }
 
+/* Shell vitrificado: vidro (blur) sobre a foto Horizonte — não usa o painel totalmente transparente do tema escuro */
+[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
+  background: rgba(12, 14, 22, 0.52) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.18);
+  backdrop-filter: blur(28px) saturate(1.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 20px 48px -28px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme='glass'] .dashboard-container.app-horizon-shell.ref-dashboard .main-content.ref-dashboard-main,
+[data-theme='glass'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='glass'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='glass'] .page-pagamento.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='glass'] .page-configuracoes.app-horizon-shell .main-content.ref-dashboard-main {
+  background: rgba(8, 10, 18, 0.48) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.12);
+  backdrop-filter: blur(22px) saturate(1.12);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 24px 64px -32px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 22px;
+}
+
+@media (max-width: 768px) {
+  [data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
+    -webkit-backdrop-filter: blur(40px) saturate(1.15);
+    backdrop-filter: blur(40px) saturate(1.15);
+  }
+}
+
 body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-loading-panel {
   min-height: 0;
 }
@@ -7842,8 +7899,8 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-me
   display: block !important;
   content: "";
   position: absolute;
-  left: 10px;
-  right: auto;
+  right: 10px;
+  left: auto;
   width: 8px;
   height: 8px;
   top: var(--sidebar-nav-dot-y, 24px);
@@ -7857,57 +7914,128 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-me
   z-index: 60;
   opacity: var(--sidebar-nav-dot-visible, 0);
   pointer-events: none;
-  transition: top 0.5s cubic-bezier(0.33, 1.12, 0.34, 1), opacity 0.22s ease;
+  transition:
+    top 0.65s cubic-bezier(0.18, 1, 0.28, 1.06),
+    opacity 0.3s ease,
+    box-shadow 0.45s ease,
+    filter 0.35s ease;
   animation: none;
-  will-change: top;
+  will-change: top, transform;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before {
-  animation: shell-nav-dot-nudge-down 0.58s cubic-bezier(0.34, 1.35, 0.48, 1) both;
+  animation: shell-nav-dot-nudge-down 0.82s cubic-bezier(0.22, 0.95, 0.28, 1.14) both;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before {
-  animation: shell-nav-dot-nudge-up 0.58s cubic-bezier(0.34, 1.35, 0.48, 1) both;
+  animation: shell-nav-dot-nudge-up 0.82s cubic-bezier(0.22, 0.95, 0.28, 1.14) both;
 }
 
+/* Chegada “com mola”: entra pela direita + eixo do movimento, blur → nítido, 2 micro-rebotes */
 @keyframes shell-nav-dot-nudge-down {
   0% {
-    transform: translateY(calc(-50% - 12px)) scale(0.78);
-    opacity: 0.75;
+    transform: translate(14px, calc(-50% - 18px)) scale(0.58);
+    opacity: 0.55;
+    filter: blur(1.5px);
+    box-shadow:
+      0 0 0 2px rgba(252, 252, 253, 0.96),
+      0 4px 20px rgba(15, 23, 42, 0.35);
   }
 
-  55% {
-    transform: translateY(calc(-50% + 4px)) scale(1.1);
+  28% {
+    transform: translate(-3px, calc(-50% + 4px)) scale(1.1);
+    opacity: 1;
+    filter: blur(0);
+    box-shadow:
+      0 0 0 2px rgba(252, 252, 253, 0.98),
+      0 0 9px rgba(59, 130, 246, 0.16);
+  }
+
+  52% {
+    transform: translate(5px, calc(-50% - 6px)) scale(0.9);
+    opacity: 1;
+    box-shadow:
+      0 0 0 2px rgba(252, 252, 253, 0.96),
+      0 2px 10px rgba(15, 23, 42, 0.28);
+  }
+
+  76% {
+    transform: translate(-2px, calc(-50% + 2px)) scale(1.06);
     opacity: 1;
   }
 
   100% {
-    transform: translateY(-50%) scale(1);
+    transform: translate(0, -50%) scale(1);
     opacity: 1;
+    filter: blur(0);
+    box-shadow:
+      0 0 0 2px rgba(252, 252, 253, 0.96),
+      0 2px 10px rgba(15, 23, 42, 0.28);
   }
 }
 
 @keyframes shell-nav-dot-nudge-up {
   0% {
-    transform: translateY(calc(-50% + 12px)) scale(0.78);
-    opacity: 0.75;
+    transform: translate(14px, calc(-50% + 18px)) scale(0.58);
+    opacity: 0.55;
+    filter: blur(1.5px);
+    box-shadow:
+      0 0 0 2px rgba(252, 252, 253, 0.96),
+      0 4px 20px rgba(15, 23, 42, 0.35);
   }
 
-  55% {
-    transform: translateY(calc(-50% - 4px)) scale(1.1);
+  28% {
+    transform: translate(-3px, calc(-50% - 4px)) scale(1.1);
+    opacity: 1;
+    filter: blur(0);
+    box-shadow:
+      0 0 0 2px rgba(252, 252, 253, 0.98),
+      0 0 9px rgba(59, 130, 246, 0.16);
+  }
+
+  52% {
+    transform: translate(5px, calc(-50% + 6px)) scale(0.9);
+    opacity: 1;
+    box-shadow:
+      0 0 0 2px rgba(252, 252, 253, 0.96),
+      0 2px 10px rgba(15, 23, 42, 0.28);
+  }
+
+  76% {
+    transform: translate(-2px, calc(-50% - 2px)) scale(1.06);
     opacity: 1;
   }
 
   100% {
-    transform: translateY(-50%) scale(1);
+    transform: translate(0, -50%) scale(1);
     opacity: 1;
+    filter: blur(0);
+    box-shadow:
+      0 0 0 2px rgba(252, 252, 253, 0.96),
+      0 2px 10px rgba(15, 23, 42, 0.28);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before,
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before,
+  [data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before,
+  [data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before,
+  [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before,
+  [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before,
+  [data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before,
+  [data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before,
+  [data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before,
+  [data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before {
     animation: none;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before,
+  [data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before,
+  [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before,
+  [data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before,
+  [data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before {
+    transition: top 0.35s ease, opacity 0.2s ease;
   }
 }
 
@@ -7917,12 +8045,13 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-me
 
 [data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before {
+[data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before,
+[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before {
   display: block !important;
   content: "";
   position: absolute;
-  left: 10px;
-  right: auto;
+  right: 10px;
+  left: auto;
   width: 8px;
   height: 8px;
   top: var(--sidebar-nav-dot-y, 24px);
@@ -7936,26 +8065,126 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-me
   z-index: 60;
   opacity: var(--sidebar-nav-dot-visible, 0);
   pointer-events: none;
-  transition: top 0.5s cubic-bezier(0.33, 1.12, 0.34, 1), opacity 0.22s ease;
+  transition:
+    top 0.65s cubic-bezier(0.18, 1, 0.28, 1.06),
+    opacity 0.3s ease,
+    box-shadow 0.45s ease,
+    filter 0.35s ease;
   animation: none;
+  will-change: top, transform;
 }
 
 [data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before {
-  animation: shell-nav-dot-nudge-down 0.58s cubic-bezier(0.34, 1.35, 0.48, 1) both;
+[data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before,
+[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before {
+  animation: shell-nav-dot-nudge-down-dark 0.82s cubic-bezier(0.22, 0.95, 0.28, 1.14) both;
 }
 
 [data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before {
-  animation: shell-nav-dot-nudge-up 0.58s cubic-bezier(0.34, 1.35, 0.48, 1) both;
+[data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before,
+[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before {
+  animation: shell-nav-dot-nudge-up-dark 0.82s cubic-bezier(0.22, 0.95, 0.28, 1.14) both;
+}
+
+@keyframes shell-nav-dot-nudge-down-dark {
+  0% {
+    transform: translate(14px, calc(-50% - 18px)) scale(0.58);
+    opacity: 0.55;
+    filter: blur(1.5px);
+    box-shadow:
+      0 0 0 2px rgba(15, 23, 42, 0.35),
+      0 4px 22px rgba(248, 250, 252, 0.2);
+  }
+
+  28% {
+    transform: translate(-3px, calc(-50% + 4px)) scale(1.1);
+    opacity: 1;
+    filter: blur(0);
+    box-shadow:
+      0 0 0 2px rgba(15, 23, 42, 0.38),
+      0 0 10px rgba(212, 168, 75, 0.2);
+  }
+
+  52% {
+    transform: translate(5px, calc(-50% - 6px)) scale(0.9);
+    opacity: 1;
+    box-shadow:
+      0 0 0 2px rgba(15, 23, 42, 0.35),
+      0 0 14px rgba(248, 250, 252, 0.35);
+  }
+
+  76% {
+    transform: translate(-2px, calc(-50% + 2px)) scale(1.06);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(0, -50%) scale(1);
+    opacity: 1;
+    filter: blur(0);
+    box-shadow:
+      0 0 0 2px rgba(15, 23, 42, 0.35),
+      0 0 14px rgba(248, 250, 252, 0.35);
+  }
+}
+
+@keyframes shell-nav-dot-nudge-up-dark {
+  0% {
+    transform: translate(14px, calc(-50% + 18px)) scale(0.58);
+    opacity: 0.55;
+    filter: blur(1.5px);
+    box-shadow:
+      0 0 0 2px rgba(15, 23, 42, 0.35),
+      0 4px 22px rgba(248, 250, 252, 0.2);
+  }
+
+  28% {
+    transform: translate(-3px, calc(-50% - 4px)) scale(1.1);
+    opacity: 1;
+    filter: blur(0);
+    box-shadow:
+      0 0 0 2px rgba(15, 23, 42, 0.38),
+      0 0 10px rgba(212, 168, 75, 0.2);
+  }
+
+  52% {
+    transform: translate(5px, calc(-50% + 6px)) scale(0.9);
+    opacity: 1;
+    box-shadow:
+      0 0 0 2px rgba(15, 23, 42, 0.35),
+      0 0 14px rgba(248, 250, 252, 0.35);
+  }
+
+  76% {
+    transform: translate(-2px, calc(-50% - 2px)) scale(1.06);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(0, -50%) scale(1);
+    opacity: 1;
+    filter: blur(0);
+    box-shadow:
+      0 0 0 2px rgba(15, 23, 42, 0.35),
+      0 0 14px rgba(248, 250, 252, 0.35);
+  }
 }
 
 [data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::after,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::after,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::after {
+[data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::after,
+[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::after {
   display: none !important;
+}
+
+/* Respiro à direita dos rótulos — bolinha indicadora no canto direito do menu */
+[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu .nav-item,
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell .sidebar .nav-menu .nav-item,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell .sidebar .nav-menu .nav-item,
+[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu .nav-item {
+  padding-right: 28px;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active::before,
@@ -7978,7 +8207,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
   gap: 12px;
   min-height: 46px;
-  padding: 12px 16px;
+  padding: 12px 28px 12px 16px;
   border-radius: 14px;
   font-size: 14px;
   font-weight: 600;

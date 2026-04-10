@@ -133,6 +133,11 @@ body {
   background-color: rgba(8, 10, 14, 0.58);
 }
 
+/* Vitrificado: deixa mais da foto visível atrás do blur da UI */
+.app-background-root__tint--glass {
+  background-color: rgba(6, 10, 18, 0.38);
+}
+
 .app-background-root__wash {
   position: absolute;
   inset: 0;
@@ -200,6 +205,22 @@ body[data-theme='dark']:has(.app-horizon-shell) {
 }
 
 html:has(body[data-theme='dark']:has(.app-horizon-shell)) {
+  background-color: transparent;
+}
+
+/* Tema vitrificado (vidro escuro) */
+body[data-theme='glass'] {
+  color-scheme: dark;
+  background-color: #05070a;
+  background-image: none;
+}
+
+body[data-theme='glass']:has(.app-horizon-shell) {
+  background-color: transparent;
+  background-image: none;
+}
+
+html:has(body[data-theme='glass']:has(.app-horizon-shell)) {
   background-color: transparent;
 }
 

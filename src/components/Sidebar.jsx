@@ -35,7 +35,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
       timeouts.push(
         window.setTimeout(() => setDotMotion(idx > prevMenuIdx.current ? 'down' : 'up'), 0)
       )
-      timeouts.push(window.setTimeout(() => setDotMotion(null), 680))
+      timeouts.push(window.setTimeout(() => setDotMotion(null), 900))
       prevMenuIdx.current = idx
       return () => timeouts.forEach((id) => window.clearTimeout(id))
     }
