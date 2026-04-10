@@ -5,7 +5,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
 import { apiUrl } from '../lib/apiUrl'
 import { formatPhoneBRDisplay } from '../lib/formatPhoneBR'
-import { isSuperAdminEmail } from '../lib/superAdmin'
+import { isSuperAdminEmail, isSuperAdminSession } from '../lib/superAdmin'
 import './dashboard.css'
 
 const USUARIOS_TABLE_HEADERS = [
@@ -44,6 +44,56 @@ function rolePillClassName(role) {
 }
 
 const PAGE_SIZE = 12
+
+const ROLE_OPTIONS_NON_SUPER = ROLE_OPTIONS.filter((o) => o.value !== 'ADMIN')
+
+function buildUsuariosQuery(page, pageSize, q, role, conta) {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+  })
+  if (q) params.set('q', q)
+  if (role) params.set('role', role)
+  if (conta) params.set('conta', conta)
+  return params.toString()
+}
+
+function downloadTextFile(filename, text) {
+  const blob = new Blob([text], { type: 'text/csv;charset=utf-8;' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
+
+function rowsToCsv(rows) {
+  const cols = ['nome', 'email', 'telefone', 'papel', 'conta_ativa', 'assinatura', 'ultimo_acesso']
+  const esc = (v) => {
+    const s = v == null ? '' : String(v)
+    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`
+    return s
+  }
+  const lines = [cols.join(',')]
+  for (const r of rows) {
+    const papel = roleDisplayLabel(r.role)
+    const conta = r.is_active === false ? 'desativada' : 'ativa'
+    const assin = r.pagamento_aprovado ? 'pago' : r.isento_pagamento ? 'isento' : '—'
+    const ult = r.last_login_at ? new Date(r.last_login_at).toISOString() : ''
+    lines.push(
+      [
+        esc(r.nome),
+        esc(r.email),
+        esc(r.telefone),
+        esc(papel),
+        esc(conta),
+        esc(assin),
+        esc(ult),
+      ].join(',')
+    )
+  }
+  return lines.join('\n')
+}
 
 function mpStatusLabel(status) {
   if (!status) return '—'
@@ -183,16 +233,36 @@ function UltimoAcessoCell({ row, getUserConnectionBadge }) {
 
 export default function AdminUsuarios() {
   const [menuAberto, setMenuAberto] = useState(false)
-  const [usuarios, setUsuarios] = useState([])
+  const [listaUsuarios, setListaUsuarios] = useState([])
+  const [totalLista, setTotalLista] = useState(0)
+  const [stats, setStats] = useState(null)
   const [loadingUsuarios, setLoadingUsuarios] = useState(true)
   const [editingUserId, setEditingUserId] = useState(null)
   const [editForm, setEditForm] = useState({})
   const [userFilter, setUserFilter] = useState('')
+  const [userFilterDebounced, setUserFilterDebounced] = useState('')
   const [filterRole, setFilterRole] = useState('')
   const [filterConta, setFilterConta] = useState('')
   const [page, setPage] = useState(1)
   const [userActionMessage, setUserActionMessage] = useState('')
   const [loadError, setLoadError] = useState('')
+  const [sessionBanner, setSessionBanner] = useState('')
+  const [auditRows, setAuditRows] = useState([])
+  const [auditLoading, setAuditLoading] = useState(false)
+  const [auditOpen, setAuditOpen] = useState(false)
+  const [exportingCsv, setExportingCsv] = useState(false)
+
+  const principalPodeDarAdmin = isSuperAdminSession()
+  const roleOptionsEdit = principalPodeDarAdmin ? ROLE_OPTIONS : ROLE_OPTIONS_NON_SUPER
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setUserFilterDebounced(userFilter.trim()), 400)
+    return () => window.clearTimeout(t)
+  }, [userFilter])
+
+  useEffect(() => {
+    setPage(1)
+  }, [userFilterDebounced, filterRole, filterConta])
 
   const refreshUsuarios = useCallback(async () => {
     setLoadingUsuarios(true)
@@ -204,68 +274,88 @@ export default function AdminUsuarios() {
         return
       }
       const u = JSON.parse(userSaved)
-      const res = await fetch(apiUrl('/api/admin/usuarios'), { headers: { 'x-user-id': u.id } })
+      const qs = buildUsuariosQuery(page, PAGE_SIZE, userFilterDebounced, filterRole, filterConta)
+      const res = await fetch(apiUrl(`/api/admin/usuarios?${qs}`), { headers: { 'x-user-id': u.id } })
       const data = await res.json().catch(() => ({}))
-      if (res.ok) {
-        setUsuarios(Array.isArray(data) ? data : [])
+      if (res.ok && data && Array.isArray(data.items)) {
+        setListaUsuarios(data.items)
+        setTotalLista(typeof data.total === 'number' ? data.total : data.items.length)
+        setStats(data.stats || null)
       } else {
-        setUsuarios([])
+        setListaUsuarios([])
+        setTotalLista(0)
+        setStats(null)
         setLoadError(data.message || `Erro ao buscar usuários (${res.status}).`)
       }
     } catch (e) {
-      setUsuarios([])
+      setListaUsuarios([])
       setLoadError(e.message || 'Falha de rede ao carregar usuários.')
     } finally {
       setLoadingUsuarios(false)
     }
-  }, [])
+  }, [page, userFilterDebounced, filterRole, filterConta])
 
   useEffect(() => {
     void refreshUsuarios()
   }, [refreshUsuarios])
 
-  useEffect(() => {
-    setPage(1)
-  }, [userFilter, filterRole, filterConta])
-
-  const usuariosFiltrados = useMemo(() => {
-    let list = usuarios
-    const termo = userFilter.trim().toLowerCase()
-    if (termo) {
-      list = list.filter((u) => {
-        return (
-          String(u.email || '').toLowerCase().includes(termo) ||
-          String(u.nome || '').toLowerCase().includes(termo) ||
-          String(u.telefone || '').toLowerCase().includes(termo)
-        )
-      })
-    }
-    if (filterRole) {
-      list = list.filter((u) => normalizeRoleKey(u.role) === filterRole)
-    }
-    if (filterConta === 'ativo') {
-      list = list.filter((u) => u.is_active !== false)
-    } else if (filterConta === 'inativo') {
-      list = list.filter((u) => u.is_active === false)
-    }
-    return list
-  }, [usuarios, userFilter, filterRole, filterConta])
-
-  const totalFiltrados = usuariosFiltrados.length
-  const totalPages = Math.max(1, Math.ceil(totalFiltrados / PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil(totalLista / PAGE_SIZE))
 
   useEffect(() => {
     setPage((p) => Math.min(p, totalPages))
   }, [totalPages])
 
   const pageSafe = Math.min(page, totalPages)
+  const pageRows = listaUsuarios
   const start = (pageSafe - 1) * PAGE_SIZE
-  const pageRows = usuariosFiltrados.slice(start, start + PAGE_SIZE)
 
   const clearFilters = () => {
     setUserFilter('')
     setFilterRole('')
     setFilterConta('')
+  }
+
+  const loadAudit = useCallback(async () => {
+    setAuditLoading(true)
+    try {
+      const userSaved = localStorage.getItem('horizonte_user')
+      if (!userSaved) return
+      const u = JSON.parse(userSaved)
+      const res = await fetch(apiUrl('/api/admin/audit-log?limit=80'), { headers: { 'x-user-id': u.id } })
+      const data = await res.json().catch(() => [])
+      setAuditRows(Array.isArray(data) ? data : [])
+    } catch {
+      setAuditRows([])
+    } finally {
+      setAuditLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (auditOpen) void loadAudit()
+  }, [auditOpen, loadAudit])
+
+  const exportarCsv = async () => {
+    setExportingCsv(true)
+    setUserActionMessage('')
+    try {
+      const userSaved = localStorage.getItem('horizonte_user')
+      if (!userSaved) throw new Error('Sessão expirada.')
+      const u = JSON.parse(userSaved)
+      const qs = buildUsuariosQuery(1, 5000, userFilterDebounced, filterRole, filterConta)
+      const res = await fetch(apiUrl(`/api/admin/usuarios?${qs}`), { headers: { 'x-user-id': u.id } })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.message || 'Falha ao exportar.')
+      const items = Array.isArray(data.items) ? data.items : []
+      const csv = rowsToCsv(items)
+      const bom = '\uFEFF'
+      downloadTextFile(`horizonte-usuarios-${new Date().toISOString().slice(0, 10)}.csv`, bom + csv)
+      setUserActionMessage(`CSV com ${items.length} linha(s) gerado.`)
+    } catch (e) {
+      setUserActionMessage(e.message || 'Erro ao exportar.')
+    } finally {
+      setExportingCsv(false)
+    }
   }
 
   const handleEditUser = (user) => {
@@ -297,6 +387,20 @@ export default function AdminUsuarios() {
       if (!userSaved) throw new Error('Sessão expirada.')
       const u = JSON.parse(userSaved)
 
+      const antes = listaUsuarios.find((row) => row.id === editingUserId)
+      if (antes) {
+        if (normalizeRoleKey(antes.role) === 'ADMIN' && normalizeRoleKey(editForm.role) !== 'ADMIN') {
+          const ok = window.confirm(
+            'Rebaixar este usuário de Admin para outro papel? Ele perderá o menu Administração após atualizar a sessão (login de novo ou Ajustes).'
+          )
+          if (!ok) return
+        }
+        if (antes.is_active !== false && editForm.is_active === false) {
+          const ok2 = window.confirm('Desativar esta conta? O usuário não conseguirá fazer login.')
+          if (!ok2) return
+        }
+      }
+
       const res = await fetch(apiUrl(`/api/admin/usuarios/${editingUserId}`), {
         method: 'PUT',
         headers: {
@@ -308,17 +412,27 @@ export default function AdminUsuarios() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Falha ao salvar usuário.')
 
-      setUsuarios((prev) => prev.map((row) => (row.id === editingUserId ? data : row)))
+      if (antes && normalizeRoleKey(antes.role) !== normalizeRoleKey(data.role)) {
+        setSessionBanner(
+          'Papel alterado: peça para o usuário abrir Ajustes ou entrar de novo para atualizar o menu.'
+        )
+      } else {
+        setSessionBanner('')
+      }
+
+      setListaUsuarios((prev) => prev.map((row) => (row.id === editingUserId ? data : row)))
       setUserActionMessage('Usuário atualizado com sucesso.')
       setEditingUserId(null)
       setEditForm({})
+      void refreshUsuarios()
     } catch (e) {
       setUserActionMessage(e.message)
     }
   }
 
   const handleDeleteUser = async (user) => {
-    if (!window.confirm(`Tem certeza que deseja excluir o usuário ${user.email}? Essa ação é irreversível.`)) {
+    const extra = normalizeRoleKey(user.role) === 'ADMIN' ? ' Esta conta tem papel Admin.' : ''
+    if (!window.confirm(`Excluir permanentemente ${user.email}?${extra} Essa ação é irreversível.`)) {
       return
     }
     try {
@@ -333,12 +447,13 @@ export default function AdminUsuarios() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Falha ao excluir usuário.')
 
-      setUsuarios((prev) => prev.filter((row) => row.id !== user.id))
+      setListaUsuarios((prev) => prev.filter((row) => row.id !== user.id))
       setUserActionMessage('Usuário excluído.')
       if (editingUserId === user.id) {
         setEditingUserId(null)
         setEditForm({})
       }
+      void refreshUsuarios()
     } catch (e) {
       setUserActionMessage(e.message)
     }
@@ -346,14 +461,21 @@ export default function AdminUsuarios() {
 
   const handleResetPassword = async (user) => {
     try {
-      const res = await fetch(apiUrl('/api/auth/request-password-reset'), {
+      const userSaved = localStorage.getItem('horizonte_user')
+      if (!userSaved) throw new Error('Sessão expirada.')
+      const u = JSON.parse(userSaved)
+      const res = await fetch(apiUrl(`/api/admin/usuarios/${user.id}/solicitar-reset-senha`), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user.email }),
+        headers: { 'x-user-id': u.id },
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Falha ao enviar link de redefinição.')
-      setUserActionMessage(`Link de redefinição enviado para ${user.email}.`)
+      if (data.devResetUrl) {
+        setUserActionMessage(`Ambiente dev (sem Resend): ${data.devResetUrl}`)
+      } else {
+        setUserActionMessage(`Se o e-mail existir no cadastro, enviamos o link para ${user.email}.`)
+      }
+      void loadAudit()
     } catch (e) {
       setUserActionMessage(e.message)
     }
