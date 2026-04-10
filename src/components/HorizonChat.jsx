@@ -26,11 +26,13 @@ function useHorizonShellDock() {
       const r = main.getBoundingClientRect()
       const mobile = window.matchMedia('(max-width: 768px)').matches
       const fabSize = mobile ? 52 : 56
-      const edge = mobile ? 14 : 20
-      const gap = 12
+      const insetH = mobile ? 10 : 8
+      /* “Sobe” o FAB: maior offset = mais alto na tela; pode sobrepor o card */
+      const lift = mobile ? 14 : 40
+      const gap = 8
 
-      const fabBottom = Math.max(edge, window.innerHeight - r.bottom + edge)
-      const fabRight = Math.max(edge, window.innerWidth - r.right + edge)
+      const fabBottom = Math.max(insetH, window.innerHeight - r.bottom + lift)
+      const fabRight = Math.max(insetH, window.innerWidth - r.right + insetH)
 
       if (mobile) {
         const w = Math.min(r.width, window.innerWidth - Math.max(0, r.left))
@@ -50,7 +52,7 @@ function useHorizonShellDock() {
       }
 
       const winBottom = fabBottom + fabSize + gap
-      const maxW = Math.min(380, Math.max(260, r.width - edge * 2))
+      const maxW = Math.min(380, Math.max(260, r.width - insetH * 2))
       const winH = Math.min(600, Math.max(300, window.innerHeight - winBottom - 24))
       setDock({
         fabStyle: { position: 'fixed', bottom: fabBottom, right: fabRight },

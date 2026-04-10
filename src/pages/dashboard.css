@@ -2819,6 +2819,172 @@ h3 {
   }
 }
 
+/* Transações (shell Horizonte): coluna central, cabeçalho tipo dashboard, KPI em grade 3×1, mobile */
+.dashboard-container.app-horizon-shell.page-transacoes .ref-tx-shell-inner {
+  width: 100%;
+  max-width: min(1180px, 100%);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header,
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead,
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__actions,
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__actions,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.page-transacoes.app-horizon-shell .ref-tx-shell-h1 {
+  margin: 0;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.page-transacoes.app-horizon-shell .ref-tx-shell-sub {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+@media (min-width: 769px) {
+  .page-transacoes.app-horizon-shell .ref-tx-kpi-row.kpi-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-transacoes.app-horizon-shell .ref-tx-kpi-row.kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .page-transacoes.app-horizon-shell .transacoes-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-transacoes.app-horizon-shell .transacoes-filter-grid__search {
+    grid-column: 1;
+  }
+
+  .page-transacoes.app-horizon-shell .transacoes-table-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .page-transacoes.app-horizon-shell .transacoes-data-table thead th,
+  .page-transacoes.app-horizon-shell .transacoes-data-table tbody td {
+    padding: 12px 12px;
+    font-size: 13px;
+  }
+
+  .page-transacoes.app-horizon-shell .transacoes-actions .btn-edit,
+  .page-transacoes.app-horizon-shell .transacoes-actions .btn-delete {
+    min-width: 42px;
+    min-height: 42px;
+    padding: 8px;
+  }
+}
+
+.page-transacoes.app-horizon-shell .transacoes-data-table {
+  min-width: 620px;
+}
+
+/* Tema claro + shell: cartões brancos como o dashboard */
+body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .ref-tx-shell-h1 {
+  font-size: clamp(22px, 3.8vw, 30px);
+  color: #0f172a;
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .ref-tx-shell-sub {
+  color: #64748b;
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .ref-tx-kpi-row.kpi-grid {
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .ref-tx-kpi-row .kpi-card {
+  min-height: 112px;
+  padding: 16px 16px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.98);
+  background: #ffffff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 14px 36px -28px rgba(15, 23, 42, 0.18),
+    0 6px 16px -12px rgba(15, 23, 42, 0.06);
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .ref-tx-kpi-row .kpi-card::before {
+  opacity: 0;
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .transacoes-filter-shell::before {
+  display: none;
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .transacoes-filter-shell {
+  margin-bottom: 18px;
+  padding: 18px 18px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.98) !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 10px 28px -22px rgba(15, 23, 42, 0.12) !important;
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .transacoes-filter-grid .filter-input {
+  background: #f8fafc;
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .transacoes-table-card {
+  border-radius: 20px !important;
+  border: 1px solid rgba(226, 232, 240, 0.98) !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 12px 32px -24px rgba(15, 23, 42, 0.14) !important;
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .transacoes-data-table {
+  min-width: 620px;
+}
+
 /* —— Relatórios analíticos —— */
 .page-relatorios .main-content {
   background:
@@ -3985,6 +4151,19 @@ body[data-theme='light'] .horizon-chat-messages::-webkit-scrollbar-thumb {
   }
 }
 
+/* FAB acima do card quando ancorado — leitura nítida sobre conteúdo */
+body[data-theme='light'] .horizon-chat-fab.horizon-chat-fab--shell-dock {
+  z-index: 9600;
+  box-shadow:
+    0 10px 36px rgba(0, 0, 0, 0.48),
+    0 2px 14px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.chat-window-open {
+  z-index: 9590;
+}
+
 /* FAB Button */
 .horizon-chat-fab {
   position: fixed;
@@ -5014,8 +5193,10 @@ body[data-theme='light'] .dashboard-container {
 
 body[data-theme='light'] .sidebar {
   width: 222px;
-  background: #edf1f7;
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-right: 1px solid rgba(226, 232, 240, 0.98);
   border-radius: 0;
   box-shadow: none;
   padding: 24px 16px 20px;
@@ -5556,13 +5737,40 @@ body[data-theme='light'] .relatorios-loading-shell {
    Layout referência (screenshot — sidebar clara, banner IA, 4 KPIs, 3 colunas)
    -------------------------------------------------------------------------- */
 body[data-theme='light'] .sidebar .brand-logo {
-  display: none;
+  display: block;
+  width: min(100%, 148px);
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+  filter: none;
+  opacity: 1;
 }
 
 body[data-theme='light'] .sidebar .brand-wrapper {
-  justify-content: flex-end;
-  margin-bottom: 10px;
-  min-height: 28px;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 14px;
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  body[data-theme='light'] .sidebar .brand-wrapper {
+    padding-right: 48px;
+    margin-bottom: 12px;
+  }
+
+  body[data-theme='light'] .sidebar .mobile-close-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+  width: min(100%, 132px);
 }
 
 body[data-theme='light'] .ref-dashboard-top {
@@ -7003,6 +7211,7 @@ body[data-theme='light'] .ref-dashboard-inner {
   .app-horizon-inner .main-content {
     flex: 1;
     min-width: 0;
+    min-height: 0;
   }
 
   .app-horizon-inner .sidebar {
@@ -7048,11 +7257,15 @@ body[data-theme='light'] .ref-dashboard-inner .ref-alert {
   text-align: center;
 }
 
-/* Shell app (tema claro): sem painel branco em tela cheia — fotos Horizonte + menu vidro (todas as páginas com .app-horizon-shell) */
+/* Shell app (tema claro): sem painel branco em tela cheia — fotos Horizonte + menu branco sólido (todas as páginas com .app-horizon-shell) */
 body[data-theme='light'] .dashboard-container.app-horizon-shell {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  overflow-x: clip;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 @media (min-width: 769px) {
@@ -7071,11 +7284,83 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .ref-dashboard .
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
-  background: rgba(255, 255, 255, 0.42);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
+  background: #ffffff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid rgba(226, 232, 240, 0.98);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 14px 36px -28px rgba(15, 23, 42, 0.14),
+    0 6px 16px -12px rgba(15, 23, 42, 0.06);
+}
+
+/* App shell (tema claro): mesmo ritmo do dashboard — sem faixa branca vazia; menu sticky; coluna ao conteúdo */
+@media (min-width: 769px) {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner {
+    align-items: flex-start;
+    align-self: flex-start;
+    height: auto;
+    max-height: none;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar {
+    height: auto;
+    max-height: calc(100dvh - max(20px, env(safe-area-inset-top, 0px)) - max(16px, env(safe-area-inset-bottom, 0px)));
+    min-height: 0;
+    align-self: flex-start;
+    position: sticky;
+    top: max(14px, env(safe-area-inset-top, 0px));
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .nav-menu {
+    flex: none;
+    overflow: visible;
+    overflow-y: visible;
+    min-height: 0;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .logout-btn {
+    margin-top: 18px;
+    flex-shrink: 0;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .main-content {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    align-self: flex-start;
+    overflow-x: clip;
+    overflow-y: visible;
+    padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Só a home ref-dashboard: painel transações compacto */
+  body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .main-content.ref-dashboard-main {
+    overflow: visible;
+    height: auto;
+    max-height: none;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-inner {
+    flex: none;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    padding-bottom: 0;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-panel.ref-panel--transactions {
+    min-height: 0;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-panel--transactions .ref-tx-list {
+    padding-bottom: 12px;
+  }
 }
 
 /* Menu lateral — mesma linguagem do cabeçalho (ref-dashboard-header): raio, borda slate, sombra suave */

@@ -144,28 +144,29 @@ export default function Transacoes() {
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content relative z-10">
-        <header className="top-header transacoes-page-header">
-           <div className="transacoes-page-header__titles">
-            <MobileMenuButton onClick={() => setMenuAberto(true)} />
-            <div>
-              <h1 className="responsive-h1 transacoes-page-header__h1">Minhas Transações</h1>
-              <p className="transacoes-page-header__sub">Lista completa com filtros e totais do recorte</p>
-            </div>
+        <div className="ref-tx-shell-inner">
+        <header className="ref-dashboard-header">
+          <MobileMenuButton onClick={() => setMenuAberto(true)} />
+          <div className="ref-dashboard-header__lead">
+            <h1 className="ref-tx-shell-h1">Minhas Transações</h1>
+            <p className="ref-tx-shell-sub">Lista completa com filtros e totais do recorte</p>
           </div>
-          <button
-            type="button"
-            className="btn-primary btn-primary-dashboard"
-            onClick={() => {
-              setEditingTransaction(null)
-              setIsModalOpen(true)
-            }}
-          >
-            + Transação
-          </button>
+          <div className="ref-dashboard-header__actions">
+            <button
+              type="button"
+              className="ref-dashboard-header__btn-tx btn-primary btn-primary-dashboard"
+              onClick={() => {
+                setEditingTransaction(null)
+                setIsModalOpen(true)
+              }}
+            >
+              + Transação
+            </button>
+          </div>
         </header>
 
         {/* Summary KPIs */}
-        <div className="kpi-grid transacoes-kpi-strip">
+        <div className="kpi-grid transacoes-kpi-strip ref-tx-kpi-row">
           <div className="kpi-card">
             <div className="kpi-header">
               <span>Receitas Filtradas</span>
@@ -338,6 +339,7 @@ export default function Transacoes() {
             )}
           </div>
         </section>
+        </div>
       </main>
       </div>
     </div>
