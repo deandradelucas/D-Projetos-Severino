@@ -4591,8 +4591,8 @@ body[data-theme='light'] .ref-dashboard-header__btn-wa--disabled {
   filter: grayscale(0.25);
 }
 
-/* Dashboard: saldo em bloco próprio (após o card Nova transação + WhatsApp) */
-.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-saldo-card {
+/* Dashboard: faixa de KPIs — Saldo, Saída e Entrada na mesma linha (grid no .ref-kpi-row) */
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip {
   flex-shrink: 0;
   width: 100%;
   min-width: 0;
@@ -4600,40 +4600,9 @@ body[data-theme='light'] .ref-dashboard-header__btn-wa--disabled {
   z-index: 0;
 }
 
-.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-saldo-card .ref-kpi-card {
-  width: 100%;
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card {
+  min-width: 0;
   box-sizing: border-box;
-}
-
-/* Conteúdo do saldo centralizado no card (vertical + horizontal) */
-body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-card,
-body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-card--skeleton {
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  gap: 12px;
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
-body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-card__body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-skel-body {
-  flex: 0 1 auto;
-  align-items: center;
-  width: 100%;
-}
-
-body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-skel-line--label,
-body[data-theme='light'] .ref-dashboard-saldo-card .ref-kpi-skel-line--value {
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* Dashboard: card compacto com Nova transação + WhatsApp */
@@ -4973,9 +4942,9 @@ body[data-theme='light'] .ref-kpi-row {
   margin: 0;
 }
 
-/* Linha só com Entrada / Saída (Saldo ficou em ref-dashboard-saldo-card) */
-body[data-theme='light'] .ref-kpi-row.ref-kpi-row--secondary {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+/* Dashboard: mantém 3 colunas mesmo quando .ref-kpi-row global cai para 2 (<1200px) */
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 body[data-theme='light'] .ref-kpi-card {
@@ -5881,6 +5850,10 @@ body[data-theme='light'] .ref-empty-cta:active {
 @media (max-width: 1200px) {
   body[data-theme='light'] .ref-kpi-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   body[data-theme='light'] .ref-bottom-grid {
@@ -7584,9 +7557,11 @@ body[data-theme='light'] .ref-empty {
   margin: 0;
 }
 
-:is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white']) .dashboard-container.app-horizon-shell .ref-kpi-row.ref-kpi-row--secondary,
-[data-theme='glass'] .dashboard-container.app-horizon-shell .ref-kpi-row.ref-kpi-row--secondary {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+:is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white'])
+  .dashboard-container.ref-dashboard.app-horizon-shell
+  .ref-dashboard-kpi-strip.ref-kpi-row,
+[data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 @media (max-width: 1200px) {
@@ -7595,9 +7570,11 @@ body[data-theme='light'] .ref-empty {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  :is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white']) .dashboard-container.app-horizon-shell .ref-kpi-row.ref-kpi-row--secondary,
-  [data-theme='glass'] .dashboard-container.app-horizon-shell .ref-kpi-row.ref-kpi-row--secondary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  :is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white'])
+    .dashboard-container.ref-dashboard.app-horizon-shell
+    .ref-dashboard-kpi-strip.ref-kpi-row,
+  [data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -7700,43 +7677,6 @@ body[data-theme='light'] .ref-empty {
   pointer-events: none;
   background: var(--bg-card-elevated);
   border-color: var(--border-color);
-}
-
-/* Saldo + ações no dashboard — espelha tema claro */
-:is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white']) .ref-dashboard-saldo-card .ref-kpi-card,
-:is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white']) .ref-dashboard-saldo-card .ref-kpi-card--skeleton,
-[data-theme='glass'] .ref-dashboard-saldo-card .ref-kpi-card,
-[data-theme='glass'] .ref-dashboard-saldo-card .ref-kpi-card--skeleton {
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  gap: 12px;
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
-:is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white']) .ref-dashboard-saldo-card .ref-kpi-card__body,
-[data-theme='glass'] .ref-dashboard-saldo-card .ref-kpi-card__body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-:is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white']) .ref-dashboard-saldo-card .ref-kpi-skel-body,
-[data-theme='glass'] .ref-dashboard-saldo-card .ref-kpi-skel-body {
-  flex: 0 1 auto;
-  align-items: center;
-  width: 100%;
-}
-
-:is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white']) .ref-dashboard-saldo-card .ref-kpi-skel-line--label,
-:is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white']) .ref-dashboard-saldo-card .ref-kpi-skel-line--value,
-[data-theme='glass'] .ref-dashboard-saldo-card .ref-kpi-skel-line--label,
-[data-theme='glass'] .ref-dashboard-saldo-card .ref-kpi-skel-line--value {
-  margin-left: auto;
-  margin-right: auto;
 }
 
 :is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white']) .ref-dashboard-actions-card,

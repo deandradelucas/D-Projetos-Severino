@@ -204,43 +204,32 @@ export default function Dashboard() {
           </div>
         </article>
 
-        <section className="ref-dashboard-saldo-card" aria-label="Saldo em conta" aria-busy={loading}>
-          {loading ? (
-            <SkeletonKpi />
-          ) : (
-            <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
-              <div className="ref-kpi-card__icon" aria-hidden>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="20" height="14" x="2" y="5" rx="2" />
-                  <path d="M2 10h20" />
-                  <circle cx="16" cy="13" r="1" fill="currentColor" stroke="none" />
-                </svg>
-              </div>
-              <div className="ref-kpi-card__body">
-                <p className="ref-kpi-card__label">Saldo em Conta</p>
-                <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(saldoTotal)}</p>
-              </div>
-            </article>
-          )}
-        </section>
-
-        {fetchError && (
-          <div className="ref-alert" role="alert">
-            <span className="ref-alert__text">{fetchError}</span>
-            <button type="button" className="ref-alert__retry" onClick={() => void fetchTransacoes()}>
-              Tentar novamente
-            </button>
-          </div>
-        )}
-
-        <section className="ref-kpi-row ref-kpi-row--secondary" aria-label="Entrada e saída do período" aria-busy={loading}>
+        <section
+          className="ref-kpi-row ref-dashboard-kpi-strip"
+          aria-label="Saldo em conta, entrada e saída do período"
+          aria-busy={loading}
+        >
           {loading ? (
             <>
+              <SkeletonKpi />
               <SkeletonKpi />
               <SkeletonKpi />
             </>
           ) : (
             <>
+              <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
+                <div className="ref-kpi-card__icon" aria-hidden>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="20" height="14" x="2" y="5" rx="2" />
+                    <path d="M2 10h20" />
+                    <circle cx="16" cy="13" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                </div>
+                <div className="ref-kpi-card__body">
+                  <p className="ref-kpi-card__label">Saldo em Conta</p>
+                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(saldoTotal)}</p>
+                </div>
+              </article>
               <article className="ref-kpi-card ref-kpi-card--expense">
                 <div className="ref-kpi-card__icon" aria-hidden>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -268,6 +257,15 @@ export default function Dashboard() {
             </>
           )}
         </section>
+
+        {fetchError && (
+          <div className="ref-alert" role="alert">
+            <span className="ref-alert__text">{fetchError}</span>
+            <button type="button" className="ref-alert__retry" onClick={() => void fetchTransacoes()}>
+              Tentar novamente
+            </button>
+          </div>
+        )}
 
         <section className="ref-bottom-grid ref-bottom-grid--single" aria-label="Transações recentes">
           <article className="ref-panel ref-panel--transactions">
