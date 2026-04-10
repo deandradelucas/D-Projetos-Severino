@@ -1,4 +1,4 @@
-const CACHE_NAME = 'horizonte-financeiro-v3'
+const CACHE_NAME = 'horizonte-financeiro-v4'
 const APP_SHELL = [
   '/',
   '/manifest.json',
@@ -42,6 +42,14 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (url.origin !== self.location.origin) {
+    return
+  }
+
+  // API (Hono + Supabase): nunca cachear no SW — senão o PWA mostra dados velhos ou falha a “puxar” o utilizador.
+  if (url.pathname.startsWith('/api')) {
+    event.respondWith(
+      fetch(request, { cache: 'no-store' })
+    )
     return
   }
 

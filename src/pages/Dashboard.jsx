@@ -2,10 +2,12 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
+import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
+import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { getWhatsAppContactUrl } from '../lib/whatsappContactUrl'
@@ -68,7 +70,7 @@ export default function Dashboard() {
     }
     try {
       await syncRecorrenciasMensais(session.id)
-      const res = await fetch(apiUrl('/api/transacoes'), {
+      const res = await fetchWithRetry(apiUrl('/api/transacoes'), {
         headers: { 'x-user-id': String(session.id).trim() },
         cache: 'no-store',
       })
@@ -109,6 +111,22 @@ export default function Dashboard() {
       })
     }
   }, [fetchTransacoes])
+
+  useEffect(() => {
+    let timeoutId
+    const onVis = () => {
+      if (document.visibilityState !== 'visible' || !fetchError) return
+      const u = readHorizonteUser()
+      if (!u?.id) return
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => void fetchTransacoes(), 500)
+    }
+    document.addEventListener('visibilitychange', onVis)
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener('visibilitychange', onVis)
+    }
+  }, [fetchTransacoes, fetchError])
 
   const { totalReceitas, totalDespesas, saldoTotal } = useMemo(() => {
     return transacoes.reduce(
@@ -304,6 +322,7 @@ export default function Dashboard() {
                     <span className="ref-tx-list-head__val">Valor</span>
                   </div>
                   {txRecentes.map((t) => {
+                    const mostraIconeRecorrente = Boolean(t.recorrencia_mensal_id) || Boolean(t.recorrente_index)
                     const isRec = t.tipo === 'RECEITA'
                     const dt = new Date(t.data_transacao)
                     const dateLine = dt.toLocaleDateString('pt-BR', {
@@ -352,8 +371,19 @@ export default function Dashboard() {
                           <span
                             className={`ref-tx-val ${isRec ? 'ref-tx-val--pos' : 'ref-tx-val--neg'} ${privacyMode ? 'privacy-blur' : ''}`}
                           >
-                            {isRec ? '+' : '−'}
-                            {formatCurrency(Math.abs(parseFloat(t.valor) || 0))}
+                            {mostraIconeRecorrente ? (
+                              <span
+                                className="ref-tx-recorrencia-ico-wrap"
+                                title="Lançamento recorrente"
+                                aria-label="Lançamento recorrente"
+                              >
+                                <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
+                              </span>
+                            ) : null}
+                            <span className="ref-tx-val__amount">
+                              {isRec ? '+' : '−'}
+                              {formatCurrency(Math.abs(parseFloat(t.valor) || 0))}
+                            </span>
                           </span>
                         </div>
                       </div>

@@ -1626,6 +1626,12 @@ h3 {
     padding-top: 14px;
     padding-bottom: 14px;
   }
+
+  .form-group--recorrencia label.modal-recorrencia-toggle-row {
+    min-height: 48px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
 }
 
 .modal-header {
@@ -1677,6 +1683,113 @@ h3 {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #666666;
+}
+
+/* Nova transação — bloco como os demais: título em maiúsculas + linha “Repetir todos os meses” + checkbox */
+/* Evitar flex: 1 com basis 0 + min-width:0 — isso espremia o texto (uma palavra por linha). */
+.form-group--recorrencia {
+  width: 100%;
+  min-width: 0;
+}
+
+.form-group--recorrencia label.modal-recorrencia-toggle-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  margin-top: 6px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  user-select: none;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.form-group--recorrencia-on label.modal-recorrencia-toggle-row {
+  border-color: rgba(212, 168, 75, 0.45);
+  background: rgba(212, 168, 75, 0.08);
+}
+
+.modal-recorrencia-toggle-row__iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--accent, #d4a84b);
+}
+
+.modal-recorrencia-toggle-row__icon {
+  display: block;
+}
+
+.modal-recorrencia-toggle-row__text {
+  min-width: 0;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-recorrencia-toggle-row__checkbox {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  justify-self: end;
+}
+
+[data-theme='dark'] .modal-recorrencia-toggle-row__iconWrap,
+[data-theme='cyberpunk'] .modal-recorrencia-toggle-row__iconWrap,
+[data-theme='glass'] .modal-recorrencia-toggle-row__iconWrap {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent, #d4a84b);
+}
+
+body[data-theme='light'] .modal-recorrencia-toggle-row__iconWrap {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+
+[data-theme='dark'] .form-group--recorrencia label.modal-recorrencia-toggle-row,
+[data-theme='cyberpunk'] .form-group--recorrencia label.modal-recorrencia-toggle-row,
+[data-theme='glass'] .form-group--recorrencia label.modal-recorrencia-toggle-row {
+  color: rgba(248, 250, 252, 0.88);
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .form-group--recorrencia-on label.modal-recorrencia-toggle-row,
+[data-theme='cyberpunk'] .form-group--recorrencia-on label.modal-recorrencia-toggle-row,
+[data-theme='glass'] .form-group--recorrencia-on label.modal-recorrencia-toggle-row {
+  border-color: rgba(212, 168, 75, 0.35);
+  background: rgba(212, 168, 75, 0.1);
+}
+
+body[data-theme='light'] .form-group--recorrencia label.modal-recorrencia-toggle-row {
+  color: #334155;
+  border-color: var(--pf-line-soft, rgba(226, 232, 240, 0.95));
+  background: #f8fafc;
+}
+
+body[data-theme='light'] .form-group--recorrencia-on label.modal-recorrencia-toggle-row {
+  border-color: rgba(59, 130, 246, 0.28);
+  background: rgba(59, 130, 246, 0.06);
 }
 
 .type-toggle {
@@ -5723,6 +5836,18 @@ body:is([data-theme='light'], [data-theme='dark'], [data-theme='cyberpunk'], [da
   text-align: end;
 }
 
+.ref-tx-recorrencia-ico-wrap {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin-right: 2px;
+}
+
+.ref-tx-recorrencia-ico {
+  display: block;
+}
+
 @media (min-width: 768px) {
   body:is([data-theme='light'], [data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white'], [data-theme='glass']) .ref-tx-icon-cell {
     padding-top: 3px;
@@ -5858,13 +5983,21 @@ body:is([data-theme='light'], [data-theme='dark'], [data-theme='cyberpunk'], [da
 }
 
 body:is([data-theme='light'], [data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white'], [data-theme='glass']) .ref-tx-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 14px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
   padding: 6px 10px;
   border-radius: 10px;
   letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+body:is([data-theme='light'], [data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white'], [data-theme='glass']) .ref-tx-val__amount {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 body:is([data-theme='light'], [data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white'], [data-theme='glass']) .ref-tx-val--pos {
   color: var(--success);
@@ -7457,6 +7590,25 @@ body[data-theme='light'] .global-skeleton {
   margin: 0;
 }
 
+/* Herda .modal-form label { text-transform: uppercase } — quebra o texto em “REPETIR / TODO…” */
+.modal-form label.modal-recorrencia-panel__label {
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+[data-theme='dark'] .modal-form label.modal-recorrencia-panel__label,
+[data-theme='cyberpunk'] .modal-form label.modal-recorrencia-panel__label,
+[data-theme='glass'] .modal-form label.modal-recorrencia-panel__label {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+body[data-theme='light'] .modal-form label.modal-recorrencia-panel__label {
+  color: #0f172a;
+}
+
 .modal-recorrencia-panel__label--inline {
   justify-content: space-between;
   gap: 16px;
@@ -7496,7 +7648,10 @@ body[data-theme='light'] .global-skeleton {
   font-size: 15px;
   font-weight: 700;
   color: #1a1a1a;
-  margin-bottom: 2px;
+  margin-bottom: 0;
+  text-transform: none;
+  letter-spacing: normal;
+  line-height: 1.25;
 }
 
 .modal-recorrencia-panel__hint {

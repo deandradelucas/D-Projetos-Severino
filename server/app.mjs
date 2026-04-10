@@ -90,6 +90,8 @@ function corsAllowedOrigin(origin) {
   ) {
     return origin
   }
+  // Produção: domínios próprios (ex.: horizontefinanceiro.mestredamente.com no mesmo projeto Vercel)
+  if (/^https:\/\/([a-z0-9-]+\.)*mestredamente\.com$/i.test(origin)) return origin
   const extra = (process.env.CORS_ORIGINS || '')
     .split(',')
     .map((s) => s.trim())
@@ -627,7 +629,7 @@ app.get('/api/transacoes', async (c) => {
     return c.json(data)
   } catch (error) {
     log.error('get transactions failed', error)
-    return c.json({ message: 'Erro ao buscar transaçoes.' }, 500)
+    return c.json({ message: 'Erro ao buscar transações.' }, 500)
   }
 })
 

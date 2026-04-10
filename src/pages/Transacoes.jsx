@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
+import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
+import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { getWhatsAppContactUrl } from '../lib/whatsappContactUrl'
@@ -114,8 +116,9 @@ export default function Transacoes() {
       if (filters.dataFim) params.append('dataFim', filters.dataFim)
       params.append('limit', '500')
 
-      const res = await fetch(apiUrl(`/api/transacoes?${params.toString()}`), {
-        headers: { 'x-user-id': session.id },
+      const res = await fetchWithRetry(apiUrl(`/api/transacoes?${params.toString()}`), {
+        headers: { 'x-user-id': String(session.id).trim() },
+        cache: 'no-store',
       })
       if (res.status === 403) {
         window.location.replace('/pagamento?expirado=1')
@@ -426,6 +429,7 @@ export default function Transacoes() {
                       ? String(subRaw.nome).trim()
                       : (t.descricao && String(t.descricao).trim()) || '—'
                   const valorAbs = Math.abs(parseFloat(t.valor) || 0)
+                  const mostraIconeRecorrente = Boolean(t.recorrencia_mensal_id) || Boolean(t.recorrente_index)
                   return (
                     <div key={t.id} className="ref-tx-row">
                       <div className="ref-tx-icon-cell">
@@ -468,8 +472,19 @@ export default function Transacoes() {
                         <span
                           className={`ref-tx-val ${isRec ? 'ref-tx-val--pos' : 'ref-tx-val--neg'} ${privacyMode ? 'privacy-blur' : ''}`}
                         >
-                          {isRec ? '+' : '−'}
-                          {formatCurrency(valorAbs)}
+                          {mostraIconeRecorrente ? (
+                            <span
+                              className="ref-tx-recorrencia-ico-wrap"
+                              title="Lançamento recorrente"
+                              aria-label="Lançamento recorrente"
+                            >
+                              <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
+                            </span>
+                          ) : null}
+                          <span className="ref-tx-val__amount">
+                            {isRec ? '+' : '−'}
+                            {formatCurrency(valorAbs)}
+                          </span>
                         </span>
                       </div>
                       <div className="ref-tx-actions-cell">

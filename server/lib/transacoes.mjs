@@ -173,6 +173,10 @@ async function enrichTransacoesComCategorias(supabaseAdmin, rows) {
     status: r.status,
     categoria_id: r.categoria_id,
     subcategoria_id: r.subcategoria_id,
+    recorrente_grupo_id: r.recorrente_grupo_id ?? null,
+    recorrente_index: r.recorrente_index ?? null,
+    recorrente_total: r.recorrente_total ?? null,
+    recorrencia_mensal_id: r.recorrencia_mensal_id ?? null,
     categorias: r.categoria_id ? catMap.get(r.categoria_id) ?? null : null,
     subcategorias: r.subcategoria_id ? subMap.get(r.subcategoria_id) ?? null : null,
   }))
@@ -204,6 +208,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
 
   const selectComEmbed = `
       id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id,
+      recorrente_grupo_id, recorrente_index, recorrente_total, recorrencia_mensal_id,
       categorias(nome, cor),
       subcategorias(nome)
     `
@@ -214,13 +219,25 @@ export async function getTransacoes(usuarioId, filters = {}) {
 
   if (error) {
     log.warn('[getTransacoes] embed falhou, fallback sem join:', error.message || error)
-    const qFlat = applyFilters(
-      supabaseAdmin
-        .from('transacoes')
-        .select('id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id')
+    const baseCols =
+      'id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id, recorrente_grupo_id, recorrente_index, recorrente_total'
+
+    let qFlat = applyFilters(
+      supabaseAdmin.from('transacoes').select(`${baseCols}, recorrencia_mensal_id`)
     )
-    const r2 = await qFlat.order('data_transacao', { ascending: false }).limit(lim)
-    if (r2.error) throw r2.error
+    let r2 = await qFlat.order('data_transacao', { ascending: false }).limit(lim)
+
+    if (r2.error) {
+      log.warn(
+        '[getTransacoes] fallback com recorrencia_mensal_id falhou; colunas legadas:',
+        r2.error.message || r2.error
+      )
+      qFlat = applyFilters(supabaseAdmin.from('transacoes').select(baseCols))
+      r2 = await qFlat.order('data_transacao', { ascending: false }).limit(lim)
+      if (r2.error) throw r2.error
+      const rows = (r2.data || []).map((r) => ({ ...r, recorrencia_mensal_id: null }))
+      return enrichTransacoesComCategorias(supabaseAdmin, rows)
+    }
     return enrichTransacoesComCategorias(supabaseAdmin, r2.data || [])
   }
 

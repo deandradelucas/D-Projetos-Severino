@@ -63,6 +63,7 @@ async function inserirTransacaoGerada(supabase, usuarioId, rule, dataIso) {
     categoria_id: rule.categoria_id,
     subcategoria_id: rule.subcategoria_id,
     data_transacao: dataIso,
+    recorrencia_mensal_id: rule.id,
   })
   if (error) throw error
 }
@@ -91,6 +92,16 @@ export async function criarRegraRecorrenciaDia1(usuarioId, primeiraLinha) {
     .maybeSingle()
 
   if (error) throw error
+
+  if (data?.id && primeiraLinha?.id) {
+    const uid = String(usuarioId || '').trim()
+    await supabase
+      .from('transacoes')
+      .update({ recorrencia_mensal_id: data.id })
+      .eq('id', primeiraLinha.id)
+      .eq('usuario_id', uid)
+  }
+
   return data
 }
 

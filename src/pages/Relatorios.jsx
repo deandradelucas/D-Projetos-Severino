@@ -4,6 +4,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import GlobalSkeleton from '../components/GlobalSkeleton'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
+import { fetchWithRetry } from '../lib/fetchWithRetry'
 import './dashboard.css'
 import {
   BarChart,
@@ -145,8 +146,9 @@ export default function Relatorios() {
       params.append('limit', '500')
       params.append('status', 'EFETIVADA') // Para relatórios, focamos nas efetivadas normalmente
 
-      const res = await fetch(apiUrl(`/api/transacoes?${params.toString()}`), {
-        headers: { 'x-user-id': usuario.id }
+      const res = await fetchWithRetry(apiUrl(`/api/transacoes?${params.toString()}`), {
+        headers: { 'x-user-id': String(usuario.id).trim() },
+        cache: 'no-store',
       })
       if (res.ok) {
         const data = await res.json()

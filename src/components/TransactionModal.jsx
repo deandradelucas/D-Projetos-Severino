@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { apiUrl } from '../lib/apiUrl'
+import RecorrenciaArrowIcon from './RecorrenciaArrowIcon'
 
 const CustomSelect = ({ name, value, onChange, options, placeholder, isOpen, onToggle, zIndex = 1 }) => {
   const [search, setSearch] = useState('')
@@ -425,10 +426,14 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
 
           {!isEditMode && (
             <div
-              className={`modal-recorrencia-panel ${formData.recorrencia_dia_1 ? 'modal-recorrencia-panel--active' : ''}`}
+              className={`form-group form-group--recorrencia ${formData.recorrencia_dia_1 ? 'form-group--recorrencia-on' : ''}`}
             >
-              <label className="modal-recorrencia-panel__label modal-recorrencia-panel__label--inline" htmlFor="tx-recorrencia-dia-1">
-                <span className="modal-recorrencia-panel__title">Repetir todo dia 1</span>
+              <label>Lançamentos recorrentes</label>
+              <label htmlFor="tx-recorrencia-dia-1" className="modal-recorrencia-toggle-row">
+                <span className="modal-recorrencia-toggle-row__iconWrap" aria-hidden>
+                  <RecorrenciaArrowIcon size={20} className="modal-recorrencia-toggle-row__icon" />
+                </span>
+                <span className="modal-recorrencia-toggle-row__text">Repetir todos os meses</span>
                 <input
                   id="tx-recorrencia-dia-1"
                   type="checkbox"
@@ -437,7 +442,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, recorrencia_dia_1: e.target.checked }))
                   }
-                  className="modal-recorrencia-panel__checkbox"
+                  className="modal-recorrencia-toggle-row__checkbox"
                 />
               </label>
             </div>
