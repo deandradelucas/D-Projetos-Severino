@@ -299,9 +299,12 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       <div className="modal-content">
         <div className="modal-header">
           <h3>{isEditMode ? 'Editar Transação' : 'Nova Transação'}</h3>
-          <button onClick={onClose} className="close-btn">&times;</button>
+          <button type="button" onClick={onClose} className="close-btn" aria-label="Fechar">
+            &times;
+          </button>
         </div>
-        <form onSubmit={handleSubmit} className="modal-form">
+        <form onSubmit={handleSubmit} className="modal-form modal-form--sheet">
+          <div className="modal-body">
           <div className="form-group">
             <label>Tipo</label>
             <div className="type-toggle">
@@ -447,6 +450,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               </label>
             </div>
           )}
+
+          </div>
 
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn-secondary" disabled={saving}>Cancelar</button>

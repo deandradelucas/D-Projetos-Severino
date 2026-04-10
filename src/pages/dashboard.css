@@ -1487,6 +1487,18 @@ h3 {
   }
 }
 
+/* Nova transação — form em coluna; .modal-body recebe scroll no mobile */
+.modal-form--sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.modal-body {
+  min-width: 0;
+}
+
 /* Nova transação / modal — mobile: bottom sheet, áreas seguras, alvos de toque */
 .modal-date-toolbar {
   display: flex;
@@ -1514,13 +1526,13 @@ h3 {
     width: 100%;
     max-width: none;
     max-height: min(92dvh, 100dvh - env(safe-area-inset-top, 0px));
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
     border-radius: 22px 22px 0 0;
     margin: 0;
-    padding: max(18px, env(safe-area-inset-top, 0px)) 16px calc(18px + env(safe-area-inset-bottom, 0px)) 16px;
+    padding: max(18px, env(safe-area-inset-top, 0px)) 16px calc(12px + env(safe-area-inset-bottom, 0px)) 16px;
     box-shadow:
       0 -8px 40px rgba(0, 0, 0, 0.18),
       0 32px 80px -24px rgba(0, 0, 0, 0.35),
@@ -1540,6 +1552,21 @@ h3 {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  .modal-form--sheet {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .modal-body {
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-bottom: 8px;
   }
 
   .modal-header {
@@ -1598,6 +1625,14 @@ h3 {
   .modal-form input.input-premium,
   .modal-form select.input-premium {
     font-size: 16px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .modal-form input[type='datetime-local'].input-premium {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .custom-select-trigger {
@@ -1610,12 +1645,30 @@ h3 {
     max-height: min(220px, 42dvh);
   }
 
+  /* Lista de categorias “ancorada” ao viewport: não é cortada pelo scroll do sheet */
+  .custom-select.open .custom-select-dropdown {
+    position: fixed;
+    left: max(12px, env(safe-area-inset-left, 0px));
+    right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    top: auto;
+    width: auto;
+    max-height: min(52dvh, 400px);
+    z-index: 10002;
+    box-shadow:
+      0 -8px 40px rgba(0, 0, 0, 0.22),
+      0 25px 60px -15px rgba(0, 0, 0, 0.35);
+  }
+
   .modal-actions {
     flex-direction: column-reverse;
     align-items: stretch;
+    flex-shrink: 0;
     gap: 10px;
-    margin-top: 24px;
+    margin-top: 12px;
+    padding-top: 14px;
     width: 100%;
+    border-top: 1px solid var(--border-color, rgba(148, 163, 184, 0.22));
   }
 
   .modal-actions .btn-primary,
@@ -1631,6 +1684,12 @@ h3 {
     min-height: 48px;
     padding-top: 14px;
     padding-bottom: 14px;
+  }
+
+  .modal-recorrencia-toggle-row__text {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
   }
 }
 
