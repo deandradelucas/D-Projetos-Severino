@@ -1,6 +1,7 @@
 import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { isSuperAdminEmail } from './super-admin.mjs'
+import { isMercadoPagoForbiddenError } from './mercadopago.mjs'
 import {
   sincronizarPagamentosPendentesDoUsuario,
   sincronizarPreapprovalUsuario,
@@ -196,12 +197,20 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   const email = partialUser.email ?? row.email ?? ''
   const isento = partialUser.isento_pagamento === true || row.isento_pagamento === true
 
-  await sincronizarPagamentosPendentesDoUsuario(uid).catch((e) =>
+  await sincronizarPagamentosPendentesDoUsuario(uid).catch((e) => {
+    if (isMercadoPagoForbiddenError(e)) {
+      log.debug('[buildAssinaturaUsuarioPayload] sync MP 403:', e?.message || e)
+      return
+    }
     log.warn('[buildAssinaturaUsuarioPayload] sync MP:', e?.message || e)
-  )
-  await sincronizarPreapprovalUsuario(uid).catch((e) =>
+  })
+  await sincronizarPreapprovalUsuario(uid).catch((e) => {
+    if (isMercadoPagoForbiddenError(e)) {
+      log.debug('[buildAssinaturaUsuarioPayload] sync preapproval 403:', e?.message || e)
+      return
+    }
     log.warn('[buildAssinaturaUsuarioPayload] sync preapproval:', e?.message || e)
-  )
+  })
 
   row = await fetchAssinaturaCamposUsuario(uid)
 
