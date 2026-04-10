@@ -26,6 +26,16 @@ const COLORS_REC = ['#4ade80', '#22d3ee', '#fcd34d', '#a78bfa', '#f472b6', '#94a
 const COLORS_PIE_MONO_DESP = ['#3a3a3a', '#4a4a4a', '#5a5a5a', '#6b6b6b', '#7c7c7c', '#8e8e8e', '#a1a1a1', '#b5b5b5']
 const COLORS_PIE_MONO_REC = ['#e5e5e5', '#d0d0d0', '#bbbbbb', '#a6a6a6', '#919191', '#7d7d7d', '#696969', '#565656']
 
+const SkeletonKpi = () => (
+  <div className="ref-kpi-card ref-kpi-card--skeleton" aria-hidden>
+    <div className="skeleton skeleton-pulse ref-kpi-skel-icon" />
+    <div className="ref-kpi-skel-body">
+      <span className="skeleton skeleton-pulse ref-kpi-skel-line ref-kpi-skel-line--label" />
+      <span className="skeleton skeleton-pulse ref-kpi-skel-line ref-kpi-skel-line--value" />
+    </div>
+  </div>
+)
+
 function transacaoDiaKey(dataTransacao) {
   if (dataTransacao == null) return ''
   const s = String(dataTransacao).trim()
@@ -395,16 +405,19 @@ export default function Relatorios() {
       <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content relative z-10">
-        <header className="top-header relatorios-page-header">
-          <div className="relatorios-page-header__titles">
-            <MobileMenuButton onClick={() => setMenuAberto(true)} />
-            <div>
-              <h1 className="responsive-h1 relatorios-page-header__h1">Relatórios Analíticos</h1>
-              <p className="relatorios-page-header__sub">Receitas, despesas e composição por categoria no período</p>
-            </div>
+      <main className="main-content relative z-10 ref-dashboard-main">
+        <div className="ref-dashboard-inner">
+        <header className="ref-dashboard-header">
+          <MobileMenuButton onClick={() => setMenuAberto(true)} />
+          <div className="ref-dashboard-header__lead">
+            <h1 className="ref-dashboard-greeting">
+              <span className="ref-dashboard-greeting__name">Relatórios analíticos</span>
+            </h1>
+            <p className="ref-panel__subtitle page-relatorios-header-sub">
+              Receitas, despesas e composição por categoria no período
+            </p>
           </div>
-          <div className="relatorios-export-btns">
+          <div className="ref-dashboard-header__actions relatorios-header-export">
             <button type="button" className="btn-secondary relatorios-btn-export" onClick={exportToCSV} disabled={transacoes.length === 0} title="Exportar CSV">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
               <span className="desktop-only">CSV</span>
@@ -422,14 +435,14 @@ export default function Relatorios() {
           </div>
         </header>
 
-        <section className="relatorios-filter-shell" aria-label="Período e categoria">
-          <div className="relatorios-filter-shell__head">
+        <article className="ref-panel page-relatorios-ref-filters" aria-label="Período e categoria">
+          <div className="ref-panel__head">
             <div>
-              <h2 className="relatorios-filter-shell__title">Filtros do relatório</h2>
-              <p className="relatorios-filter-shell__hint">Período e categoria · apenas transações efetivadas</p>
+              <h2 className="ref-panel__title">Filtros do relatório</h2>
+              <p className="ref-panel__subtitle">Período e categoria · apenas transações efetivadas</p>
             </div>
           </div>
-          <div className="relatorios-filter-grid">
+          <div className="relatorios-filter-grid page-relatorios-filter-grid">
             <div className="filter-group">
               <label htmlFor="rel-ini">Data início</label>
               <input id="rel-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
@@ -448,43 +461,70 @@ export default function Relatorios() {
               </select>
             </div>
           </div>
+        </article>
+
+        <section className="ref-kpi-row" aria-label="Resumo do período" aria-busy={loading}>
+          {loading ? (
+            <>
+              <SkeletonKpi />
+              <SkeletonKpi />
+              <SkeletonKpi />
+            </>
+          ) : (
+            <>
+              <article className="ref-kpi-card ref-kpi-card--income">
+                <div className="ref-kpi-card__icon" aria-hidden>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 19V5" />
+                    <path d="m5 12 7-7 7 7" />
+                  </svg>
+                </div>
+                <div className="ref-kpi-card__body">
+                  <p className="ref-kpi-card__label">Total de receitas</p>
+                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(summary.receitas)}</p>
+                </div>
+              </article>
+              <article className="ref-kpi-card ref-kpi-card--expense">
+                <div className="ref-kpi-card__icon" aria-hidden>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 5v14" />
+                    <path d="m19 12-7 7-7-7" />
+                  </svg>
+                </div>
+                <div className="ref-kpi-card__body">
+                  <p className="ref-kpi-card__label">Total de despesas</p>
+                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>− {formatCurrency(summary.despesas)}</p>
+                </div>
+              </article>
+              <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
+                <div className="ref-kpi-card__icon" aria-hidden>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="20" height="14" x="2" y="5" rx="2" />
+                    <path d="M2 10h20" />
+                    <circle cx="16" cy="13" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                </div>
+                <div className="ref-kpi-card__body">
+                  <p className="ref-kpi-card__label">Saldo líquido (período)</p>
+                  <p
+                    className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''} ${saldoPositivo ? 'relatorios-kpi-saldo--pos' : 'relatorios-kpi-saldo--neg'}`}
+                  >
+                    {formatCurrency(summary.saldo)}
+                  </p>
+                </div>
+              </article>
+            </>
+          )}
         </section>
 
-        <div className="kpi-grid relatorios-kpi-strip">
-          <div className="kpi-card relatorios-kpi relatorios-kpi--rec">
-            <div className="kpi-header">
-              <span>Total de receitas</span>
-            </div>
-            <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`} style={{ color: 'var(--success)' }}>
-              {formatCurrency(summary.receitas)}
-            </div>
-          </div>
-
-          <div className="kpi-card relatorios-kpi relatorios-kpi--des">
-            <div className="kpi-header">
-              <span>Total de despesas</span>
-            </div>
-            <div className={`kpi-value ${privacyMode ? 'privacy-blur' : ''}`} style={{ color: 'var(--danger)' }}>
-              − {formatCurrency(summary.despesas)}
-            </div>
-          </div>
-
-          <div className="kpi-card accent relatorios-kpi relatorios-kpi--saldo">
-            <div className="kpi-header">
-              <span>Saldo líquido (período)</span>
-            </div>
-            <div
-              className={`kpi-value ${privacyMode ? 'privacy-blur' : ''} ${saldoPositivo ? 'relatorios-kpi-saldo--pos' : 'relatorios-kpi-saldo--neg'}`}
-            >
-              {formatCurrency(summary.saldo)}
-            </div>
-          </div>
-        </div>
-
         {loading ? (
-          <div className="relatorios-loading-shell">
-            <GlobalSkeleton variant="cards" />
-            <GlobalSkeleton variant="table" rows={6} />
+          <div className="ref-bottom-grid ref-bottom-grid--single page-relatorios-loading-shell">
+            <article className="ref-panel page-relatorios-loading-panel">
+              <GlobalSkeleton variant="cards" />
+            </article>
+            <article className="ref-panel page-relatorios-loading-panel">
+              <GlobalSkeleton variant="table" rows={6} />
+            </article>
           </div>
         ) : transacoes.length === 0 ? (
           <p className="relatorios-empty-msg">Nenhuma transação efetivada neste período para compor o relatório.</p>
@@ -495,10 +535,12 @@ export default function Relatorios() {
                 Visão diária
               </h3>
               <div className="relatorios-charts__section-grid">
-                <article className="relatorios-chart-card relatorios-chart-card--wide">
-                  <div className="relatorios-chart-card__head">
-                    <h2 className="relatorios-chart-card__title">Evolução diária</h2>
-                    <p className="relatorios-chart-card__desc">Receitas e despesas por dia no período selecionado</p>
+                <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+                  <div className="ref-panel__head">
+                    <div>
+                      <h2 className="ref-panel__title">Evolução diária</h2>
+                      <p className="ref-panel__subtitle">Receitas e despesas por dia no período selecionado</p>
+                    </div>
                   </div>
                   <div className="relatorios-chart-card__body">
                     <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
@@ -528,10 +570,12 @@ export default function Relatorios() {
                   </div>
                 </article>
 
-                <article className="relatorios-chart-card relatorios-chart-card--wide">
-                  <div className="relatorios-chart-card__head">
-                    <h2 className="relatorios-chart-card__title">Saldo acumulado</h2>
-                    <p className="relatorios-chart-card__desc">Resultado líquido dia a dia no período (referência em zero)</p>
+                <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+                  <div className="ref-panel__head">
+                    <div>
+                      <h2 className="ref-panel__title">Saldo acumulado</h2>
+                      <p className="ref-panel__subtitle">Resultado líquido dia a dia no período (referência em zero)</p>
+                    </div>
                   </div>
                   <div className="relatorios-chart-card__body relatorios-chart-card__body--area">
                     <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
@@ -578,10 +622,12 @@ export default function Relatorios() {
                 Visão mensal
               </h3>
               <div className="relatorios-charts__section-grid">
-                <article className="relatorios-chart-card relatorios-chart-card--wide">
-                  <div className="relatorios-chart-card__head">
-                    <h2 className="relatorios-chart-card__title">Evolução mensal</h2>
-                    <p className="relatorios-chart-card__desc">Receitas e despesas agregadas por mês no período</p>
+                <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+                  <div className="ref-panel__head">
+                    <div>
+                      <h2 className="ref-panel__title">Evolução mensal</h2>
+                      <p className="ref-panel__subtitle">Receitas e despesas agregadas por mês no período</p>
+                    </div>
                   </div>
                   <div className="relatorios-chart-card__body">
                     {chartDataPorMes.length > 0 ? (
@@ -615,10 +661,12 @@ export default function Relatorios() {
                   </div>
                 </article>
 
-                <article className="relatorios-chart-card relatorios-chart-card--wide">
-                  <div className="relatorios-chart-card__head">
-                    <h2 className="relatorios-chart-card__title">Saldo acumulado (mensal)</h2>
-                    <p className="relatorios-chart-card__desc">Resultado líquido mês a mês no período (referência em zero)</p>
+                <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+                  <div className="ref-panel__head">
+                    <div>
+                      <h2 className="ref-panel__title">Saldo acumulado (mensal)</h2>
+                      <p className="ref-panel__subtitle">Resultado líquido mês a mês no período (referência em zero)</p>
+                    </div>
                   </div>
                   <div className="relatorios-chart-card__body relatorios-chart-card__body--area">
                     {chartDataSaldoCumMes.length > 0 ? (
@@ -665,10 +713,12 @@ export default function Relatorios() {
             </section>
 
             <div className="relatorios-charts__pair">
-              <article className="relatorios-chart-card">
-                <div className="relatorios-chart-card__head">
-                  <h2 className="relatorios-chart-card__title">Despesas por categoria</h2>
-                  <p className="relatorios-chart-card__desc">Distribuição do que saiu no período</p>
+              <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card">
+                <div className="ref-panel__head">
+                  <div>
+                    <h2 className="ref-panel__title">Despesas por categoria</h2>
+                    <p className="ref-panel__subtitle">Distribuição do que saiu no período</p>
+                  </div>
                 </div>
                 <div className="relatorios-chart-card__body relatorios-chart-card__body--pie">
                   {chartDataPorCategoria.length > 0 ? (
@@ -717,10 +767,12 @@ export default function Relatorios() {
                 </div>
               </article>
 
-              <article className="relatorios-chart-card">
-                <div className="relatorios-chart-card__head">
-                  <h2 className="relatorios-chart-card__title">Receitas por categoria</h2>
-                  <p className="relatorios-chart-card__desc">De onde entrou dinheiro no período</p>
+              <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card">
+                <div className="ref-panel__head">
+                  <div>
+                    <h2 className="ref-panel__title">Receitas por categoria</h2>
+                    <p className="ref-panel__subtitle">De onde entrou dinheiro no período</p>
+                  </div>
                 </div>
                 <div className="relatorios-chart-card__body relatorios-chart-card__body--pie">
                   {chartDataReceitasPorCategoria.length > 0 ? (
@@ -771,6 +823,7 @@ export default function Relatorios() {
             </div>
           </div>
         )}
+        </div>
       </main>
       </div>
     </div>

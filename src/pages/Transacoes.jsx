@@ -1,13 +1,32 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
-import GlobalSkeleton from '../components/GlobalSkeleton'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { getWhatsAppContactUrl } from '../lib/whatsappContactUrl'
 import './dashboard.css'
+
+const SkeletonTxRow = () => (
+  <div className="ref-tx-row ref-tx-row--skeleton" aria-hidden>
+    <div className="ref-tx-icon-cell">
+      <span className="skeleton skeleton-pulse ref-tx-skel-icon" />
+    </div>
+    <div className="ref-tx-meta-cell">
+      <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--meta" />
+    </div>
+    <div className="ref-tx-cat-cell">
+      <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--cat" />
+    </div>
+    <div className="ref-tx-sub-cell">
+      <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--sub" />
+    </div>
+    <div className="ref-tx-val-cell">
+      <span className="skeleton skeleton-pulse ref-tx-skel-pill" />
+    </div>
+  </div>
+)
 
 export default function Transacoes() {
   const { privacyMode } = useTheme()
@@ -25,6 +44,7 @@ export default function Transacoes() {
   const [transacoes, setTransacoes] = useState([])
   const [categorias, setCategorias] = useState([])
   const [loading, setLoading] = useState(false)
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false)
 
   // Filters State
   const [filters, setFilters] = useState({
@@ -117,20 +137,6 @@ export default function Transacoes() {
     }
   }
 
-  const summary = useMemo(() => {
-    return transacoes.reduce((acc, t) => {
-      const val = parseFloat(t.valor) || 0
-      if (t.tipo === 'RECEITA') {
-        acc.receitas += val
-        acc.saldo += val
-      } else {
-        acc.despesas += val
-        acc.saldo -= val
-      }
-      return acc
-    }, { receitas: 0, despesas: 0, saldo: 0 })
-  }, [transacoes])
-
   const formatCurrency = (val) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)
   }
@@ -173,7 +179,6 @@ export default function Transacoes() {
             <h1 className="ref-dashboard-greeting">
               <span className="ref-dashboard-greeting__name">Minhas transações</span>
             </h1>
-            <p className="page-transacoes-header__sub">Lista completa com filtros e totais do recorte</p>
           </div>
           <div className="ref-dashboard-header__actions">
             <button
@@ -206,110 +211,109 @@ export default function Transacoes() {
           </div>
         </header>
 
-        <section className="ref-kpi-row" aria-label="Resumo do filtro">
-          <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
-            <div className="ref-kpi-card__icon" aria-hidden>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="20" height="14" x="2" y="5" rx="2" />
-                <path d="M2 10h20" />
-                <circle cx="16" cy="13" r="1" fill="currentColor" stroke="none" />
-              </svg>
-            </div>
-            <div className="ref-kpi-card__body">
-              <p className="ref-kpi-card__label">Saldo do filtro</p>
-              <p
-                className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}
-                style={summary.saldo < 0 ? { color: '#dc2626' } : undefined}
-              >
-                {formatCurrency(summary.saldo)}
-              </p>
-            </div>
-          </article>
-          <article className="ref-kpi-card ref-kpi-card--expense">
-            <div className="ref-kpi-card__icon" aria-hidden>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 5v14" />
-                <path d="m19 12-7 7-7-7" />
-              </svg>
-            </div>
-            <div className="ref-kpi-card__body">
-              <p className="ref-kpi-card__label">Saída</p>
-              <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(summary.despesas)}</p>
-            </div>
-          </article>
-          <article className="ref-kpi-card ref-kpi-card--income">
-            <div className="ref-kpi-card__icon" aria-hidden>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 19V5" />
-                <path d="m5 12 7-7 7 7" />
-              </svg>
-            </div>
-            <div className="ref-kpi-card__body">
-              <p className="ref-kpi-card__label">Entrada</p>
-              <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(summary.receitas)}</p>
-            </div>
-          </article>
-        </section>
-
         <section className="ref-bottom-grid ref-bottom-grid--single page-transacoes-panels" aria-label="Filtros e transações">
-        <article className="ref-panel page-transacoes-ref-filters">
-          <div className="ref-panel__head">
-            <div>
-              <h2 className="ref-panel__title">Filtros</h2>
-              <p className="ref-panel__subtitle">Busca, categoria e período</p>
-            </div>
+        <article
+          className={`ref-panel page-transacoes-ref-filters ${filtrosAbertos ? '' : 'page-transacoes-ref-filters--collapsed'}`}
+        >
+          <div className="ref-panel__head page-transacoes-filters-head">
+            <button
+              type="button"
+              className="page-transacoes-filters-toggle"
+              id="transacoes-filtros-trigger"
+              aria-expanded={filtrosAbertos}
+              aria-controls="transacoes-filtros-fields"
+              onClick={() => setFiltrosAbertos((open) => !open)}
+            >
+              <span className="page-transacoes-filters-toggle__lead">
+                <span className="ref-panel__title" role="heading" aria-level={2}>
+                  Filtros
+                </span>
+                <span className="ref-panel__subtitle page-transacoes-filters-toggle__sub">
+                  Busca, categoria e período
+                </span>
+              </span>
+              <svg
+                className={`page-transacoes-filters-toggle__chevron ${filtrosAbertos ? 'page-transacoes-filters-toggle__chevron--open' : ''}`}
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
             <button type="button" className="ref-panel__link ref-panel__link--button" onClick={clearFilters}>
               Limpar filtros
             </button>
           </div>
-          <div className="transacoes-filter-grid page-transacoes-filter-grid">
-            <div className="filter-group transacoes-filter-grid__search">
-              <label htmlFor="tx-busca">Busca</label>
-              <input
-                id="tx-busca"
-                type="text"
-                name="busca"
-                placeholder="Ex: Aluguel, Supermercado…"
-                className="filter-input"
-                value={filters.busca}
-                onChange={handleFilterChange}
-              />
-            </div>
-            <div className="filter-group">
-              <label htmlFor="tx-cat">Categoria</label>
-              <select id="tx-cat" name="categoria_id" className="filter-input" value={filters.categoria_id} onChange={handleFilterChange}>
-                <option value="">Todas</option>
-                {categorias.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.nome}</option>
-                ))}
-              </select>
-            </div>
-            <div className="filter-group">
-              <label htmlFor="tx-tipo">Tipo</label>
-              <select id="tx-tipo" name="tipo" className="filter-input" value={filters.tipo} onChange={handleFilterChange}>
-                <option value="">Todos</option>
-                <option value="RECEITA">Receitas</option>
-                <option value="DESPESA">Despesas</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label htmlFor="tx-ini">Início</label>
-              <input id="tx-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
-            </div>
-            <div className="filter-group">
-              <label htmlFor="tx-fim">Fim</label>
-              <input id="tx-fim" type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={handleFilterChange} />
+          <div
+            id="transacoes-filtros-fields"
+            className="page-transacoes-filters-body"
+            role="region"
+            aria-labelledby="transacoes-filtros-trigger"
+            hidden={!filtrosAbertos}
+          >
+            <div className="transacoes-filter-grid page-transacoes-filter-grid">
+              <div className="filter-group transacoes-filter-grid__search">
+                <label htmlFor="tx-busca">Busca</label>
+                <input
+                  id="tx-busca"
+                  type="text"
+                  name="busca"
+                  placeholder="Ex: Aluguel, Supermercado…"
+                  className="filter-input"
+                  value={filters.busca}
+                  onChange={handleFilterChange}
+                />
+              </div>
+              <div className="filter-group">
+                <label htmlFor="tx-cat">Categoria</label>
+                <select id="tx-cat" name="categoria_id" className="filter-input" value={filters.categoria_id} onChange={handleFilterChange}>
+                  <option value="">Todas</option>
+                  {categorias.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.nome}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="filter-group">
+                <label htmlFor="tx-tipo">Tipo</label>
+                <select id="tx-tipo" name="tipo" className="filter-input" value={filters.tipo} onChange={handleFilterChange}>
+                  <option value="">Todos</option>
+                  <option value="RECEITA">Receitas</option>
+                  <option value="DESPESA">Despesas</option>
+                </select>
+              </div>
+              <div className="filter-group">
+                <label htmlFor="tx-ini">Início</label>
+                <input id="tx-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
+              </div>
+              <div className="filter-group">
+                <label htmlFor="tx-fim">Fim</label>
+                <input id="tx-fim" type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={handleFilterChange} />
+              </div>
             </div>
           </div>
         </article>
 
-        <article className="ref-panel page-transacoes-ref-table">
+        <article className="ref-panel ref-panel--transactions page-transacoes-ref-table">
           <div className="ref-panel__head">
             <h2 className="ref-panel__title">Transações</h2>
           </div>
-          <div className="transacoes-table-scroll page-transacoes-table-body">
+          <div className="ref-tx-list page-transacoes-tx-list">
             {loading ? (
-              <GlobalSkeleton variant="table" rows={7} />
+              <div className="skeleton-stagger ref-tx-skeleton-stack">
+                <SkeletonTxRow />
+                <SkeletonTxRow />
+                <SkeletonTxRow />
+                <SkeletonTxRow />
+                <SkeletonTxRow />
+                <SkeletonTxRow />
+              </div>
             ) : transacoes.length === 0 ? (
               <div className="ref-empty-state">
                 <p className="ref-empty">Nenhuma transação encontrada com os filtros atuais.</p>
@@ -318,50 +322,79 @@ export default function Transacoes() {
                 </button>
               </div>
             ) : (
-              <table className="data-table transacoes-data-table">
-                <thead>
-                  <tr>
-                     <th>Data</th>
-                     <th>Categoria</th>
-                     <th>Valor</th>
-                     <th className="transacoes-col-actions">Ações</th>
-                   </tr>
-                </thead>
-                <tbody>
-                  {transacoes.map(t => (
-                    <tr key={t.id}>
-                       <td className="transacoes-cell-date">
-                         <div className="transacoes-cell-date__day">
-                           {new Date(t.data_transacao).toLocaleDateString('pt-BR')}
-                         </div>
-                         <div className="transacoes-cell-date__time">
-                           {new Date(t.data_transacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                         </div>
-                       </td>
-                       <td>
-                         <div className="transacoes-cell-cat-title">
-                           {t.categorias?.nome || 'Sem categoria'}
-                           {t.recorrente_index && (
-                             <span className="transacoes-rec-badge">
-                               {t.recorrente_index}/{t.recorrente_total}
-                             </span>
-                           )}
-                         </div>
-                         <div className="transacoes-cell-cat-sub">
-                           {t.subcategorias?.nome || t.descricao || ''}
-                         </div>
-                       </td>
-                      <td className={t.tipo === 'RECEITA' ? 'val-positive' : 'val-negative'}>
-                         <span className={`transacoes-cell-val ${privacyMode ? 'privacy-blur' : ''}`}>
-                           {t.tipo === 'RECEITA' ? (
-                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="transacoes-val-ico transacoes-val-ico--up"><path d="m18 15-6-6-6 6"/></svg>
-                           ) : (
-                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="transacoes-val-ico transacoes-val-ico--down"><path d="m6 9 6 6 6-6"/></svg>
-                           )}
-                           {formatCurrency(t.valor)}
-                         </span>
-                      </td>
-                      <td className="transacoes-col-actions">
+              <div className="ref-tx-table-subgrid ref-tx-table-subgrid--actions">
+                <div className="ref-tx-list-head">
+                  <span className="ref-tx-list-head__icon" aria-hidden />
+                  <span className="ref-tx-list-head__meta">Data</span>
+                  <span className="ref-tx-list-head__cat">Categoria</span>
+                  <span className="ref-tx-list-head__sub">Subcategoria</span>
+                  <span className="ref-tx-list-head__val">Valor</span>
+                  <span className="ref-tx-list-head__actions">Ações</span>
+                </div>
+                {transacoes.map((t) => {
+                  const isRec = t.tipo === 'RECEITA'
+                  const dt = new Date(t.data_transacao)
+                  const dateLine = dt.toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })
+                  const timeLine = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                  const isoDate = Number.isNaN(dt.getTime()) ? undefined : dt.toISOString().slice(0, 10)
+                  const catNome = (t.categorias?.nome && String(t.categorias.nome).trim()) || 'Sem categoria'
+                  const subRaw = t.subcategorias
+                  const subNome =
+                    subRaw && typeof subRaw === 'object' && subRaw.nome && String(subRaw.nome).trim()
+                      ? String(subRaw.nome).trim()
+                      : (t.descricao && String(t.descricao).trim()) || '—'
+                  const valorAbs = Math.abs(parseFloat(t.valor) || 0)
+                  return (
+                    <div key={t.id} className="ref-tx-row">
+                      <div className="ref-tx-icon-cell">
+                        <div className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}`} aria-hidden>
+                          {isRec ? (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 19V5" />
+                              <path d="m5 12 7-7 7 7" />
+                            </svg>
+                          ) : (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 5v14" />
+                              <path d="m19 12-7 7-7-7" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <div className="ref-tx-meta-cell">
+                        <time className="ref-tx-date" dateTime={isoDate}>
+                          {dateLine}
+                        </time>
+                        <span className="ref-tx-time-sub">{timeLine}</span>
+                      </div>
+                      <div className="ref-tx-cat-cell">
+                        <span className="ref-tx-field-label">Categoria</span>
+                        <p className="ref-tx-cat-text break-words">
+                          {catNome}
+                          {t.recorrente_index ? (
+                            <span className="ref-tx-rec-badge">
+                              {t.recorrente_index}/{t.recorrente_total}
+                            </span>
+                          ) : null}
+                        </p>
+                      </div>
+                      <div className="ref-tx-sub-cell">
+                        <span className="ref-tx-field-label">Subcategoria</span>
+                        <p className="ref-tx-sub-text break-words">{subNome}</p>
+                      </div>
+                      <div className="ref-tx-val-cell">
+                        <span
+                          className={`ref-tx-val ${isRec ? 'ref-tx-val--pos' : 'ref-tx-val--neg'} ${privacyMode ? 'privacy-blur' : ''}`}
+                        >
+                          {isRec ? '+' : '−'}
+                          {formatCurrency(valorAbs)}
+                        </span>
+                      </div>
+                      <div className="ref-tx-actions-cell">
                         <div className="transacoes-actions" role="group" aria-label="Ações da transação">
                           <button
                             type="button"
@@ -378,14 +411,18 @@ export default function Transacoes() {
                             </svg>
                           </button>
                           <button type="button" className="btn-delete" onClick={() => handleDelete(t.id)} title="Excluir">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                              <path d="M3 6h18" />
+                              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                            </svg>
                           </button>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             )}
           </div>
         </article>

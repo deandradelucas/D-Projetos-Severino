@@ -2819,19 +2819,130 @@ h3 {
   }
 }
 
-/* Transações (shell Horizonte): coluna central, cabeçalho tipo dashboard, KPI em grade 3×1, mobile */
-.dashboard-container.app-horizon-shell.page-transacoes .ref-tx-shell-inner {
+/* Transações (shell): mesma coluna central e ritmo do dashboard */
+.page-transacoes.app-horizon-shell .ref-dashboard-inner {
   width: 100%;
   max-width: min(1180px, 100%);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  flex: 1 1 auto;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-filters-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-filters-toggle {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding: 6px 4px 6px 0;
+  min-height: 44px;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-filters-toggle__lead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-filters-toggle__sub {
+  text-transform: none;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-filters-toggle__chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s var(--pf-ease-out, ease);
+  opacity: 0.88;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-filters-toggle__chevron--open {
+  transform: rotate(180deg);
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-filters-toggle:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-filters-toggle__chevron {
+  color: #64748b;
+}
+
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-transacoes .page-transacoes-filters-toggle:focus-visible,
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-transacoes .page-transacoes-filters-toggle:focus-visible,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .page-transacoes-filters-toggle:focus-visible {
+  outline: 2px solid var(--accent-color, #38bdf8);
+  outline-offset: 2px;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell button.ref-panel__link--button {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid rgba(226, 232, 240, 0.98);
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-panels {
+  gap: 14px;
+  align-content: start;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters {
+  min-height: 0;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .page-transacoes-filter-grid {
+  padding-top: 4px;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table {
+  min-height: min(420px, 52vh);
+  flex: 1 1 auto;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list > .global-skeleton {
+  flex: 1 1 auto;
+  min-height: 220px;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list .ref-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  min-height: 200px;
 }
 
 [data-theme='dark'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header,
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header {
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -2843,15 +2954,21 @@ h3 {
 }
 
 [data-theme='dark'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead,
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__lead,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead {
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__lead,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__lead,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__lead {
   flex: 1 1 200px;
   min-width: 0;
 }
 
 [data-theme='dark'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__actions,
+[data-theme='dark'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__actions,
 [data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__actions,
-[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__actions {
+[data-theme='cyberpunk'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__actions,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-transacoes .ref-dashboard-header__actions,
+[data-theme='off-white'] .dashboard-container.app-horizon-shell.page-relatorios .ref-dashboard-header__actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -2859,39 +2976,30 @@ h3 {
   gap: 10px;
 }
 
-.page-transacoes.app-horizon-shell .ref-tx-shell-h1 {
-  margin: 0;
-  font-size: clamp(20px, 4vw, 28px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  color: var(--text-primary);
-}
-
-.page-transacoes.app-horizon-shell .ref-tx-shell-sub {
-  margin: 4px 0 0;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.35;
-  color: var(--text-secondary);
-}
-
 @media (min-width: 769px) {
-  .page-transacoes.app-horizon-shell .ref-tx-kpi-row.kpi-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
+  .page-transacoes.app-horizon-shell .ref-kpi-row,
+  .page-relatorios.app-horizon-shell .ref-kpi-row {
+    margin-bottom: 18px;
   }
 }
 
 @media (max-width: 768px) {
-  .page-transacoes.app-horizon-shell .ref-tx-kpi-row.kpi-grid {
-    grid-template-columns: 1fr;
+  .page-transacoes.app-horizon-shell .ref-kpi-row,
+  .page-relatorios.app-horizon-shell .ref-kpi-row {
     gap: 12px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
 
-  .page-transacoes.app-horizon-shell .transacoes-filter-grid {
+  .page-relatorios.app-horizon-shell .relatorios-filter-grid,
+  .page-relatorios.app-horizon-shell .page-relatorios-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-relatorios.app-horizon-shell .relatorios-filter-grid__wide {
+    grid-column: 1;
+  }
+
+  .page-transacoes.app-horizon-shell .page-transacoes-filter-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2899,90 +3007,14 @@ h3 {
     grid-column: 1;
   }
 
-  .page-transacoes.app-horizon-shell .transacoes-table-scroll {
+  .page-transacoes.app-horizon-shell .page-transacoes-tx-list {
     -webkit-overflow-scrolling: touch;
   }
-
-  .page-transacoes.app-horizon-shell .transacoes-data-table thead th,
-  .page-transacoes.app-horizon-shell .transacoes-data-table tbody td {
-    padding: 12px 12px;
-    font-size: 13px;
-  }
-
-  .page-transacoes.app-horizon-shell .transacoes-actions .btn-edit,
-  .page-transacoes.app-horizon-shell .transacoes-actions .btn-delete {
-    min-width: 42px;
-    min-height: 42px;
-    padding: 8px;
-  }
 }
 
-.page-transacoes.app-horizon-shell .transacoes-data-table {
-  min-width: 620px;
-}
-
-/* Tema claro + shell: cartões brancos como o dashboard */
-body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .ref-tx-shell-h1 {
-  font-size: clamp(22px, 3.8vw, 30px);
-  color: #0f172a;
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .ref-tx-shell-sub {
-  color: #64748b;
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .ref-tx-kpi-row.kpi-grid {
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .ref-tx-kpi-row .kpi-card {
-  min-height: 112px;
-  padding: 16px 16px 14px;
-  border-radius: 20px;
-  border: 1px solid rgba(226, 232, 240, 0.98);
-  background: #ffffff;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 1) inset,
-    0 14px 36px -28px rgba(15, 23, 42, 0.18),
-    0 6px 16px -12px rgba(15, 23, 42, 0.06);
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .ref-tx-kpi-row .kpi-card::before {
-  opacity: 0;
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .transacoes-filter-shell::before {
-  display: none;
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .transacoes-filter-shell {
-  margin-bottom: 18px;
-  padding: 18px 18px 16px;
-  border-radius: 20px;
-  border: 1px solid rgba(226, 232, 240, 0.98) !important;
-  background: #ffffff !important;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 1) inset,
-    0 10px 28px -22px rgba(15, 23, 42, 0.12) !important;
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .transacoes-filter-grid .filter-input {
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-filter-grid .filter-input {
   background: #f8fafc;
   border-color: rgba(148, 163, 184, 0.35);
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .transacoes-table-card {
-  border-radius: 20px !important;
-  border: 1px solid rgba(226, 232, 240, 0.98) !important;
-  background: #ffffff !important;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 1) inset,
-    0 12px 32px -24px rgba(15, 23, 42, 0.14) !important;
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell.page-transacoes .transacoes-data-table {
-  min-width: 620px;
 }
 
 /* —— Relatórios analíticos —— */
@@ -5525,8 +5557,8 @@ body[data-theme='light'] .exec-list-sub { margin: 1px 0 0; color: #64748b; font-
 }
 
 /* ===== Executive full-system consistency ===== */
-body[data-theme='light'] .page-transacoes .main-content,
-body[data-theme='light'] .page-relatorios .main-content,
+body[data-theme='light'] .page-transacoes:not(.app-horizon-shell) .main-content,
+body[data-theme='light'] .page-relatorios:not(.app-horizon-shell) .main-content,
 body[data-theme='light'] .config-page {
   background:
     radial-gradient(90% 55% at 100% -12%, rgba(59, 130, 246, 0.09), transparent 52%),
@@ -5712,7 +5744,7 @@ body[data-theme='light'] .relatorios-loading-shell {
 @media (max-width: 1200px) {
   body[data-theme='light'] {
     --app-sidebar-width: clamp(200px, 22vw + 40px, 268px);
-    --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 52px);
+    --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 66px);
   }
   body[data-theme='light'] .sidebar {
     width: var(--app-sidebar-width);
@@ -6730,6 +6762,7 @@ body[data-theme='light'] .ref-tx-meta-cell {
   grid-area: meta;
   min-width: 0;
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   justify-self: stretch;
   text-align: start;
@@ -6919,6 +6952,198 @@ body[data-theme='light'] .ref-tx-val--neg {
   color: #7f1d1d;
   background: rgba(254, 226, 226, 0.55);
   border: 1px solid rgba(239, 68, 68, 0.12);
+}
+
+/* Página Transações: mesma lista do dashboard + coluna Ações */
+body[data-theme='light'] .ref-tx-time-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  letter-spacing: -0.01em;
+}
+
+body[data-theme='light'] .ref-tx-rec-badge {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #b45309;
+  background: rgba(212, 168, 75, 0.14);
+  padding: 2px 7px;
+  border-radius: 6px;
+  vertical-align: middle;
+}
+
+body[data-theme='light'] .ref-tx-actions-cell {
+  grid-area: act;
+  justify-self: end;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: 0 0 0 4px;
+}
+
+body[data-theme='light'] .ref-tx-actions-cell .btn-edit,
+body[data-theme='light'] .ref-tx-actions-cell .btn-delete {
+  min-width: 40px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row {
+  grid-template-columns: 40px 1fr auto max-content;
+  grid-template-areas:
+    'icon meta val act'
+    'icon cat val act'
+    'icon sub val act';
+  column-gap: 10px;
+}
+
+@media (min-width: 768px) {
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row {
+    grid-template-columns:
+      40px
+      minmax(108px, 1.15fr)
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      auto
+      max-content;
+    grid-template-areas: 'icon meta cat sub val act';
+    column-gap: 16px;
+  }
+
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row::after {
+    left: 52px;
+    right: 12px;
+  }
+
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-list-head {
+    display: grid;
+    grid-template-columns:
+      40px
+      minmax(108px, 1.15fr)
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      auto
+      max-content;
+    grid-template-areas: 'hicon hmeta hcat hsub hval hact';
+    align-items: end;
+    column-gap: 16px;
+    row-gap: 4px;
+    padding: 6px 12px 10px 12px;
+    margin: 0 0 2px;
+    border-bottom: 1px solid rgba(203, 213, 225, 0.65);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-list-head__actions {
+    grid-area: hact;
+    justify-self: end;
+    text-align: end;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    padding: 0 6px 0 0;
+    margin: 0;
+  }
+}
+
+@supports (grid-template-columns: subgrid) {
+  @media (min-width: 768px) {
+    body[data-theme='light'] .ref-tx-table-subgrid--actions {
+      display: grid;
+      grid-template-columns:
+        40px
+        minmax(108px, 1.15fr)
+        minmax(0, 1fr)
+        minmax(0, 1fr)
+        auto
+        max-content;
+      column-gap: 16px;
+      padding-inline: 12px;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-template-areas: none;
+      padding: 6px 0 10px;
+      margin: 0 0 2px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-template-areas: none;
+      padding: 12px 0 13px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__icon,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__meta,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__cat,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__sub,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__val,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__actions {
+      grid-area: auto;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-icon-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-meta-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-cat-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-sub-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-actions-cell {
+      grid-area: auto;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row::after {
+      left: calc(40px + 16px);
+      right: 0;
+    }
+  }
+
+  @media (min-width: 769px) {
+    body[data-theme='light'] .ref-tx-table-subgrid--actions {
+      column-gap: 12px;
+      grid-template-columns:
+        40px
+        minmax(100px, 1.25fr)
+        minmax(0, min(28ch, 1.2fr))
+        minmax(0, min(34ch, 1.2fr))
+        max-content
+        max-content;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head {
+      padding: 7px 0 9px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row {
+      padding: 9px 0 10px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row::after {
+      left: calc(40px + 12px);
+      right: 0;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row .ref-tx-actions-cell {
+      align-self: center;
+    }
+  }
 }
 
 body[data-theme='light'] .ref-empty-state {
@@ -7129,7 +7354,8 @@ body[data-theme='light'] {
   --app-sidebar-pad: clamp(14px, 1.6vw + 8px, 22px) clamp(12px, 1.2vw + 8px, 18px)
     clamp(14px, 1.5vw + 8px, 20px);
   --app-shell-inner-max: 1180px;
-  --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 52px);
+  /* +14px = gap entre menu e coluna principal (mesmo ritmo dos cards) */
+  --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 66px);
   /* Altura útil da coluna do menu (rodapé “Sair” alinhado à página) */
   --app-sidebar-col-h: calc(
     100dvh - max(20px, env(safe-area-inset-top, 0px)) - max(16px, env(safe-area-inset-bottom, 0px)) - 32px
@@ -7281,6 +7507,10 @@ body[data-theme='light'] .ref-dashboard-inner .ref-alert {
 }
 
 /* Shell app (tema claro): sem painel branco em tela cheia — fotos Horizonte + menu branco sólido (todas as páginas com .app-horizon-shell) */
+html:has(body[data-theme='light'] .app-horizon-shell) {
+  scrollbar-gutter: stable;
+}
+
 body[data-theme='light'] .dashboard-container.app-horizon-shell {
   background: transparent !important;
   border: none !important;
@@ -7306,30 +7536,104 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .ref-dashboard .
   box-shadow: none !important;
 }
 
+/* Transações / Relatórios: sem painel claro atrás dos cards — fundo do Horizonte visível */
+body[data-theme='light'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
+body[data-theme='light'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Relatórios (shell): mesma coluna central que dashboard / transações */
+.page-relatorios.app-horizon-shell .ref-dashboard-inner {
+  width: 100%;
+  max-width: min(1180px, 100%);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+  gap: 14px;
+}
+
+body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-panel.page-relatorios-chart-panel {
+  min-height: 0;
+}
+
+body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-ref-filters {
+  min-height: 0;
+}
+
+body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-header-sub {
+  margin: 4px 0 0;
+  text-transform: none;
+}
+
+body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-header-export {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-charts {
+  gap: 14px;
+  margin-bottom: 0;
+}
+
+[data-theme='dark'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='cyberpunk'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='off-white'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='dark'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='cyberpunk'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
+[data-theme='off-white'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-loading-panel {
+  min-height: 0;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-dashboard-inner {
+  gap: 14px;
+}
+
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
   border: 1px solid rgba(226, 232, 240, 0.98);
+  border-radius: 20px;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 1) inset,
-    0 14px 36px -28px rgba(15, 23, 42, 0.14),
-    0 6px 16px -12px rgba(15, 23, 42, 0.06);
+    0 20px 48px -32px rgba(15, 23, 42, 0.18),
+    0 8px 20px -14px rgba(15, 23, 42, 0.06);
 }
 
 /* App shell (tema claro): mesmo ritmo do dashboard — sem faixa branca vazia; menu sticky; coluna ao conteúdo */
 @media (min-width: 769px) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner {
-    align-items: flex-start;
+    align-items: stretch;
     align-self: flex-start;
     height: auto;
     max-height: none;
+    min-height: var(--app-sidebar-col-h);
+    gap: 14px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar {
     align-self: flex-start;
     position: sticky;
     top: max(14px, env(safe-area-inset-top, 0px));
+    border-radius: 22px;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 22px 52px -32px rgba(15, 23, 42, 0.2),
+      0 10px 24px -14px rgba(15, 23, 42, 0.08);
     min-height: var(--app-sidebar-col-h);
     max-height: var(--app-sidebar-col-h);
     height: var(--app-sidebar-col-h);
@@ -7359,19 +7663,20 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
     min-height: 0;
     height: auto;
     max-height: none;
-    align-self: flex-start;
+    align-self: stretch;
     overflow-x: clip;
     overflow-y: visible;
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
   }
 
-  /* Só a home ref-dashboard: painel transações compacto */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .main-content.ref-dashboard-main {
+  /* Todas as telas do shell: mesma coluna principal (evita “pulo” ao trocar rota) */
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .main-content.ref-dashboard-main {
     overflow: visible;
     height: auto;
     max-height: none;
   }
 
+  /* Home: painel transações compacto (não estica a coluna além do conteúdo) */
   body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-inner {
     flex: none;
     height: auto;
@@ -7534,6 +7839,8 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-se
 
 @media (max-width: 768px) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
+    border-radius: 0 36px 36px 0;
+    box-shadow: 8px 0 40px rgba(15, 23, 42, 0.12);
     min-height: 100%;
     max-height: none;
     height: auto;
