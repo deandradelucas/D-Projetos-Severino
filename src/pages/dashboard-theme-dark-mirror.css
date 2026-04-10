@@ -790,6 +790,29 @@ body[data-theme='dark'] .ref-dashboard-greeting__name {
   }
 
 }
+
+@media (max-width: 480px) {
+  body[data-theme='dark'] .ref-dashboard-actions-card--welcome .ref-dashboard-header--embedded {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+
+  body[data-theme='dark'] .ref-dashboard-actions-card--welcome .ref-dashboard-header__lead {
+    flex: 1 1 calc(100% - 52px);
+  }
+
+  body[data-theme='dark'] .ref-dashboard-actions-card__toolbar--inline {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+
+  body[data-theme='dark'] .ref-dashboard-actions-card--welcome .ref-dashboard-header__btn-tx {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
 
   body[data-theme='dark'] .ref-dashboard-greeting {
@@ -2158,13 +2181,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
 }
-@media (min-width: 769px) {
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell {
-    /* Respiro lateral: conjunto menu + conteúdo centralizado sobre o fundo Horizonte */
-    margin-left: clamp(14px, 4.5vw, 64px);
-    margin-right: clamp(14px, 4.5vw, 64px);
-  }
-}
+/* Desktop: margens laterais via width/max-width + margin auto em dashboard.css (shell claro/escuro) */
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .main-content,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .ref-dashboard .main-content.ref-dashboard-main {
   background: transparent !important;
@@ -2222,8 +2239,13 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
 }
 @media (min-width: 769px) {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .app-horizon-inner {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
     align-items: stretch;
     align-self: flex-start;
+    flex: 0 1 auto;
     height: auto;
     max-height: none;
     min-height: var(--app-sidebar-col-h);
