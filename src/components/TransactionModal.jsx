@@ -111,11 +111,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     categoria_id: '',
     subcategoria_id: '',
     status: 'EFETIVADA',
-    recorrencia: {
-      ativo: false,
-      frequencia: 'MENSAL',
-      quantidade: 12
-    }
   })
   
   const [displayValor, setDisplayValor] = useState('')
@@ -172,7 +167,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
         categoria_id: t.categoria_id != null ? String(t.categoria_id) : '',
         subcategoria_id: t.subcategoria_id != null ? String(t.subcategoria_id) : '',
         status: t.status || 'EFETIVADA',
-        recorrencia: { ativo: false, frequencia: 'MENSAL', quantidade: 12 },
       })
       return
     }
@@ -190,7 +184,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
         const offset = now.getTimezoneOffset() * 60000
         return new Date(now - offset).toISOString().slice(0, 16)
       })(),
-      recorrencia: { ativo: false, frequencia: 'MENSAL', quantidade: 12 },
     }))
 
     setTimeout(() => {
@@ -256,12 +249,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
         descricao: finalDescricao,
       }
       if (!isEditMode) {
-        payload.recorrencia = formData.recorrencia.ativo
-          ? {
-              frequencia: formData.recorrencia.frequencia,
-              quantidade: parseInt(formData.recorrencia.quantidade, 10),
-            }
-          : null
+        payload.recorrencia = null
       }
 
       const url = isEditMode
@@ -406,99 +394,20 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'min-content 1fr', gap: '24px', alignItems: 'end', marginBottom: '8px' }}>
-            <div className="form-group">
-              <label>Status</label>
-              <div className="status-toggle">
-                <button 
-                  type="button"
-                  className={`status-btn ${formData.status === 'EFETIVADA' ? 'active' : ''}`}
-                  onClick={() => setFormData(prev => ({ ...prev, status: 'EFETIVADA' }))}
-                  title={formData.tipo === 'RECEITA' ? 'Recebido' : 'Pago'}
-                >
-                  {formData.tipo === 'RECEITA' ? 'Recebido' : 'Pago'}
-                </button>
-                <button 
-                  type="button"
-                  className={`status-btn ${formData.status === 'PENDENTE' ? 'active' : ''}`}
-                  onClick={() => setFormData(prev => ({ ...prev, status: 'PENDENTE' }))}
-                  title="Pendente"
-                >
-                  Pendente
-                </button>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Descrição <span style={{ fontSize: '11px', opacity: 0.7, fontWeight: 400, textTransform: 'lowercase' }}>(opcional)</span></label>
-              <input type="text" name="descricao" value={formData.descricao} onChange={handleChange} placeholder="O que você comprou?" className="input-premium" />
-            </div>
-          </div>
-
-          {/* Recurrence — apenas ao criar */}
-          {!isEditMode && (
-          <div
-            className={`modal-recorrencia-panel${formData.recorrencia.ativo ? ' modal-recorrencia-panel--active' : ''}`}
-          >
-            <label className="checkbox-container modal-recorrencia-panel__label">
-              <div
-                className={`modal-recorrencia-panel__icon${formData.recorrencia.ativo ? ' modal-recorrencia-panel__icon--on' : ''}`}
-              >
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 15l-4 4-4-4M8 9l4-4 4 4" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M20 12a8 8 0 11-16 0 8 8 0 0116 0z" />
-                </svg>
-              </div>
-              <div className="modal-recorrencia-panel__copy">
-                <div className="modal-recorrencia-panel__title">Repetir esta transação</div>
-                <div className="modal-recorrencia-panel__hint">Parcele suas contas ou crie assinaturas fixas.</div>
-              </div>
-              <input 
-                type="checkbox" 
-                checked={formData.recorrencia.ativo} 
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  recorrencia: { ...prev.recorrencia, ativo: e.target.checked }
-                }))}
-                className="modal-recorrencia-panel__checkbox"
-              />
+          <div className="form-group">
+            <label>
+              Descrição{' '}
+              <span style={{ fontSize: '11px', opacity: 0.7, fontWeight: 400, textTransform: 'lowercase' }}>(opcional)</span>
             </label>
-
-            {formData.recorrencia.ativo && (
-              <div className="slide-down modal-recorrencia-panel__grid">
-                <div className="form-group">
-                  <label className="modal-recorrencia-panel__field-label">Frequência</label>
-                  <select 
-                    className="input-premium" 
-                    value={formData.recorrencia.frequencia}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      recorrencia: { ...prev.recorrencia, frequencia: e.target.value }
-                    }))}
-                  >
-                    <option value="MENSAL">Mensal</option>
-                    <option value="SEMANAL">Semanal</option>
-                    <option value="ANUAL">Anual</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label className="modal-recorrencia-panel__field-label">Quantidade (parcelas)</label>
-                  <input 
-                    type="number" 
-                    min="2" 
-                    max="120"
-                    className="input-premium"
-                    value={formData.recorrencia.quantidade}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      recorrencia: { ...prev.recorrencia, quantidade: e.target.value }
-                    }))}
-                  />
-                </div>
-              </div>
-            )}
+            <input
+              type="text"
+              name="descricao"
+              value={formData.descricao}
+              onChange={handleChange}
+              placeholder="O que você comprou?"
+              className="input-premium"
+            />
           </div>
-          )}
 
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn-secondary" disabled={saving}>Cancelar</button>
