@@ -735,6 +735,13 @@ export default function AdminUsuarios() {
                                   >
                                     {roleDisplayLabel('ADMIN')}
                                   </span>
+                                ) : !principalPodeDarAdmin && normalizeRoleKey(editForm.role) === 'ADMIN' ? (
+                                  <span
+                                    className={rolePillClassName('ADMIN')}
+                                    title="Somente o administrador principal pode alterar ou rebaixar outro Admin."
+                                  >
+                                    {roleDisplayLabel('ADMIN')}
+                                  </span>
                                 ) : (
                                   <select
                                     className="page-admin-filter-select page-admin-filter-select--inline"
