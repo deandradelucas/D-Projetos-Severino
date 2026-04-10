@@ -9,6 +9,16 @@ import {
 
 export const TRIAL_DIAS = Number.parseInt(process.env.HORIZONTE_TRIAL_DIAS || '7', 10) || 7
 
+/** Erro PostgREST/Postgres quando a coluna ainda não existe (migração não aplicada). */
+function isMissingColumnError(err, column) {
+  const msg = String(err?.message || err?.details || err || '')
+  const code = String(err?.code || '')
+  if (code === '42703') return true
+  const c = String(column || '').trim()
+  if (!c) return false
+  return msg.includes(c) && (msg.includes('does not exist') || msg.includes('não existe'))
+}
+
 /** Status MP em que a assinatura não cobra / não mantém acesso pago. */
 const MP_STATUS_BLOQUEIA_ACESSO = new Set(['paused', 'cancelled', 'canceled'])
 
@@ -74,7 +84,13 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
   if (!uid) return {}
   const supabase = getSupabaseAdmin()
 
-  const base = await supabase.from('usuarios').select('email, isento_pagamento').eq('id', uid).maybeSingle()
+  let base = await supabase.from('usuarios').select('email, isento_pagamento').eq('id', uid).maybeSingle()
+  if (base.error && isMissingColumnError(base.error, 'isento_pagamento')) {
+    log.warn(
+      '[fetchAssinaturaCamposUsuario] coluna isento_pagamento ausente; rode scripts/migrations/06_isento_pagamento_usuarios.sql'
+    )
+    base = await supabase.from('usuarios').select('email').eq('id', uid).maybeSingle()
+  }
   if (base.error) {
     log.warn('[fetchAssinaturaCamposUsuario] base:', base.error.message || base.error)
     return {}
@@ -83,7 +99,7 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
 
   const out = {
     email: base.data.email,
-    isento_pagamento: base.data.isento_pagamento,
+    isento_pagamento: base.data.isento_pagamento === true,
     trial_ends_at: null,
     bem_vindo_pagamento_visto_at: null,
   }
@@ -250,11 +266,24 @@ export async function assertAcessoAppUsuario(usuarioId) {
   }
 
   const supabase = getSupabaseAdmin()
-  const { data: urow, error: uerr } = await supabase
+  let urow = null
+  let uerr = null
+  ;({ data: urow, error: uerr } = await supabase
     .from('usuarios')
     .select('email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_mp_status')
     .eq('id', uid)
-    .maybeSingle()
+    .maybeSingle())
+
+  if (uerr && isMissingColumnError(uerr, 'isento_pagamento')) {
+    log.warn(
+      '[assertAcessoAppUsuario] coluna isento_pagamento ausente; usando false. Rode scripts/migrations/06_isento_pagamento_usuarios.sql'
+    )
+    ;({ data: urow, error: uerr } = await supabase
+      .from('usuarios')
+      .select('email, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_mp_status')
+      .eq('id', uid)
+      .maybeSingle())
+  }
 
   if (uerr) {
     log.warn('[assertAcessoAppUsuario] leitura usuarios:', uerr.message || uerr)
@@ -267,9 +296,12 @@ export async function assertAcessoAppUsuario(usuarioId) {
   const email = urow.email ?? ''
   const hasPay = await usuarioTemPagamentoAprovado(uid, email)
 
+  const isento =
+    'isento_pagamento' in urow ? urow.isento_pagamento === true : false
+
   const flags = computeAssinaturaFlags({
     email,
-    isento_pagamento: urow.isento_pagamento === true,
+    isento_pagamento: isento,
     trial_ends_at,
     bem_vindo_pagamento_visto_at: urow.bem_vindo_pagamento_visto_at,
     assinatura_paga: hasPay,
