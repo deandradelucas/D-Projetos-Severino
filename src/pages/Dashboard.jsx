@@ -6,6 +6,7 @@ import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
+import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { getWhatsAppContactUrl } from '../lib/whatsappContactUrl'
 
@@ -66,6 +67,7 @@ export default function Dashboard() {
       return
     }
     try {
+      await syncRecorrenciasMensais(session.id)
       const res = await fetch(apiUrl('/api/transacoes'), {
         headers: { 'x-user-id': String(session.id).trim() },
         cache: 'no-store',

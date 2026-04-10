@@ -111,6 +111,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     categoria_id: '',
     subcategoria_id: '',
     status: 'EFETIVADA',
+    recorrencia_dia_1: false,
   })
   
   const [displayValor, setDisplayValor] = useState('')
@@ -167,6 +168,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
         categoria_id: t.categoria_id != null ? String(t.categoria_id) : '',
         subcategoria_id: t.subcategoria_id != null ? String(t.subcategoria_id) : '',
         status: t.status || 'EFETIVADA',
+        recorrencia_dia_1: false,
       })
       return
     }
@@ -179,6 +181,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       categoria_id: '',
       subcategoria_id: '',
       status: 'EFETIVADA',
+      recorrencia_dia_1: false,
       data_transacao: (() => {
         const now = new Date()
         const offset = now.getTimezoneOffset() * 60000
@@ -250,6 +253,11 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       }
       if (!isEditMode) {
         payload.recorrencia = null
+      } else {
+        delete payload.recorrencia_dia_1
+      }
+      if (!isEditMode && !formData.recorrencia_dia_1) {
+        delete payload.recorrencia_dia_1
       }
 
       const url = isEditMode
@@ -374,8 +382,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
           </div>
 
           <div className="form-group">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label>Data</label>
+            <div className="modal-date-toolbar">
+              <label htmlFor="tx-data-transacao">Data</label>
               <div className="date-shortcuts">
                 <button
                   type="button"
@@ -405,6 +413,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               </div>
             </div>
             <input
+              id="tx-data-transacao"
               type="datetime-local"
               name="data_transacao"
               value={formData.data_transacao}
@@ -413,6 +422,41 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               className="input-premium"
             />
           </div>
+
+          {!isEditMode && (
+            <div
+              className={`modal-recorrencia-panel ${formData.recorrencia_dia_1 ? 'modal-recorrencia-panel--active' : ''}`}
+            >
+              <label className="modal-recorrencia-panel__label" htmlFor="tx-recorrencia-dia-1">
+                <span
+                  className={`modal-recorrencia-panel__icon ${formData.recorrencia_dia_1 ? 'modal-recorrencia-panel__icon--on' : ''}`}
+                  aria-hidden
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 8v4l3 3" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="12" cy="12" r="9" />
+                  </svg>
+                </span>
+                <span className="modal-recorrencia-panel__copy">
+                  <span className="modal-recorrencia-panel__title">Repetir todo dia 1</span>
+                  <span className="modal-recorrencia-panel__hint">
+                    No primeiro dia de cada mês o sistema lança esta mesma conta ou receita automaticamente (fuso
+                    Brasil).
+                  </span>
+                </span>
+                <input
+                  id="tx-recorrencia-dia-1"
+                  type="checkbox"
+                  name="recorrencia_dia_1"
+                  checked={formData.recorrencia_dia_1}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, recorrencia_dia_1: e.target.checked }))
+                  }
+                  className="modal-recorrencia-panel__checkbox"
+                />
+              </label>
+            </div>
+          )}
 
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn-secondary" disabled={saving}>Cancelar</button>

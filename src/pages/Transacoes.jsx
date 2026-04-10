@@ -4,6 +4,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
+import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { getWhatsAppContactUrl } from '../lib/whatsappContactUrl'
 import './dashboard.css'
@@ -45,6 +46,7 @@ export default function Transacoes() {
   const [categorias, setCategorias] = useState([])
   const [loading, setLoading] = useState(false)
   const [filtrosAbertos, setFiltrosAbertos] = useState(false)
+  const [recorrencias, setRecorrencias] = useState([])
 
   // Filters State
   const [filters, setFilters] = useState({
@@ -75,6 +77,26 @@ export default function Transacoes() {
     }
   }, [])
 
+  const fetchRecorrencias = useCallback(async () => {
+    const session = readHorizonteUser()
+    if (!session?.id) return
+    try {
+      const res = await fetch(apiUrl('/api/recorrencias-mensais'), {
+        headers: { 'x-user-id': session.id },
+      })
+      if (res.status === 403) {
+        window.location.replace('/pagamento?expirado=1')
+        return
+      }
+      if (res.ok) {
+        const data = await res.json()
+        setRecorrencias(Array.isArray(data) ? data : [])
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
+
   const fetchTransacoes = useCallback(async () => {
     setLoading(true)
     const session = readHorizonteUser()
@@ -83,6 +105,7 @@ export default function Transacoes() {
       return
     }
     try {
+      await syncRecorrenciasMensais(session.id)
       const params = new URLSearchParams()
       if (filters.busca) params.append('busca', filters.busca)
       if (filters.tipo) params.append('tipo', filters.tipo)
@@ -114,8 +137,24 @@ export default function Transacoes() {
     if (session?.id) {
       fetchCategorias()
       fetchTransacoes()
+      fetchRecorrencias()
     }
-  }, [fetchCategorias, fetchTransacoes])
+  }, [fetchCategorias, fetchTransacoes, fetchRecorrencias])
+
+  const handleEncerrarRecorrencia = async (id) => {
+    if (!window.confirm('Parar de repetir este lançamento todo dia 1?')) return
+    const session = readHorizonteUser()
+    if (!session?.id) return
+    try {
+      const res = await fetch(apiUrl(`/api/recorrencias-mensais/${id}`), {
+        method: 'DELETE',
+        headers: { 'x-user-id': session.id },
+      })
+      if (res.ok) fetchRecorrencias()
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target
@@ -300,6 +339,43 @@ export default function Transacoes() {
           </div>
         </article>
 
+        {recorrencias.length > 0 && (
+          <article className="ref-panel page-transacoes-ref-recorrencias" aria-label="Recorrências mensais">
+            <div className="ref-panel__head">
+              <h2 className="ref-panel__title">Recorrentes (dia 1)</h2>
+              <span className="ref-panel__subtitle">Lançamento automático no início de cada mês</span>
+            </div>
+            <ul className="page-transacoes-recorrencias-list">
+              {recorrencias.map((r) => {
+                const isRec = r.tipo === 'RECEITA'
+                const label = (r.descricao && String(r.descricao).trim()) || 'Sem descrição'
+                const valorAbs = Math.abs(parseFloat(r.valor) || 0)
+                return (
+                  <li key={r.id} className="page-transacoes-recorrencia-row">
+                    <div className="page-transacoes-recorrencia-row__main">
+                      <span className={`page-transacoes-recorrencia-row__tipo ${isRec ? 'page-transacoes-recorrencia-row__tipo--rec' : ''}`}>
+                        {isRec ? 'Receita' : 'Despesa'}
+                      </span>
+                      <span className="page-transacoes-recorrencia-row__desc break-words">{label}</span>
+                      <span className={`page-transacoes-recorrencia-row__val ${privacyMode ? 'privacy-blur' : ''}`}>
+                        {isRec ? '+' : '−'}
+                        {formatCurrency(valorAbs)}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="page-transacoes-recorrencia-row__stop"
+                      onClick={() => handleEncerrarRecorrencia(r.id)}
+                    >
+                      Encerrar
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </article>
+        )}
+
         <article className="ref-panel ref-panel--transactions page-transacoes-ref-table">
           <div className="ref-panel__head">
             <h2 className="ref-panel__title">Transações</h2>
@@ -438,7 +514,12 @@ export default function Transacoes() {
         setIsModalOpen(false)
         setEditingTransaction(null)
       }}
-      onSave={fetchTransacoes}
+      onSave={() => {
+        void (async () => {
+          await fetchTransacoes()
+          await fetchRecorrencias()
+        })()
+      }}
       usuarioId={readHorizonteUser()?.id || usuario.id}
       editingTransaction={editingTransaction}
     />

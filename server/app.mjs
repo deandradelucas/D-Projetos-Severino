@@ -21,6 +21,13 @@ import {
   deletarTransacao,
 } from './lib/transacoes.mjs'
 import {
+  assertCronSecret,
+  criarRegraRecorrenciaDia1,
+  desativarRecorrenciaMensal,
+  listarRecorrenciasMensais,
+  processarRecorrenciasPendentes,
+} from './lib/recorrencias-mensais.mjs'
+import {
   getPerfilUsuario,
   getWhatsappLogs,
   getWhatsappStatus,
@@ -640,10 +647,91 @@ app.post('/api/transacoes', async (c) => {
     body.usuario_id = usuarioId
 
     const data = await inserirTransacao(body)
+
+    const querRecorrenciaDia1 =
+      body.recorrencia_dia_1 === true &&
+      !(body.recorrencia && Number(body.recorrencia.quantidade) > 1)
+    if (querRecorrenciaDia1 && data) {
+      try {
+        await criarRegraRecorrenciaDia1(usuarioId, data)
+      } catch (e) {
+        log.error('criar regra recorrência dia 1', e)
+      }
+    }
+
     return c.json({ message: 'Transação inserida com sucesso.', data }, 201)
   } catch (error) {
     log.error('insert transaction failed', error)
     return c.json({ message: error.message || 'Erro ao inserir transação.' }, 500)
+  }
+})
+
+app.post('/api/recorrencias-mensais/sincronizar', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) {
+      return c.json({ message: 'Não autorizado.' }, 401)
+    }
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
+    const result = await processarRecorrenciasPendentes(usuarioId)
+    return c.json(result)
+  } catch (error) {
+    log.error('sincronizar recorrências mensais', error)
+    return c.json({ message: error.message || 'Erro ao sincronizar.' }, 500)
+  }
+})
+
+app.get('/api/recorrencias-mensais', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) {
+      return c.json({ message: 'Não autorizado.' }, 401)
+    }
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
+    const data = await listarRecorrenciasMensais(usuarioId)
+    return c.json(data)
+  } catch (error) {
+    log.error('listar recorrências mensais', error)
+    return c.json({ message: error.message || 'Erro ao listar.' }, 500)
+  }
+})
+
+app.delete('/api/recorrencias-mensais/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) {
+      return c.json({ message: 'Não autorizado.' }, 401)
+    }
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
+    await desativarRecorrenciaMensal(id, usuarioId)
+    return c.json({ message: 'Recorrência encerrada.' })
+  } catch (error) {
+    log.error('desativar recorrência mensal', error)
+    return c.json({ message: error.message || 'Erro ao encerrar.' }, 500)
+  }
+})
+
+app.get('/api/cron/recorrencias-mensais', async (c) => {
+  const auth = assertCronSecret(c)
+  if (!auth.ok) {
+    return c.json({ message: auth.message }, auth.status)
+  }
+  try {
+    const result = await processarRecorrenciasPendentes(null)
+    return c.json({ ok: true, ...result })
+  } catch (error) {
+    log.error('cron recorrências mensais', error)
+    return c.json({ message: error.message || 'Erro no cron.' }, 500)
   }
 })
 
