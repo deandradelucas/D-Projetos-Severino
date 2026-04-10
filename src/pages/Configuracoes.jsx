@@ -45,6 +45,7 @@ export default function Configuracoes() {
           }))
           const u = { ...JSON.parse(localStorage.getItem('horizonte_user') || '{}'), ...data.perfil }
           localStorage.setItem('horizonte_user', JSON.stringify(u))
+          window.dispatchEvent(new Event('horizonte-session-refresh'))
         }
       })
       .catch(() => {})

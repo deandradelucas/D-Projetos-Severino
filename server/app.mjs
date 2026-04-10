@@ -5,13 +5,9 @@ import { cors } from 'hono/cors'
 import {
   authenticateUser,
   consumeResetToken,
-  createResetToken,
-  findUserByEmail,
-  getExpiresAtIso,
   getRequestOrigin,
   isValidEmail,
-  sendResetEmail,
-  storeResetToken,
+  sendPasswordResetLink,
 } from './lib/password-reset.mjs'
 import {
   getCategorias,
@@ -31,10 +27,11 @@ import {
   getPerfilUsuario,
   getWhatsappLogs,
   getWhatsappStatus,
-  listUsuariosAdmin,
+  listUsuariosAdminPaged,
   updateUsuarioAdmin,
   deleteUsuarioAdmin,
 } from './lib/usuarios.mjs'
+import { insertAdminAuditLog, listAdminAuditLog } from './lib/admin-audit.mjs'
 import { handleWhatsAppWebhook } from './lib/whatsapp.mjs'
 import { askHorizon } from './lib/ai.mjs'
 import {
@@ -49,6 +46,7 @@ import {
   insertPreferenciaRecord,
   listPagamentosUsuario,
   listPagamentosAdmin,
+  deletePagamentosPendentesAdmin,
   sincronizarPagamentosPendentesDoUsuario,
   sincronizarPreapprovalUsuario,
   sincronizarPreapprovalPorIdFromWebhook,
@@ -75,14 +73,22 @@ loadEnv()
 
 const app = new Hono()
 
-/** Apenas mestredamente@mestredamente.com (ou SUPER_ADMIN_EMAIL) acessa /api/admin/*. */
+function clientIpFromHono(c) {
+  const xf = c.req.header('x-forwarded-for')
+  if (xf) return String(xf).split(',')[0].trim().slice(0, 80)
+  const alt = c.req.header('x-real-ip') || c.req.header('cf-connecting-ip') || ''
+  return String(alt).slice(0, 80)
+}
+
+/** Contas com role ADMIN no banco ou o e-mail SUPER_ADMIN acessam /api/admin/*. */
 async function assertPrincipalAdmin(usuarioId) {
   if (!usuarioId) return { status: 401, message: 'Não autorizado.' }
   const perfil = await getPerfilUsuario(usuarioId)
-  if (!isSuperAdminEmail(perfil?.email)) {
-    return { status: 403, message: 'Acesso restrito ao administrador principal.' }
-  }
-  return null
+  if (!perfil) return { status: 401, message: 'Não autorizado.' }
+  const email = String(perfil.email || '').trim().toLowerCase()
+  const role = String(perfil.role || 'USER').toUpperCase()
+  if (isSuperAdminEmail(email) || role === 'ADMIN') return null
+  return { status: 403, message: 'Acesso restrito a administradores.' }
 }
 
 function corsAllowedOrigin(origin) {
@@ -370,33 +376,12 @@ app.post('/api/auth/request-password-reset', async (c) => {
       return c.json({ message: 'Informe um e-mail válido.' }, 400)
     }
 
-    const user = await findUserByEmail(email)
-
-    if (!user) {
-      return c.json({
-        message: 'Enviamos um link para seu e-mail.',
-      })
-    }
-
     const origin = getRequestOrigin(c)
-    const { rawToken, tokenHash } = createResetToken()
-    const expiresAt = getExpiresAtIso()
-
-    await storeResetToken({
-      email,
-      tokenHash,
-      expiresAt,
-    })
-
-    const resetUrl = `${origin}/redefinir-senha?token=${rawToken}`
-    const emailResult = await sendResetEmail({
-      to: email,
-      resetUrl,
-    })
+    const result = await sendPasswordResetLink(email, origin)
 
     return c.json({
       message: 'Enviamos um link para seu e-mail.',
-      devResetUrl: emailResult.devResetUrl || null,
+      devResetUrl: result.devResetUrl || null,
     })
   } catch (error) {
     log.error('request-password-reset failed', error)
@@ -530,11 +515,32 @@ app.get('/api/admin/usuarios', async (c) => {
     const block = await assertPrincipalAdmin(usuarioId)
     if (block) return c.json({ message: block.message }, block.status)
 
-    const usuarios = await listUsuariosAdmin()
-    return c.json(usuarios)
+    const result = await listUsuariosAdminPaged({
+      page: c.req.query('page'),
+      pageSize: c.req.query('pageSize'),
+      q: c.req.query('q'),
+      role: c.req.query('role'),
+      conta: c.req.query('conta'),
+    })
+    return c.json(result)
   } catch (error) {
     log.error('get admin usuarios failed', error)
     return c.json({ message: 'Erro ao listar usuários.' }, 500)
+  }
+})
+
+app.get('/api/admin/audit-log', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
+
+    const lim = c.req.query('limit')
+    const rows = await listAdminAuditLog(parseInt(lim || '100', 10) || 100)
+    return c.json(rows)
+  } catch (error) {
+    log.error('get admin audit-log failed', error)
+    return c.json({ message: 'Erro ao listar auditoria.' }, 500)
   }
 })
 
@@ -546,7 +552,10 @@ app.put('/api/admin/usuarios/:id', async (c) => {
 
     const id = c.req.param('id')
     const body = await c.req.json()
-    const updated = await updateUsuarioAdmin(id, body || {})
+    const updated = await updateUsuarioAdmin(id, body || {}, {
+      actorUserId: usuarioId,
+      clientIp: clientIpFromHono(c),
+    })
     return c.json(updated)
   } catch (error) {
     log.error('update admin usuario failed', error)
@@ -573,6 +582,23 @@ app.get('/api/admin/pagamentos', async (c) => {
   }
 })
 
+app.delete('/api/admin/pagamentos/pendentes', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
+
+    const { deleted } = await deletePagamentosPendentesAdmin()
+    return c.json({
+      deleted,
+      message: deleted === 0 ? 'Nenhum registro pendente para excluir.' : `${deleted} registro(s) pendente(s) excluído(s).`,
+    })
+  } catch (error) {
+    log.error('delete admin pagamentos pendentes failed', error)
+    return c.json({ message: 'Erro ao excluir logs pendentes.' }, 500)
+  }
+})
+
 app.delete('/api/admin/usuarios/:id', async (c) => {
   try {
     const usuarioId = c.req.header('x-user-id')
@@ -580,7 +606,7 @@ app.delete('/api/admin/usuarios/:id', async (c) => {
     if (block) return c.json({ message: block.message }, block.status)
 
     const id = c.req.param('id')
-    await deleteUsuarioAdmin(id)
+    await deleteUsuarioAdmin(id, { actorUserId: usuarioId, clientIp: clientIpFromHono(c) })
     return c.json({ message: 'Usuário excluído com sucesso.' })
   } catch (error) {
     log.error('delete admin usuario failed', error)
@@ -588,6 +614,42 @@ app.delete('/api/admin/usuarios/:id', async (c) => {
       return c.json({ message: error.message }, 403)
     }
     return c.json({ message: 'Erro ao excluir usuário.' }, 500)
+  }
+})
+
+app.post('/api/admin/usuarios/:id/solicitar-reset-senha', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
+
+    const id = c.req.param('id')
+    const perfil = await getPerfilUsuario(id)
+    if (!perfil?.email) return c.json({ message: 'Usuário não encontrado.' }, 404)
+
+    const origin = getRequestOrigin(c)
+    const result = await sendPasswordResetLink(perfil.email, origin)
+
+    await insertAdminAuditLog({
+      actorUserId: usuarioId,
+      action: 'reset_senha_solicitado',
+      targetUserId: id,
+      targetEmail: perfil.email,
+      clientIp: clientIpFromHono(c),
+    })
+
+    return c.json({
+      message: 'Se o e-mail existir no cadastro, enviamos o link de redefinição.',
+      devResetUrl: result.devResetUrl || null,
+    })
+  } catch (error) {
+    log.error('admin solicitar-reset-senha failed', error)
+    if (error.statusCode === 400) {
+      return c.json({ message: error.message }, 400)
+    }
+    const mapped = mapSupabaseOrNetworkError(error)
+    if (mapped) return c.json({ message: mapped.message }, mapped.status)
+    return c.json({ message: 'Erro ao solicitar redefinição.' }, 500)
   }
 })
 

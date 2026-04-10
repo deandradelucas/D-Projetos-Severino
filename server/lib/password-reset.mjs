@@ -283,3 +283,43 @@ export async function sendResetEmail({ to, resetUrl }) {
     devResetUrl: resetUrl,
   }
 }
+
+/**
+ * Fluxo único de redefinição de senha (tela pública ou painel admin).
+ * @param {string} email
+ * @param {string} origin Base URL (ex.: resultado de getRequestOrigin)
+ */
+export async function sendPasswordResetLink(email, origin) {
+  const normalizedEmail = String(email || '').trim().toLowerCase()
+  if (!isValidEmail(normalizedEmail)) {
+    const e = new Error('Informe um e-mail válido.')
+    e.statusCode = 400
+    throw e
+  }
+
+  const user = await findUserByEmail(normalizedEmail)
+  if (!user) {
+    return { ok: true, devResetUrl: null, skipped: true }
+  }
+
+  const { rawToken, tokenHash } = createResetToken()
+  const expiresAt = getExpiresAtIso()
+  await storeResetToken({
+    email: normalizedEmail,
+    tokenHash,
+    expiresAt,
+  })
+
+  const base = normalizeBaseUrl(origin) || DEFAULT_PUBLIC_APP_URL
+  const resetUrl = `${base}/redefinir-senha?token=${rawToken}`
+  const emailResult = await sendResetEmail({
+    to: normalizedEmail,
+    resetUrl,
+  })
+
+  return {
+    ok: true,
+    devResetUrl: emailResult.devResetUrl || null,
+    delivered: emailResult.delivered === true,
+  }
+}

@@ -420,3 +420,23 @@ export async function listPagamentosAdmin(limit = 200) {
   if (flat.error) throw flat.error
   return flat.data || []
 }
+
+/** Mesmos status exibidos como "Pendente" no badge (MpStatusBadge). */
+const STATUS_LOG_PENDENTE_MP = ['pending', 'in_process', 'in_mediation']
+
+/**
+ * Remove registros de log cujo status MP ainda é pendente / em análise.
+ * Não remove aprovados, recusados nem preferências já finalizadas.
+ */
+export async function deletePagamentosPendentesAdmin() {
+  const supabase = getSupabaseAdmin()
+  const { data, error } = await supabase
+    .from('pagamentos_mercadopago')
+    .delete()
+    .in('status', STATUS_LOG_PENDENTE_MP)
+    .select('id')
+
+  if (error) throw error
+  const deleted = Array.isArray(data) ? data.length : 0
+  return { deleted }
+}

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { isSuperAdminSession } from '../lib/superAdmin'
+import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
 import { useTheme } from '../context/ThemeContext'
 import { BRAND_ASSETS } from '../lib/brandAssets'
@@ -24,7 +24,18 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const [dotMotion, setDotMotion] = useState(null)
   const navMenuRef = useRef(null)
   const [activeDotTop, setActiveDotTop] = useState(null)
-  const principalAdmin = isSuperAdminSession()
+  const [sessionBump, setSessionBump] = useState(0)
+  const showAdminNav = canAccessAdminPanelSession()
+
+  useEffect(() => {
+    const bump = () => setSessionBump((n) => n + 1)
+    window.addEventListener('horizonte-session-refresh', bump)
+    window.addEventListener('storage', bump)
+    return () => {
+      window.removeEventListener('horizonte-session-refresh', bump)
+      window.removeEventListener('storage', bump)
+    }
+  }, [])
 
   /* Mobile: ao abrir o drawer, baixa chunks do menu em paralelo (clique na rota fica instantâneo). */
   useEffect(() => {
@@ -72,7 +83,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
       window.removeEventListener('resize', measure)
       ro?.disconnect()
     }
-  }, [location.pathname, menuAberto, principalAdmin])
+  }, [location.pathname, menuAberto, showAdminNav, sessionBump])
 
   const logoSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
   return (
@@ -196,7 +207,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             </NavLink>
           </li>
 
-          {principalAdmin && (
+          {showAdminNav && (
             <>
               <li className="nav-section-label">
                 <span className="nav-section-label__text">Administração</span>

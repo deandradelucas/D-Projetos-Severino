@@ -1,11 +1,11 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { isSuperAdminSession } from '../lib/superAdmin'
+import { canAccessAdminPanelSession } from '../lib/superAdmin'
 
 /**
- * Só mestredamente@mestredamente.com acessa rotas /admin/*.
+ * Rotas /admin/*: conta SUPER_ADMIN ou perfil com role ADMIN.
  */
 export default function SuperAdminOutlet() {
-  if (!isSuperAdminSession()) {
+  if (!canAccessAdminPanelSession()) {
     return <Navigate to="/dashboard" replace />
   }
   return <Outlet />

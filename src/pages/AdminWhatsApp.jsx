@@ -20,16 +20,16 @@ export default function AdminWhatsApp() {
     totalLogs: 0,
   })
 
-  const getStatusBadge = (status) => {
-    switch (status) {
+  const getStatusBadge = (st) => {
+    switch (st) {
       case 'SUCESSO':
-        return <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', backgroundColor: 'rgba(37, 211, 102, 0.1)', color: '#16a34a' }}>SUCESSO</span>
+        return <span className="admin-wa-badge admin-wa-badge--ok">SUCESSO</span>
       case 'IGNORADO':
-        return <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', backgroundColor: 'rgba(234, 179, 8, 0.1)', color: '#ca8a04' }}>IGNORADO</span>
+        return <span className="admin-wa-badge admin-wa-badge--warn">IGNORADO</span>
       case 'ERRO':
-        return <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', backgroundColor: 'rgba(220, 38, 38, 0.1)', color: '#dc2626' }}>ERRO</span>
+        return <span className="admin-wa-badge admin-wa-badge--err">ERRO</span>
       default:
-        return <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', backgroundColor: 'rgba(100, 100, 100, 0.1)', color: '#666' }}>{status}</span>
+        return <span className="admin-wa-badge admin-wa-badge--muted">{st}</span>
     }
   }
 
@@ -81,160 +81,161 @@ export default function AdminWhatsApp() {
   }, [])
 
   return (
-    <div className="dashboard-container app-horizon-shell">
+    <div className="dashboard-container page-admin app-horizon-shell">
       <div className="app-horizon-inner">
-      <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
+        <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content">
-        <header className="top-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <MobileMenuButton onClick={() => setMenuAberto(true)} />
-            <div>
-              <h1 className="responsive-h1" style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                Logs do WhatsApp
-              </h1>
-              <p className="responsive-p" style={{ color: 'var(--text-secondary)' }}>
-                Auditoria de mensagens recebidas pelo BOT
-              </p>
-            </div>
-          </div>
-        </header>
+        <main className="main-content relative z-10 ref-dashboard-main">
+          <div className="ref-dashboard-inner">
+            <header className="ref-dashboard-header">
+              <MobileMenuButton onClick={() => setMenuAberto(true)} />
+              <div className="ref-dashboard-header__lead">
+                <h1 className="ref-dashboard-greeting">
+                  <span className="ref-dashboard-greeting__name">Logs do WhatsApp</span>
+                </h1>
+                <p className="ref-panel__subtitle page-admin-header-sub">
+                  Auditoria de mensagens recebidas pelo BOT
+                </p>
+              </div>
+            </header>
 
-        <section className="content-section" style={{ gridColumn: '1 / -1', marginBottom: '24px', background: 'transparent', border: 'none', boxShadow: 'none', padding: 0 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
-            <div className="kpi-card" style={{ padding: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Integração</p>
-                  <h3 style={{ fontSize: '18px', fontWeight: '700' }}>{status.platform}</h3>
+            <section className="ref-kpi-row page-admin-kpi-row" aria-label="Status da integração">
+              <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
+                <div className="ref-kpi-card__icon" aria-hidden>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                  </svg>
                 </div>
-                <div
-                  style={{
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    backgroundColor: status.online ? '#22c55e' : '#ef4444',
-                    boxShadow: status.online ? '0 0 12px #22c55e' : '0 0 12px #ef4444',
-                    animation: 'pulse 2s infinite',
-                  }}
-                  title={status.online ? 'Conectado' : 'Desconectado'}
-                />
-              </div>
-              <div style={{ marginTop: '16px', fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
-                Status:{' '}
-                <span style={{ color: status.online ? '#22c55e' : '#ef4444', fontWeight: '600' }}>{status.online ? 'CONECTADO' : 'OFFLINE'}</span>
-              </div>
-            </div>
-
-            <div className="kpi-card" style={{ padding: '20px' }}>
-              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Última Atividade</p>
-              <h3 style={{ fontSize: '18px', fontWeight: '700' }}>
-                {status.lastPulse ? new Date(status.lastPulse).toLocaleTimeString('pt-BR') : '--:--'}
-              </h3>
-              <p style={{ marginTop: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
-                {status.lastPulse ? new Date(status.lastPulse).toLocaleDateString('pt-BR') : 'Sem registros recentes'}
-              </p>
-            </div>
-
-            <div className="kpi-card" style={{ padding: '20px' }}>
-              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Total de Mensagens</p>
-              <h3 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--accent)' }}>{status.totalLogs}</h3>
-              <p style={{ marginTop: '4px', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Logs auditados</p>
-            </div>
-          </div>
-        </section>
-
-        {whatsappConfig && (
-          <section className="content-section" style={{ gridColumn: '1 / -1', marginBottom: '20px' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '12px', color: 'var(--text-primary)' }}>URL do webhook (Chipmassa / Telein)</h2>
-            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px', maxWidth: '720px' }}>
-              {whatsappConfig.hint} O número em <strong>Telefone remetente</strong> deve coincidir com o <strong>telefone informado no cadastro da conta</strong> (criação de conta).
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div>
-                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>Com ?token= (recomendado)</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-                  <code
-                    style={{
-                      fontSize: '12px',
-                      padding: '8px 10px',
-                      background: 'var(--bg-secondary, rgba(0,0,0,.06))',
-                      borderRadius: '6px',
-                      wordBreak: 'break-all',
-                      flex: '1',
-                      minWidth: '200px',
-                    }}
-                  >
-                    {whatsappConfig.webhookUrlQuery}
-                  </code>
-                  <button type="button" className="btn-secondary" style={{ padding: '8px 14px', fontSize: '13px' }} onClick={() => copyText('query', whatsappConfig.webhookUrlQuery)}>
-                    Copiar
-                  </button>
+                <div className="ref-kpi-card__body">
+                  <p className="ref-kpi-card__label">Integração</p>
+                  <p className="ref-kpi-card__value page-admin-kpi-platform">{status.platform}</p>
+                  <p className="page-admin-kpi-foot">
+                    <span
+                      className={`page-admin-kpi-dot ${status.online ? 'page-admin-kpi-dot--on' : 'page-admin-kpi-dot--off'}`}
+                      title={status.online ? 'Conectado' : 'Desconectado'}
+                    />
+                    <span className={status.online ? 'page-admin-kpi-conn--on' : 'page-admin-kpi-conn--off'}>
+                      {status.online ? 'CONECTADO' : 'OFFLINE'}
+                    </span>
+                  </p>
                 </div>
-              </div>
-              <div>
-                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>Token no path (alternativa)</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-                  <code
-                    style={{
-                      fontSize: '12px',
-                      padding: '8px 10px',
-                      background: 'var(--bg-secondary, rgba(0,0,0,.06))',
-                      borderRadius: '6px',
-                      wordBreak: 'break-all',
-                      flex: '1',
-                      minWidth: '200px',
-                    }}
-                  >
-                    {whatsappConfig.webhookUrlPath}
-                  </code>
-                  <button type="button" className="btn-secondary" style={{ padding: '8px 14px', fontSize: '13px' }} onClick={() => copyText('path', whatsappConfig.webhookUrlPath)}>
-                    Copiar
-                  </button>
+              </article>
+
+              <article className="ref-kpi-card ref-kpi-card--expense">
+                <div className="ref-kpi-card__icon" aria-hidden>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
                 </div>
-              </div>
-            </div>
-            {copyFeedback && <p style={{ fontSize: '13px', color: 'var(--accent)', marginTop: '10px' }}>Copiado ({copyFeedback}).</p>}
-          </section>
-        )}
+                <div className="ref-kpi-card__body">
+                  <p className="ref-kpi-card__label">Última atividade</p>
+                  <p className="ref-kpi-card__value">
+                    {status.lastPulse ? new Date(status.lastPulse).toLocaleTimeString('pt-BR') : '—:—'}
+                  </p>
+                  <p className="page-admin-kpi-sub">
+                    {status.lastPulse ? new Date(status.lastPulse).toLocaleDateString('pt-BR') : 'Sem registros recentes'}
+                  </p>
+                </div>
+              </article>
 
-        <section className="content-section" style={{ gridColumn: '1 / -1' }}>
-          {error && <div style={{ color: 'var(--danger)', marginBottom: '16px' }}>{error}</div>}
+              <article className="ref-kpi-card ref-kpi-card--income">
+                <div className="ref-kpi-card__icon" aria-hidden>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                </div>
+                <div className="ref-kpi-card__body">
+                  <p className="ref-kpi-card__label">Total de mensagens</p>
+                  <p className="ref-kpi-card__value page-admin-kpi-total">{status.totalLogs}</p>
+                  <p className="page-admin-kpi-sub">Logs auditados</p>
+                </div>
+              </article>
+            </section>
 
-          <div style={{ overflowX: 'auto' }}>
-            {loading ? (
-              <AdminDataTableSkeleton headers={WHATSAPP_LOG_HEADERS} rows={8} />
-            ) : logs.length === 0 ? (
-              <p style={{ color: 'var(--text-secondary)' }}>Nenhuma mensagem processada ainda.</p>
-            ) : (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th style={{ width: '150px' }}>Data</th>
-                    <th>Telefone Remetente</th>
-                    <th style={{ minWidth: '200px' }}>Mensagem Dita</th>
-                    <th>Status</th>
-                    <th>Resultado / Detalhe</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {logs.map((log) => (
-                    <tr key={log.id}>
-                      <td style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{new Date(log.data_hora).toLocaleString('pt-BR')}</td>
-                      <td style={{ fontWeight: '600' }}>{log.telefone_remetente}</td>
-                      <td style={{ maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.mensagem_recebida}>
-                        {log.mensagem_recebida || '(vazio)'}
-                      </td>
-                      <td>{getStatusBadge(log.status)}</td>
-                      <td style={{ fontSize: '13px', color: 'var(--text-secondary)', maxWidth: '250px' }}>{log.detalhe_erro || '-'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            {whatsappConfig && (
+              <article className="ref-panel page-admin-ref-panel" aria-labelledby="wa-webhook-heading">
+                <div className="ref-panel__head">
+                  <div>
+                    <h2 id="wa-webhook-heading" className="ref-panel__title">
+                      URL do webhook (Chipmassa / Telein)
+                    </h2>
+                    <p className="ref-panel__subtitle">
+                      {whatsappConfig.hint} O número em <strong>Telefone remetente</strong> deve coincidir com o{' '}
+                      <strong>telefone informado no cadastro da conta</strong> (criação de conta).
+                    </p>
+                  </div>
+                </div>
+                <div className="page-admin-webhook-body">
+                  <div>
+                    <p className="page-admin-webhook-label">Com ?token= (recomendado)</p>
+                    <div className="page-admin-webhook-row">
+                      <code className="page-admin-code">{whatsappConfig.webhookUrlQuery}</code>
+                      <button type="button" className="btn-secondary page-admin-copy-btn" onClick={() => copyText('query', whatsappConfig.webhookUrlQuery)}>
+                        Copiar
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="page-admin-webhook-label">Token no path (alternativa)</p>
+                    <div className="page-admin-webhook-row">
+                      <code className="page-admin-code">{whatsappConfig.webhookUrlPath}</code>
+                      <button type="button" className="btn-secondary page-admin-copy-btn" onClick={() => copyText('path', whatsappConfig.webhookUrlPath)}>
+                        Copiar
+                      </button>
+                    </div>
+                  </div>
+                  {copyFeedback ? <p className="page-admin-copy-feedback">Copiado ({copyFeedback}).</p> : null}
+                </div>
+              </article>
             )}
+
+            <article className="ref-panel page-admin-ref-panel page-admin-ref-panel--table" aria-labelledby="wa-logs-heading">
+              <div className="ref-panel__head">
+                <div>
+                  <h2 id="wa-logs-heading" className="ref-panel__title">
+                    Mensagens recebidas
+                  </h2>
+                  <p className="ref-panel__subtitle">Histórico auditado do bot</p>
+                </div>
+              </div>
+              {error ? <div className="page-admin-error">{error}</div> : null}
+              <div className="page-admin-table-scroll">
+                {loading ? (
+                  <AdminDataTableSkeleton headers={WHATSAPP_LOG_HEADERS} rows={8} />
+                ) : logs.length === 0 ? (
+                  <p className="page-admin-empty">Nenhuma mensagem processada ainda.</p>
+                ) : (
+                  <table className="data-table page-admin-data-table">
+                    <thead>
+                      <tr>
+                        <th style={{ width: '150px' }}>Data</th>
+                        <th>Telefone remetente</th>
+                        <th style={{ minWidth: '200px' }}>Mensagem dita</th>
+                        <th>Status</th>
+                        <th>Resultado / detalhe</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {logs.map((log) => (
+                        <tr key={log.id}>
+                          <td>{new Date(log.data_hora).toLocaleString('pt-BR')}</td>
+                          <td style={{ fontWeight: 600 }}>{log.telefone_remetente}</td>
+                          <td className="page-admin-td-ellipsis" title={log.mensagem_recebida}>
+                            {log.mensagem_recebida || '(vazio)'}
+                          </td>
+                          <td>{getStatusBadge(log.status)}</td>
+                          <td className="page-admin-td-detail">{log.detalhe_erro || '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </article>
           </div>
-        </section>
-      </main>
+        </main>
       </div>
     </div>
   )

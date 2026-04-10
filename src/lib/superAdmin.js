@@ -15,3 +15,19 @@ export function isSuperAdminSession() {
     return false
   }
 }
+
+/** Perfil com role ADMIN (menu Administração + APIs /api/admin/*). */
+export function isAdminRoleSession() {
+  try {
+    const raw = localStorage.getItem('horizonte_user')
+    if (!raw) return false
+    const u = JSON.parse(raw)
+    return String(u?.role || '').toUpperCase() === 'ADMIN'
+  } catch {
+    return false
+  }
+}
+
+export function canAccessAdminPanelSession() {
+  return isSuperAdminSession() || isAdminRoleSession()
+}

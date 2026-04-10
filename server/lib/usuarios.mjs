@@ -4,6 +4,8 @@ import { resumoPagamentosPorUsuarioIds } from './pagamentos-mp.mjs'
 import { resolverUsuarioIdPorTelefoneGemini } from './ai.mjs'
 import { normalizeUsuarioRow, stripSenha } from './usuario-schema.mjs'
 import { isSuperAdminEmail, superAdminEmail } from './super-admin.mjs'
+import { insertAdminAuditLog } from './admin-audit.mjs'
+import { actorCanAssignAdminRole, normalizeRoleKey } from './admin-role-policy.mjs'
 
 export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
   const supabaseAdmin = getSupabaseAdmin()
@@ -239,35 +241,82 @@ function toAdminUsuarioDto(rawRow, latestByUser, approvedIds) {
   }
 }
 
-/** Lista todos os usuários para o painel admin. */
-export async function listUsuariosAdmin() {
+function escapeIlike(s) {
+  return String(s || '').replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')
+}
+
+async function fetchUsuariosAdminStats(supabaseAdmin) {
+  const nowIso = new Date().toISOString()
+  const [t, a, adm, trial] = await Promise.all([
+    supabaseAdmin.from('usuarios').select('id', { count: 'exact', head: true }),
+    supabaseAdmin.from('usuarios').select('id', { count: 'exact', head: true }).eq('is_active', true),
+    supabaseAdmin.from('usuarios').select('id', { count: 'exact', head: true }).eq('role', 'ADMIN'),
+    supabaseAdmin.from('usuarios').select('id', { count: 'exact', head: true }).gt('trial_ends_at', nowIso),
+  ])
+  return {
+    total: t.count ?? 0,
+    ativos: a.count ?? 0,
+    admins: adm.count ?? 0,
+    trial_ativos: trial.count ?? 0,
+  }
+}
+
+/**
+ * Lista paginada + filtros + totais globais (KPIs).
+ * @param {{ page?: string|number, pageSize?: string|number, q?: string, role?: string, conta?: string }} query
+ */
+export async function listUsuariosAdminPaged(query) {
   const supabaseAdmin = getSupabaseAdmin()
+  const page = Math.max(1, parseInt(String(query.page || '1'), 10) || 1)
+  const pageSize = Math.min(5000, Math.max(1, parseInt(String(query.pageSize || '12'), 10) || 12))
+  const offset = (page - 1) * pageSize
+  const q = String(query.q || '').trim()
+  const role = String(query.role || '').trim().toUpperCase()
+  const conta = String(query.conta || '').trim()
 
-  const res = await supabaseAdmin
-    .from('usuarios')
-    .select('*')
-    .order('email', { ascending: true })
+  let qb = supabaseAdmin.from('usuarios').select('*', { count: 'exact' })
 
+  if (q) {
+    const term = `%${escapeIlike(q)}%`
+    qb = qb.or(`nome.ilike.${term},email.ilike.${term},telefone.ilike.${term}`)
+  }
+  if (role && ['USER', 'ADMIN', 'READONLY'].includes(role)) {
+    qb = qb.eq('role', role)
+  }
+  if (conta === 'ativo') qb = qb.eq('is_active', true)
+  if (conta === 'inativo') qb = qb.eq('is_active', false)
+
+  qb = qb.order('email', { ascending: true }).range(offset, offset + pageSize - 1)
+
+  const res = await qb
   if (res.error) throw res.error
 
   const rawRows = res.data || []
+  const total = typeof res.count === 'number' ? res.count : rawRows.length
   const ids = rawRows.map((r) => r.id).filter(Boolean)
   const { latestByUser, approvedIds } = await resumoPagamentosPorUsuarioIds(ids)
-  return rawRows.map((row) => toAdminUsuarioDto(row, latestByUser, approvedIds))
+  const items = rawRows.map((row) => toAdminUsuarioDto(row, latestByUser, approvedIds))
+  const stats = await fetchUsuariosAdminStats(supabaseAdmin)
+
+  return { items, total, page, pageSize, stats }
 }
 
-export async function updateUsuarioAdmin(id, payload) {
+export async function updateUsuarioAdmin(id, payload, ctx = {}) {
+  const { actorUserId, clientIp } = ctx
   const supabaseAdmin = getSupabaseAdmin()
 
-  const { data: targetRow, error: fetchErr } = await supabaseAdmin
+  const actor = actorUserId ? await getPerfilUsuario(actorUserId) : null
+  const actorEmail = actor?.email
+
+  const { data: beforeRow, error: fetchErr } = await supabaseAdmin
     .from('usuarios')
-    .select('email')
+    .select('*')
     .eq('id', id)
     .single()
-  if (fetchErr || !targetRow) {
+  if (fetchErr || !beforeRow) {
     throw fetchErr || Object.assign(new Error('Usuário não encontrado.'), { statusCode: 404 })
   }
-  const targetEmail = String(targetRow.email || '').trim().toLowerCase()
+  const targetEmail = String(beforeRow.email || '').trim().toLowerCase()
 
   if (payload.email !== undefined) {
     const newEmail = String(payload.email).trim().toLowerCase()
@@ -278,16 +327,18 @@ export async function updateUsuarioAdmin(id, payload) {
     }
   }
   if (payload.role !== undefined) {
-    if (payload.role === 'ADMIN' && targetEmail !== superAdminEmail()) {
-      const e = new Error('Somente a conta administradora principal pode ter role ADMIN.')
+    const newRole = normalizeRoleKey(payload.role)
+    if (newRole === 'ADMIN' && !actorCanAssignAdminRole(actorEmail)) {
+      const e = new Error('Apenas o administrador principal pode atribuir o papel Admin.')
       e.statusCode = 403
       throw e
     }
-    if (targetEmail === superAdminEmail() && payload.role !== 'ADMIN') {
+    if (targetEmail === superAdminEmail() && newRole !== 'ADMIN') {
       const e = new Error('A role da conta administradora principal deve permanecer ADMIN.')
       e.statusCode = 403
       throw e
     }
+    payload = { ...payload, role: newRole }
   }
 
   const patch = {}
@@ -307,17 +358,51 @@ export async function updateUsuarioAdmin(id, payload) {
 
   if (error) throw error
   const mp = await resumoPagamentosPorUsuarioIds([data.id])
-  return toAdminUsuarioDto(data, mp.latestByUser, mp.approvedIds)
+  const dto = toAdminUsuarioDto(data, mp.latestByUser, mp.approvedIds)
+
+  await insertAdminAuditLog({
+    actorUserId: actorUserId || null,
+    action: 'usuario_atualizado',
+    targetUserId: id,
+    targetEmail: beforeRow.email,
+    clientIp: clientIp || null,
+    detail: {
+      antes: {
+        nome: beforeRow.nome,
+        email: beforeRow.email,
+        role: beforeRow.role,
+        is_active: beforeRow.is_active,
+        isento_pagamento: beforeRow.isento_pagamento,
+      },
+      depois: {
+        nome: data.nome,
+        email: data.email,
+        role: data.role,
+        is_active: data.is_active,
+        isento_pagamento: data.isento_pagamento,
+      },
+    },
+  })
+
+  return dto
 }
 
-export async function deleteUsuarioAdmin(id) {
+export async function deleteUsuarioAdmin(id, ctx = {}) {
+  const { actorUserId, clientIp } = ctx
   const supabaseAdmin = getSupabaseAdmin()
-  const { data: t } = await supabaseAdmin.from('usuarios').select('email').eq('id', id).single()
+  const { data: t } = await supabaseAdmin.from('usuarios').select('id, email').eq('id', id).single()
   if (t?.email && isSuperAdminEmail(t.email)) {
     const e = new Error('Não é possível excluir a conta administradora principal.')
     e.statusCode = 403
     throw e
   }
+  await insertAdminAuditLog({
+    actorUserId: actorUserId || null,
+    action: 'usuario_excluido',
+    targetUserId: id,
+    targetEmail: t?.email || null,
+    clientIp: clientIp || null,
+  })
   const { error } = await supabaseAdmin.from('usuarios').delete().eq('id', id)
   if (error) throw error
 }

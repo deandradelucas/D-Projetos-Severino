@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
+import { apiUrl } from '../lib/apiUrl'
+import { formatPhoneBRDisplay } from '../lib/formatPhoneBR'
 import { isSuperAdminEmail } from '../lib/superAdmin'
 import './dashboard.css'
 
@@ -9,7 +12,7 @@ const USUARIOS_TABLE_HEADERS = [
   'Nome',
   'E-mail',
   'Telefone',
-  'Role',
+  'Papel',
   'Conta',
   'Assinatura / pagamento',
   'Último acesso',
@@ -22,7 +25,25 @@ const ROLE_OPTIONS = [
   { value: 'READONLY', label: 'Somente leitura' },
 ]
 
-const ROLE_OPTIONS_SEM_ADMIN = ROLE_OPTIONS.filter((o) => o.value !== 'ADMIN')
+function normalizeRoleKey(role) {
+  return String(role || 'USER').trim().toUpperCase()
+}
+
+/** Rótulo amigável: Admin, Usuário ou Somente leitura (não o código cru USER/ADMIN). */
+function roleDisplayLabel(role) {
+  const key = normalizeRoleKey(role)
+  const opt = ROLE_OPTIONS.find((o) => o.value === key)
+  return opt ? opt.label : key
+}
+
+function rolePillClassName(role) {
+  const k = normalizeRoleKey(role)
+  if (k === 'ADMIN') return 'page-admin-role-pill page-admin-role-pill--admin'
+  if (k === 'READONLY') return 'page-admin-role-pill page-admin-role-pill--readonly'
+  return 'page-admin-role-pill page-admin-role-pill--user'
+}
+
+const PAGE_SIZE = 12
 
 function mpStatusLabel(status) {
   if (!status) return '—'
@@ -167,37 +188,85 @@ export default function AdminUsuarios() {
   const [editingUserId, setEditingUserId] = useState(null)
   const [editForm, setEditForm] = useState({})
   const [userFilter, setUserFilter] = useState('')
+  const [filterRole, setFilterRole] = useState('')
+  const [filterConta, setFilterConta] = useState('')
+  const [page, setPage] = useState(1)
   const [userActionMessage, setUserActionMessage] = useState('')
   const [loadError, setLoadError] = useState('')
 
-  useEffect(() => {
-    const load = async () => {
-      setLoadingUsuarios(true)
-      setLoadError('')
-      try {
-        const userSaved = localStorage.getItem('horizonte_user')
-        if (!userSaved) {
-          setLoadError('Faça login para carregar os usuários.')
-          return
-        }
-        const u = JSON.parse(userSaved)
-        const res = await fetch('/api/admin/usuarios', { headers: { 'x-user-id': u.id } })
-        const data = await res.json().catch(() => ({}))
-        if (res.ok) {
-          setUsuarios(Array.isArray(data) ? data : [])
-        } else {
-          setUsuarios([])
-          setLoadError(data.message || `Erro ao buscar usuários (${res.status}).`)
-        }
-      } catch (e) {
-        setUsuarios([])
-        setLoadError(e.message || 'Falha de rede ao carregar usuários.')
-      } finally {
-        setLoadingUsuarios(false)
+  const refreshUsuarios = useCallback(async () => {
+    setLoadingUsuarios(true)
+    setLoadError('')
+    try {
+      const userSaved = localStorage.getItem('horizonte_user')
+      if (!userSaved) {
+        setLoadError('Faça login para carregar os usuários.')
+        return
       }
+      const u = JSON.parse(userSaved)
+      const res = await fetch(apiUrl('/api/admin/usuarios'), { headers: { 'x-user-id': u.id } })
+      const data = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setUsuarios(Array.isArray(data) ? data : [])
+      } else {
+        setUsuarios([])
+        setLoadError(data.message || `Erro ao buscar usuários (${res.status}).`)
+      }
+    } catch (e) {
+      setUsuarios([])
+      setLoadError(e.message || 'Falha de rede ao carregar usuários.')
+    } finally {
+      setLoadingUsuarios(false)
     }
-    load()
   }, [])
+
+  useEffect(() => {
+    void refreshUsuarios()
+  }, [refreshUsuarios])
+
+  useEffect(() => {
+    setPage(1)
+  }, [userFilter, filterRole, filterConta])
+
+  const usuariosFiltrados = useMemo(() => {
+    let list = usuarios
+    const termo = userFilter.trim().toLowerCase()
+    if (termo) {
+      list = list.filter((u) => {
+        return (
+          String(u.email || '').toLowerCase().includes(termo) ||
+          String(u.nome || '').toLowerCase().includes(termo) ||
+          String(u.telefone || '').toLowerCase().includes(termo)
+        )
+      })
+    }
+    if (filterRole) {
+      list = list.filter((u) => normalizeRoleKey(u.role) === filterRole)
+    }
+    if (filterConta === 'ativo') {
+      list = list.filter((u) => u.is_active !== false)
+    } else if (filterConta === 'inativo') {
+      list = list.filter((u) => u.is_active === false)
+    }
+    return list
+  }, [usuarios, userFilter, filterRole, filterConta])
+
+  const totalFiltrados = usuariosFiltrados.length
+  const totalPages = Math.max(1, Math.ceil(totalFiltrados / PAGE_SIZE))
+
+  useEffect(() => {
+    setPage((p) => Math.min(p, totalPages))
+  }, [totalPages])
+
+  const pageSafe = Math.min(page, totalPages)
+  const start = (pageSafe - 1) * PAGE_SIZE
+  const pageRows = usuariosFiltrados.slice(start, start + PAGE_SIZE)
+
+  const clearFilters = () => {
+    setUserFilter('')
+    setFilterRole('')
+    setFilterConta('')
+  }
 
   const handleEditUser = (user) => {
     setEditingUserId(user.id)
@@ -205,7 +274,7 @@ export default function AdminUsuarios() {
       nome: user.nome || '',
       email: user.email || '',
       telefone: user.telefone || '',
-      role: user.role || 'USER',
+      role: normalizeRoleKey(user.role),
       is_active: user.is_active !== false,
       isento_pagamento: user.isento_pagamento === true,
     })
@@ -228,7 +297,7 @@ export default function AdminUsuarios() {
       if (!userSaved) throw new Error('Sessão expirada.')
       const u = JSON.parse(userSaved)
 
-      const res = await fetch(`/api/admin/usuarios/${editingUserId}`, {
+      const res = await fetch(apiUrl(`/api/admin/usuarios/${editingUserId}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -257,7 +326,7 @@ export default function AdminUsuarios() {
       if (!userSaved) throw new Error('Sessão expirada.')
       const u = JSON.parse(userSaved)
 
-      const res = await fetch(`/api/admin/usuarios/${user.id}`, {
+      const res = await fetch(apiUrl(`/api/admin/usuarios/${user.id}`), {
         method: 'DELETE',
         headers: { 'x-user-id': u.id },
       })
@@ -277,7 +346,7 @@ export default function AdminUsuarios() {
 
   const handleResetPassword = async (user) => {
     try {
-      const res = await fetch('/api/auth/request-password-reset', {
+      const res = await fetch(apiUrl('/api/auth/request-password-reset'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email }),
@@ -288,18 +357,6 @@ export default function AdminUsuarios() {
     } catch (e) {
       setUserActionMessage(e.message)
     }
-  }
-
-  const filtrarUsuarios = () => {
-    const termo = userFilter.trim().toLowerCase()
-    if (!termo) return usuarios
-    return usuarios.filter((u) => {
-      return (
-        String(u.email || '').toLowerCase().includes(termo) ||
-        String(u.nome || '').toLowerCase().includes(termo) ||
-        String(u.telefone || '').toLowerCase().includes(termo)
-      )
-    })
   }
 
   const getUserConnectionBadge = (user) => {
@@ -324,238 +381,298 @@ export default function AdminUsuarios() {
   }
 
   return (
-    <div className="dashboard-container page-admin-usuarios app-horizon-shell">
+    <div className="dashboard-container page-admin page-admin-usuarios app-horizon-shell">
       <div className="app-horizon-inner">
-      <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
+        <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content">
-        <header className="top-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <MobileMenuButton onClick={() => setMenuAberto(true)} />
-            <div>
-              <h1 className="responsive-h1" style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                Logs de usuários
-              </h1>
-              <p className="responsive-p" style={{ color: 'var(--text-secondary)' }}>
-                Último login, papéis e gestão de contas
+        <main className="main-content relative z-10 ref-dashboard-main">
+          <div className="ref-dashboard-inner">
+            <header className="ref-dashboard-header">
+              <MobileMenuButton onClick={() => setMenuAberto(true)} />
+              <div className="ref-dashboard-header__lead">
+                <h1 className="ref-dashboard-greeting">
+                  <span className="ref-dashboard-greeting__name">Usuários</span>
+                </h1>
+                <p className="ref-panel__subtitle page-admin-header-sub">
+                  Último login, papéis e gestão de contas
+                </p>
+              </div>
+            </header>
+
+            <article
+              className="ref-panel page-admin-ref-panel page-admin-ref-panel--table page-admin-usuarios-panel"
+              aria-labelledby="admin-users-heading"
+            >
+              <div className="ref-panel__head page-admin-usuarios-panel-head">
+                <div>
+                  <h2 id="admin-users-heading" className="ref-panel__title">
+                    Cadastros e acessos
+                  </h2>
+                  <p className="ref-panel__subtitle page-admin-usuarios-intro">
+                    Filtre por texto, papel e status da conta. Edite linhas, redefina senha ou exclua contas (exceto a administradora principal).
+                  </p>
+                </div>
+                <div className="page-admin-usuarios-head-actions">
+                  <Link to="/cadastro" className="btn-secondary page-admin-btn-novo-cadastro">
+                    Nova conta
+                  </Link>
+                </div>
+              </div>
+
+              {loadError ? <div className="page-admin-alert">{loadError}</div> : null}
+              {userActionMessage ? <div className="page-admin-toast-msg">{userActionMessage}</div> : null}
+
+              <div className="page-admin-users-toolbar page-admin-users-toolbar--grid">
+                <div className="page-admin-search-wrap">
+                  <span className="page-admin-search-icon" aria-hidden>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="m21 21-4.3-4.3" />
+                    </svg>
+                  </span>
+                  <input
+                    type="search"
+                    className="page-admin-filter-input page-admin-filter-input--search"
+                    placeholder="Buscar nome, e-mail ou telefone…"
+                    value={userFilter}
+                    onChange={(e) => setUserFilter(e.target.value)}
+                    autoComplete="off"
+                  />
+                </div>
+                <label className="page-admin-filter-label">
+                  <span>Papel</span>
+                  <select
+                    className="page-admin-filter-select"
+                    value={filterRole}
+                    onChange={(e) => setFilterRole(e.target.value)}
+                  >
+                    <option value="">Todos</option>
+                    {ROLE_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="page-admin-filter-label">
+                  <span>Conta</span>
+                  <select className="page-admin-filter-select" value={filterConta} onChange={(e) => setFilterConta(e.target.value)}>
+                    <option value="">Todas</option>
+                    <option value="ativo">Ativa</option>
+                    <option value="inativo">Desativada</option>
+                  </select>
+                </label>
+                <div className="page-admin-toolbar-btns">
+                  <button type="button" className="btn-secondary page-admin-toolbar-btn" disabled={loadingUsuarios} onClick={() => void refreshUsuarios()}>
+                    {loadingUsuarios ? 'Atualizando…' : 'Atualizar lista'}
+                  </button>
+                  <button type="button" className="btn-secondary page-admin-toolbar-btn" onClick={clearFilters}>
+                    Limpar filtros
+                  </button>
+                </div>
+              </div>
+
+              <p className="page-admin-usuarios-meta" aria-live="polite">
+                {loadingUsuarios
+                  ? 'Carregando…'
+                  : `${totalFiltrados} ${totalFiltrados === 1 ? 'usuário' : 'usuários'}${totalFiltrados !== usuarios.length ? ` (de ${usuarios.length} no total)` : ''}`}
               </p>
-            </div>
-          </div>
-        </header>
 
-        <section className="content-section" style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-            Veja quem está conectado, ajuste papéis (roles), ative ou desative contas, edite dados e envie links de redefinição de senha.
-          </p>
-
-          {loadError && (
-            <div style={{ marginBottom: '12px', padding: '10px 12px', borderRadius: '8px', background: 'rgba(239,68,68,0.12)', color: '#b91c1c', fontSize: '14px' }}>
-              {loadError}
-            </div>
-          )}
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
-            <input
-              type="text"
-              placeholder="Filtrar por nome, e-mail ou telefone..."
-              value={userFilter}
-              onChange={(e) => setUserFilter(e.target.value)}
-              style={{
-                flex: '1',
-                minWidth: '200px',
-                padding: '8px 10px',
-                borderRadius: '8px',
-                border: '1px solid rgba(148,163,184,0.4)',
-                background: 'var(--bg-secondary)',
-                color: 'var(--text-primary)',
-                fontSize: '13px',
-              }}
-            />
-            {userActionMessage && (
-              <span style={{ fontSize: '12px', color: 'var(--accent)' }}>{userActionMessage}</span>
-            )}
-          </div>
-
-          {loadingUsuarios ? (
-            <AdminDataTableSkeleton headers={USUARIOS_TABLE_HEADERS} rows={10} tableClassName="admin-usuarios-table" />
-          ) : usuarios.length === 0 ? (
-            <p style={{ color: 'var(--text-secondary)' }}>Nenhum usuário encontrado.</p>
-          ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table className="admin-usuarios-table">
-                <thead>
-                  <tr>
-                    <th className="cell-nome">Nome</th>
-                    <th className="cell-email">E-mail</th>
-                    <th className="cell-fone">Telefone</th>
-                    <th>Role</th>
-                    <th>Conta</th>
-                    <th className="cell-assinatura">Assinatura / pagamento</th>
-                    <th className="cell-acesso">Último acesso</th>
-                    <th className="cell-acoes">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtrarUsuarios().map((row) => {
-                    const isEditing = editingUserId === row.id
-                    const isPrincipal = isSuperAdminEmail(row.email)
-                    return (
-                      <tr key={row.id}>
-                        <td className="cell-nome">
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              value={editForm.nome}
-                              onChange={(e) => handleChangeField('nome', e.target.value)}
-                              style={{ width: '100%', fontSize: '13px' }}
-                            />
-                          ) : (
-                            <span style={{ fontWeight: '600' }}>{row.nome || '—'}</span>
-                          )}
-                        </td>
-                        <td className="cell-email">
-                          {isEditing ? (
-                            <input
-                              type="email"
-                              value={editForm.email}
-                              onChange={(e) => handleChangeField('email', e.target.value)}
-                              style={{ width: '100%', fontSize: '13px' }}
-                              disabled={isPrincipal}
-                              title={isPrincipal ? 'E-mail da conta administradora principal não pode ser alterado.' : undefined}
-                            />
-                          ) : (
-                            <span title={row.email}>{row.email}</span>
-                          )}
-                        </td>
-                        <td className="cell-fone">
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              value={editForm.telefone}
-                              onChange={(e) => handleChangeField('telefone', e.target.value)}
-                              style={{ width: '100%', fontSize: '13px' }}
-                            />
-                          ) : (
-                            row.telefone || '—'
-                          )}
-                        </td>
-                        <td>
-                          {isEditing ? (
-                            isPrincipal ? (
-                              <span style={{ fontSize: '12px', fontWeight: '600' }} title="A conta principal permanece como administradora.">
-                                Admin
-                              </span>
-                            ) : (
-                              <select
-                                value={editForm.role === 'ADMIN' ? 'USER' : editForm.role}
-                                onChange={(e) => handleChangeField('role', e.target.value)}
-                                style={{ fontSize: '13px' }}
-                              >
-                                {ROLE_OPTIONS_SEM_ADMIN.map((opt) => (
-                                  <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                  </option>
-                                ))}
-                              </select>
-                            )
-                          ) : (
-                            <span style={{ fontSize: '12px', fontWeight: '600' }}>{row.role || 'USER'}</span>
-                          )}
-                        </td>
-                        <td style={{ whiteSpace: 'nowrap' }}>
-                          {isEditing ? (
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
-                              <input
-                                type="checkbox"
-                                checked={editForm.is_active}
-                                onChange={(e) => handleChangeField('is_active', e.target.checked)}
-                              />
-                              Ativo
-                            </label>
-                          ) : row.is_active === false ? (
-                            <span
-                              style={{
-                                padding: '4px 8px',
-                                borderRadius: '999px',
-                                fontSize: '11px',
-                                fontWeight: '600',
-                                backgroundColor: 'rgba(239,68,68,0.16)',
-                                color: '#ef4444',
-                              }}
-                            >
-                              Desativado
-                            </span>
-                          ) : (
-                            <span
-                              style={{
-                                padding: '4px 8px',
-                                borderRadius: '999px',
-                                fontSize: '11px',
-                                fontWeight: '600',
-                                backgroundColor: 'rgba(34,197,94,0.16)',
-                                color: '#22c55e',
-                              }}
-                            >
-                              Ativo
-                            </span>
-                          )}
-                        </td>
-                        <td className="cell-assinatura">
-                          <AssinaturaPagamentoCell
-                            row={row}
-                            isEditing={isEditing}
-                            editForm={editForm}
-                            onField={handleChangeField}
-                          />
-                        </td>
-                        <td className="cell-acesso">
-                          <UltimoAcessoCell row={row} getUserConnectionBadge={getUserConnectionBadge} />
-                        </td>
-                        <td className="cell-acoes">
-                          <div className="admin-acoes-btns">
-                            {isEditing ? (
-                              <>
-                                <button type="button" className="btn-primary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={handleSaveUser}>
-                                  Salvar
-                                </button>
-                                <button type="button" className="btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={handleCancelEdit}>
-                                  Cancelar
-                                </button>
-                              </>
-                            ) : (
-                              <button type="button" className="btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={() => handleEditUser(row)}>
-                                Editar
-                              </button>
-                            )}
-                            <button
-                              type="button"
-                              className="btn-secondary"
-                              style={{ padding: '4px 8px', fontSize: '11px' }}
-                              onClick={() => handleResetPassword(row)}
-                            >
-                              Resetar senha
-                            </button>
-                            {!isPrincipal && (
-                              <button
-                                type="button"
-                                className="btn-secondary"
-                                style={{ padding: '4px 8px', fontSize: '11px', color: '#ef4444', borderColor: 'rgba(239,68,68,0.6)' }}
-                                onClick={() => handleDeleteUser(row)}
-                              >
-                                Excluir
-                              </button>
-                            )}
-                          </div>
-                        </td>
+              <div className="page-admin-table-scroll">
+                {loadingUsuarios ? (
+                  <AdminDataTableSkeleton headers={USUARIOS_TABLE_HEADERS} rows={10} tableClassName="admin-usuarios-table" />
+                ) : usuarios.length === 0 ? (
+                  <p className="page-admin-empty">Nenhum usuário encontrado.</p>
+                ) : totalFiltrados === 0 ? (
+                  <p className="page-admin-empty">Nenhum resultado com os filtros atuais.</p>
+                ) : (
+                  <table className="admin-usuarios-table">
+                    <thead>
+                      <tr>
+                        <th className="cell-nome">Nome</th>
+                        <th className="cell-email">E-mail</th>
+                        <th className="cell-fone">Telefone</th>
+                        <th>Papel</th>
+                        <th>Conta</th>
+                        <th className="cell-assinatura">Assinatura / pagamento</th>
+                        <th className="cell-acesso">Último acesso</th>
+                        <th className="cell-acoes">Ações</th>
                       </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-      </main>
+                    </thead>
+                    <tbody>
+                      {pageRows.map((row) => {
+                        const isEditing = editingUserId === row.id
+                        const isPrincipal = isSuperAdminEmail(row.email)
+                        return (
+                          <tr key={row.id}>
+                            <td className="cell-nome">
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={editForm.nome}
+                                  onChange={(e) => handleChangeField('nome', e.target.value)}
+                                  className="page-admin-inline-input"
+                                />
+                              ) : (
+                                <span className="page-admin-cell-strong">{row.nome || '—'}</span>
+                              )}
+                            </td>
+                            <td className="cell-email">
+                              {isEditing ? (
+                                <input
+                                  type="email"
+                                  value={editForm.email}
+                                  onChange={(e) => handleChangeField('email', e.target.value)}
+                                  className="page-admin-inline-input"
+                                  disabled={isPrincipal}
+                                  title={isPrincipal ? 'E-mail da conta administradora principal não pode ser alterado.' : undefined}
+                                />
+                              ) : (
+                                <span title={row.email}>{row.email}</span>
+                              )}
+                            </td>
+                            <td className="cell-fone">
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={editForm.telefone}
+                                  onChange={(e) => handleChangeField('telefone', e.target.value)}
+                                  className="page-admin-inline-input"
+                                  placeholder="DDD + número"
+                                />
+                              ) : (
+                                formatPhoneBRDisplay(row.telefone)
+                              )}
+                            </td>
+                            <td>
+                              {isEditing ? (
+                                isPrincipal ? (
+                                  <span
+                                    className={rolePillClassName('ADMIN')}
+                                    title="A conta principal permanece como administradora."
+                                  >
+                                    {roleDisplayLabel('ADMIN')}
+                                  </span>
+                                ) : (
+                                  <select
+                                    className="page-admin-filter-select page-admin-filter-select--inline"
+                                    value={editForm.role || 'USER'}
+                                    onChange={(e) => handleChangeField('role', e.target.value)}
+                                  >
+                                    {ROLE_OPTIONS.map((opt) => (
+                                      <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                )
+                              ) : (
+                                <span className={rolePillClassName(isPrincipal ? 'ADMIN' : row.role)}>
+                                  {roleDisplayLabel(isPrincipal ? 'ADMIN' : row.role)}
+                                </span>
+                              )}
+                            </td>
+                            <td>
+                              {isEditing ? (
+                                <label className="page-admin-checkbox-ativo">
+                                  <input
+                                    type="checkbox"
+                                    checked={editForm.is_active}
+                                    onChange={(e) => handleChangeField('is_active', e.target.checked)}
+                                  />
+                                  Ativo
+                                </label>
+                              ) : row.is_active === false ? (
+                                <span className="admin-badge-conta admin-badge-conta--off">Desativado</span>
+                              ) : (
+                                <span className="admin-badge-conta admin-badge-conta--on">Ativo</span>
+                              )}
+                            </td>
+                            <td className="cell-assinatura">
+                              <AssinaturaPagamentoCell
+                                row={row}
+                                isEditing={isEditing}
+                                editForm={editForm}
+                                onField={handleChangeField}
+                              />
+                            </td>
+                            <td className="cell-acesso">
+                              <UltimoAcessoCell row={row} getUserConnectionBadge={getUserConnectionBadge} />
+                            </td>
+                            <td className="cell-acoes">
+                              <div className="admin-acoes-btns">
+                                {isEditing ? (
+                                  <>
+                                    <button type="button" className="btn-primary admin-acoes-btn" onClick={handleSaveUser}>
+                                      Salvar
+                                    </button>
+                                    <button type="button" className="btn-secondary admin-acoes-btn" onClick={handleCancelEdit}>
+                                      Cancelar
+                                    </button>
+                                  </>
+                                ) : (
+                                  <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleEditUser(row)}>
+                                    Editar
+                                  </button>
+                                )}
+                                <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleResetPassword(row)}>
+                                  Senha
+                                </button>
+                                {isPrincipal ? (
+                                  <span
+                                    className="admin-acoes-protegido"
+                                    title="A conta administradora principal não pode ser excluída pelo painel."
+                                  >
+                                    Protegido
+                                  </span>
+                                ) : (
+                                  <button type="button" className="btn-secondary admin-acoes-btn admin-acoes-btn--danger" onClick={() => handleDeleteUser(row)}>
+                                    Excluir
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              {!loadingUsuarios && totalFiltrados > 0 ? (
+                <nav className="page-admin-pagination" aria-label="Paginação da lista de usuários">
+                  <span className="page-admin-pagination-info">
+                    {totalFiltrados === 0
+                      ? '—'
+                      : `${start + 1}–${Math.min(start + PAGE_SIZE, totalFiltrados)} de ${totalFiltrados}`}
+                  </span>
+                  <div className="page-admin-pagination-btns">
+                    <button
+                      type="button"
+                      className="btn-secondary page-admin-page-btn"
+                      disabled={pageSafe <= 1}
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    >
+                      Anterior
+                    </button>
+                    <span className="page-admin-page-indicator">
+                      Página {pageSafe} / {totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      className="btn-secondary page-admin-page-btn"
+                      disabled={pageSafe >= totalPages}
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    >
+                      Próxima
+                    </button>
+                  </div>
+                </nav>
+              ) : null}
+            </article>
+          </div>
+        </main>
       </div>
     </div>
   )
