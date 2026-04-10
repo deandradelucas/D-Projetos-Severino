@@ -40,6 +40,10 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks(id) {
             if (!id.includes('node_modules')) return
+            if (id.includes('react-router')) return 'vendor-router'
+            if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
+              return 'vendor-react'
+            }
             if (id.includes('recharts')) return 'vendor-recharts'
             if (id.includes('jspdf')) return 'vendor-jspdf'
             if (id.includes('html2canvas') || id.includes('canvg')) return 'vendor-canvas'
