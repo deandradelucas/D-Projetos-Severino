@@ -5968,11 +5968,6 @@ body[data-theme='light'] .page-configuracoes.app-horizon-shell .page-configuraco
   text-transform: none;
 }
 
-body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-header-export {
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
 body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-charts {
   gap: 14px;
   margin-bottom: 0;
