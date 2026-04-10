@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { isSuperAdminSession } from '../lib/superAdmin'
 import { navPrefetchHandlers } from '../lazyRoutes'
@@ -22,6 +22,8 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const location = useLocation()
   const prevMenuIdx = useRef(-1)
   const [dotMotion, setDotMotion] = useState(null)
+  const navMenuRef = useRef(null)
+  const [activeDotTop, setActiveDotTop] = useState(null)
   const principalAdmin = isSuperAdminSession()
 
   useEffect(() => {
@@ -39,6 +41,33 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     }
     prevMenuIdx.current = idx
   }, [location.pathname])
+
+  useLayoutEffect(() => {
+    const ul = navMenuRef.current
+    if (!ul) return
+
+    const measure = () => {
+      const active = ul.querySelector('.nav-item.active')
+      if (!active) {
+        setActiveDotTop(null)
+        return
+      }
+      const ulRect = ul.getBoundingClientRect()
+      const linkRect = active.getBoundingClientRect()
+      const center = linkRect.top - ulRect.top + linkRect.height / 2
+      setActiveDotTop(center)
+    }
+
+    measure()
+    window.addEventListener('resize', measure)
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null
+    ro?.observe(ul)
+
+    return () => {
+      window.removeEventListener('resize', measure)
+      ro?.disconnect()
+    }
+  }, [location.pathname, menuAberto, principalAdmin])
 
   const logoSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
   return (
@@ -66,8 +95,14 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
         </div>
 
         <ul
+          ref={navMenuRef}
           className="nav-menu"
           data-dot-motion={dotMotion || undefined}
+          style={
+            activeDotTop == null
+              ? undefined
+              : { '--sidebar-nav-dot-y': `${activeDotTop}px`, '--sidebar-nav-dot-visible': '1' }
+          }
         >
           <li>
             <NavLink 

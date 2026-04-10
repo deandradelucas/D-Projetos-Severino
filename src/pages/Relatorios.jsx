@@ -85,7 +85,7 @@ function RelatoriosTooltip({ active, payload, label, formatCurrency }) {
 
 export default function Relatorios() {
   const { privacyMode, theme } = useTheme()
-  const chartMono = theme === 'off-white'
+  const chartMono = theme === 'dark'
   const [usuario] = useState(() => {
     const saved = localStorage.getItem('horizonte_user')
     if (saved) {

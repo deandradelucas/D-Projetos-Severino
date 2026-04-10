@@ -6,7 +6,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
 
 export default function Configuracoes() {
-  const { privacyMode, togglePrivacy } = useTheme()
+  const { theme, setTheme, privacyMode, togglePrivacy } = useTheme()
   const [menuAberto, setMenuAberto] = useState(false)
 
   const [perfil, setPerfil] = useState(() => {
@@ -177,6 +177,38 @@ export default function Configuracoes() {
               </svg>
               Preferências
             </h2>
+            <div className="config-theme-picker-block">
+              <div className="config-pref-label config-pref-label--block">
+                <strong>Aparência</strong>
+                <span>Tema claro ou escuro em todo o aplicativo (salvo neste navegador)</span>
+              </div>
+              <div className="config-themes" role="group" aria-label="Tema da interface">
+                <button
+                  type="button"
+                  className={`config-theme-card ${theme === 'light' ? 'is-active' : ''}`}
+                  onClick={() => setTheme('light')}
+                  aria-pressed={theme === 'light'}
+                >
+                  <div className="config-theme-preview config-theme-preview--light" aria-hidden />
+                  <div className="config-theme-body">
+                    <h4>Claro</h4>
+                    <p>Interface clara e fundo Horizonte.</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  className={`config-theme-card ${theme === 'dark' ? 'is-active' : ''}`}
+                  onClick={() => setTheme('dark')}
+                  aria-pressed={theme === 'dark'}
+                >
+                  <div className="config-theme-preview config-theme-preview--dark" aria-hidden />
+                  <div className="config-theme-body">
+                    <h4>Escuro</h4>
+                    <p>Modo escuro para ambientes com pouca luz.</p>
+                  </div>
+                </button>
+              </div>
+            </div>
             <div className="config-pref-row">
               <div className="config-pref-label">
                 <strong>Modo privacidade</strong>
