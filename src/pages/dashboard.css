@@ -991,6 +991,35 @@ h3 {
       0 16px 40px -24px rgba(15, 23, 42, 0.12);
   }
 
+  /* Contraste extra no celular (temas escuros / vidro / off-white) */
+  [data-theme='dark'] .main-content,
+  [data-theme='cyberpunk'] .main-content,
+  [data-theme='glass'] .main-content {
+    border-color: rgba(255, 255, 255, 0.11);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+      0 16px 44px -20px rgba(0, 0, 0, 0.72);
+  }
+
+  [data-theme='off-white'] .main-content {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  [data-theme='dark'] .main-content .filter-input,
+  [data-theme='cyberpunk'] .main-content .filter-input,
+  [data-theme='glass'] .main-content .filter-input,
+  [data-theme='off-white'] .main-content .filter-input {
+    background: rgba(255, 255, 255, 0.07) !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+  }
+
+  [data-theme='dark'] .main-content .filter-group label,
+  [data-theme='cyberpunk'] .main-content .filter-group label,
+  [data-theme='glass'] .main-content .filter-group label,
+  [data-theme='off-white'] .main-content .filter-group label {
+    color: #b8c0cd;
+  }
+
   .mobile-menu-btn {
     display: flex;
     align-items: center;
@@ -2163,9 +2192,23 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
     margin-bottom: 16px;
   }
 
+  .page-transacoes.app-horizon-shell .ref-dashboard-header,
+  .page-relatorios.app-horizon-shell .ref-dashboard-header {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    gap: 10px;
+  }
+
+  .page-relatorios.app-horizon-shell .page-relatorios-header-sub {
+    font-size: 13px;
+    line-height: 1.45;
+    margin-top: 4px;
+  }
+
   .page-relatorios.app-horizon-shell .relatorios-filter-grid,
   .page-relatorios.app-horizon-shell .page-relatorios-filter-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .page-relatorios.app-horizon-shell .relatorios-filter-grid__wide {
@@ -2174,6 +2217,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
 
   .page-transacoes.app-horizon-shell .page-transacoes-filter-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .page-transacoes.app-horizon-shell .transacoes-filter-grid__search {
@@ -2182,6 +2226,19 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
 
   .page-transacoes.app-horizon-shell .page-transacoes-tx-list {
     -webkit-overflow-scrolling: touch;
+  }
+
+  .page-relatorios.app-horizon-shell .relatorios-charts {
+    gap: 22px;
+    margin-bottom: 24px;
+  }
+
+  .page-relatorios .relatorios-charts__section-title {
+    letter-spacing: 0.1em;
+  }
+
+  .page-relatorios .relatorios-chart-card__body {
+    padding: 8px 6px 12px 4px;
   }
 }
 
