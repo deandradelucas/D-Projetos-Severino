@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
 import { BRAND_ASSETS } from '../lib/brandAssets'
+import { useTheme } from '../context/ThemeContext'
 
 /** Ordem vertical no menu (índice sobe/desce a bolinha) */
 const MENU_ORDER = [
@@ -17,6 +18,7 @@ const MENU_ORDER = [
 ]
 
 export default function Sidebar({ menuAberto, setMenuAberto }) {
+  const { theme } = useTheme()
   const location = useLocation()
   const prevMenuIdx = useRef(-1)
   const [dotMotion, setDotMotion] = useState(null)
@@ -83,7 +85,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     }
   }, [location.pathname, menuAberto, showAdminNav, sessionBump])
 
-  const logoSrc = BRAND_ASSETS.logoOnLight
+  const logoSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
   return (
     <>
       {/* Mobile Backdrop */}
@@ -93,10 +95,11 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
 
       <aside className={`sidebar ${menuAberto ? 'open' : ''}`}>
         <div className="brand-wrapper">
-          <img 
-            src={logoSrc} 
-            alt="Horizonte Financeiro" 
-            className="brand-logo" 
+          <img
+            key={logoSrc}
+            src={logoSrc}
+            alt="Horizonte Financeiro"
+            className="brand-logo"
           />
           <button
             type="button"

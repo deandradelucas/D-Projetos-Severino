@@ -66,7 +66,7 @@ export default function Background() {
   if (settingsPlainBg) {
     return (
       <div
-        className={`app-background-root app-background-root--plain${theme === 'dark' ? ' app-background-root--plain-dark' : ' app-background-root--plain-light'}`}
+        className={`app-background-root app-background-root--plain${theme === 'light' ? ' app-background-root--plain-light' : ' app-background-root--plain-dark'}`}
         aria-hidden
       >
         <div className="app-background-root__plain-fill" />
@@ -84,9 +84,11 @@ export default function Background() {
       />
       <div
         className={
-          theme === 'dark'
-            ? 'app-background-root__tint app-background-root__tint--dark'
-            : 'app-background-root__tint app-background-root__tint--light'
+          theme === 'glass'
+            ? 'app-background-root__tint app-background-root__tint--glass'
+            : theme === 'dark'
+              ? 'app-background-root__tint app-background-root__tint--dark'
+              : 'app-background-root__tint app-background-root__tint--light'
         }
       />
       <div

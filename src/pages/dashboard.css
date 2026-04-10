@@ -1,4 +1,8 @@
 @import './dashboard-theme-dark-mirror.css';
+@import './dashboard-theme-dark-polish.css';
+@import './dashboard-theme-glass-mirror.css';
+@import './dashboard-theme-glass-polish.css';
+@import './dashboard-theme-glass-effects.css';
 
 /* Default Reset & Variables (Light Mode Glassmorphism) */
 :root {
@@ -37,6 +41,33 @@
 
 /* Paleta escura — mesmas chaves que :root; layout idêntico ao claro */
 body[data-theme='dark'] {
+  --bg-primary: #0c1016;
+  --bg-secondary: #101820;
+  --bg-card: #151c24;
+  --bg-card-elevated: #1a2432;
+  --active-bg: #1e293b;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --accent: #e4bc6a;
+  --accent-hover: #d4a84b;
+  --success: #34d399;
+  --danger: #f87171;
+  --sidebar-bg: #0f141c;
+  --sidebar-text: #f1f5f9;
+  --sidebar-text-muted: rgba(241, 245, 249, 0.55);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
+  --sidebar-border-color: rgba(255, 255, 255, 0.1);
+  --content-border-color: rgba(255, 255, 255, 0.06);
+  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.28);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.25);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.28);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.32);
+  --transacoes-balance-pos: #818cf8;
+}
+
+/* Vitrificado — mesmas variáveis do escuro (efeito de vidro vem de dashboard-theme-glass-effects.css) */
+body[data-theme='glass'] {
   --bg-primary: #0c1016;
   --bg-secondary: #101820;
   --bg-card: #151c24;
@@ -4667,6 +4698,14 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card
 
 .config-theme-preview--dark {
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.config-theme-preview--glass {
+  background:
+    linear-gradient(135deg, rgba(30, 58, 95, 0.55) 0%, rgba(15, 23, 42, 0.72) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 45%);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
 }
 
 .config-theme-picker-block {

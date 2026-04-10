@@ -4,14 +4,15 @@ const ThemeContext = createContext()
 
 const STORAGE_KEY = 'horizonte_theme'
 
-const VALID_THEMES = ['light', 'dark']
+const VALID_THEMES = ['light', 'dark', 'glass']
 
 const THEME_COLOR_META = {
   light: '#8ca8d4',
   dark: '#0f172a',
+  glass: '#0b1220',
 }
 
-/** Remove valores legados (glass, cyberpunk, off-white, etc.). */
+/** Remove valores legados (cyberpunk, off-white, etc.). */
 function purgeLegacyThemeStorage() {
   try {
     const v = localStorage.getItem(STORAGE_KEY)
@@ -66,7 +67,7 @@ export function ThemeProvider({ children }) {
   }
 
   const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'))
+    setThemeState((prev) => (prev === 'light' ? 'dark' : prev === 'dark' ? 'glass' : 'light'))
   }
 
   const togglePrivacy = () => setPrivacyMode((prev) => !prev)

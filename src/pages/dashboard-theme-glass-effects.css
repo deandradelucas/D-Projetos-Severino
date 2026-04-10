@@ -1,0 +1,84 @@
+/**
+ * Tema vitrificado: blur de 1px + superfícies semi-transparentes.
+ * Carregado por último (após glass-mirror e glass-polish) para sobrescrever fundos opacos.
+ */
+
+body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar,
+body[data-theme='glass'] .dashboard-container:not(.app-horizon-shell) .sidebar {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, #141c28 48%, transparent) !important;
+  background-image: none !important;
+}
+
+body[data-theme='glass'] .content-section,
+body[data-theme='glass'] .relatorios-chart-card,
+body[data-theme='glass'] .config-card,
+body[data-theme='glass'] .page-configuracoes.app-horizon-shell .config-card {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, var(--bg-card) 56%, transparent) !important;
+  background-image: none !important;
+}
+
+body[data-theme='glass'] .config-theme-card {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, var(--bg-card) 52%, transparent) !important;
+}
+
+body[data-theme='glass'] .ref-kpi-card,
+body[data-theme='glass'] .ref-kpi-card--balance,
+body[data-theme='glass'] .ref-kpi-card--expense,
+body[data-theme='glass'] .ref-kpi-card--income {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, #1a2432 54%, transparent) !important;
+  background-image: none !important;
+}
+
+body[data-theme='glass'] .ref-panel {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, #182230 52%, transparent) !important;
+  background-image: none !important;
+}
+
+body[data-theme='glass'] .ref-dashboard-header,
+body[data-theme='glass'] .ref-dashboard-actions-card,
+body[data-theme='glass'] .ref-dashboard-actions-card--welcome {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, var(--bg-card-elevated) 50%, transparent) !important;
+  background-image: none !important;
+}
+
+body[data-theme='glass'] .modal-content {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, var(--bg-card) 58%, transparent) !important;
+  background-image: none !important;
+}
+
+body[data-theme='glass'] .horizon-chat-window {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, #151c26 55%, transparent) !important;
+  background-image: none !important;
+}
+
+body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-panels,
+body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters,
+body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table,
+body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, var(--bg-card) 52%, transparent) !important;
+  background-image: none !important;
+}
+
+body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list .ref-empty-state,
+body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list > .global-skeleton {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+}
