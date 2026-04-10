@@ -4605,6 +4605,23 @@ body[data-theme='light'] .ref-dashboard-header__btn-wa--disabled {
   box-sizing: border-box;
 }
 
+/* Texto dos KPI não “espreme” com o grid: corpo flexível + quebra controlada */
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__body {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__label {
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}
+
 /* Dashboard: card compacto com Nova transação + WhatsApp */
 .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-actions-card {
   flex-shrink: 0;
@@ -4942,9 +4959,21 @@ body[data-theme='light'] .ref-kpi-row {
   margin: 0;
 }
 
-/* Dashboard: mantém 3 colunas mesmo quando .ref-kpi-row global cai para 2 (<1200px) */
+/* Dashboard: KPIs — 1 → 2 → 3 colunas (evita três cards espremidos em tablets / janelas estreitas) */
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 560px) {
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 body[data-theme='light'] .ref-kpi-card {
@@ -5850,10 +5879,6 @@ body[data-theme='light'] .ref-empty-cta:active {
 @media (max-width: 1200px) {
   body[data-theme='light'] .ref-kpi-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   body[data-theme='light'] .ref-bottom-grid {
@@ -7561,20 +7586,31 @@ body[data-theme='light'] .ref-empty {
   .dashboard-container.ref-dashboard.app-horizon-shell
   .ref-dashboard-kpi-strip.ref-kpi-row,
 [data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 560px) {
+  :is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white'])
+    .dashboard-container.ref-dashboard.app-horizon-shell
+    .ref-dashboard-kpi-strip.ref-kpi-row,
+  [data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  :is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white'])
+    .dashboard-container.ref-dashboard.app-horizon-shell
+    .ref-dashboard-kpi-strip.ref-kpi-row,
+  [data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1200px) {
   :is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white']) .dashboard-container.app-horizon-shell .ref-kpi-row,
   [data-theme='glass'] .dashboard-container.app-horizon-shell .ref-kpi-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  :is([data-theme='dark'], [data-theme='cyberpunk'], [data-theme='off-white'])
-    .dashboard-container.ref-dashboard.app-horizon-shell
-    .ref-dashboard-kpi-strip.ref-kpi-row,
-  [data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
+/* Estilos do FAB/janela (.horizon-*). Deve carregar no bundle principal: antes do lazy Dashboard,
+   AppSessionOutlet pode bloquear a rota e o import em Dashboard.jsx não roda — chat ficava sem CSS. */
+import '../pages/dashboard.css'
 
 /** Ancora FAB + janela ao `main.main-content` do app shell (canto inferior direito “dentro” do painel). */
 function useHorizonShellDock() {

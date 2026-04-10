@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { apiUrl } from '../lib/apiUrl'
+import { prefetchRoute } from '../lazyRoutes'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
 
@@ -10,6 +11,7 @@ function validateEmail(email) {
 }
 
 export default function Login() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [forgotEmail, setForgotEmail] = useState('')
@@ -29,6 +31,13 @@ export default function Login() {
       setForgotEmail(savedEmail)
       setRememberEmail(true)
     }
+  }, [])
+
+  /* Aquece o chunk do dashboard enquanto o usuário digita — entrada mais rápida após POST /login */
+  useEffect(() => {
+    prefetchRoute('/dashboard')
+    prefetchRoute('/pagamento')
+    prefetchRoute('/bem-vindo-assinatura')
   }, [])
 
   useEffect(() => {
@@ -158,13 +167,13 @@ export default function Login() {
       }
 
       const u = data.user || {}
-      /* Redirecionamento imediato evita estado pendurado no PWA / teclado mobile */
+      const navOpts = { replace: true, state: { freshLogin: true } }
       if (u.mostrar_bem_vindo_assinatura) {
-        window.location.replace('/bem-vindo-assinatura')
+        navigate('/bem-vindo-assinatura', navOpts)
       } else if (u.acesso_app_liberado === false) {
-        window.location.replace('/pagamento?expirado=1')
+        navigate('/pagamento?expirado=1', navOpts)
       } else {
-        window.location.replace('/dashboard')
+        navigate('/dashboard', navOpts)
       }
     } catch (err) {
       const net =
