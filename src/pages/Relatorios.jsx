@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import GlobalSkeleton from '../components/GlobalSkeleton'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
+import { useRelatorioAggregates } from '../hooks/useRelatorioAggregates'
+import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
 import './dashboard.css'
 import {
   BarChart,
@@ -36,39 +39,6 @@ const SkeletonKpi = () => (
     </div>
   </div>
 )
-
-function transacaoDiaKey(dataTransacao) {
-  if (dataTransacao == null) return ''
-  const s = String(dataTransacao).trim()
-  if (!s) return ''
-  const head = s.includes('T') ? s.split('T')[0] : s.slice(0, 10)
-  return /^\d{4}-\d{2}-\d{2}$/.test(head) ? head : ''
-}
-
-/** YYYY-MM a partir da data da transação */
-function transacaoMesKey(dataTransacao) {
-  const d = transacaoDiaKey(dataTransacao)
-  if (!d) return ''
-  return d.slice(0, 7)
-}
-
-function labelMesBr(ym) {
-  const [y, m] = String(ym).split('-').map(Number)
-  if (!y || !m) return String(ym)
-  return new Date(y, m - 1, 15).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
-}
-
-function tipoNormalizado(tipo) {
-  return String(tipo || '').trim().toUpperCase()
-}
-
-/** Despesa ligada a regra mensal (dia 1) ou parcelamento — mesmo critério do ícone nas listas */
-function isDespesaRecorrente(t) {
-  return (
-    tipoNormalizado(t.tipo) === 'DESPESA' &&
-    (Boolean(t.recorrencia_mensal_id) || Boolean(t.recorrente_index))
-  )
-}
 
 function RelatoriosTooltip({ active, payload, label, formatCurrency }) {
   if (!active || !payload?.length) return null
@@ -105,13 +75,7 @@ export default function Relatorios() {
   const [categorias, setCategorias] = useState([])
   const [loading, setLoading] = useState(false)
   const [pdfExportLoading, setPdfExportLoading] = useState(false)
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  const isMobile = useMatchMaxWidth(768)
 
   // Filters State (default para o mês atual)
   const [filters, setFilters] = useState(() => {
@@ -175,7 +139,6 @@ export default function Relatorios() {
     setFilters(prev => ({ ...prev, [name]: value }))
   }
 
-  // Memoized aggregations
   const {
     summary,
     chartDataPorMes,
@@ -184,101 +147,9 @@ export default function Relatorios() {
     chartDataPorCategoria,
     chartDataReceitasPorCategoria,
     chartDataSaldoCumMes,
-  } = useMemo(() => {
-    let receitas = 0
-    let despesas = 0
+  } = useRelatorioAggregates(transacoes)
 
-    const mesMap = {}
-    const recorrentesMesMap = {}
-    const catMap = {}
-    const recCatMap = {}
-
-    transacoes.forEach((t) => {
-      const dRaw = transacaoDiaKey(t.data_transacao)
-      if (!dRaw) return
-      const val = Number(t.valor)
-      const valorNum = Number.isFinite(val) ? val : parseFloat(String(t.valor).replace(',', '.')) || 0
-      const tipo = tipoNormalizado(t.tipo)
-
-      const mRaw = transacaoMesKey(t.data_transacao)
-      if (mRaw) {
-        if (!mesMap[mRaw]) {
-          mesMap[mRaw] = { Receitas: 0, Despesas: 0 }
-        }
-        if (tipo === 'RECEITA') {
-          mesMap[mRaw].Receitas += valorNum
-        } else {
-          mesMap[mRaw].Despesas += valorNum
-        }
-        if (isDespesaRecorrente(t)) {
-          recorrentesMesMap[mRaw] = (recorrentesMesMap[mRaw] || 0) + valorNum
-        }
-      }
-
-      if (tipo === 'RECEITA') {
-        receitas += valorNum
-        const cn = t.categorias?.nome || 'Sem categoria'
-        recCatMap[cn] = (recCatMap[cn] || 0) + valorNum
-      } else {
-        despesas += valorNum
-        const catName = t.categorias?.nome || 'Sem categoria'
-        catMap[catName] = (catMap[catName] || 0) + valorNum
-      }
-    })
-
-    const sortedMesKeys = Object.keys(mesMap).sort()
-    const chartDataPorMes = sortedMesKeys.map((k) => {
-      const row = mesMap[k]
-      return {
-        name: labelMesBr(k),
-        Receitas: row.Receitas,
-        Despesas: row.Despesas,
-      }
-    })
-
-    const chartDataComprasRecorrentesMes = sortedMesKeys.map((k) => ({
-      name: labelMesBr(k),
-      total: recorrentesMesMap[k] || 0,
-    }))
-    const totalComprasRecorrentesPeriodo = sortedMesKeys.reduce(
-      (acc, k) => acc + (recorrentesMesMap[k] || 0),
-      0
-    )
-
-    let runMes = 0
-    const chartDataSaldoCumMes = sortedMesKeys.map((k) => {
-      const row = mesMap[k]
-      const net = row.Receitas - row.Despesas
-      runMes += net
-      return {
-        name: labelMesBr(k),
-        saldo: runMes,
-        liquidoMes: net,
-      }
-    })
-
-    const chartDataPorCategoria = Object.entries(catMap)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
-
-    const chartDataReceitasPorCategoria = Object.entries(recCatMap)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
-
-    return {
-      summary: { receitas, despesas, saldo: receitas - despesas },
-      chartDataPorMes,
-      chartDataComprasRecorrentesMes,
-      totalComprasRecorrentesPeriodo,
-      chartDataPorCategoria,
-      chartDataReceitasPorCategoria,
-      chartDataSaldoCumMes,
-    }
-  }, [transacoes])
-
-  const formatCurrency = (val) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)
-  }
+  const formatCurrency = formatCurrencyBRL
 
   const exportToCSV = () => {
     if (transacoes.length === 0) return

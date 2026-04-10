@@ -11,6 +11,7 @@ import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { getWhatsAppContactUrl } from '../lib/whatsappContactUrl'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
 
 const SkeletonKpi = () => (
   <div className="ref-kpi-card ref-kpi-card--skeleton" aria-hidden>
@@ -176,12 +177,7 @@ export default function Dashboard() {
     }
   }, [whatsappContactUrl])
 
-  const formatCurrency = (val) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(val)
-  }
+  const formatCurrency = formatCurrencyBRL
 
   return (
     <>

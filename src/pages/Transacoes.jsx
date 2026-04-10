@@ -9,6 +9,7 @@ import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { getWhatsAppContactUrl } from '../lib/whatsappContactUrl'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
 import './dashboard.css'
 
 const SkeletonTxRow = () => (
@@ -180,9 +181,7 @@ export default function Transacoes() {
     }
   }
 
-  const formatCurrency = (val) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)
-  }
+  const formatCurrency = formatCurrencyBRL
 
   const clearFilters = () =>
     setFilters({ busca: '', tipo: '', categoria_id: '', dataInicio: '', dataFim: '' })
