@@ -832,6 +832,14 @@ app.delete('/api/transacoes/:id', async (c) => {
     const gate = await assertAcessoAppUsuario(usuarioId)
     if (gate) return c.json({ message: gate.message }, gate.status)
 
+    if (!isUuidString(id)) {
+      return c.json({ message: 'ID inválido.' }, 400)
+    }
+
+    if (!rateLimitTake(`tx-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
+    }
+
     await deletarTransacao(id, usuarioId)
     return c.json({ message: 'Transação excluída com sucesso.' })
   } catch (error) {
