@@ -15,8 +15,14 @@ export function mercadoPagoHttpError(res, json, prefix) {
   return e
 }
 
+/** 403 ou texto "Forbidden" no corpo (alguns fluxos só refletem no message). */
 export function isMercadoPagoForbiddenError(err) {
-  return Boolean(err && err.mpHttpStatus === 403)
+  if (!err) return false
+  if (err.mpHttpStatus === 403) return true
+  const m = String(err.message || '')
+  if (/forbidden/i.test(m)) return true
+  if (/\b403\b/.test(m)) return true
+  return false
 }
 
 export function getMercadoPagoAccessToken() {

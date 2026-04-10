@@ -8,9 +8,19 @@ import {
   isMercadoPagoForbiddenError,
 } from './mercadopago.mjs'
 
+/** Evita repetir [debug] 403 a cada request/sync para o mesmo id (vários usuários ou polling). */
+const mp403DebugLast = new Map()
+const MP403_DEBUG_MIN_INTERVAL_MS = 5 * 60 * 1000
+
 /** 403: token TEST vs produção, outra conta MP, ou recurso de outro vendedor — não poluir logs com [warn]. */
 function logMercadoPagoSyncIssue(contexto, idRef, err) {
   if (isMercadoPagoForbiddenError(err)) {
+    const key = `${contexto}:${String(idRef)}`
+    const now = Date.now()
+    const last = mp403DebugLast.get(key) ?? 0
+    if (now - last < MP403_DEBUG_MIN_INTERVAL_MS) return
+    mp403DebugLast.set(key, now)
+    if (mp403DebugLast.size > 2000) mp403DebugLast.clear()
     log.debug(
       contexto,
       idRef,

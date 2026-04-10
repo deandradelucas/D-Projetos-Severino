@@ -211,7 +211,10 @@ function mapSupabaseOrNetworkError(error) {
       message: 'Não foi possível conectar ao banco de dados. Tente de novo em alguns instantes.',
     }
   }
-  if (/webauthn_credentials|webauthn_challenges/i.test(raw) && /does not exist|42P01/i.test(raw)) {
+  if (
+    /webauthn_credentials|webauthn_challenges/i.test(raw) &&
+    /does not exist|42P01|Could not find the table|PGRST205|schema cache/i.test(raw)
+  ) {
     return {
       status: 503,
       message:
@@ -490,9 +493,12 @@ app.get('/api/auth/webauthn/credentials', async (c) => {
     const rows = await listCredentialSummariesForUser(usuarioId)
     return c.json({ credentials: rows })
   } catch (error) {
-    log.error('webauthn list credentials', error)
     const mapped = mapSupabaseOrNetworkError(error)
-    if (mapped) return c.json({ message: mapped.message }, mapped.status)
+    if (mapped) {
+      log.warn('webauthn list credentials', error?.message || error)
+      return c.json({ message: mapped.message }, mapped.status)
+    }
+    log.error('webauthn list credentials', error)
     return c.json({ message: 'Erro ao listar credenciais biométricas.' }, 500)
   }
 })
@@ -508,6 +514,11 @@ app.delete('/api/auth/webauthn/credentials/:id', async (c) => {
     await deleteCredentialForUser({ usuarioId, credentialId: id })
     return c.json({ ok: true })
   } catch (error) {
+    const mapped = mapSupabaseOrNetworkError(error)
+    if (mapped) {
+      log.warn('webauthn delete credential', error?.message || error)
+      return c.json({ message: mapped.message }, mapped.status)
+    }
     log.error('webauthn delete credential', error)
     return c.json({ message: 'Não foi possível remover.' }, 500)
   }
