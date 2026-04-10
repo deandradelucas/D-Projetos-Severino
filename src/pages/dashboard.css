@@ -314,6 +314,21 @@ h3 {
   box-shadow: 0 0 12px rgba(212, 168, 75, 0.45);
 }
 
+/* Separa “Conta” (Ajustes + sair) do bloco principal do app */
+.nav-section-label--account {
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.nav-item.nav-item--settings:not(.active) {
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.nav-item.nav-item--settings:not(.active) .icon-wrap {
+  background: rgba(255, 255, 255, 0.05);
+}
+
 /* Indicador animado com a cor do sistema (Dourado/Accent) */
 .nav-menu::before {
   content: "";
@@ -493,14 +508,14 @@ h3 {
 .nav-menu:has(li:nth-child(3) > .nav-item.active)::after { top: 174px; }
 .nav-menu:has(li:nth-child(4) > .nav-item.active)::before { top: 244px; }
 .nav-menu:has(li:nth-child(4) > .nav-item.active)::after { top: 246px; }
-.nav-menu:has(li:nth-child(5) > .nav-item.active)::before { top: 316px; }
-.nav-menu:has(li:nth-child(5) > .nav-item.active)::after { top: 318px; }
-.nav-menu:has(li:nth-child(7) > .nav-item.active)::before { top: 408px; }
-.nav-menu:has(li:nth-child(7) > .nav-item.active)::after { top: 410px; }
-.nav-menu:has(li:nth-child(8) > .nav-item.active)::before { top: 480px; }
-.nav-menu:has(li:nth-child(8) > .nav-item.active)::after { top: 482px; }
-.nav-menu:has(li:nth-child(9) > .nav-item.active)::before { top: 552px; }
-.nav-menu:has(li:nth-child(9) > .nav-item.active)::after { top: 554px; }
+.nav-menu:has(li:nth-child(6) > .nav-item.active)::before { top: 368px; }
+.nav-menu:has(li:nth-child(6) > .nav-item.active)::after { top: 370px; }
+.nav-menu:has(li:nth-child(8) > .nav-item.active)::before { top: 460px; }
+.nav-menu:has(li:nth-child(8) > .nav-item.active)::after { top: 462px; }
+.nav-menu:has(li:nth-child(9) > .nav-item.active)::before { top: 532px; }
+.nav-menu:has(li:nth-child(9) > .nav-item.active)::after { top: 534px; }
+.nav-menu:has(li:nth-child(10) > .nav-item.active)::before { top: 604px; }
+.nav-menu:has(li:nth-child(10) > .nav-item.active)::after { top: 606px; }
 
 /* Recharts Legend Dots (Bolinhas dos Gráficos) */
 .recharts-legend-item-marker {
@@ -4247,6 +4262,10 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
     grid-template-columns: 1fr 1fr;
     align-items: start;
   }
+
+  .config-layout > .config-card--full {
+    grid-column: 1 / -1;
+  }
 }
 
 .config-card {
@@ -7176,6 +7195,18 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-se
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
   color: rgba(15, 23, 42, 0.42);
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label--account {
+  border-top-color: rgba(226, 232, 240, 0.85);
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) {
+  color: rgba(15, 23, 42, 0.48);
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) .icon-wrap {
+  background: rgba(15, 23, 42, 0.05);
 }
 
 @media (max-width: 768px) {

@@ -98,8 +98,7 @@ export async function findUserByEmailForWebAuthn(email) {
 export async function beginRegistration({ c, usuarioId, userEmail, userName }) {
   await pruneExpiredWebAuthnChallenges()
 
-  const { rpID, origins } = getWebAuthnRpIdAndOrigins(c)
-  const expectedOrigin = origins.length ? origins : ['https://localhost']
+  const { rpID } = getWebAuthnRpIdAndOrigins(c)
 
   const existing = await listCredentialsForUser(usuarioId)
   const excludeCredentials = existing.map((row) => ({
@@ -121,7 +120,6 @@ export async function beginRegistration({ c, usuarioId, userEmail, userName }) {
       residentKey: 'preferred',
       userVerification: 'required',
     },
-    preferredAuthenticatorType: 'localDevice',
     excludeCredentials,
   })
 
@@ -132,7 +130,7 @@ export async function beginRegistration({ c, usuarioId, userEmail, userName }) {
     challenge: options.challenge,
   })
 
-  return { optionsJSON: options, challengeId, _expectedOrigin: expectedOrigin, _rpID: rpID }
+  return { optionsJSON: options, challengeId }
 }
 
 /**
@@ -193,7 +191,7 @@ export async function finishRegistration({ c, usuarioId, challengeId, credential
 /**
  * @returns {Promise<{ optionsJSON: object, challengeId: string } | null>}
  */
-export async function beginAuthentication({ c, email, log }) {
+export async function beginAuthentication({ c, email }) {
   await pruneExpiredWebAuthnChallenges()
 
   const user = await findUserByEmailForWebAuthn(email)
@@ -202,7 +200,7 @@ export async function beginAuthentication({ c, email, log }) {
   const creds = await listCredentialsForUser(user.id)
   if (creds.length === 0) return null
 
-  const { rpID, origins } = getWebAuthnRpIdAndOrigins(c)
+  const { rpID } = getWebAuthnRpIdAndOrigins(c)
 
   const allowCredentials = creds.map((row) => ({
     id: row.credential_id,
@@ -223,7 +221,7 @@ export async function beginAuthentication({ c, email, log }) {
     challenge: options.challenge,
   })
 
-  return { optionsJSON: options, challengeId, _user: user, _rpID: rpID, _origins: origins }
+  return { optionsJSON: options, challengeId }
 }
 
 function buildAuthenticatorCredential(row) {

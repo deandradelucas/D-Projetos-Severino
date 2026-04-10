@@ -2488,6 +2488,15 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-sec
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
   color: rgba(15, 23, 42, 0.42);
 }
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label--account {
+  border-top-color: rgba(226, 232, 240, 0.22);
+}
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) {
+  color: rgba(226, 232, 240, 0.58);
+}
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) .icon-wrap {
+  background: rgba(255, 255, 255, 0.06);
+}
 @media (max-width: 768px) {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     border-radius: 0 36px 36px 0;

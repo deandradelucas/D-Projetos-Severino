@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { apiUrl } from '../lib/apiUrl'
 import { prefetchRoute } from '../lazyRoutes'
+import { webAuthnSupported, fetchWebAuthnStatus, loginWithWebAuthn } from '../lib/webauthnBrowser'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
 
@@ -22,6 +23,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [requestingReset, setRequestingReset] = useState(false)
   const [showSenha, setShowSenha] = useState(false)
+  const [hasWebAuthn, setHasWebAuthn] = useState(false)
+  const [bioLoading, setBioLoading] = useState(false)
 
   useEffect(() => {
     const savedEmail = window.localStorage.getItem(REMEMBER_EMAIL_KEY)
@@ -39,6 +42,27 @@ export default function Login() {
     prefetchRoute('/pagamento')
     prefetchRoute('/bem-vindo-assinatura')
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    const run = async () => {
+      if (!webAuthnSupported() || !validateEmail(email)) {
+        setHasWebAuthn(false)
+        return
+      }
+      try {
+        const ok = await fetchWebAuthnStatus(email)
+        if (!cancelled) setHasWebAuthn(ok)
+      } catch {
+        if (!cancelled) setHasWebAuthn(false)
+      }
+    }
+    const t = window.setTimeout(run, 350)
+    return () => {
+      cancelled = true
+      window.clearTimeout(t)
+    }
+  }, [email])
 
   useEffect(() => {
     if (!rememberEmail) {
@@ -167,14 +191,7 @@ export default function Login() {
       }
 
       const u = data.user || {}
-      const navOpts = { replace: true, state: { freshLogin: true } }
-      if (u.mostrar_bem_vindo_assinatura) {
-        navigate('/bem-vindo-assinatura', navOpts)
-      } else if (u.acesso_app_liberado === false) {
-        navigate('/pagamento?expirado=1', navOpts)
-      } else {
-        navigate('/dashboard', navOpts)
-      }
+      navigateAfterLogin(u)
     } catch (err) {
       const net =
         err instanceof TypeError && String(err?.message || '').toLowerCase().includes('fetch')
@@ -182,6 +199,47 @@ export default function Login() {
           : 'Erro ao conectar com o servidor.'
       setMensagem({ texto: net, tipo: 'erro' })
       setLoading(false)
+    }
+  }
+
+  const navigateAfterLogin = (u) => {
+    const navOpts = { replace: true, state: { freshLogin: true } }
+    if (u.mostrar_bem_vindo_assinatura) {
+      navigate('/bem-vindo-assinatura', navOpts)
+    } else if (u.acesso_app_liberado === false) {
+      navigate('/pagamento?expirado=1', navOpts)
+    } else {
+      navigate('/dashboard', navOpts)
+    }
+  }
+
+  const handleBiometricLogin = async () => {
+    setMensagem({ texto: '', tipo: '' })
+    if (!validateEmail(email)) {
+      setMensagem({ texto: 'Informe o e-mail cadastrado para usar a biometria.', tipo: 'erro' })
+      return
+    }
+    if (!webAuthnSupported()) {
+      setMensagem({
+        texto: 'Biometria requer HTTPS (ou localhost) e um navegador compatível no celular.',
+        tipo: 'erro',
+      })
+      return
+    }
+    setBioLoading(true)
+    try {
+      const data = await loginWithWebAuthn(email)
+      if (data.user) {
+        window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
+      }
+      const u = data.user || {}
+      navigateAfterLogin(u)
+    } catch (err) {
+      setMensagem({
+        texto: err instanceof Error ? err.message : 'Não foi possível entrar com biometria.',
+        tipo: 'erro',
+      })
+      setBioLoading(false)
     }
   }
 
@@ -342,11 +400,35 @@ export default function Login() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || bioLoading}
               className="w-full py-2.5 sm:py-3 bg-[#d4a84b] text-[#0a0a0a] rounded-lg font-semibold text-sm hover:bg-[#b8923f] hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(212,168,75,0.2)] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none mt-2 min-h-[44px]"
             >
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
+
+            {webAuthnSupported() && hasWebAuthn && (
+              <>
+                <div className="relative my-3 flex items-center gap-2">
+                  <span className="h-px flex-1 bg-white/10" />
+                  <span className="text-[10px] font-medium uppercase tracking-wide text-[#737373]">ou</span>
+                  <span className="h-px flex-1 bg-white/10" />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleBiometricLogin}
+                  disabled={loading || bioLoading}
+                  className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/5 py-2.5 text-sm font-semibold text-[#f5f5f5] transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-[#d4a84b]" aria-hidden>
+                    <path d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" />
+                  </svg>
+                  {bioLoading ? 'Abrindo biometria…' : 'Entrar com biometria'}
+                </button>
+                <p className="mt-1.5 text-center text-[10px] leading-snug text-[#737373]">
+                  Use a digital ou o rosto neste aparelho. Ative em Configurações após entrar com a senha.
+                </p>
+              </>
+            )}
           </form>
 
           {mensagem.texto && (

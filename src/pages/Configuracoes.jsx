@@ -4,6 +4,8 @@ import './dashboard.css'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
+import { apiUrl } from '../lib/apiUrl'
+import { webAuthnSupported, registerWebAuthnCredential } from '../lib/webauthnBrowser'
 
 export default function Configuracoes() {
   const { theme, setTheme, privacyMode, togglePrivacy } = useTheme()
@@ -23,6 +25,12 @@ export default function Configuracoes() {
   const [toast, setToast] = useState('')
   const [exporting, setExporting] = useState(false)
   const [resetSending, setResetSending] = useState(false)
+  const [webauthnList, setWebauthnList] = useState([])
+  const [webauthnLoading, setWebauthnLoading] = useState(false)
+  const [webauthnError, setWebauthnError] = useState(null)
+  const [bioRegistering, setBioRegistering] = useState(false)
+
+  const usuarioIdHeader = String(perfil?.id ?? '').trim()
 
   const showToast = useCallback((msg) => {
     setToast(msg)
@@ -30,8 +38,8 @@ export default function Configuracoes() {
   }, [])
 
   useEffect(() => {
-    if (!perfil?.id) return
-    fetch('/api/usuarios/perfil', { headers: { 'x-user-id': perfil.id } })
+    if (!usuarioIdHeader) return
+    fetch('/api/usuarios/perfil', { headers: { 'x-user-id': usuarioIdHeader } })
       .then((res) => res.json())
       .then((data) => {
         if (data.perfil) {
@@ -49,11 +57,75 @@ export default function Configuracoes() {
         }
       })
       .catch(() => {})
-  }, [perfil?.id])
+  }, [usuarioIdHeader])
 
   useEffect(() => {
     localStorage.setItem('horizonte_email_digest', emailDigest ? 'true' : 'false')
   }, [emailDigest])
+
+  const loadWebAuthn = useCallback(async () => {
+    if (!usuarioIdHeader) return
+    setWebauthnLoading(true)
+    setWebauthnError(null)
+    try {
+      const res = await fetch(apiUrl('/api/auth/webauthn/credentials'), {
+        headers: { 'x-user-id': usuarioIdHeader },
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setWebauthnList([])
+        setWebauthnError(data.message || `Não foi possível carregar (${res.status}).`)
+        return
+      }
+      setWebauthnList(Array.isArray(data.credentials) ? data.credentials : [])
+    } catch {
+      setWebauthnList([])
+      setWebauthnError('Erro de rede ao carregar a biometria.')
+    } finally {
+      setWebauthnLoading(false)
+    }
+  }, [usuarioIdHeader])
+
+  useEffect(() => {
+    loadWebAuthn()
+  }, [loadWebAuthn])
+
+  const handleRegisterBiometric = async () => {
+    if (!usuarioIdHeader) return
+    if (!webAuthnSupported()) {
+      showToast('Biometria requer HTTPS (ou localhost) e navegador compatível.')
+      return
+    }
+    setBioRegistering(true)
+    try {
+      await registerWebAuthnCredential(() => ({ 'x-user-id': usuarioIdHeader }))
+      showToast('Biometria ativada neste aparelho.')
+      await loadWebAuthn()
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Não foi possível ativar a biometria.')
+    } finally {
+      setBioRegistering(false)
+    }
+  }
+
+  const handleRemoveBiometric = async (credentialRowId) => {
+    if (!usuarioIdHeader) return
+    if (!window.confirm('Remover o login por biometria vinculado a este dispositivo?')) return
+    try {
+      const res = await fetch(apiUrl(`/api/auth/webauthn/credentials/${credentialRowId}`), {
+        method: 'DELETE',
+        headers: { 'x-user-id': usuarioIdHeader },
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.message || 'Erro ao remover.')
+      }
+      showToast('Biometria removida.')
+      await loadWebAuthn()
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Erro ao remover.')
+    }
+  }
 
   const isAdmin = String(perfil.role || '').toUpperCase() === 'ADMIN'
 
@@ -85,10 +157,10 @@ export default function Configuracoes() {
   }
 
   const exportarTransacoesJson = async () => {
-    if (!perfil.id) return
+    if (!usuarioIdHeader) return
     setExporting(true)
     try {
-      const res = await fetch('/api/transacoes?limit=5000', { headers: { 'x-user-id': perfil.id } })
+      const res = await fetch('/api/transacoes?limit=5000', { headers: { 'x-user-id': usuarioIdHeader } })
       if (!res.ok) throw new Error('Falha ao buscar transações.')
       const rows = await res.json()
       const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json;charset=utf-8' })
@@ -231,9 +303,80 @@ export default function Configuracoes() {
               />
             </div>
           </section>
-        </div>
 
-        <section className="config-card">
+          <section className="config-card config-card--full">
+            <h2 className="config-card-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M7 11V8a5 5 0 0110 0v3" />
+              </svg>
+              Biometria no celular
+            </h2>
+            <p style={{ margin: '0 0 12px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              No telefone ou tablet, você pode entrar com digital ou reconhecimento facial após cadastrar este aparelho.
+              Exige HTTPS em produção (no computador use senha se a biometria não aparecer).
+            </p>
+            <button
+              type="button"
+              className="btn-primary"
+              style={{ padding: '10px 18px', fontSize: '14px', marginBottom: 14 }}
+              disabled={!usuarioIdHeader || bioRegistering || !webAuthnSupported()}
+              onClick={handleRegisterBiometric}
+            >
+              {bioRegistering ? 'Registrando…' : 'Ativar biometria neste aparelho'}
+            </button>
+            {webauthnLoading ? (
+              <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)' }}>Carregando…</p>
+            ) : webauthnError ? (
+              <div style={{ margin: 0 }}>
+                <p style={{ margin: '0 0 8px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                  {webauthnError}
+                </p>
+                <button type="button" className="config-btn-ghost" onClick={() => loadWebAuthn()}>
+                  Tentar de novo
+                </button>
+              </div>
+            ) : webauthnList.length === 0 ? (
+              <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                Ainda não há biometria registrada nesta conta. Use o botão acima para ativar neste aparelho; depois o
+                dispositivo aparecerá nesta lista.
+              </p>
+            ) : (
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                {webauthnList.map((row) => (
+                  <li
+                    key={row.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 10,
+                      padding: '10px 0',
+                      borderTop: '1px solid var(--border-color)',
+                      fontSize: '13px',
+                    }}
+                  >
+                    <span style={{ color: 'var(--text-secondary)' }}>
+                      Registrado em{' '}
+                      {row.created_at
+                        ? new Date(row.created_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+                        : '—'}
+                      {row.last_used_at ? (
+                        <span style={{ display: 'block', fontSize: '12px', marginTop: 4 }}>
+                          Último uso: {new Date(row.last_used_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
+                        </span>
+                      ) : null}
+                    </span>
+                    <button type="button" className="config-btn-ghost" onClick={() => handleRemoveBiometric(row.id)}>
+                      Remover
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+        <section className="config-card config-card--full">
           <div className="config-section-label">Dados</div>
           <h2 className="config-card-title" style={{ marginTop: 0 }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -246,13 +389,13 @@ export default function Configuracoes() {
           <p style={{ margin: '0 0 14px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
             Baixe um arquivo JSON com até 5.000 lançamentos para backup ou análise externa.
           </p>
-          <button type="button" className="btn-primary" style={{ padding: '10px 18px', fontSize: '14px' }} disabled={exporting || !perfil.id} onClick={exportarTransacoesJson}>
+          <button type="button" className="btn-primary" style={{ padding: '10px 18px', fontSize: '14px' }} disabled={exporting || !usuarioIdHeader} onClick={exportarTransacoesJson}>
             {exporting ? 'Gerando…' : 'Baixar JSON'}
           </button>
         </section>
 
         {isAdmin && (
-          <section className="config-card">
+          <section className="config-card config-card--full">
             <div className="config-section-label">Administração</div>
             <h2 className="config-card-title" style={{ marginTop: 0 }}>
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -276,6 +419,7 @@ export default function Configuracoes() {
             </div>
           </section>
         )}
+        </div>
 
         </div>
       </main>
