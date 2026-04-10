@@ -2,8 +2,21 @@ import React, { useEffect, useState, useCallback } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import MpStatusBadge from '../components/MpStatusBadge'
+import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
 import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
+
+const PAGAMENTOS_LOG_HEADERS = [
+  'Data',
+  'ID usuário',
+  'Usuário',
+  'Isenção',
+  'Valor',
+  'Status',
+  'Detalhe',
+  'ID pagamento',
+  'Referência',
+]
 
 export default function AdminPagamentos() {
   const [menuAberto, setMenuAberto] = useState(false)
@@ -14,6 +27,7 @@ export default function AdminPagamentos() {
   const [togglingUserId, setTogglingUserId] = useState(null)
 
   const load = useCallback(async () => {
+    setLoading(true)
     setError('')
     try {
       const userSaved = localStorage.getItem('horizonte_user')
@@ -120,7 +134,7 @@ export default function AdminPagamentos() {
             </div>
           )}
           {loading ? (
-            <p style={{ color: 'var(--text-secondary)' }}>Carregando…</p>
+            <AdminDataTableSkeleton headers={PAGAMENTOS_LOG_HEADERS} rows={7} />
           ) : rows.length === 0 ? (
             <p style={{ color: 'var(--text-secondary)' }}>Nenhum pagamento registrado ainda.</p>
           ) : (

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
 import './dashboard.css'
+
+const WHATSAPP_LOG_HEADERS = ['Data', 'Telefone remetente', 'Mensagem dita', 'Status', 'Resultado / detalhe']
 
 export default function AdminWhatsApp() {
   const [menuAberto, setMenuAberto] = useState(false)
@@ -42,6 +45,7 @@ export default function AdminWhatsApp() {
 
   useEffect(() => {
     const fetchLogs = async () => {
+      setLoading(true)
       try {
         const userSaved = localStorage.getItem('horizonte_user')
         if (!userSaved) return
@@ -199,7 +203,7 @@ export default function AdminWhatsApp() {
 
           <div style={{ overflowX: 'auto' }}>
             {loading ? (
-              <p>Carregando registros...</p>
+              <AdminDataTableSkeleton headers={WHATSAPP_LOG_HEADERS} rows={8} />
             ) : logs.length === 0 ? (
               <p style={{ color: 'var(--text-secondary)' }}>Nenhuma mensagem processada ainda.</p>
             ) : (

@@ -2912,6 +2912,65 @@ body[data-theme='light'] .relatorios-kpi-saldo--neg {
   font-weight: 500;
 }
 
+/* Relatórios: placeholder alinhado aos painéis reais (shimmer suave) */
+@keyframes relatorios-chart-skel-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.page-relatorios .relatorios-chart-card__body--skeleton-only {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(
+    100deg,
+    rgba(148, 163, 184, 0.14) 0%,
+    rgba(148, 163, 184, 0.28) 42%,
+    rgba(148, 163, 184, 0.14) 84%
+  );
+  background-size: 220% 100%;
+  animation: relatorios-chart-skel-shimmer 1.35s ease-in-out infinite;
+}
+
+[data-theme='dark'] .page-relatorios .relatorios-chart-card__body--skeleton-only,
+[data-theme='cyberpunk'] .page-relatorios .relatorios-chart-card__body--skeleton-only,
+[data-theme='glass'] .page-relatorios .relatorios-chart-card__body--skeleton-only {
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.12) 42%,
+    rgba(255, 255, 255, 0.05) 84%
+  );
+  background-size: 220% 100%;
+}
+
+.page-relatorios .relatorios-charts--initial-skeleton {
+  pointer-events: none;
+}
+
+.page-relatorios .relatorios-charts--refreshing,
+.page-relatorios .relatorios-kpi-row--refreshing {
+  opacity: 0.88;
+  transition: opacity 0.2s ease;
+}
+
+/* Qualquer painel/lista: atualização em segundo plano sem trocar tudo por skeleton */
+.page-panel--refreshing {
+  opacity: 0.88;
+  transition: opacity 0.2s ease;
+}
+
+.admin-table-skel-cell {
+  display: block;
+  height: 14px;
+  border-radius: 6px;
+  min-width: 40px;
+}
+
 .page-relatorios .relatorios-tooltip {
   background: var(--rel-tooltip-bg, #ffffff);
   border: 1px solid rgba(15, 23, 42, 0.1);

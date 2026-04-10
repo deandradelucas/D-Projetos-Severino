@@ -3,8 +3,11 @@ import { useSearchParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import MpStatusBadge from '../components/MpStatusBadge'
+import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
 import { apiUrl } from '../lib/apiUrl'
 import './dashboard.css'
+
+const PAGAMENTO_HISTORICO_HEADERS = ['Data', 'Valor', 'Status', 'Detalhe']
 
 function statusLabel(status) {
   if (!status) return '—'
@@ -398,7 +401,7 @@ export default function Pagamento() {
         <section className="content-section" style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
           <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '12px', color: 'var(--text-primary)' }}>Histórico</h2>
           {loading ? (
-            <p style={{ color: 'var(--text-secondary)' }}>Carregando…</p>
+            <AdminDataTableSkeleton headers={PAGAMENTO_HISTORICO_HEADERS} rows={5} />
           ) : historico.length === 0 ? (
             <p style={{ color: 'var(--text-secondary)' }}>Nenhum pagamento registrado ainda.</p>
           ) : (

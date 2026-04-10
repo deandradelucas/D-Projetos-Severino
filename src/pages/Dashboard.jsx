@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
@@ -51,6 +51,8 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [transacoes, setTransacoes] = useState([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const firstFetchDoneRef = useRef(false)
   const [fetchError, setFetchError] = useState('')
 
   useEffect(() => {
@@ -60,14 +62,21 @@ export default function Dashboard() {
     }
   }, [])
 
-  const fetchTransacoes = React.useCallback(async () => {
-    setLoading(true)
+  useEffect(() => {
+    firstFetchDoneRef.current = false
+  }, [usuario.id])
+
+  const fetchTransacoes = useCallback(async () => {
+    const isInitial = !firstFetchDoneRef.current
+    if (isInitial) setLoading(true)
+    else setRefreshing(true)
     setFetchError('')
     const session = readHorizonteUser()
     if (!session?.id) {
       setTransacoes([])
       setFetchError('Sessão inválida. Faça login novamente.')
       setLoading(false)
+      setRefreshing(false)
       return
     }
     try {
@@ -97,6 +106,8 @@ export default function Dashboard() {
       setFetchError('Sem conexão com a API. Verifique a internet e se VITE_API_URL aponta para o servidor.')
     } finally {
       setLoading(false)
+      setRefreshing(false)
+      firstFetchDoneRef.current = true
     }
   }, [])
 
@@ -112,7 +123,7 @@ export default function Dashboard() {
         setFetchError('Faça login para ver suas transações.')
       })
     }
-  }, [fetchTransacoes])
+  }, [fetchTransacoes, usuario.id])
 
   useEffect(() => {
     let timeoutId
@@ -252,9 +263,9 @@ export default function Dashboard() {
         </article>
 
         <section
-          className="ref-kpi-row ref-dashboard-kpi-strip"
+          className={`ref-kpi-row ref-dashboard-kpi-strip${refreshing ? ' page-panel--refreshing' : ''}`}
           aria-label="Saldo em conta, entrada e saída do período"
-          aria-busy={loading}
+          aria-busy={loading || refreshing}
         >
           {loading ? (
             <>
@@ -314,7 +325,10 @@ export default function Dashboard() {
           </div>
         )}
 
-        <section className="ref-bottom-grid ref-bottom-grid--single" aria-label="Transações recentes">
+        <section
+          className={`ref-bottom-grid ref-bottom-grid--single${refreshing ? ' page-panel--refreshing' : ''}`}
+          aria-label="Transações recentes"
+        >
           <article className="ref-panel ref-panel--transactions">
             <div className="ref-panel__head">
               <h2 className="ref-panel__title">Transações</h2>

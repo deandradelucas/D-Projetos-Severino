@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
@@ -51,7 +51,16 @@ export default function Transacoes() {
   const [editingTransaction, setEditingTransaction] = useState(null)
   const [transacoes, setTransacoes] = useState([])
   const [categorias, setCategorias] = useState([])
-  const [loading, setLoading] = useState(false)
+  const firstFetchDoneRef = useRef(false)
+  const [loading, setLoading] = useState(() => {
+    try {
+      const u = readHorizonteUser()
+      return Boolean(u?.id && String(u.id).trim())
+    } catch {
+      return false
+    }
+  })
+  const [refreshing, setRefreshing] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(false)
   const [filtrosAbertos, setFiltrosAbertos] = useState(false)
@@ -122,11 +131,14 @@ export default function Transacoes() {
   )
 
   const fetchTransacoes = useCallback(async () => {
-    setLoading(true)
+    const isInitial = !firstFetchDoneRef.current
+    if (isInitial) setLoading(true)
+    else setRefreshing(true)
     setHasMore(false)
     const session = readHorizonteUser()
     if (!session?.id) {
       setLoading(false)
+      setRefreshing(false)
       return
     }
     try {
@@ -149,11 +161,13 @@ export default function Transacoes() {
       console.error(err)
     } finally {
       setLoading(false)
+      setRefreshing(false)
+      firstFetchDoneRef.current = true
     }
   }, [buildTxQuery])
 
   const loadMoreTransacoes = useCallback(async () => {
-    if (loading || loadingMore || !hasMore) return
+    if (loading || refreshing || loadingMore || !hasMore) return
     const session = readHorizonteUser()
     if (!session?.id) return
     setLoadingMore(true)
@@ -178,7 +192,11 @@ export default function Transacoes() {
     } finally {
       setLoadingMore(false)
     }
-  }, [loading, loadingMore, hasMore, transacoes.length, buildTxQuery])
+  }, [loading, refreshing, loadingMore, hasMore, transacoes.length, buildTxQuery])
+
+  useEffect(() => {
+    firstFetchDoneRef.current = false
+  }, [usuario.id])
 
   useEffect(() => {
     const session = readHorizonteUser()
@@ -424,11 +442,13 @@ export default function Transacoes() {
           </article>
         )}
 
-        <article className="ref-panel ref-panel--transactions page-transacoes-ref-table">
+        <article
+          className={`ref-panel ref-panel--transactions page-transacoes-ref-table${refreshing ? ' page-panel--refreshing' : ''}`}
+        >
           <div className="ref-panel__head">
             <h2 className="ref-panel__title">Transações</h2>
           </div>
-          <div className="ref-tx-list page-transacoes-tx-list">
+          <div className="ref-tx-list page-transacoes-tx-list" aria-busy={loading || refreshing}>
             {loading ? (
               <div className="skeleton-stagger ref-tx-skeleton-stack">
                 <SkeletonTxRow />
@@ -573,7 +593,7 @@ export default function Transacoes() {
                   <button
                     type="button"
                     className="btn-secondary"
-                    disabled={loadingMore}
+                    disabled={loadingMore || refreshing}
                     onClick={() => void loadMoreTransacoes()}
                   >
                     {loadingMore ? 'Carregando…' : 'Carregar mais'}

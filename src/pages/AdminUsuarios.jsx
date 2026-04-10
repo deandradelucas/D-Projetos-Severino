@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
 import { isSuperAdminEmail } from '../lib/superAdmin'
 import './dashboard.css'
+
+const USUARIOS_TABLE_HEADERS = [
+  'Nome',
+  'E-mail',
+  'Telefone',
+  'Role',
+  'Conta',
+  'Assinatura / pagamento',
+  'Último acesso',
+  'Ações',
+]
 
 const ROLE_OPTIONS = [
   { value: 'USER', label: 'Usuário' },
@@ -160,6 +172,7 @@ export default function AdminUsuarios() {
 
   useEffect(() => {
     const load = async () => {
+      setLoadingUsuarios(true)
       setLoadError('')
       try {
         const userSaved = localStorage.getItem('horizonte_user')
@@ -364,7 +377,7 @@ export default function AdminUsuarios() {
           </div>
 
           {loadingUsuarios ? (
-            <p style={{ color: 'var(--text-secondary)' }}>Carregando usuários...</p>
+            <AdminDataTableSkeleton headers={USUARIOS_TABLE_HEADERS} rows={10} tableClassName="admin-usuarios-table" />
           ) : usuarios.length === 0 ? (
             <p style={{ color: 'var(--text-secondary)' }}>Nenhum usuário encontrado.</p>
           ) : (
