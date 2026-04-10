@@ -5705,7 +5705,7 @@ body[data-theme='light'] .relatorios-loading-shell {
 
 @media (max-width: 1200px) {
   body[data-theme='light'] {
-    --app-sidebar-width: 200px;
+    --app-sidebar-width: clamp(200px, 22vw + 40px, 268px);
     --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 52px);
   }
   body[data-theme='light'] .sidebar {
@@ -5738,39 +5738,50 @@ body[data-theme='light'] .relatorios-loading-shell {
    -------------------------------------------------------------------------- */
 body[data-theme='light'] .sidebar .brand-logo {
   display: block;
-  width: min(100%, 148px);
+  grid-area: 1 / 1;
+  /* ~85% × scale(1.18) ≈ 100% da coluna: evita corte com overflow-x do menu */
+  width: 85%;
+  max-width: 440px;
   height: auto;
-  margin: 0 auto;
+  margin: 0;
+  justify-self: center;
+  align-self: center;
   object-fit: contain;
   filter: none;
   opacity: 1;
+  transform: scale(1.18);
+  /* Eixo X no meio = marca central; Y no topo = não “sobe” cortando o padding do menu */
+  transform-origin: 50% 0;
+  pointer-events: auto;
 }
 
 body[data-theme='light'] .sidebar .brand-wrapper {
-  position: relative;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  justify-items: stretch;
   align-items: center;
-  margin-bottom: 14px;
+  width: 100%;
+  margin-bottom: 28px;
   min-height: 0;
+  overflow: visible;
+  padding-bottom: 14px;
+  position: relative;
+}
+
+body[data-theme='light'] .sidebar .brand-wrapper .mobile-close-btn {
+  grid-area: 1 / 1;
+  justify-self: end;
+  align-self: center;
+  position: relative;
+  z-index: 2;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
   body[data-theme='light'] .sidebar .brand-wrapper {
-    padding-right: 48px;
     margin-bottom: 12px;
   }
-
-  body[data-theme='light'] .sidebar .mobile-close-btn {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1;
-  }
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-  width: min(100%, 132px);
 }
 
 body[data-theme='light'] .ref-dashboard-top {
@@ -7106,11 +7117,16 @@ body[data-theme='light'] {
   --pf-sh-float: 0 28px 56px -34px rgba(15, 23, 42, 0.16);
   --pf-sh-soft: 0 8px 24px -12px rgba(15, 23, 42, 0.1);
   --pf-focus: 0 0 0 3px rgba(59, 130, 246, 0.32);
-  /* Menu lateral — largura única (demais regras usam estes tokens) */
-  --app-sidebar-width: 240px;
-  --app-sidebar-pad: 20px 16px 18px;
+  /* Menu lateral — proporcional ao viewport (largura + padding fluidos) */
+  --app-sidebar-width: clamp(220px, 17vw + 72px, 308px);
+  --app-sidebar-pad: clamp(14px, 1.6vw + 8px, 22px) clamp(12px, 1.2vw + 8px, 18px)
+    clamp(14px, 1.5vw + 8px, 20px);
   --app-shell-inner-max: 1180px;
   --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 52px);
+  /* Altura útil da coluna do menu (rodapé “Sair” alinhado à página) */
+  --app-sidebar-col-h: calc(
+    100dvh - max(20px, env(safe-area-inset-top, 0px)) - max(16px, env(safe-area-inset-bottom, 0px)) - 32px
+  );
 }
 
 /* Shell: uma única leitura visual (resolve conflitos entre blocos antigos) */
