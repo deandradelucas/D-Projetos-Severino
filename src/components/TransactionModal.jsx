@@ -343,57 +343,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
             </div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div className="form-group">
-              <label>Valor (R$)</label>
-              <input 
-                type="text" 
-                name="valorDisplay" 
-                value={displayValor} 
-                onChange={handleCurrencyChange} 
-                ref={valorInputRef}
-                required 
-                placeholder="0,00" 
-                autoComplete="off"
-                className="input-premium"
-              />
-            </div>
-
-            <div className="form-group">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label>Data</label>
-                <div className="date-shortcuts">
-                  <button 
-                    type="button" 
-                    className="date-shortcut-btn"
-                    onClick={() => {
-                      const now = new Date();
-                      const offset = now.getTimezoneOffset() * 60000;
-                      const dStr = new Date(now - offset).toISOString().slice(0, 16);
-                      setFormData(prev => ({ ...prev, data_transacao: dStr }));
-                    }}
-                  >
-                    Hoje
-                  </button>
-                  <button 
-                    type="button" 
-                    className="date-shortcut-btn"
-                    onClick={() => {
-                      const yesterday = new Date();
-                      yesterday.setDate(yesterday.getDate() - 1);
-                      const offset = yesterday.getTimezoneOffset() * 60000;
-                      const yStr = new Date(yesterday - offset).toISOString().slice(0, 16);
-                      setFormData(prev => ({ ...prev, data_transacao: yStr }));
-                    }}
-                  >
-                    Ontem
-                  </button>
-                </div>
-              </div>
-              <input type="datetime-local" name="data_transacao" value={formData.data_transacao} onChange={handleChange} required className="input-premium" />
-            </div>
-          </div>
-
           <div className="form-group">
             <label>
               Descrição{' '}
@@ -405,6 +354,62 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               value={formData.descricao}
               onChange={handleChange}
               placeholder="O que você comprou?"
+              className="input-premium"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Valor (R$)</label>
+            <input
+              type="text"
+              name="valorDisplay"
+              value={displayValor}
+              onChange={handleCurrencyChange}
+              ref={valorInputRef}
+              required
+              placeholder="0,00"
+              autoComplete="off"
+              className="input-premium"
+            />
+          </div>
+
+          <div className="form-group">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label>Data</label>
+              <div className="date-shortcuts">
+                <button
+                  type="button"
+                  className="date-shortcut-btn"
+                  onClick={() => {
+                    const now = new Date()
+                    const offset = now.getTimezoneOffset() * 60000
+                    const dStr = new Date(now - offset).toISOString().slice(0, 16)
+                    setFormData(prev => ({ ...prev, data_transacao: dStr }))
+                  }}
+                >
+                  Hoje
+                </button>
+                <button
+                  type="button"
+                  className="date-shortcut-btn"
+                  onClick={() => {
+                    const yesterday = new Date()
+                    yesterday.setDate(yesterday.getDate() - 1)
+                    const offset = yesterday.getTimezoneOffset() * 60000
+                    const yStr = new Date(yesterday - offset).toISOString().slice(0, 16)
+                    setFormData(prev => ({ ...prev, data_transacao: yStr }))
+                  }}
+                >
+                  Ontem
+                </button>
+              </div>
+            </div>
+            <input
+              type="datetime-local"
+              name="data_transacao"
+              value={formData.data_transacao}
+              onChange={handleChange}
+              required
               className="input-premium"
             />
           </div>
