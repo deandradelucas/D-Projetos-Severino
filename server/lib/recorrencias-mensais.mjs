@@ -75,10 +75,13 @@ async function inserirTransacaoGerada(supabase, usuarioId, rule, dataIso) {
 export async function criarRegraRecorrenciaDia1(usuarioId, primeiraLinha) {
   const supabase = getSupabaseAdmin()
   const mesRef = monthKeyBrazil(primeiraLinha.data_transacao)
+  const uid = String(primeiraLinha.usuario_id || usuarioId || '').trim()
+  if (!uid) throw new Error('usuario_id ausente ao criar recorrência.')
+
   const { data, error } = await supabase
     .from('recorrencias_mensais')
     .insert({
-      usuario_id: usuarioId,
+      usuario_id: uid,
       tipo: primeiraLinha.tipo,
       valor: primeiraLinha.valor,
       descricao: primeiraLinha.descricao ?? '',
@@ -92,17 +95,35 @@ export async function criarRegraRecorrenciaDia1(usuarioId, primeiraLinha) {
     .maybeSingle()
 
   if (error) throw error
+  if (!data?.id) return { regra: data, transacaoAtualizada: null }
 
-  if (data?.id && primeiraLinha?.id) {
-    const uid = String(usuarioId || '').trim()
-    await supabase
-      .from('transacoes')
-      .update({ recorrencia_mensal_id: data.id })
-      .eq('id', primeiraLinha.id)
-      .eq('usuario_id', uid)
+  if (!primeiraLinha?.id) {
+    await supabase.from('recorrencias_mensais').delete().eq('id', data.id)
+    throw new Error('Transação salva sem id; regra de recorrência revertida.')
   }
 
-  return data
+  const { data: updatedRow, error: upErr } = await supabase
+    .from('transacoes')
+    .update({ recorrencia_mensal_id: data.id })
+    .eq('id', primeiraLinha.id)
+    .eq('usuario_id', uid)
+    .select('id, recorrencia_mensal_id')
+    .maybeSingle()
+
+  if (upErr) {
+    await supabase.from('recorrencias_mensais').delete().eq('id', data.id)
+    throw upErr
+  }
+  if (!updatedRow) {
+    await supabase.from('recorrencias_mensais').delete().eq('id', data.id)
+    log.warn('[criarRegraRecorrenciaDia1] update não afetou linha', {
+      txId: primeiraLinha.id,
+      usuarioId: uid,
+    })
+    throw new Error('Não foi possível vincular a regra à transação (0 linhas).')
+  }
+
+  return { regra: data, transacaoAtualizada: updatedRow }
 }
 
 export async function listarRecorrenciasMensais(usuarioId) {

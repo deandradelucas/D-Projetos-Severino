@@ -25,6 +25,7 @@ const SkeletonTxRow = () => (
     <div className="ref-tx-sub-cell">
       <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--sub" />
     </div>
+    <div className="ref-tx-rec-cell ref-tx-rec-cell--skeleton" aria-hidden />
     <div className="ref-tx-val-cell">
       <span className="skeleton skeleton-pulse ref-tx-skel-pill" />
     </div>
@@ -409,6 +410,7 @@ export default function Transacoes() {
                   <span className="ref-tx-list-head__meta">Data</span>
                   <span className="ref-tx-list-head__cat">Categoria</span>
                   <span className="ref-tx-list-head__sub">Subcategoria</span>
+                  <span className="ref-tx-list-head__rec" aria-hidden="true" />
                   <span className="ref-tx-list-head__val">Valor</span>
                   <span className="ref-tx-list-head__actions">Ações</span>
                 </div>
@@ -468,19 +470,21 @@ export default function Transacoes() {
                         <span className="ref-tx-field-label">Subcategoria</span>
                         <p className="ref-tx-sub-text break-words">{subNome}</p>
                       </div>
+                      <div className="ref-tx-rec-cell">
+                        {mostraIconeRecorrente ? (
+                          <span
+                            className="ref-tx-recorrencia-ico-wrap"
+                            title="Lançamento recorrente"
+                            aria-label="Lançamento recorrente"
+                          >
+                            <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
+                          </span>
+                        ) : null}
+                      </div>
                       <div className="ref-tx-val-cell">
                         <span
                           className={`ref-tx-val ${isRec ? 'ref-tx-val--pos' : 'ref-tx-val--neg'} ${privacyMode ? 'privacy-blur' : ''}`}
                         >
-                          {mostraIconeRecorrente ? (
-                            <span
-                              className="ref-tx-recorrencia-ico-wrap"
-                              title="Lançamento recorrente"
-                              aria-label="Lançamento recorrente"
-                            >
-                              <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
-                            </span>
-                          ) : null}
                           <span className="ref-tx-val__amount">
                             {isRec ? '+' : '−'}
                             {formatCurrency(valorAbs)}

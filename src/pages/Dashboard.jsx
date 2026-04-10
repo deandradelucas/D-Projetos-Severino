@@ -36,6 +36,7 @@ const SkeletonTxRow = () => (
     <div className="ref-tx-sub-cell">
       <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--sub" />
     </div>
+    <div className="ref-tx-rec-cell ref-tx-rec-cell--skeleton" aria-hidden />
     <div className="ref-tx-val-cell">
       <span className="skeleton skeleton-pulse ref-tx-skel-pill" />
     </div>
@@ -43,7 +44,7 @@ const SkeletonTxRow = () => (
 )
 
 export default function Dashboard() {
-  const { privacyMode } = useTheme()
+  const { privacyMode, togglePrivacy } = useTheme()
   const [usuario, setUsuario] = useState(() => readHorizonteUser() || { nome: 'Usuário', email: '', id: '' })
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -149,7 +150,9 @@ export default function Dashboard() {
 
   const nomeExibicao = useMemo(() => {
     const n = String(usuario?.nome || usuario?.usuario || '').trim()
-    return n || 'usuário'
+    if (!n) return 'usuário'
+    const primeiro = n.split(/\s+/)[0]
+    return primeiro || 'usuário'
   }, [usuario])
 
   const [whatsappContactUrl, setWhatsappContactUrl] = useState(() => getWhatsAppContactUrl())
@@ -188,40 +191,68 @@ export default function Dashboard() {
 
         <main className="main-content relative z-10 ref-dashboard-main">
         <div className="ref-dashboard-inner">
-        <header className="ref-dashboard-header">
-          <MobileMenuButton onClick={() => setMenuAberto(true)} />
-          <div className="ref-dashboard-header__lead">
-            <h1 className="ref-dashboard-greeting">
-              <span className="ref-dashboard-greeting__prefix">Olá,</span>
-              {` `}
-              <span className={`ref-dashboard-greeting__name ${privacyMode ? 'privacy-blur' : ''}`}>{nomeExibicao}</span>
-            </h1>
-          </div>
-        </header>
-
-        <article className="ref-panel ref-dashboard-actions-card" aria-label="Ações rápidas">
-          <div className="ref-dashboard-actions-card__toolbar" role="toolbar" aria-label="Nova transação e WhatsApp">
-            <button type="button" className="ref-dashboard-header__btn-tx" onClick={() => setIsModalOpen(true)}>
-              Nova transação
-            </button>
-            <a
-              href={whatsappContactUrl || '#'}
-              target={whatsappContactUrl ? '_blank' : undefined}
-              rel={whatsappContactUrl ? 'noopener noreferrer' : undefined}
-              tabIndex={whatsappContactUrl ? undefined : -1}
-              className={`ref-dashboard-header__btn-wa ${!whatsappContactUrl ? 'ref-dashboard-header__btn-wa--disabled' : ''}`}
-              aria-label="Abrir WhatsApp"
-              title={
-                whatsappContactUrl
-                  ? 'WhatsApp'
-                  : 'Configure VITE_WHATSAPP_* no build ou WHATSAPP_CONTACT_* no servidor'
-              }
+        <article
+          className="ref-panel ref-dashboard-actions-card ref-dashboard-actions-card--welcome"
+          aria-label="Boas-vindas e ações rápidas"
+        >
+          <header className="ref-dashboard-header ref-dashboard-header--embedded">
+            <MobileMenuButton onClick={() => setMenuAberto(true)} />
+            <div className="ref-dashboard-header__lead">
+              <h1 className="ref-dashboard-greeting">
+                <span className="ref-dashboard-greeting__prefix">Olá,</span>
+                {` `}
+                <span className={`ref-dashboard-greeting__name ${privacyMode ? 'privacy-blur' : ''}`}>{nomeExibicao}</span>
+              </h1>
+            </div>
+            <div
+              className="ref-dashboard-actions-card__toolbar ref-dashboard-actions-card__toolbar--inline"
+              role="toolbar"
+              aria-label="Nova transação e WhatsApp"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-              </svg>
-            </a>
-          </div>
+              <button type="button" className="ref-dashboard-header__btn-tx" onClick={() => setIsModalOpen(true)}>
+                Nova transação
+              </button>
+              <a
+                href={whatsappContactUrl || '#'}
+                target={whatsappContactUrl ? '_blank' : undefined}
+                rel={whatsappContactUrl ? 'noopener noreferrer' : undefined}
+                tabIndex={whatsappContactUrl ? undefined : -1}
+                className={`ref-dashboard-header__btn-wa ${!whatsappContactUrl ? 'ref-dashboard-header__btn-wa--disabled' : ''}`}
+                aria-label="Abrir WhatsApp"
+                title={
+                  whatsappContactUrl
+                    ? 'WhatsApp'
+                    : 'Configure VITE_WHATSAPP_* no build ou WHATSAPP_CONTACT_* no servidor'
+                }
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+              </a>
+            </div>
+            <button
+              type="button"
+              className={`ref-dashboard-privacy-btn ${privacyMode ? 'ref-dashboard-privacy-btn--on' : ''}`}
+              onClick={togglePrivacy}
+              aria-pressed={privacyMode}
+              aria-label={privacyMode ? 'Mostrar valores e nome' : 'Ocultar valores e nome (modo privacidade)'}
+              title="Modo privacidade"
+            >
+              {privacyMode ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M10.733 5.076A10.744 10.744 0 0 1 12 5c7 0 10 7 10 7a13.165 13.165 0 0 1-1.555 2.665" />
+                  <path d="M6.52 6.52A13.134 13.134 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 4.29-.973" />
+                  <path d="M2 2l20 20" />
+                  <path d="M14.12 14.12a3 3 0 0 1-4.24-4.24" />
+                </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              )}
+            </button>
+          </header>
         </article>
 
         <section
@@ -319,6 +350,7 @@ export default function Dashboard() {
                     <span className="ref-tx-list-head__meta">Data</span>
                     <span className="ref-tx-list-head__cat">Categoria</span>
                     <span className="ref-tx-list-head__sub">Subcategoria</span>
+                    <span className="ref-tx-list-head__rec" aria-hidden="true" />
                     <span className="ref-tx-list-head__val">Valor</span>
                   </div>
                   {txRecentes.map((t) => {
@@ -367,19 +399,21 @@ export default function Dashboard() {
                           <span className="ref-tx-field-label">Subcategoria</span>
                           <p className="ref-tx-sub-text break-words">{subNome}</p>
                         </div>
+                        <div className="ref-tx-rec-cell">
+                          {mostraIconeRecorrente ? (
+                            <span
+                              className="ref-tx-recorrencia-ico-wrap"
+                              title="Lançamento recorrente"
+                              aria-label="Lançamento recorrente"
+                            >
+                              <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
+                            </span>
+                          ) : null}
+                        </div>
                         <div className="ref-tx-val-cell">
                           <span
                             className={`ref-tx-val ${isRec ? 'ref-tx-val--pos' : 'ref-tx-val--neg'} ${privacyMode ? 'privacy-blur' : ''}`}
                           >
-                            {mostraIconeRecorrente ? (
-                              <span
-                                className="ref-tx-recorrencia-ico-wrap"
-                                title="Lançamento recorrente"
-                                aria-label="Lançamento recorrente"
-                              >
-                                <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
-                              </span>
-                            ) : null}
                             <span className="ref-tx-val__amount">
                               {isRec ? '+' : '−'}
                               {formatCurrency(Math.abs(parseFloat(t.valor) || 0))}

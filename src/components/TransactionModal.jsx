@@ -296,7 +296,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
 
   return (
     <div className="modal-backdrop">
-      <div className="modal-content">
+      <div className="modal-content modal-content--nova-tx">
         <div className="modal-header">
           <h3>{isEditMode ? 'Editar Transação' : 'Nova Transação'}</h3>
           <button type="button" onClick={onClose} className="close-btn" aria-label="Fechar">
@@ -358,7 +358,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
           <div className="form-group">
             <label>
               Descrição{' '}
-              <span style={{ fontSize: '11px', opacity: 0.7, fontWeight: 400, textTransform: 'lowercase' }}>(opcional)</span>
+              <span className="modal-label-optional">(opcional)</span>
             </label>
             <input
               type="text"
