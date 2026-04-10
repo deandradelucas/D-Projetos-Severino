@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
-import GlobalSkeleton from '../components/GlobalSkeleton'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
@@ -40,6 +39,81 @@ const SkeletonKpi = () => (
   </div>
 )
 
+function RelatoriosChartSkelBody({ pie }) {
+  return (
+    <div
+      className={
+        pie
+          ? 'relatorios-chart-card__body relatorios-chart-card__body--pie relatorios-chart-card__body--skeleton-only'
+          : 'relatorios-chart-card__body relatorios-chart-card__body--skeleton-only'
+      }
+      aria-hidden
+    />
+  )
+}
+
+/** Mesmo grid dos gráficos reais: títulos fixos + área pulsante (evita “cards genéricos” + tabela falsa). */
+function RelatoriosChartsLoadingShell() {
+  return (
+    <div className="relatorios-charts relatorios-charts--initial-skeleton" aria-busy="true" aria-label="Carregando gráficos">
+      <section className="relatorios-charts__section" aria-labelledby="rel-month-heading-skel">
+        <h3 id="rel-month-heading-skel" className="relatorios-charts__section-title">
+          Visão mensal
+        </h3>
+        <div className="relatorios-charts__section-grid">
+          <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+            <div className="ref-panel__head">
+              <div>
+                <h2 className="ref-panel__title">Evolução mensal</h2>
+                <p className="ref-panel__subtitle">Receitas e despesas agregadas por mês no período</p>
+              </div>
+            </div>
+            <RelatoriosChartSkelBody />
+          </article>
+          <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+            <div className="ref-panel__head">
+              <div>
+                <h2 className="ref-panel__title">Compras recorrentes por mês</h2>
+                <p className="ref-panel__subtitle">Soma das despesas marcadas como recorrentes (regra mensal ou parcelamento) por mês</p>
+              </div>
+            </div>
+            <RelatoriosChartSkelBody />
+          </article>
+          <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+            <div className="ref-panel__head">
+              <div>
+                <h2 className="ref-panel__title">Saldo acumulado (mensal)</h2>
+                <p className="ref-panel__subtitle">Resultado líquido mês a mês no período (referência em zero)</p>
+              </div>
+            </div>
+            <RelatoriosChartSkelBody />
+          </article>
+        </div>
+      </section>
+      <div className="relatorios-charts__pair">
+        <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card">
+          <div className="ref-panel__head">
+            <div>
+              <h2 className="ref-panel__title">Despesas por categoria</h2>
+              <p className="ref-panel__subtitle">Distribuição do que saiu no período</p>
+            </div>
+          </div>
+          <RelatoriosChartSkelBody pie />
+        </article>
+        <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card">
+          <div className="ref-panel__head">
+            <div>
+              <h2 className="ref-panel__title">Receitas por categoria</h2>
+              <p className="ref-panel__subtitle">De onde entrou dinheiro no período</p>
+            </div>
+          </div>
+          <RelatoriosChartSkelBody pie />
+        </article>
+      </div>
+    </div>
+  )
+}
+
 function RelatoriosTooltip({ active, payload, label, formatCurrency }) {
   if (!active || !payload?.length) return null
   return (
@@ -73,7 +147,18 @@ export default function Relatorios() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [transacoes, setTransacoes] = useState([])
   const [categorias, setCategorias] = useState([])
-  const [loading, setLoading] = useState(false)
+  const firstFetchDoneRef = useRef(false)
+  const [loading, setLoading] = useState(() => {
+    try {
+      const raw = localStorage.getItem('horizonte_user')
+      if (raw) {
+        const u = JSON.parse(raw)
+        return Boolean(u?.id && String(u.id).trim())
+      }
+    } catch { /* ignore */ }
+    return false
+  })
+  const [refreshing, setRefreshing] = useState(false)
   const [pdfExportLoading, setPdfExportLoading] = useState(false)
   const isMobile = useMatchMaxWidth(768)
 
@@ -103,7 +188,9 @@ export default function Relatorios() {
 
   // Fetch Transacoes
   const fetchTransacoes = useCallback(async () => {
-    setLoading(true)
+    const isInitial = !firstFetchDoneRef.current
+    if (isInitial) setLoading(true)
+    else setRefreshing(true)
     try {
       const params = new URLSearchParams()
       if (filters.dataInicio) params.append('dataInicio', filters.dataInicio)
@@ -124,8 +211,14 @@ export default function Relatorios() {
       console.error(err)
     } finally {
       setLoading(false)
+      setRefreshing(false)
+      firstFetchDoneRef.current = true
     }
   }, [usuario.id, filters])
+
+  useEffect(() => {
+    firstFetchDoneRef.current = false
+  }, [usuario.id])
 
   useEffect(() => {
     if (usuario.id) {
@@ -323,7 +416,11 @@ export default function Relatorios() {
           </div>
         </article>
 
-        <section className="ref-kpi-row" aria-label="Resumo do período" aria-busy={loading}>
+        <section
+          className={`ref-kpi-row${refreshing ? ' relatorios-kpi-row--refreshing' : ''}`}
+          aria-label="Resumo do período"
+          aria-busy={loading || refreshing}
+        >
           {loading ? (
             <>
               <SkeletonKpi />
@@ -378,18 +475,11 @@ export default function Relatorios() {
         </section>
 
         {loading ? (
-          <div className="ref-bottom-grid ref-bottom-grid--single page-relatorios-loading-shell">
-            <article className="ref-panel page-relatorios-loading-panel">
-              <GlobalSkeleton variant="cards" />
-            </article>
-            <article className="ref-panel page-relatorios-loading-panel">
-              <GlobalSkeleton variant="table" rows={6} />
-            </article>
-          </div>
+          <RelatoriosChartsLoadingShell />
         ) : transacoes.length === 0 ? (
           <p className="relatorios-empty-msg">Nenhuma transação efetivada neste período para compor o relatório.</p>
         ) : (
-          <div className="relatorios-charts">
+          <div className={`relatorios-charts${refreshing ? ' relatorios-charts--refreshing' : ''}`} aria-busy={refreshing}>
             <section className="relatorios-charts__section" aria-labelledby="rel-month-heading">
               <h3 id="rel-month-heading" className="relatorios-charts__section-title">
                 Visão mensal
