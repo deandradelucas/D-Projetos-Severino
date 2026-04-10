@@ -2401,11 +2401,11 @@ body[data-theme='light'] .relatorios-kpi-saldo--neg {
 }
 
 @media (max-width: 640px) {
-  .relatorios-export-btns {
+  .page-relatorios .relatorios-header-export {
     width: 100%;
   }
 
-  .relatorios-export-btns .relatorios-btn-export {
+  .page-relatorios .relatorios-header-export .relatorios-btn-export {
     flex: 1;
     justify-content: center;
   }
@@ -3907,21 +3907,8 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   }
 }
 
-[data-theme='off-white'] .dashboard-section-header {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%);
-}
-
-[data-theme='off-white'] .dashboard-section-title::after {
-  background: linear-gradient(90deg, #d4d4d4, rgba(255, 255, 255, 0.08));
-}
-
 [data-theme='off-white'] .dashboard-page .data-table tbody tr:hover {
   background: rgba(255, 255, 255, 0.05) !important;
-}
-
-[data-theme='off-white'] .dashboard-tx-recorrente-badge {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
 }
 
 [data-theme='off-white'] .btn-primary {
@@ -4046,7 +4033,6 @@ body[data-theme='off-white'] .relatorios-kpi-saldo--neg {
   .btn-primary,
   .btn-secondary,
   .btn-primary-dashboard,
-  .transacoes-btn-clear,
   .relatorios-btn-export {
     min-height: 48px;
     min-width: 44px;
