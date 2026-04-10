@@ -62,7 +62,6 @@ const SAFELIST = new Set([
   'recharts-legend-item-marker',
   'config-theme-preview--light',
   'config-theme-preview--dark',
-  'config-theme-preview--glass',
   /* Transacoes.jsx: className={`badge badge-${status.toLowerCase()}`} */
   'badge-efetivada',
   'badge-pendente',

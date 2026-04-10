@@ -2,7 +2,6 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
-import { useTheme } from '../context/ThemeContext'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 
 /** Ordem vertical no menu (índice sobe/desce a bolinha) */
@@ -18,7 +17,6 @@ const MENU_ORDER = [
 ]
 
 export default function Sidebar({ menuAberto, setMenuAberto }) {
-  const { theme } = useTheme()
   const location = useLocation()
   const prevMenuIdx = useRef(-1)
   const [dotMotion, setDotMotion] = useState(null)
@@ -85,7 +83,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     }
   }, [location.pathname, menuAberto, showAdminNav, sessionBump])
 
-  const logoSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
+  const logoSrc = BRAND_ASSETS.logoOnLight
   return (
     <>
       {/* Mobile Backdrop */}

@@ -12,6 +12,8 @@
     "test": "npm run test:unit && npm run lint && npm run build",
     "ci": "npm run test:unit && npm run lint && npm run build && npm run audit:dashboard-css",
     "audit:dashboard-css": "node scripts/find-unused-dashboard-css.mjs",
+    "strip:dashboard-theme-css": "node scripts/strip-non-light-theme-css.mjs",
+    "gen:dashboard-dark-css": "node scripts/gen-dashboard-dark-rules.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "supabase:check": "node scripts/supabase-admin-check.mjs",
@@ -20,6 +22,8 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.12",
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.0",
     "@supabase/supabase-js": "^2.101.1",
     "concurrently": "^9.2.1",
     "hono": "^4.12.10",
@@ -41,6 +45,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
     "vite": "^8.0.1",
     "vitest": "^3.2.4"

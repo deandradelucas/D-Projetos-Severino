@@ -4,26 +4,34 @@ const ThemeContext = createContext()
 
 const STORAGE_KEY = 'horizonte_theme'
 
-const VALID_THEMES = ['light', 'dark', 'glass']
+const VALID_THEMES = ['light', 'dark']
 
 const THEME_COLOR_META = {
   light: '#8ca8d4',
-  dark: '#050607',
-  glass: '#0a1524',
+  dark: '#0f172a',
 }
 
-function normalizeTheme(raw) {
-  if (raw === 'light' || raw === 'dark' || raw === 'glass') return raw
-  if (raw === 'cyberpunk' || raw === 'off-white') return 'dark'
-  return 'light'
+/** Remove valores legados (glass, cyberpunk, off-white, etc.). */
+function purgeLegacyThemeStorage() {
+  try {
+    const v = localStorage.getItem(STORAGE_KEY)
+    if (v && !VALID_THEMES.includes(v)) {
+      localStorage.removeItem(STORAGE_KEY)
+    }
+  } catch {
+    /* quota / private mode */
+  }
 }
 
 function readStoredTheme() {
+  purgeLegacyThemeStorage()
   try {
-    return normalizeTheme(localStorage.getItem(STORAGE_KEY))
+    const v = localStorage.getItem(STORAGE_KEY)
+    if (v && VALID_THEMES.includes(v)) return v
   } catch {
-    return 'light'
+    /* ignore */
   }
+  return 'light'
 }
 
 function applyThemeToDocument(theme) {
@@ -32,7 +40,7 @@ function applyThemeToDocument(theme) {
   try {
     localStorage.setItem(STORAGE_KEY, theme)
   } catch {
-    /* ignore quota / private mode */
+    /* ignore */
   }
   const meta = document.querySelector('meta[name="theme-color"]')
   if (meta) {
@@ -52,13 +60,15 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('horizonte_privacy', privacyMode ? 'true' : 'false')
   }, [privacyMode])
 
-  const setTheme = (next) => {
-    if (!VALID_THEMES.includes(next)) return
-    setThemeState(next)
+  const setTheme = (t) => {
+    if (!VALID_THEMES.includes(t)) return
+    setThemeState(t)
   }
 
-  const toggleTheme = () =>
-    setThemeState((t) => (t === 'light' ? 'dark' : t === 'dark' ? 'glass' : 'light'))
+  const toggleTheme = () => {
+    setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'))
+  }
+
   const togglePrivacy = () => setPrivacyMode((prev) => !prev)
 
   return (

@@ -17,6 +17,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
+    <script>
+      try {
+        var k = 'horizonte_theme'
+        var v = localStorage.getItem(k)
+        if (v === 'dark' || v === 'light') document.body.setAttribute('data-theme', v)
+        else document.body.setAttribute('data-theme', 'light')
+      } catch (e) {
+        document.body.setAttribute('data-theme', 'light')
+      }
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
