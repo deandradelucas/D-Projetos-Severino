@@ -4055,16 +4055,9 @@ body[data-theme='off-white'] .relatorios-kpi-saldo--neg {
     gap: 12px;
   }
 
-  .data-table,
-  .transactions-table-wrap,
-  .transacoes-table-scroll {
+  .data-table {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
-  }
-
-  .transacoes-filter-shell,
-  .relatorios-filter-shell {
-    border-radius: 18px;
   }
 
   .content-section {
@@ -4072,8 +4065,7 @@ body[data-theme='off-white'] .relatorios-kpi-saldo--neg {
   }
 
   .kpi-card,
-  .page-transacoes .kpi-card,
-  .page-relatorios .relatorios-kpi {
+  .page-transacoes .kpi-card {
     padding: 18px 16px;
   }
 
