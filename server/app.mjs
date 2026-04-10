@@ -908,6 +908,7 @@ app.get('/api/transacoes', async (c) => {
       categoria_id: c.req.query('categoria_id'),
       status: c.req.query('status'),
       busca: c.req.query('busca'),
+      somenteRecorrentes: c.req.query('recorrentes') === '1',
       limit: c.req.query('limit') ? parseInt(c.req.query('limit')) : undefined,
       offset: qOff !== undefined && qOff !== '' ? parseInt(String(qOff), 10) : undefined,
     }

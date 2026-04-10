@@ -348,160 +348,176 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
           </button>
         </div>
         <form onSubmit={handleSubmit} className="modal-form modal-form--sheet">
-          <div className="modal-body">
-          <div className="form-group">
-            <label>Tipo</label>
-            <div className="type-toggle">
-              <button 
-                type="button"
-                className={`type-btn despesa ${formData.tipo === 'DESPESA' ? 'active' : ''}`}
-                onClick={() => handleTypeChange('DESPESA')}
-              >
-                Despesa
-              </button>
-              <button 
-                type="button"
-                className={`type-btn receita ${formData.tipo === 'RECEITA' ? 'active' : ''}`}
-                onClick={() => handleTypeChange('RECEITA')}
-              >
-                Receita
-              </button>
-            </div>
-          </div>
-
-          <div className="form-group" style={{ opacity: loadingCats ? 0.5 : 1 }}>
-            <label>Categoria</label>
-            <CustomSelect 
-              name="categoria_id" 
-              value={formData.categoria_id} 
-              onChange={handleChange} 
-              options={categorias.filter(c => c.tipo === formData.tipo)} 
-              placeholder="Pesquise..." 
-              isOpen={activeSelect === 'categoria_id'}
-              onToggle={setActiveSelect}
-              zIndex={10}
-            />
-          </div>
-
-          {subcategorias.length > 0 && (
-            <div className="form-group slide-down">
-              <label>Subcategoria</label>
-              <CustomSelect 
-                name="subcategoria_id" 
-                value={formData.subcategoria_id} 
-                onChange={handleChange} 
-                options={subcategorias} 
-                placeholder="Pesquise..." 
-                isOpen={activeSelect === 'subcategoria_id'}
-                onToggle={setActiveSelect}
-                zIndex={5}
-              />
-            </div>
-          )}
-
-          <div className="form-group">
-            <label>
-              Descrição{' '}
-              <span className="modal-label-optional">(opcional)</span>
-            </label>
-            <input
-              type="text"
-              name="descricao"
-              value={formData.descricao}
-              onChange={handleChange}
-              placeholder="O que você comprou?"
-              className="input-premium"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="tx-valor">Valor (R$)</label>
-            <input
-              id="tx-valor"
-              type="text"
-              name="valorDisplay"
-              value={displayValor}
-              onChange={handleCurrencyChange}
-              ref={valorInputRef}
-              required
-              placeholder="0,00"
-              autoComplete="off"
-              inputMode="decimal"
-              enterKeyHint="done"
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              onFocus={scrollValorIntoView}
-              className="input-premium input-valor-novo-tx"
-            />
-          </div>
-
-          <div className="form-group">
-            <div className="modal-date-toolbar">
-              <label htmlFor="tx-data-transacao">Data</label>
-              <div className="date-shortcuts">
-                <button
-                  type="button"
-                  className="date-shortcut-btn"
-                  onClick={() => {
-                    const now = new Date()
-                    const offset = now.getTimezoneOffset() * 60000
-                    const dStr = new Date(now - offset).toISOString().slice(0, 16)
-                    setFormData(prev => ({ ...prev, data_transacao: dStr }))
-                  }}
-                >
-                  Hoje
-                </button>
-                <button
-                  type="button"
-                  className="date-shortcut-btn"
-                  onClick={() => {
-                    const yesterday = new Date()
-                    yesterday.setDate(yesterday.getDate() - 1)
-                    const offset = yesterday.getTimezoneOffset() * 60000
-                    const yStr = new Date(yesterday - offset).toISOString().slice(0, 16)
-                    setFormData(prev => ({ ...prev, data_transacao: yStr }))
-                  }}
-                >
-                  Ontem
-                </button>
+          <div className="modal-body modal-body--nova-tx">
+            <section className="nova-tx-section" aria-labelledby="nova-tx-h-classif">
+              <h4 id="nova-tx-h-classif" className="nova-tx-section__title">
+                Classificação
+              </h4>
+              <div className="form-group">
+                <label>Tipo</label>
+                <div className="type-toggle">
+                  <button
+                    type="button"
+                    className={`type-btn despesa ${formData.tipo === 'DESPESA' ? 'active' : ''}`}
+                    onClick={() => handleTypeChange('DESPESA')}
+                  >
+                    Despesa
+                  </button>
+                  <button
+                    type="button"
+                    className={`type-btn receita ${formData.tipo === 'RECEITA' ? 'active' : ''}`}
+                    onClick={() => handleTypeChange('RECEITA')}
+                  >
+                    Receita
+                  </button>
+                </div>
               </div>
-            </div>
-            <input
-              id="tx-data-transacao"
-              type="datetime-local"
-              name="data_transacao"
-              value={formData.data_transacao}
-              onChange={handleChange}
-              required
-              className="input-premium"
-            />
-          </div>
 
-          {!isEditMode && (
-            <div
-              className={`form-group form-group--recorrencia ${formData.recorrencia_dia_1 ? 'form-group--recorrencia-on' : ''}`}
-            >
-              <label>Lançamentos recorrentes</label>
-              <label htmlFor="tx-recorrencia-dia-1" className="modal-recorrencia-toggle-row">
-                <span className="modal-recorrencia-toggle-row__iconWrap" aria-hidden>
-                  <RecorrenciaArrowIcon size={20} className="modal-recorrencia-toggle-row__icon" />
-                </span>
-                <span className="modal-recorrencia-toggle-row__text">Repetir todos os meses</span>
-                <input
-                  id="tx-recorrencia-dia-1"
-                  type="checkbox"
-                  name="recorrencia_dia_1"
-                  checked={formData.recorrencia_dia_1}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, recorrencia_dia_1: e.target.checked }))
-                  }
-                  className="modal-recorrencia-toggle-row__checkbox"
+              <div className="form-group" style={{ opacity: loadingCats ? 0.5 : 1 }}>
+                <label>Categoria</label>
+                <CustomSelect
+                  name="categoria_id"
+                  value={formData.categoria_id}
+                  onChange={handleChange}
+                  options={categorias.filter((c) => c.tipo === formData.tipo)}
+                  placeholder="Escolha uma categoria…"
+                  isOpen={activeSelect === 'categoria_id'}
+                  onToggle={setActiveSelect}
+                  zIndex={10}
                 />
-              </label>
-            </div>
-          )}
+              </div>
 
+              {subcategorias.length > 0 && (
+                <div className="form-group slide-down">
+                  <label>Subcategoria</label>
+                  <CustomSelect
+                    name="subcategoria_id"
+                    value={formData.subcategoria_id}
+                    onChange={handleChange}
+                    options={subcategorias}
+                    placeholder="Opcional…"
+                    isOpen={activeSelect === 'subcategoria_id'}
+                    onToggle={setActiveSelect}
+                    zIndex={5}
+                  />
+                </div>
+              )}
+            </section>
+
+            <section className="nova-tx-section" aria-labelledby="nova-tx-h-detalhes">
+              <h4 id="nova-tx-h-detalhes" className="nova-tx-section__title">
+                Valor e data
+              </h4>
+              <div className="form-group form-group--valor-destaque">
+                <label htmlFor="tx-valor">Valor (R$)</label>
+                <input
+                  id="tx-valor"
+                  type="text"
+                  name="valorDisplay"
+                  value={displayValor}
+                  onChange={handleCurrencyChange}
+                  ref={valorInputRef}
+                  required
+                  placeholder="R$ 0,00"
+                  autoComplete="off"
+                  inputMode="decimal"
+                  enterKeyHint="done"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  onFocus={scrollValorIntoView}
+                  className="input-premium input-valor-novo-tx"
+                />
+              </div>
+
+              <div className="form-group form-group--data-nova-tx">
+                <div className="modal-date-toolbar">
+                  <label htmlFor="tx-data-transacao">Data e hora</label>
+                  <div className="date-shortcuts">
+                    <button
+                      type="button"
+                      className="date-shortcut-btn"
+                      onClick={() => {
+                        const now = new Date()
+                        const offset = now.getTimezoneOffset() * 60000
+                        const dStr = new Date(now - offset).toISOString().slice(0, 16)
+                        setFormData((prev) => ({ ...prev, data_transacao: dStr }))
+                      }}
+                    >
+                      Hoje
+                    </button>
+                    <button
+                      type="button"
+                      className="date-shortcut-btn"
+                      onClick={() => {
+                        const yesterday = new Date()
+                        yesterday.setDate(yesterday.getDate() - 1)
+                        const offset = yesterday.getTimezoneOffset() * 60000
+                        const yStr = new Date(yesterday - offset).toISOString().slice(0, 16)
+                        setFormData((prev) => ({ ...prev, data_transacao: yStr }))
+                      }}
+                    >
+                      Ontem
+                    </button>
+                  </div>
+                </div>
+                <input
+                  id="tx-data-transacao"
+                  type="datetime-local"
+                  name="data_transacao"
+                  value={formData.data_transacao}
+                  onChange={handleChange}
+                  required
+                  className="input-premium input-data-novo-tx"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="tx-descricao">
+                  Descrição <span className="modal-label-optional">(opcional)</span>
+                </label>
+                <input
+                  id="tx-descricao"
+                  type="text"
+                  name="descricao"
+                  value={formData.descricao}
+                  onChange={handleChange}
+                  placeholder="Ex.: mercado, aluguel, salário…"
+                  className="input-premium"
+                />
+              </div>
+            </section>
+
+            {!isEditMode && (
+              <section
+                className={`nova-tx-section nova-tx-section--recorrencia ${formData.recorrencia_dia_1 ? 'nova-tx-section--recorrencia-on' : ''}`}
+                aria-labelledby="nova-tx-h-recorrencia"
+              >
+                <h4 id="nova-tx-h-recorrencia" className="nova-tx-section__title">
+                  Recorrência
+                </h4>
+                <div
+                  className={`form-group form-group--recorrencia ${formData.recorrencia_dia_1 ? 'form-group--recorrencia-on' : ''}`}
+                >
+                  <label htmlFor="tx-recorrencia-dia-1" className="modal-recorrencia-toggle-row">
+                    <span className="modal-recorrencia-toggle-row__iconWrap" aria-hidden>
+                      <RecorrenciaArrowIcon size={20} className="modal-recorrencia-toggle-row__icon" />
+                    </span>
+                    <span className="modal-recorrencia-toggle-row__text">Repetir todo mês neste dia</span>
+                    <input
+                      id="tx-recorrencia-dia-1"
+                      type="checkbox"
+                      name="recorrencia_dia_1"
+                      checked={formData.recorrencia_dia_1}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, recorrencia_dia_1: e.target.checked }))
+                      }
+                      className="modal-recorrencia-toggle-row__checkbox"
+                    />
+                  </label>
+                </div>
+              </section>
+            )}
           </div>
 
           <div className="modal-actions">

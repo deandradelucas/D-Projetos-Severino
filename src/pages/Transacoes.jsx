@@ -72,7 +72,9 @@ export default function Transacoes() {
     tipo: '',
     categoria_id: '',
     dataInicio: '',
-    dataFim: ''
+    dataFim: '',
+    /** '' = todos · 'recorrentes' = só parcelas / repetição mensal (API recorrentes=1) */
+    lancamentos: '',
   })
 
   const fetchCategorias = useCallback(async () => {
@@ -123,6 +125,7 @@ export default function Transacoes() {
       if (filters.categoria_id) params.append('categoria_id', filters.categoria_id)
       if (filters.dataInicio) params.append('dataInicio', filters.dataInicio)
       if (filters.dataFim) params.append('dataFim', filters.dataFim)
+      if (filters.lancamentos === 'recorrentes') params.append('recorrentes', '1')
       params.append('limit', String(TX_PAGE_SIZE))
       params.append('offset', String(offset))
       return params
@@ -245,7 +248,16 @@ export default function Transacoes() {
   const formatCurrency = formatCurrencyBRL
 
   const clearFilters = () =>
-    setFilters({ busca: '', tipo: '', categoria_id: '', dataInicio: '', dataFim: '' })
+    setFilters({
+      busca: '',
+      tipo: '',
+      categoria_id: '',
+      dataInicio: '',
+      dataFim: '',
+      lancamentos: '',
+    })
+
+  const filtroRecorrentesAtivo = filters.lancamentos === 'recorrentes'
 
   const [whatsappContactUrl, setWhatsappContactUrl] = useState(() => getWhatsAppContactUrl())
 
@@ -332,7 +344,7 @@ export default function Transacoes() {
                   Filtros
                 </span>
                 <span className="ref-panel__subtitle page-transacoes-filters-toggle__sub">
-                  Busca, categoria e período
+                  Busca, tipo de lançamento, categoria e período
                 </span>
               </span>
               <svg
@@ -391,6 +403,19 @@ export default function Transacoes() {
                   <option value="DESPESA">Despesas</option>
                 </select>
               </div>
+              <div className="filter-group transacoes-filter-grid__lancamentos">
+                <label htmlFor="tx-lancamentos">Lançamentos</label>
+                <select
+                  id="tx-lancamentos"
+                  name="lancamentos"
+                  className="filter-input"
+                  value={filters.lancamentos}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">Todos</option>
+                  <option value="recorrentes">Recorrentes</option>
+                </select>
+              </div>
               <div className="filter-group">
                 <label htmlFor="tx-ini">Início</label>
                 <input id="tx-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
@@ -403,50 +428,73 @@ export default function Transacoes() {
           </div>
         </article>
 
-        {recorrencias.length > 0 && (
-          <article className="ref-panel page-transacoes-ref-recorrencias" aria-label="Lançamentos recorrentes">
+        {filtroRecorrentesAtivo && (
+          <article
+            className="ref-panel page-transacoes-ref-recorrencias page-transacoes-ref-recorrencias--filter"
+            aria-label="Regras de repetição no dia 1"
+          >
             <div className="ref-panel__head page-transacoes-rec-head">
-              <h2 className="ref-panel__title">Lançamentos recorrentes</h2>
+              <div className="page-transacoes-rec-head__titles">
+                <h2 className="ref-panel__title">Repetição mensal (dia 1)</h2>
+                <p className="page-transacoes-rec-head__sub">
+                  Regras ativas que geram lançamentos automáticos. A lista abaixo mostra as transações já registradas (parcelas ou recorrentes), conforme os filtros.
+                </p>
+              </div>
               <span className="page-transacoes-rec-head__flag">Dia 1</span>
             </div>
-            <ul className="page-transacoes-recorrencias-list">
-              {recorrencias.map((r) => {
-                const isRec = r.tipo === 'RECEITA'
-                const label = (r.descricao && String(r.descricao).trim()) || 'Sem descrição'
-                const valorAbs = Math.abs(parseFloat(r.valor) || 0)
-                return (
-                  <li key={r.id} className="page-transacoes-recorrencia-row">
-                    <div className="page-transacoes-recorrencia-row__main">
-                      <div className="page-transacoes-recorrencia-row__text">
-                        <span className={`page-transacoes-recorrencia-row__tipo ${isRec ? 'page-transacoes-recorrencia-row__tipo--rec' : ''}`}>
-                          {isRec ? 'Receita' : 'Despesa'}
+            {recorrencias.length === 0 ? (
+              <p className="page-transacoes-rec-empty">
+                Nenhuma regra de repetição no dia 1. Ao criar uma transação, marque &quot;Repetir todo mês neste dia&quot; para aparecer aqui.
+              </p>
+            ) : (
+              <ul className="page-transacoes-recorrencias-list">
+                {recorrencias.map((r) => {
+                  const isRec = r.tipo === 'RECEITA'
+                  const label = (r.descricao && String(r.descricao).trim()) || 'Sem descrição'
+                  const valorAbs = Math.abs(parseFloat(r.valor) || 0)
+                  return (
+                    <li key={r.id} className="page-transacoes-recorrencia-row">
+                      <div className="page-transacoes-recorrencia-row__main">
+                        <div className="page-transacoes-recorrencia-row__text">
+                          <span
+                            className={`page-transacoes-recorrencia-row__tipo ${isRec ? 'page-transacoes-recorrencia-row__tipo--rec' : ''}`}
+                          >
+                            {isRec ? 'Receita' : 'Despesa'}
+                          </span>
+                          <span className="page-transacoes-recorrencia-row__desc break-words">{label}</span>
+                        </div>
+                        <span className={`page-transacoes-recorrencia-row__val ${privacyMode ? 'privacy-blur' : ''}`}>
+                          {isRec ? '+' : '−'}
+                          {formatCurrency(valorAbs)}
                         </span>
-                        <span className="page-transacoes-recorrencia-row__desc break-words">{label}</span>
                       </div>
-                      <span className={`page-transacoes-recorrencia-row__val ${privacyMode ? 'privacy-blur' : ''}`}>
-                        {isRec ? '+' : '−'}
-                        {formatCurrency(valorAbs)}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      className="page-transacoes-recorrencia-row__stop"
-                      onClick={() => handleEncerrarRecorrencia(r.id)}
-                    >
-                      Encerrar
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
+                      <button
+                        type="button"
+                        className="page-transacoes-recorrencia-row__stop"
+                        onClick={() => handleEncerrarRecorrencia(r.id)}
+                      >
+                        Encerrar
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
           </article>
         )}
 
         <article
           className={`ref-panel ref-panel--transactions page-transacoes-ref-table${refreshing ? ' page-panel--refreshing' : ''}`}
         >
-          <div className="ref-panel__head">
-            <h2 className="ref-panel__title">Transações</h2>
+          <div className="ref-panel__head page-transacoes-tx-panel-head">
+            <div>
+              <h2 className="ref-panel__title">Transações</h2>
+              {filtroRecorrentesAtivo ? (
+                <p className="ref-panel__subtitle page-transacoes-tx-filter-hint">
+                  Exibindo só lançamentos com parcelamento ou repetição mensal.
+                </p>
+              ) : null}
+            </div>
           </div>
           <div className="ref-tx-list page-transacoes-tx-list" aria-busy={loading || refreshing}>
             {loading ? (
@@ -460,7 +508,11 @@ export default function Transacoes() {
               </div>
             ) : transacoes.length === 0 ? (
               <div className="ref-empty-state">
-                <p className="ref-empty">Nenhuma transação encontrada com os filtros atuais.</p>
+                <p className="ref-empty">
+                  {filtroRecorrentesAtivo
+                    ? 'Nenhum lançamento recorrente encontrado com os filtros atuais (período, busca ou categoria).'
+                    : 'Nenhuma transação encontrada com os filtros atuais.'}
+                </p>
                 <button type="button" className="ref-empty-cta" onClick={clearFilters}>
                   Limpar filtros
                 </button>

@@ -187,7 +187,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
   const uid = String(usuarioId || '').trim()
   if (!uid) return []
 
-  const { dataInicio, dataFim, tipo, categoria_id, status, busca } = filters
+  const { dataInicio, dataFim, tipo, categoria_id, status, busca, somenteRecorrentes } = filters
   let lim =
     filters.limit !== undefined && filters.limit !== null && filters.limit !== ''
       ? parseInt(String(filters.limit), 10)
@@ -212,6 +212,10 @@ export async function getTransacoes(usuarioId, filters = {}) {
     if (categoria_id) query = query.eq('categoria_id', categoria_id)
     if (status) query = query.eq('status', status)
     if (busca) query = query.ilike('descricao', `%${busca}%`)
+    /* Parcelas (recorrente_grupo_id) ou regra mensal (recorrencia_mensal_id) */
+    if (somenteRecorrentes) {
+      query = query.or('recorrencia_mensal_id.not.is.null,recorrente_grupo_id.not.is.null')
+    }
     return query
   }
 

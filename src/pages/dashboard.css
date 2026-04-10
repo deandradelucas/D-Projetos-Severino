@@ -1817,6 +1817,74 @@ h3 {
   min-width: 0;
 }
 
+/* Nova transação — seções, hierarquia e campos alinhados em qualquer largura */
+.modal-content--nova-tx .modal-header {
+  margin-bottom: 18px;
+}
+
+.modal-body--nova-tx {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.modal-content--nova-tx .nova-tx-section {
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  border: none;
+}
+
+.modal-content--nova-tx .nova-tx-section + .nova-tx-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.modal-content--nova-tx .nova-tx-section__title {
+  margin: 0 0 12px;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.modal-content--nova-tx .nova-tx-section .form-group {
+  margin-bottom: 14px;
+}
+
+.modal-content--nova-tx .nova-tx-section .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.modal-content--nova-tx .form-group--valor-destaque {
+  padding: 14px 16px;
+  border-radius: 16px;
+  box-sizing: border-box;
+  background: linear-gradient(165deg, rgba(212, 168, 75, 0.12) 0%, rgba(248, 250, 252, 0.95) 52%);
+  border: 1px solid rgba(212, 168, 75, 0.24);
+}
+
+.modal-content--nova-tx .form-group--valor-destaque .input-valor-novo-tx.input-premium {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.modal-content--nova-tx .form-group--data-nova-tx {
+  min-width: 0;
+}
+
+@media (min-width: 769px) {
+  .modal-content.modal-content--nova-tx {
+    padding: 28px 30px 32px;
+  }
+}
+
 /* Nova transação / modal — mobile: bottom sheet, áreas seguras, alvos de toque */
 .modal-date-toolbar {
   display: flex;
@@ -1832,20 +1900,23 @@ h3 {
 }
 
 @media (max-width: 768px) {
+  /* Modal centralizado (evita “bottom sheet”); só TransactionModal usa este backdrop hoje */
   .modal-backdrop {
-    align-items: flex-end;
-    justify-content: stretch;
-    padding: 0;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    align-items: center;
+    justify-content: center;
+    padding: max(12px, env(safe-area-inset-top, 0px)) 12px max(12px, env(safe-area-inset-bottom, 0px));
     touch-action: manipulation;
   }
 
-  /* Nova transação — compacto: menos altura, botões em linha, sem scroll interno no corpo */
+  /* Nova transação — card no meio da tela; scroll interno se couber */
   .modal-content--nova-tx {
     --keyboard-overlap: 0px;
-    width: 100%;
-    max-width: none;
-    max-height: min(94dvh, 100dvh - env(safe-area-inset-top, 0px));
+    width: calc(100% - 24px);
+    max-width: 440px;
+    max-height: min(
+      88dvh,
+      100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 28px
+    );
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -1853,31 +1924,43 @@ h3 {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-    border-radius: 18px 18px 0 0;
-    margin: 0;
-    padding-top: max(10px, env(safe-area-inset-top, 0px));
-    padding-left: 14px;
-    padding-right: 14px;
-    padding-bottom: calc(max(8px, env(safe-area-inset-bottom, 0px)) + var(--keyboard-overlap, 0px));
+    border-radius: 22px;
+    margin: 0 auto;
+    padding-top: 18px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: calc(16px + var(--keyboard-overlap, 0px));
     box-shadow:
-      0 -8px 40px rgba(0, 0, 0, 0.18),
-      0 32px 80px -24px rgba(0, 0, 0, 0.35),
+      0 24px 64px -20px rgba(0, 0, 0, 0.28),
+      0 12px 32px -16px rgba(0, 0, 0, 0.18),
       0 0 0 1px rgba(255, 255, 255, 0.35);
-    transform: translateY(0);
+    transform: scale(1);
     opacity: 1;
-    animation: modalMobileSheet 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: modalMobileCenter 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  @keyframes modalMobileSheet {
+  @keyframes modalMobileCenter {
     from {
-      opacity: 0.85;
-      transform: translateY(18px);
+      opacity: 0;
+      transform: scale(0.96) translateY(10px);
     }
 
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: scale(1) translateY(0);
     }
+  }
+
+  /*
+   * iOS Safari: fonte < 16px em input focado causa zoom automático.
+   * Forçar 16px em todos os campos editáveis do modal de transação.
+   */
+  .modal-content--nova-tx .modal-form input.input-premium,
+  .modal-content--nova-tx .modal-form select.input-premium,
+  .modal-content--nova-tx .modal-form input[type='datetime-local'].input-premium,
+  .modal-content--nova-tx .custom-select-trigger,
+  .modal-content--nova-tx .custom-select-search input {
+    font-size: 16px !important;
   }
 
   .modal-content--nova-tx .modal-form--sheet {
@@ -1918,6 +2001,25 @@ h3 {
     gap: 4px;
   }
 
+  .modal-content--nova-tx .nova-tx-section + .nova-tx-section {
+    margin-top: 16px;
+    padding-top: 16px;
+  }
+
+  .modal-content--nova-tx .nova-tx-section__title {
+    font-size: 10px;
+    margin-bottom: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  .modal-content--nova-tx .form-group--valor-destaque {
+    padding: 12px 12px;
+  }
+
+  .modal-content--nova-tx .form-group--valor-destaque .input-valor-novo-tx.input-premium {
+    font-size: 1.125rem !important;
+  }
+
   .modal-content--nova-tx .modal-form label {
     font-size: 10px;
     letter-spacing: 0.04em;
@@ -1946,19 +2048,33 @@ h3 {
 
   .modal-content--nova-tx .modal-date-toolbar {
     align-items: center;
-    gap: 6px 8px;
+    justify-content: space-between;
+    gap: 8px 10px;
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .modal-content--nova-tx .modal-date-toolbar > label {
+    flex: 0 0 auto;
+    font-size: 11px;
   }
 
   .modal-content--nova-tx .date-shortcuts {
-    flex-wrap: nowrap;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 8px;
+    min-width: 0;
   }
 
   .modal-content--nova-tx .date-shortcut-btn {
-    min-height: 30px;
-    padding: 4px 10px;
-    font-size: 10px;
+    min-height: 36px;
+    min-width: 72px;
+    padding: 6px 12px;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    border-radius: 10px;
   }
 
   .modal-content--nova-tx .modal-form input.input-premium,
@@ -1976,11 +2092,27 @@ h3 {
     min-height: 44px;
   }
 
-  .modal-content--nova-tx .modal-form input[type='datetime-local'].input-premium {
+  /* Campo data/hora: alvo de toque, leitura estável, ícone do calendário tocável (WebKit) */
+  .modal-content--nova-tx .modal-form input[type='datetime-local'].input-premium,
+  .modal-content--nova-tx .input-data-novo-tx {
     min-width: 0;
     width: 100%;
     box-sizing: border-box;
-    padding: 8px 10px;
+    min-height: 44px;
+    padding: 10px 12px;
+    line-height: 1.35;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .modal-content--nova-tx input[type='datetime-local'].input-premium::-webkit-calendar-picker-indicator {
+    opacity: 0.9;
+    padding: 8px;
+    margin-inline-end: 2px;
+    cursor: pointer;
+  }
+
+  .modal-content--nova-tx input[type='datetime-local'].input-premium:focus {
+    transform: none;
   }
 
   .modal-content--nova-tx .custom-select-trigger {
@@ -2026,10 +2158,6 @@ h3 {
     min-height: 44px;
     font-size: 14px;
     padding: 10px 12px;
-  }
-
-  .modal-content--nova-tx .form-group--recorrencia > label:first-child {
-    margin-bottom: 2px;
   }
 
   .modal-content--nova-tx .form-group--recorrencia label.modal-recorrencia-toggle-row {
@@ -2665,8 +2793,42 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-pan
 .page-transacoes.app-horizon-shell .page-transacoes-ref-recorrencias .page-transacoes-rec-head {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+
+.page-transacoes-rec-head__titles {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.page-transacoes-rec-head__sub {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary, #94a3b8);
+  font-weight: 450;
+  max-width: 52ch;
+}
+
+.page-transacoes-rec-empty {
+  margin: 0;
+  padding: 4px 2px 2px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.page-transacoes-tx-panel-head {
+  align-items: flex-start;
+}
+
+.page-transacoes-tx-filter-hint {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 .page-transacoes-rec-head__flag {
@@ -2699,11 +2861,10 @@ body[data-theme='light'] .page-transacoes-rec-head__flag {
 }
 
 .page-transacoes-recorrencia-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 10px 12px;
   padding: 12px 14px;
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.06);
@@ -2767,6 +2928,29 @@ body[data-theme='light'] .page-transacoes-rec-head__flag {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: transparent;
   color: inherit;
+  grid-column: 2;
+  align-self: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .page-transacoes-recorrencia-row {
+    grid-template-columns: 1fr;
+  }
+
+  .page-transacoes-recorrencia-row__stop {
+    grid-column: 1;
+    grid-row: auto;
+    width: 100%;
+    justify-self: stretch;
+    text-align: center;
+    padding: 10px 12px;
+  }
+
+  .page-transacoes-rec-head__flag {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 body[data-theme='light'] .page-transacoes-recorrencia-row {
@@ -6039,20 +6223,9 @@ body[data-theme='light'] .ref-tx-val-cell {
   }
 }
 
+/* Rótulos inline removidos: no mobile o cartão já é legível; no desktop o cabeçalho da tabela substitui. */
 body[data-theme='light'] .ref-tx-field-label {
-  display: block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  margin: 0 0 3px;
-}
-
-@media (min-width: 768px) {
-  body[data-theme='light'] .ref-tx-field-label {
-    display: none;
-  }
+  display: none;
 }
 
 body[data-theme='light'] .ref-tx-cat-text,
@@ -7596,6 +7769,132 @@ body[data-theme='light'] .global-skeleton {
   .horizon-chat-fab {
     bottom: max(14px, calc(env(safe-area-inset-bottom, 0px) + 10px));
     right: max(12px, env(safe-area-inset-right, 0px));
+  }
+}
+
+/*
+ * Transações — mobile: cartão em coluna (data + valor + ações na 1ª linha; cat/sub em largura total).
+ * Escopo só em .page-transacoes para não alterar o dashboard.
+ */
+@media (max-width: 767px) {
+  .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-list {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions {
+    display: block;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-list-head {
+    display: none !important;
+  }
+
+  body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row,
+  body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      'txi txmeta txval txact'
+      'txi txcat txcat txcat'
+      'txi txsub txsub txrec';
+    column-gap: 10px;
+    row-gap: 8px;
+    align-items: start;
+    padding: 12px 12px 14px;
+    margin: 0 0 10px;
+    border-radius: 14px;
+    box-sizing: border-box;
+    background: color-mix(in srgb, var(--bg-card, #f8fafc) 94%, var(--text-primary, #0f172a) 3%);
+    border: 1px solid color-mix(in srgb, var(--border-color, #e2e8f0) 65%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--text-primary, #0f172a) 4%, transparent);
+  }
+
+  body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row::after,
+  body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row::after {
+    display: none;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-icon-cell {
+    grid-area: txi;
+    grid-row: 1 / -1;
+    align-self: start;
+    padding-top: 2px;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-meta-cell {
+    grid-area: txmeta;
+    min-width: 0;
+    align-self: start;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-cell {
+    grid-area: txval;
+    justify-self: end;
+    align-self: start;
+    padding: 0;
+    margin: 0;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-actions-cell {
+    grid-area: txact;
+    align-self: start;
+    justify-self: end;
+    padding: 0;
+    margin: 0;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-cat-cell {
+    grid-area: txcat;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-sub-cell {
+    grid-area: txsub;
+    min-width: 0;
+    width: 100%;
+    padding-right: 4px;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-rec-cell {
+    grid-area: txrec;
+    justify-self: end;
+    align-self: center;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 0;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-cat-text,
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-sub-text {
+    overflow-wrap: break-word;
+    word-break: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.35;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-val {
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-recorrencia-ico-wrap {
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--accent, #d4a84b) 12%, transparent);
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-actions-cell .btn-edit,
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-actions-cell .btn-delete {
+    min-width: 42px;
+    min-height: 42px;
   }
 }
 
