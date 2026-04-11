@@ -124,6 +124,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   const [displayValor, setDisplayValor] = useState('')
   const valorInputRef = useRef(null)
   const modalSheetRef = useRef(null)
+  const editingTransactionRef = useRef(editingTransaction)
+  editingTransactionRef.current = editingTransaction
+  const editingTransactionId = editingTransaction?.id ?? null
 
   const scrollValorIntoView = useCallback(() => {
     const el = valorInputRef.current
@@ -161,8 +164,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
 
     fetchCategorias()
 
-    if (editingTransaction?.id) {
-      const t = editingTransaction
+    if (editingTransactionId) {
+      const t = editingTransactionRef.current
+      if (!t?.id) return
       const val = parseFloat(t.valor) || 0
       const numValue = Number(val.toFixed(2))
       const formatted = new Intl.NumberFormat('pt-BR', {
@@ -215,7 +219,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       el.focus()
       scrollValorIntoView()
     }, 120)
-  }, [isOpen, usuarioId, editingTransaction?.id, fetchCategorias, scrollValorIntoView])
+  }, [isOpen, usuarioId, editingTransactionId, fetchCategorias, scrollValorIntoView])
 
   useEffect(() => {
     if (!isOpen) return

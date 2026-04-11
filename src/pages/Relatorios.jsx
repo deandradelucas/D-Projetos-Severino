@@ -7,6 +7,9 @@ import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { useRelatorioAggregates } from '../hooks/useRelatorioAggregates'
 import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
+import { readHorizonteUserProfile, horizonteUserProfileTemId } from '../lib/horizonteSession'
+import { getRelatorioChartPalette } from '../lib/relatorioChartTokens'
+import { downloadRelatorioCsv } from '../lib/relatorioExportCsv'
 import './dashboard.css'
 import {
   BarChart,
@@ -21,10 +24,6 @@ import {
   Pie,
   Cell,
 } from 'recharts'
-const COLORS_DESP = ['#38bdf8', '#34d399', '#fbbf24', '#fb923c', '#a78bfa', '#f472b6', '#94a3b8', '#64748b']
-const COLORS_REC = ['#4ade80', '#22d3ee', '#fcd34d', '#a78bfa', '#f472b6', '#94a3b8', '#64748b']
-const COLORS_PIE_MONO_DESP = ['#3a3a3a', '#4a4a4a', '#5a5a5a', '#6b6b6b', '#7c7c7c', '#8e8e8e', '#a1a1a1', '#b5b5b5']
-const COLORS_PIE_MONO_REC = ['#e5e5e5', '#d0d0d0', '#bbbbbb', '#a6a6a6', '#919191', '#7d7d7d', '#696969', '#565656']
 
 const SkeletonKpi = () => (
   <div className="ref-kpi-card ref-kpi-card--skeleton" aria-hidden>
@@ -121,31 +120,14 @@ function RelatoriosTooltip({ active, payload, label, formatCurrency }) {
 export default function Relatorios() {
   const { privacyMode } = useTheme()
   const chartMono = false
-  const [usuario] = useState(() => {
-    const saved = localStorage.getItem('horizonte_user')
-    if (saved) {
-      try {
-        return JSON.parse(saved) || { nome: 'Usuário', id: '' }
-      } catch (e) { console.error(e) }
-    }
-    return { nome: 'Usuário', id: '' }
-  })
+  const [usuario] = useState(() => readHorizonteUserProfile())
 
   // States
   const [menuAberto, setMenuAberto] = useState(false)
   const [transacoes, setTransacoes] = useState([])
   const [categorias, setCategorias] = useState([])
   const firstFetchDoneRef = useRef(false)
-  const [loading, setLoading] = useState(() => {
-    try {
-      const raw = localStorage.getItem('horizonte_user')
-      if (raw) {
-        const u = JSON.parse(raw)
-        return Boolean(u?.id && String(u.id).trim())
-      }
-    } catch { /* ignore */ }
-    return false
-  })
+  const [loading, setLoading] = useState(() => horizonteUserProfileTemId(readHorizonteUserProfile()))
   const [refreshing, setRefreshing] = useState(false)
   const [pdfExportLoading, setPdfExportLoading] = useState(false)
   const isMobile = useMatchMaxWidth(768)
@@ -231,30 +213,7 @@ export default function Relatorios() {
 
   const formatCurrency = formatCurrencyBRL
 
-  const exportToCSV = () => {
-    if (transacoes.length === 0) return
-
-    // Cabeçalho
-    let csvData = ['Data,Tipo,Categoria,Subcategoria,Valor,Status,Descrição']
-
-    // Linhas
-    transacoes.forEach(t => {
-      const dataStr = new Date(t.data_transacao).toLocaleDateString('pt-BR')
-      const cat = t.categorias?.nome || ''
-      const sub = t.subcategorias?.nome || ''
-      const descricao = t.descricao ? t.descricao.replace(/,/g, '') : ''
-      csvData.push(`${dataStr},${t.tipo},${cat},${sub},${t.valor},${t.status},${descricao}`)
-    })
-
-    const blob = new Blob([csvData.join('\n')], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', `relatorio_${filters.dataInicio}_a_${filters.dataFim}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+  const exportToCSV = () => downloadRelatorioCsv(transacoes, filters)
 
   const exportToPDF = async () => {
     if (transacoes.length === 0) return
@@ -312,28 +271,14 @@ export default function Relatorios() {
     }
   }
 
-  /* Cards de gráfico: eixos legíveis; off-white = só cinzas */
-  const chartAxis = chartMono ? '#525252' : '#94a3b8'
-  const chartTickFill = chartMono ? '#a3a3a3' : '#475569'
-  const legendColor = chartMono ? '#d4d4d4' : '#334155'
-  const tooltipBg = chartMono ? '#0a0a0a' : '#ffffff'
-  const pieColorsDesp = chartMono ? COLORS_PIE_MONO_DESP : COLORS_DESP
-  const pieColorsRec = chartMono ? COLORS_PIE_MONO_REC : COLORS_REC
-  const pieStroke = chartMono ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)'
-  const chartCursorFill = chartMono ? 'rgba(255,255,255,0.05)' : 'rgba(15, 23, 42, 0.06)'
-  const barRecTop = chartMono ? '#d4d4d4' : '#4ade80'
-  const barRecBot = chartMono ? '#525252' : '#059669'
-  const barDesTop = chartMono ? '#9ca3af' : '#fb7185'
-  const barDesBot = chartMono ? '#404040' : '#dc2626'
-  const barRecurrTop = chartMono ? '#a3a3a3' : '#2dd4bf'
-  const barRecurrBot = chartMono ? '#404040' : '#0f766e'
+  const chart = getRelatorioChartPalette(chartMono)
 
   const saldoPositivo = summary.saldo >= 0
 
   return (
     <div
       className="dashboard-container page-relatorios app-horizon-shell"
-      style={{ '--rel-tooltip-bg': tooltipBg }}
+      style={{ '--rel-tooltip-bg': chart.tooltipBg }}
     >
       <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
@@ -475,22 +420,22 @@ export default function Relatorios() {
                         <BarChart data={chartDataPorMes} margin={{ top: 12, right: 8, left: 0, bottom: 4 }} barGap={2} barCategoryGap="20%">
                           <defs>
                             <linearGradient id="relGradRecMes" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={barRecTop} stopOpacity={1} />
-                              <stop offset="100%" stopColor={barRecBot} stopOpacity={0.92} />
+                              <stop offset="0%" stopColor={chart.barRecTop} stopOpacity={1} />
+                              <stop offset="100%" stopColor={chart.barRecBot} stopOpacity={0.92} />
                             </linearGradient>
                             <linearGradient id="relGradDesMes" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={barDesTop} stopOpacity={1} />
-                              <stop offset="100%" stopColor={barDesBot} stopOpacity={0.9} />
+                              <stop offset="0%" stopColor={chart.barDesTop} stopOpacity={1} />
+                              <stop offset="100%" stopColor={chart.barDesBot} stopOpacity={0.9} />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
-                          <XAxis dataKey="name" stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? 'end' : 'middle'} height={isMobile ? 56 : 32} />
-                          <YAxis stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} width={isMobile ? 56 : 64} />
+                          <CartesianGrid strokeDasharray="4 8" stroke={chart.axis} strokeOpacity={0.18} vertical={false} />
+                          <XAxis dataKey="name" stroke={chart.axis} fontSize={isMobile ? 10 : 11} tickMargin={8} tick={{ fill: chart.tickFill }} axisLine={false} tickLine={false} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? 'end' : 'middle'} height={isMobile ? 56 : 32} />
+                          <YAxis stroke={chart.axis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chart.tickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} width={isMobile ? 56 : 64} />
                           <Tooltip
                             content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />}
-                            cursor={{ fill: chartCursorFill }}
+                            cursor={{ fill: chart.cursorFill }}
                           />
-                          <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: legendColor, fontSize: 12 }} />
+                          <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: chart.legend, fontSize: 12 }} />
                           <Bar dataKey="Receitas" fill="url(#relGradRecMes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={40} />
                           <Bar dataKey="Despesas" fill="url(#relGradDesMes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={40} />
                         </BarChart>
@@ -530,17 +475,17 @@ export default function Relatorios() {
                         >
                           <defs>
                             <linearGradient id="relGradRecurrMes" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={barRecurrTop} stopOpacity={1} />
-                              <stop offset="100%" stopColor={barRecurrBot} stopOpacity={0.92} />
+                              <stop offset="0%" stopColor={chart.barRecurrTop} stopOpacity={1} />
+                              <stop offset="100%" stopColor={chart.barRecurrBot} stopOpacity={0.92} />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
+                          <CartesianGrid strokeDasharray="4 8" stroke={chart.axis} strokeOpacity={0.18} vertical={false} />
                           <XAxis
                             dataKey="name"
-                            stroke={chartAxis}
+                            stroke={chart.axis}
                             fontSize={isMobile ? 10 : 11}
                             tickMargin={8}
-                            tick={{ fill: chartTickFill }}
+                            tick={{ fill: chart.tickFill }}
                             axisLine={false}
                             tickLine={false}
                             interval={0}
@@ -549,11 +494,11 @@ export default function Relatorios() {
                             height={isMobile ? 56 : 32}
                           />
                           <YAxis
-                            stroke={chartAxis}
+                            stroke={chart.axis}
                             fontSize={isMobile ? 10 : 11}
                             tickLine={false}
                             axisLine={false}
-                            tick={{ fill: chartTickFill }}
+                            tick={{ fill: chart.tickFill }}
                             tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)}
                             width={isMobile ? 56 : 64}
                           />
@@ -565,16 +510,16 @@ export default function Relatorios() {
                                 <div className="relatorios-tooltip">
                                   <div className="relatorios-tooltip__label">{label}</div>
                                   <div className="relatorios-tooltip__row">
-                                    <span className="relatorios-tooltip__dot" style={{ background: barRecurrTop }} />
+                                    <span className="relatorios-tooltip__dot" style={{ background: chart.barRecurrTop }} />
                                     <span className="relatorios-tooltip__name">Despesas recorrentes</span>
                                     <span className="relatorios-tooltip__val">{formatCurrency(v)}</span>
                                   </div>
                                 </div>
                               )
                             }}
-                            cursor={{ fill: chartCursorFill }}
+                            cursor={{ fill: chart.cursorFill }}
                           />
-                          <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: legendColor, fontSize: 12 }} />
+                          <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: chart.legend, fontSize: 12 }} />
                           <Bar
                             dataKey="total"
                             name="Despesas recorrentes"
@@ -614,11 +559,11 @@ export default function Relatorios() {
                           outerRadius={isMobile ? 80 : 102}
                           paddingAngle={3}
                           dataKey="value"
-                          stroke={pieStroke}
+                          stroke={chart.pieStroke}
                           strokeWidth={1}
                         >
                           {chartDataPorCategoria.map((_, index) => (
-                            <Cell key={`desp-${index}`} fill={pieColorsDesp[index % pieColorsDesp.length]} />
+                            <Cell key={`desp-${index}`} fill={chart.pieColorsDesp[index % chart.pieColorsDesp.length]} />
                           ))}
                         </Pie>
                         <Tooltip
@@ -639,7 +584,7 @@ export default function Relatorios() {
                           layout="vertical"
                           align="right"
                           verticalAlign="middle"
-                          wrapperStyle={{ fontSize: 12, color: legendColor, paddingLeft: 8 }}
+                          wrapperStyle={{ fontSize: 12, color: chart.legend, paddingLeft: 8 }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
@@ -668,11 +613,11 @@ export default function Relatorios() {
                           outerRadius={isMobile ? 80 : 102}
                           paddingAngle={3}
                           dataKey="value"
-                          stroke={pieStroke}
+                          stroke={chart.pieStroke}
                           strokeWidth={1}
                         >
                           {chartDataReceitasPorCategoria.map((_, index) => (
-                            <Cell key={`rec-${index}`} fill={pieColorsRec[index % pieColorsRec.length]} />
+                            <Cell key={`rec-${index}`} fill={chart.pieColorsRec[index % chart.pieColorsRec.length]} />
                           ))}
                         </Pie>
                         <Tooltip
@@ -693,7 +638,7 @@ export default function Relatorios() {
                           layout="vertical"
                           align="right"
                           verticalAlign="middle"
-                          wrapperStyle={{ fontSize: 12, color: legendColor, paddingLeft: 8 }}
+                          wrapperStyle={{ fontSize: 12, color: chart.legend, paddingLeft: 8 }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
