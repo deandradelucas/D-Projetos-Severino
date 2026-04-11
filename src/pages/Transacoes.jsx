@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { useWhatsAppContactUrl } from '../hooks/useWhatsAppContactUrl'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
@@ -7,38 +8,23 @@ import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
-import { readHorizonteUser } from '../lib/horizonteSession'
-import { getWhatsAppContactUrl } from '../lib/whatsappContactUrl'
+import {
+  readHorizonteUser,
+  readHorizonteUserPainelState,
+  readHorizonteUserProfile,
+  horizonteUserProfileTemId,
+} from '../lib/horizonteSession'
+import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
+import { SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import './dashboard.css'
 
 /** Itens por requisição — menos DOM inicial; “Carregar mais” busca o restante. */
 const TX_PAGE_SIZE = 80
 
-const SkeletonTxRow = () => (
-  <div className="ref-tx-row ref-tx-row--skeleton" aria-hidden>
-    <div className="ref-tx-icon-cell">
-      <span className="skeleton skeleton-pulse ref-tx-skel-icon" />
-    </div>
-    <div className="ref-tx-meta-cell">
-      <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--meta" />
-    </div>
-    <div className="ref-tx-cat-cell">
-      <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--cat" />
-    </div>
-    <div className="ref-tx-sub-cell">
-      <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--sub" />
-    </div>
-    <div className="ref-tx-rec-cell ref-tx-rec-cell--skeleton" aria-hidden />
-    <div className="ref-tx-val-cell">
-      <span className="skeleton skeleton-pulse ref-tx-skel-pill" />
-    </div>
-  </div>
-)
-
 export default function Transacoes() {
   const { privacyMode } = useTheme()
-  const [usuario, setUsuario] = useState(() => readHorizonteUser() || { nome: 'Usuário', id: '' })
+  const [usuario, setUsuario] = useState(() => readHorizonteUserPainelState())
 
   useEffect(() => {
     const u = readHorizonteUser()
@@ -52,14 +38,7 @@ export default function Transacoes() {
   const [transacoes, setTransacoes] = useState([])
   const [categorias, setCategorias] = useState([])
   const firstFetchDoneRef = useRef(false)
-  const [loading, setLoading] = useState(() => {
-    try {
-      const u = readHorizonteUser()
-      return Boolean(u?.id && String(u.id).trim())
-    } catch {
-      return false
-    }
-  })
+  const [loading, setLoading] = useState(() => horizonteUserProfileTemId(readHorizonteUserProfile()))
   const [refreshing, setRefreshing] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(false)
@@ -84,10 +63,7 @@ export default function Transacoes() {
       const res = await fetch(apiUrl('/api/categorias'), {
         headers: { 'x-user-id': session.id },
       })
-      if (res.status === 403) {
-        window.location.replace('/pagamento?expirado=1')
-        return
-      }
+      if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
         const data = await res.json()
         setCategorias(data || [])
@@ -104,10 +80,7 @@ export default function Transacoes() {
       const res = await fetch(apiUrl('/api/recorrencias-mensais'), {
         headers: { 'x-user-id': session.id },
       })
-      if (res.status === 403) {
-        window.location.replace('/pagamento?expirado=1')
-        return
-      }
+      if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
         const data = await res.json()
         setRecorrencias(Array.isArray(data) ? data : [])
@@ -150,10 +123,7 @@ export default function Transacoes() {
         headers: { 'x-user-id': String(session.id).trim() },
         cache: 'no-store',
       })
-      if (res.status === 403) {
-        window.location.replace('/pagamento?expirado=1')
-        return
-      }
+      if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
         const data = await res.json()
         const rows = Array.isArray(data) ? data : []
@@ -180,10 +150,7 @@ export default function Transacoes() {
         headers: { 'x-user-id': String(session.id).trim() },
         cache: 'no-store',
       })
-      if (res.status === 403) {
-        window.location.replace('/pagamento?expirado=1')
-        return
-      }
+      if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
         const data = await res.json()
         const rows = Array.isArray(data) ? data : []
@@ -208,7 +175,7 @@ export default function Transacoes() {
       fetchTransacoes()
       fetchRecorrencias()
     }
-  }, [fetchCategorias, fetchTransacoes, fetchRecorrencias])
+  }, [usuario.id, fetchCategorias, fetchTransacoes, fetchRecorrencias])
 
   const handleEncerrarRecorrencia = async (id) => {
     if (!window.confirm('Parar de repetir este lançamento todo dia 1?')) return
@@ -219,6 +186,7 @@ export default function Transacoes() {
         method: 'DELETE',
         headers: { 'x-user-id': session.id },
       })
+      if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) fetchRecorrencias()
     } catch (err) {
       console.error(err)
@@ -239,6 +207,7 @@ export default function Transacoes() {
         method: 'DELETE',
         headers: { 'x-user-id': session.id },
       })
+      if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) fetchTransacoes()
     } catch (err) {
       console.error(err)
@@ -259,26 +228,7 @@ export default function Transacoes() {
 
   const filtroRecorrentesAtivo = filters.lancamentos === 'recorrentes'
 
-  const [whatsappContactUrl, setWhatsappContactUrl] = useState(() => getWhatsAppContactUrl())
-
-  useEffect(() => {
-    if (whatsappContactUrl) return
-    let cancelled = false
-    void (async () => {
-      try {
-        const res = await fetch(apiUrl('/api/public/whatsapp-contact'), { cache: 'no-store' })
-        if (!res.ok || cancelled) return
-        const data = await res.json()
-        const url = typeof data?.url === 'string' ? data.url.trim() : ''
-        if (url && !cancelled) setWhatsappContactUrl(url)
-      } catch {
-        /* offline */
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [whatsappContactUrl])
+  const whatsappContactUrl = useWhatsAppContactUrl()
 
   return (
     <>

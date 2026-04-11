@@ -29,3 +29,18 @@ export function readHorizonteUserProfile() {
 export function horizonteUserProfileTemId(perfil) {
   return Boolean(perfil?.id && String(perfil.id).trim())
 }
+
+const PAINEL_USUARIO_PADRAO = Object.freeze({ nome: 'Usuário', email: '', id: '' })
+
+/**
+ * Estado inicial para páginas do painel (Dashboard, Transações): mescla sessão com defaults estáveis.
+ */
+export function readHorizonteUserPainelState() {
+  const u = readHorizonteUser()
+  if (!u) return { nome: PAINEL_USUARIO_PADRAO.nome, email: PAINEL_USUARIO_PADRAO.email, id: '' }
+  return {
+    ...PAINEL_USUARIO_PADRAO,
+    ...u,
+    id: u.id != null ? String(u.id).trim() : '',
+  }
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { useWhatsAppContactUrl } from '../hooks/useWhatsAppContactUrl'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
@@ -9,44 +10,15 @@ import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
-import { readHorizonteUser } from '../lib/horizonteSession'
-import { getWhatsAppContactUrl } from '../lib/whatsappContactUrl'
+import { readHorizonteUser, readHorizonteUserPainelState } from '../lib/horizonteSession'
+import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
+import { primeiroNomeExibicao } from '../lib/primeiroNomeExibicao'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
-
-const SkeletonKpi = () => (
-  <div className="ref-kpi-card ref-kpi-card--skeleton" aria-hidden>
-    <div className="skeleton skeleton-pulse ref-kpi-skel-icon" />
-    <div className="ref-kpi-skel-body">
-      <span className="skeleton skeleton-pulse ref-kpi-skel-line ref-kpi-skel-line--label" />
-      <span className="skeleton skeleton-pulse ref-kpi-skel-line ref-kpi-skel-line--value" />
-    </div>
-  </div>
-)
-
-const SkeletonTxRow = () => (
-  <div className="ref-tx-row ref-tx-row--skeleton" aria-hidden>
-    <div className="ref-tx-icon-cell">
-      <span className="skeleton skeleton-pulse ref-tx-skel-icon" />
-    </div>
-    <div className="ref-tx-meta-cell">
-      <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--meta" />
-    </div>
-    <div className="ref-tx-cat-cell">
-      <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--cat" />
-    </div>
-    <div className="ref-tx-sub-cell">
-      <span className="skeleton skeleton-pulse ref-tx-skel-line ref-tx-skel-line--sub" />
-    </div>
-    <div className="ref-tx-rec-cell ref-tx-rec-cell--skeleton" aria-hidden />
-    <div className="ref-tx-val-cell">
-      <span className="skeleton skeleton-pulse ref-tx-skel-pill" />
-    </div>
-  </div>
-)
+import { SkeletonKpi, SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 
 export default function Dashboard() {
   const { privacyMode, togglePrivacy } = useTheme()
-  const [usuario, setUsuario] = useState(() => readHorizonteUser() || { nome: 'Usuário', email: '', id: '' })
+  const [usuario, setUsuario] = useState(() => readHorizonteUserPainelState())
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [transacoes, setTransacoes] = useState([])
@@ -86,10 +58,7 @@ export default function Dashboard() {
         cache: 'no-store',
       })
 
-      if (res.status === 403) {
-        window.location.replace('/pagamento?expirado=1')
-        return
-      }
+      if (redirectAssinaturaExpiradaSe403(res)) return
 
       if (res.ok) {
         const data = await res.json()
@@ -160,33 +129,9 @@ export default function Dashboard() {
 
   const txRecentes = useMemo(() => transacoes.slice(0, 8), [transacoes])
 
-  const nomeExibicao = useMemo(() => {
-    const n = String(usuario?.nome || usuario?.usuario || '').trim()
-    if (!n) return 'usuário'
-    const primeiro = n.split(/\s+/)[0]
-    return primeiro || 'usuário'
-  }, [usuario])
+  const nomeExibicao = useMemo(() => primeiroNomeExibicao(usuario), [usuario])
 
-  const [whatsappContactUrl, setWhatsappContactUrl] = useState(() => getWhatsAppContactUrl())
-
-  useEffect(() => {
-    if (whatsappContactUrl) return
-    let cancelled = false
-    void (async () => {
-      try {
-        const res = await fetch(apiUrl('/api/public/whatsapp-contact'), { cache: 'no-store' })
-        if (!res.ok || cancelled) return
-        const data = await res.json()
-        const url = typeof data?.url === 'string' ? data.url.trim() : ''
-        if (url && !cancelled) setWhatsappContactUrl(url)
-      } catch {
-        /* offline / API indisponível */
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [whatsappContactUrl])
+  const whatsappContactUrl = useWhatsAppContactUrl()
 
   const formatCurrency = formatCurrencyBRL
 

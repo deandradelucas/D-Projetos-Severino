@@ -232,12 +232,7 @@ async function enrichTransacoesComCategorias(supabaseAdmin, rows) {
   }))
 }
 
-export async function getTransacoes(usuarioId, filters = {}) {
-  const supabaseAdmin = getSupabaseAdmin()
-  const uid = String(usuarioId || '').trim()
-  if (!uid) return []
-
-  const { dataInicio, dataFim, tipo, categoria_id, status, busca, somenteRecorrentes } = filters
+function parseTransacoesListPagination(filters) {
   let lim =
     filters.limit !== undefined && filters.limit !== null && filters.limit !== ''
       ? parseInt(String(filters.limit), 10)
@@ -252,7 +247,16 @@ export async function getTransacoes(usuarioId, filters = {}) {
   if (!Number.isFinite(off) || off < 0) off = 0
   off = Math.min(off, 50_000)
 
-  const rangeEnd = off + lim - 1
+  return { lim, off, rangeEnd: off + lim - 1 }
+}
+
+export async function getTransacoes(usuarioId, filters = {}) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const uid = String(usuarioId || '').trim()
+  if (!uid) return []
+
+  const { dataInicio, dataFim, tipo, categoria_id, status, busca, somenteRecorrentes } = filters
+  const { off, rangeEnd } = parseTransacoesListPagination(filters)
 
   const applyFilters = (q) => {
     let query = q.eq('usuario_id', uid)
