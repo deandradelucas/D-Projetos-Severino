@@ -8,6 +8,7 @@ import Login from './pages/Login'
 import Background from './components/Background'
 import PwaInstallPrompt from './components/PwaInstallPrompt'
 import HorizonChat from './components/HorizonChat'
+import ShellStickyHeaderScroll from './components/ShellStickyHeaderScroll'
 import {
   Cadastro,
   RedefinirSenha,
@@ -26,6 +27,7 @@ function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
+        <ShellStickyHeaderScroll />
         <div className="app-layout-shell">
           <Background />
           <PwaInstallPrompt />

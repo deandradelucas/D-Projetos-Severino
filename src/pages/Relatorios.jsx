@@ -20,9 +20,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  AreaChart,
-  Area,
-  ReferenceLine,
 } from 'recharts'
 const COLORS_DESP = ['#38bdf8', '#34d399', '#fbbf24', '#fb923c', '#a78bfa', '#f472b6', '#94a3b8', '#64748b']
 const COLORS_REC = ['#4ade80', '#22d3ee', '#fcd34d', '#a78bfa', '#f472b6', '#94a3b8', '#64748b']
@@ -75,15 +72,6 @@ function RelatoriosChartsLoadingShell() {
               <div>
                 <h2 className="ref-panel__title">Compras recorrentes por mês</h2>
                 <p className="ref-panel__subtitle">Soma das despesas marcadas como recorrentes (regra mensal ou parcelamento) por mês</p>
-              </div>
-            </div>
-            <RelatoriosChartSkelBody />
-          </article>
-          <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
-            <div className="ref-panel__head">
-              <div>
-                <h2 className="ref-panel__title">Saldo acumulado (mensal)</h2>
-                <p className="ref-panel__subtitle">Resultado líquido mês a mês no período (referência em zero)</p>
               </div>
             </div>
             <RelatoriosChartSkelBody />
@@ -239,7 +227,6 @@ export default function Relatorios() {
     totalComprasRecorrentesPeriodo,
     chartDataPorCategoria,
     chartDataReceitasPorCategoria,
-    chartDataSaldoCumMes,
   } = useRelatorioAggregates(transacoes)
 
   const formatCurrency = formatCurrencyBRL
@@ -334,19 +321,12 @@ export default function Relatorios() {
   const pieColorsRec = chartMono ? COLORS_PIE_MONO_REC : COLORS_REC
   const pieStroke = chartMono ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)'
   const chartCursorFill = chartMono ? 'rgba(255,255,255,0.05)' : 'rgba(15, 23, 42, 0.06)'
-  const refLineStroke = chartMono ? 'rgba(255,255,255,0.28)' : 'rgba(100, 116, 139, 0.45)'
   const barRecTop = chartMono ? '#d4d4d4' : '#4ade80'
   const barRecBot = chartMono ? '#525252' : '#059669'
   const barDesTop = chartMono ? '#9ca3af' : '#fb7185'
   const barDesBot = chartMono ? '#404040' : '#dc2626'
   const barRecurrTop = chartMono ? '#a3a3a3' : '#2dd4bf'
   const barRecurrBot = chartMono ? '#404040' : '#0f766e'
-  const saldoStop0 = chartMono ? '#d4d4d4' : '#a78bfa'
-  const saldoStop0Op = chartMono ? 0.48 : 0.55
-  const saldoStop1 = chartMono ? '#525252' : '#6366f1'
-  const saldoStop1Op = chartMono ? 0.1 : 0.05
-  const saldoLine = chartMono ? '#c4c4c4' : '#a78bfa'
-  const saldoDot = chartMono ? '#dedede' : '#c4b5fd'
 
   const saldoPositivo = summary.saldo >= 0
 
@@ -366,9 +346,6 @@ export default function Relatorios() {
             <h1 className="ref-dashboard-greeting">
               <span className="ref-dashboard-greeting__name">Relatórios analíticos</span>
             </h1>
-            <p className="ref-panel__subtitle page-relatorios-header-sub">
-              Receitas, despesas e composição por categoria no período
-            </p>
           </div>
           <div className="ref-dashboard-header__actions relatorios-header-export">
             <button type="button" className="btn-secondary relatorios-btn-export" onClick={exportToCSV} disabled={transacoes.length === 0} title="Exportar CSV">
@@ -611,55 +588,6 @@ export default function Relatorios() {
                       <div className="relatorios-chart-empty">
                         Nenhuma despesa recorrente no período (regra mensal ou parcelas).
                       </div>
-                    )}
-                  </div>
-                </article>
-
-                <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
-                  <div className="ref-panel__head">
-                    <div>
-                      <h2 className="ref-panel__title">Saldo acumulado (mensal)</h2>
-                      <p className="ref-panel__subtitle">Resultado líquido mês a mês no período (referência em zero)</p>
-                    </div>
-                  </div>
-                  <div className="relatorios-chart-card__body relatorios-chart-card__body--area">
-                    {chartDataSaldoCumMes.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
-                        <AreaChart data={chartDataSaldoCumMes} margin={{ top: 12, right: 8, left: 0, bottom: 4 }}>
-                          <defs>
-                            <linearGradient id="relGradSaldoMes" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={saldoStop0} stopOpacity={saldoStop0Op} />
-                              <stop offset="100%" stopColor={saldoStop1} stopOpacity={saldoStop1Op} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="4 8" stroke={chartAxis} strokeOpacity={0.18} vertical={false} />
-                          <XAxis dataKey="name" stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickMargin={8} tick={{ fill: chartTickFill }} axisLine={false} tickLine={false} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? 'end' : 'middle'} height={isMobile ? 56 : 32} />
-                          <YAxis stroke={chartAxis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chartTickFill }} tickFormatter={(v) => formatCurrency(v)} width={isMobile ? 68 : 72} />
-                          <ReferenceLine y={0} stroke={refLineStroke} strokeDasharray="4 4" />
-                          <Tooltip
-                            content={({ active, payload, label }) => {
-                              if (!active || !payload?.length) return null
-                              const row = payload[0]?.payload
-                              return (
-                                <div className="relatorios-tooltip">
-                                  <div className="relatorios-tooltip__label">{label}</div>
-                                  <div className="relatorios-tooltip__row">
-                                    <span className="relatorios-tooltip__name">Acumulado</span>
-                                    <span className="relatorios-tooltip__val">{formatCurrency(row?.saldo)}</span>
-                                  </div>
-                                  <div className="relatorios-tooltip__row relatorios-tooltip__row--muted">
-                                    <span className="relatorios-tooltip__name">No mês</span>
-                                    <span className="relatorios-tooltip__val">{formatCurrency(row?.liquidoMes)}</span>
-                                  </div>
-                                </div>
-                              )
-                            }}
-                          />
-                          <Area type="monotone" dataKey="saldo" stroke={saldoLine} strokeWidth={2.5} fill="url(#relGradSaldoMes)" dot={{ r: 3, fill: saldoDot, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="relatorios-chart-empty">Sem dados mensais no período.</div>
                     )}
                   </div>
                 </article>

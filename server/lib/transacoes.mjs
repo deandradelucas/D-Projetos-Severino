@@ -1,47 +1,65 @@
 import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 
+/** Normaliza `tipo` vindo do banco ou do front para o CHECK da tabela (`DESPESA` | `RECEITA`). */
+export function normalizeTipoCategoria(t) {
+  const u = String(t ?? '').trim().toUpperCase()
+  if (u === 'RECEITA' || u === 'DESPESA') return u
+  return u.length ? u : 'DESPESA'
+}
+
+async function _fetchCategoriasUsuario(supabaseAdmin, usuario_id) {
+  const { data, error } = await supabaseAdmin
+    .from('categorias')
+    .select('id, nome, tipo, cor')
+    .eq('usuario_id', usuario_id)
+    .order('nome', { ascending: true })
+  if (error) throw error
+  return data || []
+}
+
+async function _insertSubcategoriasRobusto(supabaseAdmin, subsToInsert, contexto) {
+  if (!subsToInsert?.length) return
+  const { error: errBatch } = await supabaseAdmin.from('subcategorias').insert(subsToInsert)
+  if (!errBatch) return
+  log.warn('subcategorias: insert em lote falhou, tentando uma a uma', { ...contexto, message: errBatch.message })
+  for (const row of subsToInsert) {
+    const { error: e1 } = await supabaseAdmin.from('subcategorias').insert(row)
+    if (e1) log.warn('subcategorias: linha ignorada', { ...contexto, nome: row.nome, message: e1.message })
+  }
+}
+
 export async function getCategorias(usuarioId) {
   const supabaseAdmin = getSupabaseAdmin()
   const uid = String(usuarioId || '').trim()
   if (!uid) return []
 
-  let { data: categorias, error: catError } = await supabaseAdmin
-    .from('categorias')
-    .select('id, nome, tipo, cor')
-    .eq('usuario_id', uid)
+  let categorias = await _fetchCategoriasUsuario(supabaseAdmin, uid)
 
-  if (catError) throw catError
-
-  if (!categorias || categorias.length === 0) {
-    // Self-healing: if user has no categories, seed them automatically
+  if (categorias.length === 0) {
     await _seedCategoriesForUser(uid, supabaseAdmin)
-    
-    // Fetch again after seed
-    const { data: newCats, error: newErr } = await supabaseAdmin
-      .from('categorias')
-      .select('id, nome, tipo, cor')
-      .eq('usuario_id', uid)
-      
-    if (newErr) throw newErr
-    if (!newCats || newCats.length === 0) return []
-    
-    categorias = newCats
+    categorias = await _fetchCategoriasUsuario(supabaseAdmin, uid)
   }
 
-  const categoriaIds = categorias.map(c => c.id)
+  await _syncMissingDefaultCategories(uid, supabaseAdmin, categorias)
+  categorias = await _fetchCategoriasUsuario(supabaseAdmin, uid)
+
+  if (categorias.length === 0) return []
+
+  const categoriaIds = categorias.map((c) => c.id)
   const { data: subcategorias, error: subError } = await supabaseAdmin
     .from('subcategorias')
     .select('id, categoria_id, nome')
     .in('categoria_id', categoriaIds)
+    .order('nome', { ascending: true })
 
   if (subError) throw subError
 
-  // agrupar subcategorias por categoria
-  return categorias.map(c => {
+  return categorias.map((c) => {
     return {
       ...c,
-      subcategorias: subcategorias.filter(sub => sub.categoria_id === c.id) || []
+      tipo: normalizeTipoCategoria(c.tipo),
+      subcategorias: (subcategorias || []).filter((sub) => sub.categoria_id === c.id),
     }
   })
 }
@@ -75,15 +93,47 @@ export const DEFAULT_CATEGORIES = [
 
 async function _seedCategoriesForUser(usuario_id, supabaseAdmin) {
   for (const cat of DEFAULT_CATEGORIES) {
+    const tipo = normalizeTipoCategoria(cat.tipo)
     const { data: categoriaData, error: errCat } = await supabaseAdmin
       .from('categorias')
-      .insert({ usuario_id, nome: cat.nome, tipo: cat.tipo, cor: cat.cor })
-      .select('id').single()
+      .insert({ usuario_id, nome: cat.nome, tipo, cor: cat.cor })
+      .select('id')
+      .maybeSingle()
 
-    if (errCat) continue
+    if (errCat || !categoriaData?.id) {
+      log.warn('seed categorias: insert ignorado', { nome: cat.nome, message: errCat?.message })
+      continue
+    }
 
-    const subsToInsert = cat.subcategorias.map(nome => ({ categoria_id: categoriaData.id, nome }))
-    await supabaseAdmin.from('subcategorias').insert(subsToInsert)
+    const subsToInsert = cat.subcategorias.map((nome) => ({ categoria_id: categoriaData.id, nome }))
+    await _insertSubcategoriasRobusto(supabaseAdmin, subsToInsert, { etapa: 'seed', categoria_id: categoriaData.id })
+  }
+}
+
+function _categoriaChaveUnica(nome, tipo) {
+  return `${String(nome || '').trim().toLowerCase()}|||${normalizeTipoCategoria(tipo)}`
+}
+
+/** Usuários antigos: completar categorias do catálogo padrão que ainda não existem (ex.: novas linhas em `DEFAULT_CATEGORIES`). */
+async function _syncMissingDefaultCategories(usuario_id, supabaseAdmin, categoriasAtuais) {
+  const lista = categoriasAtuais || []
+  const keys = new Set(lista.map((c) => _categoriaChaveUnica(c.nome, c.tipo)))
+  for (const cat of DEFAULT_CATEGORIES) {
+    const k = _categoriaChaveUnica(cat.nome, cat.tipo)
+    if (keys.has(k)) continue
+    const tipo = normalizeTipoCategoria(cat.tipo)
+    const { data: categoriaData, error: errCat } = await supabaseAdmin
+      .from('categorias')
+      .insert({ usuario_id, nome: cat.nome, tipo, cor: cat.cor })
+      .select('id')
+      .maybeSingle()
+    if (errCat || !categoriaData?.id) {
+      log.warn('categorias sync: categoria padrão não criada', { usuario_id, nome: cat.nome, message: errCat?.message })
+      continue
+    }
+    keys.add(k)
+    const subsToInsert = cat.subcategorias.map((nome) => ({ categoria_id: categoriaData.id, nome }))
+    await _insertSubcategoriasRobusto(supabaseAdmin, subsToInsert, { etapa: 'sync', categoria_id: categoriaData.id })
   }
 }
 

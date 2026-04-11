@@ -245,11 +245,18 @@ export default function Pagamento() {
             <h1 className="ref-dashboard-greeting">
               <span className="ref-dashboard-greeting__name">Pagamento</span>
             </h1>
-            <p className="ref-panel__subtitle page-pagamento-header-sub">
-              Assinatura mensal de <strong>R$ {precoMensal.toFixed(2).replace('.', ',')}</strong> — cobrança automática todo mês no cartão; o valor cai na conta Mercado Pago do aplicativo. Você autoriza uma vez no checkout do MP.
-            </p>
           </div>
         </header>
+
+        <section
+          className="content-section page-pagamento-legenda"
+          style={{ gridColumn: '1 / -1', maxWidth: '520px' }}
+          aria-label="Sobre a cobrança mensal"
+        >
+          <p className="ref-panel__subtitle page-pagamento-header-sub" style={{ margin: 0 }}>
+            Assinatura mensal de <strong>R$ {precoMensal.toFixed(2).replace('.', ',')}</strong> — cobrança automática todo mês no cartão; o valor cai na conta Mercado Pago do aplicativo. Você autoriza uma vez no checkout do MP.
+          </p>
+        </section>
 
         {expirado && (
           <div

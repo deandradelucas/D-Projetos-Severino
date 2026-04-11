@@ -68,18 +68,6 @@ export function computeRelatorioAggregates(transacoes) {
     0
   )
 
-  let runMes = 0
-  const chartDataSaldoCumMes = sortedMesKeys.map((k) => {
-    const row = mesMap[k]
-    const net = row.Receitas - row.Despesas
-    runMes += net
-    return {
-      name: labelMesBr(k),
-      saldo: runMes,
-      liquidoMes: net,
-    }
-  })
-
   const chartDataPorCategoria = Object.entries(catMap)
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value)
@@ -95,7 +83,6 @@ export function computeRelatorioAggregates(transacoes) {
     totalComprasRecorrentesPeriodo,
     chartDataPorCategoria,
     chartDataReceitasPorCategoria,
-    chartDataSaldoCumMes,
   }
 }
 

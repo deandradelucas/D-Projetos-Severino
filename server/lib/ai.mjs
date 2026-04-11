@@ -388,6 +388,11 @@ const DESPESA_RULES = [
   { re: /roupa|camisa|calca|calça|tenis|tênis|vestuario/i, categoriaNome: 'Cuidados Pessoais', subLabels: ['Vestuário (Roupas do Dia a Dia)', 'Sapatos e Tênis'] },
   { re: /racao|pet\b|dog|gato|veterinar|banho e tosa/i, categoriaNome: 'Pets e Dependentes', subLabels: ['Ração e Alimentação PET', 'Veterinário e Petshop', 'Banho e Tosa'] },
   { re: /passagem|hotel|hospedagem|airbnb|booking/i, categoriaNome: 'Viagens', subLabels: ['Passagens Aéreas / Ônibus', 'Hospedagem / Hotel'] },
+  {
+    re: /jogo[s]?\s*eletr[ôo]nic|jogos?\s*eletronic|videogame|video[-\s]?game|steam\b|epic\s*games|playstation|ps[45]\b|xbox|nintendo|switch\b|\bdlc\b|jogos?\s*digitais?|jogos?\s*digital|console(s)?\s*(de)?\s*jogo|riot\s*games|battle\.net|gog\.com|humble\s*bundle|microtransa[cç][aã]o|loot\s*box/i,
+    categoriaNome: 'Tecnologia e Gadgets',
+    subLabels: ['Jogos Digitais / Consoles'],
+  },
   { re: /notebook|celular novo|iphone|galaxy|computador|monitor\b|tecnologia/i, categoriaNome: 'Tecnologia e Gadgets', subLabels: ['Computadores e Periféricos', 'Celular Novo e Acessórios'] },
   { re: /aluguel(?!.*receb)/i, categoriaNome: 'Moradia', subLabels: ['Aluguel'] },
   { re: /condominio|condomínio/i, categoriaNome: 'Moradia', subLabels: ['Condomínio'] },

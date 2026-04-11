@@ -1,6 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { apiUrl } from '../lib/apiUrl'
 import RecorrenciaArrowIcon from './RecorrenciaArrowIcon'
+
+function tipoCategoriaIgual(tipoCampo, tipoAlvo) {
+  return String(tipoCampo ?? '').trim().toUpperCase() === String(tipoAlvo ?? '').trim().toUpperCase()
+}
 
 const CustomSelect = ({ name, value, onChange, options, placeholder, isOpen, onToggle, zIndex = 1 }) => {
   const [search, setSearch] = useState('')
@@ -26,8 +30,10 @@ const CustomSelect = ({ name, value, onChange, options, placeholder, isOpen, onT
     }
   }, [isOpen])
 
-  const filteredOptions = options.filter(o => 
-    o.nome.toLowerCase().includes(search.toLowerCase())
+  const filteredOptions = options.filter((o) =>
+    String(o?.nome ?? '')
+      .toLowerCase()
+      .includes(search.toLowerCase())
   )
 
   const handleKeyDown = (e) => {
@@ -135,6 +141,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     try {
       const res = await fetch(apiUrl('/api/categorias'), {
         headers: { 'x-user-id': usuarioId },
+        cache: 'no-store',
       })
       if (res.ok) {
         const data = await res.json()
@@ -333,9 +340,15 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     }
   }
 
+  const categoriasFiltradas = useMemo(() => {
+    return [...categorias]
+      .filter((c) => tipoCategoriaIgual(c.tipo, formData.tipo))
+      .sort((a, b) => String(a.nome ?? '').localeCompare(String(b.nome ?? ''), 'pt', { sensitivity: 'base' }))
+  }, [categorias, formData.tipo])
+
   if (!isOpen) return null
 
-  const selectedCategoria = categorias.find(c => c.id === formData.categoria_id)
+  const selectedCategoria = categorias.find((c) => String(c.id) === String(formData.categoria_id))
   const subcategorias = selectedCategoria ? selectedCategoria.subcategorias : []
 
   return (
@@ -379,7 +392,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   name="categoria_id"
                   value={formData.categoria_id}
                   onChange={handleChange}
-                  options={categorias.filter((c) => c.tipo === formData.tipo)}
+                  options={categoriasFiltradas}
                   placeholder="Escolha uma categoria…"
                   isOpen={activeSelect === 'categoria_id'}
                   onToggle={setActiveSelect}
@@ -402,13 +415,25 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   />
                 </div>
               )}
+
+              <div className="form-group">
+                <label htmlFor="tx-descricao">
+                  Descrição <span className="modal-label-optional">(opcional)</span>
+                </label>
+                <input
+                  id="tx-descricao"
+                  type="text"
+                  name="descricao"
+                  value={formData.descricao}
+                  onChange={handleChange}
+                  placeholder="Ex.: mercado, aluguel, salário…"
+                  className="input-premium"
+                />
+              </div>
             </section>
 
-            <section className="nova-tx-section" aria-labelledby="nova-tx-h-detalhes">
-              <h4 id="nova-tx-h-detalhes" className="nova-tx-section__title">
-                Valor e data
-              </h4>
-              <div className="form-group form-group--valor-destaque">
+            <section className="nova-tx-section">
+              <div className="form-group">
                 <label htmlFor="tx-valor">Valor (R$)</label>
                 <input
                   id="tx-valor"
@@ -469,21 +494,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   onChange={handleChange}
                   required
                   className="input-premium input-data-novo-tx"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="tx-descricao">
-                  Descrição <span className="modal-label-optional">(opcional)</span>
-                </label>
-                <input
-                  id="tx-descricao"
-                  type="text"
-                  name="descricao"
-                  value={formData.descricao}
-                  onChange={handleChange}
-                  placeholder="Ex.: mercado, aluguel, salário…"
-                  className="input-premium"
                 />
               </div>
             </section>
