@@ -45,6 +45,12 @@ function painelAssinaturaFromUser(u) {
   }
 }
 
+function pagamentoStatusBannerClass(statusUrl) {
+  if (statusUrl === 'success') return 'pagamento-banner pagamento-banner--success'
+  if (statusUrl === 'pending') return 'pagamento-banner pagamento-banner--warning'
+  return 'pagamento-banner pagamento-banner--danger'
+}
+
 export default function Pagamento() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -239,7 +245,7 @@ export default function Pagamento() {
 
       <main className="main-content relative z-10 ref-dashboard-main">
         <div className="ref-dashboard-inner">
-        <header className="ref-dashboard-header">
+        <header className="ref-dashboard-header page-pagamento-header">
           <MobileMenuButton onClick={() => setMenuAberto(true)} />
           <div className="ref-dashboard-header__lead">
             <h1 className="ref-dashboard-greeting">
@@ -248,202 +254,191 @@ export default function Pagamento() {
           </div>
         </header>
 
-        <section
-          className="content-section page-pagamento-legenda"
-          style={{ gridColumn: '1 / -1', maxWidth: '520px' }}
-          aria-label="Sobre a cobrança mensal"
-        >
-          <p className="ref-panel__subtitle page-pagamento-header-sub" style={{ margin: 0 }}>
-            Assinatura mensal de <strong>R$ {precoMensal.toFixed(2).replace('.', ',')}</strong> — cobrança automática todo mês no cartão; o valor cai na conta Mercado Pago do aplicativo. Você autoriza uma vez no checkout do MP.
-          </p>
-        </section>
-
-        {expirado && (
-          <div
-            className="content-section"
-            style={{
-              marginBottom: '16px',
-              padding: '14px 16px',
-              borderRadius: '12px',
-              background: 'rgba(239,68,68,0.1)',
-              border: '1px solid rgba(239,68,68,0.25)',
-            }}
-          >
-            <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
-              Seu período de teste terminou ou a assinatura não está ativa.
+        <div className="page-pagamento-stack">
+          <article className="ref-panel page-pagamento-card--intro" aria-label="Sobre a cobrança mensal">
+            <p className="ref-panel__subtitle page-pagamento-header-sub">
+              Assinatura mensal de <strong>R$ {precoMensal.toFixed(2).replace('.', ',')}</strong> — cobrança automática todo mês no cartão; o valor cai na conta Mercado Pago do aplicativo. Você autoriza uma vez no checkout do MP.
             </p>
-            <p style={{ margin: '8px 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Conclua o pagamento abaixo pelo Mercado Pago para voltar a usar o aplicativo. Após a aprovação, atualize a
-              página ou faça login novamente.
-            </p>
-          </div>
-        )}
+          </article>
 
-        {statusUrl && (
-          <div
-            className="content-section"
-            style={{
-              marginBottom: '16px',
-              padding: '14px 16px',
-              borderRadius: '12px',
-              background:
-                statusUrl === 'success'
-                  ? 'rgba(34,197,94,0.12)'
+          {expirado && (
+            <div className="pagamento-banner pagamento-banner--danger" role="alert">
+              <p className="pagamento-banner__title">Seu período de teste terminou ou a assinatura não está ativa.</p>
+              <p className="pagamento-banner__text">
+                Conclua o pagamento abaixo pelo Mercado Pago para voltar a usar o aplicativo. Após a aprovação, atualize a página ou faça login novamente.
+              </p>
+            </div>
+          )}
+
+          {statusUrl && (
+            <div className={pagamentoStatusBannerClass(statusUrl)} role="status">
+              <p className="pagamento-banner__title">
+                {statusUrl === 'success'
+                  ? 'Pagamento concluído ou em análise. O status final aparece em alguns instantes no histórico abaixo.'
                   : statusUrl === 'pending'
-                    ? 'rgba(234,179,8,0.12)'
-                    : 'rgba(239,68,68,0.12)',
-            }}
-          >
-            <p style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>
-              {statusUrl === 'success' && 'Pagamento concluído ou em análise. O status final aparece em alguns instantes no histórico abaixo.'}
-              {statusUrl === 'pending' && 'Pagamento pendente (ex.: boleto ou análise). Você receberá a confirmação pelo Mercado Pago.'}
-              {statusUrl === 'failure' && 'Não foi possível concluir o pagamento. Tente outro meio ou tente novamente.'}
-            </p>
-            <button type="button" className="btn-secondary" style={{ marginTop: '10px', padding: '6px 12px', fontSize: '12px' }} onClick={limparStatusUrl}>
-              Fechar aviso
-            </button>
-          </div>
-        )}
+                    ? 'Pagamento pendente (ex.: boleto ou análise). Você receberá a confirmação pelo Mercado Pago.'
+                    : 'Não foi possível concluir o pagamento. Tente outro meio ou tente novamente.'}
+              </p>
+              <button type="button" className="btn-secondary btn-secondary--compact" onClick={limparStatusUrl}>
+                Fechar aviso
+              </button>
+            </div>
+          )}
 
-        {!loading &&
-          (painelAssinatura.label || proximaCobranca || painelAssinatura.mpUrl || painelAssinatura.bloqueada) && (
-          <section className="content-section pagamento-assinatura-panel" style={{ gridColumn: '1 / -1', maxWidth: '520px' }} aria-labelledby="pagamento-assinatura-heading">
-            <h2 id="pagamento-assinatura-heading" className="pagamento-assinatura-panel__title">
-              Status da assinatura
-            </h2>
-            {painelAssinatura.label ? (
-              <p className="pagamento-assinatura-panel__status">{painelAssinatura.label}</p>
-            ) : null}
-            {painelAssinatura.bloqueada && painelAssinatura.motivo ? (
-              <p className="pagamento-assinatura-panel__alert">{painelAssinatura.motivo}</p>
-            ) : null}
-            {proximaCobranca ? (
-              <div className="pagamento-assinatura-panel__cobranca">
-                <div className="pagamento-assinatura-panel__cobranca-label">Próxima cobrança</div>
-                <div className="pagamento-assinatura-panel__cobranca-data">
-                  {new Date(proximaCobranca).toLocaleString('pt-BR', {
-                    dateStyle: 'long',
-                    timeStyle: 'short',
-                  })}
-                </div>
-                <p style={{ margin: '8px 0 0', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
-                  Data informada pelo Mercado Pago após a autorização da assinatura. Atualiza automaticamente após cada pagamento.
+          {!loading &&
+            (painelAssinatura.label || proximaCobranca || painelAssinatura.mpUrl || painelAssinatura.bloqueada) && (
+              <section className="ref-panel page-pagamento-assinatura" aria-labelledby="pagamento-assinatura-heading">
+                <h2 id="pagamento-assinatura-heading" className="pagamento-assinatura-panel__title">
+                  Status da assinatura
+                </h2>
+                {painelAssinatura.label ? (
+                  <p className="pagamento-assinatura-panel__status">{painelAssinatura.label}</p>
+                ) : null}
+                {painelAssinatura.bloqueada && painelAssinatura.motivo ? (
+                  <p className="pagamento-assinatura-panel__alert">{painelAssinatura.motivo}</p>
+                ) : null}
+                {proximaCobranca ? (
+                  <div className="pagamento-assinatura-panel__cobranca">
+                    <div className="pagamento-assinatura-panel__cobranca-label">Próxima cobrança</div>
+                    <div className="pagamento-assinatura-panel__cobranca-data">
+                      {new Date(proximaCobranca).toLocaleString('pt-BR', {
+                        dateStyle: 'long',
+                        timeStyle: 'short',
+                      })}
+                    </div>
+                    <p className="pagamento-assinatura-panel__cobranca-note">
+                      Data informada pelo Mercado Pago após a autorização da assinatura. Atualiza automaticamente após cada pagamento.
+                    </p>
+                  </div>
+                ) : null}
+                {painelAssinatura.mpUrl ? (
+                  <a
+                    className="pagamento-assinatura-panel__link"
+                    href={painelAssinatura.mpUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Gerenciar no Mercado Pago
+                  </a>
+                ) : null}
+              </section>
+            )}
+
+          <article className="ref-panel page-pagamento-checkout">
+            {!config.ready && !loading && (
+              <p className="pagamento-config-alert">
+                Pagamentos ainda não estão ativos: configure <code>MERCADO_PAGO_ACCESS_TOKEN</code> no servidor (e rode a migration da tabela <code>pagamentos_mercadopago</code>).
+              </p>
+            )}
+
+            {config.isento_pagamento && !loading && (
+              <div className="pagamento-banner pagamento-banner--success pagamento-checkout-isento-banner">
+                <p className="pagamento-banner__title">Sua conta está isenta de pagamento.</p>
+                <p className="pagamento-banner__text">
+                  Não é necessário concluir o checkout do Mercado Pago. Em caso de dúvida, fale com o suporte.
                 </p>
               </div>
-            ) : null}
-            {painelAssinatura.mpUrl ? (
-              <a
-                className="pagamento-assinatura-panel__link"
-                href={painelAssinatura.mpUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Gerenciar no Mercado Pago
-              </a>
-            ) : null}
-          </section>
-        )}
+            )}
 
-        <section className="content-section" style={{ gridColumn: '1 / -1', maxWidth: '520px' }}>
-          {!config.ready && !loading && (
-            <p style={{ color: 'var(--danger)', fontSize: '14px', marginBottom: '12px' }}>
-              Pagamentos ainda não estão ativos: configure <code>MERCADO_PAGO_ACCESS_TOKEN</code> no servidor (e rode a migration da tabela{' '}
-              <code>pagamentos_mercadopago</code>).
-            </p>
-          )}
+            <div className="pagamento-plan-card">
+              <span className="pagamento-plan-card__title">{titulo}</span>
+              <div className="pagamento-plan-card__meta">
+                Valor:{' '}
+                <strong>R$ {precoMensal.toFixed(2).replace('.', ',')} / mês</strong>
+              </div>
+            </div>
 
-          {config.isento_pagamento && !loading && (
-            <div
-              style={{
-                marginBottom: '16px',
-                padding: '14px 16px',
-                borderRadius: '12px',
-                background: 'rgba(34,197,94,0.12)',
-                border: '1px solid rgba(34,197,94,0.25)',
-              }}
+            {error ? <p className="pagamento-checkout-error">{error}</p> : null}
+
+            <button
+              type="button"
+              className="btn-primary page-pagamento-cta"
+              disabled={!config.ready || paying || loading || config.isento_pagamento}
+              onClick={handlePagar}
             >
-              <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                Sua conta está isenta de pagamento.
-              </p>
-              <p style={{ margin: '8px 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                Não é necessário concluir o checkout do Mercado Pago. Em caso de dúvida, fale com o suporte.
-              </p>
+              {paying ? 'Redirecionando…' : 'Assinar e autorizar no Mercado Pago'}
+            </button>
+
+            {config.publicKey ? (
+              <p className="pagamento-mp-hint">Chave pública MP carregada para futuras integrações (Wallet / Brick).</p>
+            ) : null}
+          </article>
+
+          <article className="ref-panel page-pagamento-historico" aria-labelledby="pagamento-hist-heading">
+            <div className="ref-panel__head">
+              <h2 id="pagamento-hist-heading" className="ref-panel__title">
+                Histórico
+              </h2>
             </div>
-          )}
+            {loading ? (
+              <AdminDataTableSkeleton headers={PAGAMENTO_HISTORICO_HEADERS} rows={5} />
+            ) : historico.length === 0 ? (
+              <p className="pagamento-hist-empty">Nenhum pagamento registrado ainda.</p>
+            ) : (
+              <>
+                <div className="pagamento-hist-table-wrap">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Data</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Detalhe</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {historico.map((row) => (
+                        <tr key={row.id}>
+                          <td className="pagamento-hist-cell--muted">
+                            {row.created_at ? new Date(row.created_at).toLocaleString('pt-BR') : '—'}
+                          </td>
+                          <td>{row.amount != null ? `R$ ${Number(row.amount).toFixed(2)}` : '—'}</td>
+                          <td>
+                            <MpStatusBadge status={row.status} label={statusLabel(row.status)} />
+                          </td>
+                          <td className="pagamento-hist-cell--detail">
+                            {row.status_detail || row.description || '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
-          <div
-            style={{
-              marginBottom: '14px',
-              padding: '12px 14px',
-              borderRadius: '10px',
-              background: 'var(--bg-secondary)',
-              border: '1px solid rgba(148,163,184,0.25)',
-              fontSize: '14px',
-              color: 'var(--text-primary)',
-            }}
-          >
-            <strong>{titulo}</strong>
-            <div style={{ marginTop: '6px', color: 'var(--text-secondary)', fontSize: '13px' }}>
-              Valor: <strong style={{ color: 'var(--text-primary)' }}>R$ {precoMensal.toFixed(2).replace('.', ',')} / mês</strong>
-            </div>
-          </div>
-
-          {error && <p style={{ color: 'var(--danger)', fontSize: '13px', marginBottom: '10px' }}>{error}</p>}
-
-          <button
-            type="button"
-            className="btn-primary"
-            disabled={!config.ready || paying || loading || config.isento_pagamento}
-            onClick={handlePagar}
-            style={{ padding: '12px 20px' }}
-          >
-            {paying ? 'Redirecionando…' : 'Assinar e autorizar no Mercado Pago'}
-          </button>
-
-          {config.publicKey && (
-            <p style={{ marginTop: '14px', fontSize: '12px', color: 'var(--text-secondary)' }}>Chave pública MP carregada para futuras integrações (Wallet / Brick).</p>
-          )}
-        </section>
-
-        <section className="content-section" style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '12px', color: 'var(--text-primary)' }}>Histórico</h2>
-          {loading ? (
-            <AdminDataTableSkeleton headers={PAGAMENTO_HISTORICO_HEADERS} rows={5} />
-          ) : historico.length === 0 ? (
-            <p style={{ color: 'var(--text-secondary)' }}>Nenhum pagamento registrado ainda.</p>
-          ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Data</th>
-                    <th>Valor</th>
-                    <th>Status</th>
-                    <th>Detalhe</th>
-                  </tr>
-                </thead>
-                <tbody>
+                <ul className="pagamento-hist-cards" aria-label="Histórico de pagamentos (lista)">
                   {historico.map((row) => (
-                    <tr key={row.id}>
-                      <td style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                        {row.created_at ? new Date(row.created_at).toLocaleString('pt-BR') : '—'}
-                      </td>
-                      <td>
-                        {row.amount != null ? `R$ ${Number(row.amount).toFixed(2)}` : '—'}
-                      </td>
-                      <td>
-                        <MpStatusBadge status={row.status} label={statusLabel(row.status)} />
-                      </td>
-                      <td style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '220px' }}>
-                        {row.status_detail || row.description || '—'}
-                      </td>
-                    </tr>
+                    <li key={row.id} className="pagamento-hist-card">
+                      <div className="pagamento-hist-card__row">
+                        <span className="pagamento-hist-card__label">Data</span>
+                        <span className="pagamento-hist-card__val">
+                          {row.created_at ? new Date(row.created_at).toLocaleString('pt-BR') : '—'}
+                        </span>
+                      </div>
+                      <div className="pagamento-hist-card__row">
+                        <span className="pagamento-hist-card__label">Valor</span>
+                        <span className="pagamento-hist-card__val">
+                          {row.amount != null ? `R$ ${Number(row.amount).toFixed(2)}` : '—'}
+                        </span>
+                      </div>
+                      <div className="pagamento-hist-card__row">
+                        <span className="pagamento-hist-card__label">Status</span>
+                        <span className="pagamento-hist-card__val">
+                          <MpStatusBadge status={row.status} label={statusLabel(row.status)} />
+                        </span>
+                      </div>
+                      <div className="pagamento-hist-card__row">
+                        <span className="pagamento-hist-card__label">Detalhe</span>
+                        <span className="pagamento-hist-card__val pagamento-hist-card__val--detail">
+                          {row.status_detail || row.description || '—'}
+                        </span>
+                      </div>
+                    </li>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+                </ul>
+              </>
+            )}
+          </article>
+        </div>
         </div>
       </main>
       </div>
