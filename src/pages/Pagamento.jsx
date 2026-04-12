@@ -1,49 +1,21 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
-import MpStatusBadge from '../components/MpStatusBadge'
-import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
+import PagamentoResumoKpis from '../components/pagamento/PagamentoResumoKpis.jsx'
+import PagamentoPainelLateral from '../components/pagamento/PagamentoPainelLateral.jsx'
+import PagamentoDetalhesCard from '../components/pagamento/PagamentoDetalhesCard.jsx'
+import PagamentoHistorico from '../components/pagamento/PagamentoHistorico.jsx'
 import { apiUrl } from '../lib/apiUrl'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
+import {
+  PLANO_PADRAO_TITULO,
+  buildOrientacaoUsuario,
+  buildResumoKpis,
+  painelAssinaturaFromUser,
+  ultimoPagamentoHistorico,
+} from '../lib/pagamentoPageModel.js'
 import './dashboard.css'
-
-const PAGAMENTO_HISTORICO_HEADERS = ['Data', 'Valor', 'Status', 'Detalhe']
-
-function statusLabel(status) {
-  if (!status) return '—'
-  const s = String(status).toLowerCase()
-  if (s === 'approved' || s === 'authorized') return 'Aprovado'
-  if (s === 'pending' || s === 'in_process' || s === 'in_mediation') return 'Pendente'
-  if (s === 'rejected' || s === 'cancelled' || s === 'refunded' || s === 'charged_back') return 'Recusado / estornado'
-  return status
-}
-
-function situacaoAssinaturaLabel(code) {
-  const m = {
-    admin: 'Administrador',
-    isento: 'Conta isenta de pagamento',
-    trial: 'Período de teste',
-    ativo: 'Assinatura ativa',
-    pausada: 'Assinatura pausada no Mercado Pago',
-    cancelada: 'Assinatura cancelada no Mercado Pago',
-    inativa: 'Sem assinatura ativa',
-  }
-  return m[code] || ''
-}
-
-function painelAssinaturaFromUser(u) {
-  if (!u) {
-    return { situacao: null, label: '', mpUrl: '', bloqueada: false, motivo: '' }
-  }
-  const code = u.assinatura_situacao
-  return {
-    situacao: code != null ? String(code) : null,
-    label: code ? situacaoAssinaturaLabel(String(code)) : '',
-    mpUrl: typeof u.mp_gerenciar_url === 'string' ? u.mp_gerenciar_url.trim() : '',
-    bloqueada: !!u.assinatura_mp_bloqueada,
-    motivo: typeof u.motivo_bloqueio_acesso === 'string' ? u.motivo_bloqueio_acesso : '',
-  }
-}
 
 function pagamentoStatusBannerClass(statusUrl) {
   if (statusUrl === 'success') return 'pagamento-banner pagamento-banner--success'
@@ -54,13 +26,16 @@ function pagamentoStatusBannerClass(statusUrl) {
 export default function Pagamento() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
+  const historicoRef = useRef(null)
+
   const [config, setConfig] = useState({ ready: false, publicKey: null, isento_pagamento: false })
   const [historico, setHistorico] = useState([])
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
+  const [dadosErro, setDadosErro] = useState('')
   const [valor] = useState('10.00')
-  const [titulo] = useState('Assinatura mensal Horizonte Financeiro')
+  const [titulo] = useState(PLANO_PADRAO_TITULO)
   const [proximaCobranca, setProximaCobranca] = useState(null)
   const [precoMensal, setPrecoMensal] = useState(10)
   const [painelAssinatura, setPainelAssinatura] = useState(() => painelAssinaturaFromUser(null))
@@ -69,85 +44,93 @@ export default function Pagamento() {
   const mpSub = searchParams.get('mp')
   const expirado = searchParams.get('expirado') === '1'
 
-  useEffect(() => {
-    const load = async () => {
+  const formatCurrency = formatCurrencyBRL
+
+  const fetchDados = useCallback(async () => {
+    setDadosErro('')
+    try {
+      const userSaved = localStorage.getItem('horizonte_user')
+      let uid = ''
+      let u = null
       try {
-        const userSaved = localStorage.getItem('horizonte_user')
-        let uid = ''
-        let u = null
-        try {
-          u = userSaved ? JSON.parse(userSaved) : null
-          uid = u?.id || ''
-        } catch {
-          uid = ''
-        }
-        const cfgHeaders = uid ? { 'x-user-id': uid } : {}
-
-        if (uid && u) {
-          setPainelAssinatura(painelAssinaturaFromUser(u))
-          if (u.assinatura_proxima_cobranca) setProximaCobranca(u.assinatura_proxima_cobranca)
-          if (u.plano_preco_mensal != null) {
-            const p = Number(u.plano_preco_mensal)
-            if (Number.isFinite(p) && p > 0) setPrecoMensal(p)
-          }
-          try {
-            const stRes = await fetch(apiUrl('/api/assinatura/status'), { headers: { 'x-user-id': uid } })
-            if (stRes.ok) {
-              const assinatura = await stRes.json()
-              const merged = { ...u, ...assinatura }
-              localStorage.setItem('horizonte_user', JSON.stringify(merged))
-              window.dispatchEvent(new Event('horizonte-session-refresh'))
-              setPainelAssinatura(painelAssinaturaFromUser(merged))
-              if (assinatura.assinatura_proxima_cobranca) {
-                setProximaCobranca(assinatura.assinatura_proxima_cobranca)
-              }
-              if (assinatura.plano_preco_mensal != null) {
-                const p = Number(assinatura.plano_preco_mensal)
-                if (Number.isFinite(p) && p > 0) setPrecoMensal(p)
-              }
-            }
-          } catch {
-            /* ignore */
-          }
-        }
-
-        const savedAfterAssinatura = localStorage.getItem('horizonte_user')
-        let uidHistorico = ''
-        try {
-          uidHistorico = savedAfterAssinatura ? JSON.parse(savedAfterAssinatura).id : ''
-        } catch {
-          uidHistorico = ''
-        }
-
-        const [cfgRes, histRes] = await Promise.all([
-          fetch(apiUrl('/api/pagamentos/config'), { headers: cfgHeaders }),
-          (async () => {
-            if (!uidHistorico) return { ok: false }
-            return fetch(apiUrl('/api/pagamentos/minhas'), { headers: { 'x-user-id': uidHistorico } })
-          })(),
-        ])
-
-        if (cfgRes.ok) {
-          const c = await cfgRes.json()
-          setConfig({
-            ready: !!c.ready,
-            publicKey: c.publicKey,
-            isento_pagamento: !!c.isento_pagamento,
-          })
-        }
-
-        if (histRes.ok) {
-          const h = await histRes.json()
-          setHistorico(Array.isArray(h) ? h : [])
-        }
+        u = userSaved ? JSON.parse(userSaved) : null
+        uid = u?.id || ''
       } catch {
-        /* ignore */
-      } finally {
-        setLoading(false)
+        uid = ''
       }
+      const cfgHeaders = uid ? { 'x-user-id': uid } : {}
+
+      if (uid && u) {
+        setPainelAssinatura(painelAssinaturaFromUser(u))
+        if (u.assinatura_proxima_cobranca) setProximaCobranca(u.assinatura_proxima_cobranca)
+        if (u.plano_preco_mensal != null) {
+          const p = Number(u.plano_preco_mensal)
+          if (Number.isFinite(p) && p > 0) setPrecoMensal(p)
+        }
+        try {
+          const stRes = await fetch(apiUrl('/api/assinatura/status'), { headers: { 'x-user-id': uid } })
+          if (stRes.ok) {
+            const assinatura = await stRes.json()
+            const merged = { ...u, ...assinatura }
+            localStorage.setItem('horizonte_user', JSON.stringify(merged))
+            window.dispatchEvent(new Event('horizonte-session-refresh'))
+            setPainelAssinatura(painelAssinaturaFromUser(merged))
+            if (assinatura.assinatura_proxima_cobranca) {
+              setProximaCobranca(assinatura.assinatura_proxima_cobranca)
+            }
+            if (assinatura.plano_preco_mensal != null) {
+              const p = Number(assinatura.plano_preco_mensal)
+              if (Number.isFinite(p) && p > 0) setPrecoMensal(p)
+            }
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+
+      const savedAfterAssinatura = localStorage.getItem('horizonte_user')
+      let uidHistorico = ''
+      try {
+        uidHistorico = savedAfterAssinatura ? JSON.parse(savedAfterAssinatura).id : ''
+      } catch {
+        uidHistorico = ''
+      }
+
+      const [cfgRes, histRes] = await Promise.all([
+        fetch(apiUrl('/api/pagamentos/config'), { headers: cfgHeaders }),
+        (async () => {
+          if (!uidHistorico) return { ok: false, status: 0 }
+          return fetch(apiUrl('/api/pagamentos/minhas'), { headers: { 'x-user-id': uidHistorico } })
+        })(),
+      ])
+
+      if (cfgRes.ok) {
+        const c = await cfgRes.json()
+        setConfig({
+          ready: !!c.ready,
+          publicKey: c.publicKey,
+          isento_pagamento: !!c.isento_pagamento,
+        })
+      } else {
+        setDadosErro((prev) => prev || 'Não foi possível carregar a configuração de pagamentos.')
+      }
+
+      if (histRes.ok) {
+        const h = await histRes.json()
+        setHistorico(Array.isArray(h) ? h : [])
+      } else if (uidHistorico) {
+        setDadosErro((prev) => prev || 'Não foi possível carregar o histórico de cobranças.')
+      }
+    } catch {
+      setDadosErro('Erro de rede ao carregar a página. Tente novamente.')
+    } finally {
+      setLoading(false)
     }
-    load()
   }, [])
+
+  useEffect(() => {
+    fetchDados()
+  }, [fetchDados])
 
   useEffect(() => {
     if (mpSub !== 'sub_ok') return
@@ -167,6 +150,10 @@ export default function Pagamento() {
             setPainelAssinatura(painelAssinaturaFromUser(merged))
             if (assinatura.assinatura_proxima_cobranca) {
               setProximaCobranca(assinatura.assinatura_proxima_cobranca)
+            }
+            if (assinatura.plano_preco_mensal != null) {
+              const p = Number(assinatura.plano_preco_mensal)
+              if (Number.isFinite(p) && p > 0) setPrecoMensal(p)
             }
           }
         }
@@ -218,7 +205,7 @@ export default function Pagamento() {
           'Content-Type': 'application/json',
           'x-user-id': u.id,
         },
-        body: JSON.stringify({ valor: v, titulo: titulo.trim() || 'Assinatura mensal Horizonte Financeiro' }),
+        body: JSON.stringify({ valor: v, titulo: titulo.trim() || PLANO_PADRAO_TITULO }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Não foi possível iniciar o pagamento.')
@@ -238,209 +225,146 @@ export default function Pagamento() {
     setSearchParams(searchParams, { replace: true })
   }
 
+  const onAtualizar = async () => {
+    setLoading(true)
+    await fetchDados()
+  }
+
+  const onVerHistorico = () => {
+    historicoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const ultimo = ultimoPagamentoHistorico(historico)
+  const primeiroRegistroIso = historico.length ? historico[historico.length - 1]?.created_at : null
+
+  const resumoItems = buildResumoKpis({
+    painel: painelAssinatura,
+    proximaCobranca,
+    precoMensal,
+    tituloPlano: titulo,
+    historico,
+  })
+
+  const orientacao = buildOrientacaoUsuario({
+    painel: painelAssinatura,
+    configReady: config.ready,
+    isento: config.isento_pagamento,
+    historicoLen: historico.length,
+  })
+
   return (
     <div className="dashboard-container page-pagamento app-horizon-shell">
       <div className="app-horizon-inner">
-      <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
+        <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
-      <main className="main-content relative z-10 ref-dashboard-main">
-        <div className="ref-dashboard-inner">
-        <header className="ref-dashboard-header page-pagamento-header">
-          <MobileMenuButton onClick={() => setMenuAberto(true)} />
-          <div className="ref-dashboard-header__lead">
-            <h1 className="ref-dashboard-greeting">
-              <span className="ref-dashboard-greeting__name">Pagamento</span>
-            </h1>
-          </div>
-        </header>
+        <main className="main-content relative z-10 ref-dashboard-main">
+          <div className="ref-dashboard-inner">
+            <header className="ref-dashboard-header page-pagamento-header">
+              <MobileMenuButton onClick={() => setMenuAberto(true)} />
+              <div className="ref-dashboard-header__lead">
+                <h1 className="ref-dashboard-greeting">
+                  <span className="ref-dashboard-greeting__name">Pagamento</span>
+                </h1>
+                <p className="ref-panel__subtitle page-pagamento-header-sub">
+                  Gerencie sua assinatura, cobranças e histórico de pagamentos no Mercado Pago.
+                </p>
+              </div>
+            </header>
 
-        <div className="page-pagamento-stack">
-          <article className="ref-panel page-pagamento-card--intro" aria-label="Sobre a cobrança mensal">
-            <p className="ref-panel__subtitle page-pagamento-header-sub">
-              Assinatura mensal de <strong>R$ {precoMensal.toFixed(2).replace('.', ',')}</strong> — cobrança automática todo mês no cartão; o valor cai na conta Mercado Pago do aplicativo. Você autoriza uma vez no checkout do MP.
-            </p>
-          </article>
-
-          {expirado && (
-            <div className="pagamento-banner pagamento-banner--danger" role="alert">
-              <p className="pagamento-banner__title">Seu período de teste terminou ou a assinatura não está ativa.</p>
-              <p className="pagamento-banner__text">
-                Conclua o pagamento abaixo pelo Mercado Pago para voltar a usar o aplicativo. Após a aprovação, atualize a página ou faça login novamente.
-              </p>
-            </div>
-          )}
-
-          {statusUrl && (
-            <div className={pagamentoStatusBannerClass(statusUrl)} role="status">
-              <p className="pagamento-banner__title">
-                {statusUrl === 'success'
-                  ? 'Pagamento concluído ou em análise. O status final aparece em alguns instantes no histórico abaixo.'
-                  : statusUrl === 'pending'
-                    ? 'Pagamento pendente (ex.: boleto ou análise). Você receberá a confirmação pelo Mercado Pago.'
-                    : 'Não foi possível concluir o pagamento. Tente outro meio ou tente novamente.'}
-              </p>
-              <button type="button" className="btn-secondary btn-secondary--compact" onClick={limparStatusUrl}>
-                Fechar aviso
-              </button>
-            </div>
-          )}
-
-          {!loading &&
-            (painelAssinatura.label || proximaCobranca || painelAssinatura.mpUrl || painelAssinatura.bloqueada) && (
-              <section className="ref-panel page-pagamento-assinatura" aria-labelledby="pagamento-assinatura-heading">
-                <h2 id="pagamento-assinatura-heading" className="pagamento-assinatura-panel__title">
-                  Status da assinatura
-                </h2>
-                {painelAssinatura.label ? (
-                  <p className="pagamento-assinatura-panel__status">{painelAssinatura.label}</p>
+            <div className="page-pagamento-layout">
+              <div className="page-pagamento-layout__primary">
+                {dadosErro ? (
+                  <div className="pagamento-banner pagamento-banner--danger" role="alert">
+                    <p className="pagamento-banner__title">{dadosErro}</p>
+                  </div>
                 ) : null}
-                {painelAssinatura.bloqueada && painelAssinatura.motivo ? (
-                  <p className="pagamento-assinatura-panel__alert">{painelAssinatura.motivo}</p>
-                ) : null}
-                {proximaCobranca ? (
-                  <div className="pagamento-assinatura-panel__cobranca">
-                    <div className="pagamento-assinatura-panel__cobranca-label">Próxima cobrança</div>
-                    <div className="pagamento-assinatura-panel__cobranca-data">
-                      {new Date(proximaCobranca).toLocaleString('pt-BR', {
-                        dateStyle: 'long',
-                        timeStyle: 'short',
-                      })}
-                    </div>
-                    <p className="pagamento-assinatura-panel__cobranca-note">
-                      Data informada pelo Mercado Pago após a autorização da assinatura. Atualiza automaticamente após cada pagamento.
+
+                {expirado ? (
+                  <div className="pagamento-banner pagamento-banner--danger" role="alert">
+                    <p className="pagamento-banner__title">Seu período de teste terminou ou a assinatura não está ativa.</p>
+                    <p className="pagamento-banner__text">
+                      Conclua o pagamento pelo Mercado Pago para voltar a usar o aplicativo. Após a aprovação, use &quot;Atualizar status&quot; ou faça login
+                      novamente.
                     </p>
                   </div>
                 ) : null}
-                {painelAssinatura.mpUrl ? (
-                  <a
-                    className="pagamento-assinatura-panel__link"
-                    href={painelAssinatura.mpUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Gerenciar no Mercado Pago
-                  </a>
+
+                {statusUrl ? (
+                  <div className={pagamentoStatusBannerClass(statusUrl)} role="status">
+                    <p className="pagamento-banner__title">
+                      {statusUrl === 'success'
+                        ? 'Pagamento concluído ou em análise. O status final aparece em instantes no histórico abaixo.'
+                        : statusUrl === 'pending'
+                          ? 'Pagamento pendente (ex.: boleto ou análise). Você receberá a confirmação pelo Mercado Pago.'
+                          : 'Não foi possível concluir o pagamento. Tente outro meio ou tente novamente.'}
+                    </p>
+                    <button type="button" className="btn-secondary btn-secondary--compact" onClick={limparStatusUrl}>
+                      Fechar aviso
+                    </button>
+                  </div>
                 ) : null}
-              </section>
-            )}
 
-          <article className="ref-panel page-pagamento-checkout">
-            {!config.ready && !loading && (
-              <p className="pagamento-config-alert">
-                Pagamentos ainda não estão ativos: configure <code>MERCADO_PAGO_ACCESS_TOKEN</code> no servidor (e rode a migration da tabela <code>pagamentos_mercadopago</code>).
-              </p>
-            )}
+                {!config.ready && !loading ? (
+                  <p className="pagamento-config-alert">
+                    Pagamentos ainda não estão ativos: configure <code>MERCADO_PAGO_ACCESS_TOKEN</code> no servidor (e rode a migration da tabela{' '}
+                    <code>pagamentos_mercadopago</code>).
+                  </p>
+                ) : null}
 
-            {config.isento_pagamento && !loading && (
-              <div className="pagamento-banner pagamento-banner--success pagamento-checkout-isento-banner">
-                <p className="pagamento-banner__title">Sua conta está isenta de pagamento.</p>
-                <p className="pagamento-banner__text">
-                  Não é necessário concluir o checkout do Mercado Pago. Em caso de dúvida, fale com o suporte.
-                </p>
+                {config.isento_pagamento && !loading ? (
+                  <div className="pagamento-banner pagamento-banner--success">
+                    <p className="pagamento-banner__title">Sua conta está isenta de pagamento.</p>
+                    <p className="pagamento-banner__text">Não é necessário concluir o checkout do Mercado Pago. Em caso de dúvida, fale com o suporte.</p>
+                  </div>
+                ) : null}
+
+                <PagamentoResumoKpis items={resumoItems} />
+
+                <PagamentoDetalhesCard
+                  tituloPlano={titulo}
+                  precoMensal={precoMensal}
+                  painel={painelAssinatura}
+                  proximaCobranca={proximaCobranca}
+                  primeiroRegistroIso={primeiroRegistroIso}
+                  formatCurrency={formatCurrency}
+                />
+
+                {painelAssinatura.bloqueada && painelAssinatura.motivo ? (
+                  <div className="pagamento-banner pagamento-banner--warning" role="status">
+                    <p className="pagamento-banner__title">Atenção ao acesso</p>
+                    <p className="pagamento-banner__text">{painelAssinatura.motivo}</p>
+                  </div>
+                ) : null}
+
+                {ultimo && (ultimo.status === 'rejected' || ultimo.status === 'cancelled' || ultimo.status === 'refunded') ? (
+                  <div className="pagamento-banner pagamento-banner--warning" role="status">
+                    <p className="pagamento-banner__title">Última cobrança: {formatCurrency(Number(ultimo.amount || 0))}</p>
+                    <p className="pagamento-banner__text">
+                      Status recente no histórico indica necessidade de revisão. Atualize o meio de pagamento no Mercado Pago ou tente autorizar novamente.
+                    </p>
+                  </div>
+                ) : null}
+
+                <PagamentoHistorico historicoRef={historicoRef} historico={historico} loading={loading} formatCurrency={formatCurrency} />
               </div>
-            )}
 
-            <div className="pagamento-plan-card">
-              <span className="pagamento-plan-card__title">{titulo}</span>
-              <div className="pagamento-plan-card__meta">
-                Valor:{' '}
-                <strong>R$ {precoMensal.toFixed(2).replace('.', ',')} / mês</strong>
-              </div>
+              <PagamentoPainelLateral
+                orientacao={orientacao}
+                onAssinar={handlePagar}
+                onAtualizar={onAtualizar}
+                onVerHistorico={onVerHistorico}
+                paying={paying}
+                loading={loading}
+                configReady={config.ready}
+                isento={config.isento_pagamento}
+                mpUrl={painelAssinatura.mpUrl}
+                disabledAssinar={!config.ready || paying || loading || config.isento_pagamento}
+                checkoutError={error}
+                mpHint={config.publicKey ? 'Integração Mercado Pago pronta (checkout pré-aprovado).' : null}
+              />
             </div>
-
-            {error ? <p className="pagamento-checkout-error">{error}</p> : null}
-
-            <button
-              type="button"
-              className="btn-primary page-pagamento-cta"
-              disabled={!config.ready || paying || loading || config.isento_pagamento}
-              onClick={handlePagar}
-            >
-              {paying ? 'Redirecionando…' : 'Assinar e autorizar no Mercado Pago'}
-            </button>
-
-            {config.publicKey ? (
-              <p className="pagamento-mp-hint">Chave pública MP carregada para futuras integrações (Wallet / Brick).</p>
-            ) : null}
-          </article>
-
-          <article className="ref-panel page-pagamento-historico" aria-labelledby="pagamento-hist-heading">
-            <div className="ref-panel__head">
-              <h2 id="pagamento-hist-heading" className="ref-panel__title">
-                Histórico
-              </h2>
-            </div>
-            {loading ? (
-              <AdminDataTableSkeleton headers={PAGAMENTO_HISTORICO_HEADERS} rows={5} />
-            ) : historico.length === 0 ? (
-              <p className="pagamento-hist-empty">Nenhum pagamento registrado ainda.</p>
-            ) : (
-              <>
-                <div className="pagamento-hist-table-wrap">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th>Detalhe</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {historico.map((row) => (
-                        <tr key={row.id}>
-                          <td className="pagamento-hist-cell--muted">
-                            {row.created_at ? new Date(row.created_at).toLocaleString('pt-BR') : '—'}
-                          </td>
-                          <td>{row.amount != null ? `R$ ${Number(row.amount).toFixed(2)}` : '—'}</td>
-                          <td>
-                            <MpStatusBadge status={row.status} label={statusLabel(row.status)} />
-                          </td>
-                          <td className="pagamento-hist-cell--detail">
-                            {row.status_detail || row.description || '—'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <ul className="pagamento-hist-cards" aria-label="Histórico de pagamentos (lista)">
-                  {historico.map((row) => (
-                    <li key={row.id} className="pagamento-hist-card">
-                      <div className="pagamento-hist-card__row">
-                        <span className="pagamento-hist-card__label">Data</span>
-                        <span className="pagamento-hist-card__val">
-                          {row.created_at ? new Date(row.created_at).toLocaleString('pt-BR') : '—'}
-                        </span>
-                      </div>
-                      <div className="pagamento-hist-card__row">
-                        <span className="pagamento-hist-card__label">Valor</span>
-                        <span className="pagamento-hist-card__val">
-                          {row.amount != null ? `R$ ${Number(row.amount).toFixed(2)}` : '—'}
-                        </span>
-                      </div>
-                      <div className="pagamento-hist-card__row">
-                        <span className="pagamento-hist-card__label">Status</span>
-                        <span className="pagamento-hist-card__val">
-                          <MpStatusBadge status={row.status} label={statusLabel(row.status)} />
-                        </span>
-                      </div>
-                      <div className="pagamento-hist-card__row">
-                        <span className="pagamento-hist-card__label">Detalhe</span>
-                        <span className="pagamento-hist-card__val pagamento-hist-card__val--detail">
-                          {row.status_detail || row.description || '—'}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </article>
-        </div>
-        </div>
-      </main>
+          </div>
+        </main>
       </div>
     </div>
   )
