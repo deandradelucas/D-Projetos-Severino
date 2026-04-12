@@ -122,10 +122,11 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           }
         >
           <li>
-            <NavLink 
-              to="/dashboard" 
+            <NavLink
+              to="/dashboard"
+              end
               {...navPrefetchHandlers('/dashboard')}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} 
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={() => setMenuAberto(false)}
             >
               <span className="icon-wrap">
@@ -140,10 +141,11 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             </NavLink>
           </li>
           <li>
-            <NavLink 
-              to="/transacoes" 
+            <NavLink
+              to="/transacoes"
+              end
               {...navPrefetchHandlers('/transacoes')}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} 
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={() => setMenuAberto(false)}
             >
               <span className="icon-wrap">
@@ -177,6 +179,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           <li>
             <NavLink
               to="/pagamento"
+              end
               {...navPrefetchHandlers('/pagamento')}
               title="Assinatura mensal Mercado Pago"
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
@@ -197,6 +200,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           <li>
             <NavLink
               to="/configuracoes"
+              end
               {...navPrefetchHandlers('/configuracoes')}
               title="Perfil, tema, biometria e dados"
               className={({ isActive }) => `nav-item nav-item--settings ${isActive ? 'active' : ''}`}
@@ -227,6 +231,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               <li>
                 <NavLink
                   to="/admin/whatsapp"
+                  end
                   {...navPrefetchHandlers('/admin/whatsapp')}
                   className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
                   onClick={() => setMenuAberto(false)}
@@ -242,6 +247,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               <li>
                 <NavLink
                   to="/admin/usuarios"
+                  end
                   {...navPrefetchHandlers('/admin/usuarios')}
                   className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
                   onClick={() => setMenuAberto(false)}
@@ -260,6 +266,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               <li>
                 <NavLink
                   to="/admin/pagamentos"
+                  end
                   {...navPrefetchHandlers('/admin/pagamentos')}
                   className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
                   onClick={() => setMenuAberto(false)}

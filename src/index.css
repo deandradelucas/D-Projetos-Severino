@@ -212,6 +212,13 @@ html:has(body[data-theme='light']:has(.app-horizon-shell)) {
   background-color: transparent;
 }
 
+/* Foto Horizonte visível nas laterais com desfoque mínimo (1px) por baixo da área de rotas */
+body[data-theme='light']:has(.app-horizon-shell) .app-routes-grow {
+  background-color: transparent;
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+}
+
 /* Tema escuro */
 body[data-theme='dark'] {
   color-scheme: dark;

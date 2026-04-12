@@ -173,8 +173,8 @@ body[data-theme='glass'] {
     box-shadow: 0 24px 48px -24px rgba(15, 23, 42, 0.14);
   }
 
-  /* Item ativo alinhado ao shell — leve encosto, sem invadir o painel */
-  .dashboard-container .nav-item.active {
+  /* Item ativo “encostado” — só layout legado (sem .app-horizon-shell no container) */
+  .dashboard-container:not(.app-horizon-shell) .nav-item.active {
     width: calc(100% + 14px);
     margin-right: -14px;
     padding-right: 18px;
@@ -911,11 +911,15 @@ h3 {
 
 .nav-item.active {
   font-weight: 700;
-  width: calc(100% + 14px);
-  margin-right: -14px;
   background-color: var(--active-bg);
   color: #000000 !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Largura extra + margem negativa: layout legado; no shell autenticado quebra alinhamento (mobile/desktop) */
+.dashboard-container:not(.app-horizon-shell) .nav-item.active {
+  width: calc(100% + 14px);
+  margin-right: -14px;
 }
 
 /* Curvas líquidas suaves com boca mais aberta */
@@ -2965,8 +2969,8 @@ body[data-theme='light'] .form-group--recorrencia-on label.modal-recorrencia-tog
   margin-top: 40px;
 }
 
-/* —— Página Minhas Transações —— */
-.page-transacoes .main-content {
+/* —— Página Minhas Transações (layout legado sem .app-horizon-shell no container) —— */
+.dashboard-container:not(.app-horizon-shell).page-transacoes .main-content {
   background:
     radial-gradient(ellipse 88% 50% at 100% -12%, rgba(212, 168, 75, 0.07), transparent 50%),
     radial-gradient(ellipse 55% 42% at 0% 100%, rgba(99, 102, 241, 0.05), transparent 48%),
@@ -2978,7 +2982,7 @@ body[data-theme='light'] .form-group--recorrencia-on label.modal-recorrencia-tog
 }
 
 @media (min-width: 769px) {
-  .page-transacoes .main-content {
+  .dashboard-container:not(.app-horizon-shell).page-transacoes .main-content {
     border-radius: 0 38px 38px 0;
     border-left: none;
   }
@@ -3418,8 +3422,8 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-fil
   border-color: rgba(148, 163, 184, 0.35);
 }
 
-/* —— Relatórios analíticos —— */
-.page-relatorios .main-content {
+/* —— Relatórios analíticos (legado sem shell no container) —— */
+.dashboard-container:not(.app-horizon-shell).page-relatorios .main-content {
   background:
     radial-gradient(ellipse 85% 48% at 100% -8%, rgba(212, 168, 75, 0.08), transparent 52%),
     radial-gradient(ellipse 50% 40% at 0% 100%, rgba(99, 102, 241, 0.06), transparent 48%),
@@ -3431,7 +3435,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-fil
 }
 
 @media (min-width: 769px) {
-  .page-relatorios .main-content {
+  .dashboard-container:not(.app-horizon-shell).page-relatorios .main-content {
     border-radius: 0 38px 38px 0;
     border-left: none;
   }
@@ -5277,9 +5281,9 @@ body[data-theme='light'] .main-content {
   padding: 14px 18px 18px;
 }
 
-body[data-theme='light'] .page-transacoes .main-content,
-body[data-theme='light'] .page-relatorios .main-content,
-body[data-theme='light'] .page-pagamento .main-content {
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-transacoes .main-content,
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-relatorios .main-content,
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-pagamento .main-content {
   border-radius: 24px;
 }
 body[data-theme='light'] .transacoes-filter-grid,
@@ -5317,7 +5321,7 @@ body[data-theme='light'] .global-skeleton--table {
 
 @media (max-width: 1200px) {
   body[data-theme='light'] {
-    --app-sidebar-width: clamp(200px, 22vw + 40px, 268px);
+    --app-sidebar-width: clamp(190px, 20vw + 34px, 252px);
     --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 66px);
   }
   body[data-theme='light'] .sidebar {
@@ -5328,10 +5332,10 @@ body[data-theme='light'] .global-skeleton--table {
 @media (max-width: 768px) {
   body[data-theme='light'] .dashboard-container { padding: 0; gap: 0; }
   body[data-theme='light'] .main-content,
-  body[data-theme='light'] .page-transacoes .main-content,
-  body[data-theme='light'] .page-relatorios .main-content,
-  body[data-theme='light'] .page-pagamento .main-content,
-  body[data-theme='light'] .page-configuracoes .main-content {
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-transacoes .main-content,
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-relatorios .main-content,
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-pagamento .main-content,
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-configuracoes .main-content {
     border-radius: 0;
     padding: 10px 10px 18px;
   }
@@ -7151,8 +7155,12 @@ body[data-theme='light'] {
   --pf-sh-float: 0 28px 56px -34px rgba(15, 23, 42, 0.16);
   --pf-sh-soft: 0 8px 24px -12px rgba(15, 23, 42, 0.1);
   --pf-focus: 0 0 0 3px rgba(59, 130, 246, 0.32);
+  /* Menu shell (tema claro): padding único ativo/inativo — evita salto ao trocar rota */
+  --shell-nav-py: 12px;
+  --shell-nav-pl: 16px;
+  --shell-nav-pr: 28px;
   /* Menu lateral — proporcional ao viewport (largura + padding fluidos) */
-  --app-sidebar-width: clamp(220px, 17vw + 72px, 308px);
+  --app-sidebar-width: clamp(210px, 15.5vw + 66px, 290px);
   --app-sidebar-pad: clamp(14px, 1.6vw + 8px, 22px) clamp(12px, 1.2vw + 8px, 18px)
     clamp(14px, 1.5vw + 8px, 20px);
   --app-shell-inner-max: 1180px;
@@ -7617,13 +7625,13 @@ body[data-theme='light'] .ref-dashboard-inner .ref-alert {
   text-align: center;
 }
 
-/* Shell app (tema claro): sem painel branco em tela cheia — fotos Horizonte + menu branco sólido (todas as páginas com .app-horizon-shell) */
+/* Shell app (tema claro): base branca no bloco menu + conteúdo; laterais da viewport com foto + blur(1px) em index.css (.app-routes-grow) */
 html:has(body[data-theme='light'] .app-horizon-shell) {
   scrollbar-gutter: stable;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell {
-  background: transparent !important;
+  background: #ffffff !important;
   border: none !important;
   box-shadow: none !important;
   overflow-x: clip;
@@ -7805,6 +7813,33 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-panel--transactions .ref-tx-list {
     padding-bottom: 12px;
+  }
+}
+
+/* Desktop shell: logo na régua do menu (alinhada à esquerda da coluna, altura ~ item 44px) */
+@media (min-width: 769px) {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+    width: auto;
+    max-width: 100%;
+    max-height: 44px;
+    height: auto;
+    object-fit: contain;
+    object-position: left center;
+    transform: none;
+    transform-origin: 50% 50%;
+    filter: saturate(0.72) brightness(0.9);
+    opacity: 0.88;
+    margin: 0;
   }
 }
 
@@ -8035,22 +8070,15 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
   display: none !important;
 }
 
-@media (min-width: 769px) {
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-    width: 100%;
-    margin-right: 0;
-    padding-right: 16px;
-    border-radius: 14px;
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 1) inset,
-      0 10px 28px -22px rgba(15, 23, 42, 0.12);
-  }
-}
-
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
   gap: 12px;
   min-height: 46px;
-  padding: 12px 28px 12px 16px;
+  padding: var(--shell-nav-py) var(--shell-nav-pr) var(--shell-nav-py) var(--shell-nav-pl);
   border-radius: 14px;
   font-size: 14px;
   font-weight: 600;
@@ -8076,10 +8104,12 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-  font-weight: 800;
+  /* Mesmo peso que inativo: evita “pulo” horizontal do texto (800 vs 600) */
+  font-weight: 600;
   color: #020617 !important;
   background: #ffffff;
   border-color: rgba(226, 232, 240, 0.98);
+  padding: var(--shell-nav-py) var(--shell-nav-pr) var(--shell-nav-py) var(--shell-nav-pl);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 1) inset,
     0 10px 28px -22px rgba(15, 23, 42, 0.12);
@@ -8217,7 +8247,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
 
 @media (max-width: 768px) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell {
-    background: transparent !important;
+    background: #ffffff !important;
   }
 }
 

@@ -452,7 +452,7 @@ body[data-theme='dark'] .global-skeleton--table {
 }
 @media (max-width: 1200px) {
   body[data-theme='dark'] {
-    --app-sidebar-width: clamp(200px, 22vw + 40px, 268px);
+    --app-sidebar-width: clamp(190px, 20vw + 34px, 252px);
     --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 66px);
   }
 }
@@ -2112,7 +2112,7 @@ body[data-theme='dark'] {
   --pf-sh-soft: 0 8px 24px -12px rgba(0, 0, 0, 0.28);
   --pf-focus: 0 0 0 3px rgba(59, 130, 246, 0.32);
   /* Menu lateral — proporcional ao viewport (largura + padding fluidos) */
-  --app-sidebar-width: clamp(220px, 17vw + 72px, 308px);
+  --app-sidebar-width: clamp(210px, 15.5vw + 66px, 290px);
   --app-sidebar-pad: clamp(14px, 1.6vw + 8px, 22px) clamp(12px, 1.2vw + 8px, 18px)
     clamp(14px, 1.5vw + 8px, 20px);
   --app-shell-inner-max: 1180px;
