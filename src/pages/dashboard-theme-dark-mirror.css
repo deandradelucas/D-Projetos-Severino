@@ -607,6 +607,9 @@ body[data-theme='dark'] .ref-dashboard-header__btn-wa {
   justify-content: center;
   width: 44px;
   height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  box-sizing: border-box;
   flex-shrink: 0;
   border-radius: 12px;
   background: #25d366;
@@ -672,22 +675,16 @@ body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-header__btn-t
   font-size: 15px;
   border-radius: 14px;
 }
-body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-header__btn-wa {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-}
-body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-header__btn-wa svg {
-  width: 24px;
-  height: 24px;
-}
+body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-header__btn-wa,
 body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-privacy-btn {
   width: 52px;
   height: 52px;
   min-width: 52px;
   min-height: 52px;
+  box-sizing: border-box;
   border-radius: 14px;
 }
+body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-header__btn-wa svg,
 body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-privacy-btn svg {
   width: 24px;
   height: 24px;
@@ -708,18 +705,13 @@ body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-privacy-btn s
 }
 @media (min-width: 769px) {
 
-  body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-header__btn-wa {
-    width: 54px;
-    height: 54px;
-  }
-}
-@media (min-width: 769px) {
-
+  body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-header__btn-wa,
   body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-privacy-btn {
     width: 54px;
     height: 54px;
     min-width: 54px;
     min-height: 54px;
+    box-sizing: border-box;
   }
 }
 body[data-theme='dark'] .ref-dashboard-greeting {
@@ -804,17 +796,13 @@ body[data-theme='dark'] .ref-dashboard-greeting__name {
 }
 @media (max-width: 768px) {
 
-  body[data-theme='dark'] .ref-dashboard-actions-card--welcome .ref-dashboard-header__btn-wa {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-  }
-}
-@media (max-width: 768px) {
-
+  body[data-theme='dark'] .ref-dashboard-actions-card--welcome .ref-dashboard-header__btn-wa,
   body[data-theme='dark'] .ref-dashboard-actions-card--welcome .ref-dashboard-privacy-btn {
     width: 40px;
     height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    box-sizing: border-box;
     border-radius: 12px;
   }
 }
@@ -870,6 +858,9 @@ body[data-theme='dark'] .ref-dashboard-greeting__name {
   body[data-theme='dark'] .ref-dashboard-header__btn-wa {
     width: 44px;
     height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    box-sizing: border-box;
     border-radius: 12px;
   }
 }
@@ -947,6 +938,9 @@ body[data-theme='dark'] .ref-dashboard-greeting__name {
   body[data-theme='dark'] .ref-dashboard-header__btn-wa {
     width: 46px;
     height: 46px;
+    min-width: 46px;
+    min-height: 46px;
+    box-sizing: border-box;
     border-radius: 14px;
   }
 }
@@ -2210,44 +2204,20 @@ body[data-theme='dark'] .ref-dashboard-inner {
     max-height: none;
   }
 }
-@media (max-width: 768px) {
-  body[data-theme='dark']
-    .dashboard-container.app-horizon-shell
-    main.ref-dashboard-main--scrolled
-    .ref-dashboard-inner
-    > .ref-dashboard-header,
-  body[data-theme='dark']
-    .dashboard-container.ref-dashboard.app-horizon-shell
-    main.ref-dashboard-main--scrolled
-    .ref-dashboard-actions-card--welcome {
-    -webkit-backdrop-filter: blur(1px);
-    backdrop-filter: blur(1px);
-    background: color-mix(in srgb, #111820 78%, transparent);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-    box-shadow: 0 6px 20px -12px rgba(0, 0, 0, 0.35);
-  }
-}
-@media (max-width: 768px) {
-  body[data-theme='dark']
-    .dashboard-container.ref-dashboard.app-horizon-shell
-    main.ref-dashboard-main.ref-dashboard-main--scrolled
-    .ref-dashboard-actions-card--welcome
-    .ref-dashboard-header--embedded {
-    flex-wrap: nowrap;
-    row-gap: 0;
-  }
-}
-@media (max-width: 768px) {
-
-  body[data-theme='dark']
-    .dashboard-container.ref-dashboard.app-horizon-shell
-    main.ref-dashboard-main.ref-dashboard-main--scrolled
-    .ref-dashboard-actions-card__toolbar--inline {
-    flex: 0 0 auto;
-    flex-basis: auto;
-    width: auto;
-    max-width: none;
-  }
+body[data-theme='dark']
+  .dashboard-container.app-horizon-shell
+  main.ref-dashboard-main--scrolled
+  .ref-dashboard-inner
+  > .ref-dashboard-header,
+body[data-theme='dark']
+  .dashboard-container.ref-dashboard.app-horizon-shell
+  main.ref-dashboard-main--scrolled
+  .ref-dashboard-actions-card--welcome {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  background: transparent;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: none;
 }
 body[data-theme='dark'] .ref-dashboard-inner .ref-alert {
   text-align: center;
