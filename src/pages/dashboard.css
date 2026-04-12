@@ -903,6 +903,11 @@ h3 {
   white-space: nowrap;
 }
 
+.nav-item .nav-item__label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .nav-item:hover:not(.active) {
   background-color: var(--sidebar-hover-bg);
   color: var(--sidebar-text);
@@ -1101,7 +1106,7 @@ h3 {
       0 14px 36px -22px rgba(0, 0, 0, 0.55);
   }
 
-  [data-theme='light'] .main-content {
+  [data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content {
     border-color: rgba(15, 23, 42, 0.08);
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.5) inset,
@@ -5164,7 +5169,7 @@ body[data-theme='light'] .logout-btn {
   border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-body[data-theme='light'] .main-content {
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content {
   background: #f5f7fc;
   border-radius: 0;
   border: none;
@@ -5227,7 +5232,7 @@ body[data-theme='light'] .input-premium {
     width: min(280px, 86vw);
   }
 
-  body[data-theme='light'] .main-content {
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content {
     padding: 14px 12px 16px;
   }
 }
@@ -5276,7 +5281,7 @@ body[data-theme='light'] .sidebar .logout-btn {
   font-size: 13px;
 }
 
-body[data-theme='light'] .main-content {
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content {
   border-radius: 24px;
   padding: 14px 18px 18px;
 }
@@ -5331,7 +5336,7 @@ body[data-theme='light'] .global-skeleton--table {
 }
 @media (max-width: 768px) {
   body[data-theme='light'] .dashboard-container { padding: 0; gap: 0; }
-  body[data-theme='light'] .main-content,
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content,
   body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-transacoes .main-content,
   body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-relatorios .main-content,
   body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-pagamento .main-content,
@@ -7198,7 +7203,7 @@ body[data-theme='light'] .sidebar {
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.65);
 }
 
-body[data-theme='light'] .dashboard-container .main-content {
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content {
   background:
     radial-gradient(ellipse 85% 55% at 100% -8%, rgba(59, 130, 246, 0.055), transparent 48%),
     linear-gradient(180deg, #f9fafc 0%, #f3f5f9 100%);
@@ -7208,17 +7213,17 @@ body[data-theme='light'] .dashboard-container .main-content {
   scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
 }
 
-body[data-theme='light'] .dashboard-container .main-content::-webkit-scrollbar {
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content::-webkit-scrollbar {
   width: 9px;
   height: 9px;
 }
-body[data-theme='light'] .dashboard-container .main-content::-webkit-scrollbar-thumb {
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.45);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
-body[data-theme='light'] .dashboard-container .main-content::-webkit-scrollbar-track {
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content::-webkit-scrollbar-track {
   background: transparent;
 }
 
@@ -8441,8 +8446,15 @@ body[data-theme='light'] .global-skeleton {
     box-shadow: none;
   }
 
-  body[data-theme='light'] .dashboard-container .main-content {
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content {
     border-radius: 0;
+    padding: max(8px, env(safe-area-inset-top, 0px)) 12px max(24px, env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Shell autenticado: padding do <main> no mobile (antes vinha da regra genérica .dashboard-container .main-content) */
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner > .main-content.ref-dashboard-main {
+    border-radius: 0;
+    box-sizing: border-box;
     padding: max(8px, env(safe-area-inset-top, 0px)) 12px max(24px, env(safe-area-inset-bottom, 0px));
   }
 
