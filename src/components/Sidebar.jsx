@@ -108,6 +108,9 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             src={logoSrc}
             alt="Horizonte Financeiro"
             className="brand-logo"
+            width={1600}
+            height={360}
+            decoding="sync"
           />
           <button
             type="button"

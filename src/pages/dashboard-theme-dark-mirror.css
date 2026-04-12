@@ -2272,7 +2272,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .ref-dashboard .m
 }
 @media (min-width: 769px) {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .app-horizon-inner > .main-content.ref-dashboard-main {
-    padding: 22px clamp(18px, 2.2vw, 26px) 28px;
+    padding: 22px clamp(14px, 1.9vw, 22px) 28px clamp(10px, 1.25vw, 16px);
     box-sizing: border-box;
   }
 }
@@ -2331,7 +2331,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     height: auto;
     max-height: none;
     min-height: var(--app-sidebar-col-h);
-    gap: 14px;
+    gap: 8px;
   }
 }
 @media (min-width: 769px) {

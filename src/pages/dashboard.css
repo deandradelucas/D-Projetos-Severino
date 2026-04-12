@@ -7290,6 +7290,8 @@ body[data-theme='light'] .ref-dashboard-inner {
     box-sizing: border-box;
     height: auto;
     max-height: none;
+    /* Vão menu ↔ conteúdo (tema): reforçado abaixo com body[data-theme] por especificidade */
+    gap: 8px;
   }
 
   .app-horizon-inner .main-content {
@@ -7657,7 +7659,8 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .ref-dashboard .
 /* Mesmo recuo interno no desktop/tablet (mobile continua com o padding compacto do @media max-width 768) */
 @media (min-width: 769px) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner > .main-content.ref-dashboard-main {
-    padding: 22px clamp(18px, 2.2vw, 26px) 28px;
+    /* top | end (direita) | bottom | start (lado do menu): start um pouco menor */
+    padding: 22px clamp(14px, 1.9vw, 22px) 28px clamp(10px, 1.25vw, 16px);
     box-sizing: border-box;
   }
 }
@@ -7749,7 +7752,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
     height: auto;
     max-height: none;
     min-height: var(--app-sidebar-col-h);
-    gap: 14px;
+    gap: 8px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar {
@@ -7777,6 +7780,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    gap: 8px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .logout-btn {
@@ -7821,7 +7825,8 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
   }
 }
 
-/* Desktop shell: logo na régua do menu (alinhada à esquerda da coluna, altura ~ item 44px) */
+/* Desktop shell: logo na régua do menu (altura ~ item 44px).
+   Espaço logo → Dashboard = mesmo ritmo que entre itens (.nav-menu gap), sem “degrau” extra. */
 @media (min-width: 769px) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
     display: flex;
@@ -7829,15 +7834,18 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
     align-items: center;
     justify-content: flex-start;
     width: 100%;
-    margin-bottom: 14px;
-    padding-bottom: 12px;
+    margin-bottom: 8px;
+    padding-bottom: 0;
+    /* Evita “salto” logo → 1.º item: cada rota remonta o Sidebar e a PNG pode vir com altura 0 até decodificar */
+    min-height: 48px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
+    height: 44px;
+    min-height: 44px;
     max-height: 44px;
-    height: auto;
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -7845,6 +7853,40 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
     filter: saturate(0.72) brightness(0.9);
     opacity: 0.88;
     margin: 0;
+  }
+
+  /* Escuro / vidro: mesma régua claro (sobrepõe .sidebar .brand-wrapper do mirror) */
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper,
+  body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 8px;
+    padding-bottom: 0;
+    min-height: 48px;
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
+  body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+    width: auto;
+    max-width: 100%;
+    height: 44px;
+    min-height: 44px;
+    max-height: 44px;
+    object-fit: contain;
+    object-position: left center;
+    transform: none;
+    transform-origin: 50% 50%;
+    filter: saturate(0.72) brightness(0.9);
+    opacity: 0.88;
+    margin: 0;
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .nav-menu,
+  body[data-theme='glass'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .nav-menu {
+    gap: 8px;
   }
 }
 
@@ -8075,6 +8117,22 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
   display: none !important;
 }
 
+/* Mesmo gap que entre Dashboard / Transações / … (evita folga extra só abaixo da logo) */
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu {
+  gap: 8px;
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:first-child,
+body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
   box-sizing: border-box;
   width: 100%;
@@ -8224,6 +8282,28 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
     overflow-y: hidden;
     display: flex;
     flex-direction: column;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+    margin-bottom: 10px;
+    padding-bottom: 0;
+    min-height: 44px;
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper,
+  body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+    margin-bottom: 10px;
+    padding-bottom: 0;
+    min-height: 44px;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
+  body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    object-fit: contain;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu {
