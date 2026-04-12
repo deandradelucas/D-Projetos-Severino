@@ -17,9 +17,16 @@ const MENU_ORDER = [
   '/admin/pagamentos',
 ]
 
+function mergeNavItemClass(isActive, href, pathname, extraClass = '') {
+  const on = Boolean(isActive) || pathname === href
+  const base = extraClass ? `nav-item ${extraClass}` : 'nav-item'
+  return on ? `${base} active` : base
+}
+
 export default function Sidebar({ menuAberto, setMenuAberto }) {
   const { theme } = useTheme()
   const location = useLocation()
+  const { pathname } = location
   const prevMenuIdx = useRef(-1)
   const [dotMotion, setDotMotion] = useState(null)
   const navMenuRef = useRef(null)
@@ -63,7 +70,8 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     if (!ul) return
 
     const measure = () => {
-      const active = ul.querySelector('.nav-item.active')
+      const active =
+        ul.querySelector('a.nav-item.active') || ul.querySelector('a.nav-item[aria-current="page"]')
       if (!active) {
         setActiveDotTop(null)
         return
@@ -126,7 +134,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               to="/dashboard"
               end
               {...navPrefetchHandlers('/dashboard')}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => mergeNavItemClass(isActive, '/dashboard', pathname)}
               onClick={() => setMenuAberto(false)}
             >
               <span className="icon-wrap">
@@ -137,7 +145,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <rect width="7" height="7" x="3" y="14" rx="1"/>
                 </svg>
               </span>
-              Dashboard
+              <span className="nav-item__label">Dashboard</span>
             </NavLink>
           </li>
           <li>
@@ -145,7 +153,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               to="/transacoes"
               end
               {...navPrefetchHandlers('/transacoes')}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => mergeNavItemClass(isActive, '/transacoes', pathname)}
               onClick={() => setMenuAberto(false)}
             >
               <span className="icon-wrap">
@@ -155,16 +163,16 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <path d="M12 18V6"/>
                 </svg>
               </span>
-              Transações
+              <span className="nav-item__label">Transações</span>
             </NavLink>
           </li>
           <li>
             <NavLink
               to="/relatorios"
-              {...navPrefetchHandlers('/relatorios')}
               end
+              {...navPrefetchHandlers('/relatorios')}
               title="Gráficos, resumo do período e exportação CSV ou PDF"
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => mergeNavItemClass(isActive, '/relatorios', pathname)}
               onClick={() => setMenuAberto(false)}
             >
               <span className="icon-wrap">
@@ -173,7 +181,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <path d="M22 12A10 10 0 0 0 12 2v10z" />
                 </svg>
               </span>
-              Relatórios
+              <span className="nav-item__label">Relatórios</span>
             </NavLink>
           </li>
           <li>
@@ -182,7 +190,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               end
               {...navPrefetchHandlers('/pagamento')}
               title="Assinatura mensal Mercado Pago"
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => mergeNavItemClass(isActive, '/pagamento', pathname)}
               onClick={() => setMenuAberto(false)}
             >
               <span className="icon-wrap">
@@ -191,7 +199,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <line x1="2" x2="22" y1="10" y2="10" />
                 </svg>
               </span>
-              Pagamento
+              <span className="nav-item__label">Pagamento</span>
             </NavLink>
           </li>
           <li className="nav-section-label nav-section-label--account">
@@ -203,7 +211,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               end
               {...navPrefetchHandlers('/configuracoes')}
               title="Perfil, tema, biometria e dados"
-              className={({ isActive }) => `nav-item nav-item--settings ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => mergeNavItemClass(isActive, '/configuracoes', pathname, 'nav-item--settings')}
               onClick={() => setMenuAberto(false)}
             >
               <span className="icon-wrap">
@@ -219,7 +227,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <line x1="17" y1="16" x2="23" y2="16" />
                 </svg>
               </span>
-              Ajustes
+              <span className="nav-item__label">Ajustes</span>
             </NavLink>
           </li>
 
@@ -233,7 +241,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   to="/admin/whatsapp"
                   end
                   {...navPrefetchHandlers('/admin/whatsapp')}
-                  className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                  className={({ isActive }) => mergeNavItemClass(isActive, '/admin/whatsapp', pathname)}
                   onClick={() => setMenuAberto(false)}
                 >
                   <span className="icon-wrap">
@@ -241,7 +249,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                     </svg>
                   </span>
-                  Logs do WhatsApp
+                  <span className="nav-item__label">Logs do WhatsApp</span>
                 </NavLink>
               </li>
               <li>
@@ -249,7 +257,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   to="/admin/usuarios"
                   end
                   {...navPrefetchHandlers('/admin/usuarios')}
-                  className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                  className={({ isActive }) => mergeNavItemClass(isActive, '/admin/usuarios', pathname)}
                   onClick={() => setMenuAberto(false)}
                 >
                   <span className="icon-wrap">
@@ -260,7 +268,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
                   </span>
-                  Logs Usuários
+                  <span className="nav-item__label">Logs Usuários</span>
                 </NavLink>
               </li>
               <li>
@@ -268,7 +276,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   to="/admin/pagamentos"
                   end
                   {...navPrefetchHandlers('/admin/pagamentos')}
-                  className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                  className={({ isActive }) => mergeNavItemClass(isActive, '/admin/pagamentos', pathname)}
                   onClick={() => setMenuAberto(false)}
                 >
                   <span className="icon-wrap">
@@ -277,7 +285,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                       <line x1="2" x2="22" y1="10" y2="10" />
                     </svg>
                   </span>
-                  Logs de Pagamentos
+                  <span className="nav-item__label">Logs de Pagamentos</span>
                 </NavLink>
               </li>
             </>
