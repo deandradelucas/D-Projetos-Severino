@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import RefDashboardScroll from '../components/RefDashboardScroll'
 import PagamentoPainelLateral from '../components/pagamento/PagamentoPainelLateral.jsx'
 import PagamentoDetalhesCard from '../components/pagamento/PagamentoDetalhesCard.jsx'
 import PagamentoHistorico from '../components/pagamento/PagamentoHistorico.jsx'
@@ -252,6 +253,7 @@ export default function Pagamento() {
               </div>
             </section>
 
+            <RefDashboardScroll>
             <div className="page-pagamento-layout">
               <div className="page-pagamento-layout__primary">
                 {dadosErro ? (
@@ -326,6 +328,7 @@ export default function Pagamento() {
                 checkoutError={error}
               />
             </div>
+            </RefDashboardScroll>
           </div>
         </main>
       </div>

@@ -2212,52 +2212,47 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   }
 }
 
-/* Mobile shell: alinhar ao menu claro — coluna + tipografia (sobrescreve regras desktop do bloco acima) */
+/* Mobile shell (escuro): mesma gaveta e lista em linha que dashboard.css — só reforça tipografia do bloco desktop */
 @media (max-width: 768px) {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
-    width: min(94vw, 384px);
-    max-width: 384px;
+    width: min(86vw, 320px);
+    max-width: 320px;
     padding-left: 12px;
     padding-right: 12px;
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 56px;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 52px;
     padding: 12px 10px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    letter-spacing: -0.02em;
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
-    flex: none;
-    width: 100%;
-    text-align: center;
-    font-size: 18px;
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
     font-weight: 600;
-    word-break: normal;
-    overflow-wrap: normal;
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item svg {
-    width: 24px;
-    height: 24px;
-  }
-
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
-    padding: 10px 52px 14px 12px;
-    min-height: 72px;
+    width: 22px;
+    height: 22px;
   }
 }
 @media (min-width: 769px) {

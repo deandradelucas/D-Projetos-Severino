@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import RefDashboardScroll from '../components/RefDashboardScroll'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
@@ -364,6 +365,7 @@ export default function Relatorios() {
           </div>
         </section>
 
+        <RefDashboardScroll>
         <article
           className={`ref-panel page-relatorios-ref-filters ${filtrosAbertos ? '' : 'page-relatorios-ref-filters--collapsed'}`}
           aria-label="Filtros"
@@ -760,6 +762,7 @@ export default function Relatorios() {
             </div>
           </div>
         )}
+        </RefDashboardScroll>
         </div>
       </main>
       </div>

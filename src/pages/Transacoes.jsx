@@ -17,6 +17,7 @@ import {
 import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
+import RefDashboardScroll from '../components/RefDashboardScroll'
 import './dashboard.css'
 
 /** Itens por requisição — menos DOM inicial; “Carregar mais” busca o restante. */
@@ -276,6 +277,7 @@ export default function Transacoes() {
           </div>
         </section>
 
+        <RefDashboardScroll>
         <section className="ref-bottom-grid ref-bottom-grid--single page-transacoes-panels" aria-label="Filtros e transações">
         <article
           className={`ref-panel page-transacoes-ref-filters ${filtrosAbertos ? '' : 'page-transacoes-ref-filters--collapsed'}`}
@@ -604,6 +606,7 @@ export default function Transacoes() {
           </div>
         </article>
         </section>
+        </RefDashboardScroll>
         </div>
       </main>
       </div>

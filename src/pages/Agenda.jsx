@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import RefDashboardScroll from '../components/RefDashboardScroll'
 import { useTheme } from '../context/ThemeContext'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import {
@@ -310,6 +311,7 @@ export default function Agenda() {
                 </div>
               </section>
 
+              <RefDashboardScroll>
               <section className="ref-kpi-row ref-dashboard-kpi-strip page-agenda__summary" aria-label="Resumo da agenda">
                 <article className="ref-kpi-card ref-kpi-card--balance">
                   <div className="ref-kpi-card__icon" aria-hidden>
@@ -815,6 +817,8 @@ export default function Agenda() {
                   </div>
                 </aside>
               </div>
+            </div>
+              </RefDashboardScroll>
             </div>
           </main>
         </div>

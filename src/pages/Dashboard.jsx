@@ -15,6 +15,7 @@ import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { primeiroNomeExibicao } from '../lib/primeiroNomeExibicao'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { SkeletonKpi, SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
+import RefDashboardScroll from '../components/RefDashboardScroll'
 
 export default function Dashboard() {
   const { privacyMode, togglePrivacy } = useTheme()
@@ -198,6 +199,7 @@ export default function Dashboard() {
           </div>
         </section>
 
+        <RefDashboardScroll>
         <section
           className={`ref-kpi-row ref-dashboard-kpi-strip dashboard-hub__kpis${refreshing ? ' page-panel--refreshing' : ''}`}
           aria-label="Saldo em conta, entrada e saída do período"
@@ -375,6 +377,7 @@ export default function Dashboard() {
           </article>
         </section>
 
+        </RefDashboardScroll>
         </div>
         </main>
       </div>

@@ -75,6 +75,10 @@ export default function ShellStickyHeaderScroll() {
           el.removeEventListener('scroll', onScroll)
         }
         ports = collectVerticalScrollPorts(main)
+        const bodyScroll = main.querySelector(':scope .ref-dashboard-scroll')
+        if (bodyScroll) {
+          ports.push(bodyScroll)
+        }
         for (const el of ports) {
           el.addEventListener('scroll', onScroll, { passive: true })
         }
