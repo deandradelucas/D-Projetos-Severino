@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import RefDashboardScroll from '../components/RefDashboardScroll'
 import AdminPaymentLogsPanel from '../components/admin/AdminPaymentLogsPanel'
 import { apiUrl } from '../lib/apiUrl'
 import { buildPaymentLogsQuery, normalizePaymentLogsResponse } from '../lib/paymentLogsAdmin'
@@ -145,6 +146,7 @@ export default function AdminPagamentos() {
               </div>
             </section>
 
+            <RefDashboardScroll>
             <AdminPaymentLogsPanel
               rows={rows}
               summary={summary}
@@ -160,6 +162,7 @@ export default function AdminPagamentos() {
               onToggleExempt={alternarIsencao}
               adminDocsUrl={ADMIN_DOCS_URL}
             />
+            </RefDashboardScroll>
           </div>
         </main>
       </div>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'horizonte-financeiro-v6'
+const CACHE_NAME = 'horizonte-financeiro-v7'
 const APP_SHELL = [
   '/',
   '/manifest.json',
@@ -27,11 +27,11 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const url = self.location.origin + '/agenda'
+  const url = self.location.origin + '/dashboard'
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
-        if (client.url.includes('/agenda') && 'focus' in client) {
+        if (client.url.includes('/dashboard') && 'focus' in client) {
           return client.focus()
         }
       }

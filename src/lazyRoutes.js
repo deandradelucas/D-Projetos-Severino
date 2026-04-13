@@ -1,5 +1,4 @@
 import { lazy } from 'react'
-import { SHOW_AGENDA } from './lib/featureFlags'
 
 export const loadCadastro = () => import('./pages/Cadastro.jsx')
 export const Cadastro = lazy(loadCadastro)
@@ -9,9 +8,6 @@ export const RedefinirSenha = lazy(loadRedefinirSenha)
 
 export const loadDashboard = () => import('./pages/Dashboard.jsx')
 export const Dashboard = lazy(loadDashboard)
-
-export const loadAgenda = () => import('./pages/Agenda.jsx')
-export const Agenda = lazy(loadAgenda)
 
 export const loadTransacoes = () => import('./pages/Transacoes.jsx')
 export const Transacoes = lazy(loadTransacoes)
@@ -41,7 +37,6 @@ const ROUTE_PREFETCH = {
   '/cadastro': loadCadastro,
   '/redefinir-senha': loadRedefinirSenha,
   '/dashboard': loadDashboard,
-  ...(SHOW_AGENDA ? { '/agenda': loadAgenda } : {}),
   '/transacoes': loadTransacoes,
   '/configuracoes': loadConfiguracoes,
   '/relatorios': loadRelatorios,
@@ -65,14 +60,7 @@ export function prefetchRoute(path) {
 }
 
 /** Rotas do menu principal (shell autenticado) — pré-carrega para troca de aba rápida. */
-const APP_NAV_PATHS = [
-  '/dashboard',
-  '/transacoes',
-  '/relatorios',
-  '/pagamento',
-  ...(SHOW_AGENDA ? ['/agenda'] : []),
-  '/configuracoes',
-]
+const APP_NAV_PATHS = ['/dashboard', '/transacoes', '/relatorios', '/pagamento', '/configuracoes']
 
 /** Dispara `import()` de todas as telas do menu (deduplicado). Útil ao abrir o menu no mobile. */
 export function prefetchAppNavChunksNow() {
@@ -82,7 +70,7 @@ export function prefetchAppNavChunksNow() {
 }
 
 /**
- * Agenda o mesmo prefetch em idle (não compete com hidratação / primeiro paint).
+ * Pré-carrega em idle (não compete com hidratação / primeiro paint).
  * `prefetchRoute` deduplica; seguro chamar após login.
  */
 export function warmAuthenticatedNavChunks() {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import RefDashboardScroll from '../components/RefDashboardScroll'
 import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
 import UserAdminStatusBadge from '../components/admin/UserAdminStatusBadge'
 import { apiUrl } from '../lib/apiUrl'
@@ -608,6 +609,7 @@ export default function AdminUsuarios() {
               </div>
             </section>
 
+            <RefDashboardScroll>
             <article
               className="ref-panel page-admin-ref-panel page-admin-ref-panel--table page-admin-usuarios-panel"
               aria-labelledby="admin-users-heading"
@@ -1311,6 +1313,7 @@ export default function AdminUsuarios() {
                 )}
               </details>
             </article>
+            </RefDashboardScroll>
           </div>
         </main>
       </div>

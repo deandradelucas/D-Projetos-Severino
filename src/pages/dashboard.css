@@ -6061,43 +6061,6 @@ body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relat
   flex-wrap: nowrap;
 }
 
-/* Agenda — hero hub: menu, título, Novo evento (mesma linha estável) */
-body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
-  flex-wrap: nowrap;
-  align-items: center;
-  row-gap: 0;
-  overflow: visible;
-}
-
-body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
-  width: auto;
-  flex-basis: auto;
-  margin-left: auto;
-  flex-shrink: 0;
-  flex-wrap: nowrap;
-}
-
-body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
-  flex-wrap: nowrap;
-  align-items: center;
-  row-gap: 0;
-  overflow: visible;
-}
-
-body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
-  flex-wrap: nowrap;
-}
-
 .dashboard-container.app-horizon-shell .mobile-menu-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -6172,13 +6135,25 @@ body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-
 }
 
 .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  position: relative;
+  z-index: 0;
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
   overflow-x: clip;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  /* Não pintar faixa sólida — o vidro do hero usa o fundo do shell / conteúdo por baixo */
+  background: transparent;
+  /* Desktop: isola stacking; no mobile (≤768) ver override — isolate + backdrop no hero pode bugar no WebKit */
+  isolation: isolate;
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
+  background: transparent;
 }
 
 .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn,
@@ -6375,7 +6350,7 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
 .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
   position: relative;
   flex-shrink: 0;
-  z-index: 40;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -6434,11 +6409,20 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
     width: 100%;
   }
 
+  /*
+   * WebKit (iOS): backdrop-filter no hero pode amostrar o irmão .ref-dashboard-scroll em movimento —
+   * parece “faixa” atrás do vidro. No mobile: fundo opaco alinhado ao shell, sem blur.
+   */
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
     transform: translate3d(0, 0, 0);
     -webkit-transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    isolation: auto;
+    background: #ffffff !important;
+    background-image: none !important;
   }
 
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
@@ -6446,6 +6430,16 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
     -webkit-transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    isolation: auto;
+    background: #1a222e !important;
+    background-image: none !important;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    isolation: auto;
   }
 }
 
@@ -6455,7 +6449,6 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
-  .dashboard-container.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   .dashboard-container.page-admin.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
     margin-bottom: 26px;
@@ -6620,7 +6613,7 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
 
 /*
  * Mobile: antes .hero-actions com flex: 1 1 100% quebrava o cabeçalho (ações iam para baixo / largura total)
- * em Agenda, Pagamento, etc. — padrão único: toolbar compacta à direita, uma linha quando couber.
+ * em Pagamento, etc. — padrão único: toolbar compacta à direita, uma linha quando couber.
  */
 @media (max-width: 768px) {
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
@@ -6666,12 +6659,6 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
   }
 
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
-    width: 100%;
-    flex-wrap: nowrap;
-    align-items: center;
-  }
-
-  .dashboard-container.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
     width: 100%;
     flex-wrap: nowrap;
     align-items: center;
@@ -7966,7 +7953,8 @@ body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-cont
   background: transparent;
 }
 
-body[data-theme='light'] .ref-dashboard .main-content.ref-dashboard-main {
+/* Gradiente só fora do shell — no app autenticado o <main> fica transparente (evita faixa clara atrás do vidro) */
+body[data-theme='light'] .dashboard-container.ref-dashboard:not(.app-horizon-shell) .main-content.ref-dashboard-main {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -8108,11 +8096,21 @@ body[data-theme='light'] .ref-dashboard-inner {
     -webkit-overflow-scrolling: touch;
   }
 
+  /* Hub: rolagem só em .ref-dashboard-scroll — se o <main> rolar, a faixa branca sobe com o conteúdo */
+  .dashboard-container.ref-dashboard.app-horizon-shell .app-horizon-inner > .main-content.ref-dashboard-main {
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: auto;
+  }
+
   body[data-theme='light'] .dashboard-container.app-horizon-shell .main-content.ref-dashboard-main {
-    overflow-y: auto;
     overflow-x: clip;
     max-height: none;
-    height: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+    overflow-y: hidden !important;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-inner {
@@ -8201,74 +8199,13 @@ body[data-theme='light'] .ref-dashboard-inner {
     min-width: 0;
   }
 
-  /* Agenda: menu + título + Novo evento na mesma linha (mobile / tablet estreito) */
-  .dashboard-container.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
-    flex-wrap: nowrap;
-    align-items: center;
-    row-gap: 0;
-    column-gap: 10px;
-  }
-
-  .dashboard-container.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: none;
-    align-self: center;
-  }
-
-  .dashboard-container.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
-    width: auto;
-    flex-basis: auto;
-    margin-left: auto;
-    flex-shrink: 0;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    gap: 8px;
-  }
-
-  body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__title {
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-  }
-
-  body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
-    min-height: 40px;
-    padding: 0 10px;
-    font-size: 11px;
-    width: auto;
-    max-width: none;
-  }
 }
 
-/* Com rolagem (classe no <main> via ShellStickyHeaderScroll): blur 1px — mesmo “grão” do vidro do shell */
-body[data-theme='light']
-  .dashboard-container.ref-dashboard.app-horizon-shell
-  main.ref-dashboard-main--scrolled
-  .dashboard-hub__hero {
-  -webkit-backdrop-filter: blur(1px) saturate(1.12);
-  backdrop-filter: blur(1px) saturate(1.12);
-  background: rgba(255, 255, 255, 0.72);
-  border-color: rgba(148, 163, 184, 0.28);
-  box-shadow:
-    0 10px 32px -16px rgba(15, 23, 42, 0.12),
-    0 1px 0 rgba(255, 255, 255, 0.45) inset;
-}
-
-body[data-theme='dark']
-  .dashboard-container.ref-dashboard.app-horizon-shell
-  main.ref-dashboard-main--scrolled
-  .dashboard-hub__hero {
-  -webkit-backdrop-filter: blur(1px) saturate(1.08);
-  backdrop-filter: blur(1px) saturate(1.08);
-  background: rgba(20, 26, 34, 0.48);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 12px 36px -18px rgba(0, 0, 0, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.06) inset;
-}
+/*
+ * ShellStickyHeaderScroll ainda define main.ref-dashboard-main--scrolled ao rolar .ref-dashboard-scroll.
+ * Não alterar o vidro do hero nesse estado: blur mais fraco + fundo mais transparente fazia o conteúdo
+ * rolável parecer uma “faixa branca” atrás do glass.
+ */
 
 @media (prefers-reduced-motion: reduce) {
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
@@ -8326,7 +8263,6 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .ref-dashboard .
 body[data-theme='light'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='light'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='light'] .page-pagamento.app-horizon-shell .main-content.ref-dashboard-main,
-body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='light'] .page-configuracoes.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='light'] .page-admin.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
   display: flex;
@@ -8349,20 +8285,6 @@ body[data-theme='light'] .page-admin.ref-dashboard.app-horizon-shell .main-conte
   flex-direction: column;
   min-height: 0;
   flex: 1 1 auto;
-}
-
-/* Agenda: 100% da coluna principal (sem cap 1180px) */
-.page-agenda.ref-dashboard.app-horizon-shell .ref-dashboard-inner {
-  width: 100%;
-  max-width: 100%;
-  margin-inline: auto;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  flex: 1 1 auto;
-  align-self: stretch;
-  min-width: 0;
-  overflow-x: clip;
 }
 
 /* Relatórios: conteúdo não ultrapassa a coluna (evita barra horizontal) */
@@ -8483,14 +8405,22 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
   }
 
+  /* Hub: rolagem no .ref-dashboard-scroll — <main> não deve ser porta de scroll */
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .app-horizon-inner .main-content.ref-dashboard-main {
+    overflow-y: hidden !important;
+  }
+
   /* Todas as telas do shell: mesma coluna principal (evita “pulo” ao trocar rota) */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .main-content.ref-dashboard-main {
     overflow-x: clip;
-    overflow-y: auto;
     min-height: 0;
   }
 
-  /* Home: painel transações compacto — coluna preenche o main; rolagem no <main> */
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+    overflow-y: hidden !important;
+  }
+
+  /* Home: painel transações compacto — coluna preenche o main; rolagem em .ref-dashboard-scroll */
   body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-inner {
     flex: 1 1 auto;
     min-height: 0;
@@ -9064,23 +8994,23 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     padding: max(8px, env(safe-area-inset-top, 0px)) 12px max(24px, env(safe-area-inset-bottom, 0px));
   }
 
-  /* Shell autenticado: padding do <main> no mobile (safe area; laterais 10px para a coluna usar mais largura) */
+  /* Shell: safe-area no topo na coluna (.ref-dashboard-inner), não no <main> — evita faixa clara extra acima do vidro */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner > .main-content.ref-dashboard-main {
     border-radius: 0;
     box-sizing: border-box;
-    padding: max(8px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px))
-      max(10px, env(safe-area-inset-left, 0px));
+    padding-top: 0;
+    padding-right: max(10px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(10px, env(safe-area-inset-left, 0px));
   }
 
-  /* Evita “corte” do cartão do topo no scroll; ritmo um pouco mais fechado entre blocos */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .ref-dashboard-inner {
-    gap: 12px;
-    padding-top: 2px;
+    gap: 10px;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
   }
 
-  /* Home: ações + saldo + KPIs em coluna com respiro (sem sobreposição) */
   body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-inner {
-    gap: 16px;
+    gap: 12px;
     align-items: stretch;
   }
 

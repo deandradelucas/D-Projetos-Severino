@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import RefDashboardScroll from '../components/RefDashboardScroll'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { webAuthnSupported, registerWebAuthnCredential } from '../lib/webauthnBrowser'
@@ -174,6 +175,7 @@ export default function Configuracoes() {
           </div>
         </section>
 
+        <RefDashboardScroll>
         {toast && <div className="config-toast">{toast}</div>}
 
         <div className="config-layout">
@@ -381,6 +383,7 @@ export default function Configuracoes() {
           )}
         </div>
 
+        </RefDashboardScroll>
         </div>
       </main>
       </div>

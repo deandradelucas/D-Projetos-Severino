@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext'
 import RoutePageFallback from './components/RoutePageFallback'
 import SuperAdminOutlet from './components/SuperAdminOutlet'
@@ -9,12 +9,10 @@ import Background from './components/Background'
 import PwaInstallPrompt from './components/PwaInstallPrompt'
 import HorizonChat from './components/HorizonChat'
 import ShellStickyHeaderScroll from './components/ShellStickyHeaderScroll'
-import { SHOW_AGENDA } from './lib/featureFlags'
 import {
   Cadastro,
   RedefinirSenha,
   Dashboard,
-  Agenda,
   Transacoes,
   Configuracoes,
   Relatorios,
@@ -46,10 +44,6 @@ function App() {
                 </Route>
                 <Route element={<AppSessionOutlet requireAppAccess />}>
                   <Route path="/dashboard" element={<Dashboard />} />
-                  <Route
-                    path="/agenda"
-                    element={SHOW_AGENDA ? <Agenda /> : <Navigate to="/dashboard" replace />}
-                  />
                   <Route path="/transacoes" element={<Transacoes />} />
                   <Route path="/relatorios" element={<Relatorios />} />
                   <Route path="/configuracoes" element={<Configuracoes />} />

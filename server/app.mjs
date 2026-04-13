@@ -67,13 +67,6 @@ import {
   validateTransacoesListQuery,
   isUuidString,
 } from './lib/transacao-validate.mjs'
-import {
-  listAgendaEventos,
-  getAgendaEventoById,
-  insertAgendaEvento,
-  atualizarAgendaEvento,
-  deletarAgendaEvento,
-} from './lib/agenda.mjs'
 import { logMpWebhook } from './lib/mp-webhook-log.mjs'
 import {
   beginRegistration,
@@ -254,16 +247,6 @@ function mapSupabaseOrNetworkError(error) {
       status: 503,
       message:
         'As tabelas de biometria ainda não existem no banco. No Supabase (SQL Editor), execute o arquivo scripts/migrations/13_webauthn.sql deste projeto.',
-    }
-  }
-  if (
-    /agenda_eventos/i.test(raw) &&
-    /does not exist|42P01|Could not find the table|PGRST205|schema cache/i.test(raw)
-  ) {
-    return {
-      status: 503,
-      message:
-        'A tabela da agenda ainda não existe no banco. No Supabase (SQL Editor), execute scripts/migrations/15_agenda_eventos.sql deste projeto.',
     }
   }
   if (/relation.*does not exist|42P01/i.test(raw)) {
@@ -947,153 +930,6 @@ app.get('/api/categorias', async (c) => {
   } catch (error) {
     log.error('get categories failed', error)
     return c.json({ message: 'Erro ao buscar categorias.' }, 500)
-  }
-})
-
-app.get('/api/agenda/eventos', async (c) => {
-  try {
-    const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) {
-      return c.json({ message: 'Não autorizado.' }, 401)
-    }
-
-    const gate = await assertAcessoAppUsuario(usuarioId)
-    if (gate) return c.json({ message: gate.message }, gate.status)
-
-    const ip = clientKeyFromHono(c)
-    if (!rateLimitTake(`agenda-list:${usuarioId}:${ip}`, 240, 60_000)) {
-      return c.json({ message: 'Muitas consultas. Aguarde um momento.' }, 429)
-    }
-
-    const data = await listAgendaEventos(usuarioId)
-    return c.json(data)
-  } catch (error) {
-    log.error('get agenda eventos failed', error)
-    const mapped = mapSupabaseOrNetworkError(error)
-    if (mapped) return c.json({ message: mapped.message }, mapped.status)
-    return c.json({ message: 'Erro ao buscar eventos da agenda.' }, 500)
-  }
-})
-
-app.get('/api/agenda/eventos/:id', async (c) => {
-  try {
-    const id = c.req.param('id')
-    const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) {
-      return c.json({ message: 'Não autorizado.' }, 401)
-    }
-
-    const gate = await assertAcessoAppUsuario(usuarioId)
-    if (gate) return c.json({ message: gate.message }, gate.status)
-
-    if (!isUuidString(id)) {
-      return c.json({ message: 'ID inválido.' }, 400)
-    }
-
-    const row = await getAgendaEventoById(usuarioId, id)
-    if (!row) return c.json({ message: 'Evento não encontrado.' }, 404)
-    return c.json(row)
-  } catch (error) {
-    log.error('get agenda evento failed', error)
-    const mapped = mapSupabaseOrNetworkError(error)
-    if (mapped) return c.json({ message: mapped.message }, mapped.status)
-    return c.json({ message: 'Erro ao buscar evento.' }, 500)
-  }
-})
-
-app.post('/api/agenda/eventos', async (c) => {
-  try {
-    const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) {
-      return c.json({ message: 'Não autorizado.' }, 401)
-    }
-
-    const gate = await assertAcessoAppUsuario(usuarioId)
-    if (gate) return c.json({ message: gate.message }, gate.status)
-
-    if (!rateLimitTake(`agenda-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
-      return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
-    }
-
-    let body
-    try {
-      body = await c.req.json()
-    } catch {
-      return c.json({ message: 'JSON inválido.' }, 400)
-    }
-
-    const data = await insertAgendaEvento(usuarioId, body)
-    return c.json(data, 201)
-  } catch (error) {
-    log.error('insert agenda evento failed', error)
-    const mapped = mapSupabaseOrNetworkError(error)
-    if (mapped) return c.json({ message: mapped.message }, mapped.status)
-    return c.json({ message: error.message || 'Erro ao criar evento.' }, 500)
-  }
-})
-
-app.patch('/api/agenda/eventos/:id', async (c) => {
-  try {
-    const id = c.req.param('id')
-    const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) {
-      return c.json({ message: 'Não autorizado.' }, 401)
-    }
-
-    const gate = await assertAcessoAppUsuario(usuarioId)
-    if (gate) return c.json({ message: gate.message }, gate.status)
-
-    if (!isUuidString(id)) {
-      return c.json({ message: 'ID inválido.' }, 400)
-    }
-
-    if (!rateLimitTake(`agenda-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
-      return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
-    }
-
-    let body
-    try {
-      body = await c.req.json()
-    } catch {
-      return c.json({ message: 'JSON inválido.' }, 400)
-    }
-
-    const data = await atualizarAgendaEvento(usuarioId, id, body)
-    return c.json(data)
-  } catch (error) {
-    log.error('update agenda evento failed', error)
-    const mapped = mapSupabaseOrNetworkError(error)
-    if (mapped) return c.json({ message: mapped.message }, mapped.status)
-    return c.json({ message: error.message || 'Erro ao atualizar evento.' }, 500)
-  }
-})
-
-app.delete('/api/agenda/eventos/:id', async (c) => {
-  try {
-    const id = c.req.param('id')
-    const usuarioId = c.req.header('x-user-id')
-    if (!usuarioId) {
-      return c.json({ message: 'Não autorizado.' }, 401)
-    }
-
-    const gate = await assertAcessoAppUsuario(usuarioId)
-    if (gate) return c.json({ message: gate.message }, gate.status)
-
-    if (!isUuidString(id)) {
-      return c.json({ message: 'ID inválido.' }, 400)
-    }
-
-    if (!rateLimitTake(`agenda-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
-      return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
-    }
-
-    await deletarAgendaEvento(usuarioId, id)
-    return c.json({ message: 'Evento excluído.' })
-  } catch (error) {
-    log.error('delete agenda evento failed', error)
-    const mapped = mapSupabaseOrNetworkError(error)
-    if (mapped) return c.json({ message: mapped.message }, mapped.status)
-    return c.json({ message: error.message || 'Erro ao excluir evento.' }, 500)
   }
 })
 

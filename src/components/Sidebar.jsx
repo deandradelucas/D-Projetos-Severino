@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
-import { SHOW_AGENDA } from '../lib/featureFlags'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { useTheme } from '../context/ThemeContext'
 
@@ -136,27 +135,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               <span className="nav-item__label">Pagamento</span>
             </NavLink>
           </li>
-          {SHOW_AGENDA && (
-            <li>
-              <NavLink
-                to="/agenda"
-                end
-                {...navPrefetchHandlers('/agenda')}
-                title="Compromissos, vencimentos e lembretes"
-                className={({ isActive }) => mergeNavItemClass(isActive, '/agenda', pathname)}
-                onClick={() => setMenuAberto(false)}
-              >
-                <span className="icon-wrap">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <rect width="18" height="18" x="3" y="4" rx="2" />
-                    <path d="M16 2v4M8 2v4M3 10h18" />
-                    <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" />
-                  </svg>
-                </span>
-                <span className="nav-item__label">Agenda</span>
-              </NavLink>
-            </li>
-          )}
           <li className="nav-section-label nav-section-label--account">
             <span className="nav-section-label__text">Conta</span>
           </li>

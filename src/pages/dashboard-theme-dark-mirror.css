@@ -496,23 +496,6 @@ body[data-theme='dark'] .sidebar .brand-wrapper .mobile-close-btn {
 body[data-theme='dark'] .page-relatorios.ref-dashboard.app-horizon-shell .relatorios-header-export {
   flex-wrap: nowrap;
 }
-body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
-  flex-wrap: nowrap;
-  align-items: center;
-  row-gap: 0;
-  overflow: visible;
-}
-body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
-  width: auto;
-  flex-basis: auto;
-  margin-left: auto;
-  flex-shrink: 0;
-  flex-wrap: nowrap;
-}
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__icon {
   background: linear-gradient(165deg, rgba(237, 233, 254, 0.98) 0%, rgba(221, 214, 254, 0.5) 100%);
   border: 1px solid rgba(124, 58, 237, 0.28);
@@ -1738,7 +1721,7 @@ body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .main-conte
 body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .main-content::-webkit-scrollbar-track {
   background: transparent;
 }
-body[data-theme='dark'] .ref-dashboard .main-content.ref-dashboard-main {
+body[data-theme='dark'] .dashboard-container.ref-dashboard:not(.app-horizon-shell) .main-content.ref-dashboard-main {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -1766,10 +1749,19 @@ body[data-theme='dark'] .ref-dashboard-inner {
 @media (max-width: 768px) {
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .main-content.ref-dashboard-main {
-    overflow-y: auto;
     overflow-x: clip;
     max-height: none;
-    height: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+    overflow-y: hidden !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .app-horizon-inner > .main-content.ref-dashboard-main {
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: auto;
   }
 }
 @media (max-width: 768px) {
@@ -1805,26 +1797,6 @@ body[data-theme='dark'] .ref-dashboard-inner {
     font-size: 11px;
   }
 }
-@media (max-width: 768px) {
-
-  body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__title {
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-  }
-}
-@media (max-width: 768px) {
-
-  body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
-    min-height: 40px;
-    padding: 0 10px;
-    font-size: 11px;
-    width: auto;
-    max-width: none;
-  }
-}
 /* Vidro do cabeçalho + estado scrolled: ver dashboard.css (importado depois) */
 body[data-theme='dark'] .ref-dashboard-inner .ref-alert {
   text-align: center;
@@ -1856,7 +1828,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .ref-dashboard .m
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='dark'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='dark'] .page-pagamento.app-horizon-shell .main-content.ref-dashboard-main,
-body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='dark'] .page-configuracoes.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='dark'] .page-admin.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
   display: flex;
@@ -1964,12 +1935,19 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     overscroll-behavior-y: contain;
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
   }
+
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .app-horizon-inner > .main-content.ref-dashboard-main {
+    overflow-y: hidden !important;
+  }
 }
 @media (min-width: 769px) {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .main-content.ref-dashboard-main {
     overflow-x: clip;
-    overflow-y: auto;
     min-height: 0;
+  }
+
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+    overflow-y: hidden !important;
   }
 }
 @media (min-width: 769px) {
@@ -2425,19 +2403,21 @@ body[data-theme='dark'] .ref-panel__link:focus-visible {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .app-horizon-inner > .main-content.ref-dashboard-main {
     border-radius: 0;
     box-sizing: border-box;
-    padding: max(8px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px))
-      max(10px, env(safe-area-inset-left, 0px));
+    padding-top: 0;
+    padding-right: max(10px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(10px, env(safe-area-inset-left, 0px));
   }
 }
 @media (max-width: 768px) {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .ref-dashboard-inner {
-    gap: 12px;
-    padding-top: 2px;
+    gap: 10px;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
   }
 }
 @media (max-width: 768px) {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-inner {
-    gap: 16px;
+    gap: 12px;
     align-items: stretch;
   }
 }

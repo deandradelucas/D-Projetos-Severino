@@ -53,7 +53,8 @@ function maxScrollTop(els) {
 
 /**
  * Shell autenticado: marca o <main> com classe para o CSS do cabeçalho (fundo transparente só com rolagem).
- * O scroll pode estar no <main> (mobile), no .dashboard-container (desktop) ou na viewport — o evento scroll não borbulha.
+ * O scroll pode estar no <main>, em `.ref-dashboard-scroll` (corpo abaixo do hero), no .dashboard-container (desktop)
+ * ou na viewport — o evento scroll não borbulha.
  */
 export default function ShellStickyHeaderScroll() {
   const location = useLocation()

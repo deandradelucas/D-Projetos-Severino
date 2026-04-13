@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
+import RefDashboardScroll from '../components/RefDashboardScroll'
 import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
 import './dashboard.css'
 
@@ -108,6 +109,7 @@ export default function AdminWhatsApp() {
               </div>
             </section>
 
+            <RefDashboardScroll>
             <section className="ref-kpi-row page-admin-kpi-row" aria-label="Status da integração">
               <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
                 <div className="ref-kpi-card__icon" aria-hidden>
@@ -243,6 +245,7 @@ export default function AdminWhatsApp() {
                 )}
               </div>
             </article>
+            </RefDashboardScroll>
           </div>
         </main>
       </div>
