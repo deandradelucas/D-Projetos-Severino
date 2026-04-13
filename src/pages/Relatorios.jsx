@@ -143,6 +143,7 @@ export default function Relatorios() {
       categoria_id: ''
     }
   })
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false)
 
   const fetchCategorias = useCallback(async () => {
     try {
@@ -201,6 +202,13 @@ export default function Relatorios() {
     const { name, value } = e.target
     setFilters(prev => ({ ...prev, [name]: value }))
   }
+
+  const clearRelatorioFilters = useCallback(() => {
+    const today = new Date()
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]
+    setFilters({ dataInicio: firstDay, dataFim: lastDay, categoria_id: '' })
+  }, [])
 
   const {
     summary,
@@ -310,30 +318,71 @@ export default function Relatorios() {
           </div>
         </header>
 
-        <article className="ref-panel page-relatorios-ref-filters" aria-label="Período e categoria">
-          <div className="ref-panel__head">
-            <div>
-              <h2 className="ref-panel__title">Filtros do relatório</h2>
-              <p className="ref-panel__subtitle">Período e categoria · apenas transações efetivadas</p>
-            </div>
+        <article
+          className={`ref-panel page-relatorios-ref-filters ${filtrosAbertos ? '' : 'page-relatorios-ref-filters--collapsed'}`}
+          aria-label="Período e categoria"
+        >
+          <div className="ref-panel__head page-relatorios-filters-head">
+            <button
+              type="button"
+              className="page-relatorios-filters-toggle"
+              id="relatorio-filtros-trigger"
+              aria-expanded={filtrosAbertos}
+              aria-controls="relatorio-filtros-fields"
+              onClick={() => setFiltrosAbertos((open) => !open)}
+            >
+              <span className="page-relatorios-filters-toggle__lead">
+                <span className="ref-panel__title" role="heading" aria-level={2}>
+                  Filtros do relatório
+                </span>
+                <span className="ref-panel__subtitle page-relatorios-filters-toggle__sub">
+                  Período e categoria · apenas transações efetivadas
+                </span>
+              </span>
+              <svg
+                className={`page-relatorios-filters-toggle__chevron ${filtrosAbertos ? 'page-relatorios-filters-toggle__chevron--open' : ''}`}
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+            <button type="button" className="ref-panel__link ref-panel__link--button" onClick={clearRelatorioFilters}>
+              Limpar filtros
+            </button>
           </div>
-          <div className="relatorios-filter-grid page-relatorios-filter-grid">
-            <div className="filter-group">
-              <label htmlFor="rel-ini">Data início</label>
-              <input id="rel-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
-            </div>
-            <div className="filter-group">
-              <label htmlFor="rel-fim">Data fim</label>
-              <input id="rel-fim" type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={handleFilterChange} />
-            </div>
-            <div className="filter-group relatorios-filter-grid__wide">
-              <label htmlFor="rel-cat">Categoria</label>
-              <select id="rel-cat" name="categoria_id" className="filter-input" value={filters.categoria_id} onChange={handleFilterChange}>
-                <option value="">Todas</option>
-                {categorias.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.nome}</option>
-                ))}
-              </select>
+          <div
+            id="relatorio-filtros-fields"
+            className="page-relatorios-filters-body"
+            role="region"
+            aria-labelledby="relatorio-filtros-trigger"
+            hidden={!filtrosAbertos}
+          >
+            <div className="relatorios-filter-grid page-relatorios-filter-grid">
+              <div className="filter-group">
+                <label htmlFor="rel-ini">Data início</label>
+                <input id="rel-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
+              </div>
+              <div className="filter-group">
+                <label htmlFor="rel-fim">Data fim</label>
+                <input id="rel-fim" type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={handleFilterChange} />
+              </div>
+              <div className="filter-group relatorios-filter-grid__wide">
+                <label htmlFor="rel-cat">Categoria</label>
+                <select id="rel-cat" name="categoria_id" className="filter-input" value={filters.categoria_id} onChange={handleFilterChange}>
+                  <option value="">Todas</option>
+                  {categorias.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.nome}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </article>
