@@ -993,66 +993,9 @@ h3 {
   }
 }
 
-/* Trail effect */
+/* Faixa vertical ao lado do indicador — removida */
 .nav-menu::after {
-  content: "";
-  position: absolute;
-  width: 2px;
-  height: 12px;
-  border-radius: 4px;
-  background: var(--accent);
-  transform: translateY(0);
-  transform-origin: center top;
-  transition:
-    top 0.62s cubic-bezier(0.33, 1.1, 0.34, 1.02),
-    transform 0.45s ease,
-    opacity 0.35s ease;
-  z-index: 54;
-  top: 25px;
-  right: 24px;
-  opacity: 0.35;
-}
-
-.nav-menu[data-dot-motion="down"]::after {
-  animation: nav-trail-fall 0.62s cubic-bezier(0.34, 1.35, 0.48, 1) forwards;
-}
-
-.nav-menu[data-dot-motion="up"]::after {
-  animation: nav-trail-rise 0.62s cubic-bezier(0.34, 1.35, 0.48, 1) forwards;
-}
-
-@keyframes nav-trail-fall {
-  0% {
-    transform: translateY(-18px) scaleY(0.65);
-    opacity: 0.2;
-  }
-
-  55% {
-    transform: translateY(4px) scaleY(1.08);
-    opacity: 0.55;
-  }
-
-  100% {
-    transform: translateY(0) scaleY(1);
-    opacity: 0.35;
-  }
-}
-
-@keyframes nav-trail-rise {
-  0% {
-    transform: translateY(18px) scaleY(0.65);
-    opacity: 0.2;
-  }
-
-  55% {
-    transform: translateY(-4px) scaleY(1.08);
-    opacity: 0.55;
-  }
-
-  100% {
-    transform: translateY(0) scaleY(1);
-    opacity: 0.35;
-  }
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1060,30 +1003,17 @@ h3 {
   .nav-menu[data-dot-motion="up"]::before {
     animation: dot-glow 2.8s infinite ease-in-out;
   }
-
-  .nav-menu[data-dot-motion="down"]::after,
-  .nav-menu[data-dot-motion="up"]::after {
-    animation: none;
-  }
 }
 
 /* Posições da bolinha para cada item do menu */
 .nav-menu:has(li:nth-child(1) > .nav-item.active)::before { top: 28px; }
-.nav-menu:has(li:nth-child(1) > .nav-item.active)::after { top: 30px; }
 .nav-menu:has(li:nth-child(2) > .nav-item.active)::before { top: 100px; }
-.nav-menu:has(li:nth-child(2) > .nav-item.active)::after { top: 102px; }
 .nav-menu:has(li:nth-child(3) > .nav-item.active)::before { top: 172px; }
-.nav-menu:has(li:nth-child(3) > .nav-item.active)::after { top: 174px; }
 .nav-menu:has(li:nth-child(4) > .nav-item.active)::before { top: 244px; }
-.nav-menu:has(li:nth-child(4) > .nav-item.active)::after { top: 246px; }
 .nav-menu:has(li:nth-child(6) > .nav-item.active)::before { top: 368px; }
-.nav-menu:has(li:nth-child(6) > .nav-item.active)::after { top: 370px; }
 .nav-menu:has(li:nth-child(8) > .nav-item.active)::before { top: 460px; }
-.nav-menu:has(li:nth-child(8) > .nav-item.active)::after { top: 462px; }
 .nav-menu:has(li:nth-child(9) > .nav-item.active)::before { top: 532px; }
-.nav-menu:has(li:nth-child(9) > .nav-item.active)::after { top: 534px; }
 .nav-menu:has(li:nth-child(10) > .nav-item.active)::before { top: 604px; }
-.nav-menu:has(li:nth-child(10) > .nav-item.active)::after { top: 606px; }
 
 /* Recharts Legend Dots (Bolinhas dos Gráficos) */
 .recharts-legend-item-marker {
