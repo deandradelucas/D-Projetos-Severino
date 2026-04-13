@@ -27,6 +27,16 @@ Prefixo `/api`. Autenticação: login grava `horizonte_user` no `localStorage` (
 - **Segredo:** nunca commitar `.env`; variáveis em Vercel / ambiente local.
 - **Usuários:** tabela `usuarios`; coluna de nome pode ser `nome` ou legado `usuario` — ver `server/lib/usuario-schema.mjs`.
 
+### Shell hub (cabeçalho em vidro — **não mexer sem necessidade**)
+
+Comportamento final validado (mobile Safari + tema claro/escuro). Evitar refactors “de passagem” em `dashboard.css` / estrutura JSX deste fluxo.
+
+- **Markup:** em páginas com `.dashboard-hub`, o `<section class="dashboard-hub__hero">` deve ser o **primeiro filho** de `<RefDashboardScroll>` (rolagem única em `.ref-dashboard-scroll`).
+- **CSS:** bloco marcado `SHELL HUB — CONTRATO ESTÁVEL` em `src/pages/dashboard.css` — sticky no hero, `main.ref-dashboard-main--scrolled` com **`backdrop-filter: blur(1px)`** ao rolar (alinhado ao `blur(1px)` de `index.css` em `.app-routes-grow`).
+- **JS:** `ShellStickyHeaderScroll.jsx` escuta `.ref-dashboard-scroll` e aplica `ref-dashboard-main--scrolled` no `<main>`.
+
+Se precisar mudar blur, stacking ou ordem do DOM, testar Dashboard e uma página hub no telemóvel antes de commitar.
+
 ## Mapa rápido de pastas
 
 - `src/pages/` — telas (Dashboard, Transacoes, Login, admin, etc.)

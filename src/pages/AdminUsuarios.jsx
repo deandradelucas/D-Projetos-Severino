@@ -597,6 +597,7 @@ export default function AdminUsuarios() {
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
+            <RefDashboardScroll>
             <section className="dashboard-hub__hero page-admin__hero" aria-label="Usuários">
               <div className="dashboard-hub__hero-row">
                 <MobileMenuButton onClick={() => setMenuAberto(true)} />
@@ -609,7 +610,6 @@ export default function AdminUsuarios() {
               </div>
             </section>
 
-            <RefDashboardScroll>
             <article
               className="ref-panel page-admin-ref-panel page-admin-ref-panel--table page-admin-usuarios-panel"
               aria-labelledby="admin-users-heading"

@@ -334,6 +334,7 @@ export default function Relatorios() {
 
       <main className="main-content relative z-10 ref-dashboard-main">
         <div className="ref-dashboard-inner dashboard-hub">
+        <RefDashboardScroll>
         <section className="dashboard-hub__hero" aria-label="Relatórios e exportação">
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
@@ -365,7 +366,6 @@ export default function Relatorios() {
           </div>
         </section>
 
-        <RefDashboardScroll>
         <article
           className={`ref-panel page-relatorios-ref-filters ${filtrosAbertos ? '' : 'page-relatorios-ref-filters--collapsed'}`}
           aria-label="Filtros"

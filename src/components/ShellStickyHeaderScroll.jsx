@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const MAIN_SELECTOR = '.dashboard-container.app-horizon-shell > .app-horizon-inner > main.main-content'
+/** Sincroniza com CSS do hub: vidro em `blur(1px)` quando há rolagem (ver AGENTS.md «Shell hub»). */
 const SCROLLED_CLASS = 'ref-dashboard-main--scrolled'
 const SCROLL_THRESHOLD_PX = 8
 

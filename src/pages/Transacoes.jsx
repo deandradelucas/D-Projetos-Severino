@@ -239,6 +239,7 @@ export default function Transacoes() {
 
       <main className="main-content relative z-10 ref-dashboard-main">
         <div className="ref-dashboard-inner dashboard-hub">
+        <RefDashboardScroll>
         <section className="dashboard-hub__hero" aria-label="Transações e atalhos">
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
@@ -277,7 +278,6 @@ export default function Transacoes() {
           </div>
         </section>
 
-        <RefDashboardScroll>
         <section className="ref-bottom-grid ref-bottom-grid--single page-transacoes-panels" aria-label="Filtros e transações">
         <article
           className={`ref-panel page-transacoes-ref-filters ${filtrosAbertos ? '' : 'page-transacoes-ref-filters--collapsed'}`}

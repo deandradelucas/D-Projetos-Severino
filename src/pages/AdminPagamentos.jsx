@@ -134,6 +134,7 @@ export default function AdminPagamentos() {
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
+            <RefDashboardScroll>
             <section className="dashboard-hub__hero page-admin__hero" aria-label="Logs de pagamentos">
               <div className="dashboard-hub__hero-row">
                 <MobileMenuButton onClick={() => setMenuAberto(true)} />
@@ -146,7 +147,6 @@ export default function AdminPagamentos() {
               </div>
             </section>
 
-            <RefDashboardScroll>
             <AdminPaymentLogsPanel
               rows={rows}
               summary={summary}

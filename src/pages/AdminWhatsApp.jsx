@@ -90,6 +90,7 @@ export default function AdminWhatsApp() {
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
+            <RefDashboardScroll>
             <section className="dashboard-hub__hero page-admin__hero" aria-label="Logs do WhatsApp">
               <div className="dashboard-hub__hero-row">
                 <MobileMenuButton onClick={() => setMenuAberto(true)} />
@@ -109,7 +110,6 @@ export default function AdminWhatsApp() {
               </div>
             </section>
 
-            <RefDashboardScroll>
             <section className="ref-kpi-row page-admin-kpi-row" aria-label="Status da integração">
               <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
                 <div className="ref-kpi-card__icon" aria-hidden>

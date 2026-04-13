@@ -6124,14 +6124,25 @@ body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relat
   overflow-y: hidden;
 }
 
-/* Hero fica no topo do painel; o restante rola dentro de .ref-dashboard-scroll (cabeçalho acompanha até o fim) */
+/*
+ * =============================================================================
+ * SHELL HUB — CONTRATO ESTÁVEL (não alterar sem reler AGENTS.md → “Shell hub”)
+ * =============================================================================
+ * - Rolagem: só `.ref-dashboard-scroll`; `<main.ref-dashboard-main>` sem scroll no hub.
+ * - DOM: `.dashboard-hub__hero` é o 1.º filho de `RefDashboardScroll` em todas as páginas hub.
+ * - Hero: `position: sticky; top: 0`; vidro base blur(8px)/blur(10px); com rolagem `main.ref-dashboard-main--scrolled` → blur(1px) (igual grão de `index.css` `.app-routes-grow`).
+ * - Regredir aqui costuma devolver faixa branca / vidro errado no mobile (Safari).
+ * =============================================================================
+ */
+
+/* Coluna única: tudo rola em .ref-dashboard-scroll; o hero é sticky no topo (conteúdo passa por baixo do vidro). */
 .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
@@ -6140,15 +6151,22 @@ body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relat
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   overflow-x: clip;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  /* Não pintar faixa sólida — o vidro do hero usa o fundo do shell / conteúdo por baixo */
   background: transparent;
-  /* Desktop: isola stacking; no mobile (≤768) ver override — isolate + backdrop no hero pode bugar no WebKit */
-  isolation: isolate;
+  isolation: auto;
+}
+
+/* Conteúdo abaixo do hero: mesma pilha — z-index explícito para o vidro sticky ficar por cima ao rolar */
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > :not(.dashboard-hub__hero) {
+  position: relative;
+  z-index: 0;
 }
 
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
@@ -6348,9 +6366,10 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
 }
 
 .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-  position: relative;
+  position: sticky;
+  top: 0;
   flex-shrink: 0;
-  z-index: 2;
+  z-index: 8;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -6375,7 +6394,7 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
     backdrop-filter 0.28s var(--pf-ease, ease);
 }
 
-/* Cabeçalhos do shell: cartão com vidro leve; ao rolar o <main> ganha classe — blur mais forte (ShellStickyHeaderScroll) */
+/* Cabeçalhos do shell: vidro leve; com rolagem o <main> ganha ref-dashboard-main--scrolled — blur(1px) como .app-routes-grow (index.css) */
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
   -webkit-backdrop-filter: blur(8px) saturate(1.08);
   backdrop-filter: blur(8px) saturate(1.08);
@@ -6396,8 +6415,35 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
     0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
+/* Com rolagem: blur(1px) — mesmo “grão” do fundo do shell (index.css .app-routes-grow). */
+body[data-theme='light']
+  .dashboard-container.ref-dashboard.app-horizon-shell
+  main.ref-dashboard-main--scrolled
+  .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(1px) saturate(1.12);
+  backdrop-filter: blur(1px) saturate(1.12);
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow:
+    0 10px 32px -16px rgba(15, 23, 42, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.45) inset;
+}
+
+body[data-theme='dark']
+  .dashboard-container.ref-dashboard.app-horizon-shell
+  main.ref-dashboard-main--scrolled
+  .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(1px) saturate(1.08);
+  backdrop-filter: blur(1px) saturate(1.08);
+  background: rgba(20, 26, 34, 0.48);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 12px 36px -18px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
 /*
- * Mobile (Safari/WebKit): backdrop-filter — translate3d promove camada compositing (z-index no hero).
+ * Mobile: compositing estável no WebKit (hero sticky + vidro no mesmo scrollport que o conteúdo).
  */
 @media (max-width: 768px) {
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
@@ -6409,39 +6455,15 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
     width: 100%;
   }
 
-  /*
-   * WebKit (iOS): backdrop-filter no hero pode amostrar o irmão .ref-dashboard-scroll em movimento —
-   * parece “faixa” atrás do vidro. No mobile: fundo opaco alinhado ao shell, sem blur.
-   */
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-    transform: translate3d(0, 0, 0);
-    -webkit-transform: translate3d(0, 0, 0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    isolation: auto;
-    background: #ffffff !important;
-    background-image: none !important;
-  }
-
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-    transform: translate3d(0, 0, 0);
-    -webkit-transform: translate3d(0, 0, 0);
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    isolation: auto;
-    background: #1a222e !important;
-    background-image: none !important;
-    border-color: rgba(255, 255, 255, 0.12);
-  }
-
-  .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    isolation: auto;
   }
 }
+/* — fim SHELL HUB (contrato acima) — */
 
 /* Páginas com hub: respiro sob o cartão do hero (desktop) */
 @media (min-width: 769px) {
@@ -8201,11 +8223,7 @@ body[data-theme='light'] .ref-dashboard-inner {
 
 }
 
-/*
- * ShellStickyHeaderScroll ainda define main.ref-dashboard-main--scrolled ao rolar .ref-dashboard-scroll.
- * Não alterar o vidro do hero nesse estado: blur mais fraco + fundo mais transparente fazia o conteúdo
- * rolável parecer uma “faixa branca” atrás do glass.
- */
+/* prefers-reduced-motion: sem animação de blur; fundo quase opaco. */
 
 @media (prefers-reduced-motion: reduce) {
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {

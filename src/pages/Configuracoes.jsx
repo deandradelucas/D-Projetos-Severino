@@ -163,6 +163,7 @@ export default function Configuracoes() {
 
       <main className="main-content relative z-10 ref-dashboard-main config-page">
         <div className="ref-dashboard-inner dashboard-hub">
+        <RefDashboardScroll>
         <section className="dashboard-hub__hero page-configuracoes__hero" aria-label="Configurações">
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto(true)} aria-label="Abrir menu" />
@@ -175,7 +176,6 @@ export default function Configuracoes() {
           </div>
         </section>
 
-        <RefDashboardScroll>
         {toast && <div className="config-toast">{toast}</div>}
 
         <div className="config-layout">
