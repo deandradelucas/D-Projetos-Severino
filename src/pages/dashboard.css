@@ -3282,6 +3282,17 @@ body[data-theme='light'] .form-group--recorrencia-on label.modal-recorrencia-tog
   flex: 1 1 auto;
 }
 
+/* Agenda (shell): mesma coluna central */
+.page-agenda.app-horizon-shell .ref-dashboard-inner {
+  width: 100%;
+  max-width: min(1180px, 100%);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
 .page-transacoes.app-horizon-shell .page-transacoes-filters-head {
   display: flex;
   align-items: center;
@@ -5698,8 +5709,9 @@ body[data-theme='light'] .ref-dashboard-header__btn-tx:active {
 }
 
 body[data-theme='light'] .ref-dashboard-header__btn-tx:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 60%, transparent);
 }
 
 body[data-theme='light'] .ref-dashboard-header__btn-wa {
@@ -5734,8 +5746,17 @@ body[data-theme='light'] .ref-dashboard-header__btn-wa:active {
 }
 
 body[data-theme='light'] .ref-dashboard-header__btn-wa:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.38);
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 60%, transparent);
+}
+
+.dashboard-container.app-horizon-shell .mobile-menu-btn:focus-visible,
+.dashboard-container.app-horizon-shell .ref-dashboard-header__btn-tx:focus-visible,
+.dashboard-container.app-horizon-shell .ref-dashboard-header__btn-wa:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 60%, transparent);
 }
 
 body[data-theme='light'] .ref-dashboard-header__btn-wa--disabled {
@@ -7753,6 +7774,18 @@ body[data-theme='glass']
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0;
   box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-container.app-horizon-shell .ref-dashboard-inner > .ref-dashboard-header,
+  .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-actions-card--welcome,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-actions-card--welcome .ref-dashboard-header,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-actions-card--welcome .ref-dashboard-header,
+  body[data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-actions-card--welcome .ref-dashboard-header {
+    transition: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
 }
 
 @media (min-width: 769px) {

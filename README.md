@@ -41,3 +41,7 @@ Estrutura do pacote:
 - `supabase/supabase-data.json` com o snapshot das tabelas do Supabase
 - `supabase/<timestamp>.sql` com dump SQL completo, quando a conexao Postgres estiver configurada
 - `project-files/` com os arquivos do projeto
+
+## Theme guidelines
+
+O arquivo `docs/theme-guidelines.md` detalha como o `dashboard.css` centraliza a lógica, quando editar os mirrors/glass e quais tokens (`--bg-card`, `--accent`, `--glass-blur`) existem para manter os temas alinhados.

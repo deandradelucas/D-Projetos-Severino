@@ -13,6 +13,7 @@ import {
   Cadastro,
   RedefinirSenha,
   Dashboard,
+  Agenda,
   Transacoes,
   Configuracoes,
   Relatorios,
@@ -44,6 +45,7 @@ function App() {
                 </Route>
                 <Route element={<AppSessionOutlet requireAppAccess />}>
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/agenda" element={<Agenda />} />
                   <Route path="/transacoes" element={<Transacoes />} />
                   <Route path="/relatorios" element={<Relatorios />} />
                   <Route path="/configuracoes" element={<Configuracoes />} />

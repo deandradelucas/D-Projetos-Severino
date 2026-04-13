@@ -9,6 +9,9 @@ export const RedefinirSenha = lazy(loadRedefinirSenha)
 export const loadDashboard = () => import('./pages/Dashboard.jsx')
 export const Dashboard = lazy(loadDashboard)
 
+export const loadAgenda = () => import('./pages/Agenda.jsx')
+export const Agenda = lazy(loadAgenda)
+
 export const loadTransacoes = () => import('./pages/Transacoes.jsx')
 export const Transacoes = lazy(loadTransacoes)
 
@@ -37,6 +40,7 @@ const ROUTE_PREFETCH = {
   '/cadastro': loadCadastro,
   '/redefinir-senha': loadRedefinirSenha,
   '/dashboard': loadDashboard,
+  '/agenda': loadAgenda,
   '/transacoes': loadTransacoes,
   '/configuracoes': loadConfiguracoes,
   '/relatorios': loadRelatorios,
@@ -60,7 +64,7 @@ export function prefetchRoute(path) {
 }
 
 /** Rotas do menu principal (shell autenticado) — pré-carrega para troca de aba rápida. */
-const APP_NAV_PATHS = ['/dashboard', '/transacoes', '/relatorios', '/configuracoes']
+const APP_NAV_PATHS = ['/dashboard', '/agenda', '/transacoes', '/relatorios', '/configuracoes']
 
 /** Dispara `import()` de todas as telas do menu (deduplicado). Útil ao abrir o menu no mobile. */
 export function prefetchAppNavChunksNow() {

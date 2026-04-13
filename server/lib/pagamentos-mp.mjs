@@ -59,7 +59,7 @@ export async function insertPreferenciaRecord({
 }
 
 /** Mesmo dia no mês calendário seguinte (UTC); clamp ao último dia do mês (ex.: 31 jan → 28/29 fev). */
-function shiftToFollowingCalendarMonth(d) {
+export function shiftToFollowingCalendarMonth(d) {
   const y = d.getUTCFullYear()
   const m = d.getUTCMonth()
   const day = d.getUTCDate()
@@ -74,7 +74,7 @@ function shiftToFollowingCalendarMonth(d) {
 }
 
 /** Garante data estritamente futura, avançando mês a mês (teto 24 iterações). */
-function ensureFutureMonthlyAnchor(d, now) {
+export function ensureFutureMonthlyAnchor(d, now) {
   let out = new Date(d.getTime())
   let guard = 0
   while (out.getTime() <= now.getTime() && guard < 24) {
@@ -88,7 +88,7 @@ function ensureFutureMonthlyAnchor(d, now) {
  * Próxima cobrança exibida/armazenada: após a compra, no mês seguinte (não no mesmo mês),
  * enquanto o MP ainda não registrou cobrança recorrente (charged_quantity === 0).
  */
-function normalizarProximaCobrancaMensal(pre, nextIso) {
+export function normalizarProximaCobrancaMensal(pre, nextIso) {
   if (!nextIso) return null
   const next = new Date(nextIso)
   if (Number.isNaN(next.getTime())) return null
