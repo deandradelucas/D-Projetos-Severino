@@ -1,22 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { useTheme } from '../context/ThemeContext'
-
-/** Ordem vertical no menu (índice sobe/desce a bolinha) */
-const MENU_ORDER = [
-  '/dashboard',
-  '/transacoes',
-  '/relatorios',
-  '/pagamento',
-  '/agenda',
-  '/configuracoes',
-  '/admin/whatsapp',
-  '/admin/usuarios',
-  '/admin/pagamentos',
-]
 
 function mergeNavItemClass(isActive, href, pathname, extraClass = '') {
   const on = Boolean(isActive) || pathname === href
@@ -26,73 +13,13 @@ function mergeNavItemClass(isActive, href, pathname, extraClass = '') {
 
 export default function Sidebar({ menuAberto, setMenuAberto }) {
   const { theme } = useTheme()
-  const location = useLocation()
-  const { pathname } = location
-  const prevMenuIdx = useRef(-1)
-  const [dotMotion, setDotMotion] = useState(null)
-  const navMenuRef = useRef(null)
-  const [activeDotTop, setActiveDotTop] = useState(null)
-  const [sessionBump, setSessionBump] = useState(0)
+  const { pathname } = useLocation()
   const showAdminNav = canAccessAdminPanelSession()
-
-  useEffect(() => {
-    const bump = () => setSessionBump((n) => n + 1)
-    window.addEventListener('horizonte-session-refresh', bump)
-    window.addEventListener('storage', bump)
-    return () => {
-      window.removeEventListener('horizonte-session-refresh', bump)
-      window.removeEventListener('storage', bump)
-    }
-  }, [])
 
   /* Mobile: ao abrir o drawer, baixa chunks do menu em paralelo (clique na rota fica instantâneo). */
   useEffect(() => {
     if (menuAberto) prefetchAppNavChunksNow()
   }, [menuAberto])
-
-  useEffect(() => {
-    const idx = MENU_ORDER.indexOf(location.pathname)
-    if (idx < 0) return
-
-    if (prevMenuIdx.current >= 0 && prevMenuIdx.current !== idx) {
-      const timeouts = []
-      timeouts.push(
-        window.setTimeout(() => setDotMotion(idx > prevMenuIdx.current ? 'down' : 'up'), 0)
-      )
-      timeouts.push(window.setTimeout(() => setDotMotion(null), 900))
-      prevMenuIdx.current = idx
-      return () => timeouts.forEach((id) => window.clearTimeout(id))
-    }
-    prevMenuIdx.current = idx
-  }, [location.pathname])
-
-  useLayoutEffect(() => {
-    const ul = navMenuRef.current
-    if (!ul) return
-
-    const measure = () => {
-      const active =
-        ul.querySelector('a.nav-item.active') || ul.querySelector('a.nav-item[aria-current="page"]')
-      if (!active) {
-        setActiveDotTop(null)
-        return
-      }
-      const ulRect = ul.getBoundingClientRect()
-      const linkRect = active.getBoundingClientRect()
-      const center = linkRect.top - ulRect.top + linkRect.height / 2
-      setActiveDotTop(center)
-    }
-
-    measure()
-    window.addEventListener('resize', measure)
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null
-    ro?.observe(ul)
-
-    return () => {
-      window.removeEventListener('resize', measure)
-      ro?.disconnect()
-    }
-  }, [location.pathname, menuAberto, showAdminNav, sessionBump])
 
   const logoSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
   return (
@@ -126,16 +53,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           </button>
         </div>
 
-        <ul
-          ref={navMenuRef}
-          className="nav-menu"
-          data-dot-motion={dotMotion || undefined}
-          style={
-            activeDotTop == null
-              ? undefined
-              : { '--sidebar-nav-dot-y': `${activeDotTop}px`, '--sidebar-nav-dot-visible': '1' }
-          }
-        >
+        <ul className="nav-menu">
           <li>
             <NavLink
               to="/dashboard"

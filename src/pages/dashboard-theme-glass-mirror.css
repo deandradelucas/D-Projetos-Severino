@@ -2402,50 +2402,7 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
     padding-bottom: 12px;
   }
 }
-body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before {
-  display: block !important;
-  content: "";
-  position: absolute;
-  right: 10px;
-  left: auto;
-  width: 8px;
-  height: 8px;
-  top: var(--sidebar-nav-dot-y, 24px);
-  transform: translateY(-50%);
-  border-radius: 50%;
-  background: #f1f5f9;
-  box-shadow:
-    0 0 0 2px rgba(252, 252, 253, 0.96),
-    0 2px 10px rgba(15, 23, 42, 0.28);
-  border: none;
-  z-index: 60;
-  opacity: var(--sidebar-nav-dot-visible, 0);
-  pointer-events: none;
-  transition:
-    top 0.65s cubic-bezier(0.18, 1, 0.28, 1.06),
-    opacity 0.3s ease,
-    box-shadow 0.45s ease,
-    filter 0.35s ease;
-  animation: none;
-  will-change: top, transform;
-}
-body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before {
-  animation: shell-nav-dot-nudge-down 0.82s cubic-bezier(0.22, 0.95, 0.28, 1.14) both;
-}
-body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before {
-  animation: shell-nav-dot-nudge-up 0.82s cubic-bezier(0.22, 0.95, 0.28, 1.14) both;
-}
-@media (prefers-reduced-motion: reduce) {
-  body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="down"]::before, body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu[data-dot-motion="up"]::before {
-    animation: none;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-
-  body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before {
-    transition: top 0.35s ease, opacity 0.2s ease;
-  }
-}
+body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before,
 body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::after {
   display: none !important;
 }
