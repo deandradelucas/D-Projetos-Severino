@@ -1,28 +1,29 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
-import MpStatusBadge from '../components/MpStatusBadge'
-import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
+import AdminPaymentLogsPanel from '../components/admin/AdminPaymentLogsPanel'
 import { apiUrl } from '../lib/apiUrl'
+import { buildPaymentLogsQuery, normalizePaymentLogsResponse } from '../lib/paymentLogsAdmin'
 import './dashboard.css'
 
 const ADMIN_DOCS_URL = import.meta.env.VITE_ADMIN_DOCS_URL || ''
 
-const PAGAMENTOS_LOG_HEADERS = [
-  'Data',
-  'ID usuário',
-  'Usuário',
-  'Isenção',
-  'Valor',
-  'Status',
-  'Detalhe',
-  'ID pagamento',
-  'Referência',
-]
+const DEFAULT_LOAD = {
+  limit: 500,
+  q: '',
+  statusGroup: 'all',
+  dateFrom: '',
+  dateTo: '',
+  sort: 'created_desc',
+  exempt: 'all',
+  overdueOnly: false,
+}
 
 export default function AdminPagamentos() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [rows, setRows] = useState([])
+  const [summary, setSummary] = useState(null)
+  const [loadParams, setLoadParams] = useState(() => ({ ...DEFAULT_LOAD }))
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [actionMsg, setActionMsg] = useState('')
@@ -36,28 +37,23 @@ export default function AdminPagamentos() {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) return
       const u = JSON.parse(userSaved)
-      const res = await fetch(apiUrl('/api/admin/pagamentos'), { headers: { 'x-user-id': u.id } })
+      const qs = buildPaymentLogsQuery(loadParams)
+      const res = await fetch(apiUrl(`/api/admin/pagamentos?${qs}`), { headers: { 'x-user-id': u.id } })
       if (!res.ok) throw new Error('Falha ao carregar logs de pagamento.')
       const data = await res.json()
-      setRows(Array.isArray(data) ? data : [])
+      const { rows: nextRows, summary: nextSummary } = normalizePaymentLogsResponse(data)
+      setRows(nextRows)
+      setSummary(nextSummary)
     } catch (e) {
       setError(e.message)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [loadParams])
 
   useEffect(() => {
     load()
   }, [load])
-
-  const isentoDoUsuario = (row) => {
-    const rel = row.usuarios
-    if (rel && typeof rel === 'object' && !Array.isArray(rel)) {
-      return rel.isento_pagamento === true
-    }
-    return false
-  }
 
   const alternarIsencao = async (usuarioId, proximo) => {
     if (!usuarioId) return
@@ -81,11 +77,12 @@ export default function AdminPagamentos() {
         prev.map((r) => {
           if (r.usuario_id !== usuarioId) return r
           const rel = r.usuarios
+          const base = { ...r, isExempt: proximo }
           if (rel && typeof rel === 'object' && !Array.isArray(rel)) {
-            return { ...r, usuarios: { ...rel, isento_pagamento: proximo } }
+            return { ...base, usuarios: { ...rel, isento_pagamento: proximo } }
           }
           return {
-            ...r,
+            ...base,
             usuarios: { email: '', nome: '', isento_pagamento: proximo },
           }
         })
@@ -96,17 +93,6 @@ export default function AdminPagamentos() {
     } finally {
       setTogglingUserId(null)
     }
-  }
-
-  const usuarioLabel = (row) => {
-    const rel = row.usuarios
-    if (rel && typeof rel === 'object' && !Array.isArray(rel)) {
-      const em = rel.email || ''
-      const nm = rel.nome || ''
-      if (em && nm) return `${nm} (${em})`
-      return em || nm || '—'
-    }
-    return row.usuario_id ? String(row.usuario_id).slice(0, 8) + '…' : '—'
   }
 
   const handleExcluirLogsPendentes = async () => {
@@ -151,125 +137,29 @@ export default function AdminPagamentos() {
               <MobileMenuButton onClick={() => setMenuAberto(true)} />
               <div className="ref-dashboard-header__lead">
                 <h1 className="ref-dashboard-greeting">
-                  <span className="ref-dashboard-greeting__name">Logs de pagamentos</span>
+                  <span className="ref-dashboard-greeting__name">Logs de Pagamentos</span>
                 </h1>
                 <p className="ref-panel__subtitle page-admin-header-sub">
-                  Mercado Pago — preferências e status dos pagamentos
+                  Acompanhe preferências, cobranças, status e receita gerada pelo Mercado Pago.
                 </p>
-                {ADMIN_DOCS_URL ? (
-                  <p className="page-admin-doc-link-wrap">
-                    <a className="page-admin-doc-link" href={ADMIN_DOCS_URL} target="_blank" rel="noreferrer">
-                      Documentação / runbook interno
-                    </a>
-                  </p>
-                ) : null}
               </div>
             </header>
 
-            <article className="ref-panel page-admin-ref-panel page-admin-ref-panel--table" aria-labelledby="admin-pag-heading">
-              <div className="ref-panel__head page-admin-pagamentos-panel-head">
-                <div>
-                  <h2 id="admin-pag-heading" className="ref-panel__title">
-                    Registros
-                  </h2>
-                  <p className="ref-panel__subtitle">Histórico e isenções por usuário</p>
-                </div>
-                <button
-                  type="button"
-                  className="btn-secondary page-admin-btn-danger-outline"
-                  disabled={loading || deletingPending}
-                  onClick={() => void handleExcluirLogsPendentes()}
-                >
-                  {deletingPending ? 'Excluindo…' : 'Excluir logs pendentes'}
-                </button>
-              </div>
-              {error ? <div className="page-admin-error">{error}</div> : null}
-              {actionMsg ? <div className="page-admin-action-msg">{actionMsg}</div> : null}
-              <div className="page-admin-table-scroll">
-                {loading ? (
-                  <AdminDataTableSkeleton headers={PAGAMENTOS_LOG_HEADERS} rows={7} />
-                ) : rows.length === 0 ? (
-                  <p className="page-admin-empty">Nenhum pagamento registrado ainda.</p>
-                ) : (
-                  <table className="data-table page-admin-data-table">
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>ID usuário</th>
-                        <th>Usuário</th>
-                        <th>Isenção</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th>Detalhe</th>
-                        <th>ID pagamento</th>
-                        <th>Referência</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((row) => (
-                        <tr key={row.id}>
-                          <td style={{ fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-                            {row.created_at ? new Date(row.created_at).toLocaleString('pt-BR') : '—'}
-                          </td>
-                          <td
-                            style={{ fontSize: '11px', fontFamily: 'monospace', maxWidth: '120px', wordBreak: 'break-all' }}
-                            title={row.usuario_id || ''}
-                          >
-                            {row.usuario_id || '—'}
-                          </td>
-                          <td style={{ fontSize: '13px', maxWidth: '200px' }} title={row.usuario_id || ''}>
-                            {usuarioLabel(row)}
-                          </td>
-                          <td style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>
-                            {row.usuario_id ? (
-                              <>
-                                <span
-                                  style={{
-                                    padding: '3px 8px',
-                                    borderRadius: '999px',
-                                    fontSize: '10px',
-                                    fontWeight: 700,
-                                    marginRight: '8px',
-                                    backgroundColor: isentoDoUsuario(row) ? 'rgba(34,197,94,0.15)' : 'rgba(148,163,184,0.2)',
-                                    color: isentoDoUsuario(row) ? '#16a34a' : '#64748b',
-                                  }}
-                                >
-                                  {isentoDoUsuario(row) ? 'Isento' : 'Não isento'}
-                                </span>
-                                <button
-                                  type="button"
-                                  className="btn-secondary"
-                                  style={{ padding: '4px 10px', fontSize: '11px', fontWeight: 600 }}
-                                  disabled={togglingUserId === row.usuario_id}
-                                  onClick={() => alternarIsencao(row.usuario_id, !isentoDoUsuario(row))}
-                                >
-                                  {togglingUserId === row.usuario_id ? '…' : isentoDoUsuario(row) ? 'Remover' : 'Isentar'}
-                                </button>
-                              </>
-                            ) : (
-                              <span style={{ color: 'var(--text-secondary)' }}>—</span>
-                            )}
-                          </td>
-                          <td>{row.amount != null ? `R$ ${Number(row.amount).toFixed(2)}` : '—'}</td>
-                          <td>
-                            <MpStatusBadge status={row.status} />
-                          </td>
-                          <td style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '160px' }}>
-                            {row.status_detail || row.description || '—'}
-                          </td>
-                          <td style={{ fontSize: '11px', fontFamily: 'monospace', wordBreak: 'break-all', maxWidth: '120px' }}>
-                            {row.payment_id || '—'}
-                          </td>
-                          <td style={{ fontSize: '11px', fontFamily: 'monospace', wordBreak: 'break-all', maxWidth: '140px' }}>
-                            {row.external_reference || '—'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </article>
+            <AdminPaymentLogsPanel
+              rows={rows}
+              summary={summary}
+              loading={loading}
+              error={error}
+              actionMsg={actionMsg}
+              loadParams={loadParams}
+              onLoadParamsChange={setLoadParams}
+              onRefresh={() => void load()}
+              onDeletePending={() => void handleExcluirLogsPendentes()}
+              deletingPending={deletingPending}
+              togglingUserId={togglingUserId}
+              onToggleExempt={alternarIsencao}
+              adminDocsUrl={ADMIN_DOCS_URL}
+            />
           </div>
         </main>
       </div>

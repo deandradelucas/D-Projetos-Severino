@@ -1,6 +1,11 @@
 import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
-import { resumoPagamentosPorUsuarioIds } from './pagamentos-mp.mjs'
+import {
+  aggregatePagamentosFinanceirosPorUsuarioIds,
+  agregarPagamentosAprovadosGlobais,
+  fetchUsuarioIdsComPagamentoAprovado,
+  resumoPagamentosPorUsuarioIds,
+} from './pagamentos-mp.mjs'
 import { resolverUsuarioIdPorTelefoneGemini } from './ai.mjs'
 import { normalizeUsuarioRow, stripSenha } from './usuario-schema.mjs'
 import { isSuperAdminEmail, superAdminEmail } from './super-admin.mjs'
@@ -220,24 +225,68 @@ export async function getWhatsappLogs(limit = 50) {
   return data || []
 }
 
-function toAdminUsuarioDto(rawRow, latestByUser, approvedIds) {
+function toAdminUsuarioDto(rawRow, latestByUser, approvedIds, financeMap) {
   const n = normalizeUsuarioRow(stripSenha(rawRow))
   const id = n.id
+  const idStr = id ? String(id) : ''
   const latest = id ? latestByUser.get(id) : null
+  const agg = idStr && financeMap ? financeMap.get(idStr) : null
+  const paid = id ? approvedIds.has(id) || approvedIds.has(idStr) : false
+  const exempt = n.isento_pagamento === true
+  const trialMs = n.trial_ends_at ? new Date(n.trial_ends_at).getTime() : null
+  const now = Date.now()
+  let paymentStatus = 'desconhecido'
+  if (exempt) paymentStatus = 'isento'
+  else if (paid) paymentStatus = 'pago'
+  else if (trialMs != null && !Number.isNaN(trialMs) && trialMs > now) paymentStatus = 'trial_ativo'
+  else if (trialMs != null && !Number.isNaN(trialMs) && trialMs <= now) paymentStatus = 'inadimplente'
+  else paymentStatus = 'sem_trial'
+
+  let isOverdue = false
+  if (!exempt && !paid && n.is_active !== false && trialMs != null && !Number.isNaN(trialMs) && trialMs < now) {
+    isOverdue = true
+  }
+
+  let daysToExpire = null
+  if (trialMs != null && !Number.isNaN(trialMs) && trialMs > now) {
+    daysToExpire = Math.ceil((trialMs - now) / 86400000)
+  }
+  const nextPayIso = n.assinatura_proxima_cobranca
+  if (nextPayIso) {
+    const np = new Date(nextPayIso).getTime()
+    if (!Number.isNaN(np) && np > now) {
+      const d = Math.ceil((np - now) / 86400000)
+      if (daysToExpire == null || d < daysToExpire) daysToExpire = d
+    }
+  }
+
   return {
     ...n,
     nome: n.nome ?? '',
     role: n.role ?? 'USER',
     is_active: n.is_active !== false,
     last_login_at: n.last_login_at ?? null,
+    created_at: n.created_at ?? null,
     isento_pagamento: n.isento_pagamento === true,
     trial_ends_at: n.trial_ends_at ?? null,
     bem_vindo_pagamento_visto_at: n.bem_vindo_pagamento_visto_at ?? null,
-    pagamento_aprovado: id ? approvedIds.has(id) : false,
+    pagamento_aprovado: paid,
     mp_ultimo_status: latest?.status ?? null,
     mp_ultimo_amount: latest?.amount ?? null,
     mp_ultimo_em: latest?.updated_at ?? latest?.created_at ?? null,
     mp_ultimo_detalhe: latest?.status_detail ?? null,
+    accumulatedRevenue: agg?.accumulatedRevenue ?? 0,
+    monthlyRevenue: agg?.monthlyRevenue ?? 0,
+    lastPaymentDate: agg?.lastPaymentDate ?? null,
+    nextPaymentDate: n.assinatura_proxima_cobranca ?? null,
+    dueDate: n.trial_ends_at ?? null,
+    subscriptionStatus: n.assinatura_mp_status ?? null,
+    billingCycle: null,
+    planName: null,
+    paymentStatus,
+    isOverdue,
+    daysToExpire,
+    notes: null,
   }
 }
 
@@ -261,20 +310,84 @@ async function fetchUsuariosAdminStats(supabaseAdmin) {
   }
 }
 
+async function fetchUsuariosAdminStatsExtended(supabaseAdmin) {
+  const nowIso = new Date().toISOString()
+  const staleCut = new Date(Date.now() - 30 * 86400000).toISOString()
+  const [base, fin, np, nt, stale, overdueTrial] = await Promise.all([
+    fetchUsuariosAdminStats(supabaseAdmin),
+    agregarPagamentosAprovadosGlobais(),
+    supabaseAdmin
+      .from('usuarios')
+      .select('assinatura_proxima_cobranca')
+      .gt('assinatura_proxima_cobranca', nowIso)
+      .order('assinatura_proxima_cobranca', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    supabaseAdmin
+      .from('usuarios')
+      .select('trial_ends_at')
+      .gt('trial_ends_at', nowIso)
+      .order('trial_ends_at', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    supabaseAdmin
+      .from('usuarios')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true)
+      .or(`last_login_at.is.null,last_login_at.lt.${staleCut}`),
+    supabaseAdmin
+      .from('usuarios')
+      .select('id', { count: 'exact', head: true })
+      .lt('trial_ends_at', nowIso)
+      .eq('isento_pagamento', false)
+      .eq('is_active', true),
+  ])
+
+  const proxPag = np.data?.assinatura_proxima_cobranca ?? null
+  const proxTrial = nt.data?.trial_ends_at ?? null
+  let proximoVencimento = null
+  const tPag = proxPag ? new Date(proxPag).getTime() : NaN
+  const tTr = proxTrial ? new Date(proxTrial).getTime() : NaN
+  if (!Number.isNaN(tPag) && !Number.isNaN(tTr)) {
+    proximoVencimento = tPag < tTr ? proxPag : proxTrial
+  } else if (!Number.isNaN(tPag)) proximoVencimento = proxPag
+  else if (!Number.isNaN(tTr)) proximoVencimento = proxTrial
+
+  return {
+    ...base,
+    assinaturas_pagas: fin.paidSubscriptions,
+    ganho_acumulado_total: fin.accumulatedRevenue,
+    receita_mensal_total: fin.monthlyRevenue,
+    ticket_medio_usuario: fin.ticketMedioUsuario,
+    proximo_pagamento: proxPag,
+    proximo_vencimento: proximoVencimento,
+    contas_sem_login_recente: stale.count ?? 0,
+    trials_vencidos_conta: overdueTrial.count ?? 0,
+  }
+}
+
 /**
- * Lista paginada + filtros + totais globais (KPIs).
- * @param {{ page?: string|number, pageSize?: string|number, q?: string, role?: string, conta?: string }} query
+ * @param {import('@supabase/supabase-js').SupabaseClient} supabaseAdmin
+ * @param {object} query
  */
-export async function listUsuariosAdminPaged(query) {
-  const supabaseAdmin = getSupabaseAdmin()
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10) || 1)
-  const pageSize = Math.min(5000, Math.max(1, parseInt(String(query.pageSize || '12'), 10) || 12))
-  const offset = (page - 1) * pageSize
+function applyUsuariosAdminFilters(supabaseAdmin, query, approvedUserSet) {
+  const nowIso = new Date().toISOString()
+  const staleCut = new Date(Date.now() - 30 * 86400000).toISOString()
   const q = String(query.q || '').trim()
   const role = String(query.role || '').trim().toUpperCase()
   const conta = String(query.conta || '').trim()
+  const assinatura = String(query.assinatura || '').trim().toLowerCase()
+  const login = String(query.login || '').trim().toLowerCase()
+  const createdFrom = String(query.createdFrom || '').trim()
+  const createdTo = String(query.createdTo || '').trim()
+  const accessFrom = String(query.accessFrom || '').trim()
+  const accessTo = String(query.accessTo || '').trim()
+  const payFrom = String(query.payFrom || '').trim()
+  const payTo = String(query.payTo || '').trim()
+  const trialEndsFrom = String(query.trialEndsFrom || '').trim()
+  const trialEndsTo = String(query.trialEndsTo || '').trim()
 
-  let qb = supabaseAdmin.from('usuarios').select('*', { count: 'exact' })
+  let qb = supabaseAdmin.from('usuarios')
 
   if (q) {
     const term = `%${escapeIlike(q)}%`
@@ -286,17 +399,178 @@ export async function listUsuariosAdminPaged(query) {
   if (conta === 'ativo') qb = qb.eq('is_active', true)
   if (conta === 'inativo') qb = qb.eq('is_active', false)
 
-  qb = qb.order('email', { ascending: true }).range(offset, offset + pageSize - 1)
+  if (createdFrom) {
+    qb = qb.gte('created_at', createdFrom.includes('T') ? createdFrom : `${createdFrom}T00:00:00.000Z`)
+  }
+  if (createdTo) {
+    qb = qb.lte('created_at', createdTo.includes('T') ? createdTo : `${createdTo}T23:59:59.999Z`)
+  }
+  if (accessFrom) {
+    qb = qb.gte('last_login_at', accessFrom.includes('T') ? accessFrom : `${accessFrom}T00:00:00.000Z`)
+  }
+  if (accessTo) {
+    qb = qb.lte('last_login_at', accessTo.includes('T') ? accessTo : `${accessTo}T23:59:59.999Z`)
+  }
+  if (payFrom) {
+    qb = qb.gte('assinatura_proxima_cobranca', payFrom.includes('T') ? payFrom : `${payFrom}T00:00:00.000Z`)
+  }
+  if (payTo) {
+    qb = qb.lte('assinatura_proxima_cobranca', payTo.includes('T') ? payTo : `${payTo}T23:59:59.999Z`)
+  }
+  if (trialEndsFrom) {
+    qb = qb.gte('trial_ends_at', trialEndsFrom.includes('T') ? trialEndsFrom : `${trialEndsFrom}T00:00:00.000Z`)
+  }
+  if (trialEndsTo) {
+    qb = qb.lte('trial_ends_at', trialEndsTo.includes('T') ? trialEndsTo : `${trialEndsTo}T23:59:59.999Z`)
+  }
 
-  const res = await qb
+  if (login === 'nunca') qb = qb.is('last_login_at', null)
+  if (login === 'stale') qb = qb.or(`last_login_at.is.null,last_login_at.lt.${staleCut}`)
+
+  if (assinatura === 'isento') qb = qb.eq('isento_pagamento', true)
+  if (assinatura === 'trial') qb = qb.gt('trial_ends_at', nowIso)
+  if (assinatura === 'pago') {
+    const arr = approvedUserSet && approvedUserSet.size ? [...approvedUserSet] : []
+    if (arr.length) qb = qb.in('id', arr)
+    else qb = qb.eq('id', '00000000-0000-0000-0000-000000000000')
+  }
+  if (assinatura === 'nao_pago') {
+    const arr = approvedUserSet && approvedUserSet.size ? [...approvedUserSet] : []
+    if (arr.length) {
+      const chunk = 120
+      for (let i = 0; i < arr.length; i += chunk) {
+        const part = arr.slice(i, i + chunk)
+        qb = qb.not('id', 'in', `(${part.join(',')})`)
+      }
+    }
+  }
+  if (assinatura === 'inadimplente') {
+    qb = qb.lt('trial_ends_at', nowIso).eq('isento_pagamento', false).eq('is_active', true)
+    const arr = approvedUserSet && approvedUserSet.size ? [...approvedUserSet] : []
+    if (arr.length) {
+      const chunk = 120
+      for (let i = 0; i < arr.length; i += chunk) {
+        const part = arr.slice(i, i + chunk)
+        qb = qb.not('id', 'in', `(${part.join(',')})`)
+      }
+    }
+  }
+
+  return qb
+}
+
+async function fetchAllUsuarioIdsForAdminList(supabaseAdmin, query, approvedUserSet) {
+  let qbCount = applyUsuariosAdminFilters(supabaseAdmin, query, approvedUserSet)
+  const counted = await qbCount.select('id', { count: 'exact', head: true })
+  if (counted.error) throw counted.error
+  const total = counted.count ?? 0
+
+  const allIds = []
+  let from = 0
+  const chunk = 1000
+  let guard = 0
+  while (guard < 100) {
+    let qb = applyUsuariosAdminFilters(supabaseAdmin, query, approvedUserSet)
+    qb = applyUsuariosAdminSort(qb, 'email_asc')
+    const res = await qb.select('id').range(from, from + chunk - 1)
+    if (res.error) throw res.error
+    const rows = res.data || []
+    for (const r of rows) {
+      if (r.id) allIds.push(r.id)
+    }
+    if (rows.length < chunk) break
+    from += chunk
+    guard += 1
+  }
+  return { allIds, total }
+}
+
+function applyUsuariosAdminSort(qb, sort) {
+  const s = String(sort || 'email_asc').toLowerCase()
+  switch (s) {
+    case 'email_desc':
+      return qb.order('email', { ascending: false })
+    case 'nome_asc':
+      return qb.order('nome', { ascending: true, nullsFirst: false })
+    case 'nome_desc':
+      return qb.order('nome', { ascending: false, nullsFirst: false })
+    case 'last_login_desc':
+      return qb.order('last_login_at', { ascending: false, nullsFirst: false })
+    case 'last_login_asc':
+      return qb.order('last_login_at', { ascending: true, nullsFirst: false })
+    case 'trial_asc':
+      return qb.order('trial_ends_at', { ascending: true, nullsFirst: false })
+    case 'trial_desc':
+      return qb.order('trial_ends_at', { ascending: false, nullsFirst: false })
+    case 'next_pay_asc':
+      return qb.order('assinatura_proxima_cobranca', { ascending: true, nullsFirst: false })
+    case 'next_pay_desc':
+      return qb.order('assinatura_proxima_cobranca', { ascending: false, nullsFirst: false })
+    case 'created_desc':
+      return qb.order('created_at', { ascending: false, nullsFirst: false })
+    case 'created_asc':
+      return qb.order('created_at', { ascending: true, nullsFirst: false })
+    case 'email_asc':
+    default:
+      return qb.order('email', { ascending: true })
+  }
+}
+
+/**
+ * Lista paginada + filtros + totais globais (KPIs).
+ * @param {Record<string, string | number | undefined>} query
+ */
+export async function listUsuariosAdminPaged(query) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const page = Math.max(1, parseInt(String(query.page || '1'), 10) || 1)
+  const pageSize = Math.min(5000, Math.max(1, parseInt(String(query.pageSize || '12'), 10) || 12))
+  const offset = (page - 1) * pageSize
+  const sort = String(query.sort || 'email_asc').trim().toLowerCase()
+
+  let approvedUserSet = null
+  const assinatura = String(query.assinatura || '').trim().toLowerCase()
+  if (['pago', 'nao_pago', 'inadimplente'].includes(assinatura)) {
+    approvedUserSet = await fetchUsuarioIdsComPagamentoAprovado()
+  }
+
+  const stats = await fetchUsuariosAdminStatsExtended(supabaseAdmin)
+
+  if (sort === 'revenue_desc' || sort === 'revenue_asc') {
+    const { allIds, total } = await fetchAllUsuarioIdsForAdminList(supabaseAdmin, query, approvedUserSet)
+    const finMap = await aggregatePagamentosFinanceirosPorUsuarioIds(allIds)
+    const asc = sort === 'revenue_asc'
+    const sortedIds = [...allIds].sort((a, b) => {
+      const va = finMap.get(String(a))?.accumulatedRevenue ?? 0
+      const vb = finMap.get(String(b))?.accumulatedRevenue ?? 0
+      if (va === vb) return String(a).localeCompare(String(b))
+      return asc ? va - vb : vb - va
+    })
+    const pageIds = sortedIds.slice(offset, offset + pageSize)
+    if (!pageIds.length) {
+      return { items: [], total, page, pageSize, stats }
+    }
+    const resRows = await supabaseAdmin.from('usuarios').select('*').in('id', pageIds)
+    if (resRows.error) throw resRows.error
+    const byId = new Map((resRows.data || []).map((r) => [r.id, r]))
+    const rawRows = pageIds.map((id) => byId.get(id)).filter(Boolean)
+    const ids = rawRows.map((r) => r.id).filter(Boolean)
+    const { latestByUser, approvedIds } = await resumoPagamentosPorUsuarioIds(ids)
+    const financeMap = await aggregatePagamentosFinanceirosPorUsuarioIds(ids)
+    const items = rawRows.map((row) => toAdminUsuarioDto(row, latestByUser, approvedIds, financeMap))
+    return { items, total, page, pageSize, stats }
+  }
+
+  let qb = applyUsuariosAdminFilters(supabaseAdmin, query, approvedUserSet)
+  qb = applyUsuariosAdminSort(qb, sort)
+  const res = await qb.select('*', { count: 'exact' }).range(offset, offset + pageSize - 1)
   if (res.error) throw res.error
 
   const rawRows = res.data || []
   const total = typeof res.count === 'number' ? res.count : rawRows.length
   const ids = rawRows.map((r) => r.id).filter(Boolean)
   const { latestByUser, approvedIds } = await resumoPagamentosPorUsuarioIds(ids)
-  const items = rawRows.map((row) => toAdminUsuarioDto(row, latestByUser, approvedIds))
-  const stats = await fetchUsuariosAdminStats(supabaseAdmin)
+  const financeMap = await aggregatePagamentosFinanceirosPorUsuarioIds(ids)
+  const items = rawRows.map((row) => toAdminUsuarioDto(row, latestByUser, approvedIds, financeMap))
 
   return { items, total, page, pageSize, stats }
 }
@@ -364,7 +638,8 @@ export async function updateUsuarioAdmin(id, payload, ctx = {}) {
 
   if (error) throw error
   const mp = await resumoPagamentosPorUsuarioIds([data.id])
-  const dto = toAdminUsuarioDto(data, mp.latestByUser, mp.approvedIds)
+  const fin = await aggregatePagamentosFinanceirosPorUsuarioIds([data.id])
+  const dto = toAdminUsuarioDto(data, mp.latestByUser, mp.approvedIds, fin)
 
   await insertAdminAuditLog({
     actorUserId: actorUserId || null,

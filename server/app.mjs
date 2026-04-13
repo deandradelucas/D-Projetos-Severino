@@ -45,7 +45,7 @@ import {
 import {
   insertPreferenciaRecord,
   listPagamentosUsuario,
-  listPagamentosAdmin,
+  listPagamentosAdminPayload,
   deletePagamentosPendentesAdmin,
   sincronizarPagamentosPendentesDoUsuario,
   sincronizarPreapprovalUsuario,
@@ -770,6 +770,17 @@ app.get('/api/admin/usuarios', async (c) => {
       q: c.req.query('q'),
       role: c.req.query('role'),
       conta: c.req.query('conta'),
+      assinatura: c.req.query('assinatura'),
+      login: c.req.query('login'),
+      createdFrom: c.req.query('createdFrom'),
+      createdTo: c.req.query('createdTo'),
+      accessFrom: c.req.query('accessFrom'),
+      accessTo: c.req.query('accessTo'),
+      payFrom: c.req.query('payFrom'),
+      payTo: c.req.query('payTo'),
+      trialEndsFrom: c.req.query('trialEndsFrom'),
+      trialEndsTo: c.req.query('trialEndsTo'),
+      sort: c.req.query('sort'),
     })
     return c.json(result)
   } catch (error) {
@@ -822,9 +833,26 @@ app.get('/api/admin/pagamentos', async (c) => {
     const block = await assertPrincipalAdmin(usuarioId)
     if (block) return c.json({ message: block.message }, block.status)
 
-    const lim = Math.min(500, Math.max(1, parseInt(c.req.query('limit') || '200', 10) || 200))
-    const rows = await listPagamentosAdmin(lim)
-    return c.json(rows)
+    const lim = Math.min(800, Math.max(1, parseInt(c.req.query('limit') || '500', 10) || 500))
+    const statusGroup = c.req.query('statusGroup') || 'all'
+    const q = c.req.query('q') || ''
+    const dateFrom = c.req.query('dateFrom') || ''
+    const dateTo = c.req.query('dateTo') || ''
+    const sort = c.req.query('sort') || 'created_desc'
+    const exempt = c.req.query('exempt') || 'all'
+    const overdueOnly = c.req.query('overdueOnly') || ''
+
+    const payload = await listPagamentosAdminPayload({
+      limit: lim,
+      statusGroup,
+      q,
+      dateFrom,
+      dateTo,
+      sort,
+      exempt,
+      overdueOnly,
+    })
+    return c.json(payload)
   } catch (error) {
     log.error('get admin pagamentos failed', error)
     return c.json({ message: 'Erro ao listar pagamentos.' }, 500)

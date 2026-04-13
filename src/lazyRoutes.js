@@ -64,7 +64,14 @@ export function prefetchRoute(path) {
 }
 
 /** Rotas do menu principal (shell autenticado) — pré-carrega para troca de aba rápida. */
-const APP_NAV_PATHS = ['/dashboard', '/agenda', '/transacoes', '/relatorios', '/configuracoes']
+const APP_NAV_PATHS = [
+  '/dashboard',
+  '/transacoes',
+  '/relatorios',
+  '/pagamento',
+  '/agenda',
+  '/configuracoes',
+]
 
 /** Dispara `import()` de todas as telas do menu (deduplicado). Útil ao abrir o menu no mobile. */
 export function prefetchAppNavChunksNow() {

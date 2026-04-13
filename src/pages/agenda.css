@@ -144,47 +144,74 @@
   }
 
   .page-agenda__calendar {
-    padding: 8px 6px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    padding: 6px 2px 8px;
+    overflow-x: hidden;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   .page-agenda__weekdays {
-    min-width: min(100%, 560px);
-    font-size: 0.65rem;
-    gap: 2px;
+    width: 100%;
+    min-width: 0;
+    font-size: 0.55rem;
+    gap: 1px;
+    margin-bottom: 4px;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 
   .page-agenda__month-grid {
-    min-width: min(100%, 560px);
-    gap: 3px;
+    width: 100%;
+    min-width: 0;
+    gap: 2px;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-auto-rows: minmax(44px, auto);
   }
 
   .page-agenda__cell {
-    min-height: 76px;
-    padding: 4px 4px 6px;
-    border-radius: 10px;
+    min-height: 0;
+    min-width: 0;
+    max-height: 76px;
+    padding: 3px 2px 4px;
+    border-radius: 8px;
+    gap: 2px;
     touch-action: manipulation;
   }
 
+  .page-agenda__cell-head {
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
   .page-agenda__cell-num {
-    font-size: 0.78rem;
+    font-size: 0.7rem;
+    line-height: 1.1;
   }
 
   .page-agenda__cell-add {
-    width: 22px;
-    height: 22px;
-    font-size: 0.95rem;
+    width: 18px;
+    height: 18px;
+    font-size: 0.8rem;
+    border-radius: 5px;
+  }
+
+  .page-agenda__cell-body {
+    max-height: 42px;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
   }
 
   .page-agenda__chip {
-    font-size: 0.6rem;
-    padding: 2px 4px;
-    border-radius: 6px;
+    font-size: 0.52rem;
+    padding: 1px 3px;
+    border-radius: 4px;
+    line-height: 1.2;
   }
 
   .page-agenda__more {
-    font-size: 0.62rem;
+    font-size: 0.5rem;
+    line-height: 1.2;
   }
 
   .page-agenda__week {
@@ -250,12 +277,33 @@
     grid-template-columns: 1fr;
   }
 
+  .page-agenda__weekdays {
+    font-size: 0.5rem;
+    gap: 0;
+  }
+
   .page-agenda__month-grid {
-    min-width: 100%;
+    gap: 1px;
+    grid-auto-rows: minmax(40px, auto);
   }
 
   .page-agenda__cell {
-    min-height: 68px;
+    max-height: 68px;
+    padding: 2px 1px 3px;
+    border-radius: 6px;
+  }
+
+  .page-agenda__cell-body {
+    max-height: 36px;
+  }
+
+  .page-agenda__cell-num {
+    font-size: 0.62rem;
+  }
+
+  .page-agenda__chip {
+    font-size: 0.48rem;
+    padding: 1px 2px;
   }
 
   .page-agenda__legend {

@@ -3,8 +3,16 @@ import { Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
+import UserAdminStatusBadge from '../components/admin/UserAdminStatusBadge'
 import { apiUrl } from '../lib/apiUrl'
 import { formatPhoneBRDisplay } from '../lib/formatPhoneBR'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
+import {
+  buildUsuariosAdminQuery,
+  formatDatePtBr,
+  formatDateTimePtBr,
+  rowsToUsersAdminCsv,
+} from '../lib/usersAdmin'
 import { isSuperAdminEmail, isSuperAdminSession } from '../lib/superAdmin'
 import './dashboard.css'
 
@@ -14,7 +22,12 @@ const USUARIOS_TABLE_HEADERS = [
   'Telefone',
   'Papel',
   'Conta',
+  'Status',
   'Assinatura / pagamento',
+  'Venc. trial',
+  'Próx. cobrança',
+  'Ganho acum.',
+  'Rec. mês',
   'Último acesso',
   'Ações',
 ]
@@ -47,17 +60,6 @@ const PAGE_SIZE = 12
 
 const ROLE_OPTIONS_NON_SUPER = ROLE_OPTIONS.filter((o) => o.value !== 'ADMIN')
 
-function buildUsuariosQuery(page, pageSize, q, role, conta) {
-  const params = new URLSearchParams({
-    page: String(page),
-    pageSize: String(pageSize),
-  })
-  if (q) params.set('q', q)
-  if (role) params.set('role', role)
-  if (conta) params.set('conta', conta)
-  return params.toString()
-}
-
 function downloadTextFile(filename, text) {
   const blob = new Blob([text], { type: 'text/csv;charset=utf-8;' })
   const a = document.createElement('a')
@@ -65,34 +67,6 @@ function downloadTextFile(filename, text) {
   a.download = filename
   a.click()
   URL.revokeObjectURL(a.href)
-}
-
-function rowsToCsv(rows) {
-  const cols = ['nome', 'email', 'telefone', 'papel', 'conta_ativa', 'assinatura', 'ultimo_acesso']
-  const esc = (v) => {
-    const s = v == null ? '' : String(v)
-    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`
-    return s
-  }
-  const lines = [cols.join(',')]
-  for (const r of rows) {
-    const papel = roleDisplayLabel(r.role)
-    const conta = r.is_active === false ? 'desativada' : 'ativa'
-    const assin = r.pagamento_aprovado ? 'pago' : r.isento_pagamento ? 'isento' : '—'
-    const ult = r.last_login_at ? new Date(r.last_login_at).toISOString() : ''
-    lines.push(
-      [
-        esc(r.nome),
-        esc(r.email),
-        esc(r.telefone),
-        esc(papel),
-        esc(conta),
-        esc(assin),
-        esc(ult),
-      ].join(',')
-    )
-  }
-  return lines.join('\n')
 }
 
 function mpStatusLabel(status) {
@@ -243,6 +217,18 @@ export default function AdminUsuarios() {
   const [userFilterDebounced, setUserFilterDebounced] = useState('')
   const [filterRole, setFilterRole] = useState('')
   const [filterConta, setFilterConta] = useState('')
+  const [filterSort, setFilterSort] = useState('email_asc')
+  const [filterAssinatura, setFilterAssinatura] = useState('')
+  const [filterLogin, setFilterLogin] = useState('')
+  const [filterCreatedFrom, setFilterCreatedFrom] = useState('')
+  const [filterCreatedTo, setFilterCreatedTo] = useState('')
+  const [filterAccessFrom, setFilterAccessFrom] = useState('')
+  const [filterAccessTo, setFilterAccessTo] = useState('')
+  const [filterPayFrom, setFilterPayFrom] = useState('')
+  const [filterPayTo, setFilterPayTo] = useState('')
+  const [filterTrialEndsFrom, setFilterTrialEndsFrom] = useState('')
+  const [filterTrialEndsTo, setFilterTrialEndsTo] = useState('')
+  const [detailUser, setDetailUser] = useState(null)
   const [page, setPage] = useState(1)
   const [userActionMessage, setUserActionMessage] = useState('')
   const [loadError, setLoadError] = useState('')
@@ -262,7 +248,22 @@ export default function AdminUsuarios() {
 
   useEffect(() => {
     setPage(1)
-  }, [userFilterDebounced, filterRole, filterConta])
+  }, [
+    userFilterDebounced,
+    filterRole,
+    filterConta,
+    filterSort,
+    filterAssinatura,
+    filterLogin,
+    filterCreatedFrom,
+    filterCreatedTo,
+    filterAccessFrom,
+    filterAccessTo,
+    filterPayFrom,
+    filterPayTo,
+    filterTrialEndsFrom,
+    filterTrialEndsTo,
+  ])
 
   const refreshUsuarios = useCallback(async () => {
     setLoadingUsuarios(true)
@@ -274,7 +275,24 @@ export default function AdminUsuarios() {
         return
       }
       const u = JSON.parse(userSaved)
-      const qs = buildUsuariosQuery(page, PAGE_SIZE, userFilterDebounced, filterRole, filterConta)
+      const qs = buildUsuariosAdminQuery({
+        page,
+        pageSize: PAGE_SIZE,
+        q: userFilterDebounced,
+        role: filterRole,
+        conta: filterConta,
+        sort: filterSort,
+        assinatura: filterAssinatura,
+        login: filterLogin,
+        createdFrom: filterCreatedFrom,
+        createdTo: filterCreatedTo,
+        accessFrom: filterAccessFrom,
+        accessTo: filterAccessTo,
+        payFrom: filterPayFrom,
+        payTo: filterPayTo,
+        trialEndsFrom: filterTrialEndsFrom,
+        trialEndsTo: filterTrialEndsTo,
+      })
       const res = await fetch(apiUrl(`/api/admin/usuarios?${qs}`), { headers: { 'x-user-id': u.id } })
       const data = await res.json().catch(() => ({}))
       if (res.ok && data && Array.isArray(data.items)) {
@@ -293,7 +311,23 @@ export default function AdminUsuarios() {
     } finally {
       setLoadingUsuarios(false)
     }
-  }, [page, userFilterDebounced, filterRole, filterConta])
+  }, [
+    page,
+    userFilterDebounced,
+    filterRole,
+    filterConta,
+    filterSort,
+    filterAssinatura,
+    filterLogin,
+    filterCreatedFrom,
+    filterCreatedTo,
+    filterAccessFrom,
+    filterAccessTo,
+    filterPayFrom,
+    filterPayTo,
+    filterTrialEndsFrom,
+    filterTrialEndsTo,
+  ])
 
   useEffect(() => {
     void refreshUsuarios()
@@ -313,6 +347,17 @@ export default function AdminUsuarios() {
     setUserFilter('')
     setFilterRole('')
     setFilterConta('')
+    setFilterSort('email_asc')
+    setFilterAssinatura('')
+    setFilterLogin('')
+    setFilterCreatedFrom('')
+    setFilterCreatedTo('')
+    setFilterAccessFrom('')
+    setFilterAccessTo('')
+    setFilterPayFrom('')
+    setFilterPayTo('')
+    setFilterTrialEndsFrom('')
+    setFilterTrialEndsTo('')
   }
 
   const loadAudit = useCallback(async () => {
@@ -342,12 +387,29 @@ export default function AdminUsuarios() {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
       const u = JSON.parse(userSaved)
-      const qs = buildUsuariosQuery(1, 5000, userFilterDebounced, filterRole, filterConta)
+      const qs = buildUsuariosAdminQuery({
+        page: 1,
+        pageSize: 5000,
+        q: userFilterDebounced,
+        role: filterRole,
+        conta: filterConta,
+        sort: filterSort,
+        assinatura: filterAssinatura,
+        login: filterLogin,
+        createdFrom: filterCreatedFrom,
+        createdTo: filterCreatedTo,
+        accessFrom: filterAccessFrom,
+        accessTo: filterAccessTo,
+        payFrom: filterPayFrom,
+        payTo: filterPayTo,
+        trialEndsFrom: filterTrialEndsFrom,
+        trialEndsTo: filterTrialEndsTo,
+      })
       const res = await fetch(apiUrl(`/api/admin/usuarios?${qs}`), { headers: { 'x-user-id': u.id } })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.message || 'Falha ao exportar.')
       const items = Array.isArray(data.items) ? data.items : []
-      const csv = rowsToCsv(items)
+      const csv = rowsToUsersAdminCsv(items)
       const bom = '\uFEFF'
       downloadTextFile(`horizonte-usuarios-${new Date().toISOString().slice(0, 10)}.csv`, bom + csv)
       setUserActionMessage(`CSV com ${items.length} linha(s) gerado.`)
@@ -480,6 +542,32 @@ export default function AdminUsuarios() {
     }
   }
 
+  const handleDetailToggleActive = async () => {
+    if (!detailUser || isSuperAdminEmail(detailUser.email)) return
+    const currentlyActive = detailUser.is_active !== false
+    const nextActive = !currentlyActive
+    if (currentlyActive && !window.confirm('Desativar esta conta? O usuário não conseguirá fazer login.')) {
+      return
+    }
+    try {
+      const userSaved = localStorage.getItem('horizonte_user')
+      if (!userSaved) throw new Error('Sessão expirada.')
+      const u = JSON.parse(userSaved)
+      const res = await fetch(apiUrl(`/api/admin/usuarios/${detailUser.id}`), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': u.id },
+        body: JSON.stringify({ is_active: nextActive }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Falha ao atualizar conta.')
+      setDetailUser({ ...detailUser, is_active: nextActive })
+      setUserActionMessage(nextActive ? 'Conta reativada.' : 'Conta desativada.')
+      void refreshUsuarios()
+    } catch (e) {
+      setUserActionMessage(e.message || 'Erro ao atualizar.')
+    }
+  }
+
   const getUserConnectionBadge = (user) => {
     const baseStyle = {
       padding: '4px 8px',
@@ -515,7 +603,7 @@ export default function AdminUsuarios() {
                   <span className="ref-dashboard-greeting__name">Usuários</span>
                 </h1>
                 <p className="ref-panel__subtitle page-admin-header-sub">
-                  Último login, papéis e gestão de contas
+                  Cadastros, acessos, assinaturas e acompanhamento financeiro
                 </p>
               </div>
             </header>
@@ -530,7 +618,7 @@ export default function AdminUsuarios() {
                     Cadastros e acessos
                   </h2>
                   <p className="ref-panel__subtitle page-admin-usuarios-intro">
-                    Filtre por texto, papel e status da conta. Apenas o administrador principal pode promover alguém a Admin. Edite linhas, redefina senha ou exclua contas (exceto a administradora principal).
+                    Filtre por cadastro, acesso, assinatura e receita. Apenas o administrador principal pode promover alguém a Admin. Edite linhas, redefina senha ou exclua contas (exceto a administradora principal).
                   </p>
                 </div>
                 <div className="page-admin-usuarios-head-actions">
@@ -552,36 +640,92 @@ export default function AdminUsuarios() {
               {userActionMessage ? <div className="page-admin-toast-msg">{userActionMessage}</div> : null}
 
               {stats && !loadError ? (
-                <section className="ref-kpi-row page-admin-kpi-row" aria-label="Indicadores do cadastro">
-                  <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
-                    <div className="ref-kpi-card__body">
-                      <p className="ref-kpi-card__label">Cadastros</p>
-                      <p className="ref-kpi-card__value">{stats.total}</p>
-                      <p className="page-admin-kpi-sub">Total no sistema</p>
+                <>
+                  <section className="ref-kpi-row page-admin-kpi-row page-admin-usuarios-kpis" aria-label="Indicadores do cadastro">
+                    <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
+                      <div className="ref-kpi-card__body">
+                        <p className="ref-kpi-card__label">Cadastros</p>
+                        <p className="ref-kpi-card__value">{stats.total}</p>
+                        <p className="page-admin-kpi-sub">Total no sistema</p>
+                      </div>
+                    </article>
+                    <article className="ref-kpi-card ref-kpi-card--income">
+                      <div className="ref-kpi-card__body">
+                        <p className="ref-kpi-card__label">Contas ativas</p>
+                        <p className="ref-kpi-card__value">{stats.ativos}</p>
+                        <p className="page-admin-kpi-sub">Podem acessar o app</p>
+                      </div>
+                    </article>
+                    <article className="ref-kpi-card ref-kpi-card--expense">
+                      <div className="ref-kpi-card__body">
+                        <p className="ref-kpi-card__label">Admins</p>
+                        <p className="ref-kpi-card__value">{stats.admins}</p>
+                        <p className="page-admin-kpi-sub">Papel Admin no banco</p>
+                      </div>
+                    </article>
+                    <article className="ref-kpi-card ref-kpi-card--balance">
+                      <div className="ref-kpi-card__body">
+                        <p className="ref-kpi-card__label">Trial ativo</p>
+                        <p className="ref-kpi-card__value">{stats.trial_ativos}</p>
+                        <p className="page-admin-kpi-sub">Teste vigente (data futura)</p>
+                      </div>
+                    </article>
+                  </section>
+                  <section className="ref-kpi-row page-admin-kpi-row page-admin-usuarios-kpis page-admin-usuarios-kpis--finance" aria-label="Indicadores financeiros">
+                    <article className="ref-kpi-card ref-kpi-card--income">
+                      <div className="ref-kpi-card__body">
+                        <p className="ref-kpi-card__label">Assinaturas pagas</p>
+                        <p className="ref-kpi-card__value">{stats.assinaturas_pagas ?? '—'}</p>
+                        <p className="page-admin-kpi-sub">Usuários com pagamento aprovado</p>
+                      </div>
+                    </article>
+                    <article className="ref-kpi-card ref-kpi-card--income ref-kpi-card--hero">
+                      <div className="ref-kpi-card__body">
+                        <p className="ref-kpi-card__label">Ganho acumulado</p>
+                        <p className="ref-kpi-card__value">{formatCurrencyBRL(stats.ganho_acumulado_total ?? 0)}</p>
+                        <p className="page-admin-kpi-sub">Soma de pagamentos aprovados (MP)</p>
+                      </div>
+                    </article>
+                    <article className="ref-kpi-card ref-kpi-card--balance">
+                      <div className="ref-kpi-card__body">
+                        <p className="ref-kpi-card__label">Receita mensal</p>
+                        <p className="ref-kpi-card__value">{formatCurrencyBRL(stats.receita_mensal_total ?? 0)}</p>
+                        <p className="page-admin-kpi-sub">Aprovados no mês (UTC)</p>
+                      </div>
+                    </article>
+                    <article className="ref-kpi-card ref-kpi-card--expense">
+                      <div className="ref-kpi-card__body">
+                        <p className="ref-kpi-card__label">Próximo pagamento</p>
+                        <p className="ref-kpi-card__value page-admin-usuarios-kpi-sm">{formatDateTimePtBr(stats.proximo_pagamento)}</p>
+                        <p className="page-admin-kpi-sub">Menor data futura de cobrança</p>
+                      </div>
+                    </article>
+                    <article className="ref-kpi-card ref-kpi-card--expense">
+                      <div className="ref-kpi-card__body">
+                        <p className="ref-kpi-card__label">Próximo vencimento</p>
+                        <p className="ref-kpi-card__value page-admin-usuarios-kpi-sm">{formatDatePtBr(stats.proximo_vencimento)}</p>
+                        <p className="page-admin-kpi-sub">Trial ou cobrança (o que ocorrer antes)</p>
+                      </div>
+                    </article>
+                    <article className="ref-kpi-card ref-kpi-card--balance">
+                      <div className="ref-kpi-card__body">
+                        <p className="ref-kpi-card__label">Sem login recente</p>
+                        <p className="ref-kpi-card__value">{stats.contas_sem_login_recente ?? '—'}</p>
+                        <p className="page-admin-kpi-sub">Ativos sem acesso há 30 dias</p>
+                      </div>
+                    </article>
+                  </section>
+                  <section className="page-admin-usuarios-insights" aria-label="Insights">
+                    <div className="page-admin-usuarios-insight-card">
+                      <span className="page-admin-usuarios-insight-k">Trials vencidos (conta ativa)</span>
+                      <span className="page-admin-usuarios-insight-v">{stats.trials_vencidos_conta ?? '—'}</span>
                     </div>
-                  </article>
-                  <article className="ref-kpi-card ref-kpi-card--income">
-                    <div className="ref-kpi-card__body">
-                      <p className="ref-kpi-card__label">Contas ativas</p>
-                      <p className="ref-kpi-card__value">{stats.ativos}</p>
-                      <p className="page-admin-kpi-sub">Podem acessar o app</p>
+                    <div className="page-admin-usuarios-insight-card">
+                      <span className="page-admin-usuarios-insight-k">Ticket médio / usuário pagante</span>
+                      <span className="page-admin-usuarios-insight-v">{formatCurrencyBRL(stats.ticket_medio_usuario ?? 0)}</span>
                     </div>
-                  </article>
-                  <article className="ref-kpi-card ref-kpi-card--expense">
-                    <div className="ref-kpi-card__body">
-                      <p className="ref-kpi-card__label">Admins</p>
-                      <p className="ref-kpi-card__value">{stats.admins}</p>
-                      <p className="page-admin-kpi-sub">Papel Admin no banco</p>
-                    </div>
-                  </article>
-                  <article className="ref-kpi-card ref-kpi-card--balance">
-                    <div className="ref-kpi-card__body">
-                      <p className="ref-kpi-card__label">Trial ativo</p>
-                      <p className="ref-kpi-card__value">{stats.trial_ativos}</p>
-                      <p className="page-admin-kpi-sub">Teste vigente (data futura)</p>
-                    </div>
-                  </article>
-                </section>
+                  </section>
+                </>
               ) : null}
 
               <div className="page-admin-users-toolbar page-admin-users-toolbar--grid">
@@ -624,6 +768,44 @@ export default function AdminUsuarios() {
                     <option value="inativo">Desativada</option>
                   </select>
                 </label>
+                <label className="page-admin-filter-label">
+                  <span>Ordenar</span>
+                  <select className="page-admin-filter-select" value={filterSort} onChange={(e) => setFilterSort(e.target.value)}>
+                    <option value="email_asc">E-mail A–Z</option>
+                    <option value="email_desc">E-mail Z–A</option>
+                    <option value="nome_asc">Nome A–Z</option>
+                    <option value="nome_desc">Nome Z–A</option>
+                    <option value="last_login_desc">Último acesso ↓</option>
+                    <option value="last_login_asc">Último acesso ↑</option>
+                    <option value="trial_asc">Venc. trial ↑</option>
+                    <option value="trial_desc">Venc. trial ↓</option>
+                    <option value="next_pay_asc">Próx. cobrança ↑</option>
+                    <option value="next_pay_desc">Próx. cobrança ↓</option>
+                    <option value="revenue_desc">Ganho acumulado ↓</option>
+                    <option value="revenue_asc">Ganho acumulado ↑</option>
+                    <option value="created_desc">Cadastro ↓</option>
+                    <option value="created_asc">Cadastro ↑</option>
+                  </select>
+                </label>
+                <label className="page-admin-filter-label">
+                  <span>Assinatura</span>
+                  <select className="page-admin-filter-select" value={filterAssinatura} onChange={(e) => setFilterAssinatura(e.target.value)}>
+                    <option value="">Todas</option>
+                    <option value="pago">Com pagamento aprovado</option>
+                    <option value="nao_pago">Sem pagamento aprovado</option>
+                    <option value="trial">Em trial</option>
+                    <option value="isento">Isentos</option>
+                    <option value="inadimplente">Inadimplentes (trial vencido)</option>
+                  </select>
+                </label>
+                <label className="page-admin-filter-label">
+                  <span>Acesso</span>
+                  <select className="page-admin-filter-select" value={filterLogin} onChange={(e) => setFilterLogin(e.target.value)}>
+                    <option value="">Qualquer</option>
+                    <option value="nunca">Nunca acessou</option>
+                    <option value="stale">Sem login há 30 dias</option>
+                  </select>
+                </label>
                 <div className="page-admin-toolbar-btns">
                   <button type="button" className="btn-secondary page-admin-toolbar-btn" disabled={loadingUsuarios} onClick={() => void refreshUsuarios()}>
                     {loadingUsuarios ? 'Atualizando…' : 'Atualizar lista'}
@@ -639,6 +821,64 @@ export default function AdminUsuarios() {
                   <button type="button" className="btn-secondary page-admin-toolbar-btn" onClick={clearFilters}>
                     Limpar filtros
                   </button>
+                </div>
+              </div>
+
+              <div className="page-admin-usuarios-adv-filters">
+                <p className="page-admin-usuarios-adv-title">Períodos e datas</p>
+                <div className="page-admin-usuarios-adv-grid">
+                  <label className="page-admin-filter-label">
+                    <span>Cadastro de</span>
+                    <input
+                      type="date"
+                      className="page-admin-filter-input"
+                      value={filterCreatedFrom}
+                      onChange={(e) => setFilterCreatedFrom(e.target.value)}
+                    />
+                  </label>
+                  <label className="page-admin-filter-label">
+                    <span>até</span>
+                    <input type="date" className="page-admin-filter-input" value={filterCreatedTo} onChange={(e) => setFilterCreatedTo(e.target.value)} />
+                  </label>
+                  <label className="page-admin-filter-label">
+                    <span>Último acesso de</span>
+                    <input
+                      type="date"
+                      className="page-admin-filter-input"
+                      value={filterAccessFrom}
+                      onChange={(e) => setFilterAccessFrom(e.target.value)}
+                    />
+                  </label>
+                  <label className="page-admin-filter-label">
+                    <span>até</span>
+                    <input type="date" className="page-admin-filter-input" value={filterAccessTo} onChange={(e) => setFilterAccessTo(e.target.value)} />
+                  </label>
+                  <label className="page-admin-filter-label">
+                    <span>Próx. cobrança de</span>
+                    <input type="date" className="page-admin-filter-input" value={filterPayFrom} onChange={(e) => setFilterPayFrom(e.target.value)} />
+                  </label>
+                  <label className="page-admin-filter-label">
+                    <span>até</span>
+                    <input type="date" className="page-admin-filter-input" value={filterPayTo} onChange={(e) => setFilterPayTo(e.target.value)} />
+                  </label>
+                  <label className="page-admin-filter-label">
+                    <span>Fim do trial de</span>
+                    <input
+                      type="date"
+                      className="page-admin-filter-input"
+                      value={filterTrialEndsFrom}
+                      onChange={(e) => setFilterTrialEndsFrom(e.target.value)}
+                    />
+                  </label>
+                  <label className="page-admin-filter-label">
+                    <span>até</span>
+                    <input
+                      type="date"
+                      className="page-admin-filter-input"
+                      value={filterTrialEndsTo}
+                      onChange={(e) => setFilterTrialEndsTo(e.target.value)}
+                    />
+                  </label>
                 </div>
               </div>
 
@@ -668,15 +908,21 @@ export default function AdminUsuarios() {
                     </button>
                   </div>
                 ) : (
-                  <table className="admin-usuarios-table">
+                  <>
+                  <table className="admin-usuarios-table admin-usuarios-table--enhanced admin-usuarios-table--desktop">
                     <thead>
                       <tr>
                         <th className="cell-nome">Nome</th>
                         <th className="cell-email">E-mail</th>
-                        <th className="cell-fone">Telefone</th>
+                        <th className="cell-fone page-admin-usuarios-col--md">Telefone</th>
                         <th>Papel</th>
                         <th>Conta</th>
+                        <th className="cell-status-fin">Status</th>
                         <th className="cell-assinatura">Assinatura / pagamento</th>
+                        <th className="page-admin-usuarios-col--sm">Venc. trial</th>
+                        <th className="page-admin-usuarios-col--sm">Próx. cobr.</th>
+                        <th className="page-admin-usuarios-col--num">Ganho</th>
+                        <th className="page-admin-usuarios-col--num page-admin-usuarios-col--md">Mês</th>
                         <th className="cell-acesso">Último acesso</th>
                         <th className="cell-acoes">Ações</th>
                       </tr>
@@ -686,7 +932,7 @@ export default function AdminUsuarios() {
                         const isEditing = editingUserId === row.id
                         const isPrincipal = isSuperAdminEmail(row.email)
                         return (
-                          <tr key={row.id}>
+                          <tr key={row.id} className={row.isOverdue ? 'admin-usuarios-tr--alert' : undefined}>
                             <td className="cell-nome">
                               {isEditing ? (
                                 <input
@@ -777,6 +1023,12 @@ export default function AdminUsuarios() {
                                 <span className="admin-badge-conta admin-badge-conta--on">Ativo</span>
                               )}
                             </td>
+                            <td className="cell-status-fin">
+                              <UserAdminStatusBadge paymentStatus={row.paymentStatus} isOverdue={row.isOverdue} />
+                              {row.daysToExpire != null && row.daysToExpire >= 0 ? (
+                                <div className="admin-subline">{row.daysToExpire} d</div>
+                              ) : null}
+                            </td>
                             <td className="cell-assinatura">
                               <AssinaturaPagamentoCell
                                 row={row}
@@ -785,6 +1037,10 @@ export default function AdminUsuarios() {
                                 onField={handleChangeField}
                               />
                             </td>
+                            <td className="page-admin-usuarios-col--sm">{formatDatePtBr(row.trial_ends_at)}</td>
+                            <td className="page-admin-usuarios-col--sm">{formatDateTimePtBr(row.nextPaymentDate)}</td>
+                            <td className="page-admin-usuarios-col--num">{formatCurrencyBRL(row.accumulatedRevenue)}</td>
+                            <td className="page-admin-usuarios-col--num">{formatCurrencyBRL(row.monthlyRevenue)}</td>
                             <td className="cell-acesso">
                               <UltimoAcessoCell row={row} getUserConnectionBadge={getUserConnectionBadge} />
                             </td>
@@ -802,9 +1058,14 @@ export default function AdminUsuarios() {
                                       </button>
                                     </>
                                   ) : (
-                                    <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleEditUser(row)}>
-                                      Editar
-                                    </button>
+                                    <>
+                                      <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => setDetailUser(row)}>
+                                        Detalhes
+                                      </button>
+                                      <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleEditUser(row)}>
+                                        Editar
+                                      </button>
+                                    </>
                                   )}
                                   <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleResetPassword(row)}>
                                     Senha
@@ -831,9 +1092,14 @@ export default function AdminUsuarios() {
                                     </button>
                                   </>
                                 ) : (
-                                  <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleEditUser(row)}>
-                                    Editar
-                                  </button>
+                                  <>
+                                    <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => setDetailUser(row)}>
+                                      Detalhes
+                                    </button>
+                                    <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleEditUser(row)}>
+                                      Editar
+                                    </button>
+                                  </>
                                 )}
                                 <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleResetPassword(row)}>
                                   Senha
@@ -857,6 +1123,61 @@ export default function AdminUsuarios() {
                       })}
                     </tbody>
                   </table>
+                  <ul className="page-admin-usuarios-mobile-list" aria-label="Lista de usuários">
+                    {pageRows.map((row) => {
+                      const isPrincipal = isSuperAdminEmail(row.email)
+                      return (
+                        <li key={row.id}>
+                          <button type="button" className="page-admin-usuarios-mobile-card" onClick={() => setDetailUser(row)}>
+                            <div className="page-admin-usuarios-mobile-top">
+                              <span className="page-admin-usuarios-mobile-name">{row.nome || row.email || '—'}</span>
+                              <UserAdminStatusBadge paymentStatus={row.paymentStatus} isOverdue={row.isOverdue} />
+                            </div>
+                            <p className="page-admin-usuarios-mobile-email">{row.email}</p>
+                            <div className="page-admin-usuarios-mobile-row">
+                              <span>{formatCurrencyBRL(row.accumulatedRevenue)}</span>
+                              <span className="page-admin-usuarios-mobile-muted">{formatDateTimePtBr(row.last_login_at)}</span>
+                            </div>
+                            <div className="page-admin-usuarios-mobile-actions">
+                              <button
+                                type="button"
+                                className="btn-secondary"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setDetailUser(row)
+                                }}
+                              >
+                                Detalhes
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-secondary"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleEditUser(row)
+                                }}
+                              >
+                                Editar
+                              </button>
+                              {!isPrincipal ? (
+                                <button
+                                  type="button"
+                                  className="btn-secondary"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleResetPassword(row)
+                                  }}
+                                >
+                                  Senha
+                                </button>
+                              ) : null}
+                            </div>
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                  </>
                 )}
               </div>
 
@@ -889,6 +1210,83 @@ export default function AdminUsuarios() {
                     </button>
                   </div>
                 </nav>
+              ) : null}
+
+              {detailUser ? (
+                <div
+                  className="modal-backdrop page-admin-payment-logs-modal-backdrop"
+                  onClick={() => setDetailUser(null)}
+                  role="presentation"
+                >
+                  <div
+                    className="modal-content page-admin-payment-logs-modal page-admin-usuarios-detail-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="user-detail-title"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="page-admin-payment-logs-modal__head">
+                      <h3 id="user-detail-title">Detalhes do usuário</h3>
+                      <button type="button" className="page-admin-payment-logs-modal__close" onClick={() => setDetailUser(null)} aria-label="Fechar">
+                        ×
+                      </button>
+                    </div>
+                    <div className="page-admin-payment-logs-modal__body">
+                      <dl className="page-admin-payment-logs-detail-dl">
+                        <dt>Nome</dt>
+                        <dd>{detailUser.nome || '—'}</dd>
+                        <dt>E-mail</dt>
+                        <dd>{detailUser.email || '—'}</dd>
+                        <dt>Telefone</dt>
+                        <dd>{formatPhoneBRDisplay(detailUser.telefone)}</dd>
+                        <dt>Papel</dt>
+                        <dd>{roleDisplayLabel(isSuperAdminEmail(detailUser.email) ? 'ADMIN' : detailUser.role)}</dd>
+                        <dt>Conta</dt>
+                        <dd>{detailUser.is_active === false ? 'Desativada' : 'Ativa'}</dd>
+                        <dt>Status financeiro</dt>
+                        <dd>
+                          <UserAdminStatusBadge paymentStatus={detailUser.paymentStatus} isOverdue={detailUser.isOverdue} />
+                        </dd>
+                        <dt>Assinatura MP</dt>
+                        <dd>{detailUser.subscriptionStatus || '—'}</dd>
+                        <dt>Ganho acumulado</dt>
+                        <dd>{formatCurrencyBRL(detailUser.accumulatedRevenue)}</dd>
+                        <dt>Receita no mês</dt>
+                        <dd>{formatCurrencyBRL(detailUser.monthlyRevenue)}</dd>
+                        <dt>Último pagamento</dt>
+                        <dd>{formatDateTimePtBr(detailUser.lastPaymentDate || detailUser.mp_ultimo_em)}</dd>
+                        <dt>Próxima cobrança</dt>
+                        <dd>{formatDateTimePtBr(detailUser.nextPaymentDate)}</dd>
+                        <dt>Fim do trial</dt>
+                        <dd>{formatDateTimePtBr(detailUser.trial_ends_at)}</dd>
+                        <dt>Último acesso</dt>
+                        <dd>{formatDateTimePtBr(detailUser.last_login_at)}</dd>
+                        <dt>Cadastro</dt>
+                        <dd>{formatDateTimePtBr(detailUser.created_at)}</dd>
+                      </dl>
+                      <div className="page-admin-usuarios-detail-actions">
+                        <button
+                          type="button"
+                          className="btn-secondary"
+                          onClick={() => {
+                            handleEditUser(detailUser)
+                            setDetailUser(null)
+                          }}
+                        >
+                          Editar
+                        </button>
+                        <button type="button" className="btn-secondary" onClick={() => void handleResetPassword(detailUser)}>
+                          Redefinir senha
+                        </button>
+                        {!isSuperAdminEmail(detailUser.email) ? (
+                          <button type="button" className="btn-secondary" onClick={() => void handleDetailToggleActive()}>
+                            {detailUser.is_active === false ? 'Reativar conta' : 'Suspender conta'}
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ) : null}
 
               <details className="page-admin-audit-block" onToggle={(e) => setAuditOpen(e.target.open)}>
