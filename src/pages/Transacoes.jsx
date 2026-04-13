@@ -293,9 +293,6 @@ export default function Transacoes() {
                 <span className="ref-panel__title" role="heading" aria-level={2}>
                   Filtros
                 </span>
-                <span className="ref-panel__subtitle page-transacoes-filters-toggle__sub">
-                  Busca, tipo de lançamento, categoria e período
-                </span>
               </span>
               <svg
                 className={`page-transacoes-filters-toggle__chevron ${filtrosAbertos ? 'page-transacoes-filters-toggle__chevron--open' : ''}`}

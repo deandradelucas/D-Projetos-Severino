@@ -366,47 +366,40 @@ export default function Relatorios() {
 
         <article
           className={`ref-panel page-relatorios-ref-filters ${filtrosAbertos ? '' : 'page-relatorios-ref-filters--collapsed'}`}
-          aria-label="Período e categoria"
+          aria-label="Filtros"
         >
           <div className="ref-panel__head page-relatorios-filters-head">
-            <div className="page-relatorios-filters-head__primary">
-              <button
-                type="button"
-                className="page-relatorios-filters-toggle"
-                id="relatorio-filtros-trigger"
-                aria-expanded={filtrosAbertos}
-                aria-controls="relatorio-filtros-fields"
-                onClick={() => setFiltrosAbertos((open) => !open)}
-              >
-                <span className="page-relatorios-filters-toggle__lead">
-                  <span className="ref-panel__title" role="heading" aria-level={2}>
-                    Filtros do relatório
-                  </span>
-                  <span className="ref-panel__subtitle page-relatorios-filters-toggle__sub">
-                    Período e categoria · apenas transações efetivadas
-                  </span>
+            <button
+              type="button"
+              className="page-relatorios-filters-toggle"
+              id="relatorio-filtros-trigger"
+              aria-expanded={filtrosAbertos}
+              aria-controls="relatorio-filtros-fields"
+              onClick={() => setFiltrosAbertos((open) => !open)}
+            >
+              <span className="page-relatorios-filters-toggle__lead">
+                <span className="ref-panel__title" role="heading" aria-level={2}>
+                  Filtros
                 </span>
-                <svg
-                  className={`page-relatorios-filters-toggle__chevron ${filtrosAbertos ? 'page-relatorios-filters-toggle__chevron--open' : ''}`}
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </button>
-            </div>
-            <div className="page-relatorios-filters-head__secondary">
-              <button type="button" className="ref-panel__link ref-panel__link--button" onClick={clearRelatorioFilters}>
-                Limpar filtros
-              </button>
-            </div>
+              </span>
+              <svg
+                className={`page-relatorios-filters-toggle__chevron ${filtrosAbertos ? 'page-relatorios-filters-toggle__chevron--open' : ''}`}
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+            <button type="button" className="ref-panel__link ref-panel__link--button" onClick={clearRelatorioFilters}>
+              Limpar filtros
+            </button>
           </div>
           <div
             id="relatorio-filtros-fields"

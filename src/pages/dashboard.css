@@ -1046,24 +1046,39 @@ h3 {
     flex-shrink: 0;
   }
 
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label {
+    text-align: center;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
+    justify-content: center;
+  }
+
   /* Por cima de .nav-item { white-space: nowrap } e de regras do tema escuro */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
     white-space: normal;
     align-items: center;
+    justify-content: center;
     height: auto;
     min-height: 52px;
-    font-size: 16px;
+    font-size: 17px;
     padding-top: 14px;
     padding-bottom: 14px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
+    flex: 0 1 auto;
+    text-align: center;
     white-space: normal;
-    word-break: break-word;
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: manual;
     line-height: 1.35;
-    font-size: 16px;
+    font-size: 17px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap,
@@ -1090,9 +1105,10 @@ h3 {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
     min-height: 52px;
-    font-size: 16px;
+    font-size: 17px;
     padding-top: 14px;
     padding-bottom: 14px;
+    justify-content: center;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn svg,
@@ -3505,34 +3521,20 @@ body[data-theme='light'] .form-group--recorrencia-on label.modal-recorrencia-tog
   gap: 10px;
 }
 
-/* Relatórios: cabeçalho — linha estável (título/chevron + Limpar), sem conflito com .ref-panel__head */
+/* Relatórios: mesmo padrão que Transações — cabeça do painel = uma linha (toggle flexível + Limpar) */
 .page-relatorios.app-horizon-shell .page-relatorios-filters-head {
-  display: flex !important;
-  flex-direction: row;
+  display: flex;
   flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px 16px;
+  gap: 10px;
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
 }
 
-.page-relatorios.app-horizon-shell .page-relatorios-filters-head__primary {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.page-relatorios.app-horizon-shell .page-relatorios-filters-head__secondary {
+.page-relatorios.app-horizon-shell .page-relatorios-filters-head > .ref-panel__link--button {
   flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-}
-
-.page-relatorios.app-horizon-shell .page-relatorios-filters-toggle {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-filters-toggle,
@@ -3972,19 +3974,15 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
   box-sizing: border-box;
 }
 
+/* Estreito: garante uma linha (igual Transações) */
 @media (max-width: 480px) {
   .page-relatorios.app-horizon-shell .page-relatorios-filters-head {
-    flex-wrap: wrap;
-    align-items: flex-start;
+    flex-wrap: nowrap;
+    align-items: center;
   }
 
-  .page-relatorios.app-horizon-shell .page-relatorios-filters-head__primary {
-    flex: 1 1 100%;
-  }
-
-  .page-relatorios.app-horizon-shell .page-relatorios-filters-head__secondary {
-    width: 100%;
-    justify-content: flex-end;
+  .page-relatorios.app-horizon-shell .page-relatorios-filters-head > .ref-panel__link--button {
+    white-space: nowrap;
   }
 }
 
@@ -8807,11 +8805,11 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
     flex: none;
     display: block;
     min-width: 0;
-    width: auto;
-    max-width: min(260px, 88%);
-    height: 56px;
-    min-height: 56px;
-    max-height: 64px;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
     margin: 0 auto;
     object-fit: contain;
     object-position: center center;

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
@@ -22,7 +22,14 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     if (menuAberto) prefetchAppNavChunksNow()
   }, [menuAberto])
 
-  const logoSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
+  const svgSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
+  const pngSrc = theme === 'light' ? BRAND_ASSETS.logoOnLightPng : BRAND_ASSETS.logoOnDarkPng
+  const [logoSrc, setLogoSrc] = useState(pngSrc)
+
+  useEffect(() => {
+    setLogoSrc(pngSrc)
+  }, [pngSrc])
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -40,6 +47,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             width={1600}
             height={360}
             decoding="sync"
+            onError={() => setLogoSrc(svgSrc)}
           />
           <span className="brand-wordmark" aria-hidden>
             HORIZONTE
