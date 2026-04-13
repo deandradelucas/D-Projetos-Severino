@@ -260,7 +260,7 @@ h3 {
 }
 
 @media (max-width: 768px) {
-  .page-pagamento .ref-dashboard-header {
+  .dashboard-container.page-pagamento:not(.app-horizon-shell) .ref-dashboard-header {
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
@@ -3846,6 +3846,18 @@ body[data-theme='light'] .form-group--recorrencia-on label.modal-recorrencia-tog
   flex: 1 1 auto;
 }
 
+/* Cabeçalho colado ao topo da área rolável (container / <main>) até o fim do conteúdo */
+.page-transacoes.app-horizon-shell .ref-dashboard-inner > .ref-dashboard-header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  box-sizing: border-box;
+  align-self: stretch;
+  isolation: isolate;
+}
+
 /* Agenda (shell): mesma coluna central */
 .page-agenda.app-horizon-shell .ref-dashboard-inner {
   width: 100%;
@@ -4494,6 +4506,16 @@ body[data-theme='light'] .relatorios-kpi-saldo--neg {
   .page-relatorios .relatorios-header-export .relatorios-btn-export {
     flex: 1;
     justify-content: center;
+  }
+
+  /* Shell: mantém exportações na mesma linha do título (ícones; texto .desktop-only oculto) */
+  .page-relatorios.app-horizon-shell .relatorios-header-export {
+    width: auto;
+    flex-wrap: nowrap;
+  }
+
+  .page-relatorios.app-horizon-shell .relatorios-header-export .relatorios-btn-export {
+    flex: 0 0 auto;
   }
 
   .page-relatorios .relatorios-chart-card--wide {
@@ -6216,6 +6238,8 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-dashboard-heade
   flex-wrap: nowrap;
   row-gap: 0;
   align-items: center;
+  /* overflow:hidden no .ref-dashboard-header global quebra sticky em alguns engines */
+  overflow: visible;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-dashboard-header__lead {
@@ -6228,6 +6252,44 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-dashboard-heade
   flex-basis: auto;
   margin-left: auto;
   flex-shrink: 0;
+}
+
+/* Relatórios — uma linha: menu, título, CSV/PDF (todos os breakpoints do tema claro) */
+body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-dashboard-header {
+  flex-wrap: nowrap;
+  row-gap: 0;
+  align-items: center;
+  overflow: visible;
+}
+
+body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-dashboard-header__lead {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-dashboard-header__actions {
+  width: auto;
+  flex-basis: auto;
+  margin-left: auto;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+
+body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-header-export {
+  flex-wrap: nowrap;
+}
+
+/* Pagamento — menu + título + subtítulo; overflow visível para sticky */
+body[data-theme='light'] .page-pagamento.app-horizon-shell .ref-dashboard-header {
+  flex-wrap: nowrap;
+  row-gap: 0;
+  align-items: center;
+  overflow: visible;
+}
+
+body[data-theme='light'] .page-pagamento.app-horizon-shell .ref-dashboard-header__lead {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 body[data-theme='light'] .ref-dashboard-header .mobile-menu-btn,
@@ -8297,6 +8359,60 @@ body[data-theme='light'] .ref-dashboard-inner {
     min-width: 40px;
     min-height: 40px;
   }
+
+  /* Relatórios: menu + título + CSV + PDF na mesma linha (mobile / tablet estreito) */
+  .dashboard-container.page-relatorios.app-horizon-shell .ref-dashboard-inner > .ref-dashboard-header {
+    flex-wrap: nowrap;
+    align-items: center;
+    row-gap: 0;
+    column-gap: 10px;
+  }
+
+  .dashboard-container.page-relatorios.app-horizon-shell .ref-dashboard-header__lead {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+    align-self: center;
+  }
+
+  .dashboard-container.page-relatorios.app-horizon-shell .ref-dashboard-header__actions {
+    width: auto;
+    flex-basis: auto;
+    margin-left: auto;
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-dashboard-greeting {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+  }
+
+  body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-header-export .relatorios-btn-export {
+    min-height: 40px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+
+  /* Pagamento: menu + bloco título/subtítulo na mesma linha (mobile / tablet estreito) */
+  .dashboard-container.page-pagamento.app-horizon-shell .ref-dashboard-inner > .ref-dashboard-header {
+    flex-wrap: nowrap;
+    align-items: center;
+    row-gap: 0;
+    column-gap: 10px;
+  }
+
+  .dashboard-container.page-pagamento.app-horizon-shell .ref-dashboard-header__lead {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+    align-self: center;
+  }
 }
 
 /* Com rolagem no painel: cabeçalho com fundo transparente + blur (classe no <main> via ShellStickyHeaderScroll; mobile e desktop) */
@@ -8507,6 +8623,30 @@ body[data-theme='light'] .page-admin.app-horizon-shell .main-content.ref-dashboa
   flex-direction: column;
   min-height: 0;
   flex: 1 1 auto;
+}
+
+/* Relatórios: cabeçalho sticky (mesmo padrão de Transações) */
+.page-relatorios.app-horizon-shell .ref-dashboard-inner > .ref-dashboard-header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  box-sizing: border-box;
+  align-self: stretch;
+  isolation: isolate;
+}
+
+/* Pagamento: cabeçalho sticky */
+.page-pagamento.app-horizon-shell .ref-dashboard-inner > .ref-dashboard-header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  box-sizing: border-box;
+  align-self: stretch;
+  isolation: isolate;
 }
 
 body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-panel.page-relatorios-chart-panel {
