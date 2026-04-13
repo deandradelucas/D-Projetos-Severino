@@ -1,9 +1,129 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { loadEnv } from './load-env.mjs'
+import { log } from './logger.mjs'
 import { DEFAULT_CATEGORIES } from './transacoes.mjs'
 
-const GEMINI_MODEL = 'gemini-2.5-flash'
+/**
+ * Modelos na ordem de tentativa (API Google AI).
+ * 2.0/1.5 costumam estar disponíveis em mais contas; 2.5 pode falhar em chaves/regiões antigas.
+ */
+const GEMINI_MODEL_FALLBACKS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash']
+
+const GEMINI_MODEL = 'gemini-2.0-flash'
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`
+
+/** POST generateContent com autenticação recomendada pela Google (`x-goog-api-key`, sem `?key=`). */
+async function geminiPostGenerateContent(modelId, apiKey, body) {
+  const id = encodeURIComponent(String(modelId || GEMINI_MODEL).trim() || GEMINI_MODEL)
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${id}:generateContent`
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': String(apiKey).trim(),
+    },
+    body: JSON.stringify(body),
+  })
+}
+
+function resolveGeminiModelCandidates() {
+  const envModel = process.env.GEMINI_MODEL?.trim()
+  const list = [envModel, ...GEMINI_MODEL_FALLBACKS].filter(Boolean)
+  return [...new Set(list)]
+}
+
+/**
+ * Monta `contents` válidos para o Gemini (roles user|model, texto não vazio).
+ * Junta mensagens consecutivas do mesmo papel e garante que a conversa comece em `user`.
+ */
+function buildGeminiContents(historico, message) {
+  const msg = String(message || '').trim()
+  const turns = []
+  for (const raw of Array.isArray(historico) ? historico.slice(-10) : []) {
+    let role = raw?.role
+    if (role === 'assistant') role = 'model'
+    if (role !== 'user' && role !== 'model') continue
+    const text = String(raw?.text ?? '').trim()
+    if (!text) continue
+    turns.push({ role, text })
+  }
+  if (msg) turns.push({ role: 'user', text: msg })
+
+  const merged = []
+  for (const t of turns) {
+    const prev = merged[merged.length - 1]
+    if (prev && prev.role === t.role) {
+      prev.text = `${prev.text}\n${t.text}`.trim()
+    } else {
+      merged.push({ role: t.role, text: t.text })
+    }
+  }
+
+  while (merged.length > 0 && merged[0].role === 'model') {
+    merged.shift()
+  }
+
+  return merged.map((t) => ({ role: t.role, parts: [{ text: t.text }] }))
+}
+
+/**
+ * Extrai texto da resposta generateContent e detecta bloqueios / candidato vazio.
+ */
+function extractTextFromGeminiResponse(json) {
+  const blockReason = json?.promptFeedback?.blockReason
+  if (blockReason && blockReason !== 'BLOCK_REASON_UNSPECIFIED') {
+    return {
+      ok: false,
+      kind: 'prompt_blocked',
+      detail: String(blockReason),
+    }
+  }
+  const errMsg = json?.error?.message
+  if (errMsg && !json?.candidates?.length) {
+    return { ok: false, kind: 'api_error', detail: String(errMsg) }
+  }
+  const cand = json?.candidates?.[0]
+  if (!cand) {
+    return { ok: false, kind: 'no_candidate', detail: errMsg || 'empty_candidates' }
+  }
+  const parts = cand?.content?.parts
+  let text = ''
+  if (Array.isArray(parts)) {
+    for (const p of parts) {
+      if (p && typeof p.text === 'string') text += p.text
+    }
+  }
+  text = text.trim()
+  const fr = cand.finishReason
+  if (text) {
+    return { ok: true, text }
+  }
+  if (fr === 'SAFETY' || fr === 'BLOCKLIST' || fr === 'PROHIBITED_CONTENT') {
+    return { ok: false, kind: 'response_blocked', detail: String(fr) }
+  }
+  return { ok: false, kind: 'empty_text', detail: fr || 'no_text' }
+}
+
+/** Fallback quando `systemInstruction` não é aceite: instruções no início da 1.ª mensagem user. */
+function contentsWithSystemPrepended(systemPrompt, contents) {
+  const first = contents[0]
+  if (!first || first.role !== 'user' || !first.parts?.[0]?.text) {
+    return [
+      { role: 'user', parts: [{ text: `${systemPrompt}\n\n(sem histórico prévio)` }] },
+      ...contents,
+    ]
+  }
+  const rest = contents.slice(1)
+  const mergedFirst = {
+    role: 'user',
+    parts: [
+      {
+        text: `${systemPrompt}\n\n---\n\n${first.parts[0].text}`,
+      },
+    ],
+  }
+  return [mergedFirst, ...rest]
+}
 
 /**
  * Busca o resumo financeiro do usuário para usar como contexto da IA.
@@ -90,7 +210,12 @@ export async function askHorizon(message, usuarioId, historico = []) {
     throw new Error('GEMINI_API_KEY não configurada no .env')
   }
 
-  const contexto = await getContextoFinanceiro(usuarioId)
+  let contexto = null
+  try {
+    contexto = await getContextoFinanceiro(usuarioId)
+  } catch (e) {
+    log.warn('[askHorizon] contexto financeiro indisponível', e?.message || e)
+  }
 
   const systemPrompt = `Você é o Horizon, um assistente financeiro pessoal inteligente e amigável do aplicativo "Horizonte Financeiro".
 
@@ -106,50 +231,120 @@ Regras importantes:
 
 ${contexto ? `--- DADOS FINANCEIROS ATUAIS DO USUÁRIO ---\n${contexto}\n--- FIM DOS DADOS ---` : 'O usuário ainda não possui transações registradas. Incentive-o a começar a registrar suas finanças.'}`
 
-  // Montar histórico de conversa no formato do Gemini
-  const contents = []
-
-  for (const msg of historico.slice(-10)) { // Últimas 10 msgs por contexto
-    contents.push({
-      role: msg.role,
-      parts: [{ text: msg.text }]
-    })
+  const contents = buildGeminiContents(historico, message)
+  if (!contents.length) {
+    throw new Error('Mensagem inválida.')
   }
 
-  // Adicionar a mensagem atual
-  contents.push({
-    role: 'user',
-    parts: [{ text: message }]
-  })
+  const modelIds = resolveGeminiModelCandidates()
+  let lastError = null
 
-  const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system_instruction: {
-        parts: [{ text: systemPrompt }]
-      },
-      contents,
-      generationConfig: {
-        maxOutputTokens: 1024,
-        temperature: 0.7,
+  const generationConfig = {
+    maxOutputTokens: 1024,
+    temperature: 0.7,
+  }
+
+  /** Corpo com systemInstruction (preferido). */
+  const horizonPayloadWithSystem = {
+    systemInstruction: { parts: [{ text: systemPrompt }] },
+    contents,
+    generationConfig,
+  }
+
+  /** Corpo sem systemInstruction — compatível com mais variantes da API. */
+  const horizonPayloadMerged = {
+    contents: contentsWithSystemPrepended(systemPrompt, contents),
+    generationConfig,
+  }
+
+  for (const modelId of modelIds) {
+    const payloadsToTry = [horizonPayloadWithSystem, horizonPayloadMerged]
+
+    for (let pi = 0; pi < payloadsToTry.length; pi++) {
+      const payload = payloadsToTry[pi]
+      try {
+        const response = await geminiPostGenerateContent(modelId, apiKey, payload)
+
+        const rawBody = await response.text()
+        let json = {}
+        try {
+          json = rawBody ? JSON.parse(rawBody) : {}
+        } catch {
+          lastError = new Error(`Gemini resposta inválida (HTTP ${response.status})`)
+          if (!response.ok) {
+            log.warn('[askHorizon] JSON inválido', {
+              modelId,
+              strategy: pi === 0 ? 'systemInstruction' : 'merged_system',
+              status: response.status,
+              snippet: rawBody?.slice(0, 200),
+            })
+          }
+          break
+        }
+
+        if (!response.ok) {
+          const apiMsg = json?.error?.message || rawBody
+          lastError = new Error(`Gemini API ${response.status}: ${apiMsg}`)
+          const retryModel =
+            response.status === 404 ||
+            /not found|is not found|does not exist|invalid model|Unsupported|NOT_FOUND/i.test(String(apiMsg))
+          const tryMergedInstead =
+            pi === 0 && (response.status === 400 || /Invalid JSON|Unknown name|cannot find field|systemInstruction/i.test(String(apiMsg)))
+
+          if (tryMergedInstead) {
+            log.warn('[askHorizon] tentando instruções embutidas na mensagem', { modelId, status: response.status })
+            continue
+          }
+          if (retryModel) {
+            log.warn('[askHorizon] modelo indisponível, tentando próximo', { modelId, status: response.status })
+            break
+          }
+          throw lastError
+        }
+
+        const extracted = extractTextFromGeminiResponse(json)
+        if (extracted.ok) {
+          return extracted.text
+        }
+
+        if (extracted.kind === 'prompt_blocked' || extracted.kind === 'response_blocked') {
+          throw new Error(
+            'O assistente não pôde responder a este pedido (filtro de segurança). Reformule com outras palavras.',
+          )
+        }
+
+        lastError = new Error(`Resposta vazia da API do Gemini (${extracted.kind}: ${extracted.detail})`)
+        log.warn('[askHorizon] sem texto útil', {
+          modelId,
+          strategy: pi === 0 ? 'systemInstruction' : 'merged_system',
+          extracted,
+        })
+        if (pi === 0) {
+          continue
+        }
+        break
+      } catch (e) {
+        if (e instanceof Error && e.message.includes('filtro de segurança')) {
+          throw e
+        }
+        lastError = e instanceof Error ? e : new Error(String(e))
+        log.warn('[askHorizon] falha no modelo', {
+          modelId,
+          strategy: pi === 0 ? 'systemInstruction' : 'merged_system',
+          err: lastError.message,
+        })
+        if (pi === 0 && lastError.message.includes('Gemini API 400')) {
+          continue
+        }
+        break
       }
-    })
-  })
-
-  if (!response.ok) {
-    const errBody = await response.text()
-    throw new Error(`Gemini API error ${response.status}: ${errBody}`)
+    }
   }
 
-  const json = await response.json()
-  const text = json?.candidates?.[0]?.content?.parts?.[0]?.text
-
-  if (!text) {
-    throw new Error('Resposta vazia da API do Gemini')
+  if (lastError) {
+    throw lastError
   }
-
-  return text
+  throw new Error('Não foi possível obter resposta do Gemini.')
 }
 
 /**
@@ -195,23 +390,41 @@ MENSAGEM RECEBIDA PARA ANÁLISE:
 
 (Lembre-se: Retorne SOMENTE o JSON puro.)`
 
-  const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{
+  const models = resolveGeminiModelCandidates()
+  let response = null
+  let lastWhatsappErr = null
+  const bodyWhatsapp = {
+    contents: [
+      {
         role: 'user',
-        parts: [{ text: systemPrompt }]
-      }],
-      generationConfig: {
-        maxOutputTokens: 500,
-        temperature: 0.2, // Baixa temperatura para ser o mais determinístico possível
-      }
-    })
-  })
-
-  if (!response.ok) {
-    throw new Error('Falha na API da IA ao analisar mensagem.')
+        parts: [{ text: systemPrompt }],
+      },
+    ],
+    generationConfig: {
+      maxOutputTokens: 500,
+      temperature: 0.2,
+    },
+  }
+  for (const mid of models) {
+    response = await geminiPostGenerateContent(mid, apiKey, bodyWhatsapp)
+    if (response.ok) break
+    const t = await response.text()
+    let j = {}
+    try {
+      j = t ? JSON.parse(t) : {}
+    } catch {
+      j = {}
+    }
+    const apiMsg = j?.error?.message || t
+    lastWhatsappErr = new Error(`Gemini ${response.status}: ${apiMsg}`)
+    const retry =
+      response.status === 404 ||
+      /not found|is not found|does not exist|invalid model|Unsupported|NOT_FOUND/i.test(String(apiMsg))
+    if (retry) continue
+    throw lastWhatsappErr
+  }
+  if (!response?.ok) {
+    throw lastWhatsappErr || new Error('Falha na API da IA ao analisar mensagem.')
   }
 
   const json = await response.json()
@@ -504,16 +717,28 @@ ou
 {"usuario_id":null}`
 
   try {
-    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 256, temperature: 0.1 },
-      }),
-    })
-
-    if (!response.ok) return null
+    const bodyTel = {
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 256, temperature: 0.1 },
+    }
+    let response = null
+    for (const mid of resolveGeminiModelCandidates()) {
+      response = await geminiPostGenerateContent(mid, apiKey, bodyTel)
+      if (response.ok) break
+      const t = await response.text()
+      let j = {}
+      try {
+        j = t ? JSON.parse(t) : {}
+      } catch {
+        j = {}
+      }
+      const apiMsg = j?.error?.message || t
+      const retry =
+        response.status === 404 ||
+        /not found|is not found|does not exist|invalid model|Unsupported|NOT_FOUND/i.test(String(apiMsg))
+      if (!retry) return null
+    }
+    if (!response?.ok) return null
 
     const json = await response.json()
     let text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''

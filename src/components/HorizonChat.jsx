@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
+import { parseApiJsonResponse } from '../lib/apiErrors'
+import { BRAND_ASSETS } from '../lib/brandAssets'
 /* Estilos do FAB/janela (.horizon-*). Deve carregar no bundle principal: antes do lazy Dashboard,
    AppSessionOutlet pode bloquear a rota e o import em Dashboard.jsx não roda — chat ficava sem CSS. */
 import '../pages/dashboard.css'
@@ -38,25 +40,33 @@ function useHorizonShellDock() {
       const fabRight = Math.max(insetH, window.innerWidth - r.right + insetH)
 
       if (mobile) {
-        const w = Math.min(r.width, window.innerWidth - Math.max(0, r.left))
+        /* Cartão compacto, centralizado no painel — não ocupa a largura inteira */
+        const sideInset = 10
+        const mainL = r.left
+        const mainR = r.right
+        const mainW = Math.max(0, mainR - mainL)
+        const maxCardW = 384
+        const w = Math.min(maxCardW, Math.max(260, mainW - sideInset * 2))
+        const left = mainL + (mainW - w) / 2
         setDock({
           fabStyle: { position: 'fixed', bottom: fabBottom, right: fabRight },
           winStyle: {
             position: 'fixed',
-            left: Math.max(0, r.left),
-            width: w,
+            left: `${left}px`,
+            width: `${w}px`,
             right: 'auto',
-            bottom: 0,
-            maxWidth: 'none',
-            maxHeight: '80vh',
+            bottom: 'max(12px, env(safe-area-inset-bottom, 0px))',
+            maxWidth: `${w}px`,
+            maxHeight: 'min(64dvh, 500px)',
+            height: 'min(64dvh, 500px)',
           },
         })
         return
       }
 
       const winBottom = fabBottom + fabSize + gap
-      const maxW = Math.min(380, Math.max(260, r.width - insetH * 2))
-      const winH = Math.min(600, Math.max(300, window.innerHeight - winBottom - 24))
+      const maxW = Math.min(352, Math.max(260, r.width - insetH * 2))
+      const winH = Math.min(520, Math.max(280, window.innerHeight - winBottom - 24))
       setDock({
         fabStyle: { position: 'fixed', bottom: fabBottom, right: fabRight },
         winStyle: {
@@ -193,19 +203,12 @@ export default function HorizonChat() {
         body: JSON.stringify({ message: msg, historico })
       })
 
-      const raw = await res.text()
-      let data = {}
-      try {
-        data = raw ? JSON.parse(raw) : {}
-      } catch {
-        throw new Error(raw ? raw.slice(0, 200) : `Resposta inválida (${res.status})`)
+      const parsed = await parseApiJsonResponse(res)
+      if (!parsed.ok) {
+        throw new Error(parsed.userMessage || 'Erro ao enviar mensagem.')
       }
 
-      if (!res.ok) {
-        throw new Error(data.message || `Erro ${res.status}`)
-      }
-
-      const resposta = data.resposta
+      const resposta = parsed.data?.resposta
       if (typeof resposta !== 'string' || !resposta.trim()) {
         throw new Error('Resposta vazia do assistente.')
       }
@@ -254,10 +257,15 @@ export default function HorizonChat() {
             <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
           </svg>
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10a9.96 9.96 0 0 1-5.06-1.37L2 22l1.4-4.94A9.96 9.96 0 0 1 2 12 10 10 0 0 1 12 2z"/>
-            <path d="M8 10h.01M12 10h.01M16 10h.01"/>
-          </svg>
+          <img
+            src={BRAND_ASSETS.appIcon}
+            alt=""
+            className="horizon-fab-logo"
+            width={32}
+            height={32}
+            decoding="async"
+            aria-hidden
+          />
         )}
         {!aberto && (
           <span className="horizon-fab-pulse" />
@@ -274,10 +282,8 @@ export default function HorizonChat() {
         {/* Header */}
         <div className="horizon-chat-header">
           <div className="horizon-chat-header-info">
-            <div className="horizon-avatar-dot">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zm0 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-              </svg>
+            <div className="horizon-avatar-dot horizon-avatar-dot--pwa">
+              <img src={BRAND_ASSETS.appIcon} alt="" width={28} height={28} decoding="async" />
             </div>
             <div>
               <div className="horizon-chat-name">Horizon IA</div>
@@ -306,7 +312,9 @@ export default function HorizonChat() {
               className={`horizon-msg ${msg.role === 'user' ? 'horizon-msg-user' : 'horizon-msg-model'}`}
             >
               {msg.role === 'model' && (
-                <div className="horizon-msg-avatar">H</div>
+                <div className="horizon-msg-avatar" aria-hidden>
+                  <img src={BRAND_ASSETS.appIcon} alt="" className="horizon-msg-avatar__img" width={24} height={24} decoding="async" />
+                </div>
               )}
               <div className="horizon-msg-bubble">
                 <MarkdownText text={msg.text} />
@@ -320,7 +328,9 @@ export default function HorizonChat() {
           {/* Digitando */}
           {carregando && (
             <div className="horizon-msg horizon-msg-model">
-              <div className="horizon-msg-avatar">H</div>
+              <div className="horizon-msg-avatar" aria-hidden>
+                <img src={BRAND_ASSETS.appIcon} alt="" className="horizon-msg-avatar__img" width={24} height={24} decoding="async" />
+              </div>
               <div className="horizon-msg-bubble horizon-typing">
                 <span /><span /><span />
               </div>

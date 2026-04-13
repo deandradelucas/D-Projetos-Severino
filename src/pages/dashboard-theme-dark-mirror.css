@@ -1844,6 +1844,7 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
 body[data-theme='dark'] .page-relatorios.app-horizon-shell .page-relatorios-ref-filters {
   min-height: 0;
 }
+body[data-theme='dark'] .page-pagamento.app-horizon-shell .page-pagamento-header-sub,
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .page-configuracoes-header-sub,
 body[data-theme='dark'] .page-admin.app-horizon-shell .page-admin-header-sub {
   margin: 4px 0 0;

@@ -54,7 +54,13 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('[Catch-all] Error:', err)
+    const isProd = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production'
     res.writeHead(500, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify({ error: 'Internal Server Error', detail: err.message }))
+    res.end(
+      JSON.stringify({
+        message: 'Erro interno do servidor. Tente novamente em alguns instantes.',
+        ...(isProd ? {} : { detail: err?.message ? String(err.message).slice(0, 500) : undefined }),
+      }),
+    )
   }
 }

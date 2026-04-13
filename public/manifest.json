@@ -12,8 +12,8 @@
   "theme_color": "#050607",
   "icons": [
     {
-      "src": "/images/horizonte_fiel_original_icon_dark.png",
-      "type": "image/png",
+      "src": "/images/horizonte_fiel_original_icon_dark.svg",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]

@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { Hono } from 'hono'
+import { HTTPException } from 'hono/http-exception'
 import { log } from './lib/logger.mjs'
 import { cors } from 'hono/cors'
 import {
@@ -279,6 +280,23 @@ function mapSupabaseOrNetworkError(error) {
     return {
       status: 503,
       message: 'Serviço de dados temporariamente indisponível. Tente de novo em alguns instantes.',
+    }
+  }
+  if (
+    /generativelanguage\.googleapis\.com|Gemini API|RESOURCE_EXHAUSTED|quota exceeded|429.*generateContent/i.test(
+      raw,
+    )
+  ) {
+    return {
+      status: 503,
+      message:
+        'O serviço de inteligência artificial está temporariamente indisponível ou sem quota. Tente novamente em alguns minutos.',
+    }
+  }
+  if (/api\.mercadopago\.com|Mercado\s*Pago|mercadopago/i.test(raw) && /ECONNRESET|ETIMEDOUT|5\d\d|fetch failed/i.test(raw)) {
+    return {
+      status: 503,
+      message: 'O gateway de pagamentos está indisponível no momento. Tente novamente em instantes.',
     }
   }
   return null
@@ -1407,11 +1425,79 @@ app.post('/api/ai/chat', async (c) => {
     return c.json({ resposta })
   } catch (error) {
     log.error('ai chat failed', error)
-    const msg = error.message?.includes('GEMINI_API_KEY')
-      ? 'Chave de API do Gemini não configurada. Adicione GEMINI_API_KEY no .env do servidor.'
-      : 'Não foi possível processar sua pergunta agora. Tente novamente.'
-    return c.json({ message: msg }, 500)
+    const raw = String(error?.message || '')
+    if (raw.includes('GEMINI_API_KEY') || /GEMINI_API_KEY não configurada/i.test(raw)) {
+      return c.json(
+        {
+          message:
+            'Chave de API do Gemini não configurada. Adicione GEMINI_API_KEY no .env do servidor.',
+        },
+        500,
+      )
+    }
+    if (raw.includes('filtro de segurança')) {
+      return c.json({ message: raw }, 422)
+    }
+    if (
+      /API key not valid|API_KEY_INVALID|PERMISSION_DENIED|invalid\s*API\s*key|API\s*key\s*not\s*valid/i.test(
+        raw,
+      )
+    ) {
+      return c.json(
+        {
+          message:
+            'A chave GEMINI_API_KEY é inválida ou foi revogada. Crie uma nova em https://aistudio.google.com/app/apikey e atualize o servidor (.env ou variáveis no Vercel).',
+        },
+        503,
+      )
+    }
+    if (/quota|RESOURCE_EXHAUSTED|exceeded your current quota|429/i.test(raw)) {
+      return c.json(
+        {
+          message:
+            'Limite de uso da API Gemini atingido. Aguarde alguns minutos ou verifique o plano em Google AI Studio.',
+        },
+        503,
+      )
+    }
+    if (/^Gemini API \d{3}:/i.test(raw) || raw.includes('Resposta vazia da API do Gemini')) {
+      return c.json(
+        {
+          message:
+            'O assistente não obteve resposta válida da API Gemini. Confirme GEMINI_API_KEY no servidor, quotas em Google AI Studio e, se precisar, defina GEMINI_MODEL=gemini-2.0-flash. Os detalhes técnicos foram registados no log do servidor.',
+        },
+        502,
+      )
+    }
+    if (raw && raw.length < 280) {
+      return c.json({ message: raw }, 500)
+    }
+    return c.json(
+      { message: 'Não foi possível processar sua pergunta agora. Tente novamente.' },
+      500,
+    )
   }
+})
+
+app.notFound((c) => c.json({ message: 'Recurso não encontrado.' }, 404))
+
+app.onError((err, c) => {
+  if (err instanceof HTTPException) {
+    return err.getResponse()
+  }
+  log.error('unhandled_route_error', {
+    path: c.req.path,
+    method: c.req.method,
+    err: errorToText(err),
+  })
+  const mapped = mapSupabaseOrNetworkError(err)
+  if (mapped) {
+    return c.json({ message: mapped.message }, mapped.status)
+  }
+  return c.json(
+    { message: 'Erro interno do servidor. Tente novamente em alguns instantes.' },
+    500,
+  )
 })
 
 export default app

@@ -206,25 +206,34 @@ h3 {
 }
 
 .page-pagamento-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   width: 100%;
-  align-items: start;
+  align-items: stretch;
   box-sizing: border-box;
 }
 
 .page-pagamento-layout__primary {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   min-width: 0;
 }
 
 @media (min-width: 1024px) {
   .page-pagamento-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
-    gap: 22px 24px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+    gap: 28px 32px;
+    align-items: start;
+  }
+
+  .pagamento-aside {
+    position: sticky;
+    top: 12px;
+    align-self: start;
+    z-index: 1;
   }
 }
 
@@ -236,21 +245,27 @@ h3 {
   min-width: 0;
 }
 
+.page-pagamento-header .page-pagamento-header-sub {
+  margin: 6px 0 0;
+  max-width: 42rem;
+  line-height: 1.45;
+}
+
 /* Lateral: ações + orientação */
 .pagamento-aside {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   min-width: 0;
 }
 
 .pagamento-aside__actions.ref-panel {
-  padding: 18px 18px;
+  padding: 20px 22px;
   min-height: 0;
 }
 
 .pagamento-aside__title {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -261,7 +276,12 @@ h3 {
 .pagamento-aside__btn-stack {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+}
+
+.pagamento-aside__btn-stack .btn-primary.page-pagamento-cta {
+  min-height: 48px;
+  font-size: 14px;
 }
 
 .pagamento-aside__btn-link {
@@ -287,8 +307,8 @@ h3 {
 }
 
 .pagamento-orientacao {
-  padding: 16px 18px;
-  border-radius: 16px;
+  padding: 18px 20px;
+  border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
   box-sizing: border-box;
 }
@@ -328,7 +348,7 @@ h3 {
 
 /* Detalhes da assinatura */
 .page-pagamento-detalhes.ref-panel {
-  padding: 18px 20px;
+  padding: 20px 22px;
   min-height: 0;
 }
 
@@ -409,11 +429,17 @@ h3 {
 }
 
 .pagamento-banner {
-  padding: 14px 16px;
-  border-radius: 14px;
+  padding: 16px 18px;
+  border-radius: 16px;
   border: 1px solid transparent;
   box-sizing: border-box;
   width: 100%;
+}
+
+body[data-theme='light'] .pagamento-banner {
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--text-primary) 6%, transparent),
+    0 4px 14px color-mix(in srgb, var(--text-primary) 4%, transparent);
 }
 
 .pagamento-banner__title {
@@ -487,7 +513,7 @@ h3 {
 }
 
 .page-pagamento-historico.ref-panel {
-  padding: 18px 20px;
+  padding: 20px 22px;
   width: 100%;
   max-width: none;
   align-self: stretch;
@@ -4900,6 +4926,11 @@ body[data-theme='light'] .horizon-avatar-dot {
   border-color: rgba(212, 168, 75, 0.45);
 }
 
+body[data-theme='light'] .horizon-avatar-dot--pwa {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
 body[data-theme='light'] .horizon-chat-status {
   color: rgba(248, 250, 252, 0.72);
 }
@@ -5052,6 +5083,15 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   transform: scale(0.95);
 }
 
+.horizon-fab-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 9px;
+  pointer-events: none;
+  display: block;
+}
+
 .chat-fab-active {
   background: #374151 !important;
   color: #ffffff !important;
@@ -5080,10 +5120,10 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   position: fixed;
   bottom: 96px;
   right: 28px;
-  width: 380px;
+  width: 360px;
   max-width: calc(100vw - 32px);
-  max-height: 600px;
-  height: calc(100vh - 120px);
+  max-height: 560px;
+  height: min(560px, calc(100vh - 120px));
   background: var(--chat-bg);
   border: 1px solid var(--chat-border);
   border-radius: 28px;
@@ -5135,6 +5175,24 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   justify-content: center;
   flex-shrink: 0;
   border: 1.5px solid rgba(212, 168, 75, 0.4);
+}
+
+.horizon-avatar-dot--pwa {
+  border-radius: 12px;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.horizon-avatar-dot--pwa img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 28px;
+  max-height: 28px;
+  margin: 0 auto;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .horizon-chat-name {
@@ -5228,15 +5286,24 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
 .horizon-msg-avatar {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
-  background: #d4a84b;
-  color: #000;
-  font-weight: 700;
-  font-size: 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+.horizon-msg-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 7px;
+  display: block;
 }
 
 .horizon-msg-bubble {
@@ -5398,44 +5465,56 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   animation: rotate 1s linear infinite;
 }
 
-/* Mobile adjustments */
+/* Mobile adjustments — janela compacta (shell-dock refinado via JS); fallback centrado */
 @media (max-width: 768px) {
   .horizon-chat-fab {
     bottom: 20px;
     right: 16px;
-    width: 52px;
-    height: 52px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .horizon-fab-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
   }
 
   .horizon-chat-window {
-    right: 0;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    max-width: 100%;
-    max-height: min(82dvh, calc(100dvh - env(safe-area-inset-top, 0px) - 8px));
-    height: min(82dvh, calc(100dvh - env(safe-area-inset-top, 0px) - 8px));
-    border-radius: 28px 28px 0 0;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    width: auto;
+    max-width: min(384px, calc(100vw - 24px));
+    margin-left: auto;
+    margin-right: auto;
+    max-height: min(64dvh, 500px);
+    height: min(64dvh, 500px);
+    border-radius: 22px;
     transform-origin: bottom center;
   }
 
+  .horizon-chat-window.horizon-chat-window--shell-dock {
+    border-radius: 22px;
+  }
+
   .horizon-chat-header {
-    padding: 12px 14px;
+    padding: 10px 12px;
   }
 
   .horizon-chat-header-info {
-    gap: 9px;
+    gap: 8px;
     min-width: 0;
   }
 
   .horizon-avatar-dot {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
   }
 
   .horizon-chat-name {
     font-size: 13px;
-    line-height: 1.1;
+    line-height: 1.15;
   }
 
   .horizon-chat-status {
@@ -5444,7 +5523,7 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: min(56vw, 220px);
+    max-width: min(52vw, 200px);
   }
 
   .horizon-chat-close {
@@ -5453,25 +5532,46 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   }
 
   .horizon-chat-messages {
-    padding: 16px 14px 12px;
+    padding: 12px 10px 10px;
+  }
+
+  .horizon-msg-bubble {
+    font-size: 12px;
+    padding: 8px 11px;
+  }
+
+  .horizon-msg-avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  .horizon-suggestions {
+    padding: 0 10px 8px;
+    gap: 5px;
+  }
+
+  .horizon-suggestion-chip {
+    padding: 4px 9px;
+    font-size: 10px;
   }
 
   .horizon-chat-input-area {
-    padding: 10px max(12px, env(safe-area-inset-right, 0px))
-      max(12px, env(safe-area-inset-bottom, 0px))
-      max(12px, env(safe-area-inset-left, 0px));
+    padding: 8px max(10px, env(safe-area-inset-right, 0px))
+      max(10px, env(safe-area-inset-bottom, 0px))
+      max(10px, env(safe-area-inset-left, 0px));
   }
 
   .horizon-chat-input {
-    min-height: 40px;
-    padding: 9px 14px;
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 13px;
   }
 
   .horizon-send-btn {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    min-height: 42px;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
   }
 
   /* Evita sobreposição do FAB (ícone X) com o botão de enviar no composer mobile. */
@@ -5479,6 +5579,18 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
     opacity: 0;
     pointer-events: none;
     transform: translateY(8px) scale(0.92);
+  }
+}
+
+/* Telas estreitas: chips e texto um pouco menores */
+@media (max-width: 380px) {
+  .horizon-suggestion-chip {
+    font-size: 9px;
+    padding: 3px 8px;
+  }
+
+  .horizon-chat-status {
+    max-width: min(48vw, 180px);
   }
 }
 
@@ -6161,6 +6273,18 @@ body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relat
   padding-bottom: env(safe-area-inset-bottom, 0px);
   background: transparent;
   isolation: auto;
+}
+
+/* Dashboard inicial: barra de rolagem oculta (scroll por toque/roda/trackpad segue igual) */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Conteúdo abaixo do hero: mesma pilha — z-index explícito para o vidro sticky ficar por cima ao rolar */
@@ -8319,6 +8443,7 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-ref
   min-height: 0;
 }
 
+body[data-theme='light'] .page-pagamento.app-horizon-shell .page-pagamento-header-sub,
 body[data-theme='light'] .page-configuracoes.app-horizon-shell .page-configuracoes-header-sub,
 body[data-theme='light'] .page-admin.app-horizon-shell .page-admin-header-sub {
   margin: 4px 0 0;
