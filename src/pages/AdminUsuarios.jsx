@@ -590,23 +590,23 @@ export default function AdminUsuarios() {
   }
 
   return (
-    <div className="dashboard-container page-admin page-admin-usuarios app-horizon-shell">
+    <div className="dashboard-container page-admin page-admin-usuarios ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
         <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
         <main className="main-content relative z-10 ref-dashboard-main">
-          <div className="ref-dashboard-inner">
-            <header className="ref-dashboard-header">
-              <MobileMenuButton onClick={() => setMenuAberto(true)} />
-              <div className="ref-dashboard-header__lead">
-                <h1 className="ref-dashboard-greeting">
-                  <span className="ref-dashboard-greeting__name">Usuários</span>
-                </h1>
-                <p className="ref-panel__subtitle page-admin-header-sub">
-                  Cadastros, acessos, assinaturas e acompanhamento financeiro
-                </p>
+          <div className="ref-dashboard-inner dashboard-hub">
+            <section className="dashboard-hub__hero page-admin__hero" aria-label="Usuários">
+              <div className="dashboard-hub__hero-row">
+                <MobileMenuButton onClick={() => setMenuAberto(true)} />
+                <div className="dashboard-hub__hero-text">
+                  <h1 className="dashboard-hub__title">Usuários</h1>
+                  <p className="ref-panel__subtitle page-admin-header-sub">
+                    Cadastros, acessos, assinaturas e acompanhamento financeiro
+                  </p>
+                </div>
               </div>
-            </header>
+            </section>
 
             <article
               className="ref-panel page-admin-ref-panel page-admin-ref-panel--table page-admin-usuarios-panel"

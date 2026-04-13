@@ -156,23 +156,23 @@ export default function Configuracoes() {
   }
 
   return (
-    <div className="dashboard-container page-configuracoes app-horizon-shell">
+    <div className="dashboard-container page-configuracoes ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content relative z-10 ref-dashboard-main config-page">
-        <div className="ref-dashboard-inner">
-        <header className="ref-dashboard-header">
-          <MobileMenuButton onClick={() => setMenuAberto(true)} aria-label="Abrir menu" />
-          <div className="ref-dashboard-header__lead">
-            <h1 className="ref-dashboard-greeting">
-              <span className="ref-dashboard-greeting__name">Configurações</span>
-            </h1>
-            <p className="ref-panel__subtitle page-configuracoes-header-sub">
-              Perfil, preferências e segurança
-            </p>
+        <div className="ref-dashboard-inner dashboard-hub">
+        <section className="dashboard-hub__hero page-configuracoes__hero" aria-label="Configurações">
+          <div className="dashboard-hub__hero-row">
+            <MobileMenuButton onClick={() => setMenuAberto(true)} aria-label="Abrir menu" />
+            <div className="dashboard-hub__hero-text">
+              <h1 className="dashboard-hub__title">Configurações</h1>
+              <p className="ref-panel__subtitle page-configuracoes-header-sub">
+                Perfil, preferências e segurança
+              </p>
+            </div>
           </div>
-        </header>
+        </section>
 
         {toast && <div className="config-toast">{toast}</div>}
 

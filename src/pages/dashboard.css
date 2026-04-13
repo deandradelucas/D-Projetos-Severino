@@ -907,6 +907,17 @@ h3 {
   display: none;
 }
 
+/* Shell autenticado: menu lateral estável (sem pseudo-curvas / sem salto ao focar) */
+.dashboard-container.app-horizon-shell .sidebar .nav-item {
+  box-sizing: border-box;
+}
+
+.dashboard-container.app-horizon-shell .sidebar .nav-item.active::before,
+.dashboard-container.app-horizon-shell .sidebar .nav-item.active::after {
+  display: none !important;
+  content: none !important;
+}
+
 /* Recharts Legend Dots (Bolinhas dos Gráficos) */
 .recharts-legend-item-marker {
   animation: pulse 2s infinite ease-in-out;
@@ -949,9 +960,10 @@ h3 {
 
 .nav-item.active {
   font-weight: 600;
+  letter-spacing: inherit;
   background-color: var(--active-bg);
   color: #000000 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: none;
 }
 
 /* Largura extra + margem negativa: layout legado; no shell autenticado quebra alinhamento (mobile/desktop) */
@@ -1019,9 +1031,11 @@ h3 {
   width: 36px;
   height: 36px;
   border-radius: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.08); /* Fundo mais visível */
   color: rgba(255, 255, 255, 0.5); /* Icone mais claro */
-  transition: background 0.22s ease, box-shadow 0.22s ease, color 0.2s ease;
+  transition: background 0.22s ease, box-shadow 0.22s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .nav-item:hover:not(.active) .icon-wrap {
@@ -6054,20 +6068,20 @@ body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relat
   flex-wrap: nowrap;
 }
 
-/* Agenda — uma linha: menu, título, subtítulo, Novo evento */
-body[data-theme='light'] .page-agenda.app-horizon-shell .ref-dashboard-header {
+/* Agenda — hero hub: menu, título, Novo evento (mesma linha estável) */
+body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
   flex-wrap: nowrap;
-  row-gap: 0;
   align-items: center;
+  row-gap: 0;
   overflow: visible;
 }
 
-body[data-theme='light'] .page-agenda.app-horizon-shell .ref-dashboard-header__lead {
+body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-body[data-theme='light'] .page-agenda.app-horizon-shell .ref-dashboard-header__actions {
+body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
   width: auto;
   flex-basis: auto;
   margin-left: auto;
@@ -6075,22 +6089,22 @@ body[data-theme='light'] .page-agenda.app-horizon-shell .ref-dashboard-header__a
   flex-wrap: nowrap;
 }
 
-body[data-theme='dark'] .page-agenda.app-horizon-shell .ref-dashboard-header,
-body[data-theme='glass'] .page-agenda.app-horizon-shell .ref-dashboard-header {
+body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row,
+body[data-theme='glass'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
   flex-wrap: nowrap;
-  row-gap: 0;
   align-items: center;
+  row-gap: 0;
   overflow: visible;
 }
 
-body[data-theme='dark'] .page-agenda.app-horizon-shell .ref-dashboard-header__lead,
-body[data-theme='glass'] .page-agenda.app-horizon-shell .ref-dashboard-header__lead {
+body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text,
+body[data-theme='glass'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-body[data-theme='dark'] .page-agenda.app-horizon-shell .ref-dashboard-header__actions,
-body[data-theme='glass'] .page-agenda.app-horizon-shell .ref-dashboard-header__actions {
+body[data-theme='dark'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions,
+body[data-theme='glass'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
   flex-wrap: nowrap;
 }
 
@@ -8168,22 +8182,36 @@ body[data-theme='light'] .ref-dashboard-inner {
     column-gap: 10px;
   }
 
+  /* Configurações e Admin: título + subtítulo (sem ações no hero) */
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row,
+  .dashboard-container.page-admin.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    column-gap: 10px;
+  }
+
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text,
+  .dashboard-container.page-admin.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
   /* Agenda: menu + título + Novo evento na mesma linha (mobile / tablet estreito) */
-  .dashboard-container.page-agenda.app-horizon-shell .ref-dashboard-inner > .ref-dashboard-header {
+  .dashboard-container.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
     flex-wrap: nowrap;
     align-items: center;
     row-gap: 0;
     column-gap: 10px;
   }
 
-  .dashboard-container.page-agenda.app-horizon-shell .ref-dashboard-header__lead {
+  .dashboard-container.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
     flex: 1 1 auto;
     min-width: 0;
     max-width: none;
     align-self: center;
   }
 
-  .dashboard-container.page-agenda.app-horizon-shell .ref-dashboard-header__actions {
+  .dashboard-container.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
     width: auto;
     flex-basis: auto;
     margin-left: auto;
@@ -8193,7 +8221,7 @@ body[data-theme='light'] .ref-dashboard-inner {
     gap: 8px;
   }
 
-  body[data-theme='light'] .page-agenda.app-horizon-shell .ref-dashboard-greeting {
+  body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__title {
     -webkit-line-clamp: 1;
     line-clamp: 1;
     overflow: hidden;
@@ -8201,7 +8229,7 @@ body[data-theme='light'] .ref-dashboard-inner {
     -webkit-box-orient: vertical;
   }
 
-  body[data-theme='light'] .page-agenda.app-horizon-shell .ref-dashboard-header__btn-tx {
+  body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
     min-height: 40px;
     padding: 0 10px;
     font-size: 11px;
@@ -8339,9 +8367,9 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .ref-dashboard .
 body[data-theme='light'] .page-transacoes.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='light'] .page-relatorios.app-horizon-shell .main-content.ref-dashboard-main,
 body[data-theme='light'] .page-pagamento.app-horizon-shell .main-content.ref-dashboard-main,
-body[data-theme='light'] .page-agenda.app-horizon-shell .main-content.ref-dashboard-main,
-body[data-theme='light'] .page-configuracoes.app-horizon-shell .main-content.ref-dashboard-main,
-body[data-theme='light'] .page-admin.app-horizon-shell .main-content.ref-dashboard-main {
+body[data-theme='light'] .page-agenda.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
+body[data-theme='light'] .page-configuracoes.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
+body[data-theme='light'] .page-admin.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -8353,9 +8381,9 @@ body[data-theme='light'] .page-admin.app-horizon-shell .main-content.ref-dashboa
 
 .page-relatorios.app-horizon-shell .ref-dashboard-inner,
 .page-pagamento.app-horizon-shell .ref-dashboard-inner,
-.page-agenda.app-horizon-shell .ref-dashboard-inner,
-.page-configuracoes.app-horizon-shell .ref-dashboard-inner,
-.page-admin.app-horizon-shell .ref-dashboard-inner {
+.page-agenda.ref-dashboard.app-horizon-shell .ref-dashboard-inner,
+.page-configuracoes.ref-dashboard.app-horizon-shell .ref-dashboard-inner,
+.page-admin.ref-dashboard.app-horizon-shell .ref-dashboard-inner {
   width: 100%;
   max-width: min(1180px, 100%);
   margin-inline: auto;
@@ -8365,8 +8393,10 @@ body[data-theme='light'] .page-admin.app-horizon-shell .main-content.ref-dashboa
   flex: 1 1 auto;
 }
 
-/* Agenda: cabeçalho sticky */
-.page-agenda.app-horizon-shell .ref-dashboard-inner > .ref-dashboard-header {
+/* Agenda, Configurações, Admin: hero sticky (alinhado ao hub) */
+.page-agenda.ref-dashboard.app-horizon-shell .ref-dashboard-inner > .dashboard-hub__hero,
+.page-configuracoes.ref-dashboard.app-horizon-shell .ref-dashboard-inner > .dashboard-hub__hero,
+.page-admin.ref-dashboard.app-horizon-shell .ref-dashboard-inner > .dashboard-hub__hero {
   position: -webkit-sticky;
   position: sticky;
   top: 0;
@@ -8617,11 +8647,6 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-me
   display: none !important;
 }
 
-body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active::before,
-body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active::after {
-  display: none !important;
-}
-
 /* Mesmo gap que entre Dashboard / Transações / … (evita folga extra só abaixo da logo) */
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu {
   gap: 8px;
@@ -8652,14 +8677,15 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
   font-weight: 600;
   letter-spacing: -0.015em;
   color: rgba(15, 23, 42, 0.52);
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   transform: none;
-  box-shadow: none;
+  box-shadow: inset 0 1px 0 transparent;
   transition:
     background-color 0.2s var(--pf-ease, ease),
     color 0.2s var(--pf-ease, ease),
-    box-shadow 0.2s var(--pf-ease, ease);
+    box-shadow 0.2s var(--pf-ease, ease),
+    border-color 0.2s var(--pf-ease, ease);
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) {
@@ -8670,31 +8696,31 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-  /* Mesmo peso que inativo: evita “pulo” horizontal do texto (800 vs 600) */
   font-weight: 600;
   color: #020617 !important;
   background: #ffffff;
-  border: none;
+  border-color: rgba(226, 232, 240, 0.95);
   padding: var(--shell-nav-py) var(--shell-nav-pr) var(--shell-nav-py) var(--shell-nav-pl);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 1) inset,
-    0 10px 28px -22px rgba(15, 23, 42, 0.12);
+  /* Sem sombra externa: evita “respiro”/micro deslocamento visual ao trocar de rota */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg {
   color: var(--accent);
 }
 
-body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:focus-visible {
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:focus:not(:focus-visible) {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+}
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.45);
+  outline-offset: 2px;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active:focus-visible {
-  box-shadow:
-    0 0 0 3px rgba(59, 130, 246, 0.35),
-    0 1px 0 rgba(255, 255, 255, 1) inset,
-    0 10px 28px -22px rgba(15, 23, 42, 0.12);
+  outline: 2px solid rgba(59, 130, 246, 0.45);
+  outline-offset: 2px;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
@@ -8702,18 +8728,21 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .icon-w
   height: 36px;
   border-radius: 0;
   background: rgba(255, 255, 255, 0.4);
-  border: none;
+  border: 1px solid rgba(226, 232, 240, 0.45);
   color: rgba(15, 23, 42, 0.42);
   box-shadow: none;
+  box-sizing: border-box;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap {
   background: rgba(255, 255, 255, 0.65);
+  border-color: rgba(226, 232, 240, 0.75);
   transform: none;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
   background: rgba(212, 168, 75, 0.14);
+  border-color: rgba(212, 168, 75, 0.35);
   color: var(--accent);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }

@@ -7,14 +7,8 @@
   font-weight: 500;
 }
 
-.page-agenda__header-actions {
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.page-agenda.app-horizon-shell .page-agenda__header-actions {
-  flex-wrap: nowrap;
-  justify-content: flex-end;
+.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text .page-agenda__subtitle {
+  margin-top: 6px;
 }
 
 .page-agenda__sr-only {
@@ -259,12 +253,12 @@
     padding: 8px 12px;
   }
 
-  .page-agenda.app-horizon-shell .ref-dashboard-header__actions.page-agenda__header-actions {
+  .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
     justify-content: flex-end;
     align-self: center;
   }
 
-  .page-agenda.app-horizon-shell .ref-dashboard-header__btn-tx {
+  .page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
     width: auto;
     max-width: none;
     min-height: 40px;
@@ -385,6 +379,7 @@ body[data-theme='glass'] .page-agenda__search input {
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .page-agenda__period {
@@ -407,12 +402,13 @@ body[data-theme='glass'] .page-agenda__search input {
   font: inherit;
   cursor: pointer;
   font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .page-agenda__view-btn--active {
   background: color-mix(in srgb, var(--accent, #d4a84b) 22%, transparent);
   border-color: color-mix(in srgb, var(--accent, #d4a84b) 45%, transparent);
-  font-weight: 600;
 }
 
 .page-agenda__ios-panel {

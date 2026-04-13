@@ -127,23 +127,23 @@ export default function AdminPagamentos() {
   }
 
   return (
-    <div className="dashboard-container page-admin app-horizon-shell">
+    <div className="dashboard-container page-admin ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
         <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
         <main className="main-content relative z-10 ref-dashboard-main">
-          <div className="ref-dashboard-inner">
-            <header className="ref-dashboard-header">
-              <MobileMenuButton onClick={() => setMenuAberto(true)} />
-              <div className="ref-dashboard-header__lead">
-                <h1 className="ref-dashboard-greeting">
-                  <span className="ref-dashboard-greeting__name">Logs de Pagamentos</span>
-                </h1>
-                <p className="ref-panel__subtitle page-admin-header-sub">
-                  Acompanhe preferências, cobranças, status e receita gerada pelo Mercado Pago.
-                </p>
+          <div className="ref-dashboard-inner dashboard-hub">
+            <section className="dashboard-hub__hero page-admin__hero" aria-label="Logs de pagamentos">
+              <div className="dashboard-hub__hero-row">
+                <MobileMenuButton onClick={() => setMenuAberto(true)} />
+                <div className="dashboard-hub__hero-text">
+                  <h1 className="dashboard-hub__title">Logs de Pagamentos</h1>
+                  <p className="ref-panel__subtitle page-admin-header-sub">
+                    Acompanhe preferências, cobranças, status e receita gerada pelo Mercado Pago.
+                  </p>
+                </div>
               </div>
-            </header>
+            </section>
 
             <AdminPaymentLogsPanel
               rows={rows}

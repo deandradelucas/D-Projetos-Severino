@@ -285,26 +285,32 @@ export default function Agenda() {
 
   return (
     <>
-      <div className="dashboard-container page-agenda app-horizon-shell">
+      <div className="dashboard-container page-agenda ref-dashboard app-horizon-shell">
         <div className="app-horizon-inner">
           <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
           <main className="main-content relative z-10 ref-dashboard-main">
-            <div className="ref-dashboard-inner">
-              <header className="ref-dashboard-header">
-                <MobileMenuButton onClick={() => setMenuAberto(true)} />
-                <div className="ref-dashboard-header__lead">
-                  <h1 className="ref-dashboard-greeting">
-                    <span className="ref-dashboard-greeting__name">Agenda</span>
-                  </h1>
-                  <p className="page-agenda__subtitle">Organize compromissos, vencimentos e lembretes</p>
+            <div className="ref-dashboard-inner dashboard-hub">
+              <section className="dashboard-hub__hero page-agenda__hero" aria-label="Agenda">
+                <div className="dashboard-hub__hero-row">
+                  <MobileMenuButton onClick={() => setMenuAberto(true)} />
+                  <div className="dashboard-hub__hero-text">
+                    <h1 className="dashboard-hub__title">Agenda</h1>
+                    <p className="ref-panel__subtitle page-agenda__subtitle">
+                      Organize compromissos, vencimentos e lembretes
+                    </p>
+                  </div>
+                  <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos da agenda">
+                    <button
+                      type="button"
+                      className="dashboard-hub__btn dashboard-hub__btn--primary"
+                      onClick={() => openNew()}
+                    >
+                      Novo evento
+                    </button>
+                  </div>
                 </div>
-                <div className="ref-dashboard-header__actions page-agenda__header-actions">
-                  <button type="button" className="ref-dashboard-header__btn-tx" onClick={() => openNew()}>
-                    Novo evento
-                  </button>
-                </div>
-              </header>
+              </section>
 
               <section className="ref-kpi-row ref-dashboard-kpi-strip page-agenda__summary" aria-label="Resumo da agenda">
                 <article className="ref-kpi-card ref-kpi-card--balance">

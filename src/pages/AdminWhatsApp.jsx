@@ -83,30 +83,30 @@ export default function AdminWhatsApp() {
   }, [])
 
   return (
-    <div className="dashboard-container page-admin app-horizon-shell">
+    <div className="dashboard-container page-admin ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
         <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
         <main className="main-content relative z-10 ref-dashboard-main">
-          <div className="ref-dashboard-inner">
-            <header className="ref-dashboard-header">
-              <MobileMenuButton onClick={() => setMenuAberto(true)} />
-              <div className="ref-dashboard-header__lead">
-                <h1 className="ref-dashboard-greeting">
-                  <span className="ref-dashboard-greeting__name">Logs do WhatsApp</span>
-                </h1>
-                <p className="ref-panel__subtitle page-admin-header-sub">
-                  Auditoria de mensagens recebidas pelo BOT
-                </p>
-                {ADMIN_DOCS_URL ? (
-                  <p className="page-admin-doc-link-wrap">
-                    <a className="page-admin-doc-link" href={ADMIN_DOCS_URL} target="_blank" rel="noreferrer">
-                      Documentação / runbook interno
-                    </a>
+          <div className="ref-dashboard-inner dashboard-hub">
+            <section className="dashboard-hub__hero page-admin__hero" aria-label="Logs do WhatsApp">
+              <div className="dashboard-hub__hero-row">
+                <MobileMenuButton onClick={() => setMenuAberto(true)} />
+                <div className="dashboard-hub__hero-text">
+                  <h1 className="dashboard-hub__title">Logs do WhatsApp</h1>
+                  <p className="ref-panel__subtitle page-admin-header-sub">
+                    Auditoria de mensagens recebidas pelo BOT
                   </p>
-                ) : null}
+                  {ADMIN_DOCS_URL ? (
+                    <p className="page-admin-doc-link-wrap">
+                      <a className="page-admin-doc-link" href={ADMIN_DOCS_URL} target="_blank" rel="noreferrer">
+                        Documentação / runbook interno
+                      </a>
+                    </p>
+                  ) : null}
+                </div>
               </div>
-            </header>
+            </section>
 
             <section className="ref-kpi-row page-admin-kpi-row" aria-label="Status da integração">
               <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
