@@ -236,21 +236,6 @@ h3 {
   min-width: 0;
 }
 
-.page-pagamento-header .page-pagamento-header-sub {
-  margin: 0;
-  max-width: min(720px, 100%);
-  line-height: 1.55;
-  font-size: 14px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-@media (max-width: 480px) {
-  .page-pagamento-header .page-pagamento-header-sub {
-    font-size: 13px;
-  }
-}
-
 /* Lateral: ações + orientação */
 .pagamento-aside {
   display: flex;
@@ -6155,9 +6140,76 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   min-width: 0;
 }
 
+/* Dashboard inicial: uma linha; título “Olá, nome” com prioridade (ellipsis se não couber) */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
+  flex-shrink: 0;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Transações: uma linha; título com prioridade (ellipsis se não couber) */
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
+  flex-shrink: 0;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-  margin: 0 0 22px;
+  margin: 0 0 30px;
   padding: 0;
+}
+
+/* Transações / Relatórios / Agenda: mais respiro entre o cabeçalho (título + ações) e o bloco seguinte */
+@media (min-width: 769px) {
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  .dashboard-container.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    margin-bottom: 40px;
+  }
 }
 
 .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__title {
@@ -6319,6 +6371,86 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
     justify-content: flex-start;
     flex: 1 1 100%;
+  }
+
+  /* Dashboard home: não empilhar ações — mantém uma linha e o nome com espaço máximo */
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+    flex: 0 0 auto;
+    width: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  /* Transações: mesma lógica — título + atalhos numa linha */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+    flex: 0 0 auto;
+    width: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
+
+/* Dashboard inicial (mobile): coluna ~100% do <main>; cabeçalho numa linha; cartões até as bordas úteis */
+@media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-inner,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-inner {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-inline: 0;
+    box-sizing: border-box;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip,
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-bottom-grid {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page .ref-panel,
+  body[data-theme='dark'] .dashboard-container.dashboard-page .ref-panel {
+    padding: 12px 10px 10px;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page .ref-tx-row,
+  body[data-theme='dark'] .dashboard-container.dashboard-page .ref-tx-row {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page .ref-tx-row::after,
+  body[data-theme='dark'] .dashboard-container.dashboard-page .ref-tx-row::after {
+    left: 8px;
+    right: 8px;
   }
 }
 
@@ -7960,7 +8092,6 @@ body[data-theme='light'] .page-admin.ref-dashboard.app-horizon-shell .main-conte
 
 .page-relatorios.app-horizon-shell .ref-dashboard-inner,
 .page-pagamento.app-horizon-shell .ref-dashboard-inner,
-.page-agenda.ref-dashboard.app-horizon-shell .ref-dashboard-inner,
 .page-configuracoes.ref-dashboard.app-horizon-shell .ref-dashboard-inner,
 .page-admin.ref-dashboard.app-horizon-shell .ref-dashboard-inner {
   width: 100%;
@@ -7970,6 +8101,20 @@ body[data-theme='light'] .page-admin.ref-dashboard.app-horizon-shell .main-conte
   flex-direction: column;
   min-height: 0;
   flex: 1 1 auto;
+}
+
+/* Agenda: 100% da coluna principal (sem cap 1180px) */
+.page-agenda.ref-dashboard.app-horizon-shell .ref-dashboard-inner {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+  align-self: stretch;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 /* Relatórios: conteúdo não ultrapassa a coluna (evita barra horizontal) */
@@ -8000,7 +8145,6 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-ref
   min-height: 0;
 }
 
-body[data-theme='light'] .page-pagamento.app-horizon-shell .page-pagamento-header-sub,
 body[data-theme='light'] .page-configuracoes.app-horizon-shell .page-configuracoes-header-sub,
 body[data-theme='light'] .page-admin.app-horizon-shell .page-admin-header-sub {
   margin: 4px 0 0;
@@ -8627,12 +8771,12 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     padding: max(8px, env(safe-area-inset-top, 0px)) 12px max(24px, env(safe-area-inset-bottom, 0px));
   }
 
-  /* Shell autenticado: padding do <main> no mobile (safe area + margem mínima nas laterais) */
+  /* Shell autenticado: padding do <main> no mobile (safe area; laterais 10px para a coluna usar mais largura) */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner > .main-content.ref-dashboard-main {
     border-radius: 0;
     box-sizing: border-box;
-    padding: max(8px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px))
-      max(12px, env(safe-area-inset-left, 0px));
+    padding: max(8px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px))
+      max(10px, env(safe-area-inset-left, 0px));
   }
 
   /* Evita “corte” do cartão do topo no scroll; ritmo um pouco mais fechado entre blocos */

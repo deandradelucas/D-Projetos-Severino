@@ -229,6 +229,11 @@ body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shel
   background-color: #ffffff;
 }
 
+/* Mesmo fundo no #root (evita bordas/canvas escuro por baixo do shell no mobile) */
+body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+  background-color: #ffffff;
+}
+
 /* Tema escuro */
 body[data-theme='dark'] {
   color-scheme: dark;
@@ -292,6 +297,16 @@ button {
     overscroll-behavior-y: none;
   }
 
+  /* Shell autenticado (tema claro): alinha html/#root/body ao branco do painel — evita faixas escuras no dev/mobile */
+  html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+    background-color: #ffffff;
+  }
+
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+    background-color: #ffffff;
+  }
+
   /* iOS safe-area paint: evita faixa clara residual no rodapé */
   body::after {
     content: "";
@@ -303,6 +318,10 @@ button {
     background: #050607;
     pointer-events: none;
     z-index: 9999;
+  }
+
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell)::after {
+    background: #ffffff;
   }
 
   input,

@@ -1,16 +1,5 @@
 /* Agenda — alinhado ao shell Horizonte (dashboard.css) */
 
-.page-agenda__subtitle {
-  margin: 4px 0 0;
-  font-size: 0.95rem;
-  color: var(--text-secondary, #64748b);
-  font-weight: 500;
-}
-
-.page-agenda.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text .page-agenda__subtitle {
-  margin-top: 6px;
-}
-
 .page-agenda__sr-only {
   position: absolute;
   width: 1px;
@@ -27,6 +16,34 @@
   flex-wrap: wrap;
 }
 
+/* Largura total da coluna: layout, toolbar e calendário acompanham o main (100%) */
+.page-agenda.ref-dashboard.app-horizon-shell .page-agenda__layout,
+.page-agenda.ref-dashboard.app-horizon-shell .page-agenda__main,
+.page-agenda.ref-dashboard.app-horizon-shell .page-agenda__side {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.page-agenda.ref-dashboard.app-horizon-shell .page-agenda__toolbar {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.page-agenda.ref-dashboard.app-horizon-shell .page-agenda__summary.ref-kpi-row {
+  width: 100%;
+  align-self: stretch;
+  box-sizing: border-box;
+}
+
+.page-agenda.ref-dashboard.app-horizon-shell .page-agenda__toolbar-row {
+  width: 100%;
+  min-width: 0;
+}
+
 .page-agenda__kpi--pay .ref-kpi-card__value {
   color: #dc2626;
 }
@@ -40,6 +57,13 @@
   grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
   gap: var(--ref-shell-stack-gap, 16px);
   align-items: start;
+}
+
+/* Respiro entre a faixa de KPIs e a barra de busca / período (desktop, como Transações/Relatórios) */
+@media (min-width: 769px) {
+  .page-agenda.ref-dashboard.app-horizon-shell .page-agenda__layout {
+    margin-top: 18px;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -75,17 +99,13 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
     width: 100%;
+    max-width: 100%;
     min-width: 0;
   }
 
   .page-agenda.app-horizon-shell .page-agenda__summary .ref-kpi-card {
     min-height: 0;
     min-width: 0;
-  }
-
-  .page-agenda__subtitle {
-    font-size: 0.88rem;
-    line-height: 1.35;
   }
 
   .page-agenda__toolbar {
@@ -275,11 +295,14 @@
   }
 }
 
-@media (max-width: 380px) {
+/* Telas estreitas: KPIs em coluna única (cada cartão 100% da largura) */
+@media (max-width: 520px) {
   .page-agenda.app-horizon-shell .page-agenda__summary.ref-kpi-row {
     grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 380px) {
   .page-agenda__weekdays {
     font-size: 0.5rem;
     gap: 0;
@@ -526,6 +549,10 @@ body[data-theme='light'] .page-agenda__notif-toolbar {
 /* Calendário mensal */
 .page-agenda__calendar {
   padding: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .page-agenda__weekdays {

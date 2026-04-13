@@ -296,9 +296,6 @@ export default function Agenda() {
                   <MobileMenuButton onClick={() => setMenuAberto(true)} />
                   <div className="dashboard-hub__hero-text">
                     <h1 className="dashboard-hub__title">Agenda</h1>
-                    <p className="ref-panel__subtitle page-agenda__subtitle">
-                      Organize compromissos, vencimentos e lembretes
-                    </p>
                   </div>
                   <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos da agenda">
                     <button

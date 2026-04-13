@@ -242,7 +242,7 @@ export default function Transacoes() {
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div className="dashboard-hub__hero-text">
-              <h1 className="dashboard-hub__title">Minhas transações</h1>
+              <h1 className="dashboard-hub__title">Transações</h1>
             </div>
             <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos da página">
               <button
