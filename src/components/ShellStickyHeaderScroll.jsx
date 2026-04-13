@@ -14,6 +14,10 @@ function isVerticalScrollPort(el) {
   if (el.classList.contains('dashboard-container') && el.classList.contains('app-horizon-shell')) {
     return true
   }
+  /* Coluna principal do app: o conteúdo pode montar depois — regista scroll desde já se for porta rolável */
+  if (el.classList.contains('ref-dashboard-main')) {
+    return true
+  }
   return el.scrollHeight > el.clientHeight + 1
 }
 

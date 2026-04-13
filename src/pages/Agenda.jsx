@@ -410,22 +410,17 @@ export default function Agenda() {
                     </div>
                     {isIOSDevice() ? (
                       <div className="page-agenda__ios-panel" role="region" aria-label="Lembretes no iPhone">
-                        <p className="page-agenda__ios-panel-title">Lembretes no iPhone</p>
+                        <p className="page-agenda__ios-panel-title">Calendário no iPhone</p>
                         <p className="page-agenda__ios-panel-text">
-                          O Safari <strong>não envia notificações Web</strong> como no Android: o separador adormece e os
-                          avisos deixam de correr. A forma fiável no iPhone é usar a app <strong>Calendário</strong> com
-                          alarmes.
+                          Para <strong>alarmes fiáveis</strong>, exporte para a app <strong>Calendário</strong>.
                         </p>
                         {!isStandalonePWAMode() ? (
                           <p className="page-agenda__ios-panel-text page-agenda__ios-panel-text--muted">
-                            Opcional: em <strong>Safari</strong> use <strong>Partilhar</strong> →{' '}
-                            <strong>Adicionar ao ecrã principal</strong> e abra pelo ícone (iOS 16.4+ pode permitir
-                            também notificações da app web — ainda assim o Calendário é o mais estável).
+                            Opcional: <strong>Safari</strong> → Partilhar → <strong>Adicionar ao ecrã principal</strong>.
                           </p>
                         ) : (
                           <p className="page-agenda__ios-panel-text page-agenda__ios-panel-text--muted">
-                            Está a usar a app no ecrã principal. Pode ativar também o interruptor abaixo; se não receber
-                            alertas, use o Calendário.
+                            Com a app no ecrã principal, combine com as notificações abaixo se precisar.
                           </p>
                         )}
                         <button
@@ -483,17 +478,17 @@ export default function Agenda() {
                               setNotifEnabled(true)
                               setNotifHint(
                                 isIOSDevice()
-                                  ? 'Lembretes: adicione o site ao ecrã principal (Safari → Partilhar) e abra pelo ícone — assim o iOS permite alertas. Com o app fechado, use “Adicionar ao Calendário” para alarmes fiáveis.'
-                                  : 'Lembretes ativos: aviso entre o horário do lembrete e o início do evento (todos os eventos carregados). Com o separador em segundo plano o browser pode atrasar — mantenha a app aberta ou use exportar ao Calendário.'
+                                  ? 'No iPhone, o Calendário (exportar acima) costuma ser mais fiável com o telemóvel bloqueado.'
+                                  : 'Lembretes ativos. Com o separador em segundo plano o aviso pode atrasar.'
                               )
                             }}
                           />
                           <span className="page-agenda__notif-text">
-                            <strong>Notificar neste telemóvel</strong>
+                            <strong>Notificações no dispositivo</strong>
                             <span className="page-agenda__notif-sub">
                               {iosWebNotificationsLikelyUnreliable()
-                                ? 'No Safari em separador o iOS suspende a página — use o ícone no ecrã principal ou o Calendário. Com a app instalada, o aviso pode aparecer ao voltar à app ou em primeiro plano.'
-                                : 'Lembretes no horário escolhido em cada evento. O aviso dispara entre o instante do lembrete e o início do evento (reabra a app se estiver em segundo plano).'}
+                                ? 'Safari em separador limita avisos — prefira o Calendário ou a app no ecrã principal.'
+                                : 'Lembretes conforme cada evento; em segundo plano o browser pode atrasar.'}
                             </span>
                           </span>
                         </label>

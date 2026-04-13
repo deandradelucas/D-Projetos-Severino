@@ -214,24 +214,29 @@ body[data-theme='light']:has(.app-horizon-shell) .app-routes-grow {
   backdrop-filter: blur(1px);
 }
 
-/* Dashboard inicial: área única branca, sem blur nem “foto” nas laterais */
-body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) .app-routes-grow {
-  background-color: #ffffff;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
+/*
+ * Dashboard com shell: no desktop mantém o cartão branco único (sem foto nas laterais).
+ * No mobile (≤768px) não aplicar isto — assim .app-routes-grow segue com foto + blur(1px)
+ * por baixo da área de rotas e o cabeçalho (backdrop-filter) tem conteúdo visível a desfocar.
+ */
+@media (min-width: 769px) {
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) .app-routes-grow {
+    background-color: #ffffff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 
-html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
-  background-color: #ffffff;
-}
+  html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+    background-color: #ffffff;
+  }
 
-body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) {
-  background-color: #ffffff;
-}
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) {
+    background-color: #ffffff;
+  }
 
-/* Mesmo fundo no #root (evita bordas/canvas escuro por baixo do shell no mobile) */
-body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
-  background-color: #ffffff;
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+    background-color: #ffffff;
+  }
 }
 
 /* Tema escuro */

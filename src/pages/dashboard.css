@@ -1009,8 +1009,8 @@ h3 {
     background: var(--sidebar-bg);
     -webkit-backdrop-filter: blur(40px);
     backdrop-filter: blur(40px);
-    width: min(88vw, 300px);
-    max-width: 300px;
+    width: min(90vw, 320px);
+    max-width: 320px;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0;
     padding-top: calc(28px + var(--safe-top));
@@ -1021,6 +1021,11 @@ h3 {
     box-shadow: 8px 0 40px rgba(0, 0, 0, 0.35);
     display: flex;
     flex-direction: column;
+    /* iOS / Chrome mobile: altura real da viewport (barra de endereço) */
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+    max-height: 100dvh;
+    overflow: hidden;
   }
 
   .sidebar .nav-menu {
@@ -1029,11 +1034,71 @@ h3 {
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
   }
 
   .sidebar .logout-btn {
     margin-top: auto;
     flex-shrink: 0;
+  }
+
+  .dashboard-container.app-horizon-shell .sidebar .nav-section-label {
+    flex-shrink: 0;
+  }
+
+  /* Por cima de .nav-item { white-space: nowrap } e de regras do tema escuro */
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
+    white-space: normal;
+    align-items: center;
+    height: auto;
+    min-height: 52px;
+    font-size: 16px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.35;
+    font-size: 16px;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 12px;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item svg,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
+    min-height: 52px;
+    font-size: 16px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn svg,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn svg {
+    width: 22px;
+    height: 22px;
   }
 
   /* Drawer mobile: logo + botão fechar na mesma linha — evita cortar “Horizonte” na imagem */
@@ -1072,7 +1137,7 @@ h3 {
     background: linear-gradient(105deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.45) 100%);
     -webkit-backdrop-filter: blur(6px) saturate(1.1);
     backdrop-filter: blur(6px) saturate(1.1);
-    z-index: 40;
+    z-index: 80;
     animation: fadeIn 0.28s ease;
   }
 
@@ -6107,29 +6172,29 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
 
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__title,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__title {
-  font-size: clamp(0.9375rem, 0.55vw + 0.78rem, 1.125rem);
+  font-size: clamp(1rem, 0.6vw + 0.78rem, 1.1875rem);
 }
 
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link {
-  font-size: clamp(0.6875rem, 0.24vw + 0.63rem, 0.8125rem);
+  font-size: clamp(0.75rem, 0.26vw + 0.65rem, 0.875rem);
 }
 
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-date,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-date {
-  font-size: clamp(0.75rem, 0.28vw + 0.66rem, 0.875rem);
+  font-size: clamp(0.8125rem, 0.3vw + 0.68rem, 0.9375rem);
 }
 
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text,
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text {
-  font-size: clamp(0.8125rem, 0.28vw + 0.72rem, 0.9375rem);
+  font-size: clamp(0.875rem, 0.32vw + 0.72rem, 1rem);
 }
 
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val {
-  font-size: clamp(0.8125rem, 0.35vw + 0.7rem, 0.9375rem);
+  font-size: clamp(0.875rem, 0.38vw + 0.72rem, 1rem);
 }
 
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty,
@@ -6202,27 +6267,6 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   word-break: normal;
 }
 
-/* Dashboard inicial: blur 1px sempre no cabeçalho (o estado com rolagem reforça o mesmo efeito) */
-body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-  -webkit-backdrop-filter: blur(1px);
-  backdrop-filter: blur(1px);
-  isolation: auto;
-  background: rgba(255, 255, 255, 0.14);
-  background-image: none;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
-  box-shadow: none;
-}
-
-body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-  -webkit-backdrop-filter: blur(1px);
-  backdrop-filter: blur(1px);
-  isolation: auto;
-  background: rgba(0, 0, 0, 0.22);
-  background-image: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: none;
-}
-
 /* Transações: uma linha; título com prioridade (ellipsis se não couber) */
 .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
   flex-wrap: nowrap;
@@ -6284,6 +6328,71 @@ body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-ho
 .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
   margin: 0 0 30px;
   padding: 0;
+}
+
+/* Cabeçalhos do shell: fundo branco translúcido + blur(1px) — todas as rotas do menu (hero sticky) */
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  isolation: auto;
+  background: rgba(255, 255, 255, 0.78);
+  background-image: none;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset;
+}
+
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  isolation: auto;
+  background: rgba(255, 255, 255, 0.1);
+  background-image: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+/*
+ * Mobile (Safari/WebKit): sticky + backdrop-filter — promover camada e vidro um pouco mais translúcido
+ * para o blur(1px) ser perceptível por cima do conteúdo / fundo.
+ */
+@media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    -webkit-backdrop-filter: blur(1px) saturate(1.06);
+    backdrop-filter: blur(1px) saturate(1.06);
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: rgba(255, 255, 255, 0.58);
+  }
+
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    -webkit-backdrop-filter: blur(1px) saturate(1.06);
+    backdrop-filter: blur(1px) saturate(1.06);
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  body[data-theme='light']
+    .dashboard-container.ref-dashboard.app-horizon-shell
+    main.ref-dashboard-main--scrolled
+    .dashboard-hub__hero {
+    -webkit-backdrop-filter: blur(1px) saturate(1.06);
+    backdrop-filter: blur(1px) saturate(1.06);
+    background: rgba(255, 255, 255, 0.78);
+  }
+
+  body[data-theme='dark']
+    .dashboard-container.ref-dashboard.app-horizon-shell
+    main.ref-dashboard-main--scrolled
+    .dashboard-hub__hero {
+    -webkit-backdrop-filter: blur(1px) saturate(1.06);
+    backdrop-filter: blur(1px) saturate(1.06);
+    background: rgba(255, 255, 255, 0.18);
+  }
 }
 
 /* Transações / Relatórios / Agenda: mais respiro entre o cabeçalho (título + ações) e o bloco seguinte */
@@ -6898,7 +7007,7 @@ body[data-theme='light'] .ref-panel__head {
 
 body[data-theme='light'] .ref-panel__title {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -0.025em;
@@ -6916,7 +7025,7 @@ body[data-theme='light'] .ref-panel__link {
   align-items: center;
   gap: 4px;
   padding: 7px 12px 7px 14px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: #1d4ed8;
   text-decoration: none;
@@ -6989,7 +7098,7 @@ body[data-theme='light'] .ref-tx-list-head {
     grid-area: hmeta;
     justify-self: stretch;
     text-align: start;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -7002,7 +7111,7 @@ body[data-theme='light'] .ref-tx-list-head {
     grid-area: hcat;
     justify-self: stretch;
     text-align: start;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -7015,7 +7124,7 @@ body[data-theme='light'] .ref-tx-list-head {
     grid-area: hsub;
     justify-self: stretch;
     text-align: start;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -7033,7 +7142,7 @@ body[data-theme='light'] .ref-tx-list-head {
     grid-area: hval;
     justify-self: end;
     text-align: end;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -7340,7 +7449,7 @@ body[data-theme='light'] .ref-tx-sub-text {
   padding: 0;
   width: 100%;
   max-width: 100%;
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: -0.015em;
   line-height: 1.4;
   color: var(--text-primary);
@@ -7436,7 +7545,7 @@ body[data-theme='light'] .ref-tx-date {
   display: block;
   margin: 0;
   padding: 0;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.4;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -7450,7 +7559,7 @@ body[data-theme='light'] .ref-tx-val {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   padding: 6px 10px;
@@ -7478,7 +7587,7 @@ body[data-theme='light'] .ref-tx-val--neg {
 body[data-theme='light'] .ref-tx-time-sub {
   display: block;
   margin-top: 3px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
   letter-spacing: -0.01em;
@@ -7487,7 +7596,7 @@ body[data-theme='light'] .ref-tx-time-sub {
 body[data-theme='light'] .ref-tx-rec-badge {
   display: inline-block;
   margin-left: 8px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--accent-hover);
   background: var(--accent-muted);
@@ -7986,7 +8095,7 @@ body[data-theme='light'] .ref-dashboard-inner {
     z-index: 30;
     width: 100%;
     box-sizing: border-box;
-    isolation: isolate;
+    isolation: auto;
     min-height: 0;
   }
 
@@ -8097,32 +8206,23 @@ body[data-theme='light'] .ref-dashboard-inner {
   }
 }
 
-/* Com rolagem no painel: hero com fundo translúcido + blur (classe no <main> via ShellStickyHeaderScroll) */
+/* Com rolagem: reforça levemente o vidro (classe no <main> via ShellStickyHeaderScroll) */
 body[data-theme='light']
   .dashboard-container.ref-dashboard.app-horizon-shell
   main.ref-dashboard-main--scrolled
   .dashboard-hub__hero {
-  /* blur(1px) + leve translúcido: transparente puro quebra backdrop em alguns browsers */
-  -webkit-backdrop-filter: blur(1px);
-  backdrop-filter: blur(1px);
-  isolation: auto;
-  background: rgba(255, 255, 255, 0.14);
-  background-image: none;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
-  box-shadow: none;
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom-color: rgba(148, 163, 184, 0.3);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.65) inset;
 }
 
 body[data-theme='dark']
   .dashboard-container.ref-dashboard.app-horizon-shell
   main.ref-dashboard-main--scrolled
   .dashboard-hub__hero {
-  -webkit-backdrop-filter: blur(1px);
-  backdrop-filter: blur(1px);
-  isolation: auto;
-  background: rgba(0, 0, 0, 0.22);
-  background-image: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: none;
+  background: rgba(255, 255, 255, 0.14);
+  border-bottom-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -8130,6 +8230,14 @@ body[data-theme='dark']
     transition: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    background: rgba(255, 255, 255, 0.97) !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    background: rgba(30, 36, 46, 0.96) !important;
   }
 }
 
@@ -8141,7 +8249,7 @@ body[data-theme='dark']
     z-index: 30;
     width: 100%;
     box-sizing: border-box;
-    isolation: isolate;
+    isolation: auto;
     min-height: 0;
   }
 }
@@ -8242,7 +8350,7 @@ body[data-theme='light'] .page-admin.ref-dashboard.app-horizon-shell .main-conte
   width: 100%;
   box-sizing: border-box;
   align-self: stretch;
-  isolation: isolate;
+  isolation: auto;
 }
 
 body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-panel.page-relatorios-chart-panel {
@@ -8632,60 +8740,106 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
 }
 
 @media (max-width: 768px) {
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     border-radius: 0;
-    box-shadow: 8px 0 40px rgba(15, 23, 42, 0.12);
-    min-height: 100%;
-    max-height: none;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+    max-height: 100dvh;
     height: auto;
-    overflow-y: hidden;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
 
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
+    box-shadow: 8px 0 40px rgba(15, 23, 42, 0.12);
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
+    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.4);
+  }
+
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+    position: relative;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
     max-width: 100%;
-    margin-bottom: 10px;
-    padding-bottom: 0;
-    min-height: 44px;
-    gap: 8px;
+    margin-bottom: 18px;
+    padding: 12px 48px 16px;
+    min-height: 80px;
+    gap: 0;
     box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn {
+    position: absolute;
+    top: max(6px, env(safe-area-inset-top, 0px));
+    right: max(0px, env(safe-area-inset-right, 0px));
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 0;
+    border-radius: 12px;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn svg,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn svg {
+    width: 26px;
+    height: 26px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    flex: 1 1 auto;
+    flex: none;
+    display: block;
     min-width: 0;
     width: auto;
-    max-width: calc(100% - 52px);
-    height: 40px;
-    min-height: 40px;
-    max-height: 40px;
+    max-width: min(260px, 88%);
+    height: 56px;
+    min-height: 56px;
+    max-height: 64px;
+    margin: 0 auto;
     object-fit: contain;
-    object-position: left center;
+    object-position: center center;
   }
 
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu {
     flex: 1 1 auto;
     min-height: 0;
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    gap: 10px;
   }
 
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
     margin-top: auto;
+    flex-shrink: 0;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
     border-radius: 0;
-    min-height: 44px;
+    min-height: 52px;
   }
 }
 
@@ -8958,12 +9112,12 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
   }
 
   body[data-theme='light'] .ref-panel__title {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   body[data-theme='light'] .ref-panel__link {
     padding: 6px 10px 6px 12px;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   /* Lista: respiro para o FAB do chat não cobrir a última linha */
@@ -8983,7 +9137,7 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
 
   body[data-theme='light'] .ref-tx-val {
     padding: 5px 8px;
-    font-size: 13px;
+    font-size: 14px;
   }
 
   body[data-theme='light'] .ref-tx-arrow-wrap {

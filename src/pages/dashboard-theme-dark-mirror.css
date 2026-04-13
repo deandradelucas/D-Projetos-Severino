@@ -787,7 +787,7 @@ body[data-theme='dark'] .ref-panel__head {
 }
 body[data-theme='dark'] .ref-panel__title {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
   color: #f1f5f9;
   letter-spacing: -0.025em;
@@ -803,7 +803,7 @@ body[data-theme='dark'] .ref-panel__link {
   align-items: center;
   gap: 4px;
   padding: 7px 12px 7px 14px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: #1d4ed8;
   text-decoration: none;
@@ -872,7 +872,7 @@ body[data-theme='dark'] .ref-tx-list-head {
     grid-area: hmeta;
     justify-self: stretch;
     text-align: start;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -887,7 +887,7 @@ body[data-theme='dark'] .ref-tx-list-head {
     grid-area: hcat;
     justify-self: stretch;
     text-align: start;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -902,7 +902,7 @@ body[data-theme='dark'] .ref-tx-list-head {
     grid-area: hsub;
     justify-self: stretch;
     text-align: start;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -924,7 +924,7 @@ body[data-theme='dark'] .ref-tx-list-head {
     grid-area: hval;
     justify-self: end;
     text-align: end;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -1264,7 +1264,7 @@ body[data-theme='dark'] .ref-tx-sub-text {
   padding: 0;
   width: 100%;
   max-width: 100%;
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: -0.015em;
   line-height: 1.4;
   color: var(--text-primary);
@@ -1344,7 +1344,7 @@ body[data-theme='dark'] .ref-tx-date {
   display: block;
   margin: 0;
   padding: 0;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.4;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -1357,7 +1357,7 @@ body[data-theme='dark'] .ref-tx-val {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   padding: 6px 10px;
@@ -1382,7 +1382,7 @@ body[data-theme='dark'] .ref-tx-val--neg {
 body[data-theme='dark'] .ref-tx-time-sub {
   display: block;
   margin-top: 3px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
   letter-spacing: -0.01em;
@@ -1390,7 +1390,7 @@ body[data-theme='dark'] .ref-tx-time-sub {
 body[data-theme='dark'] .ref-tx-rec-badge {
   display: inline-block;
   margin-left: 8px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--accent-hover);
   background: var(--accent-muted);
@@ -1825,19 +1825,7 @@ body[data-theme='dark'] .ref-dashboard-inner {
     max-width: none;
   }
 }
-body[data-theme='dark']
-  .dashboard-container.ref-dashboard.app-horizon-shell
-  main.ref-dashboard-main--scrolled
-  .dashboard-hub__hero {
-  /* blur(1px) + leve translúcido: transparente puro quebra backdrop em alguns browsers */
-  -webkit-backdrop-filter: blur(1px);
-  backdrop-filter: blur(1px);
-  isolation: auto;
-  background: rgba(255, 255, 255, 0.14);
-  background-image: none;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
-  box-shadow: none;
-}
+/* Vidro do cabeçalho + estado scrolled: ver dashboard.css (importado depois) */
 body[data-theme='dark'] .ref-dashboard-inner .ref-alert {
   text-align: center;
 }
@@ -2220,7 +2208,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
     border-radius: 0;
-    min-height: 44px;
+    min-height: 52px;
   }
 }
 @media (min-width: 769px) {
@@ -2478,14 +2466,14 @@ body[data-theme='dark'] .ref-panel__link:focus-visible {
 @media (max-width: 768px) {
 
   body[data-theme='dark'] .ref-panel__title {
-    font-size: 15px;
+    font-size: 16px;
   }
 }
 @media (max-width: 768px) {
 
   body[data-theme='dark'] .ref-panel__link {
     padding: 6px 10px 6px 12px;
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 @media (max-width: 768px) {
@@ -2511,7 +2499,7 @@ body[data-theme='dark'] .ref-panel__link:focus-visible {
 
   body[data-theme='dark'] .ref-tx-val {
     padding: 5px 8px;
-    font-size: 13px;
+    font-size: 14px;
   }
 }
 @media (max-width: 768px) {

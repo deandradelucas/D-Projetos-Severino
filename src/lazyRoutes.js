@@ -1,4 +1,5 @@
 import { lazy } from 'react'
+import { SHOW_AGENDA } from './lib/featureFlags'
 
 export const loadCadastro = () => import('./pages/Cadastro.jsx')
 export const Cadastro = lazy(loadCadastro)
@@ -40,7 +41,7 @@ const ROUTE_PREFETCH = {
   '/cadastro': loadCadastro,
   '/redefinir-senha': loadRedefinirSenha,
   '/dashboard': loadDashboard,
-  '/agenda': loadAgenda,
+  ...(SHOW_AGENDA ? { '/agenda': loadAgenda } : {}),
   '/transacoes': loadTransacoes,
   '/configuracoes': loadConfiguracoes,
   '/relatorios': loadRelatorios,
@@ -69,7 +70,7 @@ const APP_NAV_PATHS = [
   '/transacoes',
   '/relatorios',
   '/pagamento',
-  '/agenda',
+  ...(SHOW_AGENDA ? ['/agenda'] : []),
   '/configuracoes',
 ]
 
