@@ -152,9 +152,6 @@ export default function Dashboard() {
               </h1>
             </div>
             <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos do painel">
-              <Link to="/transacoes" className="dashboard-hub__btn dashboard-hub__btn--ghost">
-                Ver transações
-              </Link>
               <button type="button" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={() => setIsModalOpen(true)}>
                 + Nova transação
               </button>
