@@ -7,7 +7,7 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar,
 body[data-theme='glass'] .dashboard-container:not(.app-horizon-shell) .sidebar {
   -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
-  background: color-mix(in srgb, #141c28 48%, transparent) !important;
+  background: color-mix(in srgb, var(--sidebar-bg, #030303) 48%, transparent) !important;
   background-image: none !important;
 }
 
@@ -33,14 +33,14 @@ body[data-theme='glass'] .ref-kpi-card--expense,
 body[data-theme='glass'] .ref-kpi-card--income {
   -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
-  background: color-mix(in srgb, #1a2432 54%, transparent) !important;
+  background: color-mix(in srgb, var(--bg-card-elevated, #121212) 54%, transparent) !important;
   background-image: none !important;
 }
 
 body[data-theme='glass'] .ref-panel {
   -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
-  background: color-mix(in srgb, #182230 52%, transparent) !important;
+  background: color-mix(in srgb, var(--bg-card, #0c0c0c) 52%, transparent) !important;
   background-image: none !important;
 }
 
@@ -63,7 +63,7 @@ body[data-theme='glass'] .modal-content {
 body[data-theme='glass'] .horizon-chat-window {
   -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
-  background: color-mix(in srgb, #151c26 55%, transparent) !important;
+  background: color-mix(in srgb, var(--bg-card, #0c0c0c) 55%, transparent) !important;
   background-image: none !important;
 }
 
@@ -73,7 +73,8 @@ body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-ref
 body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list {
   -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
-  background: color-mix(in srgb, var(--bg-card) 52%, transparent) !important;
+  /* Mais opaco que 52%: leitura da lista sobre a foto sem “sumir” o layout */
+  background: color-mix(in srgb, var(--bg-card) 72%, transparent) !important;
   background-image: none !important;
 }
 

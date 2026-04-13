@@ -8,8 +8,8 @@ const VALID_THEMES = ['light', 'dark', 'glass']
 
 const THEME_COLOR_META = {
   light: '#8ca8d4',
-  dark: '#0f172a',
-  glass: '#0b1220',
+  dark: '#030303',
+  glass: '#030303',
 }
 
 /** Remove valores legados (cyberpunk, off-white, etc.). */

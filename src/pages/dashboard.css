@@ -3,6 +3,8 @@
 @import './dashboard-theme-glass-mirror.css';
 @import './dashboard-theme-glass-polish.css';
 @import './dashboard-theme-glass-effects.css';
+@import './dashboard-theme-dark-fullblack.css';
+@import './dashboard-theme-glass-fullblack.css';
 
 /* Default Reset & Variables (Light Mode Glassmorphism) */
 :root {
@@ -41,56 +43,56 @@
 
 /* Paleta escura — mesmas chaves que :root; layout idêntico ao claro */
 body[data-theme='dark'] {
-  --bg-primary: #0c1016;
-  --bg-secondary: #101820;
-  --bg-card: #151c24;
-  --bg-card-elevated: #1a2432;
-  --active-bg: #1e293b;
+  --bg-primary: #000000;
+  --bg-secondary: #050505;
+  --bg-card: #0c0c0c;
+  --bg-card-elevated: #121212;
+  --active-bg: #161616;
   --border-color: rgba(255, 255, 255, 0.08);
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
+  --text-primary: #fafafa;
+  --text-secondary: #a3a3a3;
   --accent: #e4bc6a;
   --accent-hover: #d4a84b;
   --success: #34d399;
   --danger: #f87171;
-  --sidebar-bg: #0f141c;
-  --sidebar-text: #f1f5f9;
-  --sidebar-text-muted: rgba(241, 245, 249, 0.55);
+  --sidebar-bg: #030303;
+  --sidebar-text: #fafafa;
+  --sidebar-text-muted: rgba(250, 250, 250, 0.52);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
-  --sidebar-border-color: rgba(255, 255, 255, 0.1);
-  --content-border-color: rgba(255, 255, 255, 0.06);
-  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.28);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.25);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.28);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.32);
-  --transacoes-balance-pos: #818cf8;
+  --sidebar-border-color: rgba(255, 255, 255, 0.09);
+  --content-border-color: rgba(255, 255, 255, 0.07);
+  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.35);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.32);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.38);
+  --transacoes-balance-pos: #3b82f6;
 }
 
 /* Vitrificado — mesmas variáveis do escuro (efeito de vidro vem de dashboard-theme-glass-effects.css) */
 body[data-theme='glass'] {
-  --bg-primary: #0c1016;
-  --bg-secondary: #101820;
-  --bg-card: #151c24;
-  --bg-card-elevated: #1a2432;
-  --active-bg: #1e293b;
+  --bg-primary: #000000;
+  --bg-secondary: #050505;
+  --bg-card: #0c0c0c;
+  --bg-card-elevated: #121212;
+  --active-bg: #161616;
   --border-color: rgba(255, 255, 255, 0.08);
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
+  --text-primary: #fafafa;
+  --text-secondary: #a3a3a3;
   --accent: #e4bc6a;
   --accent-hover: #d4a84b;
   --success: #34d399;
   --danger: #f87171;
-  --sidebar-bg: #0f141c;
-  --sidebar-text: #f1f5f9;
-  --sidebar-text-muted: rgba(241, 245, 249, 0.55);
+  --sidebar-bg: #030303;
+  --sidebar-text: #fafafa;
+  --sidebar-text-muted: rgba(250, 250, 250, 0.52);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
-  --sidebar-border-color: rgba(255, 255, 255, 0.1);
-  --content-border-color: rgba(255, 255, 255, 0.06);
-  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.28);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.25);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.28);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.32);
-  --transacoes-balance-pos: #818cf8;
+  --sidebar-border-color: rgba(255, 255, 255, 0.09);
+  --content-border-color: rgba(255, 255, 255, 0.07);
+  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.35);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.32);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.38);
+  --transacoes-balance-pos: #3b82f6;
 }
 
 .desktop-only {
@@ -5057,13 +5059,13 @@ body[data-theme='light'] .page-configuracoes.app-horizon-shell .config-theme-car
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card {
-  background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(148, 163, 184, 0.18);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(165deg, #101010 0%, #0a0a0a 100%);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card {
-  background: rgba(30, 41, 59, 0.92);
+  background: linear-gradient(165deg, #121212 0%, #0c0c0c 100%);
 }
 
 .config-card-title {
@@ -5223,7 +5225,7 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card
 }
 
 .config-theme-preview--dark {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: linear-gradient(135deg, #141414 0%, #000000 100%);
 }
 
 .config-theme-preview--glass {
@@ -7657,9 +7659,12 @@ body[data-theme='light']
   .dashboard-container.ref-dashboard.app-horizon-shell
   main.ref-dashboard-main--scrolled
   .ref-dashboard-actions-card--welcome {
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  background: transparent;
+  /* blur(1px) + leve translúcido: transparente puro quebra backdrop em alguns browsers */
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  isolation: auto;
+  background: rgba(255, 255, 255, 0.14);
+  background-image: none;
   border-bottom: 1px solid rgba(148, 163, 184, 0.22);
   box-shadow: none;
 }
@@ -7673,10 +7678,12 @@ body[data-theme='dark']
   .dashboard-container.ref-dashboard.app-horizon-shell
   main.ref-dashboard-main--scrolled
   .ref-dashboard-actions-card--welcome {
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  background: transparent;
-  border-bottom: 1px solid rgba(100, 116, 139, 0.28);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  isolation: auto;
+  background: rgba(0, 0, 0, 0.22);
+  background-image: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: none;
 }
 
@@ -7689,10 +7696,62 @@ body[data-theme='glass']
   .dashboard-container.ref-dashboard.app-horizon-shell
   main.ref-dashboard-main--scrolled
   .ref-dashboard-actions-card--welcome {
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  background: transparent;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  /* glass-effects.css usa background !important em .ref-dashboard-header / --welcome */
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  isolation: auto;
+  background: rgba(0, 0, 0, 0.18) !important;
+  background-image: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+/* Dashboard: header fica DENTRO do card de boas-vindas — precisa vencer body[data-theme] .ref-dashboard-header (fullblack/polish) */
+body[data-theme='light']
+  .dashboard-container.ref-dashboard.app-horizon-shell
+  main.ref-dashboard-main--scrolled
+  .ref-dashboard-actions-card--welcome
+  .ref-dashboard-header {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  isolation: auto;
+  background: rgba(255, 255, 255, 0.14);
+  background-image: none;
+  border: none;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body[data-theme='dark']
+  .dashboard-container.ref-dashboard.app-horizon-shell
+  main.ref-dashboard-main--scrolled
+  .ref-dashboard-actions-card--welcome
+  .ref-dashboard-header {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  isolation: auto;
+  background: rgba(0, 0, 0, 0.22);
+  background-image: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body[data-theme='glass']
+  .dashboard-container.ref-dashboard.app-horizon-shell
+  main.ref-dashboard-main--scrolled
+  .ref-dashboard-actions-card--welcome
+  .ref-dashboard-header {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  isolation: auto;
+  background: rgba(0, 0, 0, 0.18) !important;
+  background-image: none !important;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
   box-shadow: none;
 }
 
@@ -8763,7 +8822,8 @@ body[data-theme='light'] .global-skeleton {
   }
 
   body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row,
-  body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row {
+  body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row,
+  body[data-theme='glass'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row {
     display: grid;
     grid-template-columns: 40px minmax(0, 1fr) auto auto;
     grid-template-areas:
@@ -8783,7 +8843,8 @@ body[data-theme='light'] .global-skeleton {
   }
 
   body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row::after,
-  body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row::after {
+  body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row::after,
+  body[data-theme='glass'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row::after {
     display: none;
   }
 
@@ -8888,7 +8949,8 @@ body[data-theme='light'] .global-skeleton {
   }
 
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row {
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row,
+  body[data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row {
     display: grid;
     grid-template-columns: 40px minmax(0, 1fr) auto;
     grid-template-rows: auto auto auto;
@@ -8905,7 +8967,8 @@ body[data-theme='light'] .global-skeleton {
   }
 
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row::after,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row::after {
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row::after,
+  body[data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row::after {
     display: none;
   }
 
@@ -9177,24 +9240,24 @@ body[data-theme='dark'] .modal-content--nova-tx .modal-form select:focus,
 body[data-theme='dark'] .modal-content--nova-tx .modal-form textarea:focus,
 body[data-theme='dark'] .modal-content--nova-tx .input-premium:focus {
   outline: none;
-  border-color: rgba(148, 163, 184, 0.35) !important;
+  border-color: rgba(212, 168, 75, 0.4) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
   transform: none !important;
-  background: #1a222e !important;
+  background: #121212 !important;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .custom-select.open .custom-select-trigger {
-  border-color: rgba(148, 163, 184, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .custom-select.open .custom-select-dropdown {
-  border-color: rgba(100, 116, 139, 0.45) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focus {
   outline: none;
-  border-color: rgba(148, 163, 184, 0.35) !important;
+  border-color: rgba(212, 168, 75, 0.38) !important;
   box-shadow: none !important;
 }
 
@@ -9203,24 +9266,24 @@ body[data-theme='glass'] .modal-content--nova-tx .modal-form select:focus,
 body[data-theme='glass'] .modal-content--nova-tx .modal-form textarea:focus,
 body[data-theme='glass'] .modal-content--nova-tx .input-premium:focus {
   outline: none;
-  border-color: rgba(148, 163, 184, 0.35) !important;
+  border-color: rgba(212, 168, 75, 0.4) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
   transform: none !important;
-  background: #1a222e !important;
+  background: #121212 !important;
 }
 
 body[data-theme='glass'] .modal-content--nova-tx .custom-select.open .custom-select-trigger {
-  border-color: rgba(148, 163, 184, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
 body[data-theme='glass'] .modal-content--nova-tx .custom-select.open .custom-select-dropdown {
-  border-color: rgba(100, 116, 139, 0.45) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 body[data-theme='glass'] .modal-content--nova-tx .custom-select-search input:focus {
   outline: none;
-  border-color: rgba(148, 163, 184, 0.35) !important;
+  border-color: rgba(212, 168, 75, 0.38) !important;
   box-shadow: none !important;
 }
 

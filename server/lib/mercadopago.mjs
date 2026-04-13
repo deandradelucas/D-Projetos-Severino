@@ -188,8 +188,12 @@ export async function criarPreapprovalAssinaturaMensal(opts) {
   const cleanBase = String(baseUrl || '').replace(/\/+$/, '')
   const notificationUrl = `${cleanBase}/api/pagamentos/webhook`
 
-  const start = new Date()
-  start.setMinutes(start.getMinutes() + 15)
+  /* Primeira cobrança recorrente no mês seguinte (não no mesmo mês da compra). */
+  const now = new Date()
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 12, 0, 0, 0))
+  if (start.getTime() <= now.getTime() + 60_000) {
+    start.setUTCMonth(start.getUTCMonth() + 1)
+  }
   const end = new Date()
   end.setFullYear(end.getFullYear() + 5)
 

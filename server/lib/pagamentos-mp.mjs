@@ -58,6 +58,53 @@ export async function insertPreferenciaRecord({
   return data
 }
 
+/** Mesmo dia no mês calendário seguinte (UTC); clamp ao último dia do mês (ex.: 31 jan → 28/29 fev). */
+function shiftToFollowingCalendarMonth(d) {
+  const y = d.getUTCFullYear()
+  const m = d.getUTCMonth()
+  const day = d.getUTCDate()
+  const h = d.getUTCHours()
+  const mi = d.getUTCMinutes()
+  const s = d.getUTCSeconds()
+  const ms = d.getUTCMilliseconds()
+  const nm = m + 1
+  const lastDom = new Date(Date.UTC(y, nm + 1, 0)).getUTCDate()
+  const dom = Math.min(day, lastDom)
+  return new Date(Date.UTC(y, nm, dom, h, mi, s, ms))
+}
+
+/** Garante data estritamente futura, avançando mês a mês (teto 24 iterações). */
+function ensureFutureMonthlyAnchor(d, now) {
+  let out = new Date(d.getTime())
+  let guard = 0
+  while (out.getTime() <= now.getTime() && guard < 24) {
+    out = shiftToFollowingCalendarMonth(out)
+    guard += 1
+  }
+  return out
+}
+
+/**
+ * Próxima cobrança exibida/armazenada: após a compra, no mês seguinte (não no mesmo mês),
+ * enquanto o MP ainda não registrou cobrança recorrente (charged_quantity === 0).
+ */
+function normalizarProximaCobrancaMensal(pre, nextIso) {
+  if (!nextIso) return null
+  const next = new Date(nextIso)
+  if (Number.isNaN(next.getTime())) return null
+  const now = new Date()
+  const charged = Number(pre?.summarized?.charged_quantity ?? 0)
+  if (charged > 0) {
+    if (next.getTime() <= now.getTime()) return ensureFutureMonthlyAnchor(next, now).toISOString()
+    return next.toISOString()
+  }
+  const sameMonth =
+    next.getUTCFullYear() === now.getUTCFullYear() && next.getUTCMonth() === now.getUTCMonth()
+  let out = sameMonth ? shiftToFollowingCalendarMonth(next) : next
+  if (out.getTime() <= now.getTime()) out = ensureFutureMonthlyAnchor(out, now)
+  return out.toISOString()
+}
+
 /**
  * Atualiza usuário com dados do preapproval (próxima cobrança, status).
  */
@@ -68,7 +115,7 @@ export async function atualizarUsuarioDePreapprovalResponse(usuarioId, pre) {
   let nextIso = null
   if (pre.next_payment_date) {
     const d = new Date(pre.next_payment_date)
-    if (!Number.isNaN(d.getTime())) nextIso = d.toISOString()
+    if (!Number.isNaN(d.getTime())) nextIso = normalizarProximaCobrancaMensal(pre, d.toISOString())
   }
   const st = String(pre.status || '').toLowerCase() || null
   const { error } = await supabase
