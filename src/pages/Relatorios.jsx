@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
@@ -24,6 +24,37 @@ import {
   Pie,
   Cell,
 } from 'recharts'
+
+function formatPctBr(value, total) {
+  if (!total || total <= 0) return '0%'
+  const pct = (Number(value) / total) * 100
+  return `${pct.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 1 })}%`
+}
+
+/** Legenda ao lado do gráfico (fora do Recharts — layout responsivo estável) */
+function RelatorioPieLegendList({ rows, colorAt, total, formatCurrency }) {
+  if (!rows?.length) return null
+  return (
+    <ul className="relatorios-pie-legend">
+      {rows.map((row, i) => {
+        const val = row.value
+        const name = row.name
+        return (
+          <li key={`${String(name)}-${i}`} className="relatorios-pie-legend__item">
+            <span className="relatorios-pie-legend__swatch" style={{ background: colorAt(i) }} aria-hidden />
+            <div className="relatorios-pie-legend__body">
+              <span className="relatorios-pie-legend__name">{name}</span>
+              <span className="relatorios-pie-legend__meta">
+                <span className="relatorios-pie-legend__pct">{formatPctBr(val, total)}</span>
+                <span className="relatorios-pie-legend__val">{formatCurrency(val)}</span>
+              </span>
+            </div>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
 
 const SkeletonKpi = () => (
   <div className="ref-kpi-card ref-kpi-card--skeleton" aria-hidden>
@@ -219,6 +250,15 @@ export default function Relatorios() {
     chartDataReceitasPorCategoria,
   } = useRelatorioAggregates(transacoes)
 
+  const totalPieDesp = useMemo(
+    () => chartDataPorCategoria.reduce((s, x) => s + (Number(x.value) || 0), 0),
+    [chartDataPorCategoria]
+  )
+  const totalPieRec = useMemo(
+    () => chartDataReceitasPorCategoria.reduce((s, x) => s + (Number(x.value) || 0), 0),
+    [chartDataReceitasPorCategoria]
+  )
+
   const formatCurrency = formatCurrencyBRL
 
   const exportToCSV = () => downloadRelatorioCsv(transacoes, filters)
@@ -329,40 +369,44 @@ export default function Relatorios() {
           aria-label="Período e categoria"
         >
           <div className="ref-panel__head page-relatorios-filters-head">
-            <button
-              type="button"
-              className="page-relatorios-filters-toggle"
-              id="relatorio-filtros-trigger"
-              aria-expanded={filtrosAbertos}
-              aria-controls="relatorio-filtros-fields"
-              onClick={() => setFiltrosAbertos((open) => !open)}
-            >
-              <span className="page-relatorios-filters-toggle__lead">
-                <span className="ref-panel__title" role="heading" aria-level={2}>
-                  Filtros do relatório
-                </span>
-                <span className="ref-panel__subtitle page-relatorios-filters-toggle__sub">
-                  Período e categoria · apenas transações efetivadas
-                </span>
-              </span>
-              <svg
-                className={`page-relatorios-filters-toggle__chevron ${filtrosAbertos ? 'page-relatorios-filters-toggle__chevron--open' : ''}`}
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
+            <div className="page-relatorios-filters-head__primary">
+              <button
+                type="button"
+                className="page-relatorios-filters-toggle"
+                id="relatorio-filtros-trigger"
+                aria-expanded={filtrosAbertos}
+                aria-controls="relatorio-filtros-fields"
+                onClick={() => setFiltrosAbertos((open) => !open)}
               >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </button>
-            <button type="button" className="ref-panel__link ref-panel__link--button" onClick={clearRelatorioFilters}>
-              Limpar filtros
-            </button>
+                <span className="page-relatorios-filters-toggle__lead">
+                  <span className="ref-panel__title" role="heading" aria-level={2}>
+                    Filtros do relatório
+                  </span>
+                  <span className="ref-panel__subtitle page-relatorios-filters-toggle__sub">
+                    Período e categoria · apenas transações efetivadas
+                  </span>
+                </span>
+                <svg
+                  className={`page-relatorios-filters-toggle__chevron ${filtrosAbertos ? 'page-relatorios-filters-toggle__chevron--open' : ''}`}
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            </div>
+            <div className="page-relatorios-filters-head__secondary">
+              <button type="button" className="ref-panel__link ref-panel__link--button" onClick={clearRelatorioFilters}>
+                Limpar filtros
+              </button>
+            </div>
           </div>
           <div
             id="relatorio-filtros-fields"
@@ -439,7 +483,7 @@ export default function Relatorios() {
                   </svg>
                 </div>
                 <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Saldo líquido (período)</p>
+                  <p className="ref-kpi-card__label">Saldo no período</p>
                   <p
                     className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''} ${saldoPositivo ? 'relatorios-kpi-saldo--pos' : 'relatorios-kpi-saldo--neg'}`}
                   >
@@ -604,45 +648,54 @@ export default function Relatorios() {
                 </div>
                 <div className="relatorios-chart-card__body relatorios-chart-card__body--pie">
                   {chartDataPorCategoria.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={chartDataPorCategoria}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={isMobile ? 52 : 68}
-                          outerRadius={isMobile ? 80 : 102}
-                          paddingAngle={3}
-                          dataKey="value"
-                          stroke={chart.pieStroke}
-                          strokeWidth={1}
-                        >
-                          {chartDataPorCategoria.map((_, index) => (
-                            <Cell key={`desp-${index}`} fill={chart.pieColorsDesp[index % chart.pieColorsDesp.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          content={({ active, payload }) => {
-                            if (!active || !payload?.length) return null
-                            const p = payload[0]
-                            return (
-                              <div className="relatorios-tooltip">
-                                <div className="relatorios-tooltip__label">{p.name}</div>
-                                <div className="relatorios-tooltip__row">
-                                  <span className="relatorios-tooltip__val">{formatCurrency(p.value)}</span>
-                                </div>
-                              </div>
-                            )
-                          }}
+                    <div className="relatorios-pie-layout">
+                      <div className="relatorios-pie-layout__chart">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={chartDataPorCategoria}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius="40%"
+                              outerRadius="74%"
+                              paddingAngle={2}
+                              dataKey="value"
+                              nameKey="name"
+                              stroke={chart.pieStroke}
+                              strokeWidth={1}
+                            >
+                              {chartDataPorCategoria.map((_, index) => (
+                                <Cell key={`desp-${index}`} fill={chart.pieColorsDesp[index % chart.pieColorsDesp.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              content={({ active, payload }) => {
+                                if (!active || !payload?.length) return null
+                                const p = payload[0]
+                                const pct = formatPctBr(p.value, totalPieDesp)
+                                return (
+                                  <div className="relatorios-tooltip">
+                                    <div className="relatorios-tooltip__label">{p.name}</div>
+                                    <div className="relatorios-tooltip__row relatorios-tooltip__row--pie">
+                                      <span className="relatorios-tooltip__val">{formatCurrency(p.value)}</span>
+                                      <span className="relatorios-tooltip__pct">{pct}</span>
+                                    </div>
+                                  </div>
+                                )
+                              }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <aside className="relatorios-pie-layout__legend" style={{ color: chart.legend }}>
+                        <RelatorioPieLegendList
+                          rows={chartDataPorCategoria}
+                          colorAt={(i) => chart.pieColorsDesp[i % chart.pieColorsDesp.length]}
+                          total={totalPieDesp}
+                          formatCurrency={formatCurrency}
                         />
-                        <Legend
-                          layout="vertical"
-                          align="right"
-                          verticalAlign="middle"
-                          wrapperStyle={{ fontSize: 12, color: chart.legend, paddingLeft: 8 }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
+                      </aside>
+                    </div>
                   ) : (
                     <div className="relatorios-chart-empty">Sem despesas no período.</div>
                   )}
@@ -658,45 +711,54 @@ export default function Relatorios() {
                 </div>
                 <div className="relatorios-chart-card__body relatorios-chart-card__body--pie">
                   {chartDataReceitasPorCategoria.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={chartDataReceitasPorCategoria}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={isMobile ? 52 : 68}
-                          outerRadius={isMobile ? 80 : 102}
-                          paddingAngle={3}
-                          dataKey="value"
-                          stroke={chart.pieStroke}
-                          strokeWidth={1}
-                        >
-                          {chartDataReceitasPorCategoria.map((_, index) => (
-                            <Cell key={`rec-${index}`} fill={chart.pieColorsRec[index % chart.pieColorsRec.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          content={({ active, payload }) => {
-                            if (!active || !payload?.length) return null
-                            const p = payload[0]
-                            return (
-                              <div className="relatorios-tooltip">
-                                <div className="relatorios-tooltip__label">{p.name}</div>
-                                <div className="relatorios-tooltip__row">
-                                  <span className="relatorios-tooltip__val">{formatCurrency(p.value)}</span>
-                                </div>
-                              </div>
-                            )
-                          }}
+                    <div className="relatorios-pie-layout">
+                      <div className="relatorios-pie-layout__chart">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={chartDataReceitasPorCategoria}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius="40%"
+                              outerRadius="74%"
+                              paddingAngle={2}
+                              dataKey="value"
+                              nameKey="name"
+                              stroke={chart.pieStroke}
+                              strokeWidth={1}
+                            >
+                              {chartDataReceitasPorCategoria.map((_, index) => (
+                                <Cell key={`rec-${index}`} fill={chart.pieColorsRec[index % chart.pieColorsRec.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              content={({ active, payload }) => {
+                                if (!active || !payload?.length) return null
+                                const p = payload[0]
+                                const pct = formatPctBr(p.value, totalPieRec)
+                                return (
+                                  <div className="relatorios-tooltip">
+                                    <div className="relatorios-tooltip__label">{p.name}</div>
+                                    <div className="relatorios-tooltip__row relatorios-tooltip__row--pie">
+                                      <span className="relatorios-tooltip__val">{formatCurrency(p.value)}</span>
+                                      <span className="relatorios-tooltip__pct">{pct}</span>
+                                    </div>
+                                  </div>
+                                )
+                              }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <aside className="relatorios-pie-layout__legend" style={{ color: chart.legend }}>
+                        <RelatorioPieLegendList
+                          rows={chartDataReceitasPorCategoria}
+                          colorAt={(i) => chart.pieColorsRec[i % chart.pieColorsRec.length]}
+                          total={totalPieRec}
+                          formatCurrency={formatCurrency}
                         />
-                        <Legend
-                          layout="vertical"
-                          align="right"
-                          verticalAlign="middle"
-                          wrapperStyle={{ fontSize: 12, color: chart.legend, paddingLeft: 8 }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
+                      </aside>
+                    </div>
                   ) : (
                     <div className="relatorios-chart-empty">Sem receitas no período.</div>
                   )}
