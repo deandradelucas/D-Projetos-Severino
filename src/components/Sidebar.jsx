@@ -113,6 +113,9 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             height={360}
             decoding="sync"
           />
+          <span className="brand-wordmark" aria-hidden>
+            HORIZONTE
+          </span>
           <button
             type="button"
             className="mobile-close-btn"
