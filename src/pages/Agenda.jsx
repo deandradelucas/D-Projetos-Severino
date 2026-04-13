@@ -24,6 +24,7 @@ import {
   readAgendaNotificationsEnabled,
   writeAgendaNotificationsEnabled,
   requestAgendaNotificationPermission,
+  ensureAgendaServiceWorkerReady,
   startAgendaNotificationScheduler,
 } from '../lib/agendaNotifications'
 import { shareOrDownloadAgendaIcs } from '../lib/agendaIcsExport'
@@ -477,12 +478,13 @@ export default function Agenda() {
                                 )
                                 return
                               }
+                              await ensureAgendaServiceWorkerReady()
                               writeAgendaNotificationsEnabled(true)
                               setNotifEnabled(true)
                               setNotifHint(
                                 isIOSDevice()
-                                  ? 'Se não receber alertas, use “Adicionar lembretes ao Calendário” — no iPhone é o método fiável. Os avisos Web dependem do Safari/app não adormecer.'
-                                  : 'Lembretes ativos: aviso conforme o campo “Lembrete” de cada evento (todos os eventos carregados, não só os filtrados).'
+                                  ? 'Lembretes: adicione o site ao ecrã principal (Safari → Partilhar) e abra pelo ícone — assim o iOS permite alertas. Com o app fechado, use “Adicionar ao Calendário” para alarmes fiáveis.'
+                                  : 'Lembretes ativos: aviso entre o horário do lembrete e o início do evento (todos os eventos carregados). Com o separador em segundo plano o browser pode atrasar — mantenha a app aberta ou use exportar ao Calendário.'
                               )
                             }}
                           />
@@ -490,8 +492,8 @@ export default function Agenda() {
                             <strong>Notificar neste telemóvel</strong>
                             <span className="page-agenda__notif-sub">
                               {iosWebNotificationsLikelyUnreliable()
-                                ? 'No Safari do iPhone isto costuma falhar — prefira o botão “Calendário” acima. Em app instalada no ecrã principal pode funcionar.'
-                                : 'Lembretes no horário escolhido em cada evento (mantenha o separador ou a app aberta para o browser poder avisar).'}
+                                ? 'No Safari em separador o iOS suspende a página — use o ícone no ecrã principal ou o Calendário. Com a app instalada, o aviso pode aparecer ao voltar à app ou em primeiro plano.'
+                                : 'Lembretes no horário escolhido em cada evento. O aviso dispara entre o instante do lembrete e o início do evento (reabra a app se estiver em segundo plano).'}
                             </span>
                           </span>
                         </label>

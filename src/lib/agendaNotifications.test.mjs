@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { reminderMinutesBefore, scanAgendaEventsForNotifications } from './agendaNotifications.js'
+import {
+  isReminderNotifyWindow,
+  reminderMinutesBefore,
+  scanAgendaEventsForNotifications,
+} from './agendaNotifications.js'
 
 describe('reminderMinutesBefore', () => {
   it('mapeia lembretes conhecidos', () => {
@@ -9,6 +13,26 @@ describe('reminderMinutesBefore', () => {
     expect(reminderMinutesBefore('1-hora')).toBe(60)
     expect(reminderMinutesBefore('1-dia')).toBe(24 * 60)
     expect(reminderMinutesBefore(undefined)).toBe(30)
+  })
+})
+
+describe('isReminderNotifyWindow', () => {
+  it('30 min antes: válido desde o instante do lembrete até ao início do evento', () => {
+    const startMs = 1_700_000_000_000
+    const notifyAtMs = startMs - 30 * 60_000
+    expect(isReminderNotifyWindow(notifyAtMs - 1000, startMs, notifyAtMs, 30)).toBe(false)
+    expect(isReminderNotifyWindow(notifyAtMs, startMs, notifyAtMs, 30)).toBe(true)
+    expect(isReminderNotifyWindow(startMs - 60_000, startMs, notifyAtMs, 30)).toBe(true)
+    expect(isReminderNotifyWindow(startMs, startMs, notifyAtMs, 30)).toBe(false)
+  })
+
+  it('agora: válido no início e até 30 min depois', () => {
+    const startMs = 1_700_000_000_000
+    const notifyAtMs = startMs
+    expect(isReminderNotifyWindow(startMs - 1, startMs, notifyAtMs, 0)).toBe(false)
+    expect(isReminderNotifyWindow(startMs, startMs, notifyAtMs, 0)).toBe(true)
+    expect(isReminderNotifyWindow(startMs + 29 * 60_000, startMs, notifyAtMs, 0)).toBe(true)
+    expect(isReminderNotifyWindow(startMs + 31 * 60_000, startMs, notifyAtMs, 0)).toBe(false)
   })
 })
 

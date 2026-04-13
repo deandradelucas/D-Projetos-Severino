@@ -1036,6 +1036,31 @@ h3 {
     flex-shrink: 0;
   }
 
+  /* Drawer mobile: logo + botão fechar na mesma linha — evita cortar “Horizonte” na imagem */
+  .sidebar .brand-wrapper {
+    width: 100%;
+    max-width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    box-sizing: border-box;
+  }
+
+  .sidebar .brand-logo {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    max-width: calc(100% - 52px);
+    height: auto;
+    max-height: 44px;
+    object-fit: contain;
+    object-position: left center;
+  }
+
+  .sidebar .mobile-close-btn {
+    flex-shrink: 0;
+  }
+
   .sidebar.open {
     left: 0;
   }
@@ -6161,12 +6186,41 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   flex-wrap: nowrap;
   min-width: 0;
   justify-content: flex-end;
+  flex-shrink: 1;
 }
 
+/* Nome: até 2 linhas (evita “…” numa linha só); o bloco do título ganha prioridade sobre o toolbar */
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title {
-  white-space: nowrap;
+  white-space: normal;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* Dashboard inicial: blur 1px sempre no cabeçalho (o estado com rolagem reforça o mesmo efeito) */
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  isolation: auto;
+  background: rgba(255, 255, 255, 0.14);
+  background-image: none;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: none;
+}
+
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  isolation: auto;
+  background: rgba(0, 0, 0, 0.22);
+  background-image: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
 }
 
 /* Transações: uma linha; título com prioridade (ellipsis se não couber) */
@@ -6193,6 +6247,35 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
 }
 
 .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Relatórios: uma linha; título + exportações (CSV/PDF) */
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
+  flex-shrink: 0;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions.relatorios-header-export {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -6390,6 +6473,15 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
     justify-content: flex-end;
     gap: 8px;
   }
+
+  /* Relatórios: título + CSV/PDF numa linha */
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+    flex: 0 0 auto;
+    width: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
 }
 
 /* Dashboard inicial (mobile): coluna ~100% do <main>; cabeçalho numa linha; cartões até as bordas úteis */
@@ -6422,11 +6514,27 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
     align-items: center;
   }
 
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
     flex: 0 1 auto;
     min-width: 0;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 10px;
+    padding-right: 10px;
+    min-height: 40px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
   }
 
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
@@ -7902,22 +8010,22 @@ body[data-theme='light'] .ref-dashboard-inner {
     min-height: 40px;
   }
 
-  /* Relatórios: hero + exportações — quebra linha em vez de estourar a largura */
+  /* Relatórios: título + exportações numa linha (alinhado a Transações) */
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     column-gap: 10px;
-    row-gap: 12px;
     min-width: 0;
   }
 
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
-    flex: 1 1 200px;
+    flex: 1 1 0%;
     min-width: 0;
   }
 
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-header-export {
-    margin-left: auto;
+    margin-left: 0;
+    flex-shrink: 0;
   }
 
   body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relatorios-header-export .dashboard-hub__btn {
@@ -8535,24 +8643,32 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
     flex-direction: column;
   }
 
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
-    margin-bottom: 10px;
-    padding-bottom: 0;
-    min-height: 44px;
-  }
-
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 100%;
     margin-bottom: 10px;
     padding-bottom: 0;
     min-height: 44px;
+    gap: 8px;
+    box-sizing: border-box;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    max-width: calc(100% - 52px);
     height: 40px;
     min-height: 40px;
     max-height: 40px;
     object-fit: contain;
+    object-position: left center;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu {

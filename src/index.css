@@ -307,7 +307,12 @@ button {
     background-color: #ffffff;
   }
 
-  /* iOS safe-area paint: evita faixa clara residual no rodapé */
+  /* Shell autenticado: o cartão já leva safe-area no padding — não duplicar com padding no #root nem faixa fixa */
+  .app-routes-grow:has(.dashboard-container.app-horizon-shell) {
+    padding-bottom: 0;
+  }
+
+  /* iOS safe-area paint: páginas sem shell (login, etc.) */
   body::after {
     content: "";
     position: fixed;
@@ -322,6 +327,10 @@ button {
 
   body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell)::after {
     background: #ffffff;
+  }
+
+  body:has(.dashboard-container.app-horizon-shell)::after {
+    display: none;
   }
 
   input,

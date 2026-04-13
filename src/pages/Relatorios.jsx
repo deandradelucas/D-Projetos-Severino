@@ -337,7 +337,7 @@ export default function Relatorios() {
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div className="dashboard-hub__hero-text">
-              <h1 className="dashboard-hub__title">Relatórios analíticos</h1>
+              <h1 className="dashboard-hub__title">Relatórios</h1>
             </div>
             <div className="dashboard-hub__hero-actions relatorios-header-export" role="toolbar" aria-label="Exportar relatório">
               <button

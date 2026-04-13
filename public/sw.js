@@ -1,4 +1,4 @@
-const CACHE_NAME = 'horizonte-financeiro-v5'
+const CACHE_NAME = 'horizonte-financeiro-v6'
 const APP_SHELL = [
   '/',
   '/manifest.json',

@@ -1,16 +1,19 @@
 /**
  * Lembretes da agenda no dispositivo (Notifications API + service worker quando existir).
- * No iPhone o Safari não corre avisos em segundo plano como no Android — o fluxo fiável é exportar .ics
- * para a app Calendário (`agendaIcsExport.js` + UI na página Agenda).
+ * No iPhone o Safari suspende a página em segundo plano: não há garantia de aviso com o app fechado
+ * (use exportar .ics → Calendário, ou PWA no ecrã principal + permissão; lembretes Web push no servidor seria outro passo).
  */
 
 import { AGENDA_REMINDER_LABELS } from './agendaConstants'
+import { isIOSDevice } from './devicePlatform'
 
 const LS_ENABLED = 'horizonte_agenda_notifications_enabled'
 const LS_FIRED = 'horizonte_agenda_notif_fired_v1'
 const MAX_FIRED_KEYS = 400
-const NOTIFY_WINDOW_MS = 120_000
+/** Após o horário do evento, lembrete "agora" ainda pode disparar nesta janela (ex.: abriu a app atrasado). */
+const AT_START_GRACE_MS = 30 * 60_000
 const POLL_MS_VISIBLE = 45_000
+const POLL_MS_VISIBLE_IOS = 20_000
 const POLL_MS_HIDDEN = 120_000
 
 const DONE = new Set(['concluido', 'cancelado', 'pago', 'recebido'])
@@ -80,6 +83,22 @@ function firedKey(ev) {
 }
 
 /**
+ * Janela útil do lembrete: após o instante calculado (ex.: 30 min antes) até ao início do evento.
+ * A versão antiga só aceitava 2 min após esse instante — na prática quase ninguém recebia, e no iPhone (página suspensa) pior.
+ * @param {number} now
+ * @param {number} startMs
+ * @param {number} notifyAtMs
+ * @param {number} offsetMin
+ */
+export function isReminderNotifyWindow(now, startMs, notifyAtMs, offsetMin) {
+  if (now < notifyAtMs) return false
+  if (offsetMin === 0) {
+    return now >= startMs && now < startMs + AT_START_GRACE_MS
+  }
+  return now < startMs
+}
+
+/**
  * @param {string} title
  * @param {{ body?: string; tag?: string }} opts
  */
@@ -90,8 +109,10 @@ async function showDeviceNotification(title, opts = {}) {
     icon,
     badge: icon,
     tag: opts.tag || 'horizonte-agenda',
-    vibrate: [80, 40, 80],
     silent: false,
+  }
+  if (!isIOSDevice()) {
+    options.vibrate = [80, 40, 80]
   }
   try {
     if (navigator.serviceWorker?.ready) {
@@ -134,8 +155,7 @@ export function scanAgendaEventsForNotifications(events, fired) {
       notifyAtMs = startMs - offsetMs
     }
 
-    const inWindow = now >= notifyAtMs && now < notifyAtMs + NOTIFY_WINDOW_MS
-    if (!inWindow) continue
+    if (!isReminderNotifyWindow(now, startMs, notifyAtMs, offsetMin)) continue
 
     const reminderLabel = AGENDA_REMINDER_LABELS[ev.reminder] || AGENDA_REMINDER_LABELS['30-min']
     const when = new Date(ev.startAt).toLocaleString('pt-BR', {
@@ -172,6 +192,23 @@ export async function requestAgendaNotificationPermission() {
 }
 
 /**
+ * No iPhone (PWA), o aviso via service worker só funciona com SW ativo; após permissão, força registo e espera.
+ * Em `npm run dev` o SW está desligado por defeito (igual a `registerServiceWorker`).
+ */
+export async function ensureAgendaServiceWorkerReady() {
+  if (!('serviceWorker' in navigator)) return false
+  const forceDev = import.meta.env.VITE_ENABLE_SW === 'true'
+  if (import.meta.env.DEV && !forceDev) return true
+  try {
+    await navigator.serviceWorker.register('/sw.js')
+    await navigator.serviceWorker.ready
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
  * Inicia sondagem periódica enquanto a página estiver montada.
  * @param {() => Record<string, unknown>[]} getEvents
  * @returns {() => void} cleanup
@@ -191,18 +228,24 @@ export function startAgendaNotificationScheduler(getEvents) {
     }
   }
 
+  const pollVisible = () => (isIOSDevice() ? POLL_MS_VISIBLE_IOS : POLL_MS_VISIBLE)
+
   tick()
-  let id = setInterval(tick, document.hidden ? POLL_MS_HIDDEN : POLL_MS_VISIBLE)
+  let id = setInterval(tick, document.hidden ? POLL_MS_HIDDEN : pollVisible())
 
   const onVis = () => {
     clearInterval(id)
-    id = setInterval(tick, document.hidden ? POLL_MS_HIDDEN : POLL_MS_VISIBLE)
+    id = setInterval(tick, document.hidden ? POLL_MS_HIDDEN : pollVisible())
     tick()
   }
   document.addEventListener('visibilitychange', onVis)
+  window.addEventListener('focus', onVis)
+  window.addEventListener('pageshow', onVis)
 
   return () => {
     clearInterval(id)
     document.removeEventListener('visibilitychange', onVis)
+    window.removeEventListener('focus', onVis)
+    window.removeEventListener('pageshow', onVis)
   }
 }
