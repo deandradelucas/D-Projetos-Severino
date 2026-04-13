@@ -30,7 +30,33 @@
  * @property {number} receivableTotal
  */
 
+import { apiUrl } from './apiUrl'
+import { fetchWithRetry } from './fetchWithRetry'
+import { readHorizonteUser } from './horizonteSession'
+import { redirectAssinaturaExpiradaSe403 } from './authRedirect'
+
 const STORAGE_KEY = 'horizonte_agenda_events'
+
+/** IDs gravados no Supabase são UUID; o modo local usa prefixo `ev-`. */
+const SERVER_AGENDA_ID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+function getUserId() {
+  const u = readHorizonteUser()
+  return u?.id ? String(u.id).trim() : ''
+}
+
+function isServerAgendaId(id) {
+  return typeof id === 'string' && SERVER_AGENDA_ID_RE.test(id.trim())
+}
+
+function agendaAuthHeaders(userId) {
+  return {
+    'x-user-id': userId,
+    'Content-Type': 'application/json',
+    cache: 'no-store',
+  }
+}
 
 const DEFAULT_EVENTS = [
   {
@@ -231,59 +257,151 @@ function createId() {
 }
 
 export async function listAgendaEvents() {
-  await delay()
-  return loadStorageEvents()
+  const uid = getUserId()
+  if (!uid) {
+    await delay()
+    return loadStorageEvents()
+  }
+  try {
+    const res = await fetchWithRetry(apiUrl('/api/agenda/eventos'), {
+      headers: { 'x-user-id': uid, cache: 'no-store' },
+    })
+    if (redirectAssinaturaExpiradaSe403(res)) return []
+    if (res.ok) {
+      const data = await res.json()
+      return Array.isArray(data) ? data : []
+    }
+    if (res.status === 401) return []
+    await delay()
+    return loadStorageEvents()
+  } catch {
+    await delay()
+    return loadStorageEvents()
+  }
 }
 
 export async function getAgendaEventById(id) {
-  const events = loadStorageEvents()
-  return events.find((event) => event.id === id) || null
+  const uid = getUserId()
+  if (!uid || !isServerAgendaId(id)) {
+    const events = loadStorageEvents()
+    return events.find((event) => event.id === id) || null
+  }
+  try {
+    const res = await fetchWithRetry(apiUrl(`/api/agenda/eventos/${encodeURIComponent(id)}`), {
+      headers: { 'x-user-id': uid, cache: 'no-store' },
+    })
+    if (redirectAssinaturaExpiradaSe403(res)) return null
+    if (res.ok) return res.json()
+    return null
+  } catch {
+    return null
+  }
 }
 
 export async function createAgendaEvent(payload) {
-  const events = loadStorageEvents()
-  const now = new Date().toISOString()
-  const next = {
-    description: '',
-    category: '',
-    subcategory: '',
-    allDay: false,
-    location: '',
-    notes: '',
-    amount: null,
-    priority: 'media',
-    recurrence: 'nao-recorrente',
-    reminder: '30-min',
-    color: '#64748b',
-    linkedTransactionId: null,
-    ...payload,
-    id: createId(),
-    createdAt: now,
-    updatedAt: now,
+  const uid = getUserId()
+  if (!uid) {
+    const events = loadStorageEvents()
+    const now = new Date().toISOString()
+    const next = {
+      description: '',
+      category: '',
+      subcategory: '',
+      allDay: false,
+      location: '',
+      notes: '',
+      amount: null,
+      priority: 'media',
+      recurrence: 'nao-recorrente',
+      reminder: '30-min',
+      color: '#64748b',
+      linkedTransactionId: null,
+      ...payload,
+      id: createId(),
+      createdAt: now,
+      updatedAt: now,
+    }
+    const updated = [next, ...events]
+    persistEvents(updated)
+    await delay()
+    return next
   }
-  const updated = [next, ...events]
-  persistEvents(updated)
-  await delay()
-  return next
+
+  const res = await fetchWithRetry(apiUrl('/api/agenda/eventos'), {
+    method: 'POST',
+    headers: agendaAuthHeaders(uid),
+    body: JSON.stringify(payload),
+  })
+  if (redirectAssinaturaExpiradaSe403(res)) {
+    throw new Error('Acesso negado.')
+  }
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}))
+    throw new Error(errBody.message || 'Erro ao criar evento.')
+  }
+  return res.json()
 }
 
 export async function updateAgendaEvent(id, payload) {
-  const events = loadStorageEvents()
-  let updated = events.map((event) => {
-    if (event.id !== id) return event
-    return { ...event, ...payload, updatedAt: new Date().toISOString() }
+  const uid = getUserId()
+  if (!uid) {
+    const events = loadStorageEvents()
+    const updated = events.map((event) => {
+      if (event.id !== id) return event
+      return { ...event, ...payload, updatedAt: new Date().toISOString() }
+    })
+    persistEvents(updated)
+    await delay()
+    return updated.find((event) => event.id === id) || null
+  }
+  if (!isServerAgendaId(id)) {
+    const events = loadStorageEvents()
+    const updated = events.map((event) => {
+      if (event.id !== id) return event
+      return { ...event, ...payload, updatedAt: new Date().toISOString() }
+    })
+    persistEvents(updated)
+    await delay()
+    return updated.find((event) => event.id === id) || null
+  }
+
+  const res = await fetchWithRetry(apiUrl(`/api/agenda/eventos/${encodeURIComponent(id)}`), {
+    method: 'PATCH',
+    headers: agendaAuthHeaders(uid),
+    body: JSON.stringify(payload),
   })
-  persistEvents(updated)
-  await delay()
-  return updated.find((event) => event.id === id) || null
+  if (redirectAssinaturaExpiradaSe403(res)) {
+    throw new Error('Acesso negado.')
+  }
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}))
+    throw new Error(errBody.message || 'Erro ao atualizar evento.')
+  }
+  return res.json()
 }
 
 export async function deleteAgendaEvent(id) {
-  const events = loadStorageEvents()
-  const updated = events.filter((event) => event.id !== id)
-  persistEvents(updated)
-  await delay()
-  return updated
+  const uid = getUserId()
+  if (!uid || !isServerAgendaId(id)) {
+    const events = loadStorageEvents()
+    const updated = events.filter((event) => event.id !== id)
+    persistEvents(updated)
+    await delay()
+    return updated
+  }
+
+  const res = await fetchWithRetry(apiUrl(`/api/agenda/eventos/${encodeURIComponent(id)}`), {
+    method: 'DELETE',
+    headers: { 'x-user-id': uid, cache: 'no-store' },
+  })
+  if (redirectAssinaturaExpiradaSe403(res)) {
+    throw new Error('Acesso negado.')
+  }
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}))
+    throw new Error(errBody.message || 'Erro ao excluir evento.')
+  }
+  return []
 }
 
 export async function updateAgendaEventStatus(id, status) {
