@@ -253,23 +253,23 @@ export default function Pagamento() {
   })
 
   return (
-    <div className="dashboard-container page-pagamento app-horizon-shell">
+    <div className="dashboard-container page-pagamento ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
         <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
         <main className="main-content relative z-10 ref-dashboard-main">
-          <div className="ref-dashboard-inner">
-            <header className="ref-dashboard-header page-pagamento-header">
-              <MobileMenuButton onClick={() => setMenuAberto(true)} />
-              <div className="ref-dashboard-header__lead">
-                <h1 className="ref-dashboard-greeting">
-                  <span className="ref-dashboard-greeting__name">Pagamento</span>
-                </h1>
-                <p className="ref-panel__subtitle page-pagamento-header-sub">
-                  Gerencie sua assinatura, cobranças e histórico de pagamentos no Mercado Pago.
-                </p>
+          <div className="ref-dashboard-inner dashboard-hub">
+            <section className="dashboard-hub__hero page-pagamento-header" aria-label="Pagamento">
+              <div className="dashboard-hub__hero-row">
+                <MobileMenuButton onClick={() => setMenuAberto(true)} />
+                <div className="dashboard-hub__hero-text">
+                  <h1 className="dashboard-hub__title">Pagamento</h1>
+                  <p className="ref-panel__subtitle page-pagamento-header-sub">
+                    Gerencie sua assinatura, cobranças e histórico de pagamentos no Mercado Pago.
+                  </p>
+                </div>
               </div>
-            </header>
+            </section>
 
             <div className="page-pagamento-layout">
               <div className="page-pagamento-layout__primary">

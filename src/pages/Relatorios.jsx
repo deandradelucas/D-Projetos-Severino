@@ -285,38 +285,44 @@ export default function Relatorios() {
 
   return (
     <div
-      className="dashboard-container page-relatorios app-horizon-shell"
+      className="dashboard-container page-relatorios ref-dashboard app-horizon-shell"
       style={{ '--rel-tooltip-bg': chart.tooltipBg }}
     >
       <div className="app-horizon-inner">
       <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
       <main className="main-content relative z-10 ref-dashboard-main">
-        <div className="ref-dashboard-inner">
-        <header className="ref-dashboard-header">
-          <MobileMenuButton onClick={() => setMenuAberto(true)} />
-          <div className="ref-dashboard-header__lead">
-            <h1 className="ref-dashboard-greeting">
-              <span className="ref-dashboard-greeting__name">Relatórios analíticos</span>
-            </h1>
+        <div className="ref-dashboard-inner dashboard-hub">
+        <section className="dashboard-hub__hero" aria-label="Relatórios e exportação">
+          <div className="dashboard-hub__hero-row">
+            <MobileMenuButton onClick={() => setMenuAberto(true)} />
+            <div className="dashboard-hub__hero-text">
+              <h1 className="dashboard-hub__title">Relatórios analíticos</h1>
+            </div>
+            <div className="dashboard-hub__hero-actions relatorios-header-export" role="toolbar" aria-label="Exportar relatório">
+              <button
+                type="button"
+                className="dashboard-hub__btn dashboard-hub__btn--secondary relatorios-btn-export"
+                onClick={exportToCSV}
+                disabled={transacoes.length === 0}
+                title="Exportar CSV"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                <span className="desktop-only">CSV</span>
+              </button>
+              <button
+                type="button"
+                className="dashboard-hub__btn dashboard-hub__btn--primary relatorios-btn-export"
+                onClick={exportToPDF}
+                disabled={transacoes.length === 0 || pdfExportLoading}
+                title={pdfExportLoading ? 'Gerando PDF…' : 'Baixar PDF'}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span className="desktop-only">{pdfExportLoading ? '…' : 'PDF'}</span>
+              </button>
+            </div>
           </div>
-          <div className="ref-dashboard-header__actions relatorios-header-export">
-            <button type="button" className="btn-secondary relatorios-btn-export" onClick={exportToCSV} disabled={transacoes.length === 0} title="Exportar CSV">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-              <span className="desktop-only">CSV</span>
-            </button>
-            <button
-              type="button"
-              className="btn-primary btn-primary-dashboard relatorios-btn-export"
-              onClick={exportToPDF}
-              disabled={transacoes.length === 0 || pdfExportLoading}
-              title={pdfExportLoading ? 'Gerando PDF…' : 'Baixar PDF'}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              <span className="desktop-only">{pdfExportLoading ? '…' : 'PDF'}</span>
-            </button>
-          </div>
-        </header>
+        </section>
 
         <article
           className={`ref-panel page-relatorios-ref-filters ${filtrosAbertos ? '' : 'page-relatorios-ref-filters--collapsed'}`}
