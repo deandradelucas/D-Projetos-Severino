@@ -17,7 +17,7 @@ function ShellFixture() {
         <div className="app-horizon-inner">
           <main className="main-content relative z-10 ref-dashboard-main">
             <div className="ref-dashboard-inner">
-              <header className="ref-dashboard-header" />
+              <div className="dashboard-hub__hero" />
             </div>
           </main>
         </div>

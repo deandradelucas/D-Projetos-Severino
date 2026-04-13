@@ -11,7 +11,6 @@ body[data-theme='glass'] .dashboard-container:not(.app-horizon-shell) .sidebar {
   background-image: none !important;
 }
 
-body[data-theme='glass'] .content-section,
 body[data-theme='glass'] .relatorios-chart-card,
 body[data-theme='glass'] .config-card,
 body[data-theme='glass'] .page-configuracoes.app-horizon-shell .config-card {
@@ -41,15 +40,6 @@ body[data-theme='glass'] .ref-panel {
   -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
   background: color-mix(in srgb, var(--bg-card, #0c0c0c) 52%, transparent) !important;
-  background-image: none !important;
-}
-
-body[data-theme='glass'] .ref-dashboard-header,
-body[data-theme='glass'] .ref-dashboard-actions-card,
-body[data-theme='glass'] .ref-dashboard-actions-card--welcome {
-  -webkit-backdrop-filter: blur(1px);
-  backdrop-filter: blur(1px);
-  background: color-mix(in srgb, var(--bg-card-elevated) 50%, transparent) !important;
   background-image: none !important;
 }
 

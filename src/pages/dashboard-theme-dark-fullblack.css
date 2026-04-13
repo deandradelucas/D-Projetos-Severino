@@ -44,7 +44,6 @@ body[data-theme='dark'] .btn-primary:focus-visible {
 }
 
 /* Cartões de conteúdo */
-body[data-theme='dark'] .content-section,
 body[data-theme='dark'] .relatorios-chart-card,
 body[data-theme='dark'] .config-card {
   background: linear-gradient(165deg, #101010 0%, #0a0a0a 100%);
@@ -278,51 +277,6 @@ body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .sidebar {
   border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Cabeçalho ref */
-body[data-theme='dark'] .ref-dashboard-greeting__name {
-  color: #fafafa;
-}
-
-body[data-theme='dark'] .ref-dashboard-header {
-  background: linear-gradient(165deg, #121212 0%, #0e0e0e 45%, #090909 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 14px 36px -24px rgba(0, 0, 0, 0.6);
-}
-
-body[data-theme='dark'] .ref-dashboard-header__btn-tx,
-body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-header__btn-tx {
-  background: linear-gradient(180deg, #e8c677 0%, #c9a24e 100%);
-  color: #0a0a0a !important;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.22) inset,
-    0 8px 20px -10px rgba(0, 0, 0, 0.5);
-}
-
-body[data-theme='dark'] .ref-dashboard-header__btn-tx:hover,
-body[data-theme='dark'] .ref-dashboard-actions-card .ref-dashboard-header__btn-tx:hover {
-  background: linear-gradient(180deg, #f0d08a 0%, #d4ae5c 100%);
-  color: #0a0a0a !important;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-body[data-theme='dark'] .ref-dashboard-privacy-btn--on {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(212, 168, 75, 0.38);
-  color: var(--accent);
-}
-
-body[data-theme='dark'] .ref-dashboard-actions-card {
-  background: linear-gradient(165deg, #101010 0%, #0a0a0a 100%);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 22px;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 20px 48px -30px rgba(0, 0, 0, 0.55);
-}
-
 body[data-theme='dark'] .ref-empty-cta {
   background: linear-gradient(180deg, #e8c677 0%, #c9a24e 100%);
   color: #0a0a0a !important;
@@ -538,18 +492,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-men
       0 1px 0 rgba(255, 255, 255, 0.08) inset,
       0 12px 32px -20px rgba(0, 0, 0, 0.6);
   }
-}
-
-body[data-theme='dark'] .ref-dashboard-header .mobile-menu-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #f0f0f0;
-}
-
-body[data-theme='dark'] .ref-dashboard-header .mobile-menu-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.16);
-  color: #fafafa;
 }
 
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip {
