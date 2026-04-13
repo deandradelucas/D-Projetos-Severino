@@ -2211,6 +2211,55 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
     min-height: 52px;
   }
 }
+
+/* Mobile shell: alinhar ao menu claro — coluna + tipografia (sobrescreve regras desktop do bloco acima) */
+@media (max-width: 768px) {
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
+    width: min(94vw, 384px);
+    max-width: 384px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 56px;
+    padding: 12px 10px;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
+    flex: none;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+    padding: 10px 52px 14px 12px;
+    min-height: 72px;
+  }
+}
 @media (min-width: 769px) {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .main-content::before {
     display: none;
