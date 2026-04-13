@@ -36,8 +36,7 @@ body[data-theme='dark'] .app-background-root__tint--dark {
 }
 
 /* Botões primários — foco ouro (não anel azul genérico) */
-body[data-theme='dark'] .btn-primary:focus-visible,
-body[data-theme='dark'] .btn-primary-dashboard:focus-visible {
+body[data-theme='dark'] .btn-primary:focus-visible {
   outline: none;
   box-shadow:
     0 0 0 3px rgba(212, 168, 75, 0.42),
@@ -624,10 +623,6 @@ body[data-theme='dark'] .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fafafa;
   border-color: rgba(255, 255, 255, 0.16);
-}
-
-body[data-theme='dark'] .global-skeleton {
-  border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Saldo relatórios — azul principal */

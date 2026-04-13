@@ -19,8 +19,7 @@ body[data-theme='dark'] {
 }
 
 /* Botões primários (o espelho pode colapsar bg/cor por ordem de substituição) */
-body[data-theme='dark'] .btn-primary,
-body[data-theme='dark'] .btn-primary-dashboard {
+body[data-theme='dark'] .btn-primary {
   background: linear-gradient(180deg, #e8c677 0%, #c9a24e 100%);
   color: #0f172a;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -30,14 +29,12 @@ body[data-theme='dark'] .btn-primary-dashboard {
   font-weight: 700;
 }
 
-body[data-theme='dark'] .btn-primary:hover,
-body[data-theme='dark'] .btn-primary-dashboard:hover {
+body[data-theme='dark'] .btn-primary:hover {
   background: linear-gradient(180deg, #f0d08a 0%, #d4ae5c 100%);
   color: #0f172a;
 }
 
-body[data-theme='dark'] .btn-primary:focus-visible,
-body[data-theme='dark'] .btn-primary-dashboard:focus-visible {
+body[data-theme='dark'] .btn-primary:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.45), 0 14px 32px -18px rgba(0, 0, 0, 0.5);
 }
@@ -635,9 +632,3 @@ body[data-theme='dark'] .btn-secondary:hover {
   color: #f8fafc;
   border-color: rgba(148, 163, 184, 0.4);
 }
-
-/* Skeleton: contorno um pouco mais visível no escuro */
-body[data-theme='dark'] .global-skeleton {
-  border-color: rgba(100, 116, 139, 0.35);
-}
-

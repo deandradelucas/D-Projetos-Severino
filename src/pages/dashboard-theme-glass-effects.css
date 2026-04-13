@@ -78,8 +78,7 @@ body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-tx-
   background-image: none !important;
 }
 
-body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list .ref-empty-state,
-body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list > .global-skeleton {
+body[data-theme='glass'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list .ref-empty-state {
   -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
 }

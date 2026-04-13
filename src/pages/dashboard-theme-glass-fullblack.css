@@ -36,8 +36,7 @@ body[data-theme='glass'] .app-background-root__tint--glass {
 }
 
 /* Botões primários — foco ouro (não anel azul genérico) */
-body[data-theme='glass'] .btn-primary:focus-visible,
-body[data-theme='glass'] .btn-primary-dashboard:focus-visible {
+body[data-theme='glass'] .btn-primary:focus-visible {
   outline: none;
   box-shadow:
     0 0 0 3px rgba(212, 168, 75, 0.42),
@@ -626,10 +625,6 @@ body[data-theme='glass'] .btn-secondary:hover {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
-body[data-theme='glass'] .global-skeleton {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
 /* Saldo relatórios — azul principal */
 body[data-theme='glass'] .relatorios-kpi-saldo--pos {
   color: var(--transacoes-balance-pos, #3b82f6) !important;
@@ -660,13 +655,11 @@ body[data-theme='glass'] .btn-delete {
 }
 
 /* Texto dos botões primários sobre ouro */
-body[data-theme='glass'] .btn-primary,
-body[data-theme='glass'] .btn-primary-dashboard {
+body[data-theme='glass'] .btn-primary {
   color: #0a0a0a;
 }
 
-body[data-theme='glass'] .btn-primary:hover,
-body[data-theme='glass'] .btn-primary-dashboard:hover {
+body[data-theme='glass'] .btn-primary:hover {
   color: #0a0a0a;
 }
 

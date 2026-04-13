@@ -65,6 +65,22 @@ const SAFELIST = new Set([
   /* Transacoes.jsx: className={`badge badge-${status.toLowerCase()}`} */
   'badge-efetivada',
   'badge-pendente',
+  /* PagamentoOrientacaoCard.jsx: pagamento-orientacao--${variant} */
+  'pagamento-orientacao--success',
+  'pagamento-orientacao--warning',
+  'pagamento-orientacao--danger',
+  'pagamento-orientacao--neutral',
+  /* Legado: regras ainda presentes em dashboard.css / temas espelhados; UI atual usa dashboard-hub__* */
+  'content-section',
+  'section-header',
+  'ref-dashboard-greeting',
+  'ref-dashboard-greeting__name',
+  'ref-dashboard-greeting__prefix',
+  'ref-dashboard-header__actions',
+  'ref-dashboard-header__lead',
+  'ref-dashboard-header__btn-tx',
+  'ref-dashboard-header__btn-wa',
+  'ref-dashboard-header__btn-wa--disabled',
 ])
 
 function referencedInSources(className, bundle, tokens) {
