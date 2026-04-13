@@ -44,4 +44,4 @@ Estrutura do pacote:
 
 ## Theme guidelines
 
-O arquivo `docs/theme-guidelines.md` detalha como o `dashboard.css` centraliza a lógica, quando editar os mirrors/glass e quais tokens (`--bg-card`, `--accent`, `--glass-blur`) existem para manter os temas alinhados.
+O arquivo `docs/theme-guidelines.md` detalha como o `dashboard.css` centraliza a lógica, quando editar os mirrors do tema escuro e quais tokens (`--bg-card`, `--accent`, `--sidebar-backdrop-blur`) existem para manter os temas alinhados.

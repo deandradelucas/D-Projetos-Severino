@@ -1,5 +1,5 @@
 /**
- * Remove regras cujo seletor referencia apenas temas escuro / vitrificado / cyberpunk / off-white.
+ * Remove regras cujo seletor referencia apenas temas escuro / cyberpunk / off-white.
  * Mantém seletores sem [data-theme=*], :root, e qualquer coisa com [data-theme='light'].
  *
  * Uso: node scripts/strip-non-light-theme-css.mjs
@@ -11,7 +11,7 @@ import postcss from 'postcss'
 const ROOT = path.resolve(import.meta.dirname, '..')
 const CSS_FILE = path.join(ROOT, 'src/pages/dashboard.css')
 
-const BAD_THEME = /\[data-theme='(dark|cyberpunk|glass|off-white)'\]/
+const BAD_THEME = /\[data-theme='(dark|cyberpunk|off-white)'\]/
 const LIGHT_THEME = /(\[data-theme='light'\]|body\[data-theme='light'\])/
 
 function shouldKeepSelector(sel) {
@@ -42,7 +42,7 @@ root.walkRules((rule) => {
 let out = root.toString()
 
 const isLong =
-  /body:is\(\[data-theme='light'\], \[data-theme='dark'\], \[data-theme='cyberpunk'\], \[data-theme='off-white'\], \[data-theme='glass'\]\)/g
+  /body:is\(\[data-theme='light'\], \[data-theme='dark'\], \[data-theme='cyberpunk'\], \[data-theme='off-white'\]\)/g
 out = out.replace(isLong, "body[data-theme='light']")
 
 fs.writeFileSync(CSS_FILE, out, 'utf8')

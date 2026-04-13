@@ -86,11 +86,9 @@ export default function Background() {
       />
       <div
         className={
-          theme === 'glass'
-            ? 'app-background-root__tint app-background-root__tint--glass'
-            : theme === 'dark'
-              ? 'app-background-root__tint app-background-root__tint--dark'
-              : 'app-background-root__tint app-background-root__tint--light'
+          theme === 'dark'
+            ? 'app-background-root__tint app-background-root__tint--dark'
+            : 'app-background-root__tint app-background-root__tint--light'
         }
       />
       <div

@@ -2,9 +2,6 @@
  * Gera src/pages/dashboard-theme-dark-mirror.css espelhando
  * body[data-theme='light'] / [data-theme='light'] com paleta escura (mesmo layout).
  *
- * Também gera dashboard-theme-glass-mirror.css (cópia do escuro com data-theme='glass')
- * e dashboard-theme-glass-polish.css a partir do polish escuro.
- *
  * Uso: node scripts/gen-dashboard-dark-rules.mjs
  */
 import fs from 'node:fs'
@@ -14,9 +11,7 @@ import postcss from 'postcss'
 const ROOT = path.resolve(import.meta.dirname, '..')
 const CSS_FILE = path.join(ROOT, 'src/pages/dashboard.css')
 const OUT_FILE = path.join(ROOT, 'src/pages/dashboard-theme-dark-mirror.css')
-const GLASS_MIRROR_FILE = path.join(ROOT, 'src/pages/dashboard-theme-glass-mirror.css')
 const DARK_POLISH_FILE = path.join(ROOT, 'src/pages/dashboard-theme-dark-polish.css')
-const GLASS_POLISH_FILE = path.join(ROOT, 'src/pages/dashboard-theme-glass-polish.css')
 
 const VALUE_REPLACEMENTS = [
   [/linear-gradient\(180deg,\s*#eef2f8\s+0%,\s*#e6eaf3\s+100%\)/g, 'linear-gradient(180deg, #141c26 0%, #101820 100%)'],
@@ -141,32 +136,6 @@ const darkMirrorCss = banner + outRoot.toString()
 fs.writeFileSync(OUT_FILE, darkMirrorCss, 'utf8')
 console.error(`gen-dashboard-dark-rules: ${n} regras → ${path.relative(ROOT, OUT_FILE)}`)
 
-/** Espelho vitrificado: mesmas regras que o escuro, com seletor glass. */
-const glassMirrorCss = darkMirrorCss.replaceAll("data-theme='dark'", "data-theme='glass'")
-fs.writeFileSync(
-  GLASS_MIRROR_FILE,
-  glassMirrorCss.replace(
-    /AUTO-GENERADO por scripts\/gen-dashboard-dark-rules\.mjs/,
-    'AUTO-GENERADO (espelho glass) por scripts/gen-dashboard-dark-rules.mjs'
-  ),
-  'utf8'
-)
-console.error(`gen-dashboard-dark-rules: glass mirror → ${path.relative(ROOT, GLASS_MIRROR_FILE)}`)
-
-if (fs.existsSync(DARK_POLISH_FILE)) {
-  let polish = fs.readFileSync(DARK_POLISH_FILE, 'utf8')
-  polish = polish.replaceAll("data-theme='dark'", "data-theme='glass'")
-  polish = polish.replaceAll('.app-background-root__tint--dark', '.app-background-root__tint--glass')
-  polish = polish.replace(
-    ' * Refinos do tema escuro (carregado após dashboard-theme-dark-mirror.css).',
-    ' * Refinos do tema vitrificado (gerado a partir do polish escuro).'
-  )
-  fs.writeFileSync(
-    GLASS_POLISH_FILE,
-    `/**\n * AUTO-GENERADO a partir de dashboard-theme-dark-polish.css — rode: node scripts/gen-dashboard-dark-rules.mjs\n */\n${polish}`,
-    'utf8'
-  )
-  console.error(`gen-dashboard-dark-rules: glass polish → ${path.relative(ROOT, GLASS_POLISH_FILE)}`)
-} else {
+if (!fs.existsSync(DARK_POLISH_FILE)) {
   console.error(`gen-dashboard-dark-rules: aviso — não encontrado ${path.relative(ROOT, DARK_POLISH_FILE)}`)
 }
