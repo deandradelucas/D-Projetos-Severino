@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
@@ -19,6 +19,15 @@ import {
 } from '../lib/agendaConstants'
 import { buildMonthGrid, addMonths, addDays, weekRange, toDateKey, cloneDate } from '../lib/agendaDateUtils'
 import AgendaEventModal from '../components/agenda/AgendaEventModal'
+import {
+  notificationsSupported,
+  readAgendaNotificationsEnabled,
+  writeAgendaNotificationsEnabled,
+  requestAgendaNotificationPermission,
+  startAgendaNotificationScheduler,
+} from '../lib/agendaNotifications'
+import { shareOrDownloadAgendaIcs } from '../lib/agendaIcsExport'
+import { isIOSDevice, isStandalonePWAMode, iosWebNotificationsLikelyUnreliable } from '../lib/devicePlatform'
 import './dashboard.css'
 import './agenda.css'
 
@@ -62,6 +71,32 @@ export default function Agenda() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState(null)
+
+  const eventsRef = useRef(events)
+  useEffect(() => {
+    eventsRef.current = events
+  }, [events])
+
+  const [notifEnabled, setNotifEnabled] = useState(() => readAgendaNotificationsEnabled())
+  const [notifPermission, setNotifPermission] = useState(() =>
+    typeof Notification !== 'undefined' ? Notification.permission : 'denied'
+  )
+  const [notifHint, setNotifHint] = useState('')
+  const [icsHint, setIcsHint] = useState('')
+
+  useEffect(() => {
+    const p = typeof Notification !== 'undefined' ? Notification.permission : 'denied'
+    setNotifPermission(p)
+    if (readAgendaNotificationsEnabled() && p !== 'granted') {
+      writeAgendaNotificationsEnabled(false)
+      setNotifEnabled(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!notifEnabled || notifPermission !== 'granted') return undefined
+    return startAgendaNotificationScheduler(() => eventsRef.current)
+  }, [notifEnabled, notifPermission])
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -369,6 +404,97 @@ export default function Agenda() {
                         </button>
                       ))}
                     </div>
+                    {isIOSDevice() ? (
+                      <div className="page-agenda__ios-panel" role="region" aria-label="Lembretes no iPhone">
+                        <p className="page-agenda__ios-panel-title">Lembretes no iPhone</p>
+                        <p className="page-agenda__ios-panel-text">
+                          O Safari <strong>não envia notificações Web</strong> como no Android: o separador adormece e os
+                          avisos deixam de correr. A forma fiável no iPhone é usar a app <strong>Calendário</strong> com
+                          alarmes.
+                        </p>
+                        {!isStandalonePWAMode() ? (
+                          <p className="page-agenda__ios-panel-text page-agenda__ios-panel-text--muted">
+                            Opcional: em <strong>Safari</strong> use <strong>Partilhar</strong> →{' '}
+                            <strong>Adicionar ao ecrã principal</strong> e abra pelo ícone (iOS 16.4+ pode permitir
+                            também notificações da app web — ainda assim o Calendário é o mais estável).
+                          </p>
+                        ) : (
+                          <p className="page-agenda__ios-panel-text page-agenda__ios-panel-text--muted">
+                            Está a usar a app no ecrã principal. Pode ativar também o interruptor abaixo; se não receber
+                            alertas, use o Calendário.
+                          </p>
+                        )}
+                        <button
+                          type="button"
+                          className="ref-empty-cta page-agenda__ios-cta"
+                          onClick={async () => {
+                            setIcsHint('')
+                            const r = await shareOrDownloadAgendaIcs(events)
+                            if (r === 'empty') {
+                              setIcsHint('Não há eventos futuros na agenda para exportar.')
+                            } else if (r === 'aborted') {
+                              setIcsHint('')
+                            } else if (r === 'shared') {
+                              setIcsHint('Toque em “Calendário” (ou “Adicionar”) para gravar os eventos com alarmes.')
+                            } else {
+                              setIcsHint(
+                                'Ficheiro descarregado. Toque em “Descarregamentos”, abra o .ics e escolha “Adicionar tudo” ao Calendário.'
+                              )
+                            }
+                          }}
+                        >
+                          Adicionar lembretes ao Calendário
+                        </button>
+                        {icsHint ? <p className="page-agenda__ios-panel-hint">{icsHint}</p> : null}
+                      </div>
+                    ) : null}
+                    {notificationsSupported() ? (
+                      <div className="page-agenda__notif-toolbar" role="group" aria-label="Notificações no dispositivo">
+                        <label className="page-agenda__notif-label">
+                          <input
+                            type="checkbox"
+                            role="switch"
+                            aria-checked={notifEnabled}
+                            checked={notifEnabled}
+                            onChange={async (e) => {
+                              const on = e.target.checked
+                              if (!on) {
+                                writeAgendaNotificationsEnabled(false)
+                                setNotifEnabled(false)
+                                setNotifHint('')
+                                return
+                              }
+                              const perm = await requestAgendaNotificationPermission()
+                              setNotifPermission(perm === 'granted' ? 'granted' : perm === 'denied' ? 'denied' : 'default')
+                              if (perm !== 'granted') {
+                                setNotifHint(
+                                  perm === 'denied'
+                                    ? 'Permissão negada. Ative notificações nas definições do browser ou da app.'
+                                    : 'Não foi possível ativar. Tente de novo ou confira as definições do dispositivo.'
+                                )
+                                return
+                              }
+                              writeAgendaNotificationsEnabled(true)
+                              setNotifEnabled(true)
+                              setNotifHint(
+                                isIOSDevice()
+                                  ? 'Se não receber alertas, use “Adicionar lembretes ao Calendário” — no iPhone é o método fiável. Os avisos Web dependem do Safari/app não adormecer.'
+                                  : 'Lembretes ativos: aviso conforme o campo “Lembrete” de cada evento (todos os eventos carregados, não só os filtrados).'
+                              )
+                            }}
+                          />
+                          <span className="page-agenda__notif-text">
+                            <strong>Notificar neste telemóvel</strong>
+                            <span className="page-agenda__notif-sub">
+                              {iosWebNotificationsLikelyUnreliable()
+                                ? 'No Safari do iPhone isto costuma falhar — prefira o botão “Calendário” acima. Em app instalada no ecrã principal pode funcionar.'
+                                : 'Lembretes no horário escolhido em cada evento (mantenha o separador ou a app aberta para o browser poder avisar).'}
+                            </span>
+                          </span>
+                        </label>
+                        {notifHint ? <p className="page-agenda__notif-hint">{notifHint}</p> : null}
+                      </div>
+                    ) : null}
                   </div>
 
                   {loading ? (
