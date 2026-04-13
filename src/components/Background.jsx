@@ -53,17 +53,19 @@ export default function Background() {
   const { theme } = useTheme()
   const { pathname } = useLocation()
   const [currentImage, setCurrentImage] = useState(() => getRandomImage())
-  const settingsPlainBg = pathname === '/configuracoes'
+  /** Telas sem foto de fundo (sólido), p.ex. Configurações e Dashboard inicial */
+  const usePlainBackground = pathname === '/configuracoes' || pathname === '/dashboard'
 
   useEffect(() => {
+    if (usePlainBackground) return undefined
     const interval = setInterval(() => {
       setCurrentImage(getRandomImage())
     }, 90000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [usePlainBackground])
 
-  if (settingsPlainBg) {
+  if (usePlainBackground) {
     return (
       <div
         className={`app-background-root app-background-root--plain${theme === 'light' ? ' app-background-root--plain-light' : ' app-background-root--plain-dark'}`}

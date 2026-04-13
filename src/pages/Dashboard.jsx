@@ -148,13 +148,8 @@ export default function Dashboard() {
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">
-                Bem-vindo ao seu <span className="dashboard-hub__accent">Painel</span>
+                Olá, <span className={privacyMode ? 'privacy-blur' : ''}>{nomeExibicao}</span>
               </h1>
-              <p className="dashboard-hub__subtitle">
-                Olá,{' '}
-                <span className={privacyMode ? 'privacy-blur' : ''}>{nomeExibicao}</span>
-                {' — '}Acompanhe saldo, entradas e saídas em tempo real.
-              </p>
             </div>
             <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos do painel">
               <Link to="/transacoes" className="dashboard-hub__btn dashboard-hub__btn--ghost">

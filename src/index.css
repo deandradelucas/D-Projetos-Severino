@@ -219,6 +219,21 @@ body[data-theme='light']:has(.app-horizon-shell) .app-routes-grow {
   backdrop-filter: blur(1px);
 }
 
+/* Dashboard inicial: área única branca, sem blur nem “foto” nas laterais */
+body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) .app-routes-grow {
+  background-color: #ffffff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+  background-color: #ffffff;
+}
+
+body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) {
+  background-color: #ffffff;
+}
+
 /* Tema escuro */
 body[data-theme='dark'] {
   color-scheme: dark;
