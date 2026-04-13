@@ -2,8 +2,6 @@
  * Modelo e cópias da página Pagamento — alinhado ao payload de /api/assinatura/status e linhas de pagamentos_mercadopago.
  */
 
-import { formatCurrencyBRL } from './formatCurrency.js'
-
 export const PLANO_PADRAO_TITULO = 'Assinatura mensal Horizonte Financeiro'
 export const PROVEDOR_PAGAMENTO_LABEL = 'Mercado Pago'
 
@@ -100,37 +98,6 @@ export function referenciaPagamentoCurta(row) {
 /**
  * @param {{
  *   painel: ReturnType<typeof painelAssinaturaFromUser>
- *   proximaCobranca: string|null
- *   precoMensal: number
- *   tituloPlano: string
- *   historico: PagamentoHistoricoRow[]
- * }} p
- */
-export function buildResumoKpis(p) {
-  const { painel, proximaCobranca, precoMensal, tituloPlano, historico } = p
-  const ultimo = ultimoPagamentoHistorico(historico)
-  let proximaLabel = '—'
-  if (proximaCobranca) {
-    const d = new Date(proximaCobranca)
-    proximaLabel = Number.isNaN(d.getTime())
-      ? String(proximaCobranca)
-      : d.toLocaleString('pt-BR', { dateStyle: 'long', timeStyle: 'short' })
-  }
-  const ultimoStatus = ultimo ? pagamentoStatusLabelPt(ultimo.status) : '—'
-
-  return [
-    { key: 'status', label: 'Situação da assinatura', value: painel.label || '—', hint: painel.mpStatus ? `MP: ${painel.mpStatus}` : null },
-    { key: 'plano', label: 'Plano', value: tituloPlano || PLANO_PADRAO_TITULO },
-    { key: 'valor', label: 'Valor mensal', value: `${formatCurrencyBRL(precoMensal)} / mês`, hint: 'Cobrança recorrente' },
-    { key: 'proxima', label: 'Próxima cobrança', value: proximaLabel },
-    { key: 'provedor', label: 'Meio de pagamento', value: PROVEDOR_PAGAMENTO_LABEL },
-    { key: 'ultima', label: 'Último pagamento (histórico)', value: ultimoStatus, hint: ultimo?.created_at ? new Date(ultimo.created_at).toLocaleString('pt-BR') : null },
-  ]
-}
-
-/**
- * @param {{
- *   painel: ReturnType<typeof painelAssinaturaFromUser>
  *   configReady: boolean
  *   isento: boolean
  *   historicoLen: number
@@ -143,7 +110,7 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'neutral',
       title: 'Conta de administrador',
-      body: 'Contas administrativas seguem as regras definidas pelo time Horizonte; não é necessário concluir checkout de assinatura aqui.',
+      body: 'Sem checkout de assinatura nesta conta.',
     }
   }
 
@@ -151,7 +118,7 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'success',
       title: 'Conta isenta',
-      body: 'Sua conta não exige assinatura pelo Mercado Pago. O acesso ao app segue liberado conforme a regra do administrador.',
+      body: 'Não é necessário pagar pelo Mercado Pago.',
     }
   }
 
@@ -159,23 +126,23 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'neutral',
       title: 'Pagamentos em configuração',
-      body: 'O checkout do Mercado Pago ainda não está ativo neste ambiente. Quando estiver disponível, você poderá autorizar a assinatura aqui.',
+      body: 'O checkout será habilitado quando o servidor estiver configurado.',
     }
   }
 
   if (painel.situacao === 'ativo' && painel.paga) {
     return {
       variant: 'success',
-      title: 'Tudo certo com sua assinatura',
-      body: 'Sua assinatura está ativa e os pagamentos são renovados automaticamente no cartão autorizado no Mercado Pago, até você cancelar por lá.',
+      title: 'Assinatura ativa',
+      body: 'Renovação automática no cartão autorizado até você cancelar no Mercado Pago.',
     }
   }
 
   if (painel.situacao === 'trial') {
     return {
       variant: 'neutral',
-      title: 'Você está no período de teste',
-      body: 'Aproveite o app gratuitamente durante o trial. Ao terminar, conclua a assinatura no Mercado Pago para manter o acesso.',
+      title: 'Período de teste',
+      body: 'Ao terminar, assine no Mercado Pago para manter o acesso.',
     }
   }
 
@@ -183,7 +150,7 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'warning',
       title: 'Assinatura pausada',
-      body: 'A cobrança recorrente está pausada no Mercado Pago. Use “Gerenciar no Mercado Pago” para ver detalhes ou reativar quando disponível.',
+      body: 'Use “Gerenciar no Mercado Pago” para detalhes ou reativação.',
     }
   }
 
@@ -191,7 +158,7 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'danger',
       title: 'Assinatura cancelada',
-      body: 'A renovação automática foi encerrada. Para voltar a usar o app com assinatura, inicie um novo fluxo de autorização no Mercado Pago.',
+      body: 'Para voltar, autorize uma nova assinatura no Mercado Pago.',
     }
   }
 
@@ -206,22 +173,22 @@ export function buildOrientacaoUsuario(p) {
   if (painel.situacao === 'inativa' || !painel.paga) {
     return {
       variant: 'warning',
-      title: 'Assinatura ainda não ativa',
-      body: 'Conclua a autorização no Mercado Pago para ativar a cobrança mensal e liberar o acesso contínuo ao aplicativo.',
+      title: 'Assinatura não ativa',
+      body: 'Conclua a autorização no Mercado Pago para liberar o acesso.',
     }
   }
 
   if (historicoLen === 0) {
     return {
       variant: 'neutral',
-      title: 'Sem cobranças registradas',
-      body: 'Ainda não há pagamentos listados. Após a primeira autorização, o histórico aparecerá aqui com data, valor e status.',
+      title: 'Sem cobranças ainda',
+      body: 'Após o primeiro pagamento, o histórico aparece abaixo.',
     }
   }
 
   return {
     variant: 'neutral',
     title: 'Resumo',
-    body: painel.label || 'Acompanhe abaixo o plano, valores e histórico de cobranças.',
+    body: painel.label || 'Veja plano e histórico ao lado.',
   }
 }

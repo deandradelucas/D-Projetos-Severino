@@ -2,7 +2,7 @@ import AdminDataTableSkeleton from '../AdminDataTableSkeleton.jsx'
 import MpStatusBadge from '../MpStatusBadge.jsx'
 import { pagamentoStatusLabelPt, referenciaPagamentoCurta } from '../../lib/pagamentoPageModel.js'
 
-const HEADERS = ['Data', 'Valor', 'Status', 'Detalhe', 'Referência']
+const HEADERS = ['Data', 'Valor', 'Status', 'Ref.']
 
 export default function PagamentoHistorico({ historico, loading, formatCurrency, historicoRef }) {
   return (
@@ -10,9 +10,9 @@ export default function PagamentoHistorico({ historico, loading, formatCurrency,
       <div className="ref-panel__head page-pagamento-historico__head">
         <div>
           <h2 id="pagamento-hist-heading" className="ref-panel__title">
-            Histórico de cobranças
+            Histórico
           </h2>
-          <p className="ref-panel__subtitle">Últimas movimentações registradas pelo Mercado Pago nesta conta</p>
+          <p className="ref-panel__subtitle">Cobranças registradas nesta conta</p>
         </div>
       </div>
       {loading ? (
@@ -20,9 +20,7 @@ export default function PagamentoHistorico({ historico, loading, formatCurrency,
       ) : historico.length === 0 ? (
         <div className="pagamento-empty-state">
           <p className="pagamento-empty-state__title">Nenhuma cobrança ainda</p>
-          <p className="pagamento-empty-state__text">
-            Quando você autorizar a assinatura no Mercado Pago, as cobranças aparecerão aqui com data, valor e status.
-          </p>
+          <p className="pagamento-empty-state__text">Após o primeiro pagamento aprovado, os registros aparecem aqui.</p>
         </div>
       ) : (
         <>
@@ -36,26 +34,35 @@ export default function PagamentoHistorico({ historico, loading, formatCurrency,
                 </tr>
               </thead>
               <tbody>
-                {historico.map((row) => (
+                {historico.map((row) => {
+                  const detail = row.status_detail || row.description || ''
+                  return (
                   <tr key={row.id}>
                     <td className="pagamento-hist-cell--muted">
                       {row.created_at ? new Date(row.created_at).toLocaleString('pt-BR') : '—'}
                     </td>
                     <td>{row.amount != null ? formatCurrency(Number(row.amount)) : '—'}</td>
-                    <td>
+                    <td className="pagamento-hist-cell--status">
                       <MpStatusBadge status={row.status} label={pagamentoStatusLabelPt(row.status)} className="pagamento-hist-badge" />
+                      {detail ? (
+                        <span className="pagamento-hist-status-detail" title={detail}>
+                          {detail.length > 72 ? `${detail.slice(0, 69)}…` : detail}
+                        </span>
+                      ) : null}
                     </td>
-                    <td className="pagamento-hist-cell--detail">{row.status_detail || row.description || '—'}</td>
                     <td className="pagamento-hist-cell--ref">{referenciaPagamentoCurta(row)}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
 
           <ul className="pagamento-hist-cards" aria-label="Histórico de pagamentos (lista)">
-            {historico.map((row) => (
-              <li key={row.id} className="pagamento-hist-card">
+            {historico.map((row) => {
+              const detail = row.status_detail || row.description || ''
+              return (
+                <li key={row.id} className="pagamento-hist-card">
                 <div className="pagamento-hist-card__row">
                   <span className="pagamento-hist-card__label">Data</span>
                   <span className="pagamento-hist-card__val">
@@ -68,22 +75,22 @@ export default function PagamentoHistorico({ historico, loading, formatCurrency,
                 </div>
                 <div className="pagamento-hist-card__row">
                   <span className="pagamento-hist-card__label">Status</span>
-                  <span className="pagamento-hist-card__val">
+                  <span className="pagamento-hist-card__val pagamento-hist-card__val--status">
                     <MpStatusBadge status={row.status} label={pagamentoStatusLabelPt(row.status)} className="pagamento-hist-badge" />
+                    {detail ? (
+                      <span className="pagamento-hist-status-detail" title={detail}>
+                        {detail.length > 120 ? `${detail.slice(0, 117)}…` : detail}
+                      </span>
+                    ) : null}
                   </span>
                 </div>
                 <div className="pagamento-hist-card__row">
-                  <span className="pagamento-hist-card__label">Detalhe</span>
-                  <span className="pagamento-hist-card__val pagamento-hist-card__val--detail">
-                    {row.status_detail || row.description || '—'}
-                  </span>
-                </div>
-                <div className="pagamento-hist-card__row">
-                  <span className="pagamento-hist-card__label">Referência</span>
+                  <span className="pagamento-hist-card__label">Ref.</span>
                   <span className="pagamento-hist-card__val pagamento-hist-card__val--detail">{referenciaPagamentoCurta(row)}</span>
                 </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         </>
       )}

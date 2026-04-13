@@ -2252,6 +2252,12 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
 }
+
+@media (min-width: 769px) {
+  body[data-theme='glass'] .dashboard-container.app-horizon-shell {
+    overflow-y: hidden;
+  }
+}
 body[data-theme='glass'] .dashboard-container.app-horizon-shell .main-content,
 body[data-theme='glass'] .dashboard-container.app-horizon-shell .ref-dashboard .main-content.ref-dashboard-main {
   background: transparent !important;
@@ -2314,11 +2320,11 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
     margin-left: 0;
     margin-right: 0;
     align-items: stretch;
-    align-self: flex-start;
-    flex: 0 1 auto;
-    height: auto;
-    max-height: none;
-    min-height: var(--app-sidebar-col-h);
+    align-self: stretch;
+    flex: 1 1 auto;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
     gap: 8px;
   }
 }
@@ -2366,27 +2372,28 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
     flex: 1;
     min-width: 0;
     min-height: 0;
-    height: auto;
-    max-height: none;
+    height: 100%;
+    max-height: 100%;
     align-self: stretch;
     overflow-x: clip;
-    overflow-y: visible;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
   }
 }
 @media (min-width: 769px) {
   body[data-theme='glass'] .dashboard-container.app-horizon-shell .main-content.ref-dashboard-main {
-    overflow: visible;
-    height: auto;
-    max-height: none;
+    overflow-x: clip;
+    overflow-y: auto;
+    min-height: 0;
   }
 }
 @media (min-width: 769px) {
   body[data-theme='glass'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-inner {
-    flex: none;
-    height: auto;
-    max-height: none;
+    flex: 1 1 auto;
     min-height: 0;
+    max-height: none;
     padding-bottom: 0;
   }
 }

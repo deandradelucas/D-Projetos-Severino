@@ -484,6 +484,12 @@ h3 {
   line-height: 1.45;
 }
 
+.pagamento-detalhes-dl__muted {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
 @media (max-width: 520px) {
   .pagamento-detalhes-dl__row,
   .pagamento-detalhes-dl__row--note {
@@ -654,8 +660,12 @@ h3 {
   vertical-align: middle;
 }
 
+.page-pagamento-historico table.data-table td:nth-child(3) {
+  max-width: min(280px, 32vw);
+}
+
 .page-pagamento-historico table.data-table td:nth-child(4) {
-  max-width: min(240px, 28vw);
+  max-width: min(200px, 26vw);
   word-break: break-word;
 }
 
@@ -677,9 +687,32 @@ h3 {
 }
 
 @media (max-width: 1200px) {
-  .page-pagamento-historico table.data-table td:nth-child(4) {
-    max-width: 180px;
+  .page-pagamento-historico table.data-table td:nth-child(3) {
+    max-width: 220px;
   }
+
+  .page-pagamento-historico table.data-table td:nth-child(4) {
+    max-width: 160px;
+  }
+}
+
+.page-pagamento-historico .pagamento-hist-cell--status {
+  vertical-align: top;
+}
+
+.pagamento-hist-status-detail {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.pagamento-hist-card__val--status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
 }
 
 .pagamento-hist-badge {
@@ -7989,10 +8022,15 @@ body[data-theme='light'] .ref-dashboard-inner {
 
   .dashboard-container.app-horizon-shell {
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: stretch;
     box-sizing: border-box;
-    min-height: 100dvh;
-    min-height: 100svh;
+    /* Mesmas margens verticais que body[data-theme] .dashboard-container — altura do card = viewport − margens (evita scroll no documento) */
+    --shell-vm-t: max(10px, env(safe-area-inset-top, 0px));
+    --shell-vm-b: max(12px, env(safe-area-inset-bottom, 0px));
+    --shell-block-h: calc(100dvh - var(--shell-vm-t) - var(--shell-vm-b));
+    height: var(--shell-block-h);
+    min-height: var(--shell-block-h);
+    max-height: var(--shell-block-h);
   }
 
   .dashboard-container.app-horizon-shell > .app-horizon-inner {
@@ -8008,8 +8046,8 @@ body[data-theme='light'] .ref-dashboard-inner {
     min-height: 0;
     align-self: stretch;
     box-sizing: border-box;
-    height: auto;
-    max-height: none;
+    height: 100%;
+    max-height: 100%;
     /* Vão menu ↔ conteúdo (tema): reforçado abaixo com body[data-theme] por especificidade */
     gap: 8px;
   }
@@ -8305,7 +8343,7 @@ body[data-theme='glass']
 }
 
 @media (min-width: 769px) {
-  /* Desktop: scroll costuma estar no .dashboard-container — sticky no topo até o fim do conteúdo */
+  /* Desktop: rolagem no <main.ref-dashboard-main> — sticky no topo dentro do painel */
   .dashboard-container.app-horizon-shell .ref-dashboard-inner > .ref-dashboard-header {
     position: sticky;
     top: 0;
@@ -8340,8 +8378,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell {
   border: none !important;
   box-shadow: none !important;
   overflow-x: clip;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow-y: hidden;
   overscroll-behavior-y: contain;
 }
 
@@ -8467,11 +8504,11 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
     margin-left: 0;
     margin-right: 0;
     align-items: stretch;
-    align-self: flex-start;
-    flex: 0 1 auto;
-    height: auto;
-    max-height: none;
-    min-height: var(--app-sidebar-col-h);
+    align-self: stretch;
+    flex: 1 1 auto;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
     gap: 8px;
   }
 
@@ -8512,27 +8549,28 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
     flex: 1;
     min-width: 0;
     min-height: 0;
-    height: auto;
-    max-height: none;
+    height: 100%;
+    max-height: 100%;
     align-self: stretch;
     overflow-x: clip;
-    overflow-y: visible;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
   }
 
   /* Todas as telas do shell: mesma coluna principal (evita “pulo” ao trocar rota) */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .main-content.ref-dashboard-main {
-    overflow: visible;
-    height: auto;
-    max-height: none;
+    overflow-x: clip;
+    overflow-y: auto;
+    min-height: 0;
   }
 
-  /* Home: painel transações compacto (não estica a coluna além do conteúdo) */
+  /* Home: painel transações compacto — coluna preenche o main; rolagem no <main> */
   body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .ref-dashboard-inner {
-    flex: none;
-    height: auto;
-    max-height: none;
+    flex: 1 1 auto;
     min-height: 0;
+    max-height: none;
     padding-bottom: 0;
   }
 
@@ -8545,7 +8583,7 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
   }
 }
 
-/* Desktop shell: logo na régua do menu (altura ~ item 44px).
+/* Desktop shell: logo um pouco acima da régua do item do menu (~46px).
    Espaço logo → Dashboard = mesmo ritmo que entre itens (.nav-menu gap), sem “degrau” extra. */
 @media (min-width: 769px) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
@@ -8557,16 +8595,16 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
     margin-bottom: 8px;
     padding-bottom: 0;
     /* Evita “salto” logo → 1.º item: cada rota remonta o Sidebar e a PNG pode vir com altura 0 até decodificar */
-    min-height: 48px;
-    gap: 10px;
+    min-height: 54px;
+    gap: 11px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: 48px;
-    min-height: 48px;
-    max-height: 48px;
+    height: 54px;
+    min-height: 54px;
+    max-height: 54px;
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -8581,7 +8619,7 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
     display: inline-flex;
     align-items: center;
-    font-size: 22px;
+    font-size: 24px;
     line-height: 1;
     font-weight: 900;
     letter-spacing: 0.08em;
@@ -8600,17 +8638,17 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
     width: 100%;
     margin-bottom: 8px;
     padding-bottom: 0;
-    min-height: 48px;
-    gap: 10px;
+    min-height: 54px;
+    gap: 11px;
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: 48px;
-    min-height: 48px;
-    max-height: 48px;
+    height: 54px;
+    min-height: 54px;
+    max-height: 54px;
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -8626,7 +8664,7 @@ body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar {
   body[data-theme='glass'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
     display: inline-flex;
     align-items: center;
-    font-size: 22px;
+    font-size: 24px;
     line-height: 1;
     font-weight: 900;
     letter-spacing: 0.08em;
@@ -9732,7 +9770,7 @@ body[data-theme='glass'] .modal-content--nova-tx .custom-select-search input:foc
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper,
   body[data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper {
-    min-height: 56px;
+    min-height: 62px;
     margin-bottom: 12px;
     gap: 0;
   }
@@ -9741,9 +9779,9 @@ body[data-theme='glass'] .modal-content--nova-tx .custom-select-search input:foc
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='glass'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo {
     width: auto;
-    height: 52px;
-    min-height: 52px;
-    max-height: 52px;
+    height: 58px;
+    min-height: 58px;
+    max-height: 58px;
     max-width: 100%;
     object-fit: contain;
   }

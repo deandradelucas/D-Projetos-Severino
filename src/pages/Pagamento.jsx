@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
-import PagamentoResumoKpis from '../components/pagamento/PagamentoResumoKpis.jsx'
 import PagamentoPainelLateral from '../components/pagamento/PagamentoPainelLateral.jsx'
 import PagamentoDetalhesCard from '../components/pagamento/PagamentoDetalhesCard.jsx'
 import PagamentoHistorico from '../components/pagamento/PagamentoHistorico.jsx'
@@ -11,7 +10,6 @@ import { formatCurrencyBRL } from '../lib/formatCurrency'
 import {
   PLANO_PADRAO_TITULO,
   buildOrientacaoUsuario,
-  buildResumoKpis,
   painelAssinaturaFromUser,
   ultimoPagamentoHistorico,
 } from '../lib/pagamentoPageModel.js'
@@ -230,21 +228,7 @@ export default function Pagamento() {
     await fetchDados()
   }
 
-  const onVerHistorico = () => {
-    historicoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
   const ultimo = ultimoPagamentoHistorico(historico)
-  const primeiroRegistroIso = historico.length ? historico[historico.length - 1]?.created_at : null
-
-  const resumoItems = buildResumoKpis({
-    painel: painelAssinatura,
-    proximaCobranca,
-    precoMensal,
-    tituloPlano: titulo,
-    historico,
-  })
-
   const orientacao = buildOrientacaoUsuario({
     painel: painelAssinatura,
     configReady: config.ready,
@@ -264,9 +248,7 @@ export default function Pagamento() {
                 <MobileMenuButton onClick={() => setMenuAberto(true)} />
                 <div className="dashboard-hub__hero-text">
                   <h1 className="dashboard-hub__title">Pagamento</h1>
-                  <p className="ref-panel__subtitle page-pagamento-header-sub">
-                    Gerencie sua assinatura, cobranças e histórico de pagamentos no Mercado Pago.
-                  </p>
+                  <p className="ref-panel__subtitle page-pagamento-header-sub">Assinatura e cobranças via Mercado Pago.</p>
                 </div>
               </div>
             </section>
@@ -281,11 +263,8 @@ export default function Pagamento() {
 
                 {expirado ? (
                   <div className="pagamento-banner pagamento-banner--danger" role="alert">
-                    <p className="pagamento-banner__title">Seu período de teste terminou ou a assinatura não está ativa.</p>
-                    <p className="pagamento-banner__text">
-                      Conclua o pagamento pelo Mercado Pago para voltar a usar o aplicativo. Após a aprovação, use &quot;Atualizar status&quot; ou faça login
-                      novamente.
-                    </p>
+                    <p className="pagamento-banner__title">Teste encerrado ou assinatura inativa.</p>
+                    <p className="pagamento-banner__text">Conclua o pagamento no Mercado Pago e use &quot;Atualizar status&quot;.</p>
                   </div>
                 ) : null}
 
@@ -293,10 +272,10 @@ export default function Pagamento() {
                   <div className={pagamentoStatusBannerClass(statusUrl)} role="status">
                     <p className="pagamento-banner__title">
                       {statusUrl === 'success'
-                        ? 'Pagamento concluído ou em análise. O status final aparece em instantes no histórico abaixo.'
+                        ? 'Pagamento recebido — o status atualiza em instantes no histórico.'
                         : statusUrl === 'pending'
-                          ? 'Pagamento pendente (ex.: boleto ou análise). Você receberá a confirmação pelo Mercado Pago.'
-                          : 'Não foi possível concluir o pagamento. Tente outro meio ou tente novamente.'}
+                          ? 'Pagamento pendente. A confirmação vem pelo Mercado Pago.'
+                          : 'Não foi possível concluir. Tente outro meio ou novamente.'}
                     </p>
                     <button type="button" className="btn-secondary btn-secondary--compact" onClick={limparStatusUrl}>
                       Fechar aviso
@@ -306,41 +285,28 @@ export default function Pagamento() {
 
                 {!config.ready && !loading ? (
                   <p className="pagamento-config-alert">
-                    Pagamentos ainda não estão ativos: configure <code>MERCADO_PAGO_ACCESS_TOKEN</code> no servidor (e rode a migration da tabela{' '}
-                    <code>pagamentos_mercadopago</code>).
+                    Checkout indisponível: configure <code>MERCADO_PAGO_ACCESS_TOKEN</code> no servidor.
                   </p>
                 ) : null}
 
                 {config.isento_pagamento && !loading ? (
                   <div className="pagamento-banner pagamento-banner--success">
-                    <p className="pagamento-banner__title">Sua conta está isenta de pagamento.</p>
-                    <p className="pagamento-banner__text">Não é necessário concluir o checkout do Mercado Pago. Em caso de dúvida, fale com o suporte.</p>
+                    <p className="pagamento-banner__title">Conta isenta — sem cobrança.</p>
                   </div>
                 ) : null}
-
-                <PagamentoResumoKpis items={resumoItems} />
 
                 <PagamentoDetalhesCard
                   tituloPlano={titulo}
                   precoMensal={precoMensal}
                   painel={painelAssinatura}
                   proximaCobranca={proximaCobranca}
-                  primeiroRegistroIso={primeiroRegistroIso}
                   formatCurrency={formatCurrency}
                 />
 
-                {painelAssinatura.bloqueada && painelAssinatura.motivo ? (
-                  <div className="pagamento-banner pagamento-banner--warning" role="status">
-                    <p className="pagamento-banner__title">Atenção ao acesso</p>
-                    <p className="pagamento-banner__text">{painelAssinatura.motivo}</p>
-                  </div>
-                ) : null}
-
                 {ultimo && (ultimo.status === 'rejected' || ultimo.status === 'cancelled' || ultimo.status === 'refunded') ? (
                   <div className="pagamento-banner pagamento-banner--warning" role="status">
-                    <p className="pagamento-banner__title">Última cobrança: {formatCurrency(Number(ultimo.amount || 0))}</p>
                     <p className="pagamento-banner__text">
-                      Status recente no histórico indica necessidade de revisão. Atualize o meio de pagamento no Mercado Pago ou tente autorizar novamente.
+                      Última cobrança ({formatCurrency(Number(ultimo.amount || 0))}) não foi concluída. Atualize o cartão ou o meio de pagamento no Mercado Pago.
                     </p>
                   </div>
                 ) : null}
@@ -352,7 +318,6 @@ export default function Pagamento() {
                 orientacao={orientacao}
                 onAssinar={handlePagar}
                 onAtualizar={onAtualizar}
-                onVerHistorico={onVerHistorico}
                 paying={paying}
                 loading={loading}
                 configReady={config.ready}
@@ -360,7 +325,6 @@ export default function Pagamento() {
                 mpUrl={painelAssinatura.mpUrl}
                 disabledAssinar={!config.ready || paying || loading || config.isento_pagamento}
                 checkoutError={error}
-                mpHint={config.publicKey ? 'Integração Mercado Pago pronta (checkout pré-aprovado).' : null}
               />
             </div>
           </div>
