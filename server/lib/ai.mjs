@@ -32,6 +32,110 @@ function resolveGeminiModelCandidates() {
   return [...new Set(list)]
 }
 
+const MAX_WHATSAPP_AUDIO_BYTES = 12 * 1024 * 1024
+
+/** Normaliza MIME para inline_data do Gemini (WhatsApp costuma enviar opus em OGG). */
+export function normalizeAudioMimeForGemini(mimetype) {
+  const s = String(mimetype || '')
+    .toLowerCase()
+    .split(';')[0]
+    .trim()
+  if (s.includes('ogg')) return 'audio/ogg'
+  if (s.includes('mpeg') || s.endsWith('mp3')) return 'audio/mpeg'
+  if (s.includes('mp4') || s.includes('m4a') || s.includes('aac')) return 'audio/mp4'
+  if (s.includes('wav')) return 'audio/wav'
+  if (s.includes('webm')) return 'audio/webm'
+  return 'audio/ogg'
+}
+
+/**
+ * ASR para notas de voz do WhatsApp (pipeline alinhado a voice-ai-specialist: áudio → texto).
+ * Usa Gemini multimodal (mesma API que o resto do Horizonte).
+ * @param {Buffer|Uint8Array} audioBytes
+ * @param {string} [mimeHint] mimetype declarado no payload (ex.: audio/ogg; codecs=opus)
+ */
+export async function transcribeWhatsAppAudioWithGemini(audioBytes, mimeHint = '') {
+  loadEnv()
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
+
+  const buf = Buffer.isBuffer(audioBytes) ? audioBytes : Buffer.from(audioBytes)
+  if (buf.length === 0) throw new Error('Áudio vazio.')
+  if (buf.length > MAX_WHATSAPP_AUDIO_BYTES) {
+    throw new Error(`Áudio demasiado grande (máx. ${Math.floor(MAX_WHATSAPP_AUDIO_BYTES / 1024 / 1024)} MB).`)
+  }
+
+  const mime = normalizeAudioMimeForGemini(mimeHint)
+  const b64 = buf.toString('base64')
+
+  const instruction =
+    'Transcreve integralmente o áudio em português brasileiro. ' +
+    'Devolve apenas o texto ditado pelo utilizador, sem comentários, sem rótulos como "Transcrição:" ou "O utilizador disse". ' +
+    'Se não houver fala inteligível, devolve exatamente: (silêncio)'
+
+  const models = resolveGeminiModelCandidates()
+  let lastErr = null
+
+  for (const mid of models) {
+    const body = {
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { inline_data: { mime_type: mime, data: b64 } },
+            { text: instruction },
+          ],
+        },
+      ],
+      generationConfig: {
+        maxOutputTokens: 1024,
+        temperature: 0.1,
+      },
+    }
+
+    let response
+    try {
+      response = await geminiPostGenerateContent(mid, apiKey, body)
+    } catch (e) {
+      lastErr = e instanceof Error ? e : new Error(String(e))
+      continue
+    }
+
+    if (!response.ok) {
+      const t = await response.text()
+      let j = {}
+      try {
+        j = t ? JSON.parse(t) : {}
+      } catch {
+        j = {}
+      }
+      const apiMsg = j?.error?.message || t
+      lastErr = new Error(`Gemini ${response.status}: ${apiMsg}`)
+      const retry =
+        response.status === 404 ||
+        /not found|is not found|does not exist|invalid model|Unsupported|NOT_FOUND/i.test(String(apiMsg))
+      if (retry) continue
+      throw lastErr
+    }
+
+    const json = await response.json()
+    const extracted = extractTextFromGeminiResponse(json)
+    if (!extracted.ok) {
+      lastErr = new Error(extracted.detail || 'Falha na transcrição')
+      continue
+    }
+
+    let text = extracted.text.trim()
+    if (text.toLowerCase() === '(silêncio)' || text.toLowerCase() === '(silencio)') {
+      text = ''
+    }
+    return text
+  }
+
+  if (lastErr) throw lastErr
+  throw new Error('Não foi possível transcrever o áudio.')
+}
+
 /**
  * Monta `contents` válidos para o Gemini (roles user|model, texto não vazio).
  * Junta mensagens consecutivas do mesmo papel e garante que a conversa comece em `user`.

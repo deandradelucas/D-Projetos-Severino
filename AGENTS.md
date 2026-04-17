@@ -1,5 +1,24 @@
 # Horizonte Financeiro — guia para agentes (IA e humanos)
 
+## Framework mandante — Segunda-feira (DOMINA-IA)
+
+A orquestração de agentes, skills, regras de governança, SDC (Story Development Cycle), Consciousness Engine e convenções de qualidade (EROS, IDS, handoff, etc.) seguem o framework **[Segunda-feira](https://github.com/DOMINA-IA/segunda-feira)** neste repositório.
+
+| O quê | Onde |
+|--------|------|
+| Constituição e sistema de agentes | `segunda-feira/CLAUDE.md` |
+| Regras (16) | `segunda-feira/rules/` |
+| Agentes especialistas | `segunda-feira/agents/` |
+| Skills | `segunda-feira/skills/` |
+| Consciousness Engine | `segunda-feira/consciousness/` |
+| Comandos / orquestradores | `segunda-feira/commands/` |
+
+Em tarefas de IA, trate o Segunda-feira como **mandante de processo**: persona por `@agente`, skills com `/nome`, leitura das regras quando o assunto for workflow, autoridade, MCP ou consciência. O bloco **Stack** abaixo continua sendo a fonte deste app (React, Hono, Supabase, pastas do Horizonte).
+
+CLI (opcional, ambiente local): `npm install -g ./segunda-feira` a partir da raiz do repo; comando `segunda-feira` instala/atualiza artefatos no diretório do Claude Code (`~/.claude` no perfil do utilizador), útil se usares Claude Code em paralelo.
+
+---
+
 ## Stack
 
 - **Frontend:** React 19, Vite 8, Tailwind 4 (`src/index.css` + `@theme`), React Router 7. Estilos de app autenticada em `src/pages/dashboard.css` (importado pelas páginas do shell).

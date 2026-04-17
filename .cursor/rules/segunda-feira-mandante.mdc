@@ -1,0 +1,14 @@
+---
+description: Segunda-feira (DOMINA-IA) como framework mandante — processo, agentes, regras e qualidade
+alwaysApply: true
+---
+
+# Segunda-feira — mandante de processo
+
+1. **Constituição:** antes de orquestrar trabalho multi-etapa ou decisões de governança, alinhar com `segunda-feira/CLAUDE.md` (português brasileiro, autonomia, SDC, agentes `@…`, regras em `segunda-feira/rules/`).
+
+2. **Regras detalhadas:** quando o tema for workflow, stories, QA, autoridade de agentes, MCP, EROS, feedback loop, handoff ou Consciousness Engine, consultar os ficheiros em `segunda-feira/rules/` em vez de inventar políticas paralelas.
+
+3. **Agentes e skills:** preferir as personas e skills definidas em `segunda-feira/agents/` e `segunda-feira/skills/`; combinar com o mapa técnico em `AGENTS.md` na raiz (stack Horizonte Financeiro).
+
+4. **Conflito de escopo:** requisitos de produto e stack (rotas API, Supabase, shell do dashboard) vêm de `AGENTS.md` e do código; processo (SDC, quem pode fazer push, checklists) vem do Segunda-feira.

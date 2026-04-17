@@ -234,7 +234,16 @@ export default function AdminWhatsApp() {
                           <td>{new Date(log.data_hora).toLocaleString('pt-BR')}</td>
                           <td style={{ fontWeight: 600 }}>{log.telefone_remetente}</td>
                           <td className="page-admin-td-ellipsis" title={log.mensagem_recebida}>
-                            {log.mensagem_recebida || '(vazio)'}
+                            {log.mensagem_recebida && /\[Áudio/i.test(String(log.mensagem_recebida)) ? (
+                              <>
+                                <span className="admin-wa-badge admin-wa-badge--warn" style={{ marginRight: '0.35rem', verticalAlign: 'middle' }}>
+                                  Áudio
+                                </span>
+                                {log.mensagem_recebida}
+                              </>
+                            ) : (
+                              log.mensagem_recebida || '(vazio)'
+                            )}
                           </td>
                           <td>{getStatusBadge(log.status)}</td>
                           <td className="page-admin-td-detail">{log.detalhe_erro || '—'}</td>

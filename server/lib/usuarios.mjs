@@ -213,7 +213,7 @@ export async function registrarLogWhatsApp(telefone, mensagem, status, detalhe, 
   }
 }
 
-export async function getWhatsappLogs(limit = 50) {
+export async function getWhatsappLogs(limit = 200) {
   const supabaseAdmin = getSupabaseAdmin()
   const { data, error } = await supabaseAdmin
     .from('whatsapp_logs')
