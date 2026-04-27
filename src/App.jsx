@@ -9,6 +9,7 @@ import Background from './components/Background'
 import PwaInstallPrompt from './components/PwaInstallPrompt'
 import HorizonChat from './components/HorizonChat'
 import ShellStickyHeaderScroll from './components/ShellStickyHeaderScroll'
+import ToastContainer from './components/Toast'
 import {
   Cadastro,
   RedefinirSenha,
@@ -31,6 +32,7 @@ function App() {
           Saltar para o conteúdo
         </a>
         <ShellStickyHeaderScroll />
+        <ToastContainer />
         <div className="app-layout-shell">
           <Background />
           <PwaInstallPrompt />

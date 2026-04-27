@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { inserirTransacao } from '../lib/transacoes.mjs'
-import * as SupabaseAdmin from '../lib/supabase-admin.mjs'
 
 // Mock do Supabase
 const mockInsert = vi.fn()

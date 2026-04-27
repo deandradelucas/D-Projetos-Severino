@@ -14,6 +14,7 @@ import { readHorizonteUser, readHorizonteUserPainelState } from '../lib/horizont
 import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { primeiroNomeExibicao } from '../lib/primeiroNomeExibicao'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
+import { getSaudacao } from '../lib/getSaudacao'
 import { SkeletonKpi, SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 
@@ -150,7 +151,7 @@ export default function Dashboard() {
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">
-                Olá, <span className={privacyMode ? 'privacy-blur' : ''}>{nomeExibicao}</span>
+                {getSaudacao()}, <span className={privacyMode ? 'privacy-blur' : ''}>{nomeExibicao}</span>
               </h1>
             </div>
             <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos do painel">

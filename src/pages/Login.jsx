@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { apiUrl } from '../lib/apiUrl'
 import { prefetchRoute } from '../lazyRoutes'
+import { showToast } from '../components/Toast'
 import { webAuthnSupported, fetchWebAuthnStatus, loginWithWebAuthn } from '../lib/webauthnBrowser'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
@@ -181,7 +182,7 @@ export default function Login() {
       }
 
       if (!response.ok) {
-        setMensagem({ texto: data.message || 'Nao foi possivel fazer login agora.', tipo: 'erro' })
+        showToast(data.message || 'Dados de acesso incorretos.', 'error')
         setLoading(false)
         return
       }

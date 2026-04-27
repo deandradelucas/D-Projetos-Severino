@@ -11,6 +11,7 @@ import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
 import { readHorizonteUserProfile, horizonteUserProfileTemId } from '../lib/horizonteSession'
 import { getRelatorioChartPalette } from '../lib/relatorioChartTokens'
 import { downloadRelatorioCsv } from '../lib/relatorioExportCsv'
+import { showToast } from '../lib/toastStore'
 import './dashboard.css'
 import {
   BarChart,
@@ -242,6 +243,33 @@ export default function Relatorios() {
     setFilters({ dataInicio: firstDay, dataFim: lastDay, categoria_id: '' })
   }, [])
 
+  const setPeriodShortcut = (type) => {
+    const today = new Date()
+    let start, end
+
+    if (type === 'thisMonth') {
+      start = new Date(today.getFullYear(), today.getMonth(), 1)
+      end = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    } else if (type === 'lastMonth') {
+      start = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+      end = new Date(today.getFullYear(), today.getMonth(), 0)
+    } else if (type === 'last90') {
+      start = new Date()
+      start.setDate(today.getDate() - 90)
+      end = today
+    } else if (type === 'thisYear') {
+      start = new Date(today.getFullYear(), 0, 1)
+      end = new Date(today.getFullYear(), 11, 31)
+    }
+
+    setFilters(prev => ({
+      ...prev,
+      dataInicio: start.toISOString().split('T')[0],
+      dataFim: end.toISOString().split('T')[0]
+    }))
+    showToast('Período atualizado')
+  }
+
   const {
     summary,
     chartDataPorMes,
@@ -262,7 +290,14 @@ export default function Relatorios() {
 
   const formatCurrency = formatCurrencyBRL
 
-  const exportToCSV = () => downloadRelatorioCsv(transacoes, filters)
+  const exportToCSV = () => {
+    try {
+      downloadRelatorioCsv(transacoes, filters)
+      showToast('CSV exportado com sucesso!')
+    } catch {
+      showToast('Erro ao exportar CSV', 'error')
+    }
+  }
 
   const exportToPDF = async () => {
     if (transacoes.length === 0) return
@@ -315,6 +350,9 @@ export default function Relatorios() {
       })
 
       doc.save(`relatorio_${filters.dataInicio}_a_${filters.dataFim}.pdf`)
+      showToast('PDF gerado com sucesso!')
+    } catch {
+      showToast('Erro ao gerar PDF', 'error')
     } finally {
       setPdfExportLoading(false)
     }
@@ -411,6 +449,12 @@ export default function Relatorios() {
             hidden={!filtrosAbertos}
           >
             <div className="relatorios-filter-grid page-relatorios-filter-grid">
+              <div className="relatorios-shortcuts-row col-span-full flex flex-wrap gap-2 mb-2">
+                <button type="button" onClick={() => setPeriodShortcut('thisMonth')} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Este Mês</button>
+                <button type="button" onClick={() => setPeriodShortcut('lastMonth')} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Mês Passado</button>
+                <button type="button" onClick={() => setPeriodShortcut('last90')} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Últimos 90 dias</button>
+                <button type="button" onClick={() => setPeriodShortcut('thisYear')} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Este Ano</button>
+              </div>
               <div className="filter-group">
                 <label htmlFor="rel-ini">Data início</label>
                 <input id="rel-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />

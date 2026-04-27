@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { apiUrl } from '../lib/apiUrl'
+import { showToast } from './Toast'
 import RecorrenciaArrowIcon from './RecorrenciaArrowIcon'
 
 function tipoCategoriaIgual(tipoCampo, tipoAlvo) {
@@ -330,6 +331,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
         body: JSON.stringify(payload),
       })
       if (res.ok) {
+        showToast(isEditMode ? 'Alterações salvas!' : 'Transação registrada!')
         onSave()
         onClose()
       } else {
