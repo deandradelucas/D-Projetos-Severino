@@ -5,6 +5,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
 import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
 import { useTheme } from '../context/ThemeContext'
+import { useTransactionCache } from '../context/TransactionCacheContext'
 import { apiUrl } from '../lib/apiUrl'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
@@ -33,13 +34,21 @@ export default function Transacoes() {
   }, [])
 
   // States
+  const { transacoes: cachedTx, fetchTransacoes: syncGlobalCache } = useTransactionCache()
+
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState(null)
-  const [transacoes, setTransacoes] = useState([])
+  
+  // Inicializa com o cache global para evitar "saltos" de tela (SWR)
+  const [transacoes, setTransacoes] = useState(cachedTx || [])
   const [categorias, setCategorias] = useState([])
   const firstFetchDoneRef = useRef(false)
-  const [loading, setLoading] = useState(() => horizonteUserProfileTemId(readHorizonteUserProfile()))
+  
+  // Só exibe Skeleton se o cache estiver vazio
+  const [loading, setLoading] = useState(() => 
+    horizonteUserProfileTemId(readHorizonteUserProfile()) && (!cachedTx || cachedTx.length === 0)
+  )
   const [refreshing, setRefreshing] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(false)
@@ -203,15 +212,25 @@ export default function Transacoes() {
     if (!window.confirm('Deseja realmente excluir esta transação?')) return
     const session = readHorizonteUser()
     if (!session?.id) return
+    
+    // Otimista
+    setTransacoes(prev => prev.filter(t => t.id !== id))
+    
     try {
       const res = await fetch(apiUrl(`/api/transacoes/${id}`), {
         method: 'DELETE',
         headers: { 'x-user-id': session.id },
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
-      if (res.ok) fetchTransacoes()
+      if (res.ok) {
+        syncGlobalCache({ silent: true }) // Atualiza o Dashboard também
+      } else {
+        // Se falhar, reverte buscando do servidor
+        fetchTransacoes()
+      }
     } catch (err) {
       console.error(err)
+      fetchTransacoes()
     }
   }
 
@@ -622,6 +641,7 @@ export default function Transacoes() {
         void (async () => {
           await fetchTransacoes()
           await fetchRecorrencias()
+          syncGlobalCache({ silent: true })
         })()
       }}
       usuarioId={readHorizonteUser()?.id || usuario.id}
