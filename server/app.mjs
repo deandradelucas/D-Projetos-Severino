@@ -12,7 +12,6 @@ import {
 } from './lib/password-reset.mjs'
 import {
   getCategorias,
-  inserirTransacao,
   getTransacoes,
   atualizarTransacao,
   deletarTransacao,
@@ -20,7 +19,6 @@ import {
 
 import {
   assertCronSecret,
-  criarRegraRecorrenciaDia1,
   desativarRecorrenciaMensal,
   listarRecorrenciasMensais,
   processarRecorrenciasPendentes,
@@ -81,6 +79,7 @@ import {
   deleteCredentialForUser,
   listCredentialSummariesForUser,
 } from './lib/webauthn.mjs'
+import { TransactionService } from './lib/services/transaction-service.mjs'
 
 loadEnv()
 
@@ -1046,31 +1045,8 @@ app.post('/api/transacoes', async (c) => {
       return c.json({ message: val.message }, 400)
     }
 
-    // Vincula o usuario logado
-    body.usuario_id = usuarioId
-
-    let data = await inserirTransacao(body)
-
-    const rawDia1 = body.recorrencia_dia_1
-    const marcaRecorrenciaDia1 =
-      rawDia1 === true ||
-      rawDia1 === 'true' ||
-      rawDia1 === 1 ||
-      rawDia1 === '1'
-    const querRecorrenciaDia1 =
-      marcaRecorrenciaDia1 &&
-      !(body.recorrencia && Number(body.recorrencia.quantidade) > 1)
-    if (querRecorrenciaDia1 && data) {
-      try {
-        const { transacaoAtualizada } = await criarRegraRecorrenciaDia1(usuarioId, data)
-        if (transacaoAtualizada?.recorrencia_mensal_id) {
-          data = { ...data, recorrencia_mensal_id: transacaoAtualizada.recorrencia_mensal_id }
-        }
-      } catch (e) {
-        log.error('criar regra recorrência dia 1', e)
-        /* transação já foi gravada; regra pode ter sido revertida no servidor */
-      }
-    }
+    // Vincula o usuario logado e processa via serviço
+    const data = await TransactionService.createTransaction(usuarioId, body)
 
     return c.json({ message: 'Transação inserida com sucesso.', data }, 201)
   } catch (error) {

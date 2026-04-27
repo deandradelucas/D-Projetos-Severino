@@ -1,8 +1,8 @@
 import { log } from './logger.mjs'
 import { resolveWhatsAppWebhookToken } from './whatsapp-webhook-secret.mjs'
 import { buscarUsuarioPorTelefone, registrarLogWhatsApp, normalizarDigitosWhatsappLog } from './usuarios.mjs'
-import { getCategorias, inserirTransacao } from './transacoes.mjs'
-import { parseWhatsAppMessageWithAI, transcribeWhatsAppAudioWithGemini } from './ai.mjs'
+import { transcribeWhatsAppAudioWithGemini } from './ai.mjs'
+import { WhatsAppTransactionService } from './services/whatsapp-transaction-service.mjs'
 
 /** Headers comuns em provedores (Telein, Evolution, Z-API, etc.) */
 function collectTokenFromHeaders(getHeader) {
@@ -791,48 +791,10 @@ export async function handleWhatsAppWebhook(req, options = {}) {
 
     log.info(`[WhatsApp Webhook] Mensagem recebida de: ${telDisplay} -> "${textoUsuario.slice(0, 200)}${textoUsuario.length > 200 ? '…' : ''}"`)
 
-    const categorias = await getCategorias(usuarioTarget.id)
-    if (!categorias || categorias.length === 0) {
-      throw new Error('Usuário sem categorias no sistema para mapear a despesa.')
-    }
-
-    log.info(`[WhatsApp Webhook] Passando p/ AI... usuário: ${usuarioTarget.email}`)
-    const extractedData = await parseWhatsAppMessageWithAI(textoUsuario, categorias)
-
-    if (!extractedData.tipo || !extractedData.valor) {
-      throw new Error('A IA não conseguiu interpretar um valor ou tipo de transação na frase enviada.')
-    }
-
-    const payLoadTransacao = {
-      usuario_id: usuarioTarget.id,
-      tipo: extractedData.tipo,
-      valor: extractedData.valor,
-      descricao: extractedData.descricao || 'Adicionado via WhatsApp',
-      data_transacao: new Date().toISOString(),
-      status: 'EFETIVADA',
-    }
-
-    if (extractedData.categoria_id) payLoadTransacao.categoria_id = extractedData.categoria_id
-    if (extractedData.subcategoria_id) payLoadTransacao.subcategoria_id = extractedData.subcategoria_id
-
-    const transacaoSalva = await inserirTransacao(payLoadTransacao)
-
-    log.info(`[WhatsApp Webhook] Transação salva com sucesso: ${transacaoSalva.id}`)
-
-    let catNome = 'Sem categoria'
-    let subNome = ''
-    if (extractedData.categoria_id) {
-      const cat = categorias.find((c) => c.id === extractedData.categoria_id)
-      if (cat) {
-        catNome = cat.nome || catNome
-        if (extractedData.subcategoria_id && Array.isArray(cat.subcategorias)) {
-          const sub = cat.subcategorias.find((s) => s.id === extractedData.subcategoria_id)
-          if (sub) subNome = sub.nome
-        }
-      }
-    }
-    const valorNum = Number(extractedData.valor) || 0
-    const detalheSucesso = `Lançado: ${extractedData.tipo} R$${valorNum.toFixed(2)} - ${catNome}${subNome ? ' / ' + subNome : ''}`
+    const { transaction, detalheSucesso } = await WhatsAppTransactionService.processMessage(
+      usuarioTarget.id,
+      textoUsuario
+    )
 
     await registrarLogWhatsApp(telDisplay, mensagemParaLog, 'SUCESSO', detalheSucesso, usuarioTarget.id)
 
@@ -841,7 +803,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
       json: {
         ok: true,
         message: 'Lançamento efetuado via IA com sucesso',
-        transacao: transacaoSalva,
+        transacao: transaction,
       },
     }
   } catch (error) {

@@ -12,6 +12,7 @@ import { readHorizonteUserProfile, horizonteUserProfileTemId } from '../lib/hori
 import { getRelatorioChartPalette } from '../lib/relatorioChartTokens'
 import { downloadRelatorioCsv } from '../lib/relatorioExportCsv'
 import { showToast } from '../lib/toastStore'
+import { formatLocalDateISO, getFirstDayOfMonth, getLastDayOfMonth } from '../lib/dateUtils'
 import './dashboard.css'
 import {
   BarChart,
@@ -238,9 +239,11 @@ export default function Relatorios() {
 
   const clearRelatorioFilters = useCallback(() => {
     const today = new Date()
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]
-    setFilters({ dataInicio: firstDay, dataFim: lastDay, categoria_id: '' })
+    setFilters({ 
+      dataInicio: formatLocalDateISO(getFirstDayOfMonth(today)), 
+      dataFim: formatLocalDateISO(getLastDayOfMonth(today)), 
+      categoria_id: '' 
+    })
   }, [])
 
   const setPeriodShortcut = (type) => {
@@ -248,8 +251,8 @@ export default function Relatorios() {
     let start, end
 
     if (type === 'thisMonth') {
-      start = new Date(today.getFullYear(), today.getMonth(), 1)
-      end = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+      start = getFirstDayOfMonth(today)
+      end = getLastDayOfMonth(today)
     } else if (type === 'lastMonth') {
       start = new Date(today.getFullYear(), today.getMonth() - 1, 1)
       end = new Date(today.getFullYear(), today.getMonth(), 0)
@@ -264,8 +267,8 @@ export default function Relatorios() {
 
     setFilters(prev => ({
       ...prev,
-      dataInicio: start.toISOString().split('T')[0],
-      dataFim: end.toISOString().split('T')[0]
+      dataInicio: formatLocalDateISO(start),
+      dataFim: formatLocalDateISO(end)
     }))
     showToast('Período atualizado')
   }
