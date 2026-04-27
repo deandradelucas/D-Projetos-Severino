@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getSupabaseErrorMessage, parseSupabaseResponse, supabaseKey, supabaseUrl } from '../lib/supabase'
 import { BRAND_ASSETS } from '../lib/brandAssets'
-import { showToast } from '../components/Toast'
+import { showToast } from '../lib/toastStore'
 
 function formatTelefone(value) {
   const numbers = value.replace(/\D/g, '')

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { apiUrl } from '../lib/apiUrl'
-import { showToast } from './Toast'
+import { showToast } from '../lib/toastStore'
 import RecorrenciaArrowIcon from './RecorrenciaArrowIcon'
 
 function tipoCategoriaIgual(tipoCampo, tipoAlvo) {

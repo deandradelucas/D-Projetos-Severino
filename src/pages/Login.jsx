@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { apiUrl } from '../lib/apiUrl'
 import { prefetchRoute } from '../lazyRoutes'
-import { showToast } from '../components/Toast'
+import { showToast } from '../lib/toastStore'
 import { webAuthnSupported, fetchWebAuthnStatus, loginWithWebAuthn } from '../lib/webauthnBrowser'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
