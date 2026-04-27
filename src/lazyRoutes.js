@@ -18,6 +18,7 @@ export const Configuracoes = lazy(loadConfiguracoes)
 export const loadRelatorios = () => import('./pages/Relatorios.jsx')
 export const Relatorios = lazy(loadRelatorios)
 
+
 export const loadAdminWhatsApp = () => import('./pages/AdminWhatsApp.jsx')
 export const AdminWhatsApp = lazy(loadAdminWhatsApp)
 

@@ -12,6 +12,7 @@ A orquestração de agentes, skills, regras de governança, SDC (Story Developme
 | Skills | `segunda-feira/skills/` |
 | Consciousness Engine | `segunda-feira/consciousness/` |
 | Comandos / orquestradores | `segunda-feira/commands/` |
+| Automação (n8n, Make, webhooks, Evolution API, cron, pipelines) | `segunda-feira/agents/automation-architect.md` (**Wire**) |
 
 Em tarefas de IA, trate o Segunda-feira como **mandante de processo**: persona por `@agente`, skills com `/nome`, leitura das regras quando o assunto for workflow, autoridade, MCP ou consciência. O bloco **Stack** abaixo continua sendo a fonte deste app (React, Hono, Supabase, pastas do Horizonte).
 
@@ -25,6 +26,25 @@ CLI (opcional, ambiente local): `npm install -g ./segunda-feira` a partir da rai
 - **API:** Hono em `server/app.mjs`. **Dev local:** `node server/index.mjs`. **Produção (Vercel):** `api/index.js` adapta `req`/`res` do Node para `Request` e chama `app.fetch`.
 - **Dados:** Supabase Postgres. Cliente admin no servidor: `server/lib/supabase-admin.mjs`. Cliente público (cadastro): `src/lib/supabase.js`.
 - **Migrations SQL:** `scripts/migrations/` — rodar no SQL Editor do Supabase na ordem numérica quando indicado.
+
+### Supabase e MCP (agente)
+
+- Regra Cursor **`.cursor/rules/supabase-mcp-agent.mdc`**: quando trabalhar em banco, usar o **MCP Supabase** (configuração no cliente Cursor, endpoint read-only) para alinhar schema/dados com o código — em conjunto com `scripts/migrations/`.
+- Servidor Node aceita **`VITE_SUPABASE_URL` ou `SUPABASE_URL`** + **`SUPABASE_SERVICE_ROLE_KEY`** (`server/lib/supabase-admin.mjs`).
+
+### Cursor — skills por objetivo
+
+Skills em `.agents/skills/` quando existirem no clone; regras em `.cursor/rules/` para este app.
+
+| Objetivo | O que usar |
+|----------|------------|
+| Rever arquitetura / fluxo / código legado | **code-archaeologist** ou **explorer-agent**. |
+| Implementar ou corrigir | **dev** ou **frontend-specialist** / **backend-specialist**. |
+| Bug / erro / causa raiz | **debugger**. |
+| Testes e cobertura | **test-engineer**; E2E → **qa-automation-engineer**. |
+| Segurança | **security-auditor**. |
+| Várias áreas ao mesmo tempo | **orchestrator**. |
+| UX (acessibilidade, fluxo, consistência sem quebrar o shell) | **frontend-specialist** + **`.cursor/rules/horizonte-ux.mdc`**. |
 
 ## Comandos
 

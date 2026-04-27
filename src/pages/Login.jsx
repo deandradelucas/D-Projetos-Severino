@@ -287,7 +287,7 @@ export default function Login() {
                 placeholder="seu@email.com"
                 required
                 autoComplete="email"
-                className="w-full px-3 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-lg text-[#f5f5f5] placeholder-[#737373] text-sm focus:outline-none focus:border-[#d4a84b] focus:bg-white/10 transition-all duration-200"
+                className="w-full px-3 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-lg text-[#f5f5f5] placeholder-[#737373] text-sm focus:outline-none focus:border-[#d4a84b] focus:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#d4a84b]/45 transition-all duration-200"
               />
             </div>
 
@@ -305,13 +305,13 @@ export default function Login() {
                   required
                   minLength={6}
                   autoComplete="current-password"
-                  className="w-full px-3 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-lg text-[#f5f5f5] placeholder-[#737373] text-sm focus:outline-none focus:border-[#d4a84b] focus:bg-white/10 transition-all duration-200 pr-10"
+                  className="w-full px-3 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-lg text-[#f5f5f5] placeholder-[#737373] text-sm focus:outline-none focus:border-[#d4a84b] focus:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#d4a84b]/45 transition-all duration-200 pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowSenha(!showSenha)}
                   aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#737373] hover:text-[#a3a3a3] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#737373] hover:text-[#a3a3a3] transition-colors rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a84b]/55"
                 >
                   {showSenha ? (
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -342,7 +342,7 @@ export default function Login() {
                     setForgotEmail(email)
                     setForgotPasswordState({ text: '', type: '', link: '' })
                   }}
-                  className="text-[11px] font-medium text-[#d4a84b] transition-colors hover:text-[#b8923f] hover:underline"
+                  className="text-[11px] font-medium text-[#d4a84b] transition-colors hover:text-[#b8923f] hover:underline rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a84b]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                 >
                   Esqueceu a senha?
                 </a>
@@ -361,7 +361,7 @@ export default function Login() {
                     value={forgotEmail}
                     onChange={(event) => setForgotEmail(event.target.value)}
                     placeholder="seu@email.com"
-                    className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-[#f5f5f5] placeholder-[#737373] transition-all duration-200 focus:border-[#d4a84b] focus:bg-white/10 focus:outline-none"
+                    className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-[#f5f5f5] placeholder-[#737373] transition-all duration-200 focus:border-[#d4a84b] focus:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a84b]/45"
                     autoComplete="email"
                     required
                   />
@@ -370,7 +370,7 @@ export default function Login() {
                     type="button"
                     onClick={handleForgotPassword}
                     disabled={requestingReset}
-                    className="w-full rounded-lg border border-[#d4a84b]/40 bg-transparent px-3 py-2 text-xs font-semibold text-[#d4a84b] transition-colors hover:bg-[#d4a84b]/10 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="w-full rounded-lg border border-[#d4a84b]/40 bg-transparent px-3 py-2 text-xs font-semibold text-[#d4a84b] transition-colors hover:bg-[#d4a84b]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a84b]/50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {requestingReset ? 'Enviando link...' : 'Enviar link de redefinicao'}
                   </button>
@@ -401,7 +401,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading || bioLoading}
-              className="w-full py-2.5 sm:py-3 bg-[#d4a84b] text-[#0a0a0a] rounded-lg font-semibold text-sm hover:bg-[#b8923f] hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(212,168,75,0.2)] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none mt-2 min-h-[44px]"
+              className="w-full py-2.5 sm:py-3 bg-[#d4a84b] text-[#0a0a0a] rounded-lg font-semibold text-sm hover:bg-[#b8923f] hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(212,168,75,0.2)] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none mt-2 min-h-[44px]"
             >
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
@@ -417,7 +417,7 @@ export default function Login() {
                   type="button"
                   onClick={handleBiometricLogin}
                   disabled={loading || bioLoading}
-                  className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/5 py-2.5 text-sm font-semibold text-[#f5f5f5] transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/5 py-2.5 text-sm font-semibold text-[#f5f5f5] transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a84b]/50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-[#d4a84b]" aria-hidden>
                     <path d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" />
@@ -443,7 +443,10 @@ export default function Login() {
 
           <p className="text-center text-[#a3a3a3] mt-4 text-xs">
             Não tem conta?{' '}
-            <Link to="/cadastro" className="text-[#d4a84b] font-medium hover:text-[#b8923f] hover:underline transition-colors">
+            <Link
+              to="/cadastro"
+              className="text-[#d4a84b] font-medium hover:text-[#b8923f] hover:underline transition-colors rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a84b]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            >
               Criar conta
             </Link>
           </p>

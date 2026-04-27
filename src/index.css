@@ -262,6 +262,62 @@ button {
   font: inherit;
 }
 
+/* Skip link — teclado / leitores de ecrã (UX + WCAG 2.4.1) */
+.skip-to-main {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  z-index: 9999;
+}
+
+.skip-to-main:focus {
+  position: fixed;
+  left: max(12px, env(safe-area-inset-left, 0px));
+  top: max(12px, env(safe-area-inset-top, 0px));
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 10px 14px;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  background: var(--color-accent-gold, #d4a84b);
+  color: #0a0a0a;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  outline: none;
+}
+
+.skip-to-main:focus-visible {
+  outline: 2px solid #0a0a0a;
+  outline-offset: 2px;
+}
+
+/* Texto só para tecnologias assistivas */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+
 @media (max-width: 768px) {
   html {
     overflow: hidden;

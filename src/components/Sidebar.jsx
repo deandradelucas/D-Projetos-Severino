@@ -21,6 +21,15 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     if (menuAberto) prefetchAppNavChunksNow()
   }, [menuAberto])
 
+  useEffect(() => {
+    if (!menuAberto) return undefined
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMenuAberto(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [menuAberto, setMenuAberto])
+
   const svgSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
   const pngSrc = theme === 'light' ? BRAND_ASSETS.logoOnLightPng : BRAND_ASSETS.logoOnDarkPng
   const [logoSrc, setLogoSrc] = useState(pngSrc)
@@ -33,7 +42,12 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     <>
       {/* Mobile Backdrop */}
       {menuAberto && (
-        <div className="mobile-backdrop" onClick={() => setMenuAberto(false)} />
+        <button
+          type="button"
+          className="mobile-backdrop"
+          aria-label="Fechar menu"
+          onClick={() => setMenuAberto(false)}
+        />
       )}
 
       <aside className={`sidebar ${menuAberto ? 'open' : ''}`}>
@@ -117,6 +131,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               <span className="nav-item__label">Relatórios</span>
             </NavLink>
           </li>
+
           <li>
             <NavLink
               to="/pagamento"

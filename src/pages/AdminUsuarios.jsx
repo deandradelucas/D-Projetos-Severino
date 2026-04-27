@@ -741,7 +741,7 @@ export default function AdminUsuarios() {
                   <input
                     type="search"
                     className="page-admin-filter-input page-admin-filter-input--search"
-                    placeholder="Buscar nome, e-mail ou telefone…"
+                    placeholder="Buscar nome, e-mail, telefone ou id…"
                     value={userFilter}
                     onChange={(e) => setUserFilter(e.target.value)}
                     autoComplete="off"

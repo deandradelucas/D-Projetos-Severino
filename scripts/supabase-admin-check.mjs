@@ -3,11 +3,12 @@ import process from 'node:process'
 
 await import('../server/lib/load-env.mjs')
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
+console.log(`Tentando conectar em: ${supabaseUrl}`)
 if (!supabaseUrl || !serviceRoleKey) {
-  console.error('Faltam variaveis de ambiente. Verifique VITE_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no .env.')
+  console.error('Faltam variaveis de ambiente. Verifique VITE_SUPABASE_URL (ou SUPABASE_URL) e SUPABASE_SERVICE_ROLE_KEY no .env.')
   process.exit(1)
 }
 

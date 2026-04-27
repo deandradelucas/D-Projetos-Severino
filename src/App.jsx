@@ -27,12 +27,15 @@ function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
+        <a href="#app-main" className="skip-to-main">
+          Saltar para o conteúdo
+        </a>
         <ShellStickyHeaderScroll />
         <div className="app-layout-shell">
           <Background />
           <PwaInstallPrompt />
           <HorizonChat />
-          <div className="app-routes-grow">
+          <div className="app-routes-grow" id="app-main" tabIndex={-1}>
             <Suspense fallback={<RoutePageFallback />}>
               <Routes>
                 <Route path="/cadastro" element={<Cadastro />} />

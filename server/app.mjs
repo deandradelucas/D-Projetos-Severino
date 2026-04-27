@@ -17,6 +17,7 @@ import {
   atualizarTransacao,
   deletarTransacao,
 } from './lib/transacoes.mjs'
+
 import {
   assertCronSecret,
   criarRegraRecorrenciaDia1,
@@ -34,6 +35,7 @@ import {
 } from './lib/usuarios.mjs'
 import { insertAdminAuditLog, listAdminAuditLog } from './lib/admin-audit.mjs'
 import { handleWhatsAppWebhook } from './lib/whatsapp.mjs'
+import { resolveWhatsAppWebhookToken } from './lib/whatsapp-webhook-secret.mjs'
 import { askHorizon } from './lib/ai.mjs'
 import {
   buscarPagamentoPorId,
@@ -213,11 +215,14 @@ function errorToText(error) {
 /** Erros de configuração/rede do Supabase — retorna null se for falha genérica. */
 function mapSupabaseOrNetworkError(error) {
   const raw = errorToText(error)
-  if (raw.includes('Missing VITE_SUPABASE_URL') || raw.includes('SUPABASE_SERVICE_ROLE_KEY')) {
+  if (
+    /Missing Supabase URL \(VITE_SUPABASE_URL or SUPABASE_URL\)/i.test(raw) ||
+    /Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY/i.test(raw)
+  ) {
     return {
       status: 503,
       message:
-        'Banco de dados não configurado. Em desenvolvimento, crie um arquivo .env na raiz do projeto com VITE_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY (copie de env.example). No Vercel, defina as mesmas variáveis no projeto e faça um novo deploy.',
+        'Banco de dados não configurado. Em desenvolvimento, crie um arquivo .env na raiz com VITE_SUPABASE_URL (ou SUPABASE_URL no servidor) e SUPABASE_SERVICE_ROLE_KEY (copie de env.example). No Vercel, defina as mesmas variáveis no projeto e faça um novo deploy.',
     }
   }
   if (/Invalid supabaseUrl|Invalid VITE_SUPABASE_URL|Must be a valid HTTP or HTTPS URL/i.test(raw)) {
@@ -250,10 +255,11 @@ function mapSupabaseOrNetworkError(error) {
         'As tabelas de biometria ainda não existem no banco. No Supabase (SQL Editor), execute o arquivo scripts/migrations/13_webauthn.sql deste projeto.',
     }
   }
-  if (/relation.*does not exist|42P01/i.test(raw)) {
+  if (/relation.*does not exist|42P01|PGRST205|Could not find the table.*schema cache/i.test(raw)) {
     return {
       status: 503,
-      message: 'Tabela de usuários não encontrada. Rode as migrations do Supabase neste projeto.',
+      message:
+        'Tabela ou recurso não encontrado no banco. Rode os scripts em scripts/migrations/ no SQL Editor do Supabase (neste projeto).',
     }
   }
   if (/permission denied for table|42501/i.test(raw)) {
@@ -274,6 +280,13 @@ function mapSupabaseOrNetworkError(error) {
       status: 503,
       message:
         'O banco está desatualizado em relação ao app. Rode as migrations em scripts/migrations/ no SQL Editor do Supabase.',
+    }
+  }
+  if (/PGRST100|PGRST102|failed to parse|parse.*filter|invalid.*filter/i.test(raw)) {
+    return {
+      status: 503,
+      message:
+        'A consulta ao banco foi rejeitada (filtro inválido). Se acabou de atualizar o app, faça um deploy recente; senão, verifique os logs do servidor.',
     }
   }
   if (/PGRST301|JWT expired|expired|timeout|ETIMEDOUT|connect ECONNREFUSED|socket hang up/i.test(raw)) {
@@ -745,11 +758,21 @@ app.get('/api/admin/whatsapp-config', async (c) => {
     if (block) return c.json({ message: block.message }, block.status)
 
     const origin = getRequestOrigin(c).replace(/\/$/, '')
-    const token = process.env.WHATSAPP_WEBHOOK_TOKEN || 'ece58f64012d51028d28a04264d07131'
+    const { token, missingInProduction } = resolveWhatsAppWebhookToken()
+    if (missingInProduction || !token) {
+      return c.json({
+        webhookUrlQuery: null,
+        webhookUrlPath: null,
+        missingToken: true,
+        hint:
+          'Defina WHATSAPP_WEBHOOK_TOKEN nas variáveis de ambiente (ex.: Vercel). Em produção não existe token padrão no código por segurança.',
+      })
+    }
     const enc = encodeURIComponent(token)
     return c.json({
       webhookUrlQuery: `${origin}/api/whatsapp/webhook?token=${enc}`,
       webhookUrlPath: `${origin}/api/whatsapp/webhook/${enc}`,
+      missingToken: false,
       hint:
         'Cole uma dessas URLs no painel Chipmassa/Telein (Webhook). Sem o token correto, mensagens com texto são rejeitadas.',
     })
@@ -786,6 +809,8 @@ app.get('/api/admin/usuarios', async (c) => {
     return c.json(result)
   } catch (error) {
     log.error('get admin usuarios failed', error)
+    const mapped = mapSupabaseOrNetworkError(error)
+    if (mapped) return c.json({ message: mapped.message }, mapped.status)
     return c.json({ message: 'Erro ao listar usuários.' }, 500)
   }
 })
@@ -1188,6 +1213,8 @@ app.delete('/api/transacoes/:id', async (c) => {
     return c.json({ message: 'Erro ao excluir transação.' }, 500)
   }
 })
+
+
 
 // AI Chat Route — Pergunte ao Horizon
 

@@ -179,24 +179,41 @@ export default function AdminWhatsApp() {
                   </div>
                 </div>
                 <div className="page-admin-webhook-body">
-                  <div>
-                    <p className="page-admin-webhook-label">Com ?token= (recomendado)</p>
-                    <div className="page-admin-webhook-row">
-                      <code className="page-admin-code">{whatsappConfig.webhookUrlQuery}</code>
-                      <button type="button" className="btn-secondary page-admin-copy-btn" onClick={() => copyText('query', whatsappConfig.webhookUrlQuery)}>
-                        Copiar
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="page-admin-webhook-label">Token no path (alternativa)</p>
-                    <div className="page-admin-webhook-row">
-                      <code className="page-admin-code">{whatsappConfig.webhookUrlPath}</code>
-                      <button type="button" className="btn-secondary page-admin-copy-btn" onClick={() => copyText('path', whatsappConfig.webhookUrlPath)}>
-                        Copiar
-                      </button>
-                    </div>
-                  </div>
+                  {whatsappConfig.missingToken || !whatsappConfig.webhookUrlQuery ? (
+                    <p className="page-admin-error" role="alert">
+                      {whatsappConfig.hint ||
+                        'Defina WHATSAPP_WEBHOOK_TOKEN no servidor (ex.: Vercel) para gerar as URLs do webhook.'}
+                    </p>
+                  ) : (
+                    <>
+                      <div>
+                        <p className="page-admin-webhook-label">Com ?token= (recomendado)</p>
+                        <div className="page-admin-webhook-row">
+                          <code className="page-admin-code">{whatsappConfig.webhookUrlQuery}</code>
+                          <button
+                            type="button"
+                            className="btn-secondary page-admin-copy-btn"
+                            onClick={() => copyText('query', whatsappConfig.webhookUrlQuery)}
+                          >
+                            Copiar
+                          </button>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="page-admin-webhook-label">Token no path (alternativa)</p>
+                        <div className="page-admin-webhook-row">
+                          <code className="page-admin-code">{whatsappConfig.webhookUrlPath}</code>
+                          <button
+                            type="button"
+                            className="btn-secondary page-admin-copy-btn"
+                            onClick={() => copyText('path', whatsappConfig.webhookUrlPath)}
+                          >
+                            Copiar
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                   {copyFeedback ? <p className="page-admin-copy-feedback">Copiado ({copyFeedback}).</p> : null}
                 </div>
               </article>

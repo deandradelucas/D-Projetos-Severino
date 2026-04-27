@@ -1,4 +1,5 @@
 import { log } from './logger.mjs'
+import { resolveWhatsAppWebhookToken } from './whatsapp-webhook-secret.mjs'
 import { buscarUsuarioPorTelefone, registrarLogWhatsApp, normalizarDigitosWhatsappLog } from './usuarios.mjs'
 import { getCategorias, inserirTransacao } from './transacoes.mjs'
 import { parseWhatsAppMessageWithAI, transcribeWhatsAppAudioWithGemini } from './ai.mjs'
@@ -585,7 +586,11 @@ export async function handleWhatsAppWebhook(req, options = {}) {
     }
 
     const rawAuth = collectTokenFromHeaders(getHeader)
-    const EXPECTED_TOKEN = process.env.WHATSAPP_WEBHOOK_TOKEN || 'ece58f64012d51028d28a04264d07131'
+    const { token: EXPECTED_TOKEN, missingInProduction } = resolveWhatsAppWebhookToken()
+    if (missingInProduction) {
+      log.error('[WhatsApp Webhook] WHATSAPP_WEBHOOK_TOKEN ausente em produção; rejeitando pedido.')
+      return { status: 503, json: { error: 'Webhook não configurado. Defina WHATSAPP_WEBHOOK_TOKEN no servidor.' } }
+    }
 
     log.info('[WhatsApp Webhook] Chamada recebida.')
 

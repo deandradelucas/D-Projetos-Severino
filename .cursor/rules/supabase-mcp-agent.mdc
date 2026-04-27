@@ -1,0 +1,36 @@
+---
+description: Agente Supabase — MCP, migrations e API Node (evitar surpresas com o banco)
+alwaysApply: false
+---
+
+# Agente Supabase (Horizonte Financeiro)
+
+Use esta regra quando o trabalho envolver **Postgres/Supabase**, **migrations**, **RLS**, **erros de coluna/tabela** ou **listagens admin** que falham com 500/503.
+
+## 1. MCP Supabase no Cursor
+
+- O **Model Context Protocol** do Supabase (URL tipo `https://mcp.supabase.com/mcp`, em geral com `read_only=true`) serve para **inspecionar** projeto, schema e dados em modo seguro, sem substituir o código da aplicação.
+- **Antes** de alterar queries em `server/lib/*.mjs`, confira se colunas/tabelas existem: use o MCP quando estiver disponível **ou** os ficheiros em `scripts/migrations/` (ordem numérica).
+- **Nunca** coloque `SUPABASE_SERVICE_ROLE_KEY` ou segredos em regras, skills ou commits.
+
+## 2. Onde está a verdade no código
+
+| O quê | Onde |
+|--------|------|
+| Cliente admin (service role) | `server/lib/supabase-admin.mjs` — URL: `VITE_SUPABASE_URL` **ou** `SUPABASE_URL` |
+| Listagem / filtros admin de usuários | `server/lib/usuarios.mjs` (`listUsuariosAdminPaged`, `applyUsuariosAdminFilters`) |
+| Mapeamento de erros úteis na API | `server/app.mjs` — `mapSupabaseOrNetworkError` |
+
+## 3. Erros comuns
+
+- **Variável de URL só no front:** no Vercel, definir também `VITE_SUPABASE_URL` ou `SUPABASE_URL` para as **Serverless Functions** que usam `getSupabaseAdmin()`.
+- **Coluna/tabela em falta:** mensagens amigáveis após `mapSupabaseOrNetworkError`; aplicar SQL em `scripts/migrations/` no Supabase.
+- **Busca admin com vírgula:** o filtro `.or()` do PostgREST separa condições por vírgula; a busca por texto sanitiza vírgulas (ver `sanitizeOrSearchText` em `usuarios.mjs`). Busca por **UUID** usa `id` direto.
+- **Timestamps dentro de `.or()`:** valores ISO têm `:` e precisam ir entre aspas (`postgrestOrFilterQuotedValue` em `usuarios.mjs`); sem isso o PostgREST pode responder com **PGRST100** e a lista admin falha.
+
+## 4. Fluxo recomendado para o agente
+
+1. Reproduzir o erro (rota `/api/admin/usuarios`, logs do servidor).
+2. Ler a mensagem mapeada ou `log.error` com `error.details` / `hint` do PostgREST.
+3. Cruzar com `scripts/migrations/` e, se possível, **MCP Supabase** read-only.
+4. Corrigir query ou aplicar migration; evitar mudanças amplas fora do necessário.

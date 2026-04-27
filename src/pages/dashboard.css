@@ -1196,6 +1196,22 @@ body[data-theme='light'] .pagamento-banner {
     animation: fadeIn 0.28s ease;
   }
 
+  /* Backdrop é <button>: semântica + teclado; manter o mesmo visual */
+  button.mobile-backdrop {
+    border: none;
+    padding: 0;
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    display: block;
+    width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+  }
+
   /* Reset nav-item for mobile (disable overlap hack and curves) */
   .nav-item:hover:not(.active) {
     transform: none;
@@ -1240,6 +1256,12 @@ body[data-theme='light'] .pagamento-banner {
     min-width: 44px;
     min-height: 44px;
     padding: 10px;
+  }
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .mobile-backdrop {
+    animation: none;
   }
 }
 

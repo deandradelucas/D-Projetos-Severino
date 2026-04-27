@@ -1,0 +1,29 @@
+---
+description: UX Horizonte — acessibilidade, foco, mobile e consistência com o shell
+alwaysApply: false
+---
+
+# Agente UX (Horizonte Financeiro)
+
+Use quando o pedido for **melhorar experiência de uso**, **acessibilidade**, **navegação**, **feedback de carregamento/erro** ou **coerência visual** sem quebrar o shell validado.
+
+## Princípios
+
+1. **Respeitar o contrato do shell** (`AGENTS.md` — *Shell hub*): não alterar à-toa `dashboard.css` / hero / blur sem testar mobile e tema claro/escuro.
+2. **Teclado e leitores:** `focus-visible` em controlos interativos; estados `:focus` não substituir estilos de `:focus-visible` onde o projeto já separa (sidebar horizon shell).
+3. **Mobile:** áreas tocáveis ≥ 44px onde fizer sentido; menu lateral — backdrop semântico (`button`), fechar com **Escape**, fundo tocável para fechar.
+4. **Movimento:** respeitar `prefers-reduced-motion` em animações novas (já aplicado ao fallback de rota e ao backdrop mobile onde relevante).
+5. **Carregamento:** lazy routes — fallback com `role="status"`, texto `.sr-only` para leitores, barra visível para todos.
+
+## Onde está implementado (referência)
+
+| Tema | Ficheiros |
+|------|-----------|
+| Skip link + `#app-main` | `src/App.jsx`, `.skip-to-main` em `src/index.css` |
+| Texto só leitor / fallback rota | `.sr-only`, `src/components/RoutePageFallback.jsx` |
+| Menu mobile | `src/components/Sidebar.jsx`, `.mobile-backdrop` em `src/pages/dashboard.css` |
+| Foco no login | `src/pages/Login.jsx` (`focus-visible:ring-*`) |
+
+## Skill Cursor
+
+Para implementação front, combinar com **frontend-specialist** (`.agents/skills/frontend-specialist/SKILL.md` se existir no clone).

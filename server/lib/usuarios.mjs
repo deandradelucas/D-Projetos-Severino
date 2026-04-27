@@ -294,6 +294,24 @@ function escapeIlike(s) {
   return String(s || '').replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')
 }
 
+/**
+ * PostgREST: em `.or()`, valores com caracteres reservados (`:`, `.`, `,`, etc.) precisam de aspas.
+ * Timestamps ISO sem aspas quebram o parser e geram 400/PGRST100 — ex.: stats da lista admin.
+ * @see https://docs.postgrest.org/en/stable/references/api/tables_views.html
+ */
+function postgrestOrFilterQuotedValue(v) {
+  const s = String(v ?? '')
+  return `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
+}
+
+/** Vírgulas quebram o filtro `.or()` do PostgREST (o separador entre condições é `,`). */
+function sanitizeOrSearchText(s) {
+  return String(s || '').replace(/,/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 async function fetchUsuariosAdminStats(supabaseAdmin) {
   const nowIso = new Date().toISOString()
   const [t, a, adm, trial] = await Promise.all([
@@ -334,7 +352,7 @@ async function fetchUsuariosAdminStatsExtended(supabaseAdmin) {
       .from('usuarios')
       .select('id', { count: 'exact', head: true })
       .eq('is_active', true)
-      .or(`last_login_at.is.null,last_login_at.lt.${staleCut}`),
+      .or(`last_login_at.is.null,last_login_at.lt.${postgrestOrFilterQuotedValue(staleCut)}`),
     supabaseAdmin
       .from('usuarios')
       .select('id', { count: 'exact', head: true })
@@ -390,8 +408,13 @@ function applyUsuariosAdminFilters(supabaseAdmin, query, approvedUserSet) {
   let qb = supabaseAdmin.from('usuarios')
 
   if (q) {
-    const term = `%${escapeIlike(q)}%`
-    qb = qb.or(`nome.ilike.${term},email.ilike.${term},telefone.ilike.${term}`)
+    const qTrim = sanitizeOrSearchText(q)
+    if (qTrim && UUID_RE.test(qTrim)) {
+      qb = qb.eq('id', qTrim.toLowerCase())
+    } else if (qTrim) {
+      const term = `%${escapeIlike(qTrim)}%`
+      qb = qb.or(`nome.ilike.${term},email.ilike.${term},telefone.ilike.${term}`)
+    }
   }
   if (role && ['USER', 'ADMIN', 'READONLY'].includes(role)) {
     qb = qb.eq('role', role)
@@ -425,7 +448,9 @@ function applyUsuariosAdminFilters(supabaseAdmin, query, approvedUserSet) {
   }
 
   if (login === 'nunca') qb = qb.is('last_login_at', null)
-  if (login === 'stale') qb = qb.or(`last_login_at.is.null,last_login_at.lt.${staleCut}`)
+  if (login === 'stale') {
+    qb = qb.or(`last_login_at.is.null,last_login_at.lt.${postgrestOrFilterQuotedValue(staleCut)}`)
+  }
 
   if (assinatura === 'isento') qb = qb.eq('isento_pagamento', true)
   if (assinatura === 'trial') qb = qb.gt('trial_ends_at', nowIso)

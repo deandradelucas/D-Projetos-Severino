@@ -4,7 +4,8 @@
 export default function RoutePageFallback() {
   return (
     <div className="route-page-fallback" role="status" aria-live="polite" aria-busy="true">
-      <div className="route-page-fallback__bar" />
+      <span className="sr-only">A carregar página…</span>
+      <div className="route-page-fallback__bar" aria-hidden />
     </div>
   )
 }

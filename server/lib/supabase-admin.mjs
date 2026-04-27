@@ -27,11 +27,13 @@ export function getSupabaseAdmin() {
 
   loadEnv()
 
-  const supabaseUrl = trimEnv(process.env.VITE_SUPABASE_URL)
+  const supabaseUrl = trimEnv(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL)
   const serviceRoleKey = trimEnv(process.env.SUPABASE_SERVICE_ROLE_KEY)
 
   if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error('Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in environment.')
+    throw new Error(
+      'Missing Supabase URL (VITE_SUPABASE_URL or SUPABASE_URL) or SUPABASE_SERVICE_ROLE_KEY in environment.',
+    )
   }
 
   if (!isValidHttpUrlForSupabase(supabaseUrl)) {

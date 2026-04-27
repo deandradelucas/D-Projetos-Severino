@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: true,
-      port: 3000,
+      port: 3010,
       strictPort: true,
       proxy: {
         '/api': createApiProxy(apiTarget),
