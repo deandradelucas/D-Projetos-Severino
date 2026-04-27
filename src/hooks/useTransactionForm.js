@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
-import { apiUrl } from '../../lib/apiUrl'
-import { showToast } from '../../lib/toastStore'
+import { apiUrl } from '../lib/apiUrl'
+import { showToast } from '../lib/toastStore'
 
 /**
  * Retorna o datetime local (sem UTC shift) no formato ISO slice(0,16).

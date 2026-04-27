@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useWhatsAppContactUrl } from '../hooks/useWhatsAppContactUrl'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
@@ -7,11 +7,8 @@ import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
-import { apiUrl } from '../lib/apiUrl'
-import { fetchWithRetry } from '../lib/fetchWithRetry'
-import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
+import { useTransactionCache } from '../context/TransactionCacheContext'
 import { readHorizonteUser, readHorizonteUserPainelState } from '../lib/horizonteSession'
-import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { primeiroNomeExibicao } from '../lib/primeiroNomeExibicao'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { getSaudacao } from '../lib/getSaudacao'
@@ -23,83 +20,34 @@ export default function Dashboard() {
   const [usuario, setUsuario] = useState(() => readHorizonteUserPainelState())
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [transacoes, setTransacoes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const firstFetchDoneRef = useRef(false)
-  const [fetchError, setFetchError] = useState('')
+
+  // Consome a store de cache compartilhada — sem fetch local duplicado
+  const {
+    transacoes,
+    loadingInitial: loading,
+    revalidating: refreshing,
+    error: fetchError,
+    fetchTransacoes,
+    addTransactionOptimistic,
+  } = useTransactionCache()
 
   useEffect(() => {
     const u = readHorizonteUser()
-    if (u) {
-      queueMicrotask(() => setUsuario((prev) => ({ ...prev, ...u })))
-    }
+    if (u) queueMicrotask(() => setUsuario((prev) => ({ ...prev, ...u })))
   }, [])
 
-  useEffect(() => {
-    firstFetchDoneRef.current = false
-  }, [usuario.id])
-
-  const fetchTransacoes = useCallback(async () => {
-    const isInitial = !firstFetchDoneRef.current
-    if (isInitial) setLoading(true)
-    else setRefreshing(true)
-    setFetchError('')
-    const session = readHorizonteUser()
-    if (!session?.id) {
-      setTransacoes([])
-      setFetchError('Sessão inválida. Faça login novamente.')
-      setLoading(false)
-      setRefreshing(false)
-      return
-    }
-    try {
-      await syncRecorrenciasMensais(session.id)
-      const res = await fetchWithRetry(apiUrl('/api/transacoes'), {
-        headers: { 'x-user-id': String(session.id).trim() },
-        cache: 'no-store',
-      })
-
-      if (redirectAssinaturaExpiradaSe403(res)) return
-
-      if (res.ok) {
-        const data = await res.json()
-        setTransacoes(Array.isArray(data) ? data : [])
-        return
-      }
-
-      const errBody = await res.json().catch(() => ({}))
-      setTransacoes([])
-      setFetchError(errBody.message || `Não foi possível carregar transações (${res.status}).`)
-    } catch (err) {
-      console.error(err)
-      setTransacoes([])
-      setFetchError('Sem conexão com a API. Verifique a internet e se VITE_API_URL aponta para o servidor.')
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
-      firstFetchDoneRef.current = true
-    }
-  }, [])
-
+  // Carrega dados ao montar (usa cache se disponível, revalida silenciosamente)
   useEffect(() => {
     const u = readHorizonteUser()
-    if (u?.id) {
-      queueMicrotask(() => {
-        void fetchTransacoes()
-      })
-    } else {
-      queueMicrotask(() => {
-        setLoading(false)
-        setFetchError('Faça login para ver suas transações.')
-      })
-    }
+    if (u?.id) queueMicrotask(() => void fetchTransacoes())
   }, [fetchTransacoes, usuario.id])
 
+  // Re-fetch ao retomar visibilidade em caso de erro
   useEffect(() => {
+    if (!fetchError) return
     let timeoutId
     const onVis = () => {
-      if (document.visibilityState !== 'visible' || !fetchError) return
+      if (document.visibilityState !== 'visible') return
       const u = readHorizonteUser()
       if (!u?.id) return
       clearTimeout(timeoutId)
@@ -111,6 +59,7 @@ export default function Dashboard() {
       document.removeEventListener('visibilitychange', onVis)
     }
   }, [fetchTransacoes, fetchError])
+
 
   const { totalReceitas, totalDespesas, saldoTotal } = useMemo(() => {
     return transacoes.reduce(

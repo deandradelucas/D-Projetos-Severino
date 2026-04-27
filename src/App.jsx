@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext'
+import { TransactionCacheProvider } from './context/TransactionCacheContext'
 import RoutePageFallback from './components/RoutePageFallback'
 import SuperAdminOutlet from './components/SuperAdminOutlet'
 import AppSessionOutlet from './components/AppSessionOutlet'
@@ -27,6 +28,7 @@ import {
 function App() {
   return (
     <ThemeProvider>
+      <TransactionCacheProvider>
       <BrowserRouter>
         <a href="#app-main" className="skip-to-main">
           Saltar para o conteúdo
@@ -64,6 +66,7 @@ function App() {
           </div>
         </div>
       </BrowserRouter>
+      </TransactionCacheProvider>
     </ThemeProvider>
   )
 }
