@@ -4,6 +4,10 @@ import { buscarUsuarioPorTelefone, registrarLogWhatsApp, normalizarDigitosWhatsa
 import { insertAdminAuditLog } from './admin-audit.mjs'
 import { transcribeWhatsAppAudioWithGemini } from './ai.mjs'
 import { WhatsAppTransactionService } from './services/whatsapp-transaction-service.mjs'
+import { LRUCache } from './utils/lru-cache.mjs'
+
+// Cache para evitar processamento duplo da mesma mensagem (Evolution API v2 manda múltiplos eventos)
+const processedMessages = new LRUCache(200) 
 
 /** Headers comuns em provedores (Telein, Evolution, Z-API, etc.) */
 function collectTokenFromHeaders(getHeader) {
@@ -51,11 +55,10 @@ function parseWebhookRequestUrl(req) {
 }
 
 /** Quanto maior, melhor para identificar telefone real (LID não bate com cadastro). */
-function scoreJidQuality(jid, botNumber = '') {
+function scoreJidQuality(jid, botNumbers = []) {
   if (!jid || typeof jid !== 'string') return -1
-  
-  // Se o JID for exatamente o número do bot, penalizar fortemente
-  if (botNumber && jid.includes(botNumber)) return -50
+  const clean = jid.replace(/\D/g, '')
+  if (botNumbers.some(b => b && clean.includes(b))) return -50
 
   if (jid.includes('@s.whatsapp.net')) return 100
   if (jid.includes('@c.us')) return 80
@@ -81,13 +84,10 @@ function collectRemoteJidsRecursive(obj, depth = 0, acc = []) {
   return acc
 }
 
-function pickPreferredJidFromList(jids, botNumber = '') {
+function pickPreferredJidFromList(jids, botNumbers = []) {
   const uniq = [...new Set(jids.filter(Boolean).map(String))]
   if (uniq.length === 0) return ''
-  
-  // Ordena por qualidade, penalizando o número do robô
-  uniq.sort((a, b) => scoreJidQuality(b, botNumber) - scoreJidQuality(a, botNumber))
-  
+  uniq.sort((a, b) => scoreJidQuality(b, botNumbers) - scoreJidQuality(a, botNumbers))
   return uniq[0]
 }
 
@@ -299,10 +299,27 @@ async function enviarMensagemWhatsApp(remoteJid, texto, instanceName, apikey) {
   const baseUrl = process.env.EVOLUTION_API_URL || process.env.WHATSAPP_WEBHOOK_BASE_URL || 'http://localhost:8080'
   // Remove sufixos de webhook se presentes
   const cleanBase = baseUrl.replace(/\/api\/whatsapp\/webhook.*$/, '').replace(/\/+$/, '')
+  // Garante que o JID tenha o sufixo correto se for apenas dígitos
+  let target = remoteJid
+  if (!target.includes('@')) {
+    target = `${target}@s.whatsapp.net`
+  }
   
+  // TENTATIVA: Evolution API costuma falhar com @lid no sendText.
+  // Vamos tentar converter para @s.whatsapp.net se for LID para ver se a API aceita.
+  if (target.toLowerCase().includes('@lid')) {
+    target = target.replace(/@lid/i, '@s.whatsapp.net')
+  }
+
   const url = `${cleanBase}/message/sendText/${instanceName}`
+  log.info(`[WhatsApp Reply] Tentando enviar para ${target} (Original: ${remoteJid}) via ${url}`)
   
-  log.info(`[WhatsApp Reply] Tentando enviar para ${remoteJid} via ${url}`)
+  const bodyPayload = {
+    number: target,
+    text: texto,
+    delay: 1200,
+    linkPreview: false
+  }
 
   try {
     const res = await fetch(url, {
@@ -311,12 +328,7 @@ async function enviarMensagemWhatsApp(remoteJid, texto, instanceName, apikey) {
         'Content-Type': 'application/json',
         'apikey': apikey
       },
-      body: JSON.stringify({
-        number: remoteJid,
-        text: texto,
-        delay: 800,
-        linkPreview: false
-      })
+      body: JSON.stringify(bodyPayload)
     })
     
     if (!res.ok) {
@@ -602,13 +614,21 @@ function extractRemetenteEMensagem(body) {
   }
 
   // Tenta identificar o número do bot no payload para evitar "eco" ou erro de vínculo
-  const botNumber = String(body.instance || body.sender || '').replace(/\D/g, '')
+  const botNumbers = [
+    String(body.instance || '').replace(/\D/g, ''),
+    String(body.sender || '').replace(/\D/g, ''),
+    '554799895014', // Fallback hardcoded do robô conhecido
+  ].filter(Boolean)
 
-  remetenteRaw = pickPreferredJidFromList(jidCandidates, botNumber)
+  // Prioridade absoluta: se existe key.remoteJid e fromMe é false, ESSE é o remetente.
+  const absoluteSender = body?.data?.key?.fromMe === false ? body.data.key.remoteJid : 
+                        body?.key?.fromMe === false ? body.key.remoteJid : null
+
+  remetenteRaw = absoluteSender || pickPreferredJidFromList(jidCandidates, botNumbers)
   
   if (!remetenteRaw) {
     const fromDeep = collectRemoteJidsRecursive(body)
-    remetenteRaw = pickPreferredJidFromList(fromDeep, botNumber)
+    remetenteRaw = pickPreferredJidFromList(fromDeep, botNumbers)
   }
 
   if (typeof remetenteRaw === 'object' && remetenteRaw?.remoteJid) {
@@ -690,6 +710,28 @@ export async function handleWhatsAppWebhook(req, options = {}) {
       return { status: 400, json: { error: 'Invalid Body' } }
     }
 
+    const extracted = extractRemetenteEMensagem(body)
+    const remetenteRaw = extracted.remetenteRaw
+    numeroRemetente = String(remetenteRaw || '').replace(/\D/g, '')
+    mensagemRaw = extracted.mensagemRaw || ''
+    const audioRef = extracted.audioRef || null
+    
+    // Deduplicação por ID de mensagem (Evolution/Baileys)
+    const msgId = body?.data?.key?.id || body?.key?.id || body?.messages?.[0]?.key?.id
+    // Fallback: Deduplicação por conteúdo + remetente se o ID falhar ou for igual
+    const contentHash = `hash:${numeroRemetente}:${mensagemRaw.substring(0, 100)}`
+    const dedupKey = msgId || contentHash
+
+    log.info(`[WhatsApp Webhook] Dedup Key: ${dedupKey} | Path: ${req.path}`)
+    
+    if (dedupKey && dedupKey !== 'hash:Desconhecido:Sem conteúdo') {
+      if (processedMessages.has(dedupKey)) {
+        log.info(`[WhatsApp Webhook] Mensagem duplicada detectada e ignorada: ${dedupKey}`)
+        return { status: 200, json: { ok: true, ignored: 'duplicate_message', id: dedupKey } }
+      }
+      processedMessages.set(dedupKey, true)
+    }
+
     const preExtract = extractRemetenteEMensagem(body)
     const preMsg = (preExtract.mensagemRaw || '').trim()
     const preAudio = !!preExtract.audioRef || payloadLikelyContainsInboundAudio(body)
@@ -754,14 +796,9 @@ export async function handleWhatsAppWebhook(req, options = {}) {
       return { status: 401, json: { error: 'Unauthorized' } }
     }
 
-    const extracted = extractRemetenteEMensagem(body)
-    let remetenteRaw = extracted.remetenteRaw
-    mensagemRaw = extracted.mensagemRaw || ''
-    const audioRef = extracted.audioRef || null
-    const heuristicAudio = payloadLikelyContainsInboundAudio(body)
-
-    numeroRemetente = String(remetenteRaw || '').replace(/\D/g, '')
+    // (Remetente e mensagem já extraídos para deduplicação)
     telDisplay = normalizarDigitosWhatsappLog(numeroRemetente) || numeroRemetente || 'Desconhecido'
+    const heuristicAudio = payloadLikelyContainsInboundAudio(body)
 
     const tokenFromHeaderBool = !!rawAuth
     const tokenFromBodyBool = !!tokenFromBody
