@@ -180,6 +180,14 @@ export async function buscarUsuarioPorTelefone(telefoneLimpo, options = {}) {
   const bySuffix = buscarUsuarioPorSufixoUnico(telefoneLimpo, allUsers)
   if (bySuffix) return bySuffix
 
+  // Fallback: busca por whatsapp_id (LID do WhatsApp) quando telefone não bate
+  const { data: byWhatsappId } = await supabaseAdmin
+    .from('usuarios')
+    .select('id, email, telefone, whatsapp_id')
+    .eq('whatsapp_id', telefoneLimpo)
+    .maybeSingle()
+  if (byWhatsappId) return byWhatsappId
+
   const usarGemini = options.usarGemini !== false
   if (usarGemini) {
     const geminiMatch = await resolverUsuarioIdPorTelefoneGemini(telefoneLimpo, allUsers)
