@@ -5,9 +5,7 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
 import './dashboard.css'
 
-const WHATSAPP_LOG_HEADERS = ['Data', 'Telefone remetente', 'Mensagem dita', 'Status', 'Resultado / detalhe']
-
-const ADMIN_DOCS_URL = import.meta.env.VITE_ADMIN_DOCS_URL || ''
+const WHATSAPP_LOG_HEADERS = ['Data', 'Usuário', 'Telefone remetente', 'Mensagem dita', 'Status', 'Resultado / detalhe']
 
 export default function AdminWhatsApp() {
   const [menuAberto, setMenuAberto] = useState(false)
@@ -97,75 +95,25 @@ export default function AdminWhatsApp() {
               <div className="dashboard-hub__hero-row">
                 <MobileMenuButton onClick={() => setMenuAberto(true)} />
                 <div className="dashboard-hub__hero-text">
-                  <h1 className="dashboard-hub__title">Logs do WhatsApp</h1>
+                  <h1 className="dashboard-hub__title">WHATSAPP CORE v4</h1>
                   <p className="ref-panel__subtitle page-admin-header-sub">
-                    Auditoria de mensagens recebidas pelo BOT
+                    Gestão de infraestrutura e fluxo de mensagens
                   </p>
-                  {ADMIN_DOCS_URL ? (
-                    <p className="page-admin-doc-link-wrap">
-                      <a className="page-admin-doc-link" href={ADMIN_DOCS_URL} target="_blank" rel="noreferrer">
-                        Documentação / runbook interno
-                      </a>
-                    </p>
-                  ) : null}
                 </div>
               </div>
             </section>
 
-            <section className="ref-kpi-row page-admin-kpi-row" aria-label="Status da integração">
-              <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
-                <div className="ref-kpi-card__icon" aria-hidden>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                  </svg>
-                </div>
-                <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Integração</p>
-                  <p className="ref-kpi-card__value page-admin-kpi-platform">{status.platform}</p>
-                  <p className="page-admin-kpi-foot">
-                    <span
-                      className={`page-admin-kpi-dot ${status.online ? 'page-admin-kpi-dot--on' : 'page-admin-kpi-dot--off'}`}
-                      title={status.online ? 'Conectado' : 'Desconectado'}
-                    />
-                    <span className={status.online ? 'page-admin-kpi-conn--on' : 'page-admin-kpi-conn--off'}>
-                      {status.online ? 'CONECTADO' : 'OFFLINE'}
-                    </span>
-                  </p>
-                </div>
-              </article>
-
-              <article className="ref-kpi-card ref-kpi-card--expense">
-                <div className="ref-kpi-card__icon" aria-hidden>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 6v6l4 2" />
-                  </svg>
-                </div>
-                <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Última atividade</p>
-                  <p className="ref-kpi-card__value">
-                    {status.lastPulse ? new Date(status.lastPulse).toLocaleTimeString('pt-BR') : '—:—'}
-                  </p>
-                  <p className="page-admin-kpi-sub">
-                    {status.lastPulse ? new Date(status.lastPulse).toLocaleDateString('pt-BR') : 'Sem registros recentes'}
-                  </p>
-                </div>
-              </article>
-
-              <article className="ref-kpi-card ref-kpi-card--income">
-                <div className="ref-kpi-card__icon" aria-hidden>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                </div>
-                <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Total de mensagens</p>
-                  <p className="ref-kpi-card__value page-admin-kpi-total">{status.totalLogs}</p>
-                  <p className="page-admin-kpi-sub">Logs auditados</p>
-                </div>
-              </article>
-            </section>
+            <div className="page-admin-kpi-compact-strip" style={{ marginBottom: '16px' }}>
+              <div className="kpi-mini">
+                <span>Status:</span> 
+                <strong style={{ color: status.online ? '#22c55e' : '#ef4444', fontSize: '12px' }}>
+                  {status.online ? 'CONECTADO' : 'OFFLINE'}
+                </strong>
+              </div>
+              <div className="kpi-mini"><span>Plataforma:</span> <strong>{status.platform}</strong></div>
+              <div className="kpi-mini"><span>Mensagens:</span> <strong>{status.totalLogs}</strong></div>
+              <div className="kpi-mini kpi-mini--accent"><span>Atividade:</span> <strong>{status.lastPulse ? new Date(status.lastPulse).toLocaleTimeString('pt-BR') : '—:—'}</strong></div>
+            </div>
 
             {whatsappConfig && (
               <article className="ref-panel page-admin-ref-panel" aria-labelledby="wa-webhook-heading">
@@ -240,7 +188,8 @@ export default function AdminWhatsApp() {
                   <table className="data-table page-admin-data-table">
                     <thead>
                       <tr>
-                        <th style={{ width: '150px' }}>Data</th>
+                        <th style={{ width: '130px' }}>Data</th>
+                        <th>Usuário</th>
                         <th>Telefone remetente</th>
                         <th style={{ minWidth: '200px' }}>Mensagem dita</th>
                         <th>Status</th>
@@ -251,7 +200,15 @@ export default function AdminWhatsApp() {
                       {logs.map((log) => (
                         <tr key={log.id}>
                           <td>{log.data_hora ? new Date(log.data_hora).toLocaleString('pt-BR') : '—'}</td>
-                          <td style={{ fontWeight: 600 }}>{log.telefone_remetente}</td>
+                          <td style={{ fontWeight: 600 }}>
+                            {log.usuarios ? (
+                              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '12px' }}>{log.usuarios.nome}</span>
+                                <span style={{ fontSize: '10px', opacity: 0.7, fontWeight: 400 }}>{log.usuarios.email}</span>
+                              </div>
+                            ) : '—'}
+                          </td>
+                          <td>{log.telefone_remetente}</td>
                           <td className="page-admin-td-ellipsis" title={log.mensagem_recebida}>
                             {log.mensagem_recebida && /\[Áudio/i.test(String(log.mensagem_recebida)) ? (
                               <>
@@ -280,3 +237,4 @@ export default function AdminWhatsApp() {
     </div>
   )
 }
+

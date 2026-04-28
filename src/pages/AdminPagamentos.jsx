@@ -139,9 +139,9 @@ export default function AdminPagamentos() {
               <div className="dashboard-hub__hero-row">
                 <MobileMenuButton onClick={() => setMenuAberto(true)} />
                 <div className="dashboard-hub__hero-text">
-                  <h1 className="dashboard-hub__title">Logs de Pagamentos</h1>
+                  <h1 className="dashboard-hub__title">PAYMENTS CORE v4</h1>
                   <p className="ref-panel__subtitle page-admin-header-sub">
-                    Acompanhe preferências, cobranças, status e receita gerada pelo Mercado Pago.
+                    Gestão financeira e conciliação Mercado Pago
                   </p>
                 </div>
               </div>

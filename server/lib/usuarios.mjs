@@ -217,7 +217,7 @@ export async function getWhatsappLogs(limit = 200) {
   const supabaseAdmin = getSupabaseAdmin()
   const { data, error } = await supabaseAdmin
     .from('whatsapp_logs')
-    .select('*')
+    .select('*, usuarios(email, nome)')
     .order('data_hora', { ascending: false })
     .limit(limit)
 

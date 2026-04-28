@@ -276,6 +276,54 @@ async function loadAudioBytesFromRef(ref, webhookBody = null) {
   throw new Error('Áudio sem URL nem base64 utilizável no payload (confirme o gateway Evolution/Telein).')
 }
 
+/**
+ * Envia uma mensagem de texto de volta para o usuário via Evolution API.
+ * @param {string} remoteJid JID do destinatário (ex.: 554799895014@s.whatsapp.net)
+ * @param {string} texto Texto da mensagem
+ * @param {string} instanceName Nome da instância na Evolution API
+ * @param {string} apikey API Key da Evolution API
+ */
+async function enviarMensagemWhatsApp(remoteJid, texto, instanceName, apikey) {
+  if (!remoteJid || !texto || !instanceName || !apikey) {
+    log.warn('[WhatsApp Reply] Dados insuficientes para enviar resposta automática.')
+    return
+  }
+
+  const baseUrl = process.env.EVOLUTION_API_URL || process.env.WHATSAPP_WEBHOOK_BASE_URL || 'http://localhost:8080'
+  // Remove sufixos de webhook se presentes
+  const cleanBase = baseUrl.replace(/\/api\/whatsapp\/webhook.*$/, '').replace(/\/+$/, '')
+  
+  const url = `${cleanBase}/message/sendText/${instanceName}`
+  
+  log.info(`[WhatsApp Reply] Tentando enviar para ${remoteJid} via ${url}`)
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': apikey
+      },
+      body: JSON.stringify({
+        number: remoteJid,
+        text: texto,
+        delay: 800,
+        linkPreview: false
+      })
+    })
+    
+    if (!res.ok) {
+      const err = await res.text()
+      log.error(`[WhatsApp Reply] Falha ao enviar: ${res.status} - ${err}`)
+    } else {
+      log.info(`[WhatsApp Reply] Resposta automática enviada para ${remoteJid}`)
+    }
+  } catch (err) {
+    log.error(`[WhatsApp Reply] Erro ao enviar resposta: ${err.message}`)
+  }
+}
+
+
 function getFromMeFromBody(body) {
   const candidates = [
     body?.body?.key?.fromMe,
@@ -814,6 +862,16 @@ export async function handleWhatsAppWebhook(req, options = {}) {
 
     const logStatus = isChat ? 'CONVERSA' : 'SUCESSO'
     await registrarLogWhatsApp(telDisplay, mensagemParaLog, logStatus, detalheSucesso, usuarioTarget.id)
+
+    // Resposta automática para o usuário
+    const instanceName = body.instance || body.data?.instance || body.body?.instance
+    log.info(`[WhatsApp Webhook] Preparando resposta: instance=${instanceName}, hasToken=${!!finalToken}`)
+    if (instanceName && finalToken) {
+      const replyText = isChat ? detalheSucesso : `✅ ${detalheSucesso}`
+      enviarMensagemWhatsApp(remetenteRaw, replyText, instanceName, finalToken).catch(e => {
+        log.error('[WhatsApp Webhook] Falha na Promise de resposta automática:', e)
+      })
+    }
 
     await insertAdminAuditLog({
       actorUserId: usuarioTarget.id,
