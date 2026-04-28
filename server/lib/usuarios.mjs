@@ -333,9 +333,10 @@ async function fetchUsuariosAdminStatsExtended(supabaseAdmin) {
   const staleCut = new Date(Date.now() - 30 * 86400000).toISOString()
 
   // Isolado fora do Promise.all: falha de pagamentos não deve bloquear a lista de usuários
-  let fin = { paidSubscriptions: 0, accumulatedRevenue: 0, monthlyRevenue: 0, ticketMedioUsuario: 0 }
+  let fin = { paidUserIds: new Set(), accumulatedRevenue: 0, monthlyRevenue: 0 }
   try {
-    fin = await agregarPagamentosAprovadosGlobais()
+    const rawFin = await agregarPagamentosAprovadosGlobais()
+    fin = rawFin || fin
   } catch (e) {
     log.warn('[admin stats] agregarPagamentosAprovadosGlobais falhou, usando zeros:', e?.message ?? e)
   }
@@ -379,12 +380,15 @@ async function fetchUsuariosAdminStatsExtended(supabaseAdmin) {
   } else if (!Number.isNaN(tPag)) proximoVencimento = proxPag
   else if (!Number.isNaN(tTr)) proximoVencimento = proxTrial
 
+  const numPagos = fin.paidUserIds?.size ?? 0
+  const ticketMedio = numPagos > 0 ? fin.accumulatedRevenue / numPagos : 0
+
   return {
     ...base,
-    assinaturas_pagas: fin.paidSubscriptions,
+    assinaturas_pagas: numPagos,
     ganho_acumulado_total: fin.accumulatedRevenue,
     receita_mensal_total: fin.monthlyRevenue,
-    ticket_medio_usuario: fin.ticketMedioUsuario,
+    ticket_medio_usuario: ticketMedio,
     proximo_pagamento: proxPag,
     proximo_vencimento: proximoVencimento,
     contas_sem_login_recente: stale.count ?? 0,
@@ -413,7 +417,7 @@ function applyUsuariosAdminFilters(supabaseAdmin, query, approvedUserSet) {
   const trialEndsFrom = String(query.trialEndsFrom || '').trim()
   const trialEndsTo = String(query.trialEndsTo || '').trim()
 
-  let qb = supabaseAdmin.from('usuarios')
+  let qb = supabaseAdmin.from('usuarios').select()
 
   if (q) {
     const qTrim = sanitizeOrSearchText(q)
@@ -504,8 +508,9 @@ async function fetchAllUsuarioIdsForAdminList(supabaseAdmin, query, approvedUser
   let guard = 0
   while (guard < 100) {
     let qb = applyUsuariosAdminFilters(supabaseAdmin, query, approvedUserSet)
+    qb = qb.select('id') 
     qb = applyUsuariosAdminSort(qb, 'email_asc')
-    const res = await qb.select('id').range(from, from + chunk - 1)
+    const res = await qb.range(from, from + chunk - 1)
     if (res.error) throw res.error
     const rows = res.data || []
     for (const r of rows) {
@@ -519,6 +524,10 @@ async function fetchAllUsuarioIdsForAdminList(supabaseAdmin, query, approvedUser
 }
 
 function applyUsuariosAdminSort(qb, sort) {
+  if (!qb || typeof qb.order !== 'function') {
+    log.error('[applyUsuariosAdminSort] qb inválido:', typeof qb, qb?.constructor?.name, Object.keys(qb || {}))
+    return qb
+  }
   const s = String(sort || 'email_asc').toLowerCase()
   switch (s) {
     case 'email_desc':
@@ -554,58 +563,65 @@ function applyUsuariosAdminSort(qb, sort) {
  * @param {Record<string, string | number | undefined>} query
  */
 export async function listUsuariosAdminPaged(query) {
-  const supabaseAdmin = getSupabaseAdmin()
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10) || 1)
-  const pageSize = Math.min(5000, Math.max(1, parseInt(String(query.pageSize || '12'), 10) || 12))
-  const offset = (page - 1) * pageSize
-  const sort = String(query.sort || 'email_asc').trim().toLowerCase()
+  try {
+    const supabaseAdmin = getSupabaseAdmin()
+    const page = Math.max(1, parseInt(String(query.page || '1'), 10) || 1)
+    const pageSize = Math.min(5000, Math.max(1, parseInt(String(query.pageSize || '12'), 10) || 12))
+    const offset = (page - 1) * pageSize
+    const sort = String(query.sort || 'email_asc').trim().toLowerCase()
 
-  let approvedUserSet = null
-  const assinatura = String(query.assinatura || '').trim().toLowerCase()
-  if (['pago', 'nao_pago', 'inadimplente'].includes(assinatura)) {
-    approvedUserSet = await fetchUsuarioIdsComPagamentoAprovado()
-  }
-
-  const stats = await fetchUsuariosAdminStatsExtended(supabaseAdmin)
-
-  if (sort === 'revenue_desc' || sort === 'revenue_asc') {
-    const { allIds, total } = await fetchAllUsuarioIdsForAdminList(supabaseAdmin, query, approvedUserSet)
-    const finMap = await aggregatePagamentosFinanceirosPorUsuarioIds(allIds)
-    const asc = sort === 'revenue_asc'
-    const sortedIds = [...allIds].sort((a, b) => {
-      const va = finMap.get(String(a))?.accumulatedRevenue ?? 0
-      const vb = finMap.get(String(b))?.accumulatedRevenue ?? 0
-      if (va === vb) return String(a).localeCompare(String(b))
-      return asc ? va - vb : vb - va
-    })
-    const pageIds = sortedIds.slice(offset, offset + pageSize)
-    if (!pageIds.length) {
-      return { items: [], total, page, pageSize, stats }
+    let approvedUserSet = null
+    const assinatura = String(query.assinatura || '').trim().toLowerCase()
+    if (['pago', 'nao_pago', 'inadimplente'].includes(assinatura)) {
+      approvedUserSet = await fetchUsuarioIdsComPagamentoAprovado()
     }
-    const resRows = await supabaseAdmin.from('usuarios').select('*').in('id', pageIds)
-    if (resRows.error) throw resRows.error
-    const byId = new Map((resRows.data || []).map((r) => [r.id, r]))
-    const rawRows = pageIds.map((id) => byId.get(id)).filter(Boolean)
+
+    const stats = await fetchUsuariosAdminStatsExtended(supabaseAdmin)
+
+    if (sort === 'revenue_desc' || sort === 'revenue_asc') {
+      const { allIds, total } = await fetchAllUsuarioIdsForAdminList(supabaseAdmin, query, approvedUserSet)
+      const finMap = await aggregatePagamentosFinanceirosPorUsuarioIds(allIds)
+      const asc = sort === 'revenue_asc'
+      const sortedIds = [...allIds].sort((a, b) => {
+        const va = finMap.get(String(a))?.accumulatedRevenue ?? 0
+        const vb = finMap.get(String(b))?.accumulatedRevenue ?? 0
+        if (va === vb) return String(a).localeCompare(String(b))
+        return asc ? va - vb : vb - va
+      })
+      const pageIds = sortedIds.slice(offset, offset + pageSize)
+      if (!pageIds.length) {
+        return { items: [], total, page, pageSize, stats }
+      }
+      const resRows = await supabaseAdmin.from('usuarios').select('*').in('id', pageIds)
+      if (resRows.error) throw resRows.error
+      const byId = new Map((resRows.data || []).map((r) => [r.id, r]))
+      const rawRows = pageIds.map((id) => byId.get(id)).filter(Boolean)
+      const ids = rawRows.map((r) => r.id).filter(Boolean)
+      const { latestByUser, approvedIds } = await resumoPagamentosPorUsuarioIds(ids)
+      const financeMap = await aggregatePagamentosFinanceirosPorUsuarioIds(ids)
+      const items = rawRows.map((row) => toAdminUsuarioDto(row, latestByUser, approvedIds, financeMap))
+      return { items, total, page, pageSize, stats }
+    }
+
+    let qb = applyUsuariosAdminFilters(supabaseAdmin, query, approvedUserSet)
+    // Re-seleciona com contagem exata
+    qb = qb.select('*', { count: 'exact' })
+    qb = applyUsuariosAdminSort(qb, sort)
+    const res = await qb.range(offset, offset + pageSize - 1)
+    if (res.error) throw res.error
+
+    const rawRows = res.data || []
+    const total = typeof res.count === 'number' ? res.count : rawRows.length
     const ids = rawRows.map((r) => r.id).filter(Boolean)
     const { latestByUser, approvedIds } = await resumoPagamentosPorUsuarioIds(ids)
     const financeMap = await aggregatePagamentosFinanceirosPorUsuarioIds(ids)
     const items = rawRows.map((row) => toAdminUsuarioDto(row, latestByUser, approvedIds, financeMap))
+
     return { items, total, page, pageSize, stats }
+  } catch (err) {
+    log.error('[listUsuariosAdminPaged] erro fatal:', err)
+    throw err
   }
-
-  let qb = applyUsuariosAdminFilters(supabaseAdmin, query, approvedUserSet)
-  qb = applyUsuariosAdminSort(qb, sort)
-  const res = await qb.select('*', { count: 'exact' }).range(offset, offset + pageSize - 1)
-  if (res.error) throw res.error
-
-  const rawRows = res.data || []
-  const total = typeof res.count === 'number' ? res.count : rawRows.length
-  const ids = rawRows.map((r) => r.id).filter(Boolean)
-  const { latestByUser, approvedIds } = await resumoPagamentosPorUsuarioIds(ids)
-  const financeMap = await aggregatePagamentosFinanceirosPorUsuarioIds(ids)
-  const items = rawRows.map((row) => toAdminUsuarioDto(row, latestByUser, approvedIds, financeMap))
-
-  return { items, total, page, pageSize, stats }
 }
 
 export async function updateUsuarioAdmin(id, payload, ctx = {}) {

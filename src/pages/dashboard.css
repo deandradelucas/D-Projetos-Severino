@@ -2000,70 +2000,89 @@ body[data-theme='light'] .pagamento-banner {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 350px;
+  max-height: 450px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  padding-right: 4px;
 }
 
-.page-admin-audit-item {
+.app-horizon-shell .page-admin-audit-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(148, 163, 184, 0.08);
-  border: 1px solid transparent;
-  transition: var(--transition-base);
+  gap: 8px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--glass-bg, rgba(255, 255, 255, 0.05)) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .page-admin-audit-item:hover {
   background: rgba(148, 163, 184, 0.12);
-  border-color: rgba(148, 163, 184, 0.1);
+  transform: translateX(4px);
+  border-color: var(--accent-low);
 }
 
 .page-admin-audit-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  padding-bottom: 6px;
+  margin-bottom: 2px;
 }
 
 .page-admin-audit-time {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
   color: var(--text-secondary);
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .page-admin-audit-ip {
   font-size: 10px;
   color: var(--text-secondary);
-  opacity: 0.8;
+  opacity: 0.5;
+  font-family: var(--font-mono);
 }
 
 .page-admin-audit-body {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: baseline;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .page-admin-audit-action-tag {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   color: var(--accent);
-  background: rgba(212, 168, 75, 0.12);
-  padding: 2px 6px;
-  border-radius: 4px;
+  background: rgba(212, 168, 75, 0.08);
+  padding: 2px 8px;
+  border-radius: 20px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(212, 168, 75, 0.15);
+}
+
+.page-admin-audit-icon {
+  font-size: 14px;
+  filter: grayscale(0.5);
+  opacity: 0.8;
 }
 
 .page-admin-audit-target-text {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--text-primary);
-  opacity: 0.9;
-  word-break: break-all;
+  opacity: 0.95;
 }
 
 .page-admin-usuarios .admin-pill {
@@ -2226,33 +2245,47 @@ body[data-theme='light'] .pagamento-banner {
   white-space: nowrap;
 }
 
-.admin-wa-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+.page-admin-data-table .admin-wa-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 30px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid transparent !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.admin-wa-badge--ok {
-  background: rgba(34, 197, 94, 0.12);
-  color: #16a34a;
+.page-admin-data-table .admin-wa-badge--ok {
+  background: rgba(34, 197, 94, 0.1) !important;
+  color: #22c55e !important;
+  border-color: rgba(34, 197, 94, 0.25) !important;
 }
 
-.admin-wa-badge--warn {
-  background: rgba(234, 179, 8, 0.12);
-  color: #ca8a04;
+.page-admin-data-table .admin-wa-badge--warn {
+  background: rgba(234, 179, 8, 0.1) !important;
+  color: #eab308 !important;
+  border-color: rgba(234, 179, 8, 0.25) !important;
 }
 
-.admin-wa-badge--err {
-  background: rgba(220, 38, 38, 0.1);
-  color: #dc2626;
+.page-admin-data-table .admin-wa-badge--err {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+.admin-wa-badge--conversa {
+  background: rgba(6, 182, 212, 0.08);
+  color: #06b6d4;
+  border-color: rgba(6, 182, 212, 0.2);
 }
 
 .admin-wa-badge--muted {
-  background: rgba(100, 100, 100, 0.1);
-  color: #666;
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--text-secondary);
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
 .page-admin-alert {

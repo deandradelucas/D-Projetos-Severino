@@ -807,12 +807,13 @@ export async function handleWhatsAppWebhook(req, options = {}) {
 
     log.info(`[WhatsApp Webhook] Mensagem recebida de: ${telDisplay} -> "${textoUsuario.slice(0, 200)}${textoUsuario.length > 200 ? '…' : ''}"`)
 
-    const { transaction, detalheSucesso } = await WhatsAppTransactionService.processMessage(
+    const { transaction, detalheSucesso, isChat } = await WhatsAppTransactionService.processMessage(
       usuarioTarget.id,
       textoUsuario
     )
 
-    await registrarLogWhatsApp(telDisplay, mensagemParaLog, 'SUCESSO', detalheSucesso, usuarioTarget.id)
+    const logStatus = isChat ? 'CONVERSA' : 'SUCESSO'
+    await registrarLogWhatsApp(telDisplay, mensagemParaLog, logStatus, detalheSucesso, usuarioTarget.id)
 
     await insertAdminAuditLog({
       actorUserId: usuarioTarget.id,

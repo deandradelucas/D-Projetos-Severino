@@ -1293,13 +1293,13 @@ export default function AdminUsuarios() {
               <div className="page-admin-audit-block">
                 <div className="page-admin-audit-header">
                   <h3 className="page-admin-audit-title">Auditoria recente</h3>
-                  <button 
+                    <button 
                     type="button" 
                     className="btn-secondary btn-small" 
                     onClick={() => loadAudit()}
                     disabled={auditLoading}
                   >
-                    {auditLoading ? '...' : 'Recarregar'}
+                    {auditLoading ? '...' : 'ATUALIZAR LOGS'}
                   </button>
                 </div>
                 
@@ -1314,20 +1314,30 @@ export default function AdminUsuarios() {
                   </div>
                 ) : (
                   <ul className="page-admin-audit-list">
-                    {auditRows.map((row) => (
-                      <li key={row.id} className="page-admin-audit-item">
-                        <div className="page-admin-audit-meta">
-                          <span className="page-admin-audit-time">{new Date(row.created_at).toLocaleString('pt-BR')}</span>
-                          {row.client_ip && <span className="page-admin-audit-ip">IP: {row.client_ip}</span>}
-                        </div>
-                        <div className="page-admin-audit-body">
-                          <strong className="page-admin-audit-action-tag">{row.action}</strong>
-                          <span className="page-admin-audit-target-text">
-                            {row.target_email || row.target_user_id ? `Alvo: ${row.target_email || row.target_user_id}` : 'Sistema'}
-                          </span>
-                        </div>
-                      </li>
-                    ))}
+                    {auditRows.map((row) => {
+                      let icon = '⚡';
+                      if (row.action?.includes('login')) icon = '🔑';
+                      if (row.action?.includes('update') || row.action?.includes('edit')) icon = '📝';
+                      if (row.action?.includes('delete') || row.action?.includes('excluir')) icon = '🗑️';
+                      if (row.action?.includes('assinatura') || row.action?.includes('pagamento')) icon = '💳';
+                      if (row.action?.includes('whatsapp')) icon = '📱';
+
+                      return (
+                        <li key={row.id} className="page-admin-audit-item">
+                          <div className="page-admin-audit-meta">
+                            <span className="page-admin-audit-time">{new Date(row.created_at).toLocaleString('pt-BR')}</span>
+                            {row.client_ip && <span className="page-admin-audit-ip">IP: {row.client_ip}</span>}
+                          </div>
+                          <div className="page-admin-audit-body">
+                            <span className="page-admin-audit-icon">{icon}</span>
+                            <strong className="page-admin-audit-action-tag">{row.action}</strong>
+                            <span className="page-admin-audit-target-text">
+                              {row.target_email || row.target_user_id ? `Alvo: ${row.target_email || row.target_user_id}` : 'Sistema'}
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
               </div>

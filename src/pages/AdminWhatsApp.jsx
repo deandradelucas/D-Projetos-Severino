@@ -27,6 +27,8 @@ export default function AdminWhatsApp() {
     switch (st) {
       case 'SUCESSO':
         return <span className="admin-wa-badge admin-wa-badge--ok">SUCESSO</span>
+      case 'CONVERSA':
+        return <span className="admin-wa-badge admin-wa-badge--conversa">CONVERSA</span>
       case 'IGNORADO':
         return <span className="admin-wa-badge admin-wa-badge--warn">IGNORADO</span>
       case 'ERRO':

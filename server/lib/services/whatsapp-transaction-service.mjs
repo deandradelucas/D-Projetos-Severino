@@ -33,6 +33,14 @@ export const WhatsAppTransactionService = {
     // 2. Extração via IA
     const extractedData = await parseWhatsAppMessageWithAI(textoUsuario, categorias)
 
+    if (extractedData.tipo === 'CHAT') {
+      return {
+        transaction: { id: 'chat-' + Date.now() },
+        detalheSucesso: extractedData.resposta || 'Interação interpretada.',
+        isChat: true,
+      }
+    }
+
     if (!extractedData.tipo || !extractedData.valor) {
       throw new Error('A IA não conseguiu interpretar um valor ou tipo de transação na frase enviada.')
     }
