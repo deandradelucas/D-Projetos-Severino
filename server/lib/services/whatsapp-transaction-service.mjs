@@ -1,6 +1,6 @@
 import { log } from '../logger.mjs'
 import { getCategorias } from '../transacoes.mjs'
-import { parseWhatsAppMessageWithAI } from '../ai.mjs'
+import { parseWhatsAppMessageWithAI, askHorizon } from '../ai.mjs'
 import { TransactionService } from './transaction-service.mjs'
 
 /**
@@ -22,27 +22,36 @@ export const WhatsAppTransactionService = {
     if (!usuarioId) throw new Error('ID do usuário é obrigatório.')
     if (!textoUsuario?.trim()) throw new Error('Mensagem vazia.')
 
-    // 1. Buscar categorias do usuário (necessário para o mapeamento da IA)
-    const categorias = await getCategorias(usuarioId)
-    if (!categorias || categorias.length === 0) {
-      throw new Error('Usuário sem categorias no sistema para mapear a despesa.')
-    }
+    // 1. Buscar categorias do usuário (necessário para mapeamento de transações)
+    const categorias = await getCategorias(usuarioId) || []
 
     log.info(`[WhatsAppTransactionService] Enviando para IA: "${textoUsuario.slice(0, 100)}"`)
 
-    // 2. Extração via IA
-    const extractedData = await parseWhatsAppMessageWithAI(textoUsuario, categorias)
+    // 2. Extração via IA (categorias podem estar vazias — CHAT não precisa delas)
+    const extractedData = categorias.length > 0
+      ? await parseWhatsAppMessageWithAI(textoUsuario, categorias)
+      : { tipo: 'CHAT', resposta: null }
 
     if (extractedData.tipo === 'CHAT') {
+      let respostaChat = extractedData.resposta || 'Interação interpretada.'
+      try {
+        respostaChat = await askHorizon(textoUsuario, usuarioId)
+      } catch (e) {
+        log.warn('[WhatsAppTransactionService] askHorizon falhou, usando resposta genérica:', e?.message)
+      }
       return {
         transaction: { id: 'chat-' + Date.now() },
-        detalheSucesso: extractedData.resposta || 'Interação interpretada.',
+        detalheSucesso: respostaChat,
         isChat: true,
       }
     }
 
     if (!extractedData.tipo || !extractedData.valor) {
       throw new Error('A IA não conseguiu interpretar um valor ou tipo de transação na frase enviada.')
+    }
+
+    if (categorias.length === 0) {
+      throw new Error('Usuário sem categorias no sistema para mapear a despesa.')
     }
 
     // 3. Criação da transação via TransactionService (centralizado)
