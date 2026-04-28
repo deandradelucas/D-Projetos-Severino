@@ -15,9 +15,11 @@ import { actorCanAssignAdminRole, normalizeRoleKey } from './admin-role-policy.m
 export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
   const supabaseAdmin = getSupabaseAdmin()
   
+  const clean = String(telefoneLimpo || '').replace(/\D/g, '')
+  
   const { data, error } = await supabaseAdmin
     .from('usuarios')
-    .update({ telefone: telefoneLimpo })
+    .update({ telefone: clean })
     .eq('id', usuarioId)
     .select('id, telefone')
     .single()
@@ -54,6 +56,28 @@ export function variantesTelefoneBrasil(digitos) {
   if (!d) return []
   const out = new Set([d])
 
+  // Lógica de 9º dígito para Brasil
+  // Formatos: 55 + DDD + [9] + 8 dígitos
+  if (d.length >= 10) {
+    const isE164 = d.startsWith('55')
+    const core = isE164 ? d.slice(2) : d
+    const ddd = core.slice(0, 2)
+    const rest = core.slice(2)
+
+    // Se tem 10 dígitos (DDD + 8), tenta adicionar o 9
+    if (core.length === 10) {
+      const with9 = `${ddd}9${rest}`
+      out.add(with9)
+      if (isE164) out.add(`55${with9}`)
+    }
+    // Se tem 11 dígitos (DDD + 9 + 8), tenta remover o 9
+    else if (core.length === 11 && rest.startsWith('9')) {
+      const without9 = `${ddd}${rest.slice(1)}`
+      out.add(without9)
+      if (isE164) out.add(`55${without9}`)
+    }
+  }
+
   const isE164Br13 = d.startsWith('55') && d.length === 13
   const nacional13 = isE164Br13 ? d.slice(2) : ''
 
@@ -81,13 +105,6 @@ export function variantesTelefoneBrasil(digitos) {
     const t11 = d.slice(-11)
     out.add(t11)
     out.add(`55${t11}`)
-  }
-
-  if (!isE164Br13 && d.startsWith('55') && d.length >= 13) {
-    const after55 = d.slice(2)
-    if (after55.length > 11) {
-      out.add(after55.slice(-11))
-    }
   }
 
   return [...out]
@@ -673,7 +690,9 @@ export async function updateUsuarioAdmin(id, payload, ctx = {}) {
   const patch = {}
   if (payload.nome !== undefined) patch.nome = payload.nome
   if (payload.email !== undefined) patch.email = payload.email
-  if (payload.telefone !== undefined) patch.telefone = payload.telefone
+  if (payload.telefone !== undefined) {
+    patch.telefone = String(payload.telefone).replace(/\D/g, '')
+  }
   if (payload.role !== undefined) patch.role = payload.role
   if (payload.is_active !== undefined) patch.is_active = payload.is_active
   if (payload.isento_pagamento !== undefined) patch.isento_pagamento = !!payload.isento_pagamento

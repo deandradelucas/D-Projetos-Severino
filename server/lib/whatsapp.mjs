@@ -51,8 +51,12 @@ function parseWebhookRequestUrl(req) {
 }
 
 /** Quanto maior, melhor para identificar telefone real (LID não bate com cadastro). */
-function scoreJidQuality(jid) {
+function scoreJidQuality(jid, botNumber = '') {
   if (!jid || typeof jid !== 'string') return -1
+  
+  // Se o JID for exatamente o número do bot, penalizar fortemente
+  if (botNumber && jid.includes(botNumber)) return -50
+
   if (jid.includes('@s.whatsapp.net')) return 100
   if (jid.includes('@c.us')) return 80
   if (jid.includes('@g.us')) return 30
@@ -77,10 +81,13 @@ function collectRemoteJidsRecursive(obj, depth = 0, acc = []) {
   return acc
 }
 
-function pickPreferredJidFromList(jids) {
+function pickPreferredJidFromList(jids, botNumber = '') {
   const uniq = [...new Set(jids.filter(Boolean).map(String))]
   if (uniq.length === 0) return ''
-  uniq.sort((a, b) => scoreJidQuality(b) - scoreJidQuality(a))
+  
+  // Ordena por qualidade, penalizando o número do robô
+  uniq.sort((a, b) => scoreJidQuality(b, botNumber) - scoreJidQuality(a, botNumber))
+  
   return uniq[0]
 }
 
@@ -594,11 +601,14 @@ function extractRemetenteEMensagem(body) {
       msg.conversation || msg.extendedTextMessage?.text || msg.imageMessage?.caption || ''
   }
 
-  remetenteRaw = pickPreferredJidFromList(jidCandidates)
+  // Tenta identificar o número do bot no payload para evitar "eco" ou erro de vínculo
+  const botNumber = String(body.instance || body.sender || '').replace(/\D/g, '')
 
+  remetenteRaw = pickPreferredJidFromList(jidCandidates, botNumber)
+  
   if (!remetenteRaw) {
     const fromDeep = collectRemoteJidsRecursive(body)
-    remetenteRaw = pickPreferredJidFromList(fromDeep)
+    remetenteRaw = pickPreferredJidFromList(fromDeep, botNumber)
   }
 
   if (typeof remetenteRaw === 'object' && remetenteRaw?.remoteJid) {
@@ -853,6 +863,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
       }
     }
 
+    log.info(`[WhatsApp DEBUG] RAW_JID: ${body.key?.remoteJid || body.data?.key?.remoteJid} | REMETENTE_RAW: ${remetenteRaw} | TEL_DISPLAY: ${telDisplay}`)
     log.info(`[WhatsApp Webhook] Mensagem recebida de: ${telDisplay} -> "${textoUsuario.slice(0, 200)}${textoUsuario.length > 200 ? '…' : ''}"`)
 
     const { transaction, detalheSucesso, isChat } = await WhatsAppTransactionService.processMessage(
@@ -864,11 +875,12 @@ export async function handleWhatsAppWebhook(req, options = {}) {
     await registrarLogWhatsApp(telDisplay, mensagemParaLog, logStatus, detalheSucesso, usuarioTarget.id)
 
     // Resposta automática para o usuário
-    const instanceName = body.instance || body.data?.instance || body.body?.instance
-    log.info(`[WhatsApp Webhook] Preparando resposta: instance=${instanceName}, hasToken=${!!finalToken}`)
-    if (instanceName && finalToken) {
+    const instanceName = body.instance || body.data?.instance || body.body?.instance || process.env.EVOLUTION_INSTANCE_NAME
+    const evolutionApiKey = process.env.EVOLUTION_API_KEY
+    log.info(`[WhatsApp Webhook] Preparando resposta: instance=${instanceName}, hasApiKey=${!!evolutionApiKey}, remetente=${remetenteRaw}`)
+    if (instanceName && evolutionApiKey) {
       const replyText = isChat ? detalheSucesso : `✅ ${detalheSucesso}`
-      enviarMensagemWhatsApp(remetenteRaw, replyText, instanceName, finalToken).catch(e => {
+      enviarMensagemWhatsApp(remetenteRaw, replyText, instanceName, evolutionApiKey).catch(e => {
         log.error('[WhatsApp Webhook] Falha na Promise de resposta automática:', e)
       })
     }

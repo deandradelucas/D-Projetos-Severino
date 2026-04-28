@@ -719,7 +719,12 @@ app.get('/api/usuarios/perfil', async (c) => {
   }
 })
 
-// Webhook Whatsapp (token também pode ir no path: /api/whatsapp/webhook/SEU_TOKEN)
+// Webhook Whatsapp (token também pode ir no path: /api/whatsapp/webhook/SEU_TOKEN/...)
+app.post('/api/whatsapp/webhook/:pathToken/:subPath{.+}', async (c) => {
+  const result = await handleWhatsAppWebhook(c.req, { pathToken: c.req.param('pathToken') })
+  return c.json(result.json, result.status)
+})
+
 app.post('/api/whatsapp/webhook/:pathToken', async (c) => {
   const result = await handleWhatsAppWebhook(c.req, { pathToken: c.req.param('pathToken') })
   return c.json(result.json, result.status)
