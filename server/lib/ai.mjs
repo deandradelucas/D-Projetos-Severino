@@ -262,10 +262,14 @@ MENSAGEM: "${message}"`
     } catch (e) {
       // Fallback local se a IA falhar
       const simples = fallbackParseMensagemSimples(message)
-      if (simples) return simples
+      if (simples) return enriquecerCategoriaPorTexto(message, simples, categoriasUsuario)
       lastWhatsappErr = e
     }
   }
+
+  // Todos os modelos falharam — tenta fallback local antes de lançar o erro
+  const fallbackFinal = fallbackParseMensagemSimples(message)
+  if (fallbackFinal) return enriquecerCategoriaPorTexto(message, fallbackFinal, categoriasUsuario)
 
   throw lastWhatsappErr || new Error('Falha na IA ao analisar mensagem.')
 }

@@ -331,9 +331,17 @@ async function fetchUsuariosAdminStats(supabaseAdmin) {
 async function fetchUsuariosAdminStatsExtended(supabaseAdmin) {
   const nowIso = new Date().toISOString()
   const staleCut = new Date(Date.now() - 30 * 86400000).toISOString()
-  const [base, fin, np, nt, stale, overdueTrial] = await Promise.all([
+
+  // Isolado fora do Promise.all: falha de pagamentos não deve bloquear a lista de usuários
+  let fin = { paidSubscriptions: 0, accumulatedRevenue: 0, monthlyRevenue: 0, ticketMedioUsuario: 0 }
+  try {
+    fin = await agregarPagamentosAprovadosGlobais()
+  } catch (e) {
+    log.warn('[admin stats] agregarPagamentosAprovadosGlobais falhou, usando zeros:', e?.message ?? e)
+  }
+
+  const [base, np, nt, stale, overdueTrial] = await Promise.all([
     fetchUsuariosAdminStats(supabaseAdmin),
-    agregarPagamentosAprovadosGlobais(),
     supabaseAdmin
       .from('usuarios')
       .select('assinatura_proxima_cobranca')
@@ -726,11 +734,15 @@ export async function getWhatsappStatus() {
 
   if (error) throw error
 
+  const lastPulse = data && data.length > 0 ? data[0].data_hora : null
+  const ONLINE_WINDOW_MS = 30 * 60 * 1000 // 30 minutos sem atividade = offline
+  const online = lastPulse ? Date.now() - new Date(lastPulse).getTime() < ONLINE_WINDOW_MS : false
+
   return {
-    platform: 'Chipmassa / Telein',
+    platform: 'Evolution API',
     totalLogs: count || 0,
-    lastPulse: data && data.length > 0 ? data[0].data_hora : null,
-    online: true // Se chegamos aqui, a conexão com o banco/API está ok
+    lastPulse,
+    online,
   }
 }
 

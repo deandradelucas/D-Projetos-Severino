@@ -16,6 +16,9 @@
     "gen:dashboard-dark-css": "node scripts/gen-dashboard-dark-rules.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
+    "whatsapp:docker:up": "docker compose up -d",
+    "whatsapp:docker:logs": "docker compose logs -f evolution-api",
+    "whatsapp:docker:down": "docker compose down",
     "supabase:check": "node scripts/supabase-admin-check.mjs",
     "backup:rclone": "node scripts/run-rclone-backup.mjs",
     "backup:rclone:task": "powershell -ExecutionPolicy Bypass -File scripts/install-rclone-backup-task.ps1"

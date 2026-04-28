@@ -12,43 +12,54 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
 
-function tryListenOnce(port) {
-  return new Promise((resolve, reject) => {
+function tryListenOnce(port, host = '127.0.0.1') {
+  return new Promise((resolve) => {
     const server = net.createServer()
     server.once('error', (err) => {
-      if (err.code === 'EADDRINUSE') resolve(false)
-      else reject(err)
+      resolve(false)
     })
-    server.listen(port, '127.0.0.1', () => {
+    server.listen(port, host, () => {
       server.close(() => resolve(true))
     })
   })
 }
 
-async function allocateApiPort(preferred) {
+async function allocatePort(preferred, host = '127.0.0.1', range = 40) {
   let p = preferred
-  while (p < preferred + 40) {
-    const ok = await tryListenOnce(p)
+  while (p < preferred + range) {
+    const ok = await tryListenOnce(p, host)
     if (ok) return p
     p += 1
   }
-  throw new Error(`Nenhuma porta livre para a API entre ${preferred} e ${preferred + 39}.`)
+  throw new Error(`Nenhuma porta livre entre ${preferred} e ${preferred + range - 1} em ${host}.`)
 }
 
-const preferred = Number.parseInt(process.env.API_PORT || '3001', 10)
-const apiPort = await allocateApiPort(preferred)
+const preferredApi = Number.parseInt(process.env.API_PORT || '3001', 10)
+const apiPort = await allocatePort(preferredApi)
 
-if (apiPort !== preferred) {
+if (apiPort !== preferredApi) {
   process.stderr.write(
-    `[dev] Porta ${preferred} ocupada; usando API em http://127.0.0.1:${apiPort} (proxy Vite alinhado).\n`,
+    `[dev] Porta ${preferredApi} ocupada; usando API em http://127.0.0.1:${apiPort} (proxy Vite alinhado).\n`,
   )
+} else {
+  process.stderr.write(`[dev] Usando porta da API: ${apiPort}\n`)
 }
 
-const env = { ...process.env, API_PORT: String(apiPort) }
+const preferredVite = 3010
+const vitePort = await allocatePort(preferredVite)
+if (vitePort !== preferredVite) {
+  process.stderr.write(
+    `[dev] Porta ${preferredVite} ocupada; usando Vite em http://127.0.0.1:${vitePort}.\n`,
+  )
+} else {
+  process.stderr.write(`[dev] Usando porta do Vite: ${vitePort}\n`)
+}
+
+const env = { ...process.env, API_PORT: String(apiPort), VITE_PORT: String(vitePort) }
 const viteBin = path.join(root, 'node_modules', 'vite', 'bin', 'vite.js')
 
 const children = [
-  spawn(process.execPath, [viteBin], { cwd: root, env, stdio: 'inherit' }),
+  spawn(process.execPath, [viteBin, '--port', String(vitePort)], { cwd: root, env, stdio: 'inherit' }),
   spawn(process.execPath, ['server/index.mjs'], { cwd: root, env, stdio: 'inherit' }),
 ]
 

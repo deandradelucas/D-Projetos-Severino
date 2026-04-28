@@ -178,6 +178,12 @@ function whatsappContactUrlFromEnv() {
 
 app.get('/api/public/whatsapp-contact', (c) => c.json({ url: whatsappContactUrlFromEnv() }))
 
+function whatsappWebhookBaseUrl(c) {
+  const explicit = String(process.env.WHATSAPP_WEBHOOK_BASE_URL || '').trim()
+  if (explicit) return explicit.replace(/\/+$/, '')
+  return getRequestOrigin(c).replace(/\/+$/, '')
+}
+
 /** Painel interno: token MP configurado e path do webhook (sem segredos). */
 app.get('/api/admin/mp-saude', async (c) => {
   try {
@@ -382,6 +388,13 @@ app.post('/api/auth/login', async (c) => {
         mp_gerenciar_url: null,
       }
     }
+
+    await insertAdminAuditLog({
+      actorUserId: user.id,
+      action: 'login_sucesso',
+      clientIp: clientIpFromHono(c),
+      detail: { email: user.email },
+    })
 
     return c.json({
       message: 'Login realizado com sucesso.',
@@ -756,7 +769,7 @@ app.get('/api/admin/whatsapp-config', async (c) => {
     const block = await assertPrincipalAdmin(usuarioId)
     if (block) return c.json({ message: block.message }, block.status)
 
-    const origin = getRequestOrigin(c).replace(/\/$/, '')
+    const origin = whatsappWebhookBaseUrl(c)
     const { token, missingInProduction } = resolveWhatsAppWebhookToken()
     if (missingInProduction || !token) {
       return c.json({
@@ -773,7 +786,7 @@ app.get('/api/admin/whatsapp-config', async (c) => {
       webhookUrlPath: `${origin}/api/whatsapp/webhook/${enc}`,
       missingToken: false,
       hint:
-        'Cole uma dessas URLs no painel Chipmassa/Telein (Webhook). Sem o token correto, mensagens com texto são rejeitadas.',
+        'Cole uma dessas URLs na configuração de Webhook Global da Evolution API. Sem o token correto, mensagens são rejeitadas.',
     })
   } catch (error) {
     log.error('get whatsapp config failed', error)

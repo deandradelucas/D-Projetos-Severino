@@ -56,9 +56,9 @@ export default function AdminWhatsApp() {
         const headers = { 'x-user-id': u.id }
 
         fetch('/api/admin/whatsapp-status', { headers })
-          .then((r) => r.json())
+          .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))))
           .then((data) => setStatus(data))
-          .catch((e) => console.error('Erro ao buscar status:', e))
+          .catch((e) => console.error('Erro ao buscar status do WhatsApp:', e))
 
         const [resLogs, resCfg] = await Promise.all([
           fetch('/api/admin/whatsapp-logs', { headers }),
@@ -170,7 +170,7 @@ export default function AdminWhatsApp() {
                 <div className="ref-panel__head">
                   <div>
                     <h2 id="wa-webhook-heading" className="ref-panel__title">
-                      URL do webhook (Chipmassa / Telein)
+                      URL do webhook (Evolution API)
                     </h2>
                     <p className="ref-panel__subtitle">
                       {whatsappConfig.hint} O número em <strong>Telefone remetente</strong> deve coincidir com o{' '}
@@ -248,7 +248,7 @@ export default function AdminWhatsApp() {
                     <tbody>
                       {logs.map((log) => (
                         <tr key={log.id}>
-                          <td>{new Date(log.data_hora).toLocaleString('pt-BR')}</td>
+                          <td>{log.data_hora ? new Date(log.data_hora).toLocaleString('pt-BR') : '—'}</td>
                           <td style={{ fontWeight: 600 }}>{log.telefone_remetente}</td>
                           <td className="page-admin-td-ellipsis" title={log.mensagem_recebida}>
                             {log.mensagem_recebida && /\[Áudio/i.test(String(log.mensagem_recebida)) ? (

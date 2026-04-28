@@ -1,6 +1,7 @@
 import { log } from './logger.mjs'
 import { resolveWhatsAppWebhookToken } from './whatsapp-webhook-secret.mjs'
 import { buscarUsuarioPorTelefone, registrarLogWhatsApp, normalizarDigitosWhatsappLog } from './usuarios.mjs'
+import { insertAdminAuditLog } from './admin-audit.mjs'
 import { transcribeWhatsAppAudioWithGemini } from './ai.mjs'
 import { WhatsAppTransactionService } from './services/whatsapp-transaction-service.mjs'
 
@@ -478,6 +479,14 @@ function extractRemetenteEMensagem(body) {
     if (j && typeof j === 'string') jidCandidates.push(j)
   }
 
+  // Evolution v2 (prioridade máxima para não confundir com o sender/bot na raiz)
+  pushJid(body?.data?.key?.remoteJidAlt)
+  pushJid(body?.data?.key?.remoteJid)
+  pushJid(body?.data?.message?.key?.remoteJidAlt)
+  pushJid(body?.data?.message?.key?.remoteJid)
+  pushJid(body?.data?.messages?.[0]?.key?.remoteJidAlt)
+  pushJid(body?.data?.messages?.[0]?.key?.remoteJid)
+
   pushJid(body['body[key][remoteJidAlt]'])
   pushJid(body['body[key][remoteJid]'])
   pushJid(body['key[remoteJidAlt]'])
@@ -696,12 +705,13 @@ export async function handleWhatsAppWebhook(req, options = {}) {
     numeroRemetente = String(remetenteRaw || '').replace(/\D/g, '')
     telDisplay = normalizarDigitosWhatsappLog(numeroRemetente) || numeroRemetente || 'Desconhecido'
 
+    const tokenFromHeaderBool = !!rawAuth
     const tokenFromBodyBool = !!tokenFromBody
-    const debugInfo = `Tokens: Query=${!!tokenFromQuery}, Body=${tokenFromBodyBool} | Msg: ${mensagemRaw.substring(0, 20)}`
+    const debugInfo = `Tokens: Query=${!!tokenFromQuery}, Body=${tokenFromBodyBool}, Header=${tokenFromHeaderBool} | Msg: ${mensagemRaw.substring(0, 20)}`
 
     // Payload autenticado mas sem dados de conversa (ex.: ack, reaction)
     if (!numeroRemetente && !mensagemRaw.trim() && !audioRef) {
-      log.info('[WhatsApp Webhook] Autenticado; sem remetente/mensagem — ignorando.')
+      log.info(`[WhatsApp Webhook] Autenticado; sem remetente/mensagem — ignorando. ${debugInfo}`)
       return { status: 200, json: { ok: true, ignored: 'no_chat_payload' } }
     }
 
@@ -740,7 +750,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
 
     usuarioTarget = await buscarUsuarioPorTelefone(numeroRemetente)
     if (!usuarioTarget) {
-      log.warn(`[WhatsApp Webhook] Telefone ${telDisplay} não possui usuário vinculado.`)
+      log.warn(`[WhatsApp Webhook] Telefone ${telDisplay} não possui usuário vinculado. Payload: ${JSON.stringify(body).slice(0, 800)}`)
       await registrarLogWhatsApp(
         telDisplay,
         mensagemRaw || (audioRef || heuristicAudio ? '[Áudio]' : '(sem texto)'),
@@ -748,6 +758,12 @@ export async function handleWhatsAppWebhook(req, options = {}) {
         `Usuário não vinculado. ${debugInfo}`,
       )
       return { status: 200, json: { ok: true, warning: 'Usuário não registrado com esse telefone.' } }
+    }
+
+    // Usar telefone canônico do cadastro para o log — evita exibir JID bruto do webhook
+    if (usuarioTarget.telefone) {
+      const canonico = normalizarDigitosWhatsappLog(String(usuarioTarget.telefone).replace(/\D/g, ''))
+      if (canonico) telDisplay = canonico
     }
 
     let textoUsuario = mensagemRaw.trim()
@@ -797,6 +813,14 @@ export async function handleWhatsAppWebhook(req, options = {}) {
     )
 
     await registrarLogWhatsApp(telDisplay, mensagemParaLog, 'SUCESSO', detalheSucesso, usuarioTarget.id)
+
+    await insertAdminAuditLog({
+      actorUserId: usuarioTarget.id,
+      action: 'whatsapp_transacao_sucesso',
+      targetUserId: usuarioTarget.id,
+      targetEmail: usuarioTarget.email,
+      detail: { msg: textoUsuario.slice(0, 100), detalhe: detalheSucesso },
+    })
 
     return {
       status: 200,

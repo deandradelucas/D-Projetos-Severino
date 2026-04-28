@@ -29,7 +29,12 @@ function loadEnvFile(filePath, override) {
     }
 
     const key = line.slice(0, separatorIndex).trim()
-    const value = line.slice(separatorIndex + 1).trim()
+    let value = line.slice(separatorIndex + 1).trim()
+
+    // Strip surrounding quotes if present
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1)
+    }
 
     if (override || !(key in process.env)) {
       process.env[key] = value

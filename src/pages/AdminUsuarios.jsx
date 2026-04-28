@@ -236,7 +236,6 @@ export default function AdminUsuarios() {
   const [sessionBanner, setSessionBanner] = useState('')
   const [auditRows, setAuditRows] = useState([])
   const [auditLoading, setAuditLoading] = useState(false)
-  const [auditOpen, setAuditOpen] = useState(false)
   const [exportingCsv, setExportingCsv] = useState(false)
 
   const principalPodeDarAdmin = isSuperAdminSession()
@@ -378,8 +377,8 @@ export default function AdminUsuarios() {
   }, [])
 
   useEffect(() => {
-    if (auditOpen) void loadAudit()
-  }, [auditOpen, loadAudit])
+    void loadAudit()
+  }, [loadAudit])
 
   const exportarCsv = async () => {
     setExportingCsv(true)
@@ -1291,27 +1290,47 @@ export default function AdminUsuarios() {
                 </div>
               ) : null}
 
-              <details className="page-admin-audit-block" onToggle={(e) => setAuditOpen(e.target.open)}>
-                <summary className="page-admin-audit-summary">Auditoria recente (ações registradas no servidor)</summary>
+              <div className="page-admin-audit-block">
+                <div className="page-admin-audit-header">
+                  <h3 className="page-admin-audit-title">Auditoria recente</h3>
+                  <button 
+                    type="button" 
+                    className="btn-secondary btn-small" 
+                    onClick={() => loadAudit()}
+                    disabled={auditLoading}
+                  >
+                    {auditLoading ? '...' : 'Recarregar'}
+                  </button>
+                </div>
+                
                 {auditLoading ? (
-                  <p className="page-admin-audit-loading">Carregando…</p>
+                  <p className="page-admin-audit-loading">Carregando trilha do banco de dados…</p>
                 ) : auditRows.length === 0 ? (
-                  <p className="page-admin-audit-empty">
-                    Nenhum registro ainda. Se acabou de subir o projeto, rode a migration <code>13_admin_audit_log.sql</code> no Supabase.
-                  </p>
+                  <div className="page-admin-audit-empty-box">
+                    <p className="page-admin-audit-empty">
+                      Nenhum evento registrado no banco de dados ainda.
+                    </p>
+                    <small>As ações administrativas e acessos aparecerão aqui conforme ocorrerem.</small>
+                  </div>
                 ) : (
                   <ul className="page-admin-audit-list">
                     {auditRows.map((row) => (
                       <li key={row.id} className="page-admin-audit-item">
-                        <span className="page-admin-audit-time">{new Date(row.created_at).toLocaleString('pt-BR')}</span>
-                        <span className="page-admin-audit-action">{row.action}</span>
-                        <span className="page-admin-audit-target">{row.target_email || row.target_user_id || '—'}</span>
-                        {row.client_ip ? <span className="page-admin-audit-ip">{row.client_ip}</span> : null}
+                        <div className="page-admin-audit-meta">
+                          <span className="page-admin-audit-time">{new Date(row.created_at).toLocaleString('pt-BR')}</span>
+                          {row.client_ip && <span className="page-admin-audit-ip">IP: {row.client_ip}</span>}
+                        </div>
+                        <div className="page-admin-audit-body">
+                          <strong className="page-admin-audit-action-tag">{row.action}</strong>
+                          <span className="page-admin-audit-target-text">
+                            {row.target_email || row.target_user_id ? `Alvo: ${row.target_email || row.target_user_id}` : 'Sistema'}
+                          </span>
+                        </div>
                       </li>
                     ))}
                   </ul>
                 )}
-              </details>
+              </div>
             </article>
             </RefDashboardScroll>
           </div>

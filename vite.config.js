@@ -53,8 +53,8 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: true,
-      port: 3010,
-      strictPort: true,
+      port: Number(process.env.VITE_PORT) || 3010,
+      strictPort: false,
       proxy: {
         '/api': createApiProxy(apiTarget),
       },
