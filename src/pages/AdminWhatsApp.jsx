@@ -225,7 +225,7 @@ export default function AdminWhatsApp() {
               <div className="ref-panel__head">
                 <div>
                   <h2 id="wa-logs-heading" className="ref-panel__title">
-                    Mensagens recebidas
+                    Fluxo de Mensagens
                   </h2>
                   <p className="ref-panel__subtitle">Histórico auditado do bot</p>
                 </div>

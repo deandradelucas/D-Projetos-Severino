@@ -150,52 +150,15 @@ export default function AdminPaymentLogsPanel({
         {error ? <div className="page-admin-alert">{error}</div> : null}
         {actionMsg ? <div className="page-admin-toast-msg">{actionMsg}</div> : null}
 
-        {summary && !loading ? (
-          <section className="ref-kpi-row page-admin-kpi-row page-admin-payment-logs__kpis" aria-label="Indicadores financeiros">
-            <article className="ref-kpi-card ref-kpi-card--income ref-kpi-card--hero">
-              <div className="ref-kpi-card__body">
-                <p className="ref-kpi-card__label">Ganho acumulado</p>
-                <p className="ref-kpi-card__value">{formatCurrencyBRL(summary.accumulatedRevenue)}</p>
-                <p className="page-admin-kpi-sub">Soma dos pagamentos aprovados neste lote</p>
-              </div>
-            </article>
-            <article className="ref-kpi-card ref-kpi-card--balance">
-              <div className="ref-kpi-card__body">
-                <p className="ref-kpi-card__label">Aprovados</p>
-                <p className="ref-kpi-card__value">{summary.approvedCount}</p>
-                <p className="page-admin-kpi-sub">Registros com acesso liberado</p>
-              </div>
-            </article>
-            <article className="ref-kpi-card ref-kpi-card--expense">
-              <div className="ref-kpi-card__body">
-                <p className="ref-kpi-card__label">Pendentes</p>
-                <p className="ref-kpi-card__value">{summary.pendingCount}</p>
-                <p className="page-admin-kpi-sub">Em análise ou processamento</p>
-              </div>
-            </article>
-            <article className="ref-kpi-card ref-kpi-card--balance">
-              <div className="ref-kpi-card__body">
-                <p className="ref-kpi-card__label">Valor pendente</p>
-                <p className="ref-kpi-card__value">{formatCurrencyBRL(summary.pendingAmount)}</p>
-                <p className="page-admin-kpi-sub">Soma dos valores ainda não aprovados</p>
-              </div>
-            </article>
-            <article className="ref-kpi-card ref-kpi-card--income">
-              <div className="ref-kpi-card__body">
-                <p className="ref-kpi-card__label">Próximo pagamento</p>
-                <p className="ref-kpi-card__value page-admin-payment-logs__kpi-value--sm">{formatDateTimePt(summary.nextPaymentDate)}</p>
-                <p className="page-admin-kpi-sub">Menor data futura de cobrança (assinatura)</p>
-              </div>
-            </article>
-            <article className="ref-kpi-card ref-kpi-card--expense">
-              <div className="ref-kpi-card__body">
-                <p className="ref-kpi-card__label">Próximo vencimento</p>
-                <p className="ref-kpi-card__value page-admin-payment-logs__kpi-value--sm">{formatDatePt(summary.nextDueDate)}</p>
-                <p className="page-admin-kpi-sub">Alinhado à próxima cobrança prevista</p>
-              </div>
-            </article>
-          </section>
-        ) : null}
+        {summary && !loading && (
+          <div className="page-admin-kpi-compact-strip" style={{ marginBottom: '16px' }}>
+            <div className="kpi-mini"><span>Aprovado:</span> <strong>{formatCurrencyBRL(summary.accumulatedRevenue)}</strong></div>
+            <div className="kpi-mini"><span>Qtde:</span> <strong>{summary.approvedCount}</strong></div>
+            <div className="kpi-mini"><span>Pendente:</span> <strong>{formatCurrencyBRL(summary.pendingAmount)}</strong></div>
+            <div className="kpi-mini"><span>Atrasados:</span> <strong>{summary.overdueCount ?? 0}</strong></div>
+            <div className="kpi-mini kpi-mini--accent"><span>Mês:</span> <strong>{formatCurrencyBRL(summary.monthlyRevenue ?? 0)}</strong></div>
+          </div>
+        )}
 
         {summary?.summaryTruncated ? (
           <p className="page-admin-payment-logs__hint" role="status">

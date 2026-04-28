@@ -254,6 +254,9 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           </svg>
           Sair
         </button>
+        <div style={{ marginTop: 'auto', padding: '10px 16px', fontSize: '10px', color: 'rgba(148, 163, 184, 0.4)', textAlign: 'center' }}>
+          v3.0.2 - ADMIN UPDATE
+        </div>
       </aside>
     </>
   )

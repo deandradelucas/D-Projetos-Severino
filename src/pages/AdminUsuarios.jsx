@@ -335,10 +335,7 @@ export default function AdminUsuarios() {
 
   const totalPages = Math.max(1, Math.ceil(totalLista / PAGE_SIZE))
 
-  useEffect(() => {
-    setPage((p) => Math.min(p, totalPages))
-  }, [totalPages])
-
+  // Removemos o useEffect que causava loop infinito com setPage e totalPages
   const pageSafe = Math.min(page, totalPages)
   const pageRows = listaUsuarios
   const start = (pageSafe - 1) * PAGE_SIZE
@@ -601,13 +598,44 @@ export default function AdminUsuarios() {
               <div className="dashboard-hub__hero-row">
                 <MobileMenuButton onClick={() => setMenuAberto(true)} />
                 <div className="dashboard-hub__hero-text">
-                  <h1 className="dashboard-hub__title">Usuários</h1>
+                  <h1 className="dashboard-hub__title">ADMIN CORE v4</h1>
                   <p className="ref-panel__subtitle page-admin-header-sub">
-                    Cadastros, acessos, assinaturas e acompanhamento financeiro
+                    Gestão centralizada e auditoria de sistema
                   </p>
                 </div>
               </div>
             </section>
+
+            <div className="page-admin-compact-grid">
+              {/* KPIs Compactos */}
+              {stats && (
+                <div className="page-admin-kpi-compact-strip">
+                  <div className="kpi-mini"><span>Total:</span> <strong>{stats.total}</strong></div>
+                  <div className="kpi-mini"><span>Ativos:</span> <strong>{stats.ativos}</strong></div>
+                  <div className="kpi-mini"><span>Admins:</span> <strong>{stats.admins}</strong></div>
+                  <div className="kpi-mini"><span>Pagas:</span> <strong>{stats.assinaturas_pagas}</strong></div>
+                  <div className="kpi-mini kpi-mini--accent"><span>Receita:</span> <strong>{formatCurrencyBRL(stats.receita_mensal_total ?? 0)}</strong></div>
+                </div>
+              )}
+
+              {/* Auditoria Compacta Lateral/Topo */}
+              <div className="page-admin-audit-compact-box">
+                <div className="page-admin-audit-header">
+                  <h3 className="page-admin-audit-title">Auditoria</h3>
+                  <button type="button" className="btn-small-ghost" onClick={() => loadAudit()}>
+                    {auditLoading ? '...' : 'Recarregar'}
+                  </button>
+                </div>
+                <div className="page-admin-audit-mini-list">
+                  {auditRows.slice(0, 10).map(row => (
+                    <div key={row.id} className="audit-mini-item">
+                      <span className="audit-mini-icon">⚡</span>
+                      <span className="audit-mini-text"><strong>{row.action}</strong>: {row.target_email || 'Sistema'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             <article
               className="ref-panel page-admin-ref-panel page-admin-ref-panel--table page-admin-usuarios-panel"
@@ -640,94 +668,7 @@ export default function AdminUsuarios() {
               ) : null}
               {userActionMessage ? <div className="page-admin-toast-msg">{userActionMessage}</div> : null}
 
-              {stats && !loadError ? (
-                <>
-                  <section className="ref-kpi-row page-admin-kpi-row page-admin-usuarios-kpis" aria-label="Indicadores do cadastro">
-                    <article className="ref-kpi-card ref-kpi-card--balance ref-kpi-card--hero">
-                      <div className="ref-kpi-card__body">
-                        <p className="ref-kpi-card__label">Cadastros</p>
-                        <p className="ref-kpi-card__value">{stats.total}</p>
-                        <p className="page-admin-kpi-sub">Total no sistema</p>
-                      </div>
-                    </article>
-                    <article className="ref-kpi-card ref-kpi-card--income">
-                      <div className="ref-kpi-card__body">
-                        <p className="ref-kpi-card__label">Contas ativas</p>
-                        <p className="ref-kpi-card__value">{stats.ativos}</p>
-                        <p className="page-admin-kpi-sub">Podem acessar o app</p>
-                      </div>
-                    </article>
-                    <article className="ref-kpi-card ref-kpi-card--expense">
-                      <div className="ref-kpi-card__body">
-                        <p className="ref-kpi-card__label">Admins</p>
-                        <p className="ref-kpi-card__value">{stats.admins}</p>
-                        <p className="page-admin-kpi-sub">Papel Admin no banco</p>
-                      </div>
-                    </article>
-                    <article className="ref-kpi-card ref-kpi-card--balance">
-                      <div className="ref-kpi-card__body">
-                        <p className="ref-kpi-card__label">Trial ativo</p>
-                        <p className="ref-kpi-card__value">{stats.trial_ativos}</p>
-                        <p className="page-admin-kpi-sub">Teste vigente (data futura)</p>
-                      </div>
-                    </article>
-                  </section>
-                  <section className="ref-kpi-row page-admin-kpi-row page-admin-usuarios-kpis page-admin-usuarios-kpis--finance" aria-label="Indicadores financeiros">
-                    <article className="ref-kpi-card ref-kpi-card--income">
-                      <div className="ref-kpi-card__body">
-                        <p className="ref-kpi-card__label">Assinaturas pagas</p>
-                        <p className="ref-kpi-card__value">{stats.assinaturas_pagas ?? '—'}</p>
-                        <p className="page-admin-kpi-sub">Usuários com pagamento aprovado</p>
-                      </div>
-                    </article>
-                    <article className="ref-kpi-card ref-kpi-card--income ref-kpi-card--hero">
-                      <div className="ref-kpi-card__body">
-                        <p className="ref-kpi-card__label">Ganho acumulado</p>
-                        <p className="ref-kpi-card__value">{formatCurrencyBRL(stats.ganho_acumulado_total ?? 0)}</p>
-                        <p className="page-admin-kpi-sub">Soma de pagamentos aprovados (MP)</p>
-                      </div>
-                    </article>
-                    <article className="ref-kpi-card ref-kpi-card--balance">
-                      <div className="ref-kpi-card__body">
-                        <p className="ref-kpi-card__label">Receita mensal</p>
-                        <p className="ref-kpi-card__value">{formatCurrencyBRL(stats.receita_mensal_total ?? 0)}</p>
-                        <p className="page-admin-kpi-sub">Aprovados no mês (UTC)</p>
-                      </div>
-                    </article>
-                    <article className="ref-kpi-card ref-kpi-card--expense">
-                      <div className="ref-kpi-card__body">
-                        <p className="ref-kpi-card__label">Próximo pagamento</p>
-                        <p className="ref-kpi-card__value page-admin-usuarios-kpi-sm">{formatDateTimePtBr(stats.proximo_pagamento)}</p>
-                        <p className="page-admin-kpi-sub">Menor data futura de cobrança</p>
-                      </div>
-                    </article>
-                    <article className="ref-kpi-card ref-kpi-card--expense">
-                      <div className="ref-kpi-card__body">
-                        <p className="ref-kpi-card__label">Próximo vencimento</p>
-                        <p className="ref-kpi-card__value page-admin-usuarios-kpi-sm">{formatDatePtBr(stats.proximo_vencimento)}</p>
-                        <p className="page-admin-kpi-sub">Trial ou cobrança (o que ocorrer antes)</p>
-                      </div>
-                    </article>
-                    <article className="ref-kpi-card ref-kpi-card--balance">
-                      <div className="ref-kpi-card__body">
-                        <p className="ref-kpi-card__label">Sem login recente</p>
-                        <p className="ref-kpi-card__value">{stats.contas_sem_login_recente ?? '—'}</p>
-                        <p className="page-admin-kpi-sub">Ativos sem acesso há 30 dias</p>
-                      </div>
-                    </article>
-                  </section>
-                  <section className="page-admin-usuarios-insights" aria-label="Insights">
-                    <div className="page-admin-usuarios-insight-card">
-                      <span className="page-admin-usuarios-insight-k">Trials vencidos (conta ativa)</span>
-                      <span className="page-admin-usuarios-insight-v">{stats.trials_vencidos_conta ?? '—'}</span>
-                    </div>
-                    <div className="page-admin-usuarios-insight-card">
-                      <span className="page-admin-usuarios-insight-k">Ticket médio / usuário pagante</span>
-                      <span className="page-admin-usuarios-insight-v">{formatCurrencyBRL(stats.ticket_medio_usuario ?? 0)}</span>
-                    </div>
-                  </section>
-                </>
-              ) : null}
+
 
               <div className="page-admin-users-toolbar page-admin-users-toolbar--grid">
                 <div className="page-admin-search-wrap">
@@ -1290,57 +1231,7 @@ export default function AdminUsuarios() {
                 </div>
               ) : null}
 
-              <div className="page-admin-audit-block">
-                <div className="page-admin-audit-header">
-                  <h3 className="page-admin-audit-title">Auditoria recente</h3>
-                    <button 
-                    type="button" 
-                    className="btn-secondary btn-small" 
-                    onClick={() => loadAudit()}
-                    disabled={auditLoading}
-                  >
-                    {auditLoading ? '...' : 'ATUALIZAR LOGS'}
-                  </button>
-                </div>
-                
-                {auditLoading ? (
-                  <p className="page-admin-audit-loading">Carregando trilha do banco de dados…</p>
-                ) : auditRows.length === 0 ? (
-                  <div className="page-admin-audit-empty-box">
-                    <p className="page-admin-audit-empty">
-                      Nenhum evento registrado no banco de dados ainda.
-                    </p>
-                    <small>As ações administrativas e acessos aparecerão aqui conforme ocorrerem.</small>
-                  </div>
-                ) : (
-                  <ul className="page-admin-audit-list">
-                    {auditRows.map((row) => {
-                      let icon = '⚡';
-                      if (row.action?.includes('login')) icon = '🔑';
-                      if (row.action?.includes('update') || row.action?.includes('edit')) icon = '📝';
-                      if (row.action?.includes('delete') || row.action?.includes('excluir')) icon = '🗑️';
-                      if (row.action?.includes('assinatura') || row.action?.includes('pagamento')) icon = '💳';
-                      if (row.action?.includes('whatsapp')) icon = '📱';
 
-                      return (
-                        <li key={row.id} className="page-admin-audit-item">
-                          <div className="page-admin-audit-meta">
-                            <span className="page-admin-audit-time">{new Date(row.created_at).toLocaleString('pt-BR')}</span>
-                            {row.client_ip && <span className="page-admin-audit-ip">IP: {row.client_ip}</span>}
-                          </div>
-                          <div className="page-admin-audit-body">
-                            <span className="page-admin-audit-icon">{icon}</span>
-                            <strong className="page-admin-audit-action-tag">{row.action}</strong>
-                            <span className="page-admin-audit-target-text">
-                              {row.target_email || row.target_user_id ? `Alvo: ${row.target_email || row.target_user_id}` : 'Sistema'}
-                            </span>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </div>
             </article>
             </RefDashboardScroll>
           </div>
