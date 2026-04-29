@@ -297,25 +297,17 @@ async function enviarMensagemWhatsApp(remoteJid, texto, instanceName, apikey) {
   }
 
   const baseUrl = process.env.EVOLUTION_API_URL || process.env.WHATSAPP_WEBHOOK_BASE_URL || 'http://localhost:8080'
-  // Remove sufixos de webhook se presentes
   const cleanBase = baseUrl.replace(/\/api\/whatsapp\/webhook.*$/, '').replace(/\/+$/, '')
-  // Garante que o JID tenha o sufixo correto se for apenas dígitos
-  let target = remoteJid
-  if (!target.includes('@')) {
-    target = `${target}@s.whatsapp.net`
-  }
-  
-  // TENTATIVA: Evolution API costuma falhar com @lid no sendText.
-  // Vamos tentar converter para @s.whatsapp.net se for LID para ver se a API aceita.
-  if (target.toLowerCase().includes('@lid')) {
-    target = target.replace(/@lid/i, '@s.whatsapp.net')
-  }
+
+  // Evolution API v2: o campo `number` deve ser apenas os dígitos (sem @s.whatsapp.net)
+  // Se vier um JID completo, extrai só os dígitos
+  const numberOnly = String(remoteJid).replace(/@.*$/, '').replace(/\D/g, '')
 
   const url = `${cleanBase}/message/sendText/${instanceName}`
-  log.info(`[WhatsApp Reply] Tentando enviar para ${target} (Original: ${remoteJid}) via ${url}`)
-  
+  log.info(`[WhatsApp Reply] Tentando enviar para ${numberOnly} (Original: ${remoteJid}) via ${url}`)
+
   const bodyPayload = {
-    number: target,
+    number: numberOnly,
     text: texto,
     delay: 1200,
     linkPreview: false
@@ -914,10 +906,18 @@ export async function handleWhatsAppWebhook(req, options = {}) {
     // Resposta automática para o usuário
     const instanceName = body.instance || body.data?.instance || body.body?.instance || process.env.EVOLUTION_INSTANCE_NAME
     const evolutionApiKey = process.env.EVOLUTION_API_KEY
-    log.info(`[WhatsApp Webhook] Preparando resposta: instance=${instanceName}, hasApiKey=${!!evolutionApiKey}, remetente=${remetenteRaw}`)
+
+    // Se o remetente é um LID (@lid), usar o telefone real do cadastro para o reply
+    // A Evolution API não consegue enviar para JIDs do tipo @lid
+    const isLid = String(remetenteRaw).toLowerCase().includes('@lid')
+    const replyJid = isLid && usuarioTarget?.telefone
+      ? normalizarDigitosWhatsappLog(String(usuarioTarget.telefone).replace(/\D/g, '')) || String(usuarioTarget.telefone).replace(/\D/g, '')
+      : remetenteRaw
+
+    log.info(`[WhatsApp Webhook] Preparando resposta: instance=${instanceName}, hasApiKey=${!!evolutionApiKey}, remetente=${remetenteRaw}, replyJid=${replyJid}`)
     if (instanceName && evolutionApiKey) {
       const replyText = isChat ? detalheSucesso : `✅ ${detalheSucesso}`
-      enviarMensagemWhatsApp(remetenteRaw, replyText, instanceName, evolutionApiKey).catch(e => {
+      enviarMensagemWhatsApp(replyJid, replyText, instanceName, evolutionApiKey).catch(e => {
         log.error('[WhatsApp Webhook] Falha na Promise de resposta automática:', e)
       })
     }
