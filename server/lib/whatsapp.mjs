@@ -254,33 +254,57 @@ async function loadAudioBytesFromRef(ref, webhookBody = null) {
   if (ref.base64) {
     return Buffer.from(String(ref.base64).replace(/\s/g, ''), 'base64')
   }
+
   if (ref.url) {
-    const headers = {}
-    const extra = process.env.WHATSAPP_MEDIA_FETCH_HEADERS
-    if (extra && extra.trim()) {
+    // Tenta primeiro via Evolution API getBase64FromMediaMessage (descriptografa corretamente)
+    const evolutionBase = (process.env.EVOLUTION_API_URL || 'http://localhost:8080')
+      .replace(/\/api\/whatsapp\/webhook.*$/, '').replace(/\/+$/, '')
+    const evolutionKey = process.env.EVOLUTION_API_KEY
+    const instanceName = process.env.EVOLUTION_INSTANCE_NAME ||
+      (webhookBody?.instance) ||
+      (webhookBody?.data?.instance) ||
+      'horizonte'
+
+    if (evolutionKey) {
       try {
-        Object.assign(headers, JSON.parse(extra))
-      } catch {
-        log.warn('[WhatsApp] WHATSAPP_MEDIA_FETCH_HEADERS inválido (JSON esperado); download sem headers extra.')
+        // Evolution API v2 espera o objeto `data` do webhook como campo `message`:
+        // { key: {...}, message: { audioMessage: {...} }, messageType: "audioMessage", ... }
+        // NÃO passar apenas `data.message` (só o audioMessage interno) — isso causa 400.
+        const msgObj = webhookBody?.data ?? webhookBody
+        const res = await fetch(`${evolutionBase}/chat/getBase64FromMediaMessage/${instanceName}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', apikey: evolutionKey },
+          body: JSON.stringify({ message: msgObj, convertToMp4: false }),
+          signal: AbortSignal.timeout(30000),
+        })
+        if (res.ok) {
+          const json = await res.json()
+          const b64 = json?.base64 || json?.data?.base64
+          if (typeof b64 === 'string' && b64.length > 80) {
+            log.info('[WhatsApp Audio] Áudio obtido via getBase64FromMediaMessage (descriptografado)')
+            return Buffer.from(b64.replace(/\s/g, ''), 'base64')
+          }
+          log.warn('[WhatsApp Audio] getBase64FromMediaMessage retornou sem base64 válido:', JSON.stringify(json).slice(0, 200))
+        } else {
+          const errText = await res.text().catch(() => '')
+          log.warn(`[WhatsApp Audio] getBase64FromMediaMessage falhou: ${res.status} | body enviado: ${JSON.stringify({ key: msgObj?.key, messageType: msgObj?.messageType }).slice(0, 200)} | resposta: ${errText.slice(0, 200)}`)
+        }
+      } catch (e) {
+        log.warn('[WhatsApp Audio] Erro em getBase64FromMediaMessage:', e.message)
       }
     }
-    const apikey =
-      webhookBody &&
-      (webhookBody.apikey || webhookBody.api_key || webhookBody.Apikey || webhookBody.API_KEY)
-    if (apikey && !headers.apikey && !headers.Apikey) {
-      headers.apikey = String(apikey).trim()
-    }
 
+    // Fallback: download direto da URL
     const r = await fetch(ref.url, {
       redirect: 'follow',
-      headers,
       signal: AbortSignal.timeout(45000),
     })
     if (!r.ok) throw new Error(`Download do áudio falhou: HTTP ${r.status}`)
     const ab = await r.arrayBuffer()
     return Buffer.from(ab)
   }
-  throw new Error('Áudio sem URL nem base64 utilizável no payload (confirme o gateway Evolution/Telein).')
+
+  throw new Error('Áudio sem URL nem base64 utilizável no payload.')
 }
 
 /**
@@ -860,6 +884,7 @@ export async function handleWhatsAppWebhook(req, options = {}) {
     if (!textoUsuario && audioRef) {
       try {
         const bytes = await loadAudioBytesFromRef(audioRef, body)
+        log.info(`[WhatsApp Audio] mime=${audioRef.mimeType || 'desconhecido'} | size=${bytes.length} bytes | origem=${audioRef.url ? 'url' : 'base64'}`)
         textoUsuario = (await transcribeWhatsAppAudioWithGemini(bytes, audioRef.mimeType || '')).trim()
         mensagemParaLog = textoUsuario ? `[Áudio] ${textoUsuario}` : '[Áudio]'
         log.info(`[WhatsApp Webhook] Transcrição de áudio (${telDisplay}): "${textoUsuario.slice(0, 120)}..."`)
