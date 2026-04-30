@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
@@ -11,10 +11,31 @@ function mergeNavItemClass(isActive, href, pathname, extraClass = '') {
   return on ? `${base} active` : base
 }
 
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
+
+function getFocusableElements(container) {
+  if (!container) return []
+  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter((el) => {
+    if (el.getAttribute('aria-hidden') === 'true') return false
+    return el.offsetParent !== null || el === document.activeElement
+  })
+}
+
 export default function Sidebar({ menuAberto, setMenuAberto }) {
   const { theme } = useTheme()
   const { pathname } = useLocation()
   const showAdminNav = canAccessAdminPanelSession()
+  const sidebarRef = useRef(null)
+  const closeButtonRef = useRef(null)
+  const openerRef = useRef(null)
+  const closeMenu = useCallback(() => setMenuAberto(false), [setMenuAberto])
 
   /* Mobile: ao abrir o drawer, baixa chunks do menu em paralelo (clique na rota fica instantâneo). */
   useEffect(() => {
@@ -24,11 +45,55 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   useEffect(() => {
     if (!menuAberto) return undefined
     const onKey = (e) => {
-      if (e.key === 'Escape') setMenuAberto(false)
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        closeMenu()
+        return
+      }
+
+      if (e.key !== 'Tab') return
+      const focusable = getFocusableElements(sidebarRef.current)
+      if (focusable.length === 0) {
+        e.preventDefault()
+        return
+      }
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const active = document.activeElement
+
+      if (e.shiftKey && (active === first || !sidebarRef.current?.contains(active))) {
+        e.preventDefault()
+        last.focus()
+        return
+      }
+
+      if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [menuAberto, setMenuAberto])
+  }, [closeMenu, menuAberto])
+
+  useEffect(() => {
+    if (!menuAberto) return undefined
+
+    openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const raf = window.requestAnimationFrame(() => {
+      closeButtonRef.current?.focus({ preventScroll: true })
+    })
+
+    return () => {
+      window.cancelAnimationFrame(raf)
+      const opener = openerRef.current
+      openerRef.current = null
+      if (opener && document.contains(opener)) {
+        window.setTimeout(() => opener.focus({ preventScroll: true }), 0)
+      }
+    }
+  }, [menuAberto])
 
   const svgSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
   const pngSrc = theme === 'light' ? BRAND_ASSETS.logoOnLightPng : BRAND_ASSETS.logoOnDarkPng
@@ -46,11 +111,17 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           type="button"
           className="mobile-backdrop"
           aria-label="Fechar menu"
-          onClick={() => setMenuAberto(false)}
+          onClick={closeMenu}
         />
       )}
 
-      <aside className={`sidebar ${menuAberto ? 'open' : ''}`}>
+      <aside
+        ref={sidebarRef}
+        className={`sidebar ${menuAberto ? 'open' : ''}`}
+        role={menuAberto ? 'dialog' : undefined}
+        aria-modal={menuAberto ? 'true' : undefined}
+        aria-label="Menu principal"
+      >
         <div className="brand-wrapper">
           <img
             key={logoSrc}
@@ -66,10 +137,11 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             HORIZONTE
           </span>
           <button
+            ref={closeButtonRef}
             type="button"
             className="mobile-close-btn"
             aria-label="Fechar menu"
-            onClick={() => setMenuAberto(false)}
+            onClick={closeMenu}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
@@ -82,7 +154,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               end
               {...navPrefetchHandlers('/dashboard')}
               className={({ isActive }) => mergeNavItemClass(isActive, '/dashboard', pathname)}
-              onClick={() => setMenuAberto(false)}
+              onClick={closeMenu}
             >
               <span className="icon-wrap">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -101,7 +173,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               end
               {...navPrefetchHandlers('/transacoes')}
               className={({ isActive }) => mergeNavItemClass(isActive, '/transacoes', pathname)}
-              onClick={() => setMenuAberto(false)}
+              onClick={closeMenu}
             >
               <span className="icon-wrap">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -120,7 +192,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               {...navPrefetchHandlers('/relatorios')}
               title="Gráficos, resumo do período e exportação CSV ou PDF"
               className={({ isActive }) => mergeNavItemClass(isActive, '/relatorios', pathname)}
-              onClick={() => setMenuAberto(false)}
+              onClick={closeMenu}
             >
               <span className="icon-wrap">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -139,7 +211,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               {...navPrefetchHandlers('/pagamento')}
               title="Assinatura mensal Mercado Pago"
               className={({ isActive }) => mergeNavItemClass(isActive, '/pagamento', pathname)}
-              onClick={() => setMenuAberto(false)}
+              onClick={closeMenu}
             >
               <span className="icon-wrap">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -160,7 +232,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               {...navPrefetchHandlers('/configuracoes')}
               title="Perfil, tema, biometria e dados"
               className={({ isActive }) => mergeNavItemClass(isActive, '/configuracoes', pathname, 'nav-item--settings')}
-              onClick={() => setMenuAberto(false)}
+              onClick={closeMenu}
             >
               <span className="icon-wrap">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -190,7 +262,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   end
                   {...navPrefetchHandlers('/admin/usuarios')}
                   className={({ isActive }) => mergeNavItemClass(isActive, '/admin/usuarios', pathname)}
-                  onClick={() => setMenuAberto(false)}
+                  onClick={closeMenu}
                 >
                   <span className="icon-wrap">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -209,7 +281,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   end
                   {...navPrefetchHandlers('/admin/pagamentos')}
                   className={({ isActive }) => mergeNavItemClass(isActive, '/admin/pagamentos', pathname)}
-                  onClick={() => setMenuAberto(false)}
+                  onClick={closeMenu}
                 >
                   <span className="icon-wrap">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

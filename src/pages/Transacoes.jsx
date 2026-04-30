@@ -4,7 +4,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
 import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
 import { useTheme } from '../context/ThemeContext'
-import { useTransactionCache } from '../context/TransactionCacheContext'
+import { useTransactionCache } from '../context/transactionCacheStore'
 import { apiUrl } from '../lib/apiUrl'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
@@ -582,6 +582,7 @@ export default function Transacoes() {
                               setEditingTransaction(t)
                               setIsModalOpen(true)
                             }}
+                            aria-label={`Editar transação ${t.descricao || 'sem descrição'}`}
                             title="Editar"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -589,7 +590,13 @@ export default function Transacoes() {
                               <path d="m15 5 4 4" />
                             </svg>
                           </button>
-                          <button type="button" className="btn-delete" onClick={() => handleDelete(t.id)} title="Excluir">
+                          <button
+                            type="button"
+                            className="btn-delete"
+                            onClick={() => handleDelete(t.id)}
+                            aria-label={`Excluir transação ${t.descricao || 'sem descrição'}`}
+                            title="Excluir"
+                          >
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                               <path d="M3 6h18" />
                               <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />

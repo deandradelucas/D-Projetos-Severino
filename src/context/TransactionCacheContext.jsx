@@ -7,8 +7,6 @@
  * Não usa biblioteca externa — apenas Context API nativo do React.
  */
 import React, {
-  createContext,
-  useContext,
   useCallback,
   useRef,
   useState,
@@ -18,8 +16,7 @@ import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { readHorizonteUser } from '../lib/horizonteSession'
-
-const TransactionCacheContext = createContext(null)
+import { TransactionCacheContext } from './transactionCacheStore'
 
 /**
  * Provider — deve envolver o App (ou pelo menos as páginas autenticadas).
@@ -145,14 +142,3 @@ export function TransactionCacheProvider({ children }) {
   )
 }
 
-/**
- * Hook para consumir a store de transações.
- * Lança erro descritivo se usado fora do Provider.
- */
-export function useTransactionCache() {
-  const ctx = useContext(TransactionCacheContext)
-  if (!ctx) {
-    throw new Error('useTransactionCache deve ser usado dentro de <TransactionCacheProvider>')
-  }
-  return ctx
-}

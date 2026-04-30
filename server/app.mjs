@@ -28,7 +28,6 @@ import {
   listUsuariosAdminPaged,
   updateUsuarioAdmin,
   deleteUsuarioAdmin,
-  buscarUsuarioPorTelefone,
 } from './lib/usuarios.mjs'
 import { insertAdminAuditLog, listAdminAuditLog } from './lib/admin-audit.mjs'
 import { askHorizon } from './lib/ai.mjs'

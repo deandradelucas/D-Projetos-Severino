@@ -291,7 +291,7 @@ ATENÇÃO: Nunca responda com texto puro. Sempre use o formato JSON acima. Se a 
       const parsed = tryParseJsonBlock(text)
       const sanitized = sanitizeTransacaoExtraidaIA(parsed, categoriasUsuario)
       return enriquecerCategoriaPorTexto(message, sanitized, categoriasUsuario)
-    } catch (e) {
+    } catch {
       // Fallback 1: Tenta extrair o básico (valor/tipo) localmente
       const simples = fallbackParseMensagemSimples(message)
       if (simples) return enriquecerCategoriaPorTexto(message, simples, categoriasUsuario)
@@ -336,6 +336,4 @@ export function sanitizeTransacaoExtraidaIA(extractedData, categoriasUsuario) {
   return extractedData
 }
 
-/** Re-exportando para compatibilidade (embora agora residam em domain/) */
-export { enriquecerCategoriaPorTexto, fallbackParseMensagemSimples } from './domain/transaction-heuristics.mjs'
 export { resolverUsuarioIdPorTelefoneGemini } from './ai-phone-resolver.mjs'

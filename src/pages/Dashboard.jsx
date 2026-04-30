@@ -6,7 +6,7 @@ import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import { useTheme } from '../context/ThemeContext'
-import { useTransactionCache } from '../context/TransactionCacheContext'
+import { useTransactionCache } from '../context/transactionCacheStore'
 import { readHorizonteUser, readHorizonteUserPainelState } from '../lib/horizonteSession'
 import { primeiroNomeExibicao } from '../lib/primeiroNomeExibicao'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
@@ -27,7 +27,6 @@ export default function Dashboard() {
     revalidating: refreshing,
     error: fetchError,
     fetchTransacoes,
-    addTransactionOptimistic,
   } = useTransactionCache()
 
   useEffect(() => {

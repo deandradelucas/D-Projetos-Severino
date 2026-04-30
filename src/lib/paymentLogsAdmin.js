@@ -1,5 +1,3 @@
-import { formatCurrencyBRL } from './formatCurrency'
-
 /** Resposta da API admin (formato atual). */
 export function normalizePaymentLogsResponse(data) {
   if (Array.isArray(data)) {
@@ -240,5 +238,3 @@ export function computeOperationalInsights(rows, summary) {
     summaryTruncated: summary?.summaryTruncated === true,
   }
 }
-
-export { formatCurrencyBRL }

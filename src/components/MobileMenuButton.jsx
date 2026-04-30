@@ -2,9 +2,17 @@ export default function MobileMenuButton({
   onClick,
   className = 'mobile-menu-btn',
   'aria-label': ariaLabel = 'Abrir menu',
+  ...props
 }) {
   return (
-    <button type="button" className={className} onClick={onClick} aria-label={ariaLabel}>
+    <button
+      type="button"
+      className={className}
+      onClick={onClick}
+      aria-label={ariaLabel}
+      aria-haspopup="dialog"
+      {...props}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"

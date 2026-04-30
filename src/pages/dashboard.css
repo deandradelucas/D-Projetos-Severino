@@ -1253,6 +1253,7 @@ body[data-theme='light'] .pagamento-banner {
 
   .btn-primary,
   .btn-secondary,
+  .btn-edit,
   .relatorios-btn-export {
     min-height: 48px;
     min-width: 44px;
@@ -1479,51 +1480,6 @@ body[data-theme='light'] .pagamento-banner {
   text-transform: none !important;
   letter-spacing: 0 !important;
   line-height: 1.5 !important;
-}
-
-.page-admin-usuarios-kpis {
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-}
-
-.page-admin-usuarios-kpis--finance {
-  margin-top: 4px;
-}
-
-.page-admin-usuarios-kpi-sm {
-  font-size: 1rem !important;
-  line-height: 1.25;
-  word-break: break-word;
-}
-
-.page-admin-usuarios-insights {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 0 0 14px;
-}
-
-.page-admin-usuarios-insight-card {
-  flex: 1;
-  min-width: 200px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: rgba(148, 163, 184, 0.06);
-  font-size: 13px;
-}
-
-.page-admin-usuarios-insight-k {
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.page-admin-usuarios-insight-v {
-  font-weight: 800;
-  white-space: nowrap;
 }
 
 .page-admin-usuarios-adv-filters {
@@ -1886,10 +1842,6 @@ body[data-theme='light'] .pagamento-banner {
   background: transparent;
   color: inherit;
   cursor: pointer;
-}
-
-.page-admin-doc-link-wrap {
-  margin: 6px 0 0;
 }
 
 .page-admin-doc-link {
@@ -4047,6 +3999,17 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-fil
   gap: 8px;
 }
 
+.relatorios-shortcut-btn {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.relatorios-shortcut-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 18%, transparent);
+}
+
 .relatorios-filter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -4579,299 +4542,6 @@ body[data-theme='light'] .relatorios-kpi-saldo--neg {
   }
 }
 
-/* --- Dashboard Enhancements: Skeletons & Charts --- */
-
-/* =========================================
-   Transição entre rotas (painel principal)
-   ========================================= */
-.route-transition-skeleton {
-  position: fixed;
-  z-index: 150;
-  pointer-events: none;
-  top: 24px;
-  right: 24px;
-  bottom: 24px;
-  left: calc(24px + 260px);
-  animation: route-skeleton-enter 0.14s ease-out both;
-}
-
-@keyframes route-skeleton-enter {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.route-transition-skeleton__panel {
-  height: 100%;
-  border-radius: 0 38px 38px 0;
-  background: var(--bg-card);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 20px 44px -22px rgba(15, 23, 42, 0.15);
-  overflow: hidden;
-  position: relative;
-}
-
-.route-transition-skeleton__shine {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 35%,
-    rgba(212, 168, 75, 0.07) 50%,
-    transparent 65%
-  );
-  background-size: 220% 100%;
-  animation: route-skeleton-shine 1.05s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@keyframes route-skeleton-shine {
-  0% {
-    background-position: 100% 0;
-  }
-
-  100% {
-    background-position: -100% 0;
-  }
-}
-
-.route-transition-skeleton__inner {
-  position: relative;
-  z-index: 1;
-  padding: 20px 24px 24px;
-  height: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.route-transition-skeleton__header {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.route-transition-skeleton__title {
-  height: 28px;
-  width: min(300px, 58%);
-  border-radius: 10px;
-}
-
-.route-transition-skeleton__subtitle {
-  height: 14px;
-  width: 180px;
-  border-radius: 7px;
-}
-
-.route-transition-skeleton__kpis {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.route-transition-skeleton__kpi.skeleton-card {
-  height: 124px;
-  min-height: 0;
-  margin: 0;
-}
-
-.route-transition-skeleton__block.skeleton-chart {
-  flex: 1;
-  min-height: 140px;
-  margin: 0;
-}
-
-@media (max-width: 1024px) {
-  .route-transition-skeleton__kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .route-transition-skeleton {
-    left: max(10px, env(safe-area-inset-left));
-    right: max(10px, env(safe-area-inset-right));
-    top: max(10px, env(safe-area-inset-top));
-    bottom: max(10px, env(safe-area-inset-bottom));
-  }
-
-  .route-transition-skeleton__panel {
-    border-radius: 22px;
-  }
-
-  .route-transition-skeleton__kpis {
-    grid-template-columns: 1fr;
-  }
-
-  .route-transition-skeleton__inner {
-    padding: 16px 14px 18px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .route-transition-skeleton__shine {
-    animation: none;
-    opacity: 0.35;
-  }
-
-  .route-transition-skeleton {
-    animation: none;
-    opacity: 0.96;
-  }
-}
-
-/* =========================================
-   ENHANCED SKELETON LOADING SYSTEM
-   ========================================= */
-
-/* Skeleton Animations */
-@keyframes shimmer {
-  0% { background-position: -468px 0; }
-  100% { background-position: 468px 0; }
-}
-
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-@keyframes skeleton-wave {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Base Skeleton */
-.skeleton {
-  background: var(--bg-card);
-  border-radius: 8px;
-  position: relative;
-  overflow: hidden;
-}
-
-.skeleton::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-  animation: skeleton-wave 1.5s infinite;
-}
-
-/* Skeleton Card - Realistic KPI Card */
-.skeleton-card {
-  height: 140px;
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.skeleton-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.skeleton-icon {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-}
-
-.skeleton-text {
-  height: 12px;
-  width: 80px;
-  border-radius: 6px;
-}
-
-.skeleton-value {
-  height: 32px;
-  width: 60%;
-  border-radius: 8px;
-}
-
-.skeleton-badge {
-  height: 14px;
-  width: 50%;
-  border-radius: 7px;
-  margin-top: 4px;
-}
-
-/* Skeleton Chart */
-.skeleton-chart {
-  height: 350px;
-  width: 100%;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  padding: 24px;
-  gap: 16px;
-}
-
-.skeleton-chart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.skeleton-chart-title {
-  height: 20px;
-  width: 150px;
-  border-radius: 6px;
-}
-
-.skeleton-chart-legend {
-  display: flex;
-  gap: 16px;
-}
-
-.skeleton-chart-legend span {
-  height: 12px;
-  width: 60px;
-  border-radius: 6px;
-}
-
-.skeleton-chart-area {
-  flex: 1;
-  border-radius: 12px;
-  position: relative;
-}
-
-/* Staggered Animation for Multiple Skeletons */
-.skeleton-stagger > * {
-  animation: skeleton-fade-in 0.3s ease-out forwards;
-  opacity: 0;
-}
-
-.skeleton-stagger > *:nth-child(1) { animation-delay: 0ms; }
-.skeleton-stagger > *:nth-child(2) { animation-delay: 100ms; }
-.skeleton-stagger > *:nth-child(3) { animation-delay: 200ms; }
-.skeleton-stagger > *:nth-child(4) { animation-delay: 300ms; }
-.skeleton-stagger > *:nth-child(5) { animation-delay: 400ms; }
-.skeleton-stagger > *:nth-child(6) { animation-delay: 500ms; }
-
-@keyframes skeleton-fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Pulse variant for smaller elements */
-.skeleton-pulse {
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
-}
-
 /* Editar / excluir — histórico de transações */
 .btn-edit {
   background: transparent;
@@ -4920,6 +4590,13 @@ body[data-theme='light'] .relatorios-kpi-saldo--neg {
   transform: translateY(0);
 }
 
+.btn-edit:focus-visible,
+.btn-delete:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 22%, transparent);
+}
+
 /* Modos de Visualização */
 .privacy-blur {
   filter: blur(8px) !important;
@@ -4960,6 +4637,12 @@ body[data-theme='light'] .relatorios-kpi-saldo--neg {
 
 .switch-apple:checked::before {
   left: 22px;
+}
+
+.switch-apple:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 20%, transparent);
 }
 
 /* =========================================
@@ -5813,6 +5496,7 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card
 }
 
 .config-btn-ghost {
+  min-height: 44px;
   padding: 10px 16px;
   border-radius: 12px;
   font-size: 13px;
@@ -5827,6 +5511,12 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card
 .config-btn-ghost:hover {
   background: rgba(212, 168, 75, 0.08);
   border-color: rgba(212, 168, 75, 0.35);
+}
+
+.config-btn-ghost:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 18%, transparent);
 }
 
 .config-pref-row {
@@ -6281,6 +5971,12 @@ body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relat
   outline: 2px solid var(--accent);
   outline-offset: 3px;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 60%, transparent);
+}
+
+.dashboard-container.app-horizon-shell .mobile-close-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 28%, transparent);
 }
 
 /* Dashboard: faixa de KPIs — Saldo, Saída e Entrada na mesma linha (grid no .ref-kpi-row) */
@@ -9507,8 +9203,8 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-actions-cell .btn-edit,
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-actions-cell .btn-delete {
-    min-width: 42px;
-    min-height: 42px;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   /* Dashboard — transações recentes em cartões (sem coluna Ações; mesma leitura que em Transações) */

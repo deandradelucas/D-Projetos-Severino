@@ -388,6 +388,7 @@ export default function Relatorios() {
                 className="dashboard-hub__btn dashboard-hub__btn--secondary relatorios-btn-export"
                 onClick={exportToCSV}
                 disabled={transacoes.length === 0}
+                aria-label="Exportar relatório em CSV"
                 title="Exportar CSV"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
@@ -398,6 +399,7 @@ export default function Relatorios() {
                 className="dashboard-hub__btn dashboard-hub__btn--primary relatorios-btn-export"
                 onClick={exportToPDF}
                 disabled={transacoes.length === 0 || pdfExportLoading}
+                aria-label={pdfExportLoading ? 'Gerando relatório em PDF' : 'Exportar relatório em PDF'}
                 title={pdfExportLoading ? 'Gerando PDF…' : 'Baixar PDF'}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -453,10 +455,10 @@ export default function Relatorios() {
           >
             <div className="relatorios-filter-grid page-relatorios-filter-grid">
               <div className="relatorios-shortcuts-row col-span-full flex flex-wrap gap-2 mb-2">
-                <button type="button" onClick={() => setPeriodShortcut('thisMonth')} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Este Mês</button>
-                <button type="button" onClick={() => setPeriodShortcut('lastMonth')} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Mês Passado</button>
-                <button type="button" onClick={() => setPeriodShortcut('last90')} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Últimos 90 dias</button>
-                <button type="button" onClick={() => setPeriodShortcut('thisYear')} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Este Ano</button>
+                <button type="button" onClick={() => setPeriodShortcut('thisMonth')} className="relatorios-shortcut-btn px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Este Mês</button>
+                <button type="button" onClick={() => setPeriodShortcut('lastMonth')} className="relatorios-shortcut-btn px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Mês Passado</button>
+                <button type="button" onClick={() => setPeriodShortcut('last90')} className="relatorios-shortcut-btn px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Últimos 90 dias</button>
+                <button type="button" onClick={() => setPeriodShortcut('thisYear')} className="relatorios-shortcut-btn px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Este Ano</button>
               </div>
               <div className="filter-group">
                 <label htmlFor="rel-ini">Data início</label>
