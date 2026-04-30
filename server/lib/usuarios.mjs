@@ -14,9 +14,9 @@ import { actorCanAssignAdminRole, normalizeRoleKey } from './admin-role-policy.m
 
 export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
   const supabaseAdmin = getSupabaseAdmin()
-  
+
   const clean = String(telefoneLimpo || '').replace(/\D/g, '')
-  
+
   const { data, error } = await supabaseAdmin
     .from('usuarios')
     .update({ telefone: clean })
@@ -32,6 +32,29 @@ export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
   }
 
   return data
+}
+
+export async function atualizarWhatsappId(usuarioId, whatsappId) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const digits = String(whatsappId || '').replace(/\D/g, '')
+  if (!digits) return
+  const { error } = await supabaseAdmin
+    .from('usuarios')
+    .update({ whatsapp_id: digits })
+    .eq('id', usuarioId)
+    .is('whatsapp_id', null)
+  if (error) log.warn('[atualizarWhatsappId] Erro:', error.message)
+}
+
+export async function vincularWhatsappId(usuarioId, whatsappId) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const digits = String(whatsappId || '').replace(/\D/g, '')
+  if (!digits) throw new Error('whatsapp_id vazio')
+  const { error } = await supabaseAdmin
+    .from('usuarios')
+    .update({ whatsapp_id: digits })
+    .eq('id', usuarioId)
+  if (error) throw error
 }
 
 /**
@@ -149,7 +172,7 @@ export async function buscarUsuarioPorTelefone(telefoneLimpo, options = {}) {
   for (const v of variants) {
     const { data, error } = await supabaseAdmin
       .from('usuarios')
-      .select('id, email, telefone')
+      .select('id, nome, email, telefone, whatsapp_id')
       .eq('telefone', v)
       .maybeSingle()
 
@@ -159,7 +182,7 @@ export async function buscarUsuarioPorTelefone(telefoneLimpo, options = {}) {
 
   const { data: allUsers, error: errAll } = await supabaseAdmin
     .from('usuarios')
-    .select('id, email, telefone')
+    .select('id, nome, email, telefone, whatsapp_id')
     .not('telefone', 'is', null)
 
   if (errAll || !allUsers?.length) return null
@@ -183,7 +206,7 @@ export async function buscarUsuarioPorTelefone(telefoneLimpo, options = {}) {
   // Fallback: busca por whatsapp_id (LID do WhatsApp) quando telefone não bate
   const { data: byWhatsappId } = await supabaseAdmin
     .from('usuarios')
-    .select('id, email, telefone, whatsapp_id')
+    .select('id, nome, email, telefone, whatsapp_id')
     .eq('whatsapp_id', telefoneLimpo)
     .maybeSingle()
   if (byWhatsappId) return byWhatsappId

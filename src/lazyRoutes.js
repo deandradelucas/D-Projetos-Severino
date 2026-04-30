@@ -19,9 +19,6 @@ export const loadRelatorios = () => import('./pages/Relatorios.jsx')
 export const Relatorios = lazy(loadRelatorios)
 
 
-export const loadAdminWhatsApp = () => import('./pages/AdminWhatsApp.jsx')
-export const AdminWhatsApp = lazy(loadAdminWhatsApp)
-
 export const loadAdminUsuarios = () => import('./pages/AdminUsuarios.jsx')
 export const AdminUsuarios = lazy(loadAdminUsuarios)
 
@@ -41,7 +38,6 @@ const ROUTE_PREFETCH = {
   '/transacoes': loadTransacoes,
   '/configuracoes': loadConfiguracoes,
   '/relatorios': loadRelatorios,
-  '/admin/whatsapp': loadAdminWhatsApp,
   '/admin/usuarios': loadAdminUsuarios,
   '/admin/pagamentos': loadAdminPagamentos,
   '/pagamento': loadPagamento,

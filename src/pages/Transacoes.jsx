@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useWhatsAppContactUrl } from '../hooks/useWhatsAppContactUrl'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
@@ -248,7 +247,7 @@ export default function Transacoes() {
 
   const filtroRecorrentesAtivo = filters.lancamentos === 'recorrentes'
 
-  const whatsappContactUrl = useWhatsAppContactUrl()
+  const whatsappContactUrl = 'https://wa.me/5547999895014'
 
   return (
     <>

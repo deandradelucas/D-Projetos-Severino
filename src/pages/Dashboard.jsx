@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { useWhatsAppContactUrl } from '../hooks/useWhatsAppContactUrl'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
@@ -82,7 +81,7 @@ export default function Dashboard() {
 
   const nomeExibicao = useMemo(() => primeiroNomeExibicao(usuario), [usuario])
 
-  const whatsappContactUrl = useWhatsAppContactUrl()
+  const whatsappContactUrl = 'https://wa.me/5547999895014'
 
   const formatCurrency = formatCurrencyBRL
 

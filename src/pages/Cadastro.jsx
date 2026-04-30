@@ -91,6 +91,7 @@ export default function Cadastro() {
       }
 
       showToast('Conta criada com sucesso!', 'success')
+
       setTimeout(() => {
         navigate('/login')
       }, 1500)

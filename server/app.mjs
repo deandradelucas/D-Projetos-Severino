@@ -25,15 +25,12 @@ import {
 } from './lib/recorrencias-mensais.mjs'
 import {
   getPerfilUsuario,
-  getWhatsappLogs,
-  getWhatsappStatus,
   listUsuariosAdminPaged,
   updateUsuarioAdmin,
   deleteUsuarioAdmin,
+  buscarUsuarioPorTelefone,
 } from './lib/usuarios.mjs'
 import { insertAdminAuditLog, listAdminAuditLog } from './lib/admin-audit.mjs'
-import { handleWhatsAppWebhook } from './lib/whatsapp.mjs'
-import { resolveWhatsAppWebhookToken } from './lib/whatsapp-webhook-secret.mjs'
 import { askHorizon } from './lib/ai.mjs'
 import {
   buscarPagamentoPorId,
@@ -80,6 +77,7 @@ import {
   listCredentialSummariesForUser,
 } from './lib/webauthn.mjs'
 import { TransactionService } from './lib/services/transaction-service.mjs'
+import { assertBotSecret, processarMensagemBot } from './lib/domain/whatsapp-bot.mjs'
 
 loadEnv()
 
@@ -166,23 +164,6 @@ app.get('/api/health', (c) =>
     mercadopago: { configured: isMercadoPagoConfigured() },
   })
 )
-
-/** Contato WhatsApp (link ou número) — público; use quando o front não tiver VITE_WHATSAPP_*. */
-function whatsappContactUrlFromEnv() {
-  const link = process.env.WHATSAPP_CONTACT_LINK?.trim()
-  if (link) return link
-  const phone = String(process.env.WHATSAPP_CONTACT_PHONE || '').replace(/\D/g, '')
-  if (phone) return `https://wa.me/${phone}`
-  return 'https://wa.me/5547999895014'
-}
-
-app.get('/api/public/whatsapp-contact', (c) => c.json({ url: whatsappContactUrlFromEnv() }))
-
-function whatsappWebhookBaseUrl(c) {
-  const explicit = String(process.env.WHATSAPP_WEBHOOK_BASE_URL || '').trim()
-  if (explicit) return explicit.replace(/\/+$/, '')
-  return getRequestOrigin(c).replace(/\/+$/, '')
-}
 
 /** Painel interno: token MP configurado e path do webhook (sem segredos). */
 app.get('/api/admin/mp-saude', async (c) => {
@@ -716,86 +697,6 @@ app.get('/api/usuarios/perfil', async (c) => {
   } catch (error) {
     log.error('get perfil failed', error)
     return c.json({ message: 'Erro ao buscar perfil.' }, 500)
-  }
-})
-
-// Webhook Whatsapp (Wildcard para suportar sub-paths da Evolution API v2)
-app.post('/api/whatsapp/webhook/:pathToken/*', async (c) => {
-  const result = await handleWhatsAppWebhook(c.req, { pathToken: c.req.param('pathToken') })
-  return c.json(result.json, result.status)
-})
-
-app.post('/api/whatsapp/webhook/:pathToken', async (c) => {
-  const result = await handleWhatsAppWebhook(c.req, { pathToken: c.req.param('pathToken') })
-  return c.json(result.json, result.status)
-})
-
-app.post('/api/whatsapp/webhook', async (c) => {
-  const result = await handleWhatsAppWebhook(c.req)
-  return c.json(result.json, result.status)
-})
-
-app.get('/api/whatsapp/webhook', (c) => {
-  return c.text('Webhook do WhatsApp está ativo! Utilize o método POST para enviar dados da plataforma.')
-})
-
-// Webhook Logs Admin (Simplified Admin route based on user ID checking logic for the future, right now just returning all)
-app.get('/api/admin/whatsapp-status', async (c) => {
-  try {
-    const usuarioId = c.req.header('x-user-id')
-    const block = await assertPrincipalAdmin(usuarioId)
-    if (block) return c.json({ message: block.message }, block.status)
-
-    const status = await getWhatsappStatus()
-    return c.json(status)
-  } catch (error) {
-    log.error('get admin status failed', error)
-    return c.json({ message: 'Erro ao buscar status do whatsapp.' }, 500)
-  }
-})
-
-app.get('/api/admin/whatsapp-logs', async (c) => {
-  try {
-    const usuarioId = c.req.header('x-user-id')
-    const block = await assertPrincipalAdmin(usuarioId)
-    if (block) return c.json({ message: block.message }, block.status)
-
-    const logs = await getWhatsappLogs()
-    return c.json(logs)
-  } catch (error) {
-    log.error('get admin logs failed', error)
-    return c.json({ message: 'Erro ao buscar logs do whatsapp.' }, 500)
-  }
-})
-
-app.get('/api/admin/whatsapp-config', async (c) => {
-  try {
-    const usuarioId = c.req.header('x-user-id')
-    const block = await assertPrincipalAdmin(usuarioId)
-    if (block) return c.json({ message: block.message }, block.status)
-
-    const origin = whatsappWebhookBaseUrl(c)
-    const { token, missingInProduction } = resolveWhatsAppWebhookToken()
-    if (missingInProduction || !token) {
-      return c.json({
-        webhookUrlQuery: null,
-        webhookUrlPath: null,
-        missingToken: true,
-        hint:
-          'Defina WHATSAPP_WEBHOOK_TOKEN nas variáveis de ambiente (ex.: Vercel). Em produção não existe token padrão no código por segurança.',
-      })
-    }
-    const enc = encodeURIComponent(token)
-    return c.json({
-      webhookUrlQuery: `${origin}/api/whatsapp/webhook?token=${enc}`,
-      webhookUrlPath: `${origin}/api/whatsapp/webhook/${enc}`,
-      missingToken: false,
-      hint:
-        'Cole uma dessas URLs na configuração de Webhook Global da Evolution API. Sem o token correto, mensagens são rejeitadas.',
-    })
-  } catch (error) {
-    log.error('get whatsapp config failed', error)
-    return c.json({ message: 'Erro ao montar URL do webhook.' }, 500)
   }
 })
 
@@ -1497,6 +1398,34 @@ app.post('/api/ai/chat', async (c) => {
       { message: 'Não foi possível processar sua pergunta agora. Tente novamente.' },
       500,
     )
+  }
+})
+
+// WhatsApp Bot — chamado pelo n8n após receber mensagem da Evolution API
+app.post('/api/whatsapp/bot/mensagem', async (c) => {
+  const auth = assertBotSecret(c.req.header('Authorization'))
+  if (!auth.ok) return c.json({ message: auth.message }, auth.status)
+
+  let body
+  try {
+    body = await c.req.json()
+  } catch {
+    return c.json({ message: 'JSON inválido.' }, 400)
+  }
+
+  const phone = String(body?.phone || '').replace(/\D/g, '')
+  const message = String(body?.message || '').trim()
+
+  if (!phone || !message) {
+    return c.json({ message: 'phone e message são obrigatórios.' }, 400)
+  }
+
+  try {
+    const result = await processarMensagemBot(phone, message)
+    return c.json(result)
+  } catch (error) {
+    log.error('[whatsapp-bot] processarMensagemBot failed', error)
+    return c.json({ ok: false, reply: '❌ Erro interno. Tente novamente.' }, 500)
   }
 })
 

@@ -29,7 +29,6 @@ export default function Configuracoes() {
   const [webauthnLoading, setWebauthnLoading] = useState(false)
   const [webauthnError, setWebauthnError] = useState(null)
   const [bioRegistering, setBioRegistering] = useState(false)
-
   const usuarioIdHeader = String(perfil?.id ?? '').trim()
 
   const showToast = useCallback((msg) => {
@@ -369,9 +368,6 @@ export default function Configuracoes() {
                 Acesso a logs e usuários (conta com perfil administrador).
               </p>
               <div className="config-admin-strip">
-                <Link className="config-btn-ghost" to="/admin/whatsapp" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
-                  Logs WhatsApp
-                </Link>
                 <Link className="config-btn-ghost" to="/admin/usuarios" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
                   Logs usuários
                 </Link>

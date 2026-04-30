@@ -18,7 +18,6 @@ import {
   Transacoes,
   Configuracoes,
   Relatorios,
-  AdminWhatsApp,
   AdminUsuarios,
   AdminPagamentos,
   Pagamento,
@@ -56,7 +55,6 @@ function App() {
                   <Route path="/configuracoes" element={<Configuracoes />} />
                 </Route>
                 <Route element={<SuperAdminOutlet />}>
-                  <Route path="/admin/whatsapp" element={<AdminWhatsApp />} />
                   <Route path="/admin/usuarios" element={<AdminUsuarios />} />
                   <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
                 </Route>
