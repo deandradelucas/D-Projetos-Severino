@@ -40,12 +40,11 @@ function useHorizonShellDock() {
       const mobile = window.matchMedia('(max-width: 768px)').matches
       const fabSize = mobile ? 52 : 56
       const insetH = mobile ? 10 : 8
-      const hasBottomNav = mobile && Boolean(document.querySelector('.mobile-bottom-nav'))
       /* “Sobe” o FAB: maior offset = mais alto na tela; pode sobrepor o card */
       const lift = mobile ? 14 : 40
       const gap = 8
 
-      const fabBottom = hasBottomNav ? 220 : Math.max(insetH, window.innerHeight - r.bottom + lift)
+      const fabBottom = Math.max(insetH, window.innerHeight - r.bottom + lift)
       const fabRight = Math.max(insetH, window.innerWidth - r.right + insetH)
 
       if (mobile) {
@@ -64,9 +63,7 @@ function useHorizonShellDock() {
             left: `${left}px`,
             width: `${w}px`,
             right: 'auto',
-            bottom: hasBottomNav
-              ? 'calc(96px + env(safe-area-inset-bottom, 0px))'
-              : 'max(12px, env(safe-area-inset-bottom, 0px))',
+            bottom: 'max(12px, env(safe-area-inset-bottom, 0px))',
             maxWidth: `${w}px`,
             maxHeight: 'min(64dvh, 500px)',
             height: 'min(64dvh, 500px)',
