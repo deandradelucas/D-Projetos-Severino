@@ -97,9 +97,14 @@ export default function Dashboard() {
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div className="dashboard-hub__hero-text">
+              <span className="dashboard-hub__eyebrow">Visão geral</span>
               <h1 className="dashboard-hub__title">
                 {getSaudacao()}, <span className={privacyMode ? 'privacy-blur' : ''}>{nomeExibicao}</span>
               </h1>
+              <div className="dashboard-hub__balance-line" aria-label="Saldo disponível no painel">
+                <span>Saldo disponível</span>
+                <strong className={privacyMode ? 'privacy-blur' : ''}>{formatCurrency(saldoTotal)}</strong>
+              </div>
             </div>
             <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos do painel">
               <button type="button" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={() => setIsModalOpen(true)}>
@@ -330,6 +335,21 @@ export default function Dashboard() {
         </main>
       </div>
     </div>
+
+    <button
+      type="button"
+      className="dashboard-mobile-tx-fab"
+      onClick={() => setIsModalOpen(true)}
+      aria-label="Criar nova transação"
+    >
+      <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 5v14" />
+          <path d="M5 12h14" />
+        </svg>
+      </span>
+      <span className="dashboard-mobile-tx-fab__label">Nova transação</span>
+    </button>
 
     <TransactionModal
       isOpen={isModalOpen}

@@ -968,6 +968,10 @@ body[data-theme='light'] .pagamento-banner {
   display: none;
 }
 
+.dashboard-mobile-tx-fab {
+  display: none;
+}
+
 /* Base Responsive adjustments */
 @media (max-width: 768px) {
   .dashboard-container {
@@ -1289,6 +1293,10 @@ body[data-theme='light'] .pagamento-banner {
     padding-bottom: calc(96px + var(--safe-bottom));
   }
 
+  body:has(.dashboard-mobile-tx-fab) .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    padding-bottom: calc(148px + var(--safe-bottom));
+  }
+
   .mobile-bottom-nav {
     position: fixed;
     left: max(10px, var(--safe-left));
@@ -1397,11 +1405,85 @@ body[data-theme='light'] .pagamento-banner {
   body[data-theme='light'] .mobile-bottom-nav__item--active {
     color: #111827;
   }
+
+  .dashboard-mobile-tx-fab {
+    position: fixed;
+    left: 50%;
+    bottom: calc(92px + var(--safe-bottom));
+    z-index: 76;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    max-width: calc(100vw - 148px);
+    padding: 0 16px 0 12px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 30% 0%, rgba(255, 255, 255, 0.38), transparent 42%),
+      linear-gradient(135deg, #9b5cf6 0%, #7c3aed 52%, #5b21b6 100%);
+    color: #ffffff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 850;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    box-shadow:
+      0 18px 42px -20px rgba(91, 33, 182, 0.92),
+      0 8px 22px -14px rgba(15, 23, 42, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transform: translateX(-50%);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease,
+      background 0.18s ease;
+  }
+
+  .dashboard-mobile-tx-fab:active {
+    transform: translateX(-50%) scale(0.96);
+  }
+
+  .dashboard-mobile-tx-fab:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+    box-shadow:
+      0 0 0 5px rgba(124, 58, 237, 0.36),
+      0 18px 42px -20px rgba(91, 33, 182, 0.92);
+  }
+
+  .dashboard-mobile-tx-fab__icon {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  .dashboard-mobile-tx-fab__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  body[data-theme='light'] .dashboard-mobile-tx-fab {
+    border-color: rgba(255, 255, 255, 0.34);
+    box-shadow:
+      0 20px 46px -22px rgba(91, 33, 182, 0.72),
+      0 8px 24px -16px rgba(15, 23, 42, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  }
 }
 
 @media (max-width: 768px) and (prefers-reduced-motion: reduce) {
   .mobile-backdrop,
-  .mobile-bottom-nav__item {
+  .mobile-bottom-nav__item,
+  .dashboard-mobile-tx-fab {
     animation: none;
     transition: none;
   }
@@ -6148,6 +6230,9 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
   flex: 1 1 0%;
   min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
 }
 
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
@@ -6169,6 +6254,50 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   line-height: 1.18;
   overflow-wrap: anywhere;
   word-break: normal;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  color: var(--hub-muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--hub-accent);
+  box-shadow: 0 0 0 4px var(--hub-accent-soft);
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 8px;
+  color: var(--hub-muted);
+  font-size: clamp(0.74rem, 0.26vw + 0.68rem, 0.86rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+  min-width: 0;
+  color: var(--hub-title);
+  font-size: clamp(0.9rem, 0.42vw + 0.78rem, 1.05rem);
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Transações: uma linha; título com prioridade (ellipsis se não couber) */
@@ -6267,6 +6396,17 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
   background-image: none;
 }
 
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(124, 58, 237, 0.13), transparent 36%),
+    radial-gradient(circle at 96% 18%, rgba(212, 168, 75, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.88));
+  border-color: rgba(226, 232, 240, 0.9);
+  box-shadow:
+    0 18px 46px -28px rgba(79, 70, 229, 0.26),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
   -webkit-backdrop-filter: blur(10px) saturate(1.06);
   backdrop-filter: blur(10px) saturate(1.06);
@@ -6277,6 +6417,13 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   box-shadow:
     0 12px 40px -20px rgba(0, 0, 0, 0.45),
     0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(139, 92, 246, 0.22), transparent 38%),
+    radial-gradient(circle at 100% 18%, rgba(228, 188, 106, 0.1), transparent 34%),
+    linear-gradient(180deg, rgba(23, 31, 44, 0.9), rgba(8, 13, 22, 0.8));
 }
 
 /* Com rolagem: blur(1px) — mesmo “grão” do fundo do shell (index.css .app-routes-grow). */
@@ -6538,6 +6685,30 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
     align-items: center;
   }
 
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    padding: 12px 12px 13px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__eyebrow {
+    display: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    font-size: clamp(1.25rem, 5vw, 1.5rem);
+    line-height: 1.05;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+    gap: 6px;
+    font-size: 11px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+    font-size: 13px;
+  }
+
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
     width: 100%;
     flex-wrap: nowrap;
@@ -6551,13 +6722,7 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
-    flex: 0 1 auto;
-    min-width: 0;
-    padding-left: 10px;
-    padding-right: 10px;
-    min-height: 40px;
-    font-size: 11px;
-    font-weight: 700;
+    display: none;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
