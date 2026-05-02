@@ -6,12 +6,12 @@ import {
   daysUntilLabel,
   exportPaymentLogsCsv,
   filterPaymentLogsClient,
-  formatCurrencyBRL,
   formatDatePt,
   formatDateTimePt,
   downloadTextFile,
   sortPaymentLogRows,
 } from '../../lib/paymentLogsAdmin'
+import { formatCurrencyBRL } from '../../lib/formatCurrency'
 
 const TABLE_HEADERS = [
   'Registro',
