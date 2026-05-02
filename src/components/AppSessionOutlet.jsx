@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
 import AuthenticatedNavPrefetch from './AuthenticatedNavPrefetch'
+import MobileBottomNav from './MobileBottomNav'
 
 function readUser() {
   try {
@@ -135,6 +136,7 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
     <>
       {requireAppAccess ? <AuthenticatedNavPrefetch /> : null}
       <Outlet />
+      {requireAppAccess ? <MobileBottomNav /> : null}
     </>
   )
 }

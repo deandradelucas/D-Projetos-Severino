@@ -964,6 +964,10 @@ body[data-theme='light'] .pagamento-banner {
   display: none;
 }
 
+.mobile-bottom-nav {
+  display: none;
+}
+
 /* Base Responsive adjustments */
 @media (max-width: 768px) {
   .dashboard-container {
@@ -1276,11 +1280,130 @@ body[data-theme='light'] .pagamento-banner {
     min-height: 44px;
     padding: 10px;
   }
+
+  body:has(.mobile-bottom-nav) .dashboard-container.app-horizon-shell .main-content {
+    padding-bottom: calc(96px + var(--safe-bottom));
+  }
+
+  body:has(.mobile-bottom-nav) .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    padding-bottom: calc(96px + var(--safe-bottom));
+  }
+
+  .mobile-bottom-nav {
+    position: fixed;
+    left: max(10px, var(--safe-left));
+    right: max(10px, var(--safe-right));
+    bottom: max(8px, var(--safe-bottom));
+    z-index: 70;
+    display: block;
+    pointer-events: none;
+  }
+
+  .mobile-bottom-nav__bar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    width: min(440px, 100%);
+    margin: 0 auto;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 26px;
+    background:
+      linear-gradient(180deg, rgba(22, 22, 22, 0.86), rgba(5, 5, 5, 0.92)),
+      rgba(5, 5, 5, 0.88);
+    -webkit-backdrop-filter: blur(22px) saturate(1.18);
+    backdrop-filter: blur(22px) saturate(1.18);
+    box-shadow:
+      0 20px 50px -22px rgba(0, 0, 0, 0.72),
+      inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    pointer-events: auto;
+  }
+
+  .mobile-bottom-nav__item {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    min-height: 56px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    border-radius: 20px;
+    color: rgba(245, 245, 245, 0.64);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      color 0.18s ease,
+      background 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .mobile-bottom-nav__item:active {
+    transform: scale(0.96);
+  }
+
+  .mobile-bottom-nav__item:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .mobile-bottom-nav__icon {
+    display: grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+  }
+
+  .mobile-bottom-nav__icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .mobile-bottom-nav__label {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-bottom-nav__item--active {
+    color: #0a0a0a;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.42), transparent 48%),
+      linear-gradient(180deg, #efd184 0%, var(--accent) 100%);
+    box-shadow:
+      0 10px 24px -14px rgba(212, 168, 75, 0.86),
+      inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  }
+
+  body[data-theme='light'] .mobile-bottom-nav__bar {
+    border-color: rgba(15, 23, 42, 0.1);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(248, 250, 252, 0.94)),
+      rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 20px 48px -24px rgba(15, 23, 42, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  body[data-theme='light'] .mobile-bottom-nav__item {
+    color: rgba(15, 23, 42, 0.58);
+  }
+
+  body[data-theme='light'] .mobile-bottom-nav__item--active {
+    color: #111827;
+  }
 }
 
 @media (max-width: 768px) and (prefers-reduced-motion: reduce) {
-  .mobile-backdrop {
+  .mobile-backdrop,
+  .mobile-bottom-nav__item {
     animation: none;
+    transition: none;
   }
 }
 
@@ -8868,6 +8991,14 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
   .horizon-chat-fab {
     bottom: max(14px, calc(env(safe-area-inset-bottom, 0px) + 10px));
     right: max(12px, env(safe-area-inset-right, 0px));
+  }
+
+  body:has(.mobile-bottom-nav) .horizon-chat-fab {
+    bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  body:has(.mobile-bottom-nav) .horizon-chat-window {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 
