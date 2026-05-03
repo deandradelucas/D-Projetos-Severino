@@ -82,8 +82,10 @@ import {
   atualizarAgendaStatus,
   criarAgendaEvento,
   deletarAgendaEvento,
+  claimLembreteAgenda,
   listarAgendaEventos,
   listarEMarcarLembretesPendentes,
+  registrarFalhaLembreteAgenda,
   registrarLembretesAgendaEnviados,
 } from './lib/domain/agenda.mjs'
 
@@ -326,6 +328,9 @@ async function processAgendaReminderCron({ limit = 80 } = {}) {
   const failed = []
 
   for (const item of mensagens) {
+    const claimed = await claimLembreteAgenda(item)
+    if (!claimed) continue
+
     try {
       await sendEvolutionText({
         instance: process.env.EVOLUTION_INSTANCE,
@@ -335,6 +340,7 @@ async function processAgendaReminderCron({ limit = 80 } = {}) {
       await registrarLembretesAgendaEnviados([item])
       sent.push(item.reminder_id)
     } catch (error) {
+      await registrarFalhaLembreteAgenda(item, error?.message || 'Falha ao enviar lembrete.')
       failed.push({ reminder_id: item.reminder_id, error: error?.message || 'Falha ao enviar lembrete.' })
       log.error('[agenda-cron] send reminder failed', {
         reminder_id: item.reminder_id,

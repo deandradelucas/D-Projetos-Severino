@@ -18,6 +18,9 @@ const STATUS_FROM_DB = {
   concluido: 'CONCLUIDO',
   cancelado: 'CANCELADO',
 }
+const AGENDA_REMINDER_LOG_STATUS = 'AGENDA_LEMBRETE_OK'
+const AGENDA_REMINDER_CLAIM_STATUS = 'AGENDA_LEMB_CLAIM'
+const AGENDA_REMINDER_ERROR_STATUS = 'AGENDA_LEMB_ERRO'
 
 function cleanText(value, max = 500) {
   return String(value ?? '').trim().slice(0, max)
@@ -45,9 +48,14 @@ function parseReminderMinutes(value) {
 
 function reminderToDb(minutes, enabled = true) {
   const n = parseReminderMinutes(minutes)
-  if (!enabled || n <= 0) return 'sem-lembrete'
+  if (!enabled) return 'sem-lembrete'
+  if (n <= 0) return '0-min'
   if (n % 60 === 0) return `${n / 60}h`
   return `${n}-min`
+}
+
+function hasReminderEnabled(value) {
+  return !String(value || '').toLowerCase().includes('sem')
 }
 
 function parseDateOrThrow(value, label) {
@@ -90,7 +98,7 @@ function normalizeEvento(row) {
     fim: row.fim_em,
     timezone: AGENDA_TZ,
     lembrar_minutos_antes: reminder || 0,
-    whatsapp_notificar: reminder > 0,
+    whatsapp_notificar: hasReminderEnabled(row.lembrete),
     status: statusFromDb(row.situacao),
     origem: 'APP',
     confirmado_em: null,
@@ -274,7 +282,7 @@ export async function listarEMarcarLembretesPendentes({ limit = 50, marcarComoEn
   for (const row of rows || []) {
     const evento = normalizeEvento(row)
     const offset = evento.lembrar_minutos_antes || 0
-    if (!evento.whatsapp_notificar || offset <= 0) continue
+    if (!evento.whatsapp_notificar) continue
     const dueAt = new Date(new Date(evento.inicio).getTime() - offset * 60 * 1000)
     const lateLimit = new Date(now.getTime() - 15 * 60 * 1000)
     if (dueAt > now || dueAt < lateLimit) continue
@@ -295,7 +303,7 @@ export async function listarEMarcarLembretesPendentes({ limit = 50, marcarComoEn
     .from('whatsapp_logs')
     .select('mensagem_recebida')
     .in('mensagem_recebida', reminderKeys)
-    .eq('status', 'AGENDA_LEMBRETE_ENVIADO')
+    .in('status', [AGENDA_REMINDER_CLAIM_STATUS, AGENDA_REMINDER_LOG_STATUS])
   const sent = new Set((sentLogs || []).map((logRow) => logRow.mensagem_recebida))
   const userMap = new Map((usuarios || []).map((u) => [u.id, u]))
   const mensagens = []
@@ -327,21 +335,57 @@ export async function listarEMarcarLembretesPendentes({ limit = 50, marcarComoEn
   return { ok: true, total: mensagens.length, mensagens }
 }
 
+export async function claimLembreteAgenda(mensagem) {
+  const item = mensagem && typeof mensagem === 'object' ? mensagem : null
+  if (!item?.reminder_id) return false
+
+  const supabase = getSupabaseAdmin()
+  const { error } = await supabase.from('whatsapp_logs').insert({
+    telefone_remetente: item.phone,
+    mensagem_recebida: item.reminder_id,
+    status: AGENDA_REMINDER_CLAIM_STATUS,
+    detalhe_erro: null,
+    usuario_id: item.user_id,
+  })
+
+  if (!error) return true
+  if (error.code === '23505') return false
+  throw error
+}
+
 export async function registrarLembretesAgendaEnviados(mensagens = []) {
   const items = Array.isArray(mensagens) ? mensagens : []
   if (!items.length) return { ok: true, total: 0 }
 
   const supabase = getSupabaseAdmin()
-  const logs = items.map((m) => ({
-    telefone_remetente: m.phone,
-    mensagem_recebida: m.reminder_id,
-    status: 'AGENDA_LEMBRETE_ENVIADO',
-    detalhe_erro: null,
-    usuario_id: m.user_id,
-  }))
-  const { error } = await supabase.from('whatsapp_logs').insert(logs)
+  for (const m of items) {
+    const { error } = await supabase
+      .from('whatsapp_logs')
+      .update({ status: AGENDA_REMINDER_LOG_STATUS, detalhe_erro: null })
+      .eq('mensagem_recebida', m.reminder_id)
+      .eq('status', AGENDA_REMINDER_CLAIM_STATUS)
+
+    if (error) throw error
+  }
+  return { ok: true, total: items.length }
+}
+
+export async function registrarFalhaLembreteAgenda(mensagem, detalhe) {
+  const item = mensagem && typeof mensagem === 'object' ? mensagem : null
+  if (!item?.reminder_id) return { ok: true }
+
+  const supabase = getSupabaseAdmin()
+  const { error } = await supabase
+    .from('whatsapp_logs')
+    .update({
+      status: AGENDA_REMINDER_ERROR_STATUS,
+      detalhe_erro: cleanText(detalhe, 1000),
+    })
+    .eq('mensagem_recebida', item.reminder_id)
+    .eq('status', AGENDA_REMINDER_CLAIM_STATUS)
+
   if (error) throw error
-  return { ok: true, total: logs.length }
+  return { ok: true }
 }
 
 export async function registrarInteracaoAgendaWhatsApp({ usuarioId, telefone, mensagem, intencao, resposta, ok = true }) {

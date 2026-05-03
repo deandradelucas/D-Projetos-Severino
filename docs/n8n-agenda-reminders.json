@@ -7,13 +7,13 @@
           "interval": [
             {
               "field": "minutes",
-              "minutesInterval": 5
+              "minutesInterval": 1
             }
           ]
         }
       },
       "id": "b2c3d4e5-1001-4001-9001-000000000001",
-      "name": "A cada 5 minutos",
+      "name": "A cada 1 minuto",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [240, 300]
@@ -50,70 +50,14 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [480, 300]
-    },
-    {
-      "parameters": {
-        "jsCode": "const mensagens = $json.mensagens || [];\nreturn mensagens.map((item) => ({\n  json: {\n    phone: item.phone,\n    message: item.message,\n    reminder_id: item.reminder_id,\n    event_id: item.event_id,\n    title: item.title,\n  }\n}));"
-      },
-      "id": "b2c3d4e5-1003-4003-9003-000000000003",
-      "name": "Explodir mensagens",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [720, 300]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $env.EVOLUTION_API_URL + '/message/sendText/' + $env.EVOLUTION_INSTANCE }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "apikey",
-              "value": "={{ $env.EVOLUTION_API_KEY }}"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ number: $json.phone, text: $json.message }) }}",
-        "options": {
-          "timeout": 30000
-        }
-      },
-      "id": "b2c3d4e5-1004-4004-9004-000000000004",
-      "name": "Enviar WhatsApp Evolution",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [960, 300]
     }
   ],
   "connections": {
-    "A cada 5 minutos": {
+    "A cada 1 minuto": {
       "main": [
         [
           {
             "node": "Processar lembretes no Horizonte",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Processar lembretes no Horizonte": {
-      "main": [
-        []
-      ]
-    },
-    "Explodir mensagens": {
-      "main": [
-        [
-          {
-            "node": "Enviar WhatsApp Evolution",
             "type": "main",
             "index": 0
           }

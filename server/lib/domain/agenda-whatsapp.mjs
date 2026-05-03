@@ -8,8 +8,10 @@ import {
   AGENDA_TZ,
 } from './agenda.mjs'
 
-const AGENDA_RE =
-  /\b(agenda|compromisso|compromissos|reuni[aã]o|reuniao|evento|consulta|agendar|marcar|cancelar|reagendar|remarcar|confirmar|concluir|lembrete|avise|avisar)\b/i
+const AGENDA_KEYWORD_RE =
+  /\b(agenda|compromisso|compromissos|reuni[aã]o|reuniao|evento|consulta|consult[óo]rio|dentista|m[eé]dico|agendar|marcar|anotar|anota|cancelar|desmarcar|reagendar|remarcar|confirmar|concluir|finalizar|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar)\b/i
+const CREATE_INTENT_RE =
+  /\b(marcar|agendar|criar|adicionar|anotar|anota|colocar|inclui|incluir|tenho|terei|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar|consulta|reuni[aã]o|reuniao|evento|compromisso|dentista|m[eé]dico)\b/i
 
 const WEEKDAY_MAP = new Map([
   ['domingo', 0],
@@ -86,10 +88,13 @@ function nextWeekday(targetDay) {
 
 function parseTime(message) {
   const text = String(message || '').toLowerCase()
-  const match = text.match(/\b(?:as|às|a)\s*(\d{1,2})(?:[:h](\d{2}))?\b|\b(\d{1,2})h(\d{2})?\b/i)
+  const match = text.match(
+    /\b(?:as|às|a|para|pelas?)\s*(\d{1,2})(?:[:h](\d{2}))?\b|\b(\d{1,2})[:h](\d{2})\b|\b(\d{1,2})h\b/i
+  )
   if (!match) return null
-  const hour = Number.parseInt(match[1] || match[3], 10)
+  let hour = Number.parseInt(match[1] || match[3] || match[5], 10)
   const minute = Number.parseInt(match[2] || match[4] || '0', 10)
+  if (hour >= 1 && hour <= 11 && /\b(da|de)?\s*(tarde|noite)\b/.test(text)) hour += 12
   if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null
   return { hour, minute }
 }
@@ -98,6 +103,20 @@ export function parseAgendaDateTime(message, base = new Date()) {
   const raw = String(message || '')
   const text = stripAccents(raw.toLowerCase())
   const time = parseTime(text)
+
+  const relative = text.match(/\b(?:daqui\s+a|em)\s+(\d{1,3})\s*(min|minuto|minutos|hora|horas|h|dia|dias|semana|semanas)\b/)
+  if (relative) {
+    const amount = Number.parseInt(relative[1], 10)
+    const unit = relative[2]
+    if (!Number.isFinite(amount)) return null
+    const d = new Date(base)
+    if (unit.startsWith('min')) d.setUTCMinutes(d.getUTCMinutes() + amount)
+    else if (unit.startsWith('h') || unit.startsWith('hora')) d.setUTCHours(d.getUTCHours() + amount)
+    else if (unit.startsWith('dia')) d.setUTCDate(d.getUTCDate() + amount)
+    else if (unit.startsWith('semana')) d.setUTCDate(d.getUTCDate() + amount * 7)
+    return d
+  }
+
   if (!time) return null
 
   let parts = saoPauloParts(base)
@@ -127,22 +146,43 @@ export function parseAgendaDateTime(message, base = new Date()) {
 
 function parseReminderMinutes(message) {
   const text = stripAccents(String(message || '').toLowerCase())
-  const match = text.match(/\b(?:avise|avisar|lembre|lembrete).*?(\d{1,4})\s*(min|minutos|hora|horas|h)\b/)
+  const match = text.match(
+    /\b(?:avise|avisar|alerte|alerta|alertar|lembre|lembrar|lembra|lembrete).*?(\d{1,4})\s*(min|minuto|minutos|hora|horas|h)\s+antes\b|\b(\d{1,4})\s*(min|minuto|minutos|hora|horas|h)\s+antes\b/
+  )
   if (!match) return null
-  const n = Number.parseInt(match[1], 10)
+  const n = Number.parseInt(match[1] || match[3], 10)
   if (!Number.isFinite(n)) return null
-  const unit = match[2]
+  const unit = match[2] || match[4]
   return Math.min(unit.startsWith('h') || unit.startsWith('hora') ? n * 60 : n, 1440)
 }
 
 function extractTitle(message) {
   let text = String(message || '').trim()
-  text = text.replace(/^(marcar|agendar|criar|adicionar)\s+(um|uma|o|a)?\s*/i, '')
+  text = text.replace(/^(me\s+)?(marcar|agendar|criar|adicionar|anotar|anota|colocar|inclui|incluir|avise|avisar|alerte|alerta|alertar|lembra|lembrar|lembre|tenho|terei)\s+(de|para|um|uma|o|a)?\s*/i, '')
+  text = text.replace(/^(um|uma|o|a)\s+(compromisso|lembrete|evento)\s+(de|para)?\s*/i, '')
+  text = text.replace(/\b(me\s+)?(avise|avisar|alerte|alerta|alertar|lembre|lembrar|lembra)\b.*$/i, '')
   text = text.replace(/\b(hoje|amanh[aã]|depois de amanh[aã]|segunda|ter[cç]a|quarta|quinta|sexta|s[aá]bado|domingo)\b.*$/i, '')
+  text = text.replace(/\b(?:daqui\s+a|em)\s+\d{1,3}\s*(min|minuto|minutos|hora|horas|h|dia|dias|semana|semanas)\b.*$/i, '')
   text = text.replace(/\b(dia\s+)?\d{1,2}[/-]\d{1,2}([/-]\d{2,4})?.*$/i, '')
-  text = text.replace(/\b(?:as|às|a)\s*\d{1,2}([:h]\d{2})?\b.*$/i, '')
+  text = text.replace(/\b(?:as|às|a|para|pelas?)\s*\d{1,2}([:h]\d{2})?\b.*$/i, '')
+  text = text.replace(/\b\d{1,2}[:h]\d{2}\b.*$/i, '')
   const title = text.trim().replace(/\s+/g, ' ')
   return title.length >= 2 ? title.slice(0, 160) : 'Compromisso'
+}
+
+function hasCreateIntent(message) {
+  const text = String(message || '')
+  return CREATE_INTENT_RE.test(text) || /\b(me\s+)?(lembra|avise|alerte)\s+de\b/i.test(text)
+}
+
+function formatReminderLabel(minutes) {
+  const n = Number.parseInt(String(minutes ?? 0), 10)
+  if (!Number.isFinite(n) || n <= 0) return 'na hora marcada'
+  if (n % 60 === 0) {
+    const horas = n / 60
+    return `${horas} ${horas === 1 ? 'hora' : 'horas'} antes`
+  }
+  return `${n} min antes`
 }
 
 function formatLista(eventos, titulo = 'Agenda') {
@@ -177,7 +217,9 @@ function targetToken(message, verbs) {
 }
 
 export function isAgendaMessage(message) {
-  return AGENDA_RE.test(String(message || ''))
+  const raw = String(message || '')
+  if (AGENDA_KEYWORD_RE.test(raw)) return true
+  return hasCreateIntent(raw) && Boolean(parseAgendaDateTime(raw))
 }
 
 export async function processarMensagemAgenda(usuario, phone, rawMessage) {
@@ -191,13 +233,16 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
   try {
     const text = stripAccents(message.toLowerCase())
 
-    if (/\b(minha agenda|agenda hoje|compromissos hoje|hoje)\b/.test(text) && !/\b(marcar|agendar|criar|adicionar)\b/.test(text)) {
+    const createIntent = hasCreateIntent(message)
+    const inicioParaCriar = parseAgendaDateTime(message)
+
+    if (/\b(minha agenda|agenda hoje|compromissos hoje|hoje)\b/.test(text) && !createIntent) {
       intent = 'agenda_list_today'
       reply = formatLista(await listarProximos(usuario.id, true), 'Agenda de hoje')
       return { ok: true, reply }
     }
 
-    if (/\b(proximos|próximos|minha agenda|agenda|compromissos)\b/.test(message) && !/\b(marcar|agendar|criar|adicionar)\b/i.test(message)) {
+    if (/\b(proximos|próximos|minha agenda|agenda|compromissos)\b/.test(message) && !createIntent) {
       intent = 'agenda_list'
       reply = formatLista(await listarProximos(usuario.id, false), 'Próximos compromissos')
       return { ok: true, reply }
@@ -245,6 +290,28 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
       return { ok: true, reply }
     }
 
+    if (createIntent) {
+      intent = 'agenda_create'
+      const inicio = inicioParaCriar
+      if (!inicio) {
+        reply = '🗓️ Para criar na agenda, envie algo como: *marcar reunião amanhã às 15h* ou *me lembra de pagar a luz sexta 9h*.'
+        return { ok: true, reply }
+      }
+      const minutos = parseReminderMinutes(message) ?? 0
+      const data = await criarAgendaEvento(
+        usuario.id,
+        {
+          titulo: extractTitle(message),
+          inicio: inicio.toISOString(),
+          lembrar_minutos_antes: minutos,
+          whatsapp_notificar: true,
+        },
+        'WHATSAPP'
+      )
+      reply = `✅ Compromisso criado!\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}\nCódigo: ${data.id.slice(0, 8)}`
+      return { ok: true, reply }
+    }
+
     const reminderMinutes = parseReminderMinutes(message)
     if (reminderMinutes !== null) {
       intent = 'agenda_reminder_config'
@@ -260,29 +327,7 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
       return { ok: true, reply }
     }
 
-    if (/\b(marcar|agendar|criar|adicionar)\b/.test(text)) {
-      intent = 'agenda_create'
-      const inicio = parseAgendaDateTime(message)
-      if (!inicio) {
-        reply = '🗓️ Para criar na agenda, envie algo como: *marcar reunião amanhã às 15h*.'
-        return { ok: true, reply }
-      }
-      const minutos = parseReminderMinutes(message) ?? 15
-      const data = await criarAgendaEvento(
-        usuario.id,
-        {
-          titulo: extractTitle(message),
-          inicio: inicio.toISOString(),
-          lembrar_minutos_antes: minutos,
-          whatsapp_notificar: true,
-        },
-        'WHATSAPP'
-      )
-      reply = `✅ Compromisso criado!\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${data.lembrar_minutos_antes} min antes\nCódigo: ${data.id.slice(0, 8)}`
-      return { ok: true, reply }
-    }
-
-    reply = '🗓️ Posso ajudar com sua agenda. Ex.: *agenda hoje*, *marcar reunião amanhã 15h*, *confirmar 1*, *cancelar 1*.'
+    reply = '🗓️ Posso ajudar com sua agenda. Ex.: *agenda hoje*, *marcar reunião amanhã 15h*, *me lembra de pagar a luz sexta 9h*, *confirmar 1*, *cancelar 1*.'
     return { ok: true, reply }
   } catch (error) {
     ok = false

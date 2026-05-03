@@ -3,7 +3,7 @@
 ## Fluxos n8n
 
 - `docs/n8n-whatsapp-bot.json`: recebe mensagens da Evolution API e chama `/api/whatsapp/bot/mensagem`.
-- `docs/n8n-agenda-reminders.json`: roda a cada 5 minutos e chama `/api/cron/agenda-lembretes`; o backend busca, envia pela Evolution API e registra os lembretes enviados.
+- `docs/n8n-agenda-reminders.json`: roda a cada 1 minuto e chama `/api/cron/agenda-lembretes`; o backend busca, envia pela Evolution API e registra os lembretes enviados.
 
 ## Variáveis necessárias no n8n
 

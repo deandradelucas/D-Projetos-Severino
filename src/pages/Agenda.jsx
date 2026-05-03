@@ -85,6 +85,12 @@ function formatTime(iso) {
   }).format(new Date(iso))
 }
 
+function formatReminder(minutes) {
+  const n = Number.parseInt(String(minutes ?? 0), 10)
+  if (!Number.isFinite(n) || n <= 0) return 'Na hora'
+  return `${n} min`
+}
+
 function isToday(iso) {
   return saoPauloDateKey(iso) === saoPauloDateKey(new Date())
 }
@@ -349,7 +355,7 @@ export default function Agenda() {
                               <span className="agenda-event__halo" aria-hidden="true" />
                               <div className="agenda-event__time">
                                 <strong>{formatTime(evento.inicio)}</strong>
-                                <span>{evento.lembrar_minutos_antes} min</span>
+                                <span>{formatReminder(evento.lembrar_minutos_antes)}</span>
                               </div>
                               <div className="agenda-event__body">
                                 <div className="agenda-event__topline">
@@ -416,6 +422,7 @@ export default function Agenda() {
               <label className="agenda-field">
                 <span>Lembrete</span>
                 <select value={form.lembrar_minutos_antes} onChange={(e) => setForm((f) => ({ ...f, lembrar_minutos_antes: e.target.value }))}>
+                  <option value={0}>Na hora</option>
                   <option value={5}>5 min antes</option>
                   <option value={10}>10 min antes</option>
                   <option value={15}>15 min antes</option>
