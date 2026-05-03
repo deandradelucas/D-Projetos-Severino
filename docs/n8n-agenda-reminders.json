@@ -20,14 +20,14 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "={{ $env.HORIZONTE_API_URL + '/api/agenda/lembretes/pendentes' }}",
+        "method": "GET",
+        "url": "={{ $env.HORIZONTE_API_URL + '/api/cron/agenda-lembretes' }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Authorization",
-              "value": "={{ 'Bearer ' + ($env.AGENDA_REMINDER_SECRET || $env.WHATSAPP_BOT_SECRET) }}"
+              "value": "={{ 'Bearer ' + ($env.CRON_SECRET || $env.AGENDA_REMINDER_SECRET || $env.WHATSAPP_BOT_SECRET) }}"
             },
             {
               "name": "Content-Type",
@@ -35,9 +35,7 @@
             }
           ]
         },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ limit: 80, janelaMinutos: 5 }) }}",
+        "sendBody": false,
         "options": {
           "timeout": 30000,
           "response": {
@@ -48,7 +46,7 @@
         }
       },
       "id": "b2c3d4e5-1002-4002-9002-000000000002",
-      "name": "Buscar lembretes pendentes",
+      "name": "Processar lembretes no Horizonte",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [480, 300]
@@ -99,22 +97,16 @@
       "main": [
         [
           {
-            "node": "Buscar lembretes pendentes",
+            "node": "Processar lembretes no Horizonte",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Buscar lembretes pendentes": {
+    "Processar lembretes no Horizonte": {
       "main": [
-        [
-          {
-            "node": "Explodir mensagens",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Explodir mensagens": {

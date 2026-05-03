@@ -7233,6 +7233,13 @@ body[data-theme='light'] .ref-bottom-grid.ref-bottom-grid--single {
   grid-template-columns: minmax(0, 1fr);
 }
 
+@media (min-width: 769px) {
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-bottom-grid,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-bottom-grid {
+    margin-top: 28px;
+  }
+}
+
 body[data-theme='light'] .ref-panel {
   border-radius: 20px;
   border: 1px solid rgba(226, 232, 240, 0.98);
@@ -9799,19 +9806,29 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 6px;
+  max-width: 680px;
 }
 
 .agenda-page .dashboard-hub__title {
+  font-size: clamp(1.75rem, 2.45vw, 2.55rem);
+  line-height: 0.96;
   white-space: normal;
   overflow-wrap: anywhere;
 }
 
 .agenda-page .dashboard-hub__balance-line {
   display: block;
+  max-width: 600px;
+  color: var(--agenda-muted);
+  font-size: 0.92rem;
+  font-weight: 680;
 }
 
 .agenda-page .agenda-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 18px 20px 20px;
   background:
     radial-gradient(circle at 12% 0%, rgba(139, 92, 246, 0.1), transparent 34%),
     radial-gradient(circle at 96% 10%, rgba(212, 168, 75, 0.1), transparent 32%),
@@ -9825,10 +9842,179 @@ body[data-theme='dark'] .agenda-page .agenda-hero {
     linear-gradient(180deg, rgba(20, 28, 42, 0.92), rgba(8, 13, 22, 0.82));
 }
 
+.agenda-page .dashboard-hub__hero-row {
+  align-items: flex-start;
+  gap: 18px;
+  width: 100%;
+}
+
+.agenda-page .dashboard-hub__hero-actions {
+  margin-left: auto;
+}
+
+.agenda-page .dashboard-hub__hero-actions .dashboard-hub__btn--primary {
+  min-height: 44px;
+  padding-inline: 18px;
+  border-radius: 16px;
+  box-shadow: 0 16px 34px -22px rgba(91, 33, 182, 0.85);
+}
+
+.agenda-hero > *:not(.agenda-hero__orb) {
+  position: relative;
+  z-index: 1;
+}
+
+.agenda-hero__orb {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(2px);
+  opacity: 0.72;
+}
+
+.agenda-hero__orb--one {
+  right: 22%;
+  top: -68px;
+  width: 170px;
+  height: 170px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.22), transparent 68%);
+}
+
+.agenda-hero__orb--two {
+  right: -30px;
+  bottom: -86px;
+  width: 210px;
+  height: 210px;
+  background: radial-gradient(circle, rgba(212, 168, 75, 0.18), transparent 70%);
+}
+
+.agenda-hero__brief {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 92px;
+  margin-top: 18px;
+  padding: 16px 18px 16px 20px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 28px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(139, 92, 246, 0.16), transparent 34%),
+    linear-gradient(135deg, rgba(139, 92, 246, 0.09), rgba(212, 168, 75, 0.045) 52%, transparent),
+    rgba(255, 255, 255, 0.68);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.82) inset,
+    0 22px 52px -38px rgba(15, 23, 42, 0.5);
+}
+
+.agenda-hero__brief::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 5px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--agenda-accent), var(--agenda-accent-2));
+}
+
+body[data-theme='dark'] .agenda-hero__brief {
+  border-color: rgba(148, 163, 184, 0.14);
+  background:
+    linear-gradient(135deg, rgba(139, 92, 246, 0.12), transparent 48%),
+    rgba(2, 6, 23, 0.22);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 18px 46px -36px rgba(0, 0, 0, 0.85);
+}
+
+.agenda-hero__brief-main {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 6px;
+}
+
+.agenda-hero__next {
+  display: grid;
+  gap: 2px;
+}
+
+.agenda-hero__next strong {
+  overflow: hidden;
+  color: var(--agenda-ink);
+  font-size: clamp(1.04rem, 1.3vw, 1.28rem);
+  font-weight: 940;
+  letter-spacing: -0.03em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-hero__next span {
+  color: var(--agenda-muted);
+  font-size: 0.88rem;
+  font-weight: 760;
+}
+
+.agenda-hero__mini-stats {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.agenda-hero__mini-stats div {
+  display: grid;
+  min-width: 72px;
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.48));
+  text-align: center;
+}
+
+body[data-theme='dark'] .agenda-hero__mini-stats div {
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.agenda-hero__mini-stats strong {
+  color: var(--agenda-ink);
+  font-size: 1.05rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.agenda-hero__mini-stats span {
+  margin-top: 3px;
+  color: var(--agenda-muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.agenda-hero__chip {
+  flex: 0 0 auto;
+  padding: 9px 12px;
+  border-radius: 999px;
+  color: #5b21b6;
+  background: rgba(139, 92, 246, 0.12);
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+body[data-theme='dark'] .agenda-hero__chip {
+  color: #ddd6fe;
+  background: rgba(139, 92, 246, 0.18);
+}
+
 .agenda-kpis {
   display: grid;
-  grid-template-columns: 1.25fr repeat(3, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 2px;
 }
 
 .agenda-kpi,
@@ -9856,13 +10042,13 @@ body[data-theme='dark'] .agenda-list-panel {
 }
 
 .agenda-kpi {
-  min-height: 126px;
-  padding: 18px;
-  border-radius: 24px;
+  min-height: 146px;
+  padding: 20px;
+  border-radius: 30px;
 }
 
-.agenda-kpi span,
-.agenda-whatsapp-card__eyebrow {
+.agenda-kpi__top span,
+.agenda-section-eyebrow {
   color: var(--agenda-muted);
   font-size: 0.72rem;
   font-weight: 850;
@@ -9870,21 +10056,67 @@ body[data-theme='dark'] .agenda-list-panel {
   text-transform: uppercase;
 }
 
+.agenda-kpi__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.agenda-kpi__top i {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(139, 92, 246, 0.16);
+  border-radius: 14px;
+  color: #6d28d9;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.9), transparent 38%),
+    rgba(139, 92, 246, 0.11);
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+body[data-theme='dark'] .agenda-kpi__top i {
+  color: #ddd6fe;
+  border-color: rgba(139, 92, 246, 0.24);
+  background: rgba(139, 92, 246, 0.14);
+}
+
 .agenda-kpi strong {
   display: block;
-  margin-top: 10px;
+  margin-top: 18px;
   color: var(--agenda-ink);
-  font-size: clamp(2rem, 3.2vw, 3rem);
+  font-size: clamp(2.3rem, 3.4vw, 3.35rem);
   font-weight: 950;
   letter-spacing: -0.07em;
   line-height: 0.95;
 }
 
 .agenda-kpi p {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   color: var(--agenda-muted);
-  font-size: 0.9rem;
-  font-weight: 650;
+  font-size: 0.92rem;
+  font-weight: 720;
+}
+
+.agenda-kpi {
+  position: relative;
+  overflow: hidden;
+}
+
+.agenda-kpi::after {
+  content: '';
+  position: absolute;
+  right: 16px;
+  bottom: -42px;
+  width: 112px;
+  height: 112px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--agenda-accent) 13%, transparent);
+  opacity: 0.5;
 }
 
 .agenda-kpi--hero {
@@ -9920,8 +10152,8 @@ body[data-theme='dark'] .agenda-kpi--hero {
 }
 
 .agenda-list-panel {
-  padding: 20px;
-  border-radius: 30px;
+  padding: 22px;
+  border-radius: 34px;
 }
 
 .agenda-list-panel__header {
@@ -9973,42 +10205,88 @@ body[data-theme='dark'] .agenda-secondary-btn {
 }
 
 .agenda-day__cards {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
+.agenda-day__cards::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: 14px;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(148, 163, 184, 0.34), transparent);
+}
+
 .agenda-event {
+  position: relative;
   display: grid;
   grid-template-columns: 86px minmax(0, 1fr);
   gap: 14px;
-  padding: 14px;
+  padding: 15px;
   border: 1px solid rgba(148, 163, 184, 0.18);
-  border-left: 4px solid var(--agenda-accent);
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: 0 14px 32px -28px rgba(15, 23, 42, 0.34);
+  border-left: 0;
+  border-radius: 26px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.6)),
+    rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.72) inset,
+    0 18px 42px -34px rgba(15, 23, 42, 0.38);
+}
+
+.agenda-event::before {
+  content: '';
+  position: absolute;
+  top: 21px;
+  left: -2px;
+  width: 7px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--agenda-accent);
+  box-shadow: 0 0 0 5px rgba(139, 92, 246, 0.1);
+}
+
+.agenda-event__halo {
+  position: absolute;
+  right: -30px;
+  top: -46px;
+  width: 118px;
+  height: 118px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--agenda-accent) 10%, transparent);
+  pointer-events: none;
 }
 
 body[data-theme='dark'] .agenda-event {
-  background: rgba(2, 6, 23, 0.34);
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.72), rgba(2, 6, 23, 0.48)),
+    rgba(2, 6, 23, 0.34);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.055) inset,
+    0 18px 46px -36px rgba(0, 0, 0, 0.85);
 }
 
 .agenda-event--confirmed {
-  border-left-color: var(--agenda-success);
+  --agenda-accent: var(--agenda-success);
 }
 
 .agenda-event--done {
-  border-left-color: #64748b;
+  --agenda-accent: #64748b;
   opacity: 0.78;
 }
 
 .agenda-event--cancelled {
-  border-left-color: var(--agenda-danger);
+  --agenda-accent: var(--agenda-danger);
   opacity: 0.66;
 }
 
 .agenda-event__time {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -10035,6 +10313,7 @@ body[data-theme='dark'] .agenda-event {
 }
 
 .agenda-event__topline {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -10071,6 +10350,7 @@ body[data-theme='dark'] .agenda-event {
 
 .agenda-event__local,
 .agenda-event__desc {
+  position: relative;
   margin: 8px 0 0;
   color: var(--agenda-muted);
   font-size: 0.86rem;
@@ -10080,13 +10360,14 @@ body[data-theme='dark'] .agenda-event {
 
 .agenda-event__meta,
 .agenda-event__actions {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 12px;
 }
 
-.agenda-event__actions button {
+.agenda-event__actions .agenda-action {
   min-height: 34px;
   padding: 0 10px;
   border: 1px solid rgba(148, 163, 184, 0.22);
@@ -10099,8 +10380,30 @@ body[data-theme='dark'] .agenda-event {
   cursor: pointer;
 }
 
-body[data-theme='dark'] .agenda-event__actions button {
+body[data-theme='dark'] .agenda-event__actions .agenda-action {
   background: rgba(255, 255, 255, 0.06);
+}
+
+.agenda-event__actions .agenda-action--primary {
+  border-color: rgba(34, 197, 94, 0.26);
+  color: #166534;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+body[data-theme='dark'] .agenda-event__actions .agenda-action--primary {
+  color: #bbf7d0;
+  background: rgba(34, 197, 94, 0.14);
+}
+
+.agenda-event__actions .agenda-action--danger {
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #991b1b;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+body[data-theme='dark'] .agenda-event__actions .agenda-action--danger {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.12);
 }
 
 .agenda-empty {
@@ -10288,6 +10591,28 @@ body[data-theme='dark'] .agenda-field select {
     line-height: 1.35;
   }
 
+  .agenda-hero__brief {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+    gap: 8px;
+    min-height: auto;
+    margin-top: 12px;
+    padding: 12px 13px;
+  }
+
+  .agenda-hero__mini-stats {
+    width: 100%;
+  }
+
+  .agenda-hero__mini-stats div {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .agenda-hero__chip {
+    width: fit-content;
+  }
+
   .agenda-kpis {
     display: flex;
     gap: 10px;
@@ -10328,6 +10653,11 @@ body[data-theme='dark'] .agenda-field select {
     grid-template-columns: 1fr;
     gap: 10px;
     padding: 13px;
+  }
+
+  .agenda-event::before {
+    top: 17px;
+    height: 30px;
   }
 
   .agenda-event__time {
@@ -10581,6 +10911,571 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
 }
 
 @media (min-width: 769px) {
+}
+
+/* Dashboard black: override final para o card "Visão geral" vencer os imports anteriores. */
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+  background: #000000 !important;
+  background-image: none !important;
+  border: 0.5px solid #0b0b0b !important;
+  box-shadow: none !important;
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row,
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* =============================================================================
+   Dashboard home — mobile slim/minimalista
+   Escopo restrito ao dashboard inicial para não alterar outras páginas hub.
+   ============================================================================= */
+@media (max-width: 768px) {
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell {
+    padding: 0;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .main-content {
+    border: none;
+    box-shadow: none;
+    padding: 8px 8px calc(10px + var(--safe-bottom));
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 0 calc(136px + var(--safe-bottom));
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    margin-bottom: 0;
+    min-height: 0;
+    padding: 9px 10px;
+    border-radius: 20px;
+    box-shadow: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    gap: 8px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 14px;
+    box-shadow: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+    gap: 2px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+    font-size: clamp(1.06rem, 4.2vw, 1.28rem);
+    font-weight: 850;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+    font-size: 12px;
+    font-weight: 850;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+    gap: 6px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    margin: 0;
+    overflow: visible;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card {
+    min-height: 58px;
+    align-items: flex-start;
+    gap: 7px;
+    padding: 10px;
+    border-radius: 18px;
+    box-shadow: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card::after {
+    display: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__icon {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 11px;
+    box-shadow: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__label {
+    color: var(--text-secondary, #64748b) !important;
+    font-size: 9.5px;
+    font-weight: 760;
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__value,
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--hero .ref-kpi-card__value {
+    color: var(--text-primary, #0f172a) !important;
+    margin-top: 3px;
+    font-size: clamp(0.82rem, 3.2vw, 1rem);
+    font-weight: 880;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--hero {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-bottom-grid {
+    margin: 8px 0 0;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
+    padding: 12px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 16px 34px -30px rgba(15, 23, 42, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.52);
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-panel__head {
+    min-height: 0;
+    margin-bottom: 8px;
+    padding: 2px 2px 10px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__title {
+    font-size: 0.98rem;
+    font-weight: 850;
+    letter-spacing: -0.035em;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link {
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: 12px;
+    font-size: 0.74rem;
+    box-shadow: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-list {
+    gap: 8px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-list-head {
+    display: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-row,
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid > .ref-tx-row {
+    display: grid;
+    grid-template-areas:
+      "icon cat val"
+      "icon meta val";
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: 2px 10px;
+    align-items: center;
+    min-height: 62px;
+    padding: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 18px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-row::after {
+    display: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-icon-cell {
+    grid-area: icon;
+    align-self: center;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-arrow-wrap {
+    width: 30px;
+    height: 30px;
+    border-radius: 12px;
+    box-shadow: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-arrow-wrap svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-cat-cell {
+    grid-area: cat;
+    min-width: 0;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-meta-cell {
+    grid-area: meta;
+    min-width: 0;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-sub-cell {
+    grid-area: meta;
+    min-width: 0;
+    padding-left: 70px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-val-cell {
+    grid-area: val;
+    align-self: center;
+    justify-self: end;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-rec-cell {
+    display: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-field-label {
+    display: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text,
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text {
+    font-size: 0.86rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text {
+    max-width: calc(100% - 74px);
+    font-size: 0.72rem;
+    font-weight: 620;
+    line-height: 1.15;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-date {
+    display: inline-flex;
+    align-items: center;
+    max-width: 66px;
+    overflow: hidden;
+    color: var(--text-secondary);
+    font-size: 0.68rem;
+    font-weight: 720;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val {
+    font-size: 0.84rem;
+    font-weight: 880;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-empty-state {
+    padding: 18px 12px 20px;
+    border-radius: 18px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-empty {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.35;
+  }
+
+  .dashboard-mobile-tx-fab {
+    min-height: 46px;
+    max-width: calc(100vw - 168px);
+    padding: 0 13px 0 9px;
+    font-size: 12px;
+    box-shadow:
+      0 12px 30px -18px rgba(91, 33, 182, 0.8),
+      inset 0 1px 0 rgba(255, 255, 255, 0.26);
+  }
+
+  .dashboard-mobile-tx-fab__icon {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+@media (max-width: 380px) {
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--hero {
+    grid-column: 1 / -1;
+    min-height: 62px;
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 8px;
+    margin: 0;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--hero,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--hero {
+    flex: 1 1 auto !important;
+    flex-basis: auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    scroll-snap-align: none;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card {
+    min-height: 58px !important;
+    padding: 10px !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--hero,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--hero {
+    grid-column: 1 / -1;
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__label,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__label {
+    color: var(--text-secondary) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__value,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--hero .ref-kpi-card__value,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__value,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--hero .ref-kpi-card__value {
+    color: var(--text-primary);
+    font-size: clamp(0.82rem, 3.2vw, 1rem) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--expense .ref-kpi-card__value,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--expense .ref-kpi-card__value {
+    color: var(--danger) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--income .ref-kpi-card__value,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--income .ref-kpi-card__value {
+    color: var(--success) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions),
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) {
+    gap: 8px;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row {
+    display: grid !important;
+    grid-template-areas:
+      "icon cat val"
+      "icon meta val";
+    grid-template-columns: 34px minmax(0, 1fr) auto !important;
+    gap: 2px 10px !important;
+    min-height: 62px !important;
+    padding: 10px !important;
+    border-left: 0 !important;
+    border-radius: 18px !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row {
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.72)),
+      #ffffff !important;
+    border-color: rgba(226, 232, 240, 0.82) !important;
+    box-shadow: 0 12px 26px -24px rgba(15, 23, 42, 0.35) !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row {
+    background:
+      linear-gradient(135deg, rgba(19, 19, 23, 0.92), rgba(8, 8, 10, 0.78)),
+      #08080a !important;
+    border-color: rgba(255, 255, 255, 0.07) !important;
+    box-shadow: none !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) .ref-tx-arrow-wrap,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) .ref-tx-arrow-wrap {
+    width: 30px;
+    height: 30px;
+    border-radius: 12px;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) .ref-tx-date,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) .ref-tx-date {
+    max-width: 66px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    font-size: 0.68rem !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) .ref-tx-val,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) .ref-tx-val {
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    font-size: 0.84rem !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .main-content {
+    background: #f7f8fb;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
+    background: rgba(255, 255, 255, 0.86);
+    border-color: rgba(15, 23, 42, 0.06);
+    box-shadow: 0 10px 26px -24px rgba(15, 23, 42, 0.28);
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.74)),
+      #ffffff;
+    border-color: rgba(226, 232, 240, 0.78);
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow: 0 8px 24px -22px rgba(15, 23, 42, 0.28);
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__icon,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link {
+    background: rgba(15, 23, 42, 0.035);
+    border-color: rgba(15, 23, 42, 0.06);
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-row::after {
+    background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.08), transparent);
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-date {
+    color: rgba(71, 85, 105, 0.78);
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .main-content {
+    background:
+      radial-gradient(circle at 82% 4%, rgba(139, 92, 246, 0.08), transparent 28%),
+      linear-gradient(180deg, #050506 0%, #000000 100%);
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
+    background:
+      linear-gradient(180deg, rgba(19, 19, 23, 0.88), rgba(8, 8, 10, 0.84)),
+      rgba(8, 8, 10, 0.82);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    background: #000000;
+    background-image: none;
+    border: 0.5px solid #0b0b0b;
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card {
+    background: #000000;
+    border: 0.5px solid #0b0b0b;
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
+    background: #000000;
+    border: 0.5px solid #0b0b0b;
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__icon,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link {
+    background: rgba(255, 255, 255, 0.055);
+    border-color: rgba(255, 255, 255, 0.09);
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--income .ref-kpi-card__icon {
+    color: var(--success);
+    background: linear-gradient(165deg, color-mix(in srgb, var(--success) 22%, transparent) 0%, color-mix(in srgb, var(--success) 10%, transparent) 100%);
+    border-color: color-mix(in srgb, var(--success) 35%, transparent);
+    box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--success) 35%, transparent);
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--expense .ref-kpi-card__icon {
+    color: var(--danger);
+    background: linear-gradient(165deg, color-mix(in srgb, var(--danger) 20%, transparent) 0%, color-mix(in srgb, var(--danger) 10%, transparent) 100%);
+    border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+    box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--danger) 30%, transparent);
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-row::after {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.07), transparent);
+  }
+
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-date {
+    color: rgba(255, 255, 255, 0.58);
+  }
+}
+
+@media (max-width: 380px) {
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
 }
 
 /* Home dashboard: ajuste fino da logo no menu lateral */

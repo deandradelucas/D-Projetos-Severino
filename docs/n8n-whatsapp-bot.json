@@ -45,7 +45,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const data = $json.data || {};\nconst key = data.key || {};\nconst remoteJid = String(key.remoteJid || '');\n\n// Ignora mensagens de grupos\nif (remoteJid.endsWith('@g.us')) return [];\n\n// Extrai número (dígitos para lookup)\nconst phone = remoteJid.replace('@s.whatsapp.net', '').replace(/\\D/g, '');\n\n// Extrai texto ou metadados de áudio (vários formatos Evolution API)\nconst msg = data.message || {};\nconst audio = msg.audioMessage || msg.pttMessage || {};\nconst text = (\n  msg.conversation ||\n  msg.extendedTextMessage?.text ||\n  msg.imageMessage?.caption ||\n  msg.videoMessage?.caption ||\n  audio.caption ||\n  audio.transcription ||\n  audio.text ||\n  data.transcription ||\n  ''\n).trim();\n\nconst audioUrl = String(audio.url || audio.mediaUrl || audio.media_url || data.mediaUrl || data.audioUrl || data.url || '').trim();\nconst audioBase64 = String(audio.base64 || data.base64 || data.audioBase64 || '').trim();\nconst mimeType = String(audio.mimetype || audio.mimeType || data.mimetype || data.mimeType || 'audio/ogg');\n\n// Ignora mensagens sem texto e sem áudio (figurinhas, imagens sem legenda, etc.)\nif (!text && !audioUrl && !audioBase64) return [];\n\nreturn [{ json: { phone, message: text, remoteJid, audioUrl, audioBase64, mimeType, isAudio: Boolean(!text && (audioUrl || audioBase64)) } }];"
+        "jsCode": "const payload = $json.body || $json;\nconst event = String(payload.event || payload.type || '').toLowerCase();\nif (event && !event.includes('messages')) return [];\n\nconst data = payload.data || payload;\nconst key = data.key || {};\nconst remoteJid = String(key.remoteJid || '');\n\n// Ignora mensagens próprias e grupos\nif (!remoteJid || remoteJid.endsWith('@g.us') || key.fromMe) return [];\n\n// Extrai número (dígitos para lookup)\nconst phone = remoteJid.replace('@s.whatsapp.net', '').replace(/\\D/g, '');\n\n// Extrai texto ou metadados de áudio (vários formatos Evolution API)\nconst msg = data.message || {};\nconst audio = msg.audioMessage || msg.pttMessage || {};\nconst messageId = String(key.id || data.id || '').trim();\nconst text = (\n  msg.conversation ||\n  msg.extendedTextMessage?.text ||\n  msg.imageMessage?.caption ||\n  msg.videoMessage?.caption ||\n  audio.caption ||\n  audio.transcription ||\n  audio.text ||\n  data.transcription ||\n  ''\n).trim();\n\nconst audioUrl = String(audio.url || audio.mediaUrl || audio.media_url || data.mediaUrl || data.audioUrl || data.url || '').trim();\nconst audioBase64 = String(audio.base64 || data.base64 || data.audioBase64 || '').trim();\nconst mimeType = String(audio.mimetype || audio.mimeType || data.mimetype || data.mimeType || 'audio/ogg');\nconst hasAudio = Boolean(audioUrl || audioBase64 || (messageId && (msg.audioMessage || msg.pttMessage)));\n\n// Ignora mensagens sem texto e sem áudio (figurinhas, imagens sem legenda, etc.)\nif (!text && !hasAudio) return [];\n\nreturn [{ json: { phone, message: text, remoteJid, audioUrl, audioBase64, mimeType, messageId, evolutionInstance: data.instance || payload.instance, rawEvolutionData: payload, isAudio: Boolean(!text && hasAudio) } }];"
       },
       "id": "a1b2c3d4-0003-0003-0003-000000000003",
       "name": "Extrair telefone e mensagem",
@@ -72,7 +72,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ phone: $json.phone, message: $json.message, audioUrl: $json.audioUrl, audioBase64: $json.audioBase64, mimeType: $json.mimeType }) }}",
+        "jsonBody": "={{ ({ phone: $json.phone, message: $json.message, audioUrl: $json.audioUrl, audioBase64: $json.audioBase64, mimeType: $json.mimeType, messageId: $json.messageId, evolutionInstance: $json.evolutionInstance, rawEvolutionData: $json.rawEvolutionData || {} }) }}",
         "options": {
           "timeout": 30000,
           "response": {
@@ -167,7 +167,7 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "saveManualExecutions": true,

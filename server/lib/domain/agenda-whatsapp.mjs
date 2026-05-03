@@ -23,31 +23,62 @@ const WEEKDAY_MAP = new Map([
   ['sabado', 6],
 ])
 
+const SAO_PAULO_OFFSET = '-03:00'
+
+function pad2(value) {
+  return String(value).padStart(2, '0')
+}
+
+function saoPauloParts(date = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: AGENDA_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    weekday: 'short',
+  }).formatToParts(date)
+  const get = (type) => parts.find((part) => part.type === type)?.value
+  const key = `${get('year')}-${get('month')}-${get('day')}`
+  const weekdayName = String(get('weekday') || '').toLowerCase()
+  const weekday = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].indexOf(weekdayName.slice(0, 3))
+  return {
+    year: Number.parseInt(get('year'), 10),
+    month: Number.parseInt(get('month'), 10),
+    day: Number.parseInt(get('day'), 10),
+    key,
+    weekday: weekday >= 0 ? weekday : new Date(`${key}T00:00:00${SAO_PAULO_OFFSET}`).getUTCDay(),
+  }
+}
+
+function saoPauloDateFromParts({ year, month, day, hour = 0, minute = 0 }) {
+  return new Date(`${year}-${pad2(month)}-${pad2(day)}T${pad2(hour)}:${pad2(minute)}:00${SAO_PAULO_OFFSET}`)
+}
+
 function stripAccents(value) {
   return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
 function startOfToday() {
-  const d = new Date()
-  d.setHours(0, 0, 0, 0)
-  return d
+  const parts = saoPauloParts()
+  return saoPauloDateFromParts(parts)
 }
 
 function endOfToday() {
-  const d = new Date()
-  d.setHours(23, 59, 59, 999)
+  const parts = saoPauloParts()
+  const d = saoPauloDateFromParts({ ...parts, hour: 23, minute: 59 })
+  d.setUTCSeconds(59, 999)
   return d
 }
 
 function addDays(base, days) {
   const d = new Date(base)
-  d.setDate(d.getDate() + days)
+  d.setUTCDate(d.getUTCDate() + days)
   return d
 }
 
 function nextWeekday(targetDay) {
   const d = startOfToday()
-  const current = d.getDay()
+  const current = saoPauloParts(d).weekday
   let delta = targetDay - current
   if (delta <= 0) delta += 7
   return addDays(d, delta)
@@ -69,31 +100,29 @@ export function parseAgendaDateTime(message, base = new Date()) {
   const time = parseTime(text)
   if (!time) return null
 
-  let date = new Date(base)
-  date.setSeconds(0, 0)
+  let parts = saoPauloParts(base)
 
   const explicitDate = text.match(/\b(\d{1,2})[/-](\d{1,2})(?:[/-](\d{2,4}))?\b/)
   if (explicitDate) {
     const day = Number.parseInt(explicitDate[1], 10)
     const month = Number.parseInt(explicitDate[2], 10)
-    let year = explicitDate[3] ? Number.parseInt(explicitDate[3], 10) : date.getFullYear()
+    let year = explicitDate[3] ? Number.parseInt(explicitDate[3], 10) : parts.year
     if (year < 100) year += 2000
-    date = new Date(year, month - 1, day)
+    parts = { year, month, day }
   } else if (text.includes('depois de amanha')) {
-    date = addDays(startOfToday(), 2)
+    parts = saoPauloParts(addDays(startOfToday(), 2))
   } else if (text.includes('amanha')) {
-    date = addDays(startOfToday(), 1)
+    parts = saoPauloParts(addDays(startOfToday(), 1))
   } else {
     for (const [name, weekday] of WEEKDAY_MAP.entries()) {
       if (text.includes(name)) {
-        date = nextWeekday(weekday)
+        parts = saoPauloParts(nextWeekday(weekday))
         break
       }
     }
   }
 
-  date.setHours(time.hour, time.minute, 0, 0)
-  return date
+  return saoPauloDateFromParts({ ...parts, hour: time.hour, minute: time.minute })
 }
 
 function parseReminderMinutes(message) {

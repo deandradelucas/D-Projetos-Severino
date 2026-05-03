@@ -245,7 +245,7 @@ function buildReminderMessage(evento, offsetMinutos) {
   return `${prefix}\n\n*${evento.titulo}*\n🗓️ ${quando}${local}${desc}\n\nResponda: *confirmar ${evento.codigo}*, *concluir ${evento.codigo}* ou *reagendar ${evento.codigo} para amanhã 10h*.`
 }
 
-export async function listarEMarcarLembretesPendentes({ limit = 50 } = {}) {
+export async function listarEMarcarLembretesPendentes({ limit = 50, marcarComoEnviado = true } = {}) {
   const supabase = getSupabaseAdmin()
   const now = new Date()
   const from = new Date(now.getTime() - 15 * 60 * 1000).toISOString()
@@ -313,19 +313,26 @@ export async function listarEMarcarLembretesPendentes({ limit = 50 } = {}) {
     })
   }
 
-  if (mensagens.length) {
-    const logs = mensagens.map((m) => ({
-      telefone_remetente: m.phone,
-      mensagem_recebida: m.reminder_id,
-      status: 'AGENDA_LEMBRETE_ENVIADO',
-      detalhe_erro: null,
-      usuario_id: m.user_id,
-    }))
-    const { error: logErr } = await supabase.from('whatsapp_logs').insert(logs)
-    if (logErr) throw logErr
-  }
+  if (marcarComoEnviado) await registrarLembretesAgendaEnviados(mensagens)
 
   return { ok: true, total: mensagens.length, mensagens }
+}
+
+export async function registrarLembretesAgendaEnviados(mensagens = []) {
+  const items = Array.isArray(mensagens) ? mensagens : []
+  if (!items.length) return { ok: true, total: 0 }
+
+  const supabase = getSupabaseAdmin()
+  const logs = items.map((m) => ({
+    telefone_remetente: m.phone,
+    mensagem_recebida: m.reminder_id,
+    status: 'AGENDA_LEMBRETE_ENVIADO',
+    detalhe_erro: null,
+    usuario_id: m.user_id,
+  }))
+  const { error } = await supabase.from('whatsapp_logs').insert(logs)
+  if (error) throw error
+  return { ok: true, total: logs.length }
 }
 
 export async function registrarInteracaoAgendaWhatsApp({ usuarioId, telefone, mensagem, intencao, resposta, ok = true }) {

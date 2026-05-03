@@ -151,6 +151,11 @@ export default function Agenda() {
     }
   }, [eventos])
 
+  const nextEvento = useMemo(
+    () => eventos.find((ev) => ev.status !== 'CANCELADO' && ev.status !== 'CONCLUIDO') || null,
+    [eventos]
+  )
+
   const grouped = useMemo(() => {
     const map = new Map()
     for (const ev of eventos) {
@@ -243,13 +248,15 @@ export default function Agenda() {
           <div className="ref-dashboard-inner dashboard-hub agenda-shell">
             <RefDashboardScroll>
               <section className="dashboard-hub__hero agenda-hero" aria-label="Agenda e lembretes">
+                <span className="agenda-hero__orb agenda-hero__orb--one" aria-hidden="true" />
+                <span className="agenda-hero__orb agenda-hero__orb--two" aria-hidden="true" />
                 <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto(true)} />
                   <div className="dashboard-hub__hero-text">
                     <span className="dashboard-hub__eyebrow">Agenda</span>
-                    <h1 className="dashboard-hub__title">Seu dia, organizado</h1>
+                    <h1 className="dashboard-hub__title">Seu tempo no controle</h1>
                     <div className="dashboard-hub__balance-line">
-                      <span>Compromissos, lembretes e ações rápidas em um só lugar.</span>
+                      <span>Uma linha do tempo inteligente para compromissos, lembretes e comandos por voz.</span>
                     </div>
                   </div>
                   <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações da agenda">
@@ -258,26 +265,65 @@ export default function Agenda() {
                     </button>
                   </div>
                 </div>
+                <div className="agenda-hero__brief" aria-label="Próximo compromisso">
+                  <div className="agenda-hero__brief-main">
+                    <span className="agenda-section-eyebrow">Próximo compromisso</span>
+                    {nextEvento ? (
+                      <div className="agenda-hero__next">
+                        <strong>{nextEvento.titulo}</strong>
+                        <span>{formatDate(nextEvento.inicio)} às {formatTime(nextEvento.inicio)}</span>
+                      </div>
+                    ) : (
+                      <div className="agenda-hero__next">
+                        <strong>Sem pendências imediatas</strong>
+                        <span>Use o botão acima ou envie um áudio pelo WhatsApp.</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="agenda-hero__mini-stats" aria-label="Resumo rápido">
+                    <div>
+                      <strong>{stats.hoje}</strong>
+                      <span>hoje</span>
+                    </div>
+                    <div>
+                      <strong>{stats.whatsapp}</strong>
+                      <span>avisos</span>
+                    </div>
+                  </div>
+                  <span className="agenda-hero__chip">America/São_Paulo</span>
+                </div>
               </section>
 
               <section className="agenda-kpis" aria-label="Resumo da agenda">
                 <article className="agenda-kpi agenda-kpi--hero">
-                  <span>Hoje</span>
+                  <div className="agenda-kpi__top">
+                    <span>Hoje</span>
+                    <i aria-hidden="true">H</i>
+                  </div>
                   <strong>{stats.hoje}</strong>
                   <p>compromissos ativos</p>
                 </article>
                 <article className="agenda-kpi">
-                  <span>Próximos</span>
+                  <div className="agenda-kpi__top">
+                    <span>Próximos</span>
+                    <i aria-hidden="true">P</i>
+                  </div>
                   <strong>{stats.proximos}</strong>
                   <p>nos próximos 45 dias</p>
                 </article>
                 <article className="agenda-kpi">
-                  <span>Confirmados</span>
+                  <div className="agenda-kpi__top">
+                    <span>Confirmados</span>
+                    <i aria-hidden="true">C</i>
+                  </div>
                   <strong>{stats.confirmados}</strong>
                   <p>com presença marcada</p>
                 </article>
                 <article className="agenda-kpi">
-                  <span>WhatsApp</span>
+                  <div className="agenda-kpi__top">
+                    <span>WhatsApp</span>
+                    <i aria-hidden="true">W</i>
+                  </div>
                   <strong>{stats.whatsapp}</strong>
                   <p>com lembrete ativo</p>
                 </article>
@@ -286,7 +332,7 @@ export default function Agenda() {
               <section className="agenda-list-panel" aria-label="Lista de compromissos">
                 <div className="agenda-list-panel__header">
                   <div>
-                    <span className="agenda-whatsapp-card__eyebrow">Linha do tempo</span>
+                    <span className="agenda-section-eyebrow">Linha do tempo</span>
                     <h2>Próximos compromissos</h2>
                   </div>
                   <button type="button" className="agenda-secondary-btn" onClick={openNew}>Adicionar</button>
@@ -309,6 +355,7 @@ export default function Agenda() {
                         <div className="agenda-day__cards">
                           {group.rows.map((evento) => (
                             <article className={`agenda-event agenda-event--${eventTone(evento.status)}`} key={evento.id}>
+                              <span className="agenda-event__halo" aria-hidden="true" />
                               <div className="agenda-event__time">
                                 <strong>{formatTime(evento.inicio)}</strong>
                                 <span>{evento.lembrar_minutos_antes} min</span>
@@ -327,10 +374,10 @@ export default function Agenda() {
                                   <span>Código {evento.id.slice(0, 8)}</span>
                                 </div>
                                 <div className="agenda-event__actions">
-                                  <button type="button" onClick={() => openEdit(evento)}>Editar</button>
-                                  <button type="button" onClick={() => setStatus(evento, 'CONFIRMADO')}>Confirmar</button>
-                                  <button type="button" onClick={() => setStatus(evento, 'CONCLUIDO')}>Concluir</button>
-                                  <button type="button" onClick={() => setStatus(evento, 'CANCELADO')}>Cancelar</button>
+                                  <button type="button" className="agenda-action agenda-action--ghost" onClick={() => openEdit(evento)}>Editar</button>
+                                  <button type="button" className="agenda-action agenda-action--primary" onClick={() => setStatus(evento, 'CONFIRMADO')}>Confirmar</button>
+                                  <button type="button" className="agenda-action agenda-action--ghost" onClick={() => setStatus(evento, 'CONCLUIDO')}>Concluir</button>
+                                  <button type="button" className="agenda-action agenda-action--danger" onClick={() => setStatus(evento, 'CANCELADO')}>Cancelar</button>
                                 </div>
                               </div>
                             </article>
@@ -351,7 +398,7 @@ export default function Agenda() {
           <form className="agenda-modal" onSubmit={saveEvent}>
             <div className="agenda-modal__header">
               <div>
-                <span className="agenda-whatsapp-card__eyebrow">{editing ? 'Editar agenda' : 'Novo na agenda'}</span>
+                <span className="agenda-section-eyebrow">{editing ? 'Editar agenda' : 'Novo na agenda'}</span>
                 <h2>{editing ? 'Atualizar compromisso' : 'Criar compromisso'}</h2>
               </div>
               <button type="button" className="agenda-modal__close" onClick={() => setModalOpen(false)} aria-label="Fechar">×</button>

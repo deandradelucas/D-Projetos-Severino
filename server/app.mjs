@@ -84,6 +84,7 @@ import {
   deletarAgendaEvento,
   listarAgendaEventos,
   listarEMarcarLembretesPendentes,
+  registrarLembretesAgendaEnviados,
 } from './lib/domain/agenda.mjs'
 
 loadEnv()
@@ -110,6 +111,30 @@ function assertAgendaReminderSecret(c) {
   return { ok: false, status: 401, message: 'Não autorizado.' }
 }
 
+function assertAgendaCronSecret(c) {
+  const allowed = [
+    process.env.CRON_SECRET,
+    process.env.AGENDA_REMINDER_SECRET,
+    process.env.WHATSAPP_BOT_SECRET,
+  ]
+    .map((value) => String(value || '').trim())
+    .filter(Boolean)
+
+  if (!allowed.length) {
+    log.warn('[agenda-cron] nenhum segredo configurado')
+    return { ok: false, status: 503, message: 'Cron de agenda não configurado.' }
+  }
+
+  const auth = c.req.header('authorization') || ''
+  const bearer = auth.startsWith('Bearer ') ? auth.slice(7).trim() : ''
+  const headers = [bearer, c.req.header('x-cron-secret'), c.req.header('x-agenda-reminder-secret')]
+    .map((value) => String(value || '').trim())
+    .filter(Boolean)
+  if (headers.some((value) => allowed.includes(value))) return { ok: true }
+
+  return { ok: false, status: 401, message: 'Não autorizado.' }
+}
+
 function parseJsonEnv(value) {
   try {
     return value ? JSON.parse(value) : {}
@@ -125,9 +150,74 @@ function base64ToBuffer(value) {
   return Buffer.from(clean, 'base64')
 }
 
+function firstString(...values) {
+  for (const value of values) {
+    const s = String(value || '').trim()
+    if (s) return s
+  }
+  return ''
+}
+
+function extractBase64FromEvolutionResponse(data) {
+  return firstString(
+    data?.base64,
+    data?.media,
+    data?.base64Data,
+    data?.data?.base64,
+    data?.data?.media,
+    data?.data?.base64Data,
+    data?.file?.base64,
+    data?.message?.base64
+  )
+}
+
+async function audioBufferFromEvolutionMedia(body) {
+  const messageId = firstString(
+    body?.messageId,
+    body?.audioMessageId,
+    body?.rawEvolutionData?.data?.key?.id,
+    body?.rawEvolutionData?.key?.id,
+    body?.rawEvolutionData?.id
+  )
+  const baseUrl = firstString(process.env.EVOLUTION_API_URL, process.env.EVOLUTION_SERVER_URL)
+  const instance = firstString(
+    body?.evolutionInstance,
+    body?.instance,
+    body?.rawEvolutionData?.instance,
+    body?.rawEvolutionData?.data?.instance,
+    process.env.EVOLUTION_INSTANCE
+  )
+  const apiKey = firstString(body?.evolutionApiKey, process.env.EVOLUTION_API_KEY)
+
+  if (!messageId || !baseUrl || !instance || !apiKey) return null
+
+  const response = await fetch(`${baseUrl.replace(/\/+$/, '')}/chat/getBase64FromMediaMessage/${encodeURIComponent(instance)}`, {
+    method: 'POST',
+    headers: {
+      apikey: apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message: { key: { id: messageId } },
+      convertToMp4: false,
+    }),
+  })
+
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    throw new Error(`Evolution getBase64 ${response.status}: ${String(data?.message || data?.error || '').slice(0, 220)}`)
+  }
+
+  const b64 = extractBase64FromEvolutionResponse(data)
+  return base64ToBuffer(b64)
+}
+
 async function audioBufferFromWhatsAppBody(body) {
   const direct = base64ToBuffer(body?.audioBase64 || body?.base64 || body?.mediaBase64)
   if (direct?.length) return direct
+
+  const fromEvolution = await audioBufferFromEvolutionMedia(body)
+  if (fromEvolution?.length) return fromEvolution
 
   const audioUrl = String(body?.audioUrl || body?.mediaUrl || body?.url || '').trim()
   if (!audioUrl) return null
@@ -144,6 +234,124 @@ async function audioBufferFromWhatsAppBody(body) {
     throw new Error(`Falha ao baixar áudio (${response.status}).`)
   }
   return Buffer.from(await response.arrayBuffer())
+}
+
+async function processWhatsappBotBody(body) {
+  const phone = String(body?.phone || '').replace(/\D/g, '')
+  let message = String(body?.message || body?.text || body?.transcription || '').trim()
+  let inputType = 'text'
+
+  if (!message && (body?.audioBase64 || body?.base64 || body?.mediaBase64 || body?.audioUrl || body?.mediaUrl || body?.url || body?.messageId)) {
+    const audioBuffer = await audioBufferFromWhatsAppBody(body)
+    if (!audioBuffer?.length) {
+      return {
+        status: 400,
+        response: { ok: false, reply: '🎙️ Não consegui receber o áudio. Tente enviar novamente.' },
+      }
+    }
+    message = (await transcribeWhatsAppAudioWithGemini(audioBuffer, body?.mimeType || body?.mimetype || 'audio/ogg')).trim()
+    inputType = 'audio'
+  }
+
+  if (!phone || !message) {
+    return { status: 400, response: { message: 'phone e message ou áudio são obrigatórios.' } }
+  }
+
+  const result = await processarMensagemBot(phone, message)
+  return {
+    status: 200,
+    response: { ...result, inputType, transcript: inputType === 'audio' ? message : undefined },
+  }
+}
+
+function buildBotBodyFromEvolutionPayload(payload) {
+  const data = payload?.data || payload || {}
+  const key = data.key || {}
+  const remoteJid = String(key.remoteJid || '')
+  if (!remoteJid || remoteJid.endsWith('@g.us') || key.fromMe) return null
+
+  const msg = data.message || {}
+  const audio = msg.audioMessage || msg.pttMessage || {}
+  const text = firstString(
+    msg.conversation,
+    msg.extendedTextMessage?.text,
+    msg.imageMessage?.caption,
+    msg.videoMessage?.caption,
+    audio.caption,
+    audio.transcription,
+    audio.text,
+    data.transcription
+  )
+  const messageId = firstString(key.id, data.id)
+  const hasAudio = Boolean(audio.url || audio.mediaUrl || audio.media_url || data.mediaUrl || data.audioUrl || data.url || audio.base64 || data.base64 || data.audioBase64 || messageId && (msg.audioMessage || msg.pttMessage))
+
+  if (!text && !hasAudio) return null
+
+  return {
+    phone: remoteJid.replace('@s.whatsapp.net', '').replace(/\D/g, ''),
+    message: text,
+    audioUrl: firstString(audio.url, audio.mediaUrl, audio.media_url, data.mediaUrl, data.audioUrl, data.url),
+    audioBase64: firstString(audio.base64, data.base64, data.audioBase64),
+    mimeType: firstString(audio.mimetype, audio.mimeType, data.mimetype, data.mimeType, 'audio/ogg'),
+    messageId,
+    evolutionInstance: firstString(data.instance, payload?.instance),
+    rawEvolutionData: { data },
+  }
+}
+
+async function sendEvolutionText({ instance, number, text }) {
+  const baseUrl = firstString(process.env.EVOLUTION_API_URL, process.env.EVOLUTION_SERVER_URL)
+  const apiKey = firstString(process.env.EVOLUTION_API_KEY)
+  if (!baseUrl || !apiKey || !instance || !number || !text) return false
+
+  const response = await fetch(`${baseUrl.replace(/\/+$/, '')}/message/sendText/${encodeURIComponent(instance)}`, {
+    method: 'POST',
+    headers: {
+      apikey: apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ number, text, delay: 1000 }),
+  })
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '')
+    throw new Error(`Evolution sendText ${response.status}: ${detail.slice(0, 220)}`)
+  }
+  return true
+}
+
+async function processAgendaReminderCron({ limit = 80 } = {}) {
+  const result = await listarEMarcarLembretesPendentes({ limit, marcarComoEnviado: false })
+  const mensagens = Array.isArray(result?.mensagens) ? result.mensagens : []
+  const sent = []
+  const failed = []
+
+  for (const item of mensagens) {
+    try {
+      await sendEvolutionText({
+        instance: process.env.EVOLUTION_INSTANCE,
+        number: item.phone,
+        text: item.message,
+      })
+      await registrarLembretesAgendaEnviados([item])
+      sent.push(item.reminder_id)
+    } catch (error) {
+      failed.push({ reminder_id: item.reminder_id, error: error?.message || 'Falha ao enviar lembrete.' })
+      log.error('[agenda-cron] send reminder failed', {
+        reminder_id: item.reminder_id,
+        event_id: item.event_id,
+        user_id: item.user_id,
+        error: error?.message || error,
+      })
+    }
+  }
+
+  return {
+    ok: failed.length === 0,
+    total: mensagens.length,
+    sent: sent.length,
+    failed: failed.length,
+    failures: failed.slice(0, 5),
+  }
 }
 
 /** Contas com role ADMIN no banco ou o e-mail SUPER_ADMIN acessam /api/admin/*. */
@@ -1241,6 +1449,20 @@ app.post('/api/agenda/lembretes/pendentes', async (c) => {
   }
 })
 
+app.get('/api/cron/agenda-lembretes', async (c) => {
+  const auth = assertAgendaCronSecret(c)
+  if (!auth.ok) return c.json({ message: auth.message }, auth.status)
+
+  try {
+    const result = await processAgendaReminderCron({ limit: 80 })
+    log.info('[agenda-cron] processed reminders', result)
+    return c.json(result)
+  } catch (error) {
+    log.error('cron agenda lembretes', error)
+    return c.json({ message: error.message || 'Erro no cron de lembretes.' }, 500)
+  }
+})
+
 app.put('/api/transacoes/:id', async (c) => {
   try {
     const id = c.req.param('id')
@@ -1611,36 +1833,68 @@ app.post('/api/whatsapp/bot/mensagem', async (c) => {
     return c.json({ message: 'JSON inválido.' }, 400)
   }
 
-  const phone = String(body?.phone || '').replace(/\D/g, '')
-  let message = String(body?.message || body?.text || body?.transcription || '').trim()
-  let inputType = 'text'
-
-  if (!message && (body?.audioBase64 || body?.base64 || body?.mediaBase64 || body?.audioUrl || body?.mediaUrl || body?.url)) {
-    try {
-      const audioBuffer = await audioBufferFromWhatsAppBody(body)
-      if (!audioBuffer?.length) {
-        return c.json({ ok: false, reply: '🎙️ Não consegui receber o áudio. Tente enviar novamente.' }, 400)
-      }
-      message = (await transcribeWhatsAppAudioWithGemini(audioBuffer, body?.mimeType || body?.mimetype || 'audio/ogg')).trim()
-      inputType = 'audio'
-    } catch (error) {
-      log.error('[whatsapp-bot] transcribe audio failed', error)
-      return c.json({ ok: false, reply: '🎙️ Não consegui transcrever o áudio. Tente novamente ou envie por texto.' }, 200)
-    }
-  }
-
-  if (!phone || !message) {
-    return c.json({ message: 'phone e message ou áudio são obrigatórios.' }, 400)
-  }
-
   try {
-    const result = await processarMensagemBot(phone, message)
-    return c.json({ ...result, inputType, transcript: inputType === 'audio' ? message : undefined })
+    const result = await processWhatsappBotBody(body)
+    return c.json(result.response, result.status)
   } catch (error) {
     log.error('[whatsapp-bot] processarMensagemBot failed', error)
+    const raw = String(error?.message || '')
+    if (/transcrev|Gemini|getBase64|baixar áudio|Áudio/i.test(raw)) {
+      return c.json({ ok: false, reply: '🎙️ Não consegui transcrever o áudio. Tente novamente ou envie por texto.' }, 200)
+    }
     return c.json({ ok: false, reply: '❌ Erro interno. Tente novamente.' }, 500)
   }
 })
+
+async function handleEvolutionWebhook(c) {
+  const expected = process.env.WHATSAPP_WEBHOOK_TOKEN
+  const token = c.req.param('token') || c.req.query('token')
+  if (!expected || token !== expected) return c.json({ ok: false, message: 'Não autorizado.' }, 401)
+  const eventParam = c.req.param('event') || ''
+
+  let payload
+  try {
+    payload = await c.req.json()
+  } catch {
+    return c.json({ ok: false, message: 'JSON inválido.' }, 400)
+  }
+
+  const botBody = buildBotBodyFromEvolutionPayload(payload)
+  if (!botBody) {
+    log.info('[whatsapp-webhook] ignored', {
+      event: eventParam || payload?.event || payload?.type || '',
+      has_data: Boolean(payload?.data),
+    })
+    return c.json({ ok: true, ignored: true })
+  }
+
+  try {
+    log.info('[whatsapp-webhook] received', {
+      event: eventParam || payload?.event || payload?.type || '',
+      instance: botBody.evolutionInstance || '',
+      has_text: Boolean(botBody.message),
+      has_audio: Boolean(botBody.audioBase64 || botBody.audioUrl || botBody.messageId),
+    })
+    const result = await processWhatsappBotBody(botBody)
+    const reply = result.response?.reply
+    let sent = false
+    if (reply) {
+      sent = await sendEvolutionText({
+        instance: botBody.evolutionInstance,
+        number: botBody.phone,
+        text: reply,
+      })
+    }
+    return c.json({ ok: true, sent, inputType: result.response?.inputType })
+  } catch (error) {
+    log.error('[whatsapp-webhook] failed', error)
+    return c.json({ ok: false, message: 'Falha ao processar webhook WhatsApp.' }, 200)
+  }
+}
+
+// Webhook direto da Evolution API. Útil quando o n8n não está ativo ou não envia mídia.
+app.post('/api/whatsapp/webhook/:token', handleEvolutionWebhook)
+app.post('/api/whatsapp/webhook/:token/:event', handleEvolutionWebhook)
 
 app.notFound((c) => c.json({ message: 'Recurso não encontrado.' }, 404))
 
