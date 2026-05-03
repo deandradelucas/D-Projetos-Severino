@@ -19,11 +19,12 @@ const MOBILE_NAV_ITEMS = [
     to: '/transacoes',
     label: 'Transações',
     end: true,
+    className: 'mobile-bottom-nav__item--transactions',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <circle cx="12" cy="12" r="9" />
-        <path d="M15.5 8.5h-5a1.75 1.75 0 1 0 0 3.5h3a1.75 1.75 0 1 1 0 3.5H8.5" />
-        <path d="M12 6.5v11" />
+        <path d="M7 7h10" />
+        <path d="M7 12h10" />
+        <path d="M7 17h6" />
       </svg>
     ),
   },
@@ -70,7 +71,11 @@ export default function MobileBottomNav() {
             end={item.end}
             {...navPrefetchHandlers(item.to)}
             className={({ isActive }) =>
-              isActive ? 'mobile-bottom-nav__item mobile-bottom-nav__item--active' : 'mobile-bottom-nav__item'
+              [
+                'mobile-bottom-nav__item',
+                item.className,
+                isActive ? 'mobile-bottom-nav__item--active' : '',
+              ].filter(Boolean).join(' ')
             }
           >
             <span className="mobile-bottom-nav__icon">{item.icon}</span>
