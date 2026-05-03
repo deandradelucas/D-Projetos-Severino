@@ -1,8 +1,13 @@
-const CACHE_NAME = 'horizonte-financeiro-v7'
+const CACHE_NAME = 'horizonte-financeiro-v8'
 const APP_SHELL = [
   '/',
+  '/dashboard',
   '/manifest.json',
-  '/images/horizonte_fiel_original_icon_dark.png',
+  '/images/horizonte_fiel_original_icon_dark.svg',
+  '/images/horizonte_icon_192.png',
+  '/images/horizonte_icon_512.png',
+  '/images/horizonte_icon_192_maskable.png',
+  '/images/horizonte_icon_512_maskable.png',
 ]
 
 self.addEventListener('install', (event) => {

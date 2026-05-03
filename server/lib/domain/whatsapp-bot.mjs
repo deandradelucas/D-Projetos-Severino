@@ -3,6 +3,7 @@ import { buscarUsuarioPorTelefone } from '../usuarios.mjs'
 import { getCategorias, inserirTransacao } from '../transacoes.mjs'
 import { parseWhatsAppMessageWithAI } from '../ai.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
+import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
 
 const SALDO_RE =
   /\b(saldo|quanto[\s-]tenho|meu[\s-]saldo|balan[çc]o|quanto[\s-]sobrou|extrato|resumo financeiro)\b/i
@@ -48,7 +49,7 @@ function fmt(v) {
 }
 
 const AJUDA =
-  '🤖 *Horizonte Bot*\n\nPosso registrar:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n\nDigite uma dessas!'
+  '🤖 *Horizonte Bot*\n\nPosso registrar:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite uma dessas!'
 
 /**
  * Ponto central do bot — recebe telefone + mensagem bruta do n8n e retorna o texto de resposta.
@@ -72,6 +73,11 @@ export async function processarMensagemBot(phone, rawMessage) {
       reply:
         '❌ Número não cadastrado no *Horizonte Financeiro*.\n\nAcesse o app e adicione seu telefone em *Perfil* para usar o bot.',
     }
+  }
+
+  // 2. Agenda via WhatsApp — antes do parser financeiro para não confundir compromissos com transações
+  if (isAgendaMessage(message)) {
+    return processarMensagemAgenda(usuario, phone, message)
   }
 
   // 2. Consulta de saldo

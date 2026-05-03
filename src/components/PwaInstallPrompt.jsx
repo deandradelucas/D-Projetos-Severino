@@ -1,15 +1,35 @@
 import { useEffect, useState } from 'react'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 
+const DISMISS_KEY = 'horizonte_pwa_install_dismissed_at'
+const DISMISS_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
+
+function isStandaloneMode() {
+  return window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true
+}
+
+function wasDismissedRecently() {
+  const dismissedAt = Number(window.localStorage.getItem(DISMISS_KEY) || 0)
+  return dismissedAt > 0 && Date.now() - dismissedAt < DISMISS_WINDOW_MS
+}
+
 export default function PwaInstallPrompt() {
   const [installEvent, setInstallEvent] = useState(null)
   const [installed, setInstalled] = useState(false)
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
+    if (isStandaloneMode()) {
+      setInstalled(true)
+      return undefined
+    }
+
     const handleBeforeInstallPrompt = (event) => {
       event.preventDefault()
       setInstallEvent(event)
+      if (wasDismissedRecently()) {
+        return
+      }
       setVisible(true)
     }
 
@@ -33,10 +53,18 @@ export default function PwaInstallPrompt() {
       return
     }
 
-    await installEvent.prompt()
-    await installEvent.userChoice
+    try {
+      await installEvent.prompt()
+      await installEvent.userChoice
+    } finally {
+      setVisible(false)
+      setInstallEvent(null)
+    }
+  }
+
+  function handleDismiss() {
+    window.localStorage.setItem(DISMISS_KEY, String(Date.now()))
     setVisible(false)
-    setInstallEvent(null)
   }
 
   if (!visible || installed) {
@@ -44,37 +72,55 @@ export default function PwaInstallPrompt() {
   }
 
   return (
-    <div className="fixed right-4 bottom-4 z-20 max-w-[320px] rounded-2xl border border-white/15 bg-black/75 p-4 text-[#f5f5f5] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] backdrop-blur-md">
-      <div className="flex items-start gap-3">
+    <aside className="pwa-install-sheet" role="dialog" aria-modal="false" aria-labelledby="pwa-install-title">
+      <div className="pwa-install-sheet__glow" aria-hidden />
+      <button
+        type="button"
+        onClick={handleDismiss}
+        className="pwa-install-sheet__close"
+        aria-label="Fechar convite de instalação"
+      >
+        ×
+      </button>
+      <div className="pwa-install-sheet__content">
         <img
-          src={BRAND_ASSETS.appIcon}
-          alt="Horizonte Financeiro"
-          className="h-11 w-11 shrink-0 rounded-xl bg-[#111111] p-1.5"
+          src={BRAND_ASSETS.appIconPng || BRAND_ASSETS.appIcon}
+          alt=""
+          className="pwa-install-sheet__icon"
+          width={56}
+          height={56}
+          decoding="async"
         />
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold">Instalar app</p>
-          <p className="mt-1 text-xs text-[#cfcfcf]">
-            Adicione a Horizonte Financeiro na tela inicial para abrir como aplicativo.
+
+        <div className="pwa-install-sheet__body">
+          <p className="pwa-install-sheet__eyebrow">App pronto para instalar</p>
+          <h2 className="pwa-install-sheet__title" id="pwa-install-title">Horizonte na tela inicial</h2>
+          <p className="pwa-install-sheet__text">
+            Abra em tela cheia, com atalhos para Dashboard, Transações e Relatórios.
           </p>
+          <ul className="pwa-install-sheet__benefits" aria-label="Benefícios do aplicativo instalado">
+            <li>Mais rápido no celular</li>
+            <li>Ícone dedicado</li>
+          </ul>
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-end gap-2">
+      <div className="pwa-install-sheet__actions">
         <button
           type="button"
-          onClick={() => setVisible(false)}
-          className="rounded-xl border border-white/10 px-3 py-2 text-xs font-medium text-[#cfcfcf] transition hover:border-white/20 hover:text-white"
+          onClick={handleDismiss}
+          className="pwa-install-sheet__btn pwa-install-sheet__btn--ghost"
         >
-          Agora nao
+          Agora não
         </button>
         <button
           type="button"
           onClick={handleInstall}
-          className="rounded-xl bg-[#d4a84b] px-3 py-2 text-xs font-semibold text-[#0a0a0a] transition hover:bg-[#b8923f]"
+          className="pwa-install-sheet__btn pwa-install-sheet__btn--primary"
         >
           Instalar
         </button>
       </div>
-    </div>
+    </aside>
   )
 }

@@ -203,6 +203,31 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               <span className="nav-item__label">Relatórios</span>
             </NavLink>
           </li>
+          <li>
+            <NavLink
+              to="/agenda"
+              end
+              {...navPrefetchHandlers('/agenda')}
+              title="Compromissos, lembretes e interação via WhatsApp"
+              className={({ isActive }) => mergeNavItemClass(isActive, '/agenda', pathname)}
+              onClick={closeMenu}
+            >
+              <span className="icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M8 2v4" />
+                  <path d="M16 2v4" />
+                  <rect width="18" height="18" x="3" y="4" rx="2" />
+                  <path d="M3 10h18" />
+                  <path d="M8 14h.01" />
+                  <path d="M12 14h.01" />
+                  <path d="M16 14h.01" />
+                  <path d="M8 18h.01" />
+                  <path d="M12 18h.01" />
+                </svg>
+              </span>
+              <span className="nav-item__label">Agenda</span>
+            </NavLink>
+          </li>
 
           <li>
             <NavLink

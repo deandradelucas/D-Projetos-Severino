@@ -18,6 +18,8 @@ export const Configuracoes = lazy(loadConfiguracoes)
 export const loadRelatorios = () => import('./pages/Relatorios.jsx')
 export const Relatorios = lazy(loadRelatorios)
 
+export const loadAgenda = () => import('./pages/Agenda.jsx')
+export const Agenda = lazy(loadAgenda)
 
 export const loadAdminUsuarios = () => import('./pages/AdminUsuarios.jsx')
 export const AdminUsuarios = lazy(loadAdminUsuarios)
@@ -38,6 +40,7 @@ const ROUTE_PREFETCH = {
   '/transacoes': loadTransacoes,
   '/configuracoes': loadConfiguracoes,
   '/relatorios': loadRelatorios,
+  '/agenda': loadAgenda,
   '/admin/usuarios': loadAdminUsuarios,
   '/admin/pagamentos': loadAdminPagamentos,
   '/pagamento': loadPagamento,
@@ -57,7 +60,7 @@ export function prefetchRoute(path) {
 }
 
 /** Rotas do menu principal (shell autenticado) — pré-carrega para troca de aba rápida. */
-const APP_NAV_PATHS = ['/dashboard', '/transacoes', '/relatorios', '/pagamento', '/configuracoes']
+const APP_NAV_PATHS = ['/dashboard', '/transacoes', '/relatorios', '/agenda', '/pagamento', '/configuracoes']
 
 /** Dispara `import()` de todas as telas do menu (deduplicado). Útil ao abrir o menu no mobile. */
 export function prefetchAppNavChunksNow() {

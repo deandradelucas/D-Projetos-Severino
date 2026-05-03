@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
 import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
@@ -15,6 +15,8 @@ import { SkeletonKpi, SkeletonTxRow } from '../components/dashboard/DashboardSke
 import RefDashboardScroll from '../components/RefDashboardScroll'
 
 export default function Dashboard() {
+  const location = useLocation()
+  const navigate = useNavigate()
   const { privacyMode, togglePrivacy } = useTheme()
   const [usuario, setUsuario] = useState(() => readHorizonteUserPainelState())
   const [menuAberto, setMenuAberto] = useState(false)
@@ -39,6 +41,17 @@ export default function Dashboard() {
     const u = readHorizonteUser()
     if (u?.id) queueMicrotask(() => void fetchTransacoes())
   }, [fetchTransacoes, usuario.id])
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    if (params.get('acao') !== 'nova-transacao') return
+    queueMicrotask(() => setIsModalOpen(true))
+    params.delete('acao')
+    navigate(
+      { pathname: location.pathname, search: params.toString() ? `?${params.toString()}` : '' },
+      { replace: true }
+    )
+  }, [location.pathname, location.search, navigate])
 
   // Re-fetch ao retomar visibilidade em caso de erro
   useEffect(() => {
@@ -261,7 +274,6 @@ export default function Dashboard() {
                     const dateLine = dt.toLocaleDateString('pt-BR', {
                       day: '2-digit',
                       month: 'short',
-                      year: 'numeric',
                     })
                     const isoDate = Number.isNaN(dt.getTime()) ? undefined : dt.toISOString().slice(0, 10)
                     const catNome = (t.categorias?.nome && String(t.categorias.nome).trim()) || '—'
@@ -336,20 +348,22 @@ export default function Dashboard() {
       </div>
     </div>
 
-    <button
-      type="button"
-      className="dashboard-mobile-tx-fab"
-      onClick={() => setIsModalOpen(true)}
-      aria-label="Criar nova transação"
-    >
-      <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 5v14" />
-          <path d="M5 12h14" />
-        </svg>
-      </span>
-      <span className="dashboard-mobile-tx-fab__label">Nova transação</span>
-    </button>
+    {!isModalOpen && (
+      <button
+        type="button"
+        className="dashboard-mobile-tx-fab"
+        onClick={() => setIsModalOpen(true)}
+        aria-label="Criar nova transação"
+      >
+        <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
+        </span>
+        <span className="dashboard-mobile-tx-fab__label">Nova transação</span>
+      </button>
+    )}
 
     <TransactionModal
       isOpen={isModalOpen}

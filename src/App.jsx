@@ -18,6 +18,7 @@ import {
   Transacoes,
   Configuracoes,
   Relatorios,
+  Agenda,
   AdminUsuarios,
   AdminPagamentos,
   Pagamento,
@@ -52,6 +53,7 @@ function App() {
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/transacoes" element={<Transacoes />} />
                   <Route path="/relatorios" element={<Relatorios />} />
+                  <Route path="/agenda" element={<Agenda />} />
                   <Route path="/configuracoes" element={<Configuracoes />} />
                 </Route>
                 <Route element={<SuperAdminOutlet />}>

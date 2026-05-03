@@ -77,6 +77,14 @@ import {
 } from './lib/webauthn.mjs'
 import { TransactionService } from './lib/services/transaction-service.mjs'
 import { assertBotSecret, processarMensagemBot } from './lib/domain/whatsapp-bot.mjs'
+import {
+  atualizarAgendaEvento,
+  atualizarAgendaStatus,
+  criarAgendaEvento,
+  deletarAgendaEvento,
+  listarAgendaEventos,
+  listarEMarcarLembretesPendentes,
+} from './lib/domain/agenda.mjs'
 
 loadEnv()
 
@@ -87,6 +95,19 @@ function clientIpFromHono(c) {
   if (xf) return String(xf).split(',')[0].trim().slice(0, 80)
   const alt = c.req.header('x-real-ip') || c.req.header('cf-connecting-ip') || ''
   return String(alt).slice(0, 80)
+}
+
+function assertAgendaReminderSecret(c) {
+  const expected = process.env.AGENDA_REMINDER_SECRET || process.env.WHATSAPP_BOT_SECRET
+  if (!expected || String(expected).trim() === '') {
+    log.warn('[agenda] AGENDA_REMINDER_SECRET/WHATSAPP_BOT_SECRET não configurado')
+    return { ok: false, status: 503, message: 'Agenda WhatsApp não configurada.' }
+  }
+  const auth = c.req.header('authorization') || ''
+  const bearer = auth.startsWith('Bearer ') ? auth.slice(7).trim() : ''
+  const header = c.req.header('x-agenda-reminder-secret') || ''
+  if (bearer === expected || header === expected) return { ok: true }
+  return { ok: false, status: 401, message: 'Não autorizado.' }
 }
 
 /** Contas com role ADMIN no banco ou o e-mail SUPER_ADMIN acessam /api/admin/*. */
@@ -1039,6 +1060,148 @@ app.get('/api/cron/recorrencias-mensais', async (c) => {
   } catch (error) {
     log.error('cron recorrências mensais', error)
     return c.json({ message: error.message || 'Erro no cron.' }, 500)
+  }
+})
+
+app.get('/api/agenda', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
+    const data = await listarAgendaEventos(usuarioId, {
+      from: c.req.query('from'),
+      to: c.req.query('to'),
+      status: c.req.query('status'),
+      incluirCancelados: c.req.query('incluirCancelados') === '1',
+    })
+    return c.json(data)
+  } catch (error) {
+    log.error('listar agenda', error)
+    return c.json({ message: error.message || 'Erro ao listar agenda.' }, 500)
+  }
+})
+
+app.post('/api/agenda', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
+    if (!rateLimitTake(`agenda-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
+    }
+
+    let body
+    try {
+      body = await c.req.json()
+    } catch {
+      return c.json({ message: 'JSON inválido.' }, 400)
+    }
+
+    const data = await criarAgendaEvento(usuarioId, body, 'APP')
+    return c.json({ message: 'Compromisso criado.', data }, 201)
+  } catch (error) {
+    log.error('criar agenda', error)
+    return c.json({ message: error.message || 'Erro ao criar compromisso.' }, 500)
+  }
+})
+
+app.put('/api/agenda/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
+    if (!rateLimitTake(`agenda-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
+    }
+
+    let body
+    try {
+      body = await c.req.json()
+    } catch {
+      return c.json({ message: 'JSON inválido.' }, 400)
+    }
+
+    const data = await atualizarAgendaEvento(id, usuarioId, body)
+    return c.json({ message: 'Compromisso atualizado.', data })
+  } catch (error) {
+    log.error('atualizar agenda', error)
+    return c.json({ message: error.message || 'Erro ao atualizar compromisso.' }, 500)
+  }
+})
+
+app.patch('/api/agenda/:id/status', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
+    let body
+    try {
+      body = await c.req.json()
+    } catch {
+      return c.json({ message: 'JSON inválido.' }, 400)
+    }
+
+    const data = await atualizarAgendaStatus(id, usuarioId, body?.status)
+    return c.json({ message: 'Status atualizado.', data })
+  } catch (error) {
+    log.error('status agenda', error)
+    return c.json({ message: error.message || 'Erro ao atualizar status.' }, 500)
+  }
+})
+
+app.delete('/api/agenda/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const usuarioId = c.req.header('x-user-id')
+    if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+    if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
+
+    const gate = await assertAcessoAppUsuario(usuarioId)
+    if (gate) return c.json({ message: gate.message }, gate.status)
+
+    await deletarAgendaEvento(id, usuarioId)
+    return c.json({ message: 'Compromisso removido.' })
+  } catch (error) {
+    log.error('remover agenda', error)
+    return c.json({ message: error.message || 'Erro ao remover compromisso.' }, 500)
+  }
+})
+
+app.post('/api/agenda/lembretes/pendentes', async (c) => {
+  const auth = assertAgendaReminderSecret(c)
+  if (!auth.ok) return c.json({ message: auth.message }, auth.status)
+
+  try {
+    let body = {}
+    try {
+      body = await c.req.json()
+    } catch {
+      body = {}
+    }
+    const result = await listarEMarcarLembretesPendentes({
+      limit: body?.limit,
+      janelaMinutos: body?.janelaMinutos,
+    })
+    return c.json(result)
+  } catch (error) {
+    log.error('agenda lembretes pendentes', error)
+    return c.json({ message: error.message || 'Erro ao buscar lembretes.' }, 500)
   }
 })
 

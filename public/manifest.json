@@ -1,11 +1,13 @@
 {
+  "id": "/",
   "name": "Horizonte Financeiro",
   "short_name": "Horizonte",
-  "description": "Aplicativo da Horizonte Financeiro para cadastro e acesso rapido no celular.",
+  "description": "Controle suas finanças, registre transações e acompanhe seu saldo pelo celular.",
   "lang": "pt-BR",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
   "categories": ["finance", "productivity"],
   "background_color": "#050607",
@@ -14,7 +16,73 @@
     {
       "src": "/images/horizonte_fiel_original_icon_dark.svg",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "sizes": "520x520",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/horizonte_icon_192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/horizonte_icon_512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/horizonte_icon_192_maskable.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/horizonte_icon_512_maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nova transação",
+      "short_name": "Transação",
+      "description": "Abra o Dashboard para registrar uma nova transação.",
+      "url": "/dashboard?acao=nova-transacao",
+      "icons": [
+        {
+          "src": "/images/horizonte_icon_192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Transações",
+      "short_name": "Transações",
+      "description": "Veja e filtre seus lançamentos financeiros.",
+      "url": "/transacoes",
+      "icons": [
+        {
+          "src": "/images/horizonte_icon_192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Relatórios",
+      "short_name": "Relatórios",
+      "description": "Acompanhe gráficos e resumo financeiro.",
+      "url": "/relatorios",
+      "icons": [
+        {
+          "src": "/images/horizonte_icon_192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
