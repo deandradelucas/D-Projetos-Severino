@@ -9813,15 +9813,15 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
 
 .agenda-page .agenda-hero {
   background:
-    radial-gradient(circle at 8% 0%, rgba(139, 92, 246, 0.16), transparent 34%),
-    radial-gradient(circle at 96% 10%, rgba(212, 168, 75, 0.16), transparent 32%),
+    radial-gradient(circle at 12% 0%, rgba(139, 92, 246, 0.1), transparent 34%),
+    radial-gradient(circle at 96% 10%, rgba(212, 168, 75, 0.1), transparent 32%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.9));
 }
 
 body[data-theme='dark'] .agenda-page .agenda-hero {
   background:
-    radial-gradient(circle at 8% 0%, rgba(139, 92, 246, 0.24), transparent 36%),
-    radial-gradient(circle at 96% 10%, rgba(212, 168, 75, 0.12), transparent 34%),
+    radial-gradient(circle at 12% 0%, rgba(139, 92, 246, 0.18), transparent 36%),
+    radial-gradient(circle at 96% 10%, rgba(212, 168, 75, 0.08), transparent 34%),
     linear-gradient(180deg, rgba(20, 28, 42, 0.92), rgba(8, 13, 22, 0.82));
 }
 
@@ -9832,11 +9832,10 @@ body[data-theme='dark'] .agenda-page .agenda-hero {
 }
 
 .agenda-kpi,
-.agenda-whatsapp-card,
 .agenda-list-panel {
   border: 1px solid rgba(148, 163, 184, 0.18);
   background:
-    radial-gradient(circle at 95% 0%, rgba(139, 92, 246, 0.09), transparent 38%),
+    radial-gradient(circle at 95% 0%, rgba(139, 92, 246, 0.055), transparent 38%),
     rgba(255, 255, 255, 0.9);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8) inset,
@@ -9846,11 +9845,10 @@ body[data-theme='dark'] .agenda-page .agenda-hero {
 }
 
 body[data-theme='dark'] .agenda-kpi,
-body[data-theme='dark'] .agenda-whatsapp-card,
 body[data-theme='dark'] .agenda-list-panel {
   border-color: rgba(148, 163, 184, 0.16);
   background:
-    radial-gradient(circle at 95% 0%, rgba(139, 92, 246, 0.16), transparent 40%),
+    radial-gradient(circle at 95% 0%, rgba(139, 92, 246, 0.1), transparent 40%),
     rgba(15, 23, 42, 0.66);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.05) inset,
@@ -9901,16 +9899,6 @@ body[data-theme='dark'] .agenda-kpi--hero {
     linear-gradient(135deg, rgba(91, 33, 182, 0.32), rgba(15, 23, 42, 0.72));
 }
 
-.agenda-whatsapp-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px;
-  border-radius: 26px;
-}
-
-.agenda-whatsapp-card h2,
 .agenda-list-panel h2,
 .agenda-modal h2 {
   margin: 4px 0 0;
@@ -9920,16 +9908,6 @@ body[data-theme='dark'] .agenda-kpi--hero {
   letter-spacing: -0.04em;
 }
 
-.agenda-whatsapp-card p {
-  max-width: 760px;
-  margin: 7px 0 0;
-  color: var(--agenda-muted);
-  font-size: 0.94rem;
-  font-weight: 620;
-  line-height: 1.45;
-}
-
-.agenda-whatsapp-card__badge,
 .agenda-status {
   display: inline-flex;
   align-items: center;
@@ -9939,11 +9917,6 @@ body[data-theme='dark'] .agenda-kpi--hero {
   font-size: 0.72rem;
   font-weight: 850;
   white-space: nowrap;
-}
-
-.agenda-whatsapp-card__badge {
-  color: #5b21b6;
-  background: rgba(139, 92, 246, 0.12);
 }
 
 .agenda-list-panel {
@@ -10340,13 +10313,11 @@ body[data-theme='dark'] .agenda-field select {
     flex-basis: min(82vw, 320px);
   }
 
-  .agenda-whatsapp-card,
   .agenda-list-panel {
     padding: 16px;
     border-radius: 24px;
   }
 
-  .agenda-whatsapp-card,
   .agenda-list-panel__header,
   .agenda-event__topline {
     align-items: flex-start;

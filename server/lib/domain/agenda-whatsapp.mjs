@@ -219,7 +219,8 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
     const reminderMinutes = parseReminderMinutes(message)
     if (reminderMinutes !== null) {
       intent = 'agenda_reminder_config'
-      const token = targetToken(message, 'avise|avisar|lembre|lembrete') || '1'
+      const rawToken = targetToken(message, 'avise|avisar|lembre|lembrete')
+      const token = rawToken === String(reminderMinutes) ? '1' : rawToken || '1'
       const evento = await resolveEvento(usuario.id, token)
       if (!evento) throw new Error('Não encontrei compromisso para configurar o lembrete.')
       await atualizarAgendaEvento(evento.id, usuario.id, {

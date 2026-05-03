@@ -216,10 +216,10 @@ export default function Agenda() {
                 <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto(true)} />
                   <div className="dashboard-hub__hero-text">
-                    <span className="dashboard-hub__eyebrow">Agenda inteligente</span>
-                    <h1 className="dashboard-hub__title">Compromissos no ritmo certo</h1>
+                    <span className="dashboard-hub__eyebrow">Agenda</span>
+                    <h1 className="dashboard-hub__title">Seu dia, organizado</h1>
                     <div className="dashboard-hub__balance-line">
-                      <span>WhatsApp avisa antes e entende seus comandos.</span>
+                      <span>Compromissos, lembretes e ações rápidas em um só lugar.</span>
                     </div>
                   </div>
                   <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações da agenda">
@@ -251,15 +251,6 @@ export default function Agenda() {
                   <strong>{stats.whatsapp}</strong>
                   <p>com lembrete ativo</p>
                 </article>
-              </section>
-
-              <section className="agenda-whatsapp-card" aria-label="Como usar agenda no WhatsApp">
-                <div>
-                  <span className="agenda-whatsapp-card__eyebrow">Comandos rápidos</span>
-                  <h2>Converse com a sua agenda</h2>
-                  <p>Exemplos: “agenda hoje”, “marcar reunião amanhã às 15h”, “reagendar 1 para sexta 10h”, “concluir 1”.</p>
-                </div>
-                <span className="agenda-whatsapp-card__badge">n8n + Evolution</span>
               </section>
 
               <section className="agenda-list-panel" aria-label="Lista de compromissos">
