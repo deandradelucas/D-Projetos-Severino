@@ -110,7 +110,6 @@ export default function Dashboard() {
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto(true)} />
             <div className="dashboard-hub__hero-text">
-              <span className="dashboard-hub__eyebrow">Visão geral</span>
               <h1 className="dashboard-hub__title">
                 {getSaudacao()}, <span className={privacyMode ? 'privacy-blur' : ''}>{nomeExibicao}</span>
               </h1>
