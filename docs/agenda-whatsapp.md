@@ -26,3 +26,9 @@
 - `me avise 30 minutos antes`
 
 Os números dos comandos correspondem à lista retornada por `agenda hoje` ou `próximos compromissos`. Também é possível usar o código curto do compromisso exibido nas respostas.
+
+## Áudio no WhatsApp
+
+O endpoint `/api/whatsapp/bot/mensagem` aceita texto ou áudio. Para áudio, envie no body `audioBase64` ou `audioUrl` com `mimeType`.
+
+O backend transcreve com Gemini (`GEMINI_API_KEY`) e envia o texto transcrito para o mesmo parser que já entende despesas, receitas e agenda.
