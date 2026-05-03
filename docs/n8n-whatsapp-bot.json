@@ -5,15 +5,14 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "whatsapp-horizonte",
-        "responseMode": "responseNode",
+        "responseMode": "onReceived",
         "options": {}
       },
       "id": "a1b2c3d4-0001-0001-0001-000000000001",
       "name": "Webhook Evolution API",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1.1,
-      "position": [240, 300],
-      "webhookId": "whatsapp-horizonte"
+      "position": [240, 300]
     },
     {
       "parameters": {
@@ -128,26 +127,13 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [1340, 420]
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "={ \"ok\": true }",
-        "options": {}
-      },
-      "id": "a1b2c3d4-0007-0007-0007-000000000007",
-      "name": "Responder webhook 200",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [1340, 180]
     }
   ],
   "connections": {
     "Webhook Evolution API": {
       "main": [
         [
-          { "node": "É mensagem própria?", "type": "main", "index": 0 },
-          { "node": "Responder webhook 200", "type": "main", "index": 0 }
+          { "node": "É mensagem própria?", "type": "main", "index": 0 }
         ]
       ]
     },
