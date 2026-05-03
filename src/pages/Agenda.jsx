@@ -24,22 +24,53 @@ const STATUS_LABEL = {
   CANCELADO: 'Cancelado',
 }
 
+const AGENDA_TIME_ZONE = 'America/Sao_Paulo'
+const SAO_PAULO_OFFSET = '-03:00'
+
+function saoPauloParts(date) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: AGENDA_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date)
+  const get = (type) => parts.find((part) => part.type === type)?.value
+  return {
+    year: get('year'),
+    month: get('month'),
+    day: get('day'),
+    hour: get('hour'),
+    minute: get('minute'),
+  }
+}
+
+function saoPauloDateKey(isoOrDate) {
+  const date = isoOrDate instanceof Date ? isoOrDate : new Date(isoOrDate)
+  const parts = saoPauloParts(date)
+  return `${parts.year}-${parts.month}-${parts.day}`
+}
+
 function toDatetimeLocal(iso) {
   if (!iso) return ''
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ''
-  const pad = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  const parts = saoPauloParts(d)
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`
 }
 
 function localToIso(value) {
   if (!value) return ''
-  const d = new Date(value)
+  const normalized = value.length === 16 ? `${value}:00${SAO_PAULO_OFFSET}` : `${value}${SAO_PAULO_OFFSET}`
+  const d = new Date(normalized)
   return Number.isNaN(d.getTime()) ? '' : d.toISOString()
 }
 
 function formatDate(iso) {
   return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: AGENDA_TIME_ZONE,
     weekday: 'short',
     day: '2-digit',
     month: 'short',
@@ -48,15 +79,14 @@ function formatDate(iso) {
 
 function formatTime(iso) {
   return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: AGENDA_TIME_ZONE,
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(iso))
 }
 
 function isToday(iso) {
-  const d = new Date(iso)
-  const now = new Date()
-  return d.toDateString() === now.toDateString()
+  return saoPauloDateKey(iso) === saoPauloDateKey(new Date())
 }
 
 function eventTone(status) {
@@ -84,9 +114,9 @@ export default function Agenda() {
     setLoading(true)
     setError('')
     try {
-      const from = new Date()
-      from.setHours(0, 0, 0, 0)
-      const to = new Date()
+      const todayKey = saoPauloDateKey(new Date())
+      const from = new Date(`${todayKey}T00:00:00${SAO_PAULO_OFFSET}`)
+      const to = new Date(from)
       to.setDate(to.getDate() + 45)
       to.setHours(23, 59, 59, 999)
       const params = new URLSearchParams({
@@ -124,7 +154,7 @@ export default function Agenda() {
   const grouped = useMemo(() => {
     const map = new Map()
     for (const ev of eventos) {
-      const key = new Date(ev.inicio).toISOString().slice(0, 10)
+      const key = saoPauloDateKey(ev.inicio)
       if (!map.has(key)) map.set(key, [])
       map.get(key).push(ev)
     }
@@ -332,7 +362,7 @@ export default function Agenda() {
               <input value={form.titulo} onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))} required maxLength={160} placeholder="Ex.: reunião com cliente" />
             </label>
             <label className="agenda-field">
-              <span>Data e hora</span>
+              <span>Data e hora (São Paulo)</span>
               <input type="datetime-local" value={form.inicio} onChange={(e) => setForm((f) => ({ ...f, inicio: e.target.value }))} required />
             </label>
             <label className="agenda-field">

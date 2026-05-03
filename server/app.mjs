@@ -30,7 +30,7 @@ import {
   deleteUsuarioAdmin,
 } from './lib/usuarios.mjs'
 import { insertAdminAuditLog, listAdminAuditLog } from './lib/admin-audit.mjs'
-import { askHorizon } from './lib/ai.mjs'
+import { askHorizon, transcribeWhatsAppAudioWithGemini } from './lib/ai.mjs'
 import {
   buscarPagamentoPorId,
   criarPreapprovalAssinaturaMensal,
@@ -108,6 +108,42 @@ function assertAgendaReminderSecret(c) {
   const header = c.req.header('x-agenda-reminder-secret') || ''
   if (bearer === expected || header === expected) return { ok: true }
   return { ok: false, status: 401, message: 'Não autorizado.' }
+}
+
+function parseJsonEnv(value) {
+  try {
+    return value ? JSON.parse(value) : {}
+  } catch {
+    return {}
+  }
+}
+
+function base64ToBuffer(value) {
+  const raw = String(value || '').trim()
+  if (!raw) return null
+  const clean = raw.includes(',') ? raw.split(',').pop() : raw
+  return Buffer.from(clean, 'base64')
+}
+
+async function audioBufferFromWhatsAppBody(body) {
+  const direct = base64ToBuffer(body?.audioBase64 || body?.base64 || body?.mediaBase64)
+  if (direct?.length) return direct
+
+  const audioUrl = String(body?.audioUrl || body?.mediaUrl || body?.url || '').trim()
+  if (!audioUrl) return null
+
+  const headers = {
+    ...parseJsonEnv(process.env.WHATSAPP_MEDIA_FETCH_HEADERS),
+    ...(body?.mediaHeaders && typeof body.mediaHeaders === 'object' ? body.mediaHeaders : {}),
+  }
+  const evolutionKey = body?.evolutionApiKey || process.env.EVOLUTION_API_KEY
+  if (evolutionKey && !headers.apikey) headers.apikey = String(evolutionKey)
+
+  const response = await fetch(audioUrl, { headers })
+  if (!response.ok) {
+    throw new Error(`Falha ao baixar áudio (${response.status}).`)
+  }
+  return Buffer.from(await response.arrayBuffer())
 }
 
 /** Contas com role ADMIN no banco ou o e-mail SUPER_ADMIN acessam /api/admin/*. */
@@ -1576,15 +1612,30 @@ app.post('/api/whatsapp/bot/mensagem', async (c) => {
   }
 
   const phone = String(body?.phone || '').replace(/\D/g, '')
-  const message = String(body?.message || '').trim()
+  let message = String(body?.message || body?.text || body?.transcription || '').trim()
+  let inputType = 'text'
+
+  if (!message && (body?.audioBase64 || body?.base64 || body?.mediaBase64 || body?.audioUrl || body?.mediaUrl || body?.url)) {
+    try {
+      const audioBuffer = await audioBufferFromWhatsAppBody(body)
+      if (!audioBuffer?.length) {
+        return c.json({ ok: false, reply: '🎙️ Não consegui receber o áudio. Tente enviar novamente.' }, 400)
+      }
+      message = (await transcribeWhatsAppAudioWithGemini(audioBuffer, body?.mimeType || body?.mimetype || 'audio/ogg')).trim()
+      inputType = 'audio'
+    } catch (error) {
+      log.error('[whatsapp-bot] transcribe audio failed', error)
+      return c.json({ ok: false, reply: '🎙️ Não consegui transcrever o áudio. Tente novamente ou envie por texto.' }, 200)
+    }
+  }
 
   if (!phone || !message) {
-    return c.json({ message: 'phone e message são obrigatórios.' }, 400)
+    return c.json({ message: 'phone e message ou áudio são obrigatórios.' }, 400)
   }
 
   try {
     const result = await processarMensagemBot(phone, message)
-    return c.json(result)
+    return c.json({ ...result, inputType, transcript: inputType === 'audio' ? message : undefined })
   } catch (error) {
     log.error('[whatsapp-bot] processarMensagemBot failed', error)
     return c.json({ ok: false, reply: '❌ Erro interno. Tente novamente.' }, 500)
