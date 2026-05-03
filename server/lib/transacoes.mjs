@@ -66,29 +66,34 @@ export async function getCategorias(usuarioId) {
 /** Fonte única para seed + fallback de IA (WhatsApp). Manter nomes alinhados. */
 export const DEFAULT_CATEGORIES = [
   // DESPESAS GERAIS
-  { nome: 'Alimentação', tipo: 'DESPESA', cor: '#ef4444', subcategorias: ['Supermercado', 'Restaurantes e Lanches', 'Padaria e Cafeteira', 'Delivery (iFood, etc)', 'Feira e Sacolão', 'Açougue e Peixaria', 'Atacadista', 'Bebidas', 'Doces e Sobremesas', 'Fast Food', 'Hortifruti'] },
-  { nome: 'Moradia', tipo: 'DESPESA', cor: '#f97316', subcategorias: ['Aluguel', 'Conta de Luz', 'Conta de Água', 'Condomínio', 'Internet e TV', 'Gás', 'IPTU', 'Manutenção e Reformas', 'Seguro Residencial', 'Material de Limpeza', 'Decoração de Interiores', 'Jardinagem/Paisagismo', 'Eletrodomésticos', 'Móveis'] },
-  { nome: 'Transporte', tipo: 'DESPESA', cor: '#eab308', subcategorias: ['Combustível', 'App de Transporte (Uber, 99)', 'Transporte Público', 'Estacionamento', 'Pedágio', 'Manutenção Veicular', 'IPVA e Licenciamento', 'Seguro Auto', 'Financiamento do Veículo', 'Lavagem e Estética Automotiva', 'Táxi', 'Aluguel de Veículos e Carsharing', 'Bicicleta/Manutenção'] },
-  { nome: 'Saúde', tipo: 'DESPESA', cor: '#14b8a6', subcategorias: ['Plano de Saúde', 'Medicamentos', 'Consultas Médicas', 'Exames', 'Odontologia / Dentista', 'Terapia / Psicologia', 'Academia e Esportes', 'Suplementos e Vitaminas', 'Óculos e Lentes', 'Fisioterapia', 'Nutricionista', 'Terapias Alternativas (Acupuntura, etc)', 'Pilates/Yoga'] },
-  { nome: 'Educação', tipo: 'DESPESA', cor: '#3b82f6', subcategorias: ['Mensalidade (Escola/Faculdade)', 'Cursos e Certificações', 'Material Escolar / Artigos', 'Livros e Apostilas', 'Idiomas', 'Papelaria', 'Fardamento / Uniformes', 'Mentorias e Consultorias', 'Transporte Escolar'] },
-  { nome: 'Lazer e Entretenimento', tipo: 'DESPESA', cor: '#8b5cf6', subcategorias: ['Assinaturas (Netflix, Spotify, etc)', 'Cinema, Shows e Teatro', 'Bares e Baladas', 'Viagens e Passeios', 'Jogos e Hobbies', 'Livros Não-Didáticos', 'Revistas e Jornais', 'Eventos Esportivos', 'Festas', 'Colecionáveis', 'Praias e Parques'] },
+  { nome: 'Alimentação', tipo: 'DESPESA', cor: '#ef4444', subcategorias: ['Supermercado', 'Restaurantes e Lanches', 'Padaria e Cafeteira', 'Delivery (iFood, etc)', 'Feira e Sacolão', 'Açougue e Peixaria', 'Atacadista', 'Bebidas', 'Doces e Sobremesas', 'Fast Food', 'Hortifruti', 'Mercearia', 'Comida Saudável', 'Marmitas', 'Cesta Básica', 'Almoço no Trabalho', 'Conveniência', 'Sorveteria', 'Churrasco'] },
+  { nome: 'Moradia', tipo: 'DESPESA', cor: '#f97316', subcategorias: ['Aluguel', 'Conta de Luz', 'Conta de Água', 'Condomínio', 'Internet e TV', 'Gás', 'IPTU', 'Manutenção e Reformas', 'Seguro Residencial', 'Material de Limpeza', 'Decoração de Interiores', 'Jardinagem/Paisagismo', 'Eletrodomésticos', 'Móveis', 'Prestação do Imóvel', 'Financiamento Imobiliário', 'Energia Solar', 'Dedetização', 'Mudança e Frete', 'Portaria e Segurança', 'Utensílios Domésticos'] },
+  { nome: 'Transporte', tipo: 'DESPESA', cor: '#eab308', subcategorias: ['Combustível', 'App de Transporte (Uber, 99)', 'Transporte Público', 'Estacionamento', 'Pedágio', 'Manutenção Veicular', 'IPVA e Licenciamento', 'Seguro Auto', 'Financiamento do Veículo', 'Lavagem e Estética Automotiva', 'Táxi', 'Aluguel de Veículos e Carsharing', 'Bicicleta/Manutenção', 'Moto', 'Pneus', 'Óleo e Revisão', 'Multas de Trânsito', 'Guincho', 'Balsa/Barca', 'Recarga de Veículo Elétrico'] },
+  { nome: 'Saúde', tipo: 'DESPESA', cor: '#14b8a6', subcategorias: ['Plano de Saúde', 'Medicamentos', 'Consultas Médicas', 'Exames', 'Odontologia / Dentista', 'Terapia / Psicologia', 'Academia e Esportes', 'Suplementos e Vitaminas', 'Óculos e Lentes', 'Fisioterapia', 'Nutricionista', 'Terapias Alternativas (Acupuntura, etc)', 'Pilates/Yoga', 'Hospital e Pronto Atendimento', 'Vacinas', 'Cirurgias e Procedimentos', 'Dermatologia', 'Psiquiatria', 'Check-up', 'Equipamentos Médicos', 'Seguro Saúde Internacional'] },
+  { nome: 'Educação', tipo: 'DESPESA', cor: '#3b82f6', subcategorias: ['Mensalidade (Escola/Faculdade)', 'Cursos e Certificações', 'Material Escolar / Artigos', 'Livros e Apostilas', 'Idiomas', 'Papelaria', 'Fardamento / Uniformes', 'Mentorias e Consultorias', 'Transporte Escolar', 'Pós-graduação / MBA', 'Cursos Online', 'Workshops e Eventos', 'Taxas de Prova', 'Intercâmbio', 'Aulas Particulares', 'Creche / Berçário'] },
+  { nome: 'Lazer e Entretenimento', tipo: 'DESPESA', cor: '#8b5cf6', subcategorias: ['Assinaturas (Netflix, Spotify, etc)', 'Cinema, Shows e Teatro', 'Bares e Baladas', 'Viagens e Passeios', 'Jogos e Hobbies', 'Livros Não-Didáticos', 'Revistas e Jornais', 'Eventos Esportivos', 'Festas', 'Colecionáveis', 'Praias e Parques', 'Museus e Exposições', 'Streaming de Música', 'Streaming de Vídeo', 'Passeios em Família', 'Clubes e Associações', 'Instrumentos Musicais'] },
   
   // PESSOAIS E ESPECÍFICOS
-  { nome: 'Cuidados Pessoais', tipo: 'DESPESA', cor: '#ec4899', subcategorias: ['Salão de Beleza / Barbearia', 'Cosméticos e Perfumaria', 'Vestuário (Roupas do Dia a Dia)', 'Sapatos e Tênis', 'Roupas Sociais', 'Semijóias e Relógios', 'Tratamentos Estéticos', 'Maquiagem', 'Acessórios'] },
-  { nome: 'Pets e Dependentes', tipo: 'DESPESA', cor: '#06b6d4', subcategorias: ['Ração e Alimentação PET', 'Veterinário e Petshop', 'Mesada', 'Gastos Extras com Filhos/PETs', 'Brinquedos PET', 'Remédios PET', 'Banho e Tosa', 'Adestramento', 'Pensão e Gastos Judiciais', 'Vestuário Infantil', 'Lanche Escolar', 'Atividades Extracurriculares (Natação, Balé)'] },
-  { nome: 'Documentações e Impostos', tipo: 'DESPESA', cor: '#57534e', subcategorias: ['Renovação CNH / Multas', 'Emissão de Passaporte', 'Cartório e Certidões', 'Imposto de Renda (Pagamento)', 'MEI / DAS', 'Simples Nacional'] },
-  { nome: 'Viagens', tipo: 'DESPESA', cor: '#0284c7', subcategorias: ['Passagens Aéreas / Ônibus', 'Hospedagem / Hotel', 'Alimentação em Viagem', 'Passeios Turísticos / Ingressos', 'Seguro Viagem', 'Aluguel de Carro (Viagem)'] },
-  { nome: 'Tecnologia e Gadgets', tipo: 'DESPESA', cor: '#334155', subcategorias: ['Celular Novo e Acessórios', 'Assinatura de Softwares (Office, Adobe)', 'Computadores e Periféricos', 'Jogos Digitais / Consoles', 'Hospedagem / Domínios', 'Apps Mobile'] },
-  { nome: 'Doações e Presentes', tipo: 'DESPESA', cor: '#db2777', subcategorias: ['Carnês / Dízimo', 'Arrecadações', 'Ajuda a Familiares e Amigos', 'ONGs / Patrocínios', 'Presentes de Aniversário', 'Natal e Festas Comemorativas', 'Amigo Oculto'] },
+  { nome: 'Cuidados Pessoais', tipo: 'DESPESA', cor: '#ec4899', subcategorias: ['Salão de Beleza / Barbearia', 'Cosméticos e Perfumaria', 'Vestuário (Roupas do Dia a Dia)', 'Sapatos e Tênis', 'Roupas Sociais', 'Semijóias e Relógios', 'Tratamentos Estéticos', 'Maquiagem', 'Acessórios', 'Skincare', 'Perfumes', 'Depilação', 'Massagem', 'Tatuagem e Piercing', 'Lavanderia', 'Costura e Ajustes'] },
+  { nome: 'Pets e Dependentes', tipo: 'DESPESA', cor: '#06b6d4', subcategorias: ['Ração e Alimentação PET', 'Veterinário e Petshop', 'Mesada', 'Gastos Extras com Filhos/PETs', 'Brinquedos PET', 'Remédios PET', 'Banho e Tosa', 'Adestramento', 'Pensão e Gastos Judiciais', 'Vestuário Infantil', 'Lanche Escolar', 'Atividades Extracurriculares (Natação, Balé)', 'Creche / Escola Infantil', 'Fraldas e Higiene', 'Material Infantil', 'Babá / Cuidador', 'Plano de Saúde PET', 'Hotelzinho PET'] },
+  { nome: 'Compras e Varejo', tipo: 'DESPESA', cor: '#a855f7', subcategorias: ['Marketplace (Amazon, Mercado Livre)', 'Shopping', 'Loja de Departamento', 'Eletrônicos de Consumo', 'Presentes Diversos', 'Utilidades', 'Compras Online', 'Importados', 'Outlet', 'Cashback Usado', 'Assinatura de Clube de Compras'] },
+  { nome: 'Serviços e Assinaturas', tipo: 'DESPESA', cor: '#6366f1', subcategorias: ['Telefone / Celular', 'Plano de Internet Móvel', 'Armazenamento em Nuvem', 'Softwares e SaaS', 'Antivírus / Segurança Digital', 'Correios e Entregas', 'Manutenção de Equipamentos', 'Serviços Domésticos', 'Diarista / Faxina', 'Contador Pessoal', 'Advogado / Serviços Jurídicos', 'Consultorias'] },
+  { nome: 'Documentações e Impostos', tipo: 'DESPESA', cor: '#57534e', subcategorias: ['Renovação CNH / Multas', 'Emissão de Passaporte', 'Cartório e Certidões', 'Imposto de Renda (Pagamento)', 'MEI / DAS', 'Simples Nacional', 'Taxas Municipais', 'Taxas Estaduais', 'Taxas Federais', 'Registro de Imóveis', 'Procurações', 'Certificado Digital'] },
+  { nome: 'Viagens', tipo: 'DESPESA', cor: '#0284c7', subcategorias: ['Passagens Aéreas / Ônibus', 'Hospedagem / Hotel', 'Alimentação em Viagem', 'Passeios Turísticos / Ingressos', 'Seguro Viagem', 'Aluguel de Carro (Viagem)', 'Bagagem Extra', 'Câmbio / Moeda Estrangeira', 'Visto / Documentação', 'Cruzeiro', 'Transfer / Táxi Viagem', 'Compras em Viagem', 'Roaming Internacional'] },
+  { nome: 'Tecnologia e Gadgets', tipo: 'DESPESA', cor: '#334155', subcategorias: ['Celular Novo e Acessórios', 'Assinatura de Softwares (Office, Adobe)', 'Computadores e Periféricos', 'Jogos Digitais / Consoles', 'Hospedagem / Domínios', 'Apps Mobile', 'Manutenção de Celular', 'Manutenção de Computador', 'Peças e Componentes', 'Impressora e Suprimentos', 'Smartwatch e Wearables', 'Casa Inteligente', 'IA / Ferramentas de Produtividade'] },
+  { nome: 'Doações e Presentes', tipo: 'DESPESA', cor: '#db2777', subcategorias: ['Carnês / Dízimo', 'Arrecadações', 'Ajuda a Familiares e Amigos', 'ONGs / Patrocínios', 'Presentes de Aniversário', 'Natal e Festas Comemorativas', 'Amigo Oculto', 'Casamentos', 'Chá de Bebê', 'Vaquinhas Online', 'Gorjetas', 'Doações Recorrentes'] },
+  { nome: 'Trabalho e Negócios', tipo: 'DESPESA', cor: '#0f766e', subcategorias: ['Coworking', 'Ferramentas de Trabalho', 'Marketing e Anúncios', 'Tráfego Pago', 'Design e Branding', 'Eventos e Networking', 'Viagens a Trabalho', 'Equipamentos Profissionais', 'Uniformes / EPIs', 'Taxas de Plataforma', 'Comissões Pagas', 'Fretes de Venda'] },
   
   // FINANCEIROS
-  { nome: 'Despesas Financeiras', tipo: 'DESPESA', cor: '#64748b', subcategorias: ['Parcela de Empréstimo', 'Pagamento de Fatura (Não Categorizado)', 'Taxas e Tarifas Bancárias', 'Seguros Variados', 'Juros e Multas', 'Taxa de Corretagem', 'Contabilidade', 'Juros Cartão de Crédito', 'PIX e TEDs Pagos'] },
+  { nome: 'Despesas Financeiras', tipo: 'DESPESA', cor: '#64748b', subcategorias: ['Parcela de Empréstimo', 'Pagamento de Fatura (Não Categorizado)', 'Taxas e Tarifas Bancárias', 'Seguros Variados', 'Juros e Multas', 'Taxa de Corretagem', 'Contabilidade', 'Juros Cartão de Crédito', 'PIX e TEDs Pagos', 'IOF', 'Anuidade de Cartão', 'Renegociação de Dívida', 'Cheque Especial', 'Consórcio', 'Taxas de Investimento', 'Tarifa de Conta PJ'] },
+  { nome: 'Investimentos e Patrimônio', tipo: 'DESPESA', cor: '#0ea5e9', subcategorias: ['Aporte em Investimentos', 'Compra de Ações / FIIs', 'Tesouro Direto', 'CDB / Renda Fixa', 'Criptomoedas', 'Previdência Privada', 'Reserva de Emergência', 'Compra de Imóvel', 'Compra de Veículo', 'Seguro de Vida', 'Consórcio / Carta de Crédito'] },
 
   // RECEITAS
-  { nome: 'Renda Principal', tipo: 'RECEITA', cor: '#22c55e', subcategorias: ['Salário', 'Férias', '13º Salário', 'PLR / Bônus', 'Aposentadoria / INSS', 'BPC'] },
-  { nome: 'Rendas PJ / Empresa', tipo: 'RECEITA', cor: '#15803d', subcategorias: ['Pró-labore', 'Distribuição de Lucros', 'Reembolso de Despesas Empresariais', 'Vendas Corporativas'] },
-  { nome: 'Renda Extra', tipo: 'RECEITA', cor: '#10b981', subcategorias: ['Freelance / Serviços Extras', 'Vendas e Comissionamentos', 'Aluguéis Recebidos', 'Restituição de Imposto', 'Venda de Bens/Ativos Usados'] },
-  { nome: 'Rendimentos e Benefícios', tipo: 'RECEITA', cor: '#059669', subcategorias: ['Rendimento de Investimentos', 'Dividendos (Ações e FIIs)', 'Juros Recebidos', 'Resgate de Benefício (Previdência)', 'Auxílios Governamentais', 'FGTS', 'Seguro-Desemprego', 'Abono Salarial', 'Mesada Recebida'] }
+  { nome: 'Renda Principal', tipo: 'RECEITA', cor: '#22c55e', subcategorias: ['Salário', 'Férias', '13º Salário', 'PLR / Bônus', 'Aposentadoria / INSS', 'BPC', 'Adiantamento Salarial', 'Horas Extras', 'Comissão CLT', 'Vale / Benefício em Dinheiro'] },
+  { nome: 'Rendas PJ / Empresa', tipo: 'RECEITA', cor: '#15803d', subcategorias: ['Pró-labore', 'Distribuição de Lucros', 'Reembolso de Despesas Empresariais', 'Vendas Corporativas', 'Serviços Prestados', 'Consultoria', 'Contrato Mensal', 'Royalties / Licenciamento', 'Comissão de Vendas PJ'] },
+  { nome: 'Renda Extra', tipo: 'RECEITA', cor: '#10b981', subcategorias: ['Freelance / Serviços Extras', 'Vendas e Comissionamentos', 'Aluguéis Recebidos', 'Restituição de Imposto', 'Venda de Bens/Ativos Usados', 'Bicos / Diárias', 'Afiliados', 'Aulas Particulares', 'Conteúdo Digital', 'Cashback Recebido', 'Reembolso Pessoal'] },
+  { nome: 'Rendimentos e Benefícios', tipo: 'RECEITA', cor: '#059669', subcategorias: ['Rendimento de Investimentos', 'Dividendos (Ações e FIIs)', 'Juros Recebidos', 'Resgate de Benefício (Previdência)', 'Auxílios Governamentais', 'FGTS', 'Seguro-Desemprego', 'Abono Salarial', 'Mesada Recebida', 'Rendimento de Cripto', 'Rendimento de CDB', 'Tesouro Direto', 'Juros sobre Capital Próprio'] },
+  { nome: 'Receitas Eventuais', tipo: 'RECEITA', cor: '#84cc16', subcategorias: ['Presente Recebido', 'Sorteio / Prêmio', 'Herança', 'Indenização', 'Seguro Recebido', 'Devolução / Estorno', 'Venda de Garagem', 'Vaquinha Recebida', 'Ajuda Familiar Recebida'] }
 ]
 
 async function _seedCategoriesForUser(usuario_id, supabaseAdmin) {
@@ -114,13 +119,17 @@ function _categoriaChaveUnica(nome, tipo) {
   return `${String(nome || '').trim().toLowerCase()}|||${normalizeTipoCategoria(tipo)}`
 }
 
+function _subcategoriaChaveUnica(nome) {
+  return String(nome || '').trim().toLowerCase()
+}
+
 /** Usuários antigos: completar categorias do catálogo padrão que ainda não existem (ex.: novas linhas em `DEFAULT_CATEGORIES`). */
 async function _syncMissingDefaultCategories(usuario_id, supabaseAdmin, categoriasAtuais) {
   const lista = categoriasAtuais || []
-  const keys = new Set(lista.map((c) => _categoriaChaveUnica(c.nome, c.tipo)))
+  const categoriasPorChave = new Map(lista.map((c) => [_categoriaChaveUnica(c.nome, c.tipo), c]))
   for (const cat of DEFAULT_CATEGORIES) {
     const k = _categoriaChaveUnica(cat.nome, cat.tipo)
-    if (keys.has(k)) continue
+    if (categoriasPorChave.has(k)) continue
     const tipo = normalizeTipoCategoria(cat.tipo)
     const { data: categoriaData, error: errCat } = await supabaseAdmin
       .from('categorias')
@@ -131,9 +140,42 @@ async function _syncMissingDefaultCategories(usuario_id, supabaseAdmin, categori
       log.warn('categorias sync: categoria padrão não criada', { usuario_id, nome: cat.nome, message: errCat?.message })
       continue
     }
-    keys.add(k)
+    categoriasPorChave.set(k, { id: categoriaData.id, nome: cat.nome, tipo, cor: cat.cor })
     const subsToInsert = cat.subcategorias.map((nome) => ({ categoria_id: categoriaData.id, nome }))
     await _insertSubcategoriasRobusto(supabaseAdmin, subsToInsert, { etapa: 'sync', categoria_id: categoriaData.id })
+  }
+
+  const categoriasPadraoExistentes = DEFAULT_CATEGORIES
+    .map((cat) => categoriasPorChave.get(_categoriaChaveUnica(cat.nome, cat.tipo)))
+    .filter((cat) => cat?.id)
+
+  if (!categoriasPadraoExistentes.length) return
+
+  const { data: subsAtuais, error: subError } = await supabaseAdmin
+    .from('subcategorias')
+    .select('categoria_id, nome')
+    .in('categoria_id', categoriasPadraoExistentes.map((cat) => cat.id))
+
+  if (subError) {
+    log.warn('categorias sync: não foi possível conferir subcategorias existentes', { usuario_id, message: subError.message })
+    return
+  }
+
+  const subsPorCategoria = new Map()
+  for (const sub of subsAtuais || []) {
+    if (!subsPorCategoria.has(sub.categoria_id)) subsPorCategoria.set(sub.categoria_id, new Set())
+    subsPorCategoria.get(sub.categoria_id).add(_subcategoriaChaveUnica(sub.nome))
+  }
+
+  for (const cat of DEFAULT_CATEGORIES) {
+    const categoriaAtual = categoriasPorChave.get(_categoriaChaveUnica(cat.nome, cat.tipo))
+    if (!categoriaAtual?.id) continue
+    const existentes = subsPorCategoria.get(categoriaAtual.id) || new Set()
+    const subsToInsert = cat.subcategorias
+      .filter((nome) => !existentes.has(_subcategoriaChaveUnica(nome)))
+      .map((nome) => ({ categoria_id: categoriaAtual.id, nome }))
+    if (!subsToInsert.length) continue
+    await _insertSubcategoriasRobusto(supabaseAdmin, subsToInsert, { etapa: 'sync-subcategorias', categoria_id: categoriaAtual.id })
   }
 }
 

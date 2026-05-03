@@ -23,8 +23,15 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
   }, [isOpen, onToggle])
 
   useEffect(() => {
-    if (isOpen && searchInputRef.current) {
-      setTimeout(() => searchInputRef.current?.focus(), 50)
+    if (!isOpen) return
+
+    const shouldFocusSearch = typeof window === 'undefined' || !window.matchMedia('(max-width: 768px)').matches
+    if (!shouldFocusSearch) return
+
+    const focusTimer = setTimeout(() => searchInputRef.current?.focus(), 50)
+
+    return () => {
+      clearTimeout(focusTimer)
     }
   }, [isOpen])
 

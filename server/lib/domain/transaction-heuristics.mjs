@@ -65,14 +65,21 @@ export const DESPESA_RULES = [
   { re: /bar\b|balada|cervejaria/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Bares e Baladas'] },
   { re: /salao|salão|barbearia|cabelo|manicure/i, categoriaNome: 'Cuidados Pessoais', subLabels: ['Salão de Beleza / Barbearia'] },
   { re: /roupa|camisa|calca|calça|tenis|tênis|vestuario/i, categoriaNome: 'Cuidados Pessoais', subLabels: ['Vestuário (Roupas do Dia a Dia)', 'Sapatos e Tênis'] },
+  { re: /amazon|mercado\s*livre|shopee|shein|aliexpress|magalu|americanas|shopping|loja de departamento/i, categoriaNome: 'Compras e Varejo', subLabels: ['Marketplace (Amazon, Mercado Livre)', 'Compras Online', 'Shopping', 'Loja de Departamento'] },
+  { re: /presente(?!.*receb)|lembrancinha|casamento|aniversario|aniversário|natal|amigo oculto/i, categoriaNome: 'Doações e Presentes', subLabels: ['Presentes de Aniversário', 'Natal e Festas Comemorativas', 'Casamentos', 'Presentes Diversos'] },
   { re: /racao|pet\b|dog|gato|veterinar|banho e tosa/i, categoriaNome: 'Pets e Dependentes', subLabels: ['Ração e Alimentação PET', 'Veterinário e Petshop', 'Banho e Tosa'] },
+  { re: /fralda|baba\b|babá|creche|bercario|berçário|filho|filha|lanche escolar/i, categoriaNome: 'Pets e Dependentes', subLabels: ['Fraldas e Higiene', 'Babá / Cuidador', 'Creche / Escola Infantil', 'Lanche Escolar'] },
   { re: /passagem|hotel|hospedagem|airbnb|booking/i, categoriaNome: 'Viagens', subLabels: ['Passagens Aéreas / Ônibus', 'Hospedagem / Hotel'] },
+  { re: /visto|bagagem|cambio|câmbio|roaming|seguro viagem/i, categoriaNome: 'Viagens', subLabels: ['Visto / Documentação', 'Bagagem Extra', 'Câmbio / Moeda Estrangeira', 'Roaming Internacional', 'Seguro Viagem'] },
   {
     re: /jogo[s]?\s*eletr[ôo]nic|jogos?\s*eletronic|videogame|video[-\s]?game|steam\b|epic\s*games|playstation|ps[45]\b|xbox|nintendo|switch\b|\bdlc\b|jogos?\s*digitais?|jogos?\s*digital|console(s)?\s*(de)?\s*jogo|riot\s*games|battle\.net|gog\.com|humble\s*bundle|microtransa[cç][aã]o|loot\s*box/i,
     categoriaNome: 'Tecnologia e Gadgets',
     subLabels: ['Jogos Digitais / Consoles'],
   },
-  { re: /notebook|celular novo|iphone|galaxy|computador|monitor\b|tecnologia/i, categoriaNome: 'Tecnologia e Gadgets', subLabels: ['Computadores e Periféricos', 'Celular Novo e Acessórios'] },
+  { re: /chatgpt|claude|cursor|midjourney|canva|notion|office|adobe|software|saas|dominio|domínio|hospedagem/i, categoriaNome: 'Tecnologia e Gadgets', subLabels: ['IA / Ferramentas de Produtividade', 'Assinatura de Softwares (Office, Adobe)', 'Hospedagem / Domínios'] },
+  { re: /notebook|celular novo|iphone|galaxy|computador|monitor\b|tecnologia|smartwatch|wearable|periferico|periférico/i, categoriaNome: 'Tecnologia e Gadgets', subLabels: ['Computadores e Periféricos', 'Celular Novo e Acessórios', 'Smartwatch e Wearables'] },
+  { re: /telefone|plano.*celular|nuvem|icloud|google drive|dropbox|antivirus|antivírus|correios|entrega|diarista|faxina|advogado/i, categoriaNome: 'Serviços e Assinaturas', subLabels: ['Telefone / Celular', 'Armazenamento em Nuvem', 'Antivírus / Segurança Digital', 'Correios e Entregas', 'Diarista / Faxina', 'Advogado / Serviços Jurídicos'] },
+  { re: /coworking|trafego pago|tráfego pago|anuncio|anúncio|marketing|branding|frete.*venda|taxa.*plataforma|equipamento profissional/i, categoriaNome: 'Trabalho e Negócios', subLabels: ['Coworking', 'Tráfego Pago', 'Marketing e Anúncios', 'Design e Branding', 'Fretes de Venda', 'Taxas de Plataforma', 'Equipamentos Profissionais'] },
   { re: /aluguel(?!.*receb)/i, categoriaNome: 'Moradia', subLabels: ['Aluguel'] },
   { re: /condominio|condomínio/i, categoriaNome: 'Moradia', subLabels: ['Condomínio'] },
   { re: /luz\b|energia eletrica|energia elétrica|celesc|copel|enel/i, categoriaNome: 'Moradia', subLabels: ['Conta de Luz'] },
@@ -80,6 +87,8 @@ export const DESPESA_RULES = [
   { re: /internet\b|fibra|wifi|vivo fibra|net\b claro|oi fibra/i, categoriaNome: 'Moradia', subLabels: ['Internet e TV'] },
   { re: /\bgas\b|glp|botijao|botijão/i, categoriaNome: 'Moradia', subLabels: ['Gás'] },
   { re: /iptu\b/i, categoriaNome: 'Moradia', subLabels: ['IPTU'] },
+  { re: /passaporte|cartorio|cartório|certidao|certidão|cnh|das\b|mei\b|simples nacional|imposto de renda.*pag/i, categoriaNome: 'Documentações e Impostos', subLabels: ['Emissão de Passaporte', 'Cartório e Certidões', 'Renovação CNH / Multas', 'MEI / DAS', 'Simples Nacional', 'Imposto de Renda (Pagamento)'] },
+  { re: /aporte|investi|tesouro|cdb|acao|ação|fii|fiis|cripto|bitcoin|previdencia privada|previdência privada/i, categoriaNome: 'Investimentos e Patrimônio', subLabels: ['Aporte em Investimentos', 'Tesouro Direto', 'CDB / Renda Fixa', 'Compra de Ações / FIIs', 'Criptomoedas', 'Previdência Privada'] },
   { re: /fatura|cartao|cartão|anuidade|ted|pix.*tarifa|tarifa banc/i, categoriaNome: 'Despesas Financeiras', subLabels: ['Pagamento de Fatura (Não Categorizado)', 'Taxas e Tarifas Bancárias', 'Juros Cartão de Crédito'] },
   { re: /emprestimo|empréstimo|financiamento(?!.*veic)/i, categoriaNome: 'Despesas Financeiras', subLabels: ['Parcela de Empréstimo'] },
 ]
@@ -97,6 +106,7 @@ export const RECEITA_RULES = [
   { re: /restituicao|restituição|imposto.*restit/i, categoriaNome: 'Renda Extra', subLabels: ['Restituição de Imposto'] },
   { re: /dividend|fii|fiis|acao|ação|cdb|tesouro|juros.*receb|rendimento.*invest/i, categoriaNome: 'Rendimentos e Benefícios', subLabels: ['Dividendos (Ações e FIIs)', 'Rendimento de Investimentos', 'Juros Recebidos'] },
   { re: /fgts|seguro.desemprego|abono|auxilio|auxílio|mesada recebida/i, categoriaNome: 'Rendimentos e Benefícios', subLabels: ['FGTS', 'Seguro-Desemprego', 'Abono Salarial', 'Auxílios Governamentais', 'Mesada Recebida'] },
+  { re: /presente.*receb|premio|prêmio|sorteio|heranca|herança|indenizacao|indenização|seguro.*receb|estorno|devolucao|devolução|vaquinha.*receb|ajuda.*familiar/i, categoriaNome: 'Receitas Eventuais', subLabels: ['Presente Recebido', 'Sorteio / Prêmio', 'Herança', 'Indenização', 'Seguro Recebido', 'Devolução / Estorno', 'Vaquinha Recebida', 'Ajuda Familiar Recebida'] },
 ]
 
 export function rulesForTipo(tipo) {
