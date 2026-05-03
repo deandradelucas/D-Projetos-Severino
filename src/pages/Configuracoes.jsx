@@ -168,9 +168,6 @@ export default function Configuracoes() {
             <MobileMenuButton onClick={() => setMenuAberto(true)} aria-label="Abrir menu" />
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">Configurações</h1>
-              <p className="ref-panel__subtitle page-configuracoes-header-sub">
-                Perfil, preferências e segurança
-              </p>
             </div>
           </div>
         </section>

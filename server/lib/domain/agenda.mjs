@@ -23,6 +23,14 @@ function cleanText(value, max = 500) {
   return String(value ?? '').trim().slice(0, max)
 }
 
+function normalizeBrazilWhatsAppNumber(value) {
+  const digits = String(value || '').replace(/\D/g, '')
+  if (!digits) return ''
+  if ((digits.length === 12 || digits.length === 13) && digits.startsWith('55')) return digits
+  if (digits.length === 10 || digits.length === 11) return `55${digits}`
+  return ''
+}
+
 function parseReminderMinutes(value) {
   if (typeof value === 'string') {
     const text = value.toLowerCase()
@@ -296,7 +304,7 @@ export async function listarEMarcarLembretesPendentes({ limit = 50, marcarComoEn
     const key = `agenda_reminder:${evento.id}:${evento.lembrar_minutos_antes}`
     if (sent.has(key)) continue
     const usuario = userMap.get(evento.usuario_id)
-    const phone = String(usuario?.whatsapp_id || usuario?.telefone || '').replace(/\D/g, '')
+    const phone = normalizeBrazilWhatsAppNumber(usuario?.whatsapp_id) || normalizeBrazilWhatsAppNumber(usuario?.telefone)
     if (!phone) {
       log.warn('[agenda] lembrete sem telefone', { eventoId: evento.id, usuarioId: evento.usuario_id })
       continue
