@@ -1,25 +1,25 @@
 import { Link } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 
-export default function AuthPhoneShell({ title, headerTitle, showBack = false, backTo = '/login', children, footer, compact = false }) {
+export default function AuthPhoneShell({
+  title,
+  headerTitle,
+  showBack = false,
+  backTo = '/login',
+  children,
+  footer,
+  compact = false,
+  showBodyLogo = false,
+}) {
   return (
-    <div className="fixed inset-0 z-[20] min-h-dvh w-full overflow-y-auto bg-[#f3f4f7] px-4 py-6 text-[#0f172a]">
-      <div className="mx-auto flex min-h-[calc(100dvh-48px)] w-full items-center justify-center">
+    <div className="fixed inset-0 z-[20] min-h-dvh w-full overflow-y-auto bg-[#f3f4f7] p-0 text-[#0f172a] sm:px-4 sm:py-6">
+      <div className="mx-auto flex min-h-dvh w-full items-stretch justify-start sm:min-h-[calc(100dvh-48px)] sm:items-center sm:justify-center">
         <main
-          className={`relative w-full max-w-[300px] overflow-hidden rounded-[28px] bg-white shadow-[0_28px_70px_-36px_rgba(15,23,42,0.55)] ${
-            compact ? 'min-h-[520px]' : 'min-h-[620px]'
+          className={`relative flex min-h-dvh w-full max-w-none flex-col overflow-hidden rounded-none bg-white shadow-none sm:max-w-[300px] sm:rounded-[28px] sm:shadow-[0_28px_70px_-36px_rgba(15,23,42,0.55)] ${
+            compact ? 'sm:min-h-[520px]' : 'sm:min-h-[620px]'
           }`}
         >
-          <section className="relative h-[155px] overflow-hidden bg-[#050505]">
-            <div
-              className="absolute inset-0 opacity-55"
-              aria-hidden="true"
-              style={{
-                backgroundImage:
-                  'radial-gradient(circle at 18px 18px, #171717 0 17px, transparent 18px), linear-gradient(135deg, transparent 0 42%, #171717 42% 58%, transparent 58%), radial-gradient(circle at 80% 20%, #141414 0 24px, transparent 25px)',
-                backgroundSize: '56px 56px, 64px 64px, 72px 72px',
-              }}
-            />
+          <section className="relative h-[220px] shrink-0 overflow-hidden bg-[#000000] sm:h-[155px]">
             {showBack && (
               <Link
                 to={backTo}
@@ -30,22 +30,28 @@ export default function AuthPhoneShell({ title, headerTitle, showBack = false, b
               </Link>
             )}
             {headerTitle ? (
-              <h1 className="relative z-10 pt-8 text-center text-2xl font-medium tracking-[-0.04em] text-white">
+              <h1 className="relative z-10 pt-12 text-center text-3xl font-medium tracking-[-0.04em] text-white sm:pt-8 sm:text-2xl">
                 {headerTitle}
               </h1>
             ) : (
               <div className="relative z-10 flex h-full items-center justify-center pb-8">
-                <div className="grid h-[58px] w-[58px] place-items-center rounded-[16px] bg-white shadow-[0_18px_40px_-20px_rgba(255,255,255,0.75)]">
-                  <img src={BRAND_ASSETS.appIconPng} alt="Horizonte Financeiro" className="h-9 w-9" />
+                <div className="grid h-[76px] w-[76px] place-items-center rounded-[22px] bg-white shadow-[0_18px_40px_-20px_rgba(255,255,255,0.75)] sm:h-[58px] sm:w-[58px] sm:rounded-[16px]">
+                  <img src={BRAND_ASSETS.appIconPng} alt="Horizonte Financeiro" className="h-12 w-12 sm:h-9 sm:w-9" />
                 </div>
               </div>
             )}
           </section>
 
-          <section className="relative -mt-7 rounded-t-[34px] bg-white px-7 pb-7 pt-9">
-            {!headerTitle && (
-              <h1 className="mb-9 text-center text-[24px] font-medium tracking-[-0.04em] text-[#111827]">{title}</h1>
-            )}
+          <section className="relative -mt-9 flex flex-1 flex-col rounded-tl-[42px] rounded-tr-none bg-white px-9 pb-[max(28px,env(safe-area-inset-bottom))] pt-12 sm:-mt-7 sm:rounded-tl-[34px] sm:px-7 sm:pb-7 sm:pt-9">
+            {showBodyLogo ? (
+              <div className="mb-10 flex justify-center sm:mb-9">
+                <div className="grid h-[64px] w-[64px] place-items-center rounded-[18px] bg-white shadow-[0_18px_40px_-24px_rgba(15,23,42,0.45)] ring-1 ring-[#eef0f4]">
+                  <img src={BRAND_ASSETS.appIconPng} alt="Horizonte Financeiro" className="h-10 w-10" />
+                </div>
+              </div>
+            ) : !headerTitle ? (
+              <h1 className="mb-10 text-center text-[32px] font-medium tracking-[-0.04em] text-[#111827] sm:mb-9 sm:text-[24px]">{title}</h1>
+            ) : null}
             {children}
             {footer ? <div className="mt-8 text-center text-[11px] font-medium text-[#111827]">{footer}</div> : null}
           </section>

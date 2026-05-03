@@ -71,12 +71,13 @@ function toIso(value) {
 function normalizeEvento(row) {
   if (!row) return row
   const reminder = parseReminderMinutes(row.lembrete)
+  const local = row.local_texto || row.local || ''
   return {
     id: row.id,
     usuario_id: row.usuario_id,
     titulo: row.titulo || '',
     descricao: row.observacoes || row.descricao || '',
-    local: row.local_texto || '',
+    local,
     inicio: row.inicio_em,
     fim: row.fim_em,
     timezone: AGENDA_TZ,

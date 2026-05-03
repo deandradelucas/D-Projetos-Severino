@@ -252,13 +252,6 @@ export default function Agenda() {
                 <span className="agenda-hero__orb agenda-hero__orb--two" aria-hidden="true" />
                 <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto(true)} />
-                  <div className="dashboard-hub__hero-text">
-                    <span className="dashboard-hub__eyebrow">Agenda</span>
-                    <h1 className="dashboard-hub__title">Seu tempo no controle</h1>
-                    <div className="dashboard-hub__balance-line">
-                      <span>Uma linha do tempo inteligente para compromissos, lembretes e comandos por voz.</span>
-                    </div>
-                  </div>
                   <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações da agenda">
                     <button type="button" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={openNew}>
                       + Novo compromisso
@@ -276,7 +269,6 @@ export default function Agenda() {
                     ) : (
                       <div className="agenda-hero__next">
                         <strong>Sem pendências imediatas</strong>
-                        <span>Use o botão acima ou envie um áudio pelo WhatsApp.</span>
                       </div>
                     )}
                   </div>
@@ -290,7 +282,6 @@ export default function Agenda() {
                       <span>avisos</span>
                     </div>
                   </div>
-                  <span className="agenda-hero__chip">America/São_Paulo</span>
                 </div>
               </section>
 

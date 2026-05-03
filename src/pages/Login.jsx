@@ -247,6 +247,8 @@ export default function Login() {
   return (
     <AuthPhoneShell
       title="Login"
+      headerTitle="Login"
+      showBodyLogo
       compact={!showForgotPassword && !(webAuthnSupported() && hasWebAuthn)}
       footer={
         <>

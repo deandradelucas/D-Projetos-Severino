@@ -102,7 +102,6 @@ export default function Cadastro() {
     <AuthPhoneShell
       title="Sign Up"
       headerTitle="Sign Up"
-      showBack
       compact={step === 1}
       footer={
         <>
