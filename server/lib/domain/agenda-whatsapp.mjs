@@ -308,7 +308,7 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
         },
         'WHATSAPP'
       )
-      reply = `✅ Compromisso criado!\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}\nCódigo: ${data.id.slice(0, 8)}`
+      reply = `✅ Compromisso criado!\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}`
       return { ok: true, reply }
     }
 

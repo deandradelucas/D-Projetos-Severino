@@ -359,13 +359,25 @@ export async function registrarLembretesAgendaEnviados(mensagens = []) {
 
   const supabase = getSupabaseAdmin()
   for (const m of items) {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('whatsapp_logs')
       .update({ status: AGENDA_REMINDER_LOG_STATUS, detalhe_erro: null })
       .eq('mensagem_recebida', m.reminder_id)
       .eq('status', AGENDA_REMINDER_CLAIM_STATUS)
+      .select('id')
 
     if (error) throw error
+    if (data?.length) continue
+
+    const { error: insertError } = await supabase.from('whatsapp_logs').insert({
+      telefone_remetente: m.phone,
+      mensagem_recebida: m.reminder_id,
+      status: AGENDA_REMINDER_LOG_STATUS,
+      detalhe_erro: null,
+      usuario_id: m.user_id,
+    })
+    if (insertError?.code === '23505') continue
+    if (insertError) throw insertError
   }
   return { ok: true, total: items.length }
 }

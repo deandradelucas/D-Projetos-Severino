@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { log } from './lib/logger.mjs'
 import { cors } from 'hono/cors'
+import { getSupabaseAdmin } from './lib/supabase-admin.mjs'
 import {
   authenticateUser,
   consumeResetToken,
@@ -238,10 +239,37 @@ async function audioBufferFromWhatsAppBody(body) {
   return Buffer.from(await response.arrayBuffer())
 }
 
+async function claimWhatsAppInboundMessage(body, phone) {
+  const messageId = firstString(
+    body?.messageId,
+    body?.rawEvolutionData?.data?.key?.id,
+    body?.rawEvolutionData?.key?.id,
+    body?.rawEvolutionData?.id
+  )
+  if (!messageId) return true
+
+  const supabase = getSupabaseAdmin()
+  const { error } = await supabase.from('whatsapp_logs').insert({
+    telefone_remetente: String(phone || '').slice(0, 64),
+    mensagem_recebida: `whatsapp_message:${messageId}`.slice(0, 1000),
+    status: 'WHATSAPP_RECEBIDO',
+    detalhe_erro: null,
+  })
+
+  if (!error) return true
+  if (error.code === '23505') return false
+  throw error
+}
+
 async function processWhatsappBotBody(body) {
   const phone = String(body?.phone || '').replace(/\D/g, '')
   let message = String(body?.message || body?.text || body?.transcription || '').trim()
   let inputType = 'text'
+
+  const claimed = await claimWhatsAppInboundMessage(body, phone)
+  if (!claimed) {
+    return { status: 200, response: { ok: true, duplicate: true, reply: '' } }
+  }
 
   if (!message && (body?.audioBase64 || body?.base64 || body?.mediaBase64 || body?.audioUrl || body?.mediaUrl || body?.url || body?.messageId)) {
     const audioBuffer = await audioBufferFromWhatsAppBody(body)
