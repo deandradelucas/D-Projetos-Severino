@@ -5,6 +5,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
 import UserAdminStatusBadge from '../components/admin/UserAdminStatusBadge'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { apiUrl } from '../lib/apiUrl'
 import { formatPhoneBRDisplay } from '../lib/formatPhoneBR'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
@@ -237,6 +238,7 @@ export default function AdminUsuarios() {
   const [auditRows, setAuditRows] = useState([])
   const [auditLoading, setAuditLoading] = useState(false)
   const [exportingCsv, setExportingCsv] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState(null)
 
   const principalPodeDarAdmin = isSuperAdminSession()
   const roleOptionsEdit = principalPodeDarAdmin ? ROLE_OPTIONS : ROLE_OPTIONS_NON_SUPER
@@ -439,7 +441,7 @@ export default function AdminUsuarios() {
     setEditForm((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSaveUser = async () => {
+  const executeSaveUser = async () => {
     if (!editingUserId) return
     try {
       const userSaved = localStorage.getItem('horizonte_user')
@@ -447,18 +449,6 @@ export default function AdminUsuarios() {
       const u = JSON.parse(userSaved)
 
       const antes = listaUsuarios.find((row) => row.id === editingUserId)
-      if (antes) {
-        if (normalizeRoleKey(antes.role) === 'ADMIN' && normalizeRoleKey(editForm.role) !== 'ADMIN') {
-          const ok = window.confirm(
-            'Rebaixar este usuário de Admin para outro papel? Ele perderá o menu Administração após atualizar a sessão (login de novo ou Ajustes).'
-          )
-          if (!ok) return
-        }
-        if (antes.is_active !== false && editForm.is_active === false) {
-          const ok2 = window.confirm('Desativar esta conta? O usuário não conseguirá fazer login.')
-          if (!ok2) return
-        }
-      }
 
       const res = await fetch(apiUrl(`/api/admin/usuarios/${editingUserId}`), {
         method: 'PUT',
@@ -488,11 +478,23 @@ export default function AdminUsuarios() {
     }
   }
 
-  const handleDeleteUser = async (user) => {
-    const extra = normalizeRoleKey(user.role) === 'ADMIN' ? ' Esta conta tem papel Admin.' : ''
-    if (!window.confirm(`Excluir permanentemente ${user.email}?${extra} Essa ação é irreversível.`)) {
-      return
+  const handleSaveUser = () => {
+    if (!editingUserId) return
+    const antes = listaUsuarios.find((row) => row.id === editingUserId)
+    if (antes) {
+      if (normalizeRoleKey(antes.role) === 'ADMIN' && normalizeRoleKey(editForm.role) !== 'ADMIN') {
+        setConfirmDialog({ kind: 'save-demote' })
+        return
+      }
+      if (antes.is_active !== false && editForm.is_active === false) {
+        setConfirmDialog({ kind: 'save-deactivate' })
+        return
+      }
     }
+    void executeSaveUser()
+  }
+
+  const executeDeleteUser = async (user) => {
     try {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
@@ -517,6 +519,10 @@ export default function AdminUsuarios() {
     }
   }
 
+  const handleDeleteUser = (user) => {
+    setConfirmDialog({ kind: 'delete-user', user })
+  }
+
   const handleResetPassword = async (user) => {
     try {
       const userSaved = localStorage.getItem('horizonte_user')
@@ -539,13 +545,8 @@ export default function AdminUsuarios() {
     }
   }
 
-  const handleDetailToggleActive = async () => {
+  const executeDetailToggleActive = async (nextActive) => {
     if (!detailUser || isSuperAdminEmail(detailUser.email)) return
-    const currentlyActive = detailUser.is_active !== false
-    const nextActive = !currentlyActive
-    if (currentlyActive && !window.confirm('Desativar esta conta? O usuário não conseguirá fazer login.')) {
-      return
-    }
     try {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
@@ -563,6 +564,17 @@ export default function AdminUsuarios() {
     } catch (e) {
       setUserActionMessage(e.message || 'Erro ao atualizar.')
     }
+  }
+
+  const handleDetailToggleActive = () => {
+    if (!detailUser || isSuperAdminEmail(detailUser.email)) return
+    const currentlyActive = detailUser.is_active !== false
+    const nextActive = !currentlyActive
+    if (currentlyActive && !nextActive) {
+      setConfirmDialog({ kind: 'detail-deactivate' })
+      return
+    }
+    void executeDetailToggleActive(nextActive)
   }
 
   const getUserConnectionBadge = (user) => {
@@ -1237,6 +1249,57 @@ export default function AdminUsuarios() {
           </div>
         </main>
       </div>
+
+      <ConfirmDialog
+        open={confirmDialog != null}
+        title={
+          confirmDialog?.kind === 'save-demote'
+            ? 'Rebaixar papel de Admin?'
+            : confirmDialog?.kind === 'save-deactivate' || confirmDialog?.kind === 'detail-deactivate'
+              ? 'Desativar conta?'
+              : confirmDialog?.kind === 'delete-user'
+                ? 'Excluir usuário permanentemente?'
+                : ''
+        }
+        message={
+          confirmDialog?.kind === 'save-demote'
+            ? 'Rebaixar este usuário de Admin para outro papel? Ele perderá o menu Administração após atualizar a sessão (login de novo ou Ajustes).'
+            : confirmDialog?.kind === 'save-deactivate' || confirmDialog?.kind === 'detail-deactivate'
+              ? 'Desativar esta conta? O usuário não conseguirá fazer login.'
+              : confirmDialog?.kind === 'delete-user'
+                ? (() => {
+                    const u = confirmDialog.user
+                    const extra = normalizeRoleKey(u.role) === 'ADMIN' ? ' Esta conta tem papel Admin.' : ''
+                    return `Excluir permanentemente ${u.email}?${extra} Essa ação é irreversível.`
+                  })()
+                : ''
+        }
+        confirmLabel={confirmDialog?.kind === 'delete-user' ? 'Excluir' : 'Confirmar'}
+        onConfirm={async () => {
+          if (!confirmDialog) return
+          if (confirmDialog.kind === 'save-demote') {
+            const antes = listaUsuarios.find((row) => row.id === editingUserId)
+            if (antes && antes.is_active !== false && editForm.is_active === false) {
+              window.setTimeout(() => setConfirmDialog({ kind: 'save-deactivate' }), 0)
+            } else {
+              await executeSaveUser()
+            }
+            return
+          }
+          if (confirmDialog.kind === 'save-deactivate') {
+            await executeSaveUser()
+            return
+          }
+          if (confirmDialog.kind === 'delete-user') {
+            await executeDeleteUser(confirmDialog.user)
+            return
+          }
+          if (confirmDialog.kind === 'detail-deactivate') {
+            await executeDetailToggleActive(false)
+          }
+        }}
+        onClose={() => setConfirmDialog(null)}
+      />
     </div>
   )
 }

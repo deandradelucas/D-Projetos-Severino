@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import AdminPaymentLogsPanel from '../components/admin/AdminPaymentLogsPanel'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { apiUrl } from '../lib/apiUrl'
 import { buildPaymentLogsQuery, normalizePaymentLogsResponse } from '../lib/paymentLogsAdmin'
 import './dashboard.css'
@@ -30,6 +31,7 @@ export default function AdminPagamentos() {
   const [actionMsg, setActionMsg] = useState('')
   const [togglingUserId, setTogglingUserId] = useState(null)
   const [deletingPending, setDeletingPending] = useState(false)
+  const [confirmDeletePendingOpen, setConfirmDeletePendingOpen] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -96,15 +98,7 @@ export default function AdminPagamentos() {
     }
   }
 
-  const handleExcluirLogsPendentes = async () => {
-    if (
-      !window.confirm(
-        'Excluir todos os registros cujo status no Mercado Pago está pendente, em processamento ou em mediação? ' +
-          'Aprovados, recusados e estornados não serão removidos. Esta ação não pode ser desfeita.'
-      )
-    ) {
-      return
-    }
+  const executeExcluirLogsPendentes = async () => {
     setDeletingPending(true)
     setActionMsg('')
     setError('')
@@ -156,7 +150,7 @@ export default function AdminPagamentos() {
               loadParams={loadParams}
               onLoadParamsChange={setLoadParams}
               onRefresh={() => void load()}
-              onDeletePending={() => void handleExcluirLogsPendentes()}
+              onDeletePending={() => setConfirmDeletePendingOpen(true)}
               deletingPending={deletingPending}
               togglingUserId={togglingUserId}
               onToggleExempt={alternarIsencao}
@@ -166,6 +160,18 @@ export default function AdminPagamentos() {
           </div>
         </main>
       </div>
+
+      <ConfirmDialog
+        open={confirmDeletePendingOpen}
+        title="Excluir logs pendentes?"
+        message={
+          'Excluir todos os registros cujo status no Mercado Pago está pendente, em processamento ou em mediação? ' +
+          'Aprovados, recusados e estornados não serão removidos. Esta ação não pode ser desfeita.'
+        }
+        confirmLabel="Excluir"
+        onConfirm={() => executeExcluirLogsPendentes()}
+        onClose={() => setConfirmDeletePendingOpen(false)}
+      />
     </div>
   )
 }
