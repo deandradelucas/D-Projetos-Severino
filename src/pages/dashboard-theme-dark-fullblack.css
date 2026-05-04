@@ -28,13 +28,6 @@ body[data-theme='dark'] {
   --transacoes-balance-pos: #3b82f6;
 }
 
-/* Vinheta do fundo — neutro, sem azul */
-body[data-theme='dark'] .app-background-root__tint--dark {
-  background:
-    radial-gradient(ellipse 88% 62% at 50% 18%, rgba(255, 255, 255, 0.03), transparent 55%),
-    linear-gradient(165deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.92) 100%);
-}
-
 /* Botões primários — foco ouro (não anel azul genérico) */
 body[data-theme='dark'] .btn-primary:focus-visible {
   outline: none;
@@ -629,14 +622,6 @@ body[data-theme='dark'] .app-background-root--plain-dark .app-background-root__p
   background: #000000;
 }
 
-body[data-theme='dark'] .app-background-root__tint--dark {
-  background:
-    radial-gradient(circle at 18% 6%, rgba(139, 92, 246, 0.16), transparent 34%),
-    radial-gradient(circle at 92% 12%, rgba(0, 183, 255, 0.1), transparent 28%),
-    radial-gradient(circle at 72% 92%, rgba(255, 200, 61, 0.07), transparent 30%),
-    linear-gradient(165deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.96) 100%);
-}
-
 body[data-theme='dark'] .dashboard-container.app-horizon-shell,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
   background: transparent;
@@ -933,16 +918,13 @@ body[data-theme='dark'] .agenda-action--danger {
   color: #ff8a9b;
 }
 
-/* Dashboard black: fundo totalmente preto, sem vinhetas ou brilhos. */
-body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__tint--dark,
+/* Dashboard black: fundo totalmente preto. */
 body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__plain-fill,
-body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__wash,
-body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__vignette {
+body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__wash {
   background: #000000 !important;
   background-image: none !important;
 }
 
-body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__image,
 body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__noise {
   opacity: 0 !important;
 }

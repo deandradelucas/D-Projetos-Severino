@@ -3,13 +3,6 @@
  * Bordas, botões, cartões e fundo — sem editar o CSS gerado.
  */
 
-/* Foto de fundo: vinheta azulada + leve brilho no centro (mais “cinema”) */
-body[data-theme='dark'] .app-background-root__tint--dark {
-  background:
-    radial-gradient(ellipse 85% 65% at 50% 20%, rgba(59, 130, 246, 0.07), transparent 55%),
-    linear-gradient(165deg, rgba(15, 23, 42, 0.5) 0%, rgba(2, 6, 15, 0.88) 100%);
-}
-
 /* Variáveis: superfícies um pouco mais ricas */
 body[data-theme='dark'] {
   --bg-card: #161e2a;
