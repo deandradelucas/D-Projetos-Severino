@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import Sidebar from '../components/Sidebar'
-import MobileMenuButton from '../components/MobileMenuButton'
-import RefDashboardScroll from '../components/RefDashboardScroll'
-import PagamentoPainelLateral from '../components/pagamento/PagamentoPainelLateral.jsx'
-import PagamentoDetalhesCard from '../components/pagamento/PagamentoDetalhesCard.jsx'
-import PagamentoHistorico from '../components/pagamento/PagamentoHistorico.jsx'
-import { apiUrl } from '../lib/apiUrl'
-import { formatCurrencyBRL } from '../lib/formatCurrency'
+import Sidebar from '@components/Sidebar'
+import MobileMenuButton from '@components/MobileMenuButton'
+import RefDashboardScroll from '@components/RefDashboardScroll'
+import PagamentoPainelLateral from '@features/pagamentos/components/PagamentoPainelLateral.jsx'
+import PagamentoDetalhesCard from '@features/pagamentos/components/PagamentoDetalhesCard.jsx'
+import PagamentoHistorico from '@features/pagamentos/components/PagamentoHistorico.jsx'
+import { apiUrl } from '@shared/api'
+import { formatCurrencyBRL } from '@shared/format'
 import {
   PLANO_PADRAO_TITULO,
   buildOrientacaoUsuario,
   painelAssinaturaFromUser,
   ultimoPagamentoHistorico,
-} from '../lib/pagamentoPageModel.js'
+} from '@features/pagamentos/model/pagamentoPageModel.js'
 import './dashboard.css'
 
 function pagamentoStatusBannerClass(statusUrl) {

@@ -1,8 +1,10 @@
 import { randomUUID } from 'node:crypto'
-import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { log } from './lib/logger.mjs'
 import { cors } from 'hono/cors'
+import { createApp } from './app-factory.mjs'
+import { httpRequestLogger, pagamentosRequestLogger } from './middleware/request-logger.mjs'
+import { clientIpFromHono } from './lib/http/client-ip.mjs'
 import { getSupabaseAdmin } from './lib/supabase-admin.mjs'
 import {
   authenticateUser,
@@ -78,6 +80,7 @@ import {
 } from './lib/webauthn.mjs'
 import { TransactionService } from './lib/services/transaction-service.mjs'
 import { assertBotSecret, processarMensagemBot } from './lib/domain/whatsapp-bot.mjs'
+import healthRoutes from './routes/health.mjs'
 import {
   atualizarAgendaEvento,
   atualizarAgendaStatus,
@@ -92,14 +95,7 @@ import {
 
 loadEnv()
 
-const app = new Hono()
-
-function clientIpFromHono(c) {
-  const xf = c.req.header('x-forwarded-for')
-  if (xf) return String(xf).split(',')[0].trim().slice(0, 80)
-  const alt = c.req.header('x-real-ip') || c.req.header('cf-connecting-ip') || ''
-  return String(alt).slice(0, 80)
-}
+const app = createApp()
 
 function assertAgendaReminderSecret(c) {
   const expected = process.env.AGENDA_REMINDER_SECRET || process.env.WHATSAPP_BOT_SECRET
@@ -427,41 +423,11 @@ app.use('*', cors({
   allowHeaders: ['Content-Type', 'x-user-id', 'Authorization'],
 }))
 
-app.use('*', async (c, next) => {
-  const start = Date.now()
-  await next()
-  const duration = Date.now() - start
-  const status = c.res?.status || 200
-  log.info('http_request', {
-    method: c.req.method,
-    path: c.req.path,
-    status,
-    duration_ms: duration,
-    user_id: c.req.header('x-user-id') || null,
-    client_ip: clientIpFromHono(c),
-  })
-})
+app.use('*', httpRequestLogger)
 
-app.use('/api/pagamentos/*', async (c, next) => {
-  const start = Date.now()
-  await next()
-  const duration = Date.now() - start
-  log.info('pagamentos_request', {
-    path: c.req.path,
-    method: c.req.method,
-    status: c.res?.status || 200,
-    duration_ms: duration,
-    user_id: c.req.header('x-user-id') || null,
-  })
-})
+app.use('/api/pagamentos/*', pagamentosRequestLogger)
 
-app.get('/api/health', (c) =>
-  c.json({
-    ok: true,
-    t: new Date().toISOString(),
-    mercadopago: { configured: isMercadoPagoConfigured() },
-  })
-)
+app.route('/api', healthRoutes)
 
 /** Painel interno: token MP configurado e path do webhook (sem segredos). */
 app.get('/api/admin/mp-saude', async (c) => {

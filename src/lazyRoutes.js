@@ -27,7 +27,7 @@ export const AdminUsuarios = lazy(loadAdminUsuarios)
 const loadAdminPagamentos = () => import('./pages/AdminPagamentos.jsx')
 export const AdminPagamentos = lazy(loadAdminPagamentos)
 
-const loadPagamento = () => import('./pages/Pagamento.jsx')
+const loadPagamento = () => import('./features/pagamentos/PagamentoPage.jsx')
 export const Pagamento = lazy(loadPagamento)
 
 const loadBemVindoAssinatura = () => import('./pages/BemVindoAssinatura.jsx')

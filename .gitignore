@@ -29,3 +29,5 @@ nul
 # Backup temp
 .backup-temp/
 .env*.local
+.tmp/
+docker_logs.txt
