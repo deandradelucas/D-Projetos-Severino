@@ -1,11 +1,24 @@
 import { describe, expect, it } from 'vitest'
 import {
+  AGENDA_AVISO_ROW_PREFIX,
   draftAgendaFromTextHeuristic,
   isAgendaMessage,
   parseAgendaDateTime,
+  parseReminderMinutes,
 } from '../lib/domain/agenda-whatsapp.mjs'
 
 describe('agenda WhatsApp parser', () => {
+  it('reconhece rowId da lista de antecedência do aviso', () => {
+    const id = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
+    expect(isAgendaMessage(`${AGENDA_AVISO_ROW_PREFIX}${id}:10`)).toBe(true)
+  })
+
+  it('reconhece escolha de aviso por texto aviso1–aviso4', () => {
+    expect(isAgendaMessage('aviso2')).toBe(true)
+    expect(isAgendaMessage('AVISO4')).toBe(true)
+    expect(isAgendaMessage('2')).toBe(false)
+  })
+
   it('reconhece compromissos em linguagem natural', () => {
     expect(isAgendaMessage('tenho dentista sexta às 14h')).toBe(true)
     expect(isAgendaMessage('me lembra de pagar a luz amanhã 9h')).toBe(true)
@@ -33,6 +46,17 @@ describe('agenda WhatsApp parser', () => {
     const data = parseAgendaDateTime('me lembre quando for 22:00', base)
 
     expect(data?.toISOString()).toBe('2026-05-04T01:00:00.000Z')
+  })
+
+  it('não confunde horário "para/as … HH horas" com antecedência "HH horas antes"', () => {
+    expect(parseReminderMinutes('reunião para as 17 horas')).toBe(null)
+    expect(parseReminderMinutes('reunião para as 17 horas antes do almoço')).toBe(null)
+    expect(parseReminderMinutes('marcar reuniao as 17 horas antes da daily')).toBe(null)
+  })
+
+  it('mantém antecedência explícita em horas quando não é padrão de horário', () => {
+    expect(parseReminderMinutes('me avise 17 horas antes da viagem')).toBe(1020)
+    expect(parseReminderMinutes('avisar 5 horas antes')).toBe(300)
   })
 
   it('draft heurístico para o app web devolve título e ISO de início', () => {

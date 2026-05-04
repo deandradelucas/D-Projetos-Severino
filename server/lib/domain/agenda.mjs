@@ -211,6 +211,25 @@ export async function criarAgendaEvento(usuarioId, body) {
   return normalizeEvento(data)
 }
 
+/** Último compromisso criado na janela (ex.: escolher aviso logo após criar pelo WhatsApp). */
+export async function ultimoEventoAgendaCriadoRecentemente(usuarioId, windowMinutes = 25) {
+  const supabase = getSupabaseAdmin()
+  const uid = String(usuarioId || '').trim()
+  if (!uid) return null
+  const window = Math.min(Math.max(Number(windowMinutes) || 25, 5), 120)
+  const since = new Date(Date.now() - window * 60 * 1000).toISOString()
+  const { data, error } = await supabase
+    .from('agenda_eventos')
+    .select('*')
+    .eq('usuario_id', uid)
+    .gte('criado_em', since)
+    .order('criado_em', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (error) throw error
+  return data ? normalizeEvento(data) : null
+}
+
 export async function atualizarAgendaEvento(id, usuarioId, body) {
   const supabase = getSupabaseAdmin()
   const uid = String(usuarioId || '').trim()

@@ -162,6 +162,27 @@ function firstString(...values) {
   return ''
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+/** Limites comuns de lista interativa WhatsApp (título/descrição de linha). */
+function sanitizeEvolutionListSections(sections) {
+  const truncate = (s, max) => {
+    const t = String(s ?? '').trim()
+    if (t.length <= max) return t
+    return `${t.slice(0, Math.max(0, max - 1))}…`
+  }
+  return (Array.isArray(sections) ? sections : []).map((sec) => ({
+    title: truncate(sec?.title, 24) || 'Opções',
+    rows: (Array.isArray(sec?.rows) ? sec.rows : []).map((row) => ({
+      title: truncate(row?.title, 24) || 'Item',
+      description: truncate(row?.description, 72) || '—',
+      rowId: String(row?.rowId ?? '').slice(0, 200),
+    })),
+  }))
+}
+
 function extractBase64FromEvolutionResponse(data) {
   return firstString(
     data?.base64,
@@ -262,7 +283,7 @@ async function claimWhatsAppInboundMessage(body, phone) {
   throw error
 }
 
-async function processWhatsappBotBody(body) {
+async function processWhatsappBotBody(body, options = {}) {
   const phone = String(body?.phone || '').replace(/\D/g, '')
   let message = String(body?.message || body?.text || body?.transcription || '').trim()
   let inputType = 'text'
@@ -289,9 +310,15 @@ async function processWhatsappBotBody(body) {
   }
 
   const result = await processarMensagemBot(phone, message)
+  const whatsappOutboundSent = await deliverWhatsappBotOutbound(body, phone, result, options)
   return {
     status: 200,
-    response: { ...result, inputType, transcript: inputType === 'audio' ? message : undefined },
+    response: {
+      ...result,
+      inputType,
+      transcript: inputType === 'audio' ? message : undefined,
+      whatsappOutboundSent,
+    },
   }
 }
 
@@ -303,7 +330,11 @@ function buildBotBodyFromEvolutionPayload(payload) {
 
   const msg = data.message || {}
   const audio = msg.audioMessage || msg.pttMessage || {}
+  const listRowId = msg.listResponseMessage?.singleSelectReply?.selectedRowId
+  const buttonId = firstString(msg.buttonsResponseMessage?.selectedButtonId, msg.buttonsResponseMessage?.selectedDisplayText)
   const text = firstString(
+    listRowId,
+    buttonId,
     msg.conversation,
     msg.extendedTextMessage?.text,
     msg.imageMessage?.caption,
@@ -336,6 +367,48 @@ function stripRespondaAgendaReminderSuffix(text) {
   return text.replace(/\s*Responda\s*:\s*[\s\S]*$/i, '').trimEnd()
 }
 
+function extractAgendaAvisoEventIdFromListInteractive(inter) {
+  const rows = inter?.values?.[0]?.rows
+  const rowId = String(rows?.[0]?.rowId || '')
+  const m = rowId.match(/^agenda_aviso:([a-f0-9-]{36}):/i)
+  return m?.[1] || ''
+}
+
+/** Até 3 botões de resposta (limite WhatsApp); combina com menu numérico 4 no texto/rodapé. */
+async function sendEvolutionButtons({ instance, number, title, description, footer, buttons, delay = 1000 }) {
+  const baseUrl = firstString(process.env.EVOLUTION_API_URL, process.env.EVOLUTION_SERVER_URL)
+  const apiKey = firstString(process.env.EVOLUTION_API_KEY)
+  if (!baseUrl || !apiKey || !instance || !number || !Array.isArray(buttons) || buttons.length < 1) return false
+
+  const payload = {
+    number,
+    title: String(title || 'Horizonte').slice(0, 60),
+    description: String(description || '').slice(0, 1024),
+    footer: String(footer || '').slice(0, 60),
+    buttons: buttons.slice(0, 3).map((b) => ({
+      type: 'reply',
+      id: String(b.id || '').slice(0, 256),
+      displayText: String(b.displayText || 'Opção').slice(0, 20),
+    })),
+    delay,
+  }
+
+  const response = await fetch(`${baseUrl.replace(/\/+$/, '')}/message/sendButtons/${encodeURIComponent(instance)}`, {
+    method: 'POST',
+    headers: {
+      apikey: apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+  const raw = await response.text().catch(() => '')
+  if (!response.ok) {
+    log.warn('[evolution] sendButtons failed', { status: response.status, detail: raw.slice(0, 400) })
+    return false
+  }
+  return true
+}
+
 async function sendEvolutionText({ instance, number, text }) {
   const baseUrl = firstString(process.env.EVOLUTION_API_URL, process.env.EVOLUTION_SERVER_URL)
   const apiKey = firstString(process.env.EVOLUTION_API_KEY)
@@ -351,9 +424,143 @@ async function sendEvolutionText({ instance, number, text }) {
   })
   if (!response.ok) {
     const detail = await response.text().catch(() => '')
-    throw new Error(`Evolution sendText ${response.status}: ${detail.slice(0, 220)}`)
+    log.warn('[evolution] sendText failed', { status: response.status, detail: detail.slice(0, 280) })
+    return false
   }
   return true
+}
+
+/**
+ * Lista interativa (antecedência do aviso na agenda).
+ * Evolution `SendListDto` usa `sections`; alguns proxies aceitam também `values`.
+ */
+async function sendEvolutionListOnce({
+  instance,
+  number,
+  title,
+  description,
+  buttonText,
+  footerText,
+  sections,
+  delay = 900,
+}) {
+  const baseUrl = firstString(process.env.EVOLUTION_API_URL, process.env.EVOLUTION_SERVER_URL)
+  const apiKey = firstString(process.env.EVOLUTION_API_KEY)
+  if (!baseUrl || !apiKey || !instance || !number || !title || !buttonText || !sections?.length) {
+    return false
+  }
+
+  const safeSections = sanitizeEvolutionListSections(sections)
+  const footer = String(footerText ?? '').trim() || 'Horizonte Financeiro'
+  const desc = String(description ?? '').trim() || 'Escolha uma opção abaixo.'
+
+  const response = await fetch(`${baseUrl.replace(/\/+$/, '')}/message/sendList/${encodeURIComponent(instance)}`, {
+    method: 'POST',
+    headers: {
+      apikey: apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      number,
+      title: String(title).slice(0, 60),
+      description: desc.slice(0, 1024),
+      buttonText: String(buttonText).slice(0, 20),
+      footerText: footer.slice(0, 60),
+      sections: safeSections,
+      delay,
+    }),
+  })
+  const raw = await response.text().catch(() => '')
+  if (!response.ok) {
+    log.warn('[evolution] sendList failed', {
+      status: response.status,
+      detail: raw.slice(0, 400),
+      instance: String(instance).slice(0, 64),
+    })
+    return false
+  }
+  return true
+}
+
+async function sendEvolutionList(params) {
+  const attempts = Math.min(Math.max(Number(process.env.EVOLUTION_SENDLIST_RETRIES) || 3, 1), 5)
+  const gapMs = Math.min(Math.max(Number(process.env.EVOLUTION_SENDLIST_RETRY_MS) || 700, 200), 5000)
+  for (let i = 0; i < attempts; i++) {
+    if (i > 0) await sleep(gapMs)
+    if (await sendEvolutionListOnce(params)) return true
+  }
+  return false
+}
+
+/**
+ * Envia texto + lista no WhatsApp quando há instância Evolution resolvida.
+ * Por defeito só usa `evolutionInstance` / `instance` do body (evita duplicar com n8n que também envia texto).
+ * Com `evolutionEnvFallback: true` (webhook direto e `POST /api/whatsapp/bot/mensagem`), usa `EVOLUTION_INSTANCE` se o body não trouxer nome da instância.
+ */
+async function deliverWhatsappBotOutbound(body, phone, response, options = {}) {
+  if (!response || typeof response !== 'object' || !phone) return false
+  const instance = firstString(
+    body?.evolutionInstance,
+    body?.instance,
+    options.evolutionEnvFallback ? process.env.EVOLUTION_INSTANCE : undefined,
+  )
+  if (!instance) return false
+
+  const inter = response.evolutionInteractive
+  const needsList = inter?.type === 'list' && Array.isArray(inter.values)
+  const replyText = String(response.reply || '').trim()
+  const fallbackText = String(response.whatsappFallbackText || '').trim()
+
+  let textDelivered = false
+  let listDelivered = false
+  let buttonsDelivered = false
+
+  try {
+    if (needsList) {
+      // Sempre enviar texto de confirmação primeiro (lista/botões falham sem feedback visível).
+      if (fallbackText) {
+        textDelivered = await sendEvolutionText({ instance, number: phone, text: fallbackText })
+        await sleep(450)
+      }
+      listDelivered = await sendEvolutionList({
+        instance,
+        number: phone,
+        title: inter.title,
+        description: inter.description,
+        buttonText: inter.buttonText,
+        footerText: inter.footerText,
+        sections: inter.values,
+        delay: inter.delay ?? 1200,
+      })
+      const eventId = extractAgendaAvisoEventIdFromListInteractive(inter)
+      if (!listDelivered && eventId) {
+        const prefix = `agenda_aviso:${eventId}:`
+        buttonsDelivered = await sendEvolutionButtons({
+          instance,
+          number: phone,
+          title: String(inter.title || 'Compromisso').slice(0, 60),
+          description: String(inter.description || '').slice(0, 1024),
+          footer: '30 min: envie aviso4',
+          buttons: [
+            { id: `${prefix}0`, displayText: 'Na hora' },
+            { id: `${prefix}5`, displayText: '5 min antes' },
+            { id: `${prefix}10`, displayText: '10 min antes' },
+          ],
+          delay: 900,
+        })
+      }
+      if (!textDelivered && fallbackText) {
+        textDelivered = await sendEvolutionText({ instance, number: phone, text: fallbackText })
+      }
+    } else if (replyText) {
+      textDelivered = await sendEvolutionText({ instance, number: phone, text: replyText })
+    }
+
+    return Boolean(textDelivered || listDelivered || buttonsDelivered)
+  } catch (e) {
+    log.error('[whatsapp] deliverWhatsappBotOutbound', e)
+    return false
+  }
 }
 
 async function processAgendaReminderCron({ limit = 80 } = {}) {
@@ -367,11 +574,12 @@ async function processAgendaReminderCron({ limit = 80 } = {}) {
     if (!claimed) continue
 
     try {
-      await sendEvolutionText({
+      const okText = await sendEvolutionText({
         instance: process.env.EVOLUTION_INSTANCE,
         number: item.phone,
         text: stripRespondaAgendaReminderSuffix(item.message),
       })
+      if (!okText) throw new Error('Evolution sendText falhou.')
       await registrarLembretesAgendaEnviados([item])
       sent.push(item.reminder_id)
     } catch (error) {
@@ -1925,7 +2133,7 @@ app.post('/api/whatsapp/bot/mensagem', async (c) => {
   }
 
   try {
-    const result = await processWhatsappBotBody(body)
+    const result = await processWhatsappBotBody(body, { evolutionEnvFallback: true })
     return c.json(result.response, result.status)
   } catch (error) {
     log.error('[whatsapp-bot] processarMensagemBot failed', error)
@@ -1966,14 +2174,16 @@ async function handleEvolutionWebhook(c) {
       has_text: Boolean(botBody.message),
       has_audio: Boolean(botBody.audioBase64 || botBody.audioUrl || botBody.messageId),
     })
-    const result = await processWhatsappBotBody(botBody)
-    const reply = result.response?.reply
-    let sent = false
-    if (reply) {
+    const result = await processWhatsappBotBody(botBody, { evolutionEnvFallback: true })
+    const reply = String(result.response?.reply || '').trim()
+    const fallback = String(result.response?.whatsappFallbackText || '').trim()
+    let sent = Boolean(result.response?.whatsappOutboundSent)
+    const textOut = reply || fallback
+    if (!sent && textOut) {
       sent = await sendEvolutionText({
-        instance: botBody.evolutionInstance,
+        instance: botBody.evolutionInstance || process.env.EVOLUTION_INSTANCE,
         number: botBody.phone,
-        text: reply,
+        text: textOut,
       })
     }
     return c.json({ ok: true, sent, inputType: result.response?.inputType })

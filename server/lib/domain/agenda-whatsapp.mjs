@@ -5,6 +5,7 @@ import {
   formatAgendaDateTime,
   listarAgendaEventos,
   registrarInteracaoAgendaWhatsApp,
+  ultimoEventoAgendaCriadoRecentemente,
   AGENDA_TZ,
 } from './agenda.mjs'
 
@@ -144,15 +145,30 @@ export function parseAgendaDateTime(message, base = new Date()) {
   return saoPauloDateFromParts({ ...parts, hour: time.hour, minute: time.minute })
 }
 
-function parseReminderMinutes(message) {
+/** Indica que "… para/as HH horas antes …" é horário (às HH), não pedido de aviso "HH horas antes". */
+function isLikelyClockAtPhraseBeforeHourOffset(before) {
+  const b = String(before || '').trimEnd()
+  return (
+    /\bpara\s+as\s*$/i.test(b) ||
+    /\breuni[aã]o\s+para\s+as\s*$/i.test(b) ||
+    /\breuniao\s+para\s+as\s*$/i.test(b) ||
+    /\breuni[aã]o\s+as\s*$/i.test(b) ||
+    /\breuniao\s+as\s*$/i.test(b) ||
+    /\b(?:marcar|agendar|criar|anotar|tenho|terei)\s+\S+(?:\s+\S+)*\s+as\s*$/i.test(b)
+  )
+}
+
+export function parseReminderMinutes(message) {
   const text = stripAccents(String(message || '').toLowerCase())
   const match = text.match(
     /\b(?:avise|avisar|alerte|alerta|alertar|lembre|lembrar|lembra|lembrete).*?(\d{1,4})\s*(min|minuto|minutos|hora|horas|h)\s+antes\b|\b(\d{1,4})\s*(min|minuto|minutos|hora|horas|h)\s+antes\b/
   )
-  if (!match) return null
+  if (!match || match.index === undefined) return null
   const n = Number.parseInt(match[1] || match[3], 10)
   if (!Number.isFinite(n)) return null
   const unit = match[2] || match[4]
+  const isHourUnit = unit.startsWith('h') || unit.startsWith('hora')
+  if (isHourUnit && isLikelyClockAtPhraseBeforeHourOffset(text.slice(0, match.index))) return null
   return Math.min(unit.startsWith('h') || unit.startsWith('hora') ? n * 60 : n, 1440)
 }
 
@@ -264,8 +280,21 @@ function targetToken(message, verbs) {
   return String(message || '').match(re)?.[1]
 }
 
+/** Resposta ao menu de antecedência do aviso (lista WhatsApp). Formato: agenda_aviso:<uuid>:<minutos> */
+export const AGENDA_AVISO_ROW_PREFIX = 'agenda_aviso:'
+
+const AVISO_WHATSAPP_MINUTOS = new Set([0, 5, 10, 30])
+
+function isAgendaAvisoRowMessage(message) {
+  const raw = String(message || '').trim()
+  return /^agenda_aviso:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:\d+$/i.test(raw)
+}
+
 export function isAgendaMessage(message) {
   const raw = String(message || '')
+  const trimmed = raw.trim()
+  if (/^aviso[1-4]$/i.test(trimmed)) return true
+  if (isAgendaAvisoRowMessage(raw)) return true
   if (AGENDA_KEYWORD_RE.test(raw)) return true
   return hasCreateIntent(raw) && Boolean(parseAgendaDateTime(raw))
 }
@@ -279,6 +308,39 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
   let ok = true
 
   try {
+    const avisoPick = message.match(/^agenda_aviso:([a-f0-9-]{36}):(\d+)$/i)
+    if (avisoPick) {
+      intent = 'agenda_aviso_lista'
+      const eventId = avisoPick[1]
+      const minutes = Number.parseInt(avisoPick[2], 10)
+      if (!AVISO_WHATSAPP_MINUTOS.has(minutes)) throw new Error('Opção de aviso inválida.')
+      const updated = await atualizarAgendaEvento(eventId, usuario.id, {
+        lembrar_minutos_antes: minutes,
+        whatsapp_notificar: true,
+      })
+      reply = `⏰ Definido: aviso *${formatReminderLabel(minutes)}* antes de *${updated.titulo}*.\n🗓️ ${formatAgendaDateTime(updated.inicio, updated.timezone || AGENDA_TZ)}`
+      return { ok: true, reply }
+    }
+
+    const digitMenu = message.trim().match(/^aviso([1-4])$/i)
+    if (digitMenu) {
+      intent = 'agenda_aviso_menu'
+      const minutesMap = { '1': 0, '2': 5, '3': 10, '4': 30 }
+      const minutes = minutesMap[digitMenu[1]]
+      const recent = await ultimoEventoAgendaCriadoRecentemente(usuario.id, 30)
+      if (!recent) {
+        reply =
+          'Use aviso1–aviso4 logo após criar um compromisso (ex.: marcar reunião amanhã 15h, depois envie aviso2).'
+        return { ok: true, reply }
+      }
+      const updated = await atualizarAgendaEvento(recent.id, usuario.id, {
+        lembrar_minutos_antes: minutes,
+        whatsapp_notificar: true,
+      })
+      reply = `⏰ Definido: aviso *${formatReminderLabel(minutes)}* antes de *${updated.titulo}*.\n🗓️ ${formatAgendaDateTime(updated.inicio, updated.timezone || AGENDA_TZ)}`
+      return { ok: true, reply }
+    }
+
     const text = stripAccents(message.toLowerCase())
 
     const createIntent = hasCreateIntent(message)
@@ -345,21 +407,64 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
         reply = '🗓️ Para criar na agenda, envie algo como: *marcar reunião amanhã às 15h* ou *me lembra de pagar a luz sexta 9h*.'
         return { ok: true, reply }
       }
-      const minutos = parseReminderMinutes(message) ?? 0
+      const explicitReminder = parseReminderMinutes(message)
       const reminderCreate = isReminderCreateMessage(message)
-      const data = await criarAgendaEvento(
-        usuario.id,
-        {
-          titulo: titleForCreate(message),
-          descricao: reminderCreate ? 'Notificação criada pelo WhatsApp.' : undefined,
-          inicio: inicio.toISOString(),
-          lembrar_minutos_antes: minutos,
-          whatsapp_notificar: true,
+      const data = await criarAgendaEvento(usuario.id, {
+        titulo: titleForCreate(message),
+        descricao: reminderCreate ? 'Notificação criada pelo WhatsApp.' : undefined,
+        inicio: inicio.toISOString(),
+        lembrar_minutos_antes: explicitReminder !== null ? explicitReminder : 15,
+        whatsapp_notificar: true,
+      })
+
+      if (explicitReminder !== null) {
+        reply = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}`
+        return { ok: true, reply }
+      }
+
+      const quando = formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)
+      /** Texto só se a Evolution falhar ao enviar a lista (uma mensagem lista é mais fiável que texto+lista). */
+      const whatsappFallbackText = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n\n*${data.titulo}*\n${quando}\n\nEscolha o aviso enviando uma mensagem:\naviso1 — Na hora\naviso2 — 5 min antes\naviso3 — 10 min antes\naviso4 — 30 min antes`
+      return {
+        ok: true,
+        reply: '',
+        whatsappFallbackText,
+        evolutionInteractive: {
+          type: 'list',
+          title: '✅ Compromisso criado',
+          description: `${data.titulo}\n${quando}\n\nToque em Escolher tempo e selecione o aviso.`,
+          buttonText: 'Escolher tempo',
+          footerText: 'Horizonte Financeiro',
+          delay: 1200,
+          values: [
+            {
+              title: 'Antecedência',
+              rows: [
+                {
+                  title: 'Na hora',
+                  description: 'No horário do compromisso',
+                  rowId: `${AGENDA_AVISO_ROW_PREFIX}${data.id}:0`,
+                },
+                {
+                  title: '5 minutos antes',
+                  description: 'Lembrete 5 min antes',
+                  rowId: `${AGENDA_AVISO_ROW_PREFIX}${data.id}:5`,
+                },
+                {
+                  title: '10 minutos antes',
+                  description: 'Lembrete 10 min antes',
+                  rowId: `${AGENDA_AVISO_ROW_PREFIX}${data.id}:10`,
+                },
+                {
+                  title: '30 minutos antes',
+                  description: 'Lembrete 30 min antes',
+                  rowId: `${AGENDA_AVISO_ROW_PREFIX}${data.id}:30`,
+                },
+              ],
+            },
+          ],
         },
-        'WHATSAPP'
-      )
-      reply = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}`
-      return { ok: true, reply }
+      }
     }
 
     const reminderMinutes = parseReminderMinutes(message)
