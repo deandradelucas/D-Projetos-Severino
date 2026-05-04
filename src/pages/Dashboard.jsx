@@ -108,7 +108,7 @@ export default function Dashboard() {
         <RefDashboardScroll>
         <section className="dashboard-hub__hero" aria-label="Painel e ações rápidas">
           <div className="dashboard-hub__hero-row">
-            <MobileMenuButton onClick={() => setMenuAberto(true)} />
+            <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">
                 {getSaudacao()}, <span className={privacyMode ? 'privacy-blur' : ''}>{nomeExibicao}</span>

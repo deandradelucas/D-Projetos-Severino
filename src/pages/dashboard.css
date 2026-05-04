@@ -13348,3 +13348,109 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
 @media (min-width: 769px) {
 }
 
+/* ============================================================
+   STORY 2.2 — Shell & Navegação: Consistência Premium
+   Adiciona indicador gold, tokens de motion e hamburger→X.
+   NÃO toca no bloco SHELL HUB CONTRATO ESTÁVEL (linhas 6697-7087).
+   ============================================================ */
+
+/* --- Hamburger → X: estrutura de barras (Story 2.2) --- */
+.mobile-menu-btn {
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mobile-menu-btn__bar {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  transform-origin: center;
+  transition:
+    transform var(--duration-slow, 300ms) var(--ease-out, cubic-bezier(0, 0, 0.2, 1)),
+    opacity var(--duration-slow, 300ms) ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-menu-btn--open .mobile-menu-btn__bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .mobile-menu-btn--open .mobile-menu-btn__bar:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .mobile-menu-btn--open .mobile-menu-btn__bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}
+
+/* --- Mobile menu button: border-radius e transition (Story 2.2) --- */
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    border-radius: 10px;
+    transition:
+      transform var(--duration-fast, 150ms) var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1)),
+      box-shadow var(--duration-fast, 150ms) ease;
+  }
+
+  body[data-theme='dark'] .mobile-menu-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--sidebar-text, #fafafa);
+  }
+}
+
+/* --- Nav item: transition usando tokens de motion (Story 2.2) --- */
+.nav-item {
+  transition:
+    background-color var(--duration-fast, 150ms) var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1)),
+    color var(--duration-fast, 150ms) ease,
+    box-shadow var(--duration-fast, 150ms) ease;
+}
+
+/* --- Indicador gold: inset border esquerdo no item ativo (desktop shell) --- */
+@media (min-width: 769px) {
+  .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
+    background-color: rgba(212, 168, 75, 0.08);
+    color: var(--sidebar-text, #fafafa) !important;
+    box-shadow: inset 3px 0 0 var(--accent, #d4a84b);
+    border-radius: 8px;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
+    background-color: rgba(212, 168, 75, 0.1);
+    color: var(--sidebar-text, #ffffff) !important;
+  }
+}
+
+/* --- Mobile bottom nav: transition usando tokens de motion (Story 2.2) --- */
+@media (max-width: 768px) {
+  .mobile-bottom-nav__item {
+    transition:
+      color var(--duration-fast, 150ms) ease,
+      background var(--duration-fast, 150ms) ease,
+      transform var(--duration-fast, 150ms) ease,
+      box-shadow var(--duration-fast, 150ms) ease;
+  }
+
+  .mobile-bottom-nav__item:focus-visible {
+    outline-color: var(--accent, #d4a84b);
+  }
+}
+
+/* --- Icon wrap: usa CSS vars canônicos (Story 2.2) --- */
+.icon-wrap {
+  transition:
+    background var(--duration-fast, 150ms) ease,
+    box-shadow var(--duration-fast, 150ms) ease,
+    color var(--duration-fast, 150ms) ease;
+}
+
+.nav-item.active .icon-wrap {
+  background: rgba(212, 168, 75, 0.12);
+  color: var(--accent, #d4a84b);
+}
+
