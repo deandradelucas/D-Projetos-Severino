@@ -197,21 +197,21 @@ body[data-theme='light'] {
     linear-gradient(168deg, #9eb6e0 0%, #7d9ad0 42%, #6d8ec4 100%);
 }
 
-/* App autenticado (tema claro): sem gradiente do body — a foto vem do Background (horizons) atrás do app */
+/* App autenticado (tema claro): fundo sólido, sem fotos no carregamento das rotas */
 body[data-theme='light']:has(.app-horizon-shell) {
-  background-color: transparent;
+  background-color: #ffffff;
   background-image: none;
 }
 
 html:has(body[data-theme='light']:has(.app-horizon-shell)) {
-  background-color: transparent;
+  background-color: #ffffff;
 }
 
-/* Foto Horizonte visível nas laterais com desfoque mínimo (1px) por baixo da área de rotas */
+/* Rotas autenticadas: sem foto/vinheta por baixo do shell */
 body[data-theme='light']:has(.app-horizon-shell) .app-routes-grow {
-  background-color: transparent;
-  -webkit-backdrop-filter: blur(1px);
-  backdrop-filter: blur(1px);
+  background-color: #ffffff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /*
@@ -247,12 +247,18 @@ body[data-theme='dark'] {
 }
 
 body[data-theme='dark']:has(.app-horizon-shell) {
-  background-color: transparent;
+  background-color: #030303;
   background-image: none;
 }
 
 html:has(body[data-theme='dark']:has(.app-horizon-shell)) {
-  background-color: transparent;
+  background-color: #030303;
+}
+
+body[data-theme='dark']:has(.app-horizon-shell) .app-routes-grow {
+  background-color: #030303;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 input,

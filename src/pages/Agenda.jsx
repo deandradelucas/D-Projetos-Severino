@@ -476,11 +476,11 @@ export default function Agenda() {
                 </div>
                 <div className="agenda-hero__summary" aria-label="Resumo de compromissos">
                   <div>
-                    <span>Itens do dia</span>
+                    <span>Hoje</span>
                     <strong>{stats.selectedDay}</strong>
                   </div>
                   <div>
-                    <span>Nesta semana</span>
+                    <span>Semana</span>
                     <strong>{stats.week}</strong>
                   </div>
                   {nextEvento ? (

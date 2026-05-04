@@ -199,9 +199,8 @@ function formatReminderLabel(minutes) {
 function formatLista(eventos, titulo = 'Agenda') {
   if (!eventos.length) return `🗓️ *${titulo}*\n\nNenhum compromisso encontrado.`
   const lines = eventos.slice(0, 8).map((ev, idx) => {
-    const codigo = ev.id.slice(0, 8)
     const local = ev.local ? `\n   📍 ${ev.local}` : ''
-    return `${idx + 1}. *${ev.titulo}*\n   ${formatAgendaDateTime(ev.inicio, ev.timezone || AGENDA_TZ)}\n   Código: ${codigo}${local}`
+    return `${idx + 1}. *${ev.titulo}*\n   ${formatAgendaDateTime(ev.inicio, ev.timezone || AGENDA_TZ)}${local}`
   })
   return `🗓️ *${titulo}*\n\n${lines.join('\n\n')}\n\nComandos: *confirmar 1*, *reagendar 1 para amanhã 10h*, *cancelar 1*.`
 }

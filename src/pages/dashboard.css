@@ -9831,7 +9831,7 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
 .agenda-page .agenda-hero {
   position: relative;
   overflow: hidden;
-  padding: 18px 20px 20px;
+  padding: 16px 18px 18px;
   background:
     radial-gradient(circle at 12% 0%, rgba(139, 92, 246, 0.1), transparent 34%),
     radial-gradient(circle at 96% 10%, rgba(212, 168, 75, 0.1), transparent 32%),
@@ -9846,8 +9846,8 @@ body[data-theme='dark'] .agenda-page .agenda-hero {
 }
 
 .agenda-page .dashboard-hub__hero-row {
-  align-items: flex-start;
-  gap: 18px;
+  align-items: center;
+  gap: 14px;
   width: 100%;
 }
 
@@ -9856,10 +9856,10 @@ body[data-theme='dark'] .agenda-page .agenda-hero {
 }
 
 .agenda-page .dashboard-hub__hero-actions .dashboard-hub__btn--primary {
-  min-height: 44px;
-  padding-inline: 18px;
-  border-radius: 16px;
-  box-shadow: 0 16px 34px -22px rgba(91, 33, 182, 0.85);
+  min-height: 40px;
+  padding-inline: 16px;
+  border-radius: 15px;
+  box-shadow: 0 14px 30px -22px rgba(91, 33, 182, 0.85);
 }
 
 .agenda-hero > *:not(.agenda-hero__orb) {
@@ -11534,14 +11534,14 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
 
 .agenda-page .agenda-hero__title span {
   color: rgba(255, 255, 255, 0.62);
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 650;
   letter-spacing: -0.02em;
 }
 
 .agenda-page .agenda-hero__title strong {
   color: #ffffff;
-  font-size: clamp(1.55rem, 5vw, 2.2rem);
+  font-size: clamp(1.44rem, 4.6vw, 2.06rem);
   font-weight: 820;
   letter-spacing: -0.06em;
   line-height: 1;
@@ -11549,44 +11549,72 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
 
 .agenda-page .agenda-hero__summary {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 22px;
+  grid-template-columns: repeat(2, max-content) minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
 }
 
 .agenda-page .agenda-hero__summary div {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  gap: 7px;
   min-width: 0;
-  padding: 13px 14px;
+  min-height: 38px;
+  padding: 7px 10px;
   border: 0.5px solid rgba(255, 255, 255, 0.14);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.06));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .agenda-page .agenda-hero__summary span {
   display: block;
   color: rgba(255, 255, 255, 0.58);
-  font-size: 0.68rem;
-  font-weight: 720;
+  font-size: 0.64rem;
+  font-weight: 760;
   letter-spacing: 0.02em;
 }
 
 .agenda-page .agenda-hero__summary strong {
   display: block;
-  margin-top: 5px;
   color: #ffffff;
-  font-size: 1.72rem;
+  font-size: 1.05rem;
   font-weight: 860;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.045em;
   line-height: 1;
 }
 
 .agenda-page .agenda-hero__summary p {
   grid-column: 1 / -1;
-  margin: 2px 0 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 8px 10px;
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.065);
   color: rgba(255, 255, 255, 0.68);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 620;
-  line-height: 1.35;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 901px) {
+  .agenda-page .agenda-hero {
+    min-height: 156px;
+  }
+
+  .agenda-page .agenda-hero__summary {
+    grid-template-columns: repeat(2, max-content) minmax(280px, 1fr);
+  }
+
+  .agenda-page .agenda-hero__summary p {
+    grid-column: auto;
+    min-width: 0;
+  }
 }
 
 .agenda-page .agenda-calendar-panel,
@@ -11908,15 +11936,15 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   .agenda-page .agenda-hero,
   body[data-theme='dark'] .agenda-page .agenda-hero,
   body[data-theme='light'] .agenda-page .agenda-hero {
-    min-height: 224px !important;
-    padding-bottom: 50px !important;
+    min-height: clamp(184px, 42vw, 206px) !important;
+    padding: 12px clamp(10px, 3vw, 16px) clamp(40px, 8vw, 52px) !important;
   }
 
   .agenda-page .agenda-hero .dashboard-hub__hero-row {
     display: grid !important;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 10px !important;
   }
 
   .agenda-page .agenda-hero .dashboard-hub__hero-actions {
@@ -11925,10 +11953,38 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   }
 
   .agenda-page .agenda-hero .dashboard-hub__btn--primary {
-    min-height: 40px !important;
+    min-height: 38px !important;
     width: auto !important;
-    padding-inline: 16px !important;
-    border-radius: 13px !important;
+    padding-inline: 14px !important;
+    border-radius: 14px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .agenda-page .agenda-hero__title {
+    overflow: hidden;
+  }
+
+  .agenda-page .agenda-hero__title span,
+  .agenda-page .agenda-hero__title strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .agenda-page .agenda-hero__summary {
+    grid-template-columns: repeat(2, max-content) minmax(0, 1fr);
+    gap: clamp(7px, 2vw, 9px);
+    margin-top: clamp(12px, 3.8vw, 16px);
+  }
+
+  .agenda-page .agenda-hero__summary div {
+    min-height: 36px;
+    padding: 7px 9px;
+  }
+
+  .agenda-page .agenda-hero__summary p {
+    grid-column: 1 / -1;
+    max-width: 100%;
   }
 
   .agenda-page .agenda-calendar-panel {
@@ -11959,27 +12015,56 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
 }
 
 @media (max-width: 380px) {
+  .agenda-page .agenda-hero,
+  body[data-theme='dark'] .agenda-page .agenda-hero,
+  body[data-theme='light'] .agenda-page .agenda-hero {
+    min-height: 184px !important;
+    padding-bottom: 38px !important;
+  }
+
   .agenda-page .agenda-hero .dashboard-hub__hero-row {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 8px !important;
   }
 
   .agenda-page .agenda-hero .dashboard-hub__hero-actions {
-    grid-column: 1 / -1 !important;
-    justify-self: stretch;
-    width: 100% !important;
+    grid-column: auto !important;
+    justify-self: end;
+    width: auto !important;
   }
 
   .agenda-page .agenda-hero .dashboard-hub__btn--primary {
-    width: 100% !important;
+    width: auto !important;
+    min-height: 36px !important;
+    padding-inline: 11px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .agenda-page .agenda-hero__title span {
+    font-size: 0.68rem;
+  }
+
+  .agenda-page .agenda-hero__title strong {
+    font-size: 1.34rem;
   }
 
   .agenda-page .agenda-hero__summary {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: repeat(2, max-content) minmax(0, 1fr);
+    gap: 7px;
   }
 
   .agenda-page .agenda-hero__summary div {
-    padding: 11px 10px;
+    min-height: 34px;
+    padding: 6px 8px;
+  }
+
+  .agenda-page .agenda-hero__summary strong {
+    font-size: 0.98rem;
+  }
+
+  .agenda-page .agenda-hero__summary p {
+    font-size: 0.68rem;
+    padding: 6px 8px;
   }
 
   .agenda-page .agenda-calendar-day {
@@ -11994,6 +12079,39 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   .agenda-page .agenda-day-item {
     grid-template-columns: 30px minmax(0, 1fr);
     gap: 10px;
+  }
+}
+
+@media (max-width: 340px) {
+  .agenda-page .agenda-hero,
+  body[data-theme='dark'] .agenda-page .agenda-hero,
+  body[data-theme='light'] .agenda-page .agenda-hero {
+    min-height: 176px !important;
+    padding-inline: 8px !important;
+    padding-bottom: 34px !important;
+  }
+
+  .agenda-page .agenda-hero .dashboard-hub__hero-row {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+  }
+
+  .agenda-page .agenda-hero__summary div {
+    min-height: 32px;
+    padding: 6px 7px;
+    border-radius: 14px;
+  }
+
+  .agenda-page .agenda-hero__summary span {
+    font-size: 0.58rem;
+  }
+
+  .agenda-page .agenda-hero__summary strong {
+    font-size: 0.9rem;
+  }
+
+  .agenda-page .agenda-hero__summary p {
+    display: block;
+    font-size: 0.64rem;
   }
 }
 
