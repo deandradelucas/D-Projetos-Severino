@@ -116,7 +116,7 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, cate
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     if (!formData.valor || parseFloat(formData.valor) <= 0) {
-      alert('Informe um valor válido maior que zero.')
+      showToast('Informe um valor válido maior que zero.', 'error')
       return
     }
 
@@ -161,11 +161,11 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, cate
         onSave()
         onClose()
       } else {
-        const error = await res.json()
-        alert(error.message || 'Erro ao salvar transação')
+        const error = await res.json().catch(() => ({}))
+        showToast(error.message || 'Não foi possível salvar a transação.', 'error')
       }
     } catch {
-      alert('Erro inesperado de conexão')
+      showToast('Sem conexão. Tente de novo.', 'error')
     } finally {
       setSaving(false)
     }

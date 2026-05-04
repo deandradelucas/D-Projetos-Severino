@@ -4,6 +4,7 @@ import './dashboard.css'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { webAuthnSupported, registerWebAuthnCredential } from '../lib/webauthnBrowser'
@@ -22,13 +23,13 @@ export default function Configuracoes() {
     }
   })
 
-  const [emailDigest, setEmailDigest] = useState(() => localStorage.getItem('horizonte_email_digest') === 'true')
   const [toast, setToast] = useState('')
   const [resetSending, setResetSending] = useState(false)
   const [webauthnList, setWebauthnList] = useState([])
   const [webauthnLoading, setWebauthnLoading] = useState(false)
   const [webauthnError, setWebauthnError] = useState(null)
   const [bioRegistering, setBioRegistering] = useState(false)
+  const [confirmBiometricRemoval, setConfirmBiometricRemoval] = useState(null)
   const usuarioIdHeader = String(perfil?.id ?? '').trim()
 
   const showToast = useCallback((msg) => {
@@ -57,10 +58,6 @@ export default function Configuracoes() {
       })
       .catch(() => {})
   }, [usuarioIdHeader])
-
-  useEffect(() => {
-    localStorage.setItem('horizonte_email_digest', emailDigest ? 'true' : 'false')
-  }, [emailDigest])
 
   const loadWebAuthn = useCallback(async () => {
     if (!usuarioIdHeader) return
@@ -109,7 +106,6 @@ export default function Configuracoes() {
 
   const handleRemoveBiometric = async (credentialRowId) => {
     if (!usuarioIdHeader) return
-    if (!window.confirm('Remover o login por biometria vinculado a este dispositivo?')) return
     try {
       const res = await fetch(apiUrl(`/api/auth/webauthn/credentials/${credentialRowId}`), {
         method: 'DELETE',
@@ -127,6 +123,10 @@ export default function Configuracoes() {
   }
 
   const isAdmin = String(perfil.role || '').toUpperCase() === 'ADMIN'
+  const biometricSupported = webAuthnSupported()
+  const profileInitial = (perfil.nome || perfil.email || '?').charAt(0).toUpperCase()
+  const roleLabel = isAdmin ? 'Administrador' : 'Usuário'
+  const telefoneLabel = perfil.telefone || 'Não informado'
 
   const copiarEmail = () => {
     if (!perfil.email) return
@@ -174,202 +174,154 @@ export default function Configuracoes() {
 
         {toast && <div className="config-toast">{toast}</div>}
 
-        <div className="config-layout">
-          <section className="config-card">
-            <h2 className="config-card-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              Seu perfil
-            </h2>
-            <div className="config-avatar-wrap">
-              <div className="config-avatar" aria-hidden>
-                {(perfil.nome || '?').charAt(0).toUpperCase()}
+        <div className="config-layout config-layout--clean">
+          <section className="config-card config-profile-card">
+            <div className="config-profile-main">
+              <div className="config-avatar config-avatar--clean" aria-hidden>
+                {profileInitial}
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
-                  {perfil.nome || 'Usuário'}
-                </div>
-                <p style={{ margin: '6px 0 0', fontSize: '14px', color: 'var(--text-secondary)', wordBreak: 'break-all' }}>
-                  {perfil.email || '—'}
-                </p>
-                {perfil.telefone ? (
-                  <p className="config-meta">
-                    Telefone (cadastro / WhatsApp):{' '}
-                    <strong style={{ color: 'var(--text-primary)' }}>{perfil.telefone}</strong>
-                    <br />
-                    O bot usa <strong>só este número</strong> para vincular mensagens à sua conta.
-                  </p>
-                ) : (
-                  <p className="config-meta">
-                    Sem telefone no cadastro — o bot do WhatsApp não conseguirá associar mensagens a você até existir um número na conta.
-                  </p>
-                )}
+              <div className="config-profile-copy">
+                <span className="config-card-kicker">Conta</span>
+                <h2 className="config-profile-name">{perfil.nome || 'Usuário'}</h2>
+                <p className="config-profile-email">{perfil.email || 'E-mail não informado'}</p>
               </div>
             </div>
-            <div className="config-actions-row">
-              <button type="button" className="config-btn-ghost" onClick={copiarEmail} disabled={!perfil.email}>
+
+            <div className="config-field-grid" aria-label="Dados do perfil">
+              <div className="config-field">
+                <span>Perfil</span>
+                <strong>{roleLabel}</strong>
+              </div>
+              <div className="config-field">
+                <span>Telefone</span>
+                <strong>{telefoneLabel}</strong>
+              </div>
+            </div>
+
+            <div className="config-quick-actions">
+              <button type="button" className="config-action-btn" onClick={copiarEmail} disabled={!perfil.email}>
                 Copiar e-mail
               </button>
-              <button type="button" className="config-btn-ghost" onClick={solicitarRedefinicaoSenha} disabled={!perfil.email || resetSending}>
-                {resetSending ? 'Enviando…' : 'Link para nova senha'}
+              <button type="button" className="config-action-btn" onClick={solicitarRedefinicaoSenha} disabled={!perfil.email || resetSending}>
+                {resetSending ? 'Enviando…' : 'Redefinir senha'}
               </button>
             </div>
           </section>
 
           <section className="config-card">
-            <h2 className="config-card-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-              Preferências
-            </h2>
-            <div className="config-theme-picker-block">
-              <div className="config-pref-label config-pref-label--block">
-                <strong>Aparência</strong>
-                <span>Claro ou escuro. A preferência fica salva neste navegador.</span>
-              </div>
-              <div className="config-themes" role="group" aria-label="Tema da interface">
-                <button
-                  type="button"
-                  className={`config-theme-card ${theme === 'light' ? 'is-active' : ''}`}
-                  onClick={() => setTheme('light')}
-                  aria-pressed={theme === 'light'}
-                >
-                  <div className="config-theme-preview config-theme-preview--light" aria-hidden />
-                  <div className="config-theme-body">
-                    <h4>Claro</h4>
-                    <p>Mesmo layout, cores claras e fundo Horizonte.</p>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  className={`config-theme-card ${theme === 'dark' ? 'is-active' : ''}`}
-                  onClick={() => setTheme('dark')}
-                  aria-pressed={theme === 'dark'}
-                >
-                  <div className="config-theme-preview config-theme-preview--dark" aria-hidden />
-                  <div className="config-theme-body">
-                    <h4>Escuro</h4>
-                    <p>Mesmo layout, paleta escura para ambientes com pouca luz.</p>
-                  </div>
-                </button>
-              </div>
+            <div className="config-card-head">
+              <span className="config-card-kicker">Preferências</span>
+              <h2 className="config-card-title-clean">Aparência</h2>
+              <p className="config-card-subtitle">Escolha o tema e o nível de privacidade da interface.</p>
             </div>
-            <div className="config-pref-row">
-              <div className="config-pref-label">
-                <strong>Modo privacidade</strong>
-                <span>Oculta valores sensíveis nas telas principais</span>
-              </div>
-              <input type="checkbox" className="switch-apple" checked={privacyMode} onChange={togglePrivacy} aria-label="Modo privacidade" />
+
+            <div className="config-themes config-themes--compact" role="group" aria-label="Tema da interface">
+              <button
+                type="button"
+                className={`config-theme-card ${theme === 'light' ? 'is-active' : ''}`}
+                onClick={() => setTheme('light')}
+                aria-pressed={theme === 'light'}
+              >
+                <div className="config-theme-preview config-theme-preview--light" aria-hidden />
+                <div className="config-theme-body">
+                  <h4>Claro</h4>
+                  <p>Visual leve para o dia.</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                className={`config-theme-card ${theme === 'dark' ? 'is-active' : ''}`}
+                onClick={() => setTheme('dark')}
+                aria-pressed={theme === 'dark'}
+              >
+                <div className="config-theme-preview config-theme-preview--dark" aria-hidden />
+                <div className="config-theme-body">
+                  <h4>Escuro</h4>
+                  <p>Menos brilho à noite.</p>
+                </div>
+              </button>
             </div>
-            <div className="config-pref-row">
-              <div className="config-pref-label">
-                <strong>Resumo por e-mail</strong>
-                <span>Preferência salva no navegador (integração de envio em evolução)</span>
-              </div>
-              <input
-                type="checkbox"
-                className="switch-apple"
-                checked={emailDigest}
-                onChange={() => setEmailDigest((v) => !v)}
-                aria-label="Resumo por e-mail"
-              />
+
+            <div className="config-preference-list">
+              <label className="config-pref-row config-pref-row--clean">
+                <span className="config-pref-label">
+                  <strong>Modo privacidade</strong>
+                  <span>Oculta valores sensíveis nas telas principais.</span>
+                </span>
+                <input type="checkbox" className="switch-apple" checked={privacyMode} onChange={togglePrivacy} aria-label="Modo privacidade" />
+              </label>
             </div>
           </section>
 
-          <section className="config-card config-card--full">
-            <h2 className="config-card-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect x="5" y="11" width="14" height="10" rx="2" />
-                <path d="M7 11V8a5 5 0 0110 0v3" />
-              </svg>
-              Biometria no celular
-            </h2>
-            <p style={{ margin: '0 0 12px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              No telefone ou tablet, você pode entrar com digital ou reconhecimento facial após cadastrar este aparelho.
-              Exige HTTPS em produção (no computador use senha se a biometria não aparecer).
-            </p>
-            <button
-              type="button"
-              className="btn-primary"
-              style={{ padding: '10px 18px', fontSize: '14px', marginBottom: 14 }}
-              disabled={!usuarioIdHeader || bioRegistering || !webAuthnSupported()}
-              onClick={handleRegisterBiometric}
-            >
-              {bioRegistering ? 'Registrando…' : 'Ativar biometria neste aparelho'}
-            </button>
-            {webauthnLoading ? (
-              <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)' }}>Carregando…</p>
-            ) : webauthnError ? (
-              <div style={{ margin: 0 }}>
-                <p style={{ margin: '0 0 8px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                  {webauthnError}
-                </p>
-                <button type="button" className="config-btn-ghost" onClick={() => loadWebAuthn()}>
-                  Tentar de novo
-                </button>
+          <section className="config-card config-card--full config-security-card">
+            <div className="config-card-head config-card-head--row">
+              <div>
+                <span className="config-card-kicker">Segurança</span>
+                <h2 className="config-card-title-clean">Login por biometria</h2>
+                <p className="config-card-subtitle">Use digital ou Face ID neste aparelho quando disponível.</p>
               </div>
-            ) : webauthnList.length === 0 ? (
-              <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                Ainda não há biometria registrada nesta conta. Use o botão acima para ativar neste aparelho; depois o
-                dispositivo aparecerá nesta lista.
-              </p>
-            ) : (
-              <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                {webauthnList.map((row) => (
-                  <li
-                    key={row.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: 10,
-                      padding: '10px 0',
-                      borderTop: '1px solid var(--border-color)',
-                      fontSize: '13px',
-                    }}
-                  >
-                    <span style={{ color: 'var(--text-secondary)' }}>
-                      Registrado em{' '}
-                      {row.created_at
-                        ? new Date(row.created_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
-                        : '—'}
-                      {row.last_used_at ? (
-                        <span style={{ display: 'block', fontSize: '12px', marginTop: 4 }}>
-                          Último uso: {new Date(row.last_used_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
-                        </span>
-                      ) : null}
-                    </span>
-                    <button type="button" className="config-btn-ghost" onClick={() => handleRemoveBiometric(row.id)}>
-                      Remover
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+              <button
+                type="button"
+                className="config-action-btn config-action-btn--primary"
+                disabled={!usuarioIdHeader || bioRegistering || !biometricSupported}
+                onClick={handleRegisterBiometric}
+              >
+                {bioRegistering ? 'Ativando…' : 'Ativar'}
+              </button>
+            </div>
+
+            <div className="config-security-panel">
+              {webauthnLoading ? (
+                <p className="config-empty-note">Carregando dispositivos…</p>
+              ) : webauthnError ? (
+                <div className="config-empty-note">
+                  <span>{webauthnError}</span>
+                  <button type="button" className="config-action-btn" onClick={() => loadWebAuthn()}>
+                    Tentar de novo
+                  </button>
+                </div>
+              ) : webauthnList.length === 0 ? (
+                <p className="config-empty-note">
+                  Nenhuma biometria cadastrada nesta conta.
+                </p>
+              ) : (
+                <ul className="config-bio-list">
+                  {webauthnList.map((row) => (
+                    <li key={row.id} className="config-bio-item">
+                      <span>
+                        <strong>
+                          {row.created_at
+                            ? new Date(row.created_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+                            : 'Dispositivo cadastrado'}
+                        </strong>
+                        {row.last_used_at ? (
+                          <small>
+                            Último uso: {new Date(row.last_used_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
+                          </small>
+                        ) : null}
+                      </span>
+                      <button type="button" className="config-action-btn" onClick={() => setConfirmBiometricRemoval(row.id)}>
+                        Remover
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </section>
 
           {isAdmin && (
-            <section className="config-card config-card--full">
-              <div className="config-section-label">Administração</div>
-              <h2 className="config-card-title" style={{ marginTop: 0 }}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-                Painel admin
-              </h2>
-              <p style={{ margin: '0 0 14px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                Acesso a logs e usuários (conta com perfil administrador).
-              </p>
+            <section className="config-card config-card--full config-admin-card">
+              <div className="config-card-head">
+                <span className="config-card-kicker">Administração</span>
+                <h2 className="config-card-title-clean">Painel admin</h2>
+              </div>
               <div className="config-admin-strip">
-                <Link className="config-btn-ghost" to="/admin/usuarios" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
-                  Logs usuários
+                <Link className="config-action-btn" to="/admin/usuarios" onClick={() => setMenuAberto(false)}>
+                  Usuários
                 </Link>
-                <Link className="config-btn-ghost" to="/admin/pagamentos" style={{ textDecoration: 'none' }} onClick={() => setMenuAberto(false)}>
-                  Logs de Pagamentos
+                <Link className="config-action-btn" to="/admin/pagamentos" onClick={() => setMenuAberto(false)}>
+                  Pagamentos
                 </Link>
               </div>
             </section>
@@ -380,6 +332,14 @@ export default function Configuracoes() {
         </div>
       </main>
       </div>
+      <ConfirmDialog
+        open={Boolean(confirmBiometricRemoval)}
+        title="Remover biometria?"
+        message="Este aparelho deixará de usar digital ou reconhecimento facial para entrar na conta."
+        confirmLabel="Remover"
+        onConfirm={() => handleRemoveBiometric(confirmBiometricRemoval)}
+        onClose={() => setConfirmBiometricRemoval(null)}
+      />
     </div>
   )
 }

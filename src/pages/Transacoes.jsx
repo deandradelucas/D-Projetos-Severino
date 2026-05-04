@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
 import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { useTheme } from '../context/ThemeContext'
 import { useTransactionCache } from '../context/transactionCacheStore'
 import { apiUrl } from '../lib/apiUrl'
@@ -53,6 +54,7 @@ export default function Transacoes() {
   const [hasMore, setHasMore] = useState(false)
   const [filtrosAbertos, setFiltrosAbertos] = useState(false)
   const [recorrencias, setRecorrencias] = useState([])
+  const [confirmDialog, setConfirmDialog] = useState(null)
 
   // Filters State
   const [filters, setFilters] = useState({
@@ -186,8 +188,7 @@ export default function Transacoes() {
     }
   }, [usuario.id, fetchCategorias, fetchTransacoes, fetchRecorrencias])
 
-  const handleEncerrarRecorrencia = async (id) => {
-    if (!window.confirm('Parar de repetir este lançamento todo dia 1?')) return
+  const encerrarRecorrencia = async (id) => {
     const session = readHorizonteUser()
     if (!session?.id) return
     try {
@@ -202,13 +203,21 @@ export default function Transacoes() {
     }
   }
 
+  const handleEncerrarRecorrencia = (id) => {
+    setConfirmDialog({
+      title: 'Encerrar repetição?',
+      message: 'Este lançamento deixará de se repetir todo dia 1. As transações já criadas serão mantidas.',
+      confirmLabel: 'Encerrar',
+      onConfirm: () => encerrarRecorrencia(id),
+    })
+  }
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target
     setFilters(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Deseja realmente excluir esta transação?')) return
+  const deleteTransacao = async (id) => {
     const session = readHorizonteUser()
     if (!session?.id) return
     
@@ -231,6 +240,15 @@ export default function Transacoes() {
       console.error(err)
       fetchTransacoes()
     }
+  }
+
+  const handleDelete = (transacao) => {
+    setConfirmDialog({
+      title: 'Excluir transação?',
+      message: `A transação "${transacao.descricao || 'sem descrição'}" será removida da sua lista.`,
+      confirmLabel: 'Excluir',
+      onConfirm: () => deleteTransacao(transacao.id),
+    })
   }
 
   const formatCurrency = formatCurrencyBRL
@@ -593,7 +611,7 @@ export default function Transacoes() {
                           <button
                             type="button"
                             className="btn-delete"
-                            onClick={() => handleDelete(t.id)}
+                            onClick={() => handleDelete(t)}
                             aria-label={`Excluir transação ${t.descricao || 'sem descrição'}`}
                             title="Excluir"
                           >
@@ -652,6 +670,14 @@ export default function Transacoes() {
       }}
       usuarioId={readHorizonteUser()?.id || usuario.id}
       editingTransaction={editingTransaction}
+    />
+    <ConfirmDialog
+      open={Boolean(confirmDialog)}
+      title={confirmDialog?.title}
+      message={confirmDialog?.message}
+      confirmLabel={confirmDialog?.confirmLabel}
+      onConfirm={confirmDialog?.onConfirm}
+      onClose={() => setConfirmDialog(null)}
     />
     </>
   )

@@ -37,9 +37,33 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const openerRef = useRef(null)
   const closeMenu = useCallback(() => setMenuAberto(false), [setMenuAberto])
 
-  /* Mobile: ao abrir o drawer, baixa chunks do menu em paralelo (clique na rota fica instantâneo). */
+  /* Mobile: espera a animação do drawer terminar antes de aquecer chunks. */
   useEffect(() => {
-    if (menuAberto) prefetchAppNavChunksNow()
+    if (!menuAberto) return undefined
+
+    let idleId = null
+    const timeoutId = window.setTimeout(() => {
+      const run = () => prefetchAppNavChunksNow()
+      if ('requestIdleCallback' in window) {
+        idleId = window.requestIdleCallback(run, { timeout: 1200 })
+      } else {
+        run()
+      }
+    }, 430)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+      if (idleId != null && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleId)
+      }
+    }
+  }, [menuAberto])
+
+  useEffect(() => {
+    document.body.classList.toggle('horizon-sidebar-open', menuAberto)
+    return () => {
+      document.body.classList.remove('horizon-sidebar-open')
+    }
   }, [menuAberto])
 
   useEffect(() => {

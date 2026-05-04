@@ -364,6 +364,19 @@ export default function Relatorios() {
   const chart = getRelatorioChartPalette(chartMono)
 
   const saldoPositivo = summary.saldo >= 0
+  const selectedCategoryName = useMemo(() => {
+    if (!filters.categoria_id) return 'Todas as categorias'
+    return categorias.find((cat) => String(cat.id) === String(filters.categoria_id))?.nome || 'Categoria selecionada'
+  }, [categorias, filters.categoria_id])
+  const periodLabel = useMemo(() => {
+    const formatDate = (value) => {
+      if (!value) return null
+      return new Date(`${value}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+    }
+    const start = formatDate(filters.dataInicio)
+    const end = formatDate(filters.dataFim)
+    return start && end ? `${start} a ${end}` : 'Período personalizado'
+  }, [filters.dataFim, filters.dataInicio])
 
   return (
     <div
@@ -410,7 +423,7 @@ export default function Relatorios() {
         </section>
 
         <article
-          className={`ref-panel page-relatorios-ref-filters ${filtrosAbertos ? '' : 'page-relatorios-ref-filters--collapsed'}`}
+          className={`ref-panel page-relatorios-ref-filters page-relatorios-ref-filters--clean ${filtrosAbertos ? '' : 'page-relatorios-ref-filters--collapsed'}`}
           aria-label="Filtros"
         >
           <div className="ref-panel__head page-relatorios-filters-head">
@@ -425,6 +438,9 @@ export default function Relatorios() {
               <span className="page-relatorios-filters-toggle__lead">
                 <span className="ref-panel__title" role="heading" aria-level={2}>
                   Filtros
+                </span>
+                <span className="relatorios-filter-summary">
+                  {periodLabel} · {selectedCategoryName}
                 </span>
               </span>
               <svg
@@ -454,18 +470,18 @@ export default function Relatorios() {
             hidden={!filtrosAbertos}
           >
             <div className="relatorios-filter-grid page-relatorios-filter-grid">
-              <div className="relatorios-shortcuts-row col-span-full flex flex-wrap gap-2 mb-2">
-                <button type="button" onClick={() => setPeriodShortcut('thisMonth')} className="relatorios-shortcut-btn px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Este Mês</button>
-                <button type="button" onClick={() => setPeriodShortcut('lastMonth')} className="relatorios-shortcut-btn px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Mês Passado</button>
-                <button type="button" onClick={() => setPeriodShortcut('last90')} className="relatorios-shortcut-btn px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Últimos 90 dias</button>
-                <button type="button" onClick={() => setPeriodShortcut('thisYear')} className="relatorios-shortcut-btn px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-[#a3a3a3] hover:bg-[#d4a84b]/10 hover:border-[#d4a84b]/30 hover:text-[#d4a84b] transition-all">Este Ano</button>
+              <div className="relatorios-shortcuts-row">
+                <button type="button" onClick={() => setPeriodShortcut('thisMonth')} className="relatorios-shortcut-btn">Mês atual</button>
+                <button type="button" onClick={() => setPeriodShortcut('lastMonth')} className="relatorios-shortcut-btn">Mês passado</button>
+                <button type="button" onClick={() => setPeriodShortcut('last90')} className="relatorios-shortcut-btn">90 dias</button>
+                <button type="button" onClick={() => setPeriodShortcut('thisYear')} className="relatorios-shortcut-btn">Ano</button>
               </div>
               <div className="filter-group">
-                <label htmlFor="rel-ini">Data início</label>
+                <label htmlFor="rel-ini">Início</label>
                 <input id="rel-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
               </div>
               <div className="filter-group">
-                <label htmlFor="rel-fim">Data fim</label>
+                <label htmlFor="rel-fim">Fim</label>
                 <input id="rel-fim" type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={handleFilterChange} />
               </div>
               <div className="filter-group relatorios-filter-grid__wide">
@@ -502,7 +518,7 @@ export default function Relatorios() {
                   </svg>
                 </div>
                 <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Total de receitas</p>
+                  <p className="ref-kpi-card__label">Receitas</p>
                   <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(summary.receitas)}</p>
                 </div>
               </article>
@@ -514,7 +530,7 @@ export default function Relatorios() {
                   </svg>
                 </div>
                 <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Total de despesas</p>
+                  <p className="ref-kpi-card__label">Despesas</p>
                   <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>− {formatCurrency(summary.despesas)}</p>
                 </div>
               </article>
@@ -527,7 +543,7 @@ export default function Relatorios() {
                   </svg>
                 </div>
                 <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Saldo no período</p>
+                  <p className="ref-kpi-card__label">Saldo</p>
                   <p
                     className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''} ${saldoPositivo ? 'relatorios-kpi-saldo--pos' : 'relatorios-kpi-saldo--neg'}`}
                   >
@@ -542,19 +558,19 @@ export default function Relatorios() {
         {loading ? (
           <RelatoriosChartsLoadingShell />
         ) : transacoes.length === 0 ? (
-          <p className="relatorios-empty-msg">Nenhuma transação efetivada neste período para compor o relatório.</p>
+          <p className="relatorios-empty-msg">Nenhuma transação efetivada neste período.</p>
         ) : (
           <div className={`relatorios-charts${refreshing ? ' relatorios-charts--refreshing' : ''}`} aria-busy={refreshing}>
             <section className="relatorios-charts__section" aria-labelledby="rel-month-heading">
               <h3 id="rel-month-heading" className="relatorios-charts__section-title">
-                Visão mensal
+                Mensal
               </h3>
               <div className="relatorios-charts__section-grid">
                 <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
                   <div className="ref-panel__head">
                     <div>
                       <h2 className="ref-panel__title">Evolução mensal</h2>
-                      <p className="ref-panel__subtitle">Receitas e despesas agregadas por mês no período</p>
+                      <p className="ref-panel__subtitle">Receitas e despesas por mês</p>
                     </div>
                   </div>
                   <div className="relatorios-chart-card__body">
@@ -592,9 +608,9 @@ export default function Relatorios() {
                 <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
                   <div className="ref-panel__head">
                     <div>
-                      <h2 className="ref-panel__title">Compras recorrentes por mês</h2>
+                      <h2 className="ref-panel__title">Recorrentes</h2>
                       <p className="ref-panel__subtitle">
-                        Soma das despesas marcadas como recorrentes (regra mensal ou parcelamento) por mês
+                        Despesas fixas e parceladas
                         {totalComprasRecorrentesPeriodo > 0 ? (
                           <>
                             {' '}
@@ -674,7 +690,7 @@ export default function Relatorios() {
                       </ResponsiveContainer>
                     ) : (
                       <div className="relatorios-chart-empty">
-                        Nenhuma despesa recorrente no período (regra mensal ou parcelas).
+                        Nenhuma recorrência no período.
                       </div>
                     )}
                   </div>
@@ -687,7 +703,7 @@ export default function Relatorios() {
                 <div className="ref-panel__head">
                   <div>
                     <h2 className="ref-panel__title">Despesas por categoria</h2>
-                    <p className="ref-panel__subtitle">Distribuição do que saiu no período</p>
+                    <p className="ref-panel__subtitle">Distribuição das saídas</p>
                   </div>
                 </div>
                 <div className="relatorios-chart-card__body relatorios-chart-card__body--pie">
@@ -750,7 +766,7 @@ export default function Relatorios() {
                 <div className="ref-panel__head">
                   <div>
                     <h2 className="ref-panel__title">Receitas por categoria</h2>
-                    <p className="ref-panel__subtitle">De onde entrou dinheiro no período</p>
+                    <p className="ref-panel__subtitle">Distribuição das entradas</p>
                   </div>
                 </div>
                 <div className="relatorios-chart-card__body relatorios-chart-card__body--pie">

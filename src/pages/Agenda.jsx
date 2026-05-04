@@ -3,6 +3,7 @@ import './dashboard.css'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { apiUrl } from '../lib/apiUrl'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { showToast } from '../lib/toastStore'
@@ -267,6 +268,7 @@ export default function Agenda() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
   const [selectedDateKey, setSelectedDateKey] = useState(() => saoPauloDateKey(new Date()))
   const [calendarMonthKey, setCalendarMonthKey] = useState(() => saoPauloDateKey(new Date()).slice(0, 7))
@@ -307,6 +309,27 @@ export default function Agenda() {
   useEffect(() => {
     void loadAgenda()
   }, [loadAgenda])
+
+  useEffect(() => {
+    if (!modalOpen) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.body.classList.add('horizon-modal-open')
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape' && !saving) {
+        setModalOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.body.classList.remove('horizon-modal-open')
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [modalOpen, saving])
 
   const activeEventos = useMemo(
     () =>
@@ -426,6 +449,27 @@ export default function Agenda() {
       await loadAgenda()
     } catch (err) {
       showToast(err.message || 'Falha ao salvar item da agenda.', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function deleteEvent() {
+    if (!usuarioId || !editing?.id) return
+    setSaving(true)
+    try {
+      const res = await fetch(apiUrl(`/api/agenda/${editing.id}`), {
+        method: 'DELETE',
+        headers: { 'x-user-id': usuarioId },
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.message || 'Falha ao remover item da agenda.')
+      showToast('Item removido.', 'success')
+      setModalOpen(false)
+      setEditing(null)
+      await loadAgenda()
+    } catch (err) {
+      showToast(err.message || 'Falha ao remover item da agenda.', 'error')
     } finally {
       setSaving(false)
     }
@@ -643,14 +687,31 @@ export default function Agenda() {
             </div>
 
             <div className="agenda-modal__actions">
-              <button type="button" className="agenda-secondary-btn" onClick={() => setModalOpen(false)}>Cancelar</button>
-              <button type="submit" className="dashboard-hub__btn dashboard-hub__btn--primary" disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar item'}
-              </button>
+              {editing ? (
+                <button type="button" className="agenda-danger-btn" onClick={() => setConfirmDeleteOpen(true)} disabled={saving}>
+                  Remover
+                </button>
+              ) : (
+                <span aria-hidden="true" />
+              )}
+              <div className="agenda-modal__actions-main">
+                <button type="button" className="agenda-secondary-btn" onClick={() => setModalOpen(false)} disabled={saving}>Cancelar</button>
+                <button type="submit" className="dashboard-hub__btn dashboard-hub__btn--primary" disabled={saving}>
+                  {saving ? 'Salvando...' : 'Salvar item'}
+                </button>
+              </div>
             </div>
           </form>
         </div>
       )}
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        title="Remover item?"
+        message={`"${editing?.titulo || 'Este item'}" será removido da agenda.`}
+        confirmLabel="Remover"
+        onConfirm={deleteEvent}
+        onClose={() => setConfirmDeleteOpen(false)}
+      />
     </div>
   )
 }
