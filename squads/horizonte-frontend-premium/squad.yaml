@@ -1,0 +1,156 @@
+name: horizonte-frontend-premium
+version: "1.0.0"
+description: >
+  Squad especializado em elevar o frontend PWA do Horizonte Financeiro a nível
+  premium/vendável — design system consistente, UX mobile-first impecável,
+  animações e micro-interações que transmitem confiança e sofisticação para
+  produto financeiro SaaS.
+created_at: "2026-05-04"
+author: craft (squad-creator)
+framework: segunda-feira
+
+goal: >
+  Transformar o frontend em um produto visual e funcionalmente premium:
+  padronizar design system em todas as páginas, garantir consistência total de
+  componentes, UX mobile-first, animações suaves e identidade visual pronta
+  para venda/demonstração comercial.
+
+scope:
+  pages:
+    - Dashboard
+    - Transações
+    - Relatórios
+    - Agenda
+    - Configurações
+    - Login / Cadastro
+    - Pagamento / BemVindoAssinatura
+    - Admin (Pagamentos, Usuários)
+  components:
+    - Shell Hub (Sidebar, MobileBottomNav, ShellStickyHeaderScroll)
+    - TransactionModal
+    - Cards KPI
+    - Skeletons
+    - Toast / ConfirmDialog
+    - PwaInstallPrompt
+  stack:
+    - React 19
+    - Vite 8
+    - Tailwind 4 (@theme tokens em src/index.css)
+    - dashboard.css (shell autenticado)
+
+design_tokens:
+  palette:
+    bg_base: "#050607"
+    bg_primary: "#0a0a0a"
+    bg_secondary: "#141414"
+    bg_card: "#1a1a1a"
+    text_primary: "#f5f5f5"
+    text_secondary: "#a3a3a3"
+    text_muted: "#737373"
+    accent_gold: "#d4a84b"
+    accent_gold_hover: "#b8923f"
+    accent_gold_muted: "rgba(212,168,75,0.15)"
+    border: "#2a2a2a"
+    success: "#22c55e"
+    error: "#ef4444"
+  typography:
+    font_primary: "Inter"
+    scale: [12, 14, 16, 18, 20, 24, 28, 32, 40]
+  motion:
+    duration_fast: "150ms"
+    duration_base: "250ms"
+    duration_slow: "400ms"
+    easing_standard: "cubic-bezier(0.4, 0, 0.2, 1)"
+    easing_decelerate: "cubic-bezier(0, 0, 0.2, 1)"
+
+agents:
+  - id: design-system-architect
+    file: agents/design-system-architect.md
+    role: Mapeia inconsistências, define tokens canônicos e estrutura o design system
+
+  - id: ux-director
+    file: agents/ux-director.md
+    role: Dirige UX visual, mobile-first, micro-interações e linguagem de movimento
+
+  - id: frontend-implementer
+    file: agents/frontend-implementer.md
+    role: Implementa React/Tailwind seguindo design system e stories do SDC
+
+  - id: visual-qa
+    file: agents/visual-qa.md
+    role: Valida consistência visual, acessibilidade mínima e check PWA
+
+tasks:
+  - id: audit-frontend
+    file: tasks/audit-frontend.md
+    owner: design-system-architect
+    description: Auditar todas as páginas e componentes — mapear inconsistências de tokens, espaçamento, tipografia e padrões visuais
+
+  - id: define-design-system
+    file: tasks/define-design-system.md
+    owner: design-system-architect
+    description: Consolidar e expandir tokens em src/index.css, criar guia de componentes
+
+  - id: implement-shell-consistency
+    file: tasks/implement-shell-consistency.md
+    owner: frontend-implementer
+    description: Padronizar shell (Sidebar, MobileBottomNav, Header) em todas as rotas
+
+  - id: implement-pages
+    file: tasks/implement-pages.md
+    owner: frontend-implementer
+    description: Aplicar design system página por página conforme AC das stories
+
+  - id: animate-interactions
+    file: tasks/animate-interactions.md
+    owner: frontend-implementer
+    description: Adicionar motion tokens, transitions e micro-interações nos elementos-chave
+
+  - id: visual-qa-pass
+    file: tasks/visual-qa-pass.md
+    owner: visual-qa
+    description: QA visual completo — checklist de consistência, contraste, mobile e PWA
+
+workflow:
+  sequence:
+    - audit-frontend
+    - define-design-system
+    - implement-shell-consistency
+    - implement-pages
+    - animate-interactions
+    - visual-qa-pass
+  parallel_allowed:
+    - [implement-shell-consistency, implement-pages]
+    - [animate-interactions, visual-qa-pass]
+
+stories:
+  epic: 2
+  list:
+    - id: "2.1"
+      title: "Design System Audit & Token Foundation"
+      owner: design-system-architect
+      file: "docs/stories/2.1-design-system-audit.story.md"
+    - id: "2.2"
+      title: "Shell & Navegação — Consistência Total"
+      owner: frontend-implementer
+      file: "docs/stories/2.2-shell-navegacao-consistencia.story.md"
+    - id: "2.3"
+      title: "Páginas Core — Refinamento Visual"
+      owner: frontend-implementer
+      file: "docs/stories/2.3-paginas-core-refinamento.story.md"
+    - id: "2.4"
+      title: "Micro-interações & Motion System"
+      owner: frontend-implementer
+      file: "docs/stories/2.4-micro-interacoes-motion.story.md"
+    - id: "2.5"
+      title: "Visual QA & PWA Polish"
+      owner: visual-qa
+      file: "docs/stories/2.5-visual-qa-pwa-polish.story.md"
+
+constraints:
+  - "Não quebrar o contrato estável do Shell Hub (dashboard.css bloco SHELL HUB — CONTRATO ESTÁVEL)"
+  - "Não alterar backend/API — escopo exclusivamente frontend"
+  - "Manter suporte a tema claro e escuro (data-theme)"
+  - "Mobile Safari testado antes de qualquer commit no shell"
+  - "npm run lint + npm run test devem passar antes de marcar story Done"
+  - "Alterações mínimas e incrementais — sem big-bang rewrites"
