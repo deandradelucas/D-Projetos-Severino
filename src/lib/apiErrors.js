@@ -18,7 +18,7 @@ function defaultMessageForHttpStatus(status) {
  * @param {number} status - HTTP status
  * @param {unknown} data - objeto JSON ou vazio
  */
-export function messageFromApiPayload(status, data) {
+function messageFromApiPayload(status, data) {
   if (data && typeof data === 'object') {
     const m = data.message
     if (typeof m === 'string' && m.trim()) return m.trim()

@@ -6425,28 +6425,6 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   word-break: normal;
 }
 
-.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 100%;
-  color: var(--hub-muted);
-  font-size: 0.68rem;
-  font-weight: 850;
-  line-height: 1;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__eyebrow::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--hub-accent);
-  box-shadow: 0 0 0 4px var(--hub-accent-soft);
-}
-
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
   display: inline-flex;
   max-width: 100%;
@@ -6856,10 +6834,6 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
     padding: 12px 12px 13px;
-  }
-
-  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__eyebrow {
-    display: none;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title {
@@ -8525,7 +8499,6 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-ref
 }
 
 body[data-theme='light'] .page-pagamento.app-horizon-shell .page-pagamento-header-sub,
-body[data-theme='light'] .page-configuracoes.app-horizon-shell .page-configuracoes-header-sub,
 body[data-theme='light'] .page-admin.app-horizon-shell .page-admin-header-sub {
   margin: 4px 0 0;
   text-transform: none;
@@ -9394,17 +9367,17 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
   body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row,
   body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row {
     display: grid;
-    grid-template-columns: 40px minmax(0, 1fr) auto auto;
+    grid-template-columns: 34px minmax(0, 1fr) auto auto;
     grid-template-areas:
       'txi txmeta txval txact'
       'txi txcat txcat txcat'
       'txi txsub txsub txrec';
-    column-gap: 10px;
-    row-gap: 8px;
+    column-gap: 8px;
+    row-gap: 5px;
     align-items: start;
-    padding: 12px 12px 14px;
-    margin: 0 0 10px;
-    border-radius: 14px;
+    padding: 9px 10px 10px;
+    margin: 0 0 8px;
+    border-radius: 13px;
     box-sizing: border-box;
     background: color-mix(in srgb, var(--bg-card, #f8fafc) 94%, var(--text-primary, #0f172a) 3%);
     border: 1px solid color-mix(in srgb, var(--border-color, #e2e8f0) 65%, transparent);
@@ -9420,7 +9393,7 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     grid-area: txi;
     grid-row: 1 / -1;
     align-self: start;
-    padding-top: 2px;
+    padding-top: 1px;
   }
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-meta-cell {
@@ -9473,12 +9446,40 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     word-break: normal;
     word-wrap: break-word;
     hyphens: auto;
-    line-height: 1.35;
+    line-height: 1.24;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-date {
+    font-size: 12px !important;
+    line-height: 1.15 !important;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-cat-text {
+    font-size: 13px !important;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-sub-text {
+    font-size: 12px !important;
   }
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-val {
     white-space: nowrap;
     max-width: 100%;
+    padding: 5px 8px !important;
+    border-radius: 10px !important;
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 10px !important;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap svg {
+    width: 14px !important;
+    height: 14px !important;
   }
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-recorrencia-ico-wrap {
@@ -9492,8 +9493,10 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-actions-cell .btn-edit,
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-actions-cell .btn-delete {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 6px !important;
+    border-radius: 10px !important;
   }
 
   /* Dashboard — transações recentes em cartões (sem coluna Ações; mesma leitura que em Transações) */
@@ -9891,136 +9894,6 @@ body[data-theme='dark'] .agenda-page .agenda-hero {
   background: radial-gradient(circle, rgba(212, 168, 75, 0.18), transparent 70%);
 }
 
-.agenda-hero__brief {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 16px;
-  min-height: 92px;
-  margin-top: 18px;
-  padding: 16px 18px 16px 20px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 28px;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 8% 0%, rgba(139, 92, 246, 0.16), transparent 34%),
-    linear-gradient(135deg, rgba(139, 92, 246, 0.09), rgba(212, 168, 75, 0.045) 52%, transparent),
-    rgba(255, 255, 255, 0.68);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.82) inset,
-    0 22px 52px -38px rgba(15, 23, 42, 0.5);
-}
-
-.agenda-hero__brief::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 18px;
-  bottom: 18px;
-  width: 5px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, var(--agenda-accent), var(--agenda-accent-2));
-}
-
-body[data-theme='dark'] .agenda-hero__brief {
-  border-color: rgba(148, 163, 184, 0.14);
-  background:
-    linear-gradient(135deg, rgba(139, 92, 246, 0.12), transparent 48%),
-    rgba(2, 6, 23, 0.22);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 18px 46px -36px rgba(0, 0, 0, 0.85);
-}
-
-.agenda-hero__brief-main {
-  display: grid;
-  flex: 1 1 auto;
-  min-width: 0;
-  gap: 6px;
-}
-
-.agenda-hero__next {
-  display: grid;
-  gap: 2px;
-}
-
-.agenda-hero__next strong {
-  overflow: hidden;
-  color: var(--agenda-ink);
-  font-size: clamp(1.04rem, 1.3vw, 1.28rem);
-  font-weight: 940;
-  letter-spacing: -0.03em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.agenda-hero__next span {
-  color: var(--agenda-muted);
-  font-size: 0.88rem;
-  font-weight: 760;
-}
-
-.agenda-hero__mini-stats {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 8px;
-}
-
-.agenda-hero__mini-stats div {
-  display: grid;
-  min-width: 72px;
-  padding: 10px 12px;
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  border-radius: 20px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.48));
-  text-align: center;
-}
-
-body[data-theme='dark'] .agenda-hero__mini-stats div {
-  background: rgba(255, 255, 255, 0.055);
-}
-
-.agenda-hero__mini-stats strong {
-  color: var(--agenda-ink);
-  font-size: 1.05rem;
-  font-weight: 950;
-  line-height: 1;
-}
-
-.agenda-hero__mini-stats span {
-  margin-top: 3px;
-  color: var(--agenda-muted);
-  font-size: 0.68rem;
-  font-weight: 850;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.agenda-hero__chip {
-  flex: 0 0 auto;
-  padding: 9px 12px;
-  border-radius: 999px;
-  color: #5b21b6;
-  background: rgba(139, 92, 246, 0.12);
-  font-size: 0.74rem;
-  font-weight: 850;
-}
-
-body[data-theme='dark'] .agenda-hero__chip {
-  color: #ddd6fe;
-  background: rgba(139, 92, 246, 0.18);
-}
-
-.agenda-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 2px;
-}
-
-.agenda-kpi,
 .agenda-list-panel {
   border: 1px solid rgba(148, 163, 184, 0.18);
   background:
@@ -10033,7 +9906,6 @@ body[data-theme='dark'] .agenda-hero__chip {
   backdrop-filter: blur(14px) saturate(1.08);
 }
 
-body[data-theme='dark'] .agenda-kpi,
 body[data-theme='dark'] .agenda-list-panel {
   border-color: rgba(148, 163, 184, 0.16);
   background:
@@ -10044,94 +9916,12 @@ body[data-theme='dark'] .agenda-list-panel {
     0 20px 48px -34px rgba(0, 0, 0, 0.8);
 }
 
-.agenda-kpi {
-  min-height: 146px;
-  padding: 20px;
-  border-radius: 30px;
-}
-
-.agenda-kpi__top span,
 .agenda-section-eyebrow {
   color: var(--agenda-muted);
   font-size: 0.72rem;
   font-weight: 850;
   letter-spacing: 0.11em;
   text-transform: uppercase;
-}
-
-.agenda-kpi__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.agenda-kpi__top i {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border: 1px solid rgba(139, 92, 246, 0.16);
-  border-radius: 14px;
-  color: #6d28d9;
-  background:
-    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.9), transparent 38%),
-    rgba(139, 92, 246, 0.11);
-  font-style: normal;
-  font-size: 0.72rem;
-  font-weight: 950;
-}
-
-body[data-theme='dark'] .agenda-kpi__top i {
-  color: #ddd6fe;
-  border-color: rgba(139, 92, 246, 0.24);
-  background: rgba(139, 92, 246, 0.14);
-}
-
-.agenda-kpi strong {
-  display: block;
-  margin-top: 18px;
-  color: var(--agenda-ink);
-  font-size: clamp(2.3rem, 3.4vw, 3.35rem);
-  font-weight: 950;
-  letter-spacing: -0.07em;
-  line-height: 0.95;
-}
-
-.agenda-kpi p {
-  margin: 12px 0 0;
-  color: var(--agenda-muted);
-  font-size: 0.92rem;
-  font-weight: 720;
-}
-
-.agenda-kpi {
-  position: relative;
-  overflow: hidden;
-}
-
-.agenda-kpi::after {
-  content: '';
-  position: absolute;
-  right: 16px;
-  bottom: -42px;
-  width: 112px;
-  height: 112px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--agenda-accent) 13%, transparent);
-  opacity: 0.5;
-}
-
-.agenda-kpi--hero {
-  background:
-    radial-gradient(circle at 88% 0%, rgba(212, 168, 75, 0.18), transparent 42%),
-    linear-gradient(135deg, rgba(139, 92, 246, 0.14), rgba(255, 255, 255, 0.92));
-}
-
-body[data-theme='dark'] .agenda-kpi--hero {
-  background:
-    radial-gradient(circle at 88% 0%, rgba(212, 168, 75, 0.16), transparent 42%),
-    linear-gradient(135deg, rgba(91, 33, 182, 0.32), rgba(15, 23, 42, 0.72));
 }
 
 .agenda-list-panel h2,
@@ -10141,17 +9931,6 @@ body[data-theme='dark'] .agenda-kpi--hero {
   font-size: clamp(1.15rem, 1.4vw, 1.45rem);
   font-weight: 920;
   letter-spacing: -0.04em;
-}
-
-.agenda-status {
-  display: inline-flex;
-  align-items: center;
-  min-height: 30px;
-  padding: 0 11px;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 850;
-  white-space: nowrap;
 }
 
 .agenda-list-panel {
@@ -10182,231 +9961,6 @@ body[data-theme='dark'] .agenda-kpi--hero {
 
 body[data-theme='dark'] .agenda-secondary-btn {
   background: rgba(255, 255, 255, 0.06);
-}
-
-.agenda-days {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.agenda-day {
-  display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
-  gap: 14px;
-}
-
-.agenda-day__label {
-  position: sticky;
-  top: 86px;
-  align-self: start;
-  color: var(--agenda-muted);
-  font-size: 0.76rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.agenda-day__cards {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.agenda-day__cards::before {
-  content: '';
-  position: absolute;
-  top: 18px;
-  bottom: 18px;
-  left: 14px;
-  width: 1px;
-  background: linear-gradient(180deg, transparent, rgba(148, 163, 184, 0.34), transparent);
-}
-
-.agenda-event {
-  position: relative;
-  display: grid;
-  grid-template-columns: 86px minmax(0, 1fr);
-  gap: 14px;
-  padding: 15px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-left: 0;
-  border-radius: 26px;
-  overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.6)),
-    rgba(255, 255, 255, 0.72);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.72) inset,
-    0 18px 42px -34px rgba(15, 23, 42, 0.38);
-}
-
-.agenda-event::before {
-  content: '';
-  position: absolute;
-  top: 21px;
-  left: -2px;
-  width: 7px;
-  height: 34px;
-  border-radius: 999px;
-  background: var(--agenda-accent);
-  box-shadow: 0 0 0 5px rgba(139, 92, 246, 0.1);
-}
-
-.agenda-event__halo {
-  position: absolute;
-  right: -30px;
-  top: -46px;
-  width: 118px;
-  height: 118px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--agenda-accent) 10%, transparent);
-  pointer-events: none;
-}
-
-body[data-theme='dark'] .agenda-event {
-  background:
-    linear-gradient(135deg, rgba(15, 23, 42, 0.72), rgba(2, 6, 23, 0.48)),
-    rgba(2, 6, 23, 0.34);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.055) inset,
-    0 18px 46px -36px rgba(0, 0, 0, 0.85);
-}
-
-.agenda-event--confirmed {
-  --agenda-accent: var(--agenda-success);
-}
-
-.agenda-event--done {
-  --agenda-accent: #64748b;
-  opacity: 0.78;
-}
-
-.agenda-event--cancelled {
-  --agenda-accent: var(--agenda-danger);
-  opacity: 0.66;
-}
-
-.agenda-event__time {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.agenda-event__time strong {
-  color: var(--agenda-ink);
-  font-size: 1.15rem;
-  font-weight: 930;
-  letter-spacing: -0.04em;
-}
-
-.agenda-event__time span,
-.agenda-event__meta span {
-  display: inline-flex;
-  width: fit-content;
-  padding: 5px 8px;
-  border-radius: 999px;
-  color: var(--agenda-muted);
-  background: color-mix(in srgb, var(--agenda-muted) 9%, transparent);
-  font-size: 0.7rem;
-  font-weight: 820;
-}
-
-.agenda-event__topline {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.agenda-event h3 {
-  margin: 0;
-  color: var(--agenda-ink);
-  font-size: 1rem;
-  font-weight: 920;
-  letter-spacing: -0.03em;
-}
-
-.agenda-status--confirmed {
-  color: #166534;
-  background: rgba(34, 197, 94, 0.12);
-}
-
-.agenda-status--scheduled {
-  color: #5b21b6;
-  background: rgba(139, 92, 246, 0.12);
-}
-
-.agenda-status--done {
-  color: #475569;
-  background: rgba(100, 116, 139, 0.12);
-}
-
-.agenda-status--cancelled {
-  color: #991b1b;
-  background: rgba(239, 68, 68, 0.12);
-}
-
-.agenda-event__local,
-.agenda-event__desc {
-  position: relative;
-  margin: 8px 0 0;
-  color: var(--agenda-muted);
-  font-size: 0.86rem;
-  font-weight: 620;
-  line-height: 1.38;
-}
-
-.agenda-event__meta,
-.agenda-event__actions {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.agenda-event__actions .agenda-action {
-  min-height: 34px;
-  padding: 0 10px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 12px;
-  color: var(--agenda-ink);
-  background: rgba(255, 255, 255, 0.62);
-  font: inherit;
-  font-size: 0.76rem;
-  font-weight: 820;
-  cursor: pointer;
-}
-
-body[data-theme='dark'] .agenda-event__actions .agenda-action {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.agenda-event__actions .agenda-action--primary {
-  border-color: rgba(34, 197, 94, 0.26);
-  color: #166534;
-  background: rgba(34, 197, 94, 0.12);
-}
-
-body[data-theme='dark'] .agenda-event__actions .agenda-action--primary {
-  color: #bbf7d0;
-  background: rgba(34, 197, 94, 0.14);
-}
-
-.agenda-event__actions .agenda-action--danger {
-  border-color: rgba(239, 68, 68, 0.2);
-  color: #991b1b;
-  background: rgba(239, 68, 68, 0.08);
-}
-
-body[data-theme='dark'] .agenda-event__actions .agenda-action--danger {
-  color: #fecaca;
-  background: rgba(239, 68, 68, 0.12);
 }
 
 .agenda-empty {
@@ -10518,7 +10072,6 @@ body[data-theme='dark'] .agenda-field select {
 .agenda-field textarea:focus-visible,
 .agenda-field select:focus-visible,
 .agenda-secondary-btn:focus-visible,
-.agenda-event__actions button:focus-visible,
 .agenda-modal__close:focus-visible {
   outline: 2px solid var(--agenda-accent);
   outline-offset: 2px;
@@ -10552,20 +10105,6 @@ body[data-theme='dark'] .agenda-field select {
   margin-top: 18px;
 }
 
-@media (max-width: 900px) {
-  .agenda-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .agenda-day {
-    grid-template-columns: 1fr;
-  }
-
-  .agenda-day__label {
-    position: static;
-  }
-}
-
 @media (max-width: 768px) {
   .agenda-page .dashboard-hub__hero-row {
     display: grid;
@@ -10594,87 +10133,14 @@ body[data-theme='dark'] .agenda-field select {
     line-height: 1.35;
   }
 
-  .agenda-hero__brief {
-    grid-template-columns: 1fr;
-    align-items: flex-start;
-    gap: 8px;
-    min-height: auto;
-    margin-top: 12px;
-    padding: 12px 13px;
-  }
-
-  .agenda-hero__mini-stats {
-    width: 100%;
-  }
-
-  .agenda-hero__mini-stats div {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-
-  .agenda-hero__chip {
-    width: fit-content;
-  }
-
-  .agenda-kpis {
-    display: flex;
-    gap: 10px;
-    margin: 0 -2px;
-    padding: 0 2px 4px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-
-  .agenda-kpis::-webkit-scrollbar {
-    display: none;
-  }
-
-  .agenda-kpi {
-    flex: 0 0 min(76vw, 292px);
-    min-height: 112px;
-    padding: 16px;
-    scroll-snap-align: start;
-  }
-
-  .agenda-kpi--hero {
-    flex-basis: min(82vw, 320px);
-  }
-
   .agenda-list-panel {
     padding: 16px;
     border-radius: 24px;
   }
 
-  .agenda-list-panel__header,
-  .agenda-event__topline {
+  .agenda-list-panel__header {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .agenda-event {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 13px;
-  }
-
-  .agenda-event::before {
-    top: 17px;
-    height: 30px;
-  }
-
-  .agenda-event__time {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .agenda-event__actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .agenda-event__actions button {
-    min-height: 40px;
   }
 
   .agenda-modal {
@@ -10704,9 +10170,7 @@ body[data-theme='dark'] .agenda-field select {
 }
 
 .agenda-page .agenda-hero,
-.agenda-page .agenda-kpi,
 .agenda-page .agenda-list-panel,
-.agenda-page .agenda-event,
 .agenda-page .agenda-modal {
   background: #ffffff !important;
   background-image: none !important;
@@ -10719,9 +10183,7 @@ body[data-theme='dark'] .agenda-page .main-content {
 }
 
 body[data-theme='dark'] .agenda-page .agenda-hero,
-body[data-theme='dark'] .agenda-page .agenda-kpi,
 body[data-theme='dark'] .agenda-page .agenda-list-panel,
-body[data-theme='dark'] .agenda-page .agenda-event,
 body[data-theme='dark'] .agenda-page .agenda-modal {
   background: #000000 !important;
   background-image: none !important;
@@ -10734,14 +10196,8 @@ body[data-theme='dark'] .agenda-page .agenda-modal {
   border-radius: 18px;
 }
 
-.agenda-page .agenda-hero__orb,
-.agenda-page .agenda-kpi::after,
-.agenda-page .agenda-event__halo {
+.agenda-page .agenda-hero__orb {
   display: none !important;
-}
-
-.agenda-page .dashboard-hub__eyebrow {
-  color: var(--agenda-muted);
 }
 
 .agenda-page .dashboard-hub__hero-actions .dashboard-hub__btn--primary,
@@ -10760,135 +10216,16 @@ body[data-theme='dark'] .agenda-page .agenda-modal__actions .dashboard-hub__btn-
   color: #000000 !important;
 }
 
-.agenda-page .agenda-hero__brief {
-  margin-top: 14px;
-  border-radius: 16px;
-  background: rgba(15, 23, 42, 0.025) !important;
-  background-image: none !important;
-  border: 0.5px solid rgba(15, 23, 42, 0.08) !important;
-  box-shadow: none !important;
-}
-
-body[data-theme='dark'] .agenda-page .agenda-hero__brief {
-  background: #000000 !important;
-  border: 0.5px solid #0b0b0b !important;
-}
-
-.agenda-page .agenda-hero__brief::before {
-  display: none;
-}
-
-.agenda-page .agenda-hero__mini-stats div,
-.agenda-page .agenda-hero__chip,
-.agenda-page .agenda-event__time span,
-.agenda-page .agenda-event__meta span {
-  background: rgba(15, 23, 42, 0.035) !important;
-  border: 0.5px solid rgba(15, 23, 42, 0.06);
-  box-shadow: none !important;
-}
-
-body[data-theme='dark'] .agenda-page .agenda-hero__mini-stats div,
-body[data-theme='dark'] .agenda-page .agenda-hero__chip,
-body[data-theme='dark'] .agenda-page .agenda-event__time span,
-body[data-theme='dark'] .agenda-page .agenda-event__meta span {
-  background: #000000 !important;
-  border-color: #0b0b0b;
-}
-
-.agenda-page .agenda-kpis {
-  gap: 10px;
-  margin-top: 0;
-}
-
-.agenda-page .agenda-kpi {
-  min-height: 116px;
-  padding: 16px;
-  border-radius: 16px;
-}
-
-.agenda-page .agenda-kpi strong {
-  margin-top: 12px;
-  font-size: clamp(1.9rem, 2.6vw, 2.7rem);
-}
-
-.agenda-page .agenda-kpi p {
-  margin-top: 8px;
-  font-size: 0.84rem;
-}
-
-.agenda-page .agenda-kpi__top i {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  color: var(--agenda-muted);
-  background: rgba(15, 23, 42, 0.035) !important;
-  border: 0.5px solid rgba(15, 23, 42, 0.06);
-}
-
-body[data-theme='dark'] .agenda-page .agenda-kpi__top i {
-  color: rgba(255, 255, 255, 0.72);
-  background: #000000 !important;
-  border-color: #0b0b0b;
-}
-
 .agenda-page .agenda-list-panel {
   padding: 18px;
   border-radius: 18px;
 }
 
-.agenda-page .agenda-days {
-  gap: 14px;
-}
-
-.agenda-page .agenda-day {
-  grid-template-columns: 104px minmax(0, 1fr);
-  gap: 12px;
-}
-
-.agenda-page .agenda-day__cards::before {
-  display: none;
-}
-
-.agenda-page .agenda-event {
-  grid-template-columns: 78px minmax(0, 1fr);
-  gap: 14px;
-  min-height: 0;
-  padding: 14px;
-  border-radius: 16px;
-}
-
-.agenda-page .agenda-event::before {
-  width: 3px;
-  height: 28px;
-  background: rgba(100, 116, 139, 0.55);
-  box-shadow: none;
-}
-
-.agenda-page .agenda-status {
-  min-height: 28px;
-  border: 0.5px solid transparent;
-  border-radius: 999px;
-}
-
-.agenda-page .agenda-status--scheduled {
-  color: #475569;
-  background: rgba(100, 116, 139, 0.1);
-  border-color: rgba(100, 116, 139, 0.14);
-}
-
-body[data-theme='dark'] .agenda-page .agenda-status--scheduled {
-  color: rgba(255, 255, 255, 0.72);
-  background: #000000;
-  border-color: #0b0b0b;
-}
-
-.agenda-page .agenda-event__actions .agenda-action,
 .agenda-page .agenda-secondary-btn {
   border-radius: 12px;
   box-shadow: none !important;
 }
 
-body[data-theme='dark'] .agenda-page .agenda-event__actions .agenda-action,
 body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
   background: #000000 !important;
   border-color: #0b0b0b !important;
@@ -10921,30 +10258,9 @@ body[data-theme='dark'] .agenda-page .agenda-toggle {
     border-radius: 16px;
   }
 
-  .agenda-page .agenda-kpi {
-    flex-basis: min(64vw, 240px);
-    min-height: 104px;
-    padding: 14px;
-    border-radius: 14px;
-  }
-
-  .agenda-page .agenda-kpi--hero {
-    flex-basis: min(68vw, 260px);
-  }
-
   .agenda-page .agenda-list-panel {
     padding: 14px;
     border-radius: 16px;
-  }
-
-  .agenda-page .agenda-day {
-    gap: 8px;
-  }
-
-  .agenda-page .agenda-event {
-    grid-template-columns: 1fr;
-    padding: 12px;
-    border-radius: 14px;
   }
 }
 
@@ -11015,7 +10331,6 @@ body[data-theme='light'] .agenda-page .agenda-hero {
   color: #ffffff !important;
 }
 
-.agenda-page .agenda-hero .dashboard-hub__eyebrow,
 .agenda-page .agenda-hero .dashboard-hub__balance-line,
 .agenda-page .agenda-hero .dashboard-hub__balance-line span {
   color: rgba(255, 255, 255, 0.66) !important;
@@ -11039,100 +10354,30 @@ body[data-theme='light'] .agenda-page .dashboard-hub__hero-actions .dashboard-hu
   box-shadow: 0 18px 28px -24px rgba(255, 255, 255, 0.7) !important;
 }
 
-.agenda-page .agenda-hero__brief,
-body[data-theme='dark'] .agenda-page .agenda-hero__brief,
-body[data-theme='light'] .agenda-page .agenda-hero__brief {
-  margin-top: 20px;
-  padding: 14px 16px;
-  border: 0.5px solid rgba(255, 255, 255, 0.14) !important;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #ffffff;
-  box-shadow: none !important;
-}
-
-.agenda-page .agenda-hero__next strong,
-.agenda-page .agenda-hero__mini-stats strong {
-  color: #ffffff !important;
-  font-weight: 500 !important;
-  letter-spacing: -0.04em;
-}
-
-.agenda-page .agenda-hero__next span,
-.agenda-page .agenda-hero__mini-stats span,
-.agenda-page .agenda-hero__brief .agenda-section-eyebrow {
-  color: rgba(255, 255, 255, 0.62) !important;
-}
-
-.agenda-page .agenda-hero__mini-stats div,
-.agenda-page .agenda-hero__chip,
-body[data-theme='dark'] .agenda-page .agenda-hero__mini-stats div,
-body[data-theme='dark'] .agenda-page .agenda-hero__chip {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  color: rgba(255, 255, 255, 0.72) !important;
-}
-
-.agenda-page .agenda-kpi,
 .agenda-page .agenda-list-panel,
-.agenda-page .agenda-event,
-body[data-theme='dark'] .agenda-page .agenda-kpi,
-body[data-theme='dark'] .agenda-page .agenda-list-panel,
-body[data-theme='dark'] .agenda-page .agenda-event {
+body[data-theme='dark'] .agenda-page .agenda-list-panel {
   background: #ffffff !important;
   border: 0.5px solid rgba(15, 23, 42, 0.08) !important;
   box-shadow: 0 18px 44px -34px rgba(15, 23, 42, 0.34) !important;
 }
 
-.agenda-page .agenda-kpi strong,
 .agenda-page .agenda-list-panel h2,
-.agenda-page .agenda-event h3,
-.agenda-page .agenda-event__time strong,
-body[data-theme='dark'] .agenda-page .agenda-kpi strong,
-body[data-theme='dark'] .agenda-page .agenda-list-panel h2,
-body[data-theme='dark'] .agenda-page .agenda-event h3,
-body[data-theme='dark'] .agenda-page .agenda-event__time strong {
+body[data-theme='dark'] .agenda-page .agenda-list-panel h2 {
   color: #111827 !important;
 }
 
 .agenda-page .agenda-section-eyebrow,
-.agenda-page .agenda-kpi__top span,
-.agenda-page .agenda-kpi p,
-.agenda-page .agenda-day__label,
 .agenda-page .agenda-event__local,
-.agenda-page .agenda-event__desc,
 body[data-theme='dark'] .agenda-page .agenda-section-eyebrow,
-body[data-theme='dark'] .agenda-page .agenda-kpi__top span,
-body[data-theme='dark'] .agenda-page .agenda-kpi p,
-body[data-theme='dark'] .agenda-page .agenda-day__label,
-body[data-theme='dark'] .agenda-page .agenda-event__local,
-body[data-theme='dark'] .agenda-page .agenda-event__desc {
+body[data-theme='dark'] .agenda-page .agenda-event__local {
   color: #64748b !important;
 }
 
-.agenda-page .agenda-event__actions .agenda-action,
 .agenda-page .agenda-secondary-btn,
-body[data-theme='dark'] .agenda-page .agenda-event__actions .agenda-action,
 body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
   background: #ffffff !important;
   border-color: rgba(15, 23, 42, 0.1) !important;
   color: #111827 !important;
-}
-
-.agenda-page .agenda-event__actions .agenda-action--primary,
-body[data-theme='dark'] .agenda-page .agenda-event__actions .agenda-action--primary {
-  background: #050505 !important;
-  border-color: #050505 !important;
-  color: #ffffff !important;
-}
-
-.agenda-page .agenda-event__meta span,
-.agenda-page .agenda-event__time span,
-body[data-theme='dark'] .agenda-page .agenda-event__meta span,
-body[data-theme='dark'] .agenda-page .agenda-event__time span {
-  background: rgba(15, 23, 42, 0.035) !important;
-  border-color: rgba(15, 23, 42, 0.06) !important;
-  color: #64748b !important;
 }
 
 @media (max-width: 768px) {
@@ -11165,11 +10410,6 @@ body[data-theme='dark'] .agenda-page .agenda-event__time span {
     line-height: 0.96;
   }
 
-  .agenda-page .agenda-kpis {
-    margin-top: -20px;
-    position: relative;
-    z-index: 2;
-  }
 }
 
 @media (max-width: 900px) {
@@ -11226,7 +10466,13 @@ body[data-theme='dark'] .agenda-page .agenda-event__time span {
     padding: 0 !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
-    background: #f3f4f7 !important;
+    background: #000000 !important;
+  }
+
+  body:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell),
+  body:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell) #root,
+  body:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell) .app-routes-grow {
+    background: #000000 !important;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .app-horizon-inner,
@@ -11246,6 +10492,17 @@ body[data-theme='dark'] .agenda-page .agenda-event__time span {
     min-height: 100dvh !important;
     margin: 0 !important;
     padding: 0 14px calc(136px + var(--safe-bottom)) !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    background:
+      linear-gradient(
+        180deg,
+        #000000 0,
+        #000000 calc(258px + var(--safe-top)),
+        #f3f4f7 calc(258px + var(--safe-top)),
+        #f3f4f7 100%
+      ) !important;
     border-radius: 0 !important;
     box-shadow: none !important;
   }
@@ -11256,6 +10513,7 @@ body[data-theme='dark'] .agenda-page .agenda-event__time span {
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
     position: relative !important;
+    top: auto !important;
     isolation: isolate;
     width: auto !important;
     min-height: calc(220px + var(--safe-top)) !important;
@@ -11269,6 +10527,8 @@ body[data-theme='dark'] .agenda-page .agenda-event__time span {
     box-shadow: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+    z-index: 2 !important;
+    transform: translateZ(0);
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after {
@@ -13256,6 +12516,224 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row,
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
     grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* Shell mobile/PWA — mesma proteção do Dashboard contra o bounce branco no topo */
+@media (max-width: 900px) {
+  body:has(.dashboard-container.ref-dashboard.app-horizon-shell),
+  body:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root,
+  body:has(.dashboard-container.ref-dashboard.app-horizon-shell) .app-routes-grow {
+    background: #000000 !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    background: #000000 !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .app-horizon-inner,
+  .dashboard-container.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
+  .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    background-image: none !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 14px calc(112px + var(--safe-bottom)) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #f3f4f7 !important;
+    background-image: none !important;
+  }
+
+  body:has(.dashboard-mobile-tx-fab) .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    padding-bottom: calc(138px + var(--safe-bottom)) !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    isolation: isolate !important;
+    width: auto !important;
+    max-width: none !important;
+    min-height: calc(176px + var(--safe-top)) !important;
+    margin: calc(-1 * var(--safe-top)) -14px 0 !important;
+    padding: calc(34px + var(--safe-top)) 14px 46px !important;
+    overflow: hidden !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #000000 !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    transform: translateZ(0);
+    z-index: 2 !important;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    min-height: calc(220px + var(--safe-top)) !important;
+    padding: calc(46px + var(--safe-top)) 14px 52px !important;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    background: #f3f4f7 !important;
+    background-image: none !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    min-height: calc(158px + var(--safe-top)) !important;
+    padding: calc(30px + var(--safe-top)) 14px 40px !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    background: #f3f4f7 !important;
+    background-image: none !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-panels {
+    position: relative !important;
+    z-index: 3 !important;
+    gap: 14px !important;
+    margin: -18px 0 0 !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-filters {
+    border-radius: 20px !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.9) inset,
+      0 16px 38px -28px rgba(15, 23, 42, 0.32) !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-table {
+    border-radius: 22px !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    min-height: 44px !important;
+    gap: 10px !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+    font-size: clamp(1.25rem, 5vw, 1.45rem) !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+    min-height: 42px !important;
+    padding: 0 12px !important;
+    border-radius: 11px !important;
+    font-size: 12px !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+  }
+
+  .agenda-page.ref-dashboard.app-horizon-shell .agenda-hero,
+  body[data-theme='light'] .agenda-page.ref-dashboard.app-horizon-shell .agenda-hero,
+  body[data-theme='dark'] .agenda-page.ref-dashboard.app-horizon-shell .agenda-hero {
+    min-height: calc(236px + var(--safe-top)) !important;
+    padding: calc(20px + var(--safe-top)) 14px 28px !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after {
+    content: '' !important;
+    position: absolute !important;
+    right: 0 !important;
+    bottom: -1px !important;
+    left: 0 !important;
+    z-index: 1 !important;
+    display: block !important;
+    height: 42px !important;
+    pointer-events: none !important;
+    border-top-left-radius: 42px !important;
+    border-top-right-radius: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero > * {
+    position: relative !important;
+    z-index: 2 !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__title,
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line,
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong,
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .ref-panel__subtitle,
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .dashboard-hub__eyebrow,
+  .agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title,
+  .agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title span,
+  .agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title strong {
+    color: #ffffff !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line span,
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .page-pagamento-header-sub,
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .page-configuracoes-header-sub,
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .page-admin-header-sub {
+    color: rgba(255, 255, 255, 0.64) !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+    background: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.86) !important;
+    color: #050505 !important;
+    box-shadow: 0 18px 28px -24px rgba(255, 255, 255, 0.7) !important;
   }
 }
 

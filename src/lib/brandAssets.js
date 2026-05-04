@@ -7,7 +7,6 @@ export const BRAND_ASSETS = {
   /** Raster para menu (mobile: largura 100% sem depender de SVG inline) */
   logoOnLightPng: '/images/horizonte_fiel_original_logo_light.png',
   logoOnDarkPng: '/images/horizonte_fiel_original_logo_dark.png',
-  iconOnDark: '/images/horizonte_fiel_original_icon_light.svg',
   /** Ícone do app / PWA (mesmo arte do manifest — ver `public/manifest.json`) */
   appIcon: '/images/horizonte_fiel_original_icon_dark.svg',
   appIconPng: '/images/horizonte_icon_192.png',
