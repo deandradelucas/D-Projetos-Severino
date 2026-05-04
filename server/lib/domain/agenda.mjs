@@ -259,7 +259,8 @@ function buildReminderMessage(evento, offsetMinutos) {
   const local = evento.local ? `\n📍 ${evento.local}` : ''
   const desc = evento.descricao ? `\n📝 ${evento.descricao}` : ''
   const prefix = offsetMinutos > 0 ? `⏰ Lembrete: faltam ${offsetMinutos} min` : '⏰ Lembrete: está na hora'
-  return `${prefix}\n\n*${evento.titulo}*\n🗓️ ${quando}${local}${desc}\n\n*confirmar ${evento.codigo}*, *concluir ${evento.codigo}* ou *reagendar ${evento.codigo} para amanhã 10h*.`
+  // Apenas aviso amigável — sem comandos técnicos (confirmar/código) para não confundir no WhatsApp.
+  return `${prefix}\n\n*${evento.titulo}*\n🗓️ ${quando}${local}${desc}`
 }
 
 export async function listarEMarcarLembretesPendentes({ limit = 50, marcarComoEnviado = true } = {}) {
@@ -317,7 +318,6 @@ export async function listarEMarcarLembretesPendentes({ limit = 50, marcarComoEn
       log.warn('[agenda] lembrete sem telefone', { eventoId: evento.id, usuarioId: evento.usuario_id })
       continue
     }
-    const codigo = evento.id.slice(0, 8)
     mensagens.push({
       reminder_id: key,
       event_id: evento.id,
@@ -326,7 +326,7 @@ export async function listarEMarcarLembretesPendentes({ limit = 50, marcarComoEn
       title: evento.titulo,
       starts_at: evento.inicio,
       offset_minutes: evento.lembrar_minutos_antes,
-      message: buildReminderMessage({ ...evento, codigo }, evento.lembrar_minutos_antes),
+      message: buildReminderMessage(evento, evento.lembrar_minutos_antes),
     })
   }
 

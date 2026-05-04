@@ -330,6 +330,12 @@ function buildBotBodyFromEvolutionPayload(payload) {
   }
 }
 
+/** Remove sufixo legado ou injetado por automação (ex.: "Responda: confirmar …"). */
+function stripRespondaAgendaReminderSuffix(text) {
+  if (!text || typeof text !== 'string') return text
+  return text.replace(/\s*Responda\s*:\s*[\s\S]*$/i, '').trimEnd()
+}
+
 async function sendEvolutionText({ instance, number, text }) {
   const baseUrl = firstString(process.env.EVOLUTION_API_URL, process.env.EVOLUTION_SERVER_URL)
   const apiKey = firstString(process.env.EVOLUTION_API_KEY)
@@ -364,7 +370,7 @@ async function processAgendaReminderCron({ limit = 80 } = {}) {
       await sendEvolutionText({
         instance: process.env.EVOLUTION_INSTANCE,
         number: item.phone,
-        text: item.message,
+        text: stripRespondaAgendaReminderSuffix(item.message),
       })
       await registrarLembretesAgendaEnviados([item])
       sent.push(item.reminder_id)
