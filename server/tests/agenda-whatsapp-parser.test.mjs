@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { isAgendaMessage, parseAgendaDateTime } from '../lib/domain/agenda-whatsapp.mjs'
+import {
+  draftAgendaFromTextHeuristic,
+  isAgendaMessage,
+  parseAgendaDateTime,
+} from '../lib/domain/agenda-whatsapp.mjs'
 
 describe('agenda WhatsApp parser', () => {
   it('reconhece compromissos em linguagem natural', () => {
@@ -29,5 +33,15 @@ describe('agenda WhatsApp parser', () => {
     const data = parseAgendaDateTime('me lembre quando for 22:00', base)
 
     expect(data?.toISOString()).toBe('2026-05-04T01:00:00.000Z')
+  })
+
+  it('draft heurístico para o app web devolve título e ISO de início', () => {
+    const base = new Date('2026-05-04T12:00:00.000Z')
+    const d = draftAgendaFromTextHeuristic('marcar reunião amanhã às 15h', base)
+    expect(d).toBeTruthy()
+    expect(d.origem).toBe('heuristica')
+    expect(d.titulo.length).toBeGreaterThan(1)
+    expect(d.inicio).toMatch(/^\d{4}-\d{2}-\d{2}T/)
+    expect([0, 5, 10, 15, 30, 60]).toContain(d.lembrar_minutos_antes)
   })
 })

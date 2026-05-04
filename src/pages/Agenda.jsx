@@ -269,6 +269,8 @@ export default function Agenda() {
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const [nlTexto, setNlTexto] = useState('')
+  const [nlBusy, setNlBusy] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
   const [selectedDateKey, setSelectedDateKey] = useState(() => saoPauloDateKey(new Date()))
   const [calendarMonthKey, setCalendarMonthKey] = useState(() => saoPauloDateKey(new Date()).slice(0, 7))
@@ -405,11 +407,13 @@ export default function Agenda() {
     d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15, 0, 0)
     if (selectedDateKey !== todayKey) d.setHours(9, 0, 0, 0)
     setEditing(null)
+    setNlTexto('')
     setForm({ ...EMPTY_FORM, inicio: toDatetimeLocal(d.toISOString()) })
     setModalOpen(true)
   }
 
   function openEdit(evento) {
+    setNlTexto('')
     setEditing(evento)
     setForm({
       titulo: evento.titulo || '',
@@ -421,6 +425,46 @@ export default function Agenda() {
       whatsapp_notificar: evento.whatsapp_notificar !== false,
     })
     setModalOpen(true)
+  }
+
+  async function interpretarAgendaIA() {
+    const t = nlTexto.trim()
+    if (!t || !usuarioId) return
+    setNlBusy(true)
+    try {
+      const res = await fetch(apiUrl('/api/ai/agenda-parse'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioId },
+        body: JSON.stringify({ texto: t }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        showToast(data.message || 'Não foi possível interpretar.', 'error')
+        return
+      }
+      const r = data.rascunho
+      if (!r?.inicio) {
+        showToast('Resposta incompleta — inclua data e horário na frase.', 'error')
+        return
+      }
+      setForm((f) => ({
+        ...f,
+        titulo: r.titulo || f.titulo,
+        descricao: r.descricao != null ? r.descricao : f.descricao,
+        local: r.local != null ? r.local : f.local,
+        inicio: toDatetimeLocal(r.inicio),
+        lembrar_minutos_antes:
+          r.lembrar_minutos_antes != null ? Number(r.lembrar_minutos_antes) : f.lembrar_minutos_antes,
+        whatsapp_notificar: r.whatsapp_notificar !== false,
+      }))
+      const origem = r.origem === 'ia' ? 'IA' : 'regras locais'
+      showToast(`Formulário preenchido (${origem}). Confira e salve.`, 'success')
+      setNlTexto('')
+    } catch {
+      showToast('Sem conexão. Tente de novo.', 'error')
+    } finally {
+      setNlBusy(false)
+    }
   }
 
   async function saveEvent(e) {
@@ -607,7 +651,10 @@ export default function Agenda() {
                 ) : selectedEvents.length === 0 ? (
                   <div className="agenda-empty">
                     <strong>Nenhum item neste dia.</strong>
-                    <span>Toque no + para criar um item ou peça pelo WhatsApp: “me avise de pagar a luz amanhã às 9h”.</span>
+                    <span>
+                      Toque no + para criar um item. No modal, use “Interpretar com IA” ou envie pelo WhatsApp:
+                      “me avise de pagar a luz amanhã às 9h”.
+                    </span>
                   </div>
                 ) : (
                   <div className="agenda-daily-list">
@@ -649,6 +696,32 @@ export default function Agenda() {
                 <h2>{editing ? 'Atualizar agenda' : 'Criar item na agenda'}</h2>
               </div>
               <button type="button" className="agenda-modal__close" onClick={() => setModalOpen(false)} aria-label="Fechar">×</button>
+            </div>
+
+            <div className="agenda-field" style={{ marginBottom: 12 }}>
+              <span>Linguagem natural (IA)</span>
+              <p style={{ margin: '4px 0 8px', fontSize: 13, color: 'var(--text-secondary)' }}>
+                Ex.: &quot;marcar dentista sexta às 14h&quot;, &quot;me lembra de pagar luz amanhã 9h&quot;
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <input
+                  type="text"
+                  value={nlTexto}
+                  onChange={(e) => setNlTexto(e.target.value)}
+                  placeholder="Descreva o compromisso ou lembrete…"
+                  disabled={nlBusy || saving}
+                  autoComplete="off"
+                />
+                <button
+                  type="button"
+                  className="agenda-secondary-btn"
+                  style={{ alignSelf: 'flex-start' }}
+                  disabled={nlBusy || saving || !nlTexto.trim()}
+                  onClick={() => void interpretarAgendaIA()}
+                >
+                  {nlBusy ? 'Interpretando…' : 'Interpretar com IA'}
+                </button>
+              </div>
             </div>
 
             <label className="agenda-field">

@@ -196,6 +196,44 @@ function formatReminderLabel(minutes) {
   return `${n} min antes`
 }
 
+/** Opções do select no app web (minutos antes). */
+const REMINDER_OPTIONS_APP = [0, 5, 10, 15, 30, 60]
+
+/**
+ * Aproxima minutos pedidos para o valor mais próximo permitido no formulário da agenda (web).
+ */
+export function snapReminderToAppOptions(minutes) {
+  const n = Number.parseInt(String(minutes ?? 15), 10)
+  if (!Number.isFinite(n)) return 15
+  const clamped = Math.min(Math.max(n, 0), 1440)
+  return REMINDER_OPTIONS_APP.reduce(
+    (best, v) => (Math.abs(v - clamped) < Math.abs(best - clamped) ? v : best),
+    15,
+  )
+}
+
+/**
+ * Rascunho para o modal da agenda (app) ou fallback quando a IA falha.
+ * Reutiliza o mesmo interpretador de data/hora do WhatsApp.
+ */
+export function draftAgendaFromTextHeuristic(message, base = new Date()) {
+  const inicio = parseAgendaDateTime(message, base)
+  if (!inicio) return null
+  const titulo = titleForCreate(message)
+  const remFromText = parseReminderMinutes(message)
+  const lembrar_minutos_antes = snapReminderToAppOptions(remFromText ?? 15)
+  const reminderCreate = isReminderCreateMessage(message)
+  return {
+    titulo,
+    descricao: reminderCreate ? '' : '',
+    local: '',
+    inicio: inicio.toISOString(),
+    lembrar_minutos_antes,
+    whatsapp_notificar: true,
+    origem: 'heuristica',
+  }
+}
+
 function formatLista(eventos, titulo = 'Agenda') {
   if (!eventos.length) return `🗓️ *${titulo}*\n\nNenhum compromisso encontrado.`
   const lines = eventos.slice(0, 8).map((ev, idx) => {

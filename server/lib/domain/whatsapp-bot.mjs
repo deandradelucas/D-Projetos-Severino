@@ -48,6 +48,31 @@ function fmt(v) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)
 }
 
+/** ISO para gravar na transação + se o utilizador mencionou data na mensagem (IA). */
+export function resolveDataTransacaoParaBot(parsed) {
+  const raw = parsed?.data_transacao
+  if (raw == null || raw === '') {
+    return { iso: new Date().toISOString(), explicit: false }
+  }
+  const d = new Date(raw)
+  if (Number.isNaN(d.getTime())) {
+    return { iso: new Date().toISOString(), explicit: false }
+  }
+  return { iso: d.toISOString(), explicit: true }
+}
+
+function formatDataTransacaoReplyPtBr(iso) {
+  try {
+    return new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      dateStyle: 'short',
+      timeStyle: 'short',
+    }).format(new Date(iso))
+  } catch {
+    return iso
+  }
+}
+
 const AJUDA =
   '🤖 *Horizonte Bot*\n\nPosso registrar:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite uma dessas!'
 
@@ -124,13 +149,14 @@ export async function processarMensagemBot(phone, rawMessage) {
   }
 
   // 6. Inserir transação
+  const { iso: dataTransacaoIso, explicit: dataExplicita } = resolveDataTransacaoParaBot(parsed)
   try {
     await inserirTransacao({
       usuario_id: usuario.id,
       tipo: parsed.tipo,
       valor: parsed.valor,
       descricao: parsed.descricao || message.slice(0, 100),
-      data_transacao: new Date().toISOString(),
+      data_transacao: dataTransacaoIso,
       status: 'EFETIVADA',
       categoria_id: parsed.categoria_id || undefined,
       subcategoria_id: parsed.subcategoria_id || undefined,
@@ -152,9 +178,12 @@ export async function processarMensagemBot(phone, rawMessage) {
   const emoji = parsed.tipo === 'RECEITA' ? '✅' : '💸'
   const acao = parsed.tipo === 'RECEITA' ? 'Receita' : 'Despesa'
   const saldoLinha = saldoAtual !== null ? `\n\n📊 Saldo atual: *${fmt(saldoAtual)}*` : ''
+  const dataLinha = dataExplicita
+    ? `\n📅 *Data:* ${formatDataTransacaoReplyPtBr(dataTransacaoIso)}`
+    : ''
 
   return {
     ok: true,
-    reply: `${emoji} *${acao} registrada!*\n\n💰 Valor: ${fmt(parsed.valor)}\n📝 ${parsed.descricao || message.slice(0, 60)}${saldoLinha}`,
+    reply: `${emoji} *${acao} registrada!*\n\n💰 Valor: ${fmt(parsed.valor)}\n📝 ${parsed.descricao || message.slice(0, 60)}${dataLinha}${saldoLinha}`,
   }
 }

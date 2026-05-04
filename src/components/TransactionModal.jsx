@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { apiUrl } from '../lib/apiUrl'
+import { showToast } from '../lib/toastStore'
 import CategorySelector from './transaction/CategorySelector'
 import RecurrenceOptions from './transaction/RecurrenceOptions'
 import { useTransactionForm } from '../hooks/useTransactionForm'
@@ -12,6 +13,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   const [categorias, setCategorias] = useState([])
   const [loadingCats, setLoadingCats] = useState(false)
   const [activeSelect, setActiveSelect] = useState(null)
+  const [aiTexto, setAiTexto] = useState('')
+  const [aiBusy, setAiBusy] = useState(false)
 
   const valorInputRef = useRef(null)
   const modalSheetRef = useRef(null)
@@ -53,7 +56,41 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     handleCurrencyChange,
     setDateShortcut,
     handleSubmit,
+    applyAiParsed,
   } = useTransactionForm({ usuarioId, editingTransaction, isOpen, categorias, onSave, onClose })
+
+  const preencherComIA = useCallback(async () => {
+    const t = aiTexto.trim()
+    if (!t || !usuarioId) return
+    setAiBusy(true)
+    try {
+      const res = await fetch(apiUrl('/api/ai/transacao-parse'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioId },
+        body: JSON.stringify({ texto: t }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        showToast(data.message || 'Não foi possível interpretar.', 'error')
+        return
+      }
+      const r = data.resultado
+      if (r?.tipo === 'CHAT') {
+        showToast(r.resposta || 'Não identifiquei um lançamento nesse texto.', 'info')
+        return
+      }
+      if (applyAiParsed(r)) {
+        showToast('Campos preenchidos — confira categoria e salve.', 'success')
+        setAiTexto('')
+      } else {
+        showToast('Inclua valor e tipo (ex.: "gastei 45,90 no mercado ontem").', 'error')
+      }
+    } catch {
+      showToast('Sem conexão. Tente de novo.', 'error')
+    } finally {
+      setAiBusy(false)
+    }
+  }, [aiTexto, usuarioId, applyAiParsed])
 
   // Inicializa o formulário e busca categorias ao abrir
   useEffect(() => {
@@ -67,6 +104,10 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       scrollValorIntoView()
     }, 120)
   }, [isOpen, usuarioId, editingTransaction?.id, fetchCategorias, initForm, scrollValorIntoView])
+
+  useEffect(() => {
+    if (!isOpen) setAiTexto('')
+  }, [isOpen])
 
   // Trava scroll do body enquanto modal está aberto
   useEffect(() => {
@@ -124,6 +165,37 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
 
         <form onSubmit={handleSubmit} className="modal-form modal-form--sheet">
           <div className="modal-body modal-body--nova-tx">
+
+            {!isEditMode && (
+              <section className="nova-tx-section" aria-labelledby="nova-tx-h-ia">
+                <h4 id="nova-tx-h-ia" className="nova-tx-section__title">
+                  Escreva como no WhatsApp (IA)
+                </h4>
+                <p className="nova-tx-section__hint" style={{ margin: '0 0 10px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  Ex.: &quot;gastei 89,90 no mercado ontem&quot;, &quot;recebi 3500 de salário hoje&quot;
+                </p>
+                <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <input
+                    type="text"
+                    value={aiTexto}
+                    onChange={(e) => setAiTexto(e.target.value)}
+                    placeholder="Descreva o lançamento em uma frase…"
+                    className="input-premium"
+                    disabled={aiBusy || loadingCats}
+                    autoComplete="off"
+                  />
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    style={{ alignSelf: 'flex-start' }}
+                    disabled={aiBusy || loadingCats || !aiTexto.trim()}
+                    onClick={() => void preencherComIA()}
+                  >
+                    {aiBusy ? 'Interpretando…' : 'Preencher com IA'}
+                  </button>
+                </div>
+              </section>
+            )}
 
             {/* ── Seção: Classificação ── */}
             <section className="nova-tx-section" aria-labelledby="nova-tx-h-classif">

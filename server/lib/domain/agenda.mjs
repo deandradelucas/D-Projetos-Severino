@@ -259,7 +259,7 @@ function buildReminderMessage(evento, offsetMinutos) {
   const local = evento.local ? `\n📍 ${evento.local}` : ''
   const desc = evento.descricao ? `\n📝 ${evento.descricao}` : ''
   const prefix = offsetMinutos > 0 ? `⏰ Lembrete: faltam ${offsetMinutos} min` : '⏰ Lembrete: está na hora'
-  return `${prefix}\n\n*${evento.titulo}*\n🗓️ ${quando}${local}${desc}\n\nResponda: *confirmar ${evento.codigo}*, *concluir ${evento.codigo}* ou *reagendar ${evento.codigo} para amanhã 10h*.`
+  return `${prefix}\n\n*${evento.titulo}*\n🗓️ ${quando}${local}${desc}\n\n*confirmar ${evento.codigo}*, *concluir ${evento.codigo}* ou *reagendar ${evento.codigo} para amanhã 10h*.`
 }
 
 export async function listarEMarcarLembretesPendentes({ limit = 50, marcarComoEnviado = true } = {}) {

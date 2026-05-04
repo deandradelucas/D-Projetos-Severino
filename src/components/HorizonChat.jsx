@@ -298,7 +298,7 @@ export default function HorizonChat() {
               <div className="horizon-chat-name">Horizon IA</div>
               <div className="horizon-chat-status">
                 <span className="horizon-status-dot" />
-                Assistente financeiro · Gemini
+                Finanças e agenda · Gemini
               </div>
             </div>
           </div>

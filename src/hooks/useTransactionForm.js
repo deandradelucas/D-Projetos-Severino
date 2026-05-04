@@ -113,6 +113,41 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, cate
     setFormData((prev) => ({ ...prev, data_transacao: dStr }))
   }, [])
 
+  /**
+   * Preenche o formulário a partir do JSON retornado por /api/ai/transacao-parse (mesmo formato do WhatsApp).
+   * @returns {boolean} true se aplicou uma transação válida
+   */
+  const applyAiParsed = useCallback((parsed) => {
+    if (!parsed || typeof parsed !== 'object') return false
+    if (parsed.tipo === 'CHAT') return false
+    if (parsed.tipo !== 'DESPESA' && parsed.tipo !== 'RECEITA') return false
+    const val = Number(parsed.valor)
+    if (!Number.isFinite(val) || val <= 0) return false
+
+    const numValue = Number(val.toFixed(2))
+    setDisplayValor(formatBRL(numValue))
+
+    let dtStr = ''
+    if (parsed.data_transacao) {
+      const d = new Date(parsed.data_transacao)
+      if (!Number.isNaN(d.getTime())) {
+        const offset = d.getTimezoneOffset() * 60000
+        dtStr = new Date(d.getTime() - offset).toISOString().slice(0, 16)
+      }
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      tipo: parsed.tipo,
+      valor: String(numValue),
+      descricao: parsed.descricao ? String(parsed.descricao) : '',
+      categoria_id: parsed.categoria_id != null ? String(parsed.categoria_id) : '',
+      subcategoria_id: parsed.subcategoria_id != null ? String(parsed.subcategoria_id) : '',
+      data_transacao: dtStr || prev.data_transacao,
+    }))
+    return true
+  }, [])
+
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     if (!formData.valor || parseFloat(formData.valor) <= 0) {
@@ -183,5 +218,6 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, cate
     handleCurrencyChange,
     setDateShortcut,
     handleSubmit,
+    applyAiParsed,
   }
 }
