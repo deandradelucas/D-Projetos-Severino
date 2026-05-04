@@ -4,9 +4,10 @@ import { getCategorias, inserirTransacao } from '../transacoes.mjs'
 import { parseWhatsAppMessageWithAI } from '../ai.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
+import { detectExtratoPedido, montarRespostaExtratoWhatsApp } from './whatsapp-extrato.mjs'
 
 const SALDO_RE =
-  /\b(saldo|quanto[\s-]tenho|meu[\s-]saldo|balan[çc]o|quanto[\s-]sobrou|extrato|resumo financeiro)\b/i
+  /\b(saldo|quanto[\s-]tenho|meu[\s-]saldo|balan[çc]o|quanto[\s-]sobrou|resumo financeiro)\b/i
 
 export function isSaldoQuery(message) {
   return SALDO_RE.test(String(message || ''))
@@ -74,7 +75,7 @@ function formatDataTransacaoReplyPtBr(iso) {
 }
 
 const AJUDA =
-  '🤖 *Horizonte Bot*\n\nPosso registrar:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite uma dessas!'
+  '🤖 *Horizonte Bot*\n\nPosso registrar:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico de gastos do dia", "receitas da semana", "extrato do mês"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite uma dessas!'
 
 /**
  * Ponto central do bot — recebe telefone + mensagem bruta do n8n e retorna o texto de resposta.
@@ -105,7 +106,18 @@ export async function processarMensagemBot(phone, rawMessage) {
     return processarMensagemAgenda(usuario, phone, message)
   }
 
-  // 2. Consulta de saldo
+  // Extrato / histórico (dia, semana ou mês) — antes da IA para não cair em CHAT genérico
+  if (detectExtratoPedido(message)) {
+    try {
+      const texto = await montarRespostaExtratoWhatsApp(usuario.id, message)
+      if (texto) return { ok: true, reply: texto }
+    } catch (e) {
+      log.error('[whatsapp-bot] montarRespostaExtratoWhatsApp error', e)
+      return { ok: false, reply: '❌ Erro ao buscar seu histórico. Tente novamente.' }
+    }
+  }
+
+  // Consulta de saldo
   if (isSaldoQuery(message)) {
     try {
       const { saldo, receitas, despesas } = await calcularSaldo(usuario.id)
