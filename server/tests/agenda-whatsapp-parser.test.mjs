@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  AGENDA_AVISO_ROW_PREFIX,
   draftAgendaFromTextHeuristic,
   isAgendaMessage,
   parseAgendaDateTime,
@@ -8,15 +7,12 @@ import {
 } from '../lib/domain/agenda-whatsapp.mjs'
 
 describe('agenda WhatsApp parser', () => {
-  it('reconhece rowId da lista de antecedência do aviso', () => {
-    const id = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
-    expect(isAgendaMessage(`${AGENDA_AVISO_ROW_PREFIX}${id}:10`)).toBe(true)
-  })
-
-  it('reconhece escolha de aviso por texto aviso1–aviso4', () => {
+  it('reconhece menu numérico 1–5 (e alias aviso1–aviso5)', () => {
+    expect(isAgendaMessage('3')).toBe(true)
     expect(isAgendaMessage('aviso2')).toBe(true)
-    expect(isAgendaMessage('AVISO4')).toBe(true)
-    expect(isAgendaMessage('2')).toBe(false)
+    expect(isAgendaMessage('AVISO5')).toBe(true)
+    expect(isAgendaMessage('6')).toBe(false)
+    expect(isAgendaMessage('12')).toBe(false)
   })
 
   it('reconhece compromissos em linguagem natural', () => {
@@ -46,6 +42,20 @@ describe('agenda WhatsApp parser', () => {
     const data = parseAgendaDateTime('me lembre quando for 22:00', base)
 
     expect(data?.toISOString()).toBe('2026-05-04T01:00:00.000Z')
+  })
+
+  it('sem data no texto: horário que já passou hoje em SP vai para o dia seguinte', () => {
+    const base = new Date('2026-05-04T20:15:00.000Z')
+    const data = parseAgendaDateTime('reunião 15:30', base)
+
+    expect(data?.toISOString()).toBe('2026-05-05T18:30:00.000Z')
+  })
+
+  it('sem data no texto: horário ainda futuro hoje em SP mantém o mesmo dia', () => {
+    const base = new Date('2026-05-04T20:15:00.000Z')
+    const data = parseAgendaDateTime('reunião 18:30', base)
+
+    expect(data?.toISOString()).toBe('2026-05-04T21:30:00.000Z')
   })
 
   it('não confunde horário "para/as … HH horas" com antecedência "HH horas antes"', () => {

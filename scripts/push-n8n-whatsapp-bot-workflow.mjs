@@ -78,7 +78,7 @@ const instance = extractedItem?.json?.instance || '';
 
 if (backendResp?.whatsappOutboundSent) return [];
 
-const textToSend = String(backendResp?.reply || '').trim() || String(backendResp?.whatsappFallbackText || '').trim();
+const textToSend = String(backendResp?.reply || '').trim();
 if (!textToSend || !remoteJid || !instance) return [];
 
 return [{ json: { remoteJid, instance, reply: textToSend } }];`

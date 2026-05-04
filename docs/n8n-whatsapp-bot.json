@@ -90,7 +90,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Se o Horizonte já enviou pela Evolution, não duplicar.\nconst backendResp = $json;\nconst extractedItem = $('Extrair telefone e mensagem').first();\nconst phone = extractedItem?.json?.phone || '';\n\nif (backendResp?.whatsappOutboundSent) return [];\n\nconst textToSend = String(backendResp?.reply || '').trim() || String(backendResp?.whatsappFallbackText || '').trim();\nif (!textToSend || !phone) return [];\n\nreturn [{ json: { phone, reply: textToSend } }];"
+        "jsCode": "// Se o Horizonte já enviou pela Evolution, não duplicar.\nconst backendResp = $json;\nconst extractedItem = $('Extrair telefone e mensagem').first();\nconst phone = extractedItem?.json?.phone || '';\n\nif (backendResp?.whatsappOutboundSent) return [];\n\nconst textToSend = String(backendResp?.reply || '').trim();\nif (!textToSend || !phone) return [];\n\nreturn [{ json: { phone, reply: textToSend } }];"
       },
       "id": "a1b2c3d4-0005-0005-0005-000000000005",
       "name": "Montar envio",
