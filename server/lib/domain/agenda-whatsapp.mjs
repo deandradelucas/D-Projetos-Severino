@@ -170,6 +170,17 @@ function extractTitle(message) {
   return title.length >= 2 ? title.slice(0, 160) : 'Compromisso'
 }
 
+function isReminderCreateMessage(message) {
+  return /\b(me\s+)?(lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar|lembrete)\b/i.test(String(message || ''))
+}
+
+function titleForCreate(message) {
+  const title = extractTitle(message)
+  if (!isReminderCreateMessage(message)) return title
+  if (/^(compromisso|quando for|quando der|na hora)$/i.test(title)) return 'Notificação'
+  return title
+}
+
 function hasCreateIntent(message) {
   const text = String(message || '')
   return CREATE_INTENT_RE.test(text) || /\b(me\s+)?(lembra|avise|alerte)\s+de\b/i.test(text)
@@ -298,17 +309,19 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
         return { ok: true, reply }
       }
       const minutos = parseReminderMinutes(message) ?? 0
+      const reminderCreate = isReminderCreateMessage(message)
       const data = await criarAgendaEvento(
         usuario.id,
         {
-          titulo: extractTitle(message),
+          titulo: titleForCreate(message),
+          descricao: reminderCreate ? 'Notificação criada pelo WhatsApp.' : undefined,
           inicio: inicio.toISOString(),
           lembrar_minutos_antes: minutos,
           whatsapp_notificar: true,
         },
         'WHATSAPP'
       )
-      reply = `✅ Compromisso criado!\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}`
+      reply = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}`
       return { ok: true, reply }
     }
 

@@ -5,6 +5,7 @@ describe('agenda WhatsApp parser', () => {
   it('reconhece compromissos em linguagem natural', () => {
     expect(isAgendaMessage('tenho dentista sexta às 14h')).toBe(true)
     expect(isAgendaMessage('me lembra de pagar a luz amanhã 9h')).toBe(true)
+    expect(isAgendaMessage('me lembre quando for 22:00')).toBe(true)
     expect(isAgendaMessage('me avise de ligar para o contador amanhã às 8h')).toBe(true)
     expect(isAgendaMessage('me alerte de tomar remédio em 30 minutos')).toBe(true)
     expect(isAgendaMessage('anota reunião com João dia 10/05 às 16h30')).toBe(true)
@@ -21,5 +22,12 @@ describe('agenda WhatsApp parser', () => {
     const data = parseAgendaDateTime('me lembra em 30 minutos de tomar remédio', base)
 
     expect(data?.toISOString()).toBe('2026-05-03T07:00:00.000Z')
+  })
+
+  it('interpreta pedido de notificação sem título explícito', () => {
+    const base = new Date('2026-05-03T06:30:00.000Z')
+    const data = parseAgendaDateTime('me lembre quando for 22:00', base)
+
+    expect(data?.toISOString()).toBe('2026-05-04T01:00:00.000Z')
   })
 })

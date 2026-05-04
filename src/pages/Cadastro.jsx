@@ -100,8 +100,8 @@ export default function Cadastro() {
 
   return (
     <AuthPhoneShell
-      title="Sign Up"
-      headerTitle="Sign Up"
+      title="Criar conta"
+      headerTitle="Criar conta"
       compact={step === 1}
       footer={
         <>
@@ -167,7 +167,7 @@ export default function Cadastro() {
         {step === 2 && (
           <div className="space-y-5">
             <label className="block" htmlFor="email">
-              <span className="mb-2 block text-[11px] font-medium text-[#111827]">Email</span>
+              <span className="mb-2 block text-[11px] font-medium text-[#111827]">E-mail</span>
               <input
                 id="email"
                 type="email"
@@ -181,7 +181,7 @@ export default function Cadastro() {
             </label>
 
             <label className="block" htmlFor="senha">
-              <span className="mb-2 block text-[11px] font-medium text-[#111827]">Password</span>
+              <span className="mb-2 block text-[11px] font-medium text-[#111827]">Senha</span>
               <div className="relative">
                 <input
                   id="senha"
@@ -203,7 +203,7 @@ export default function Cadastro() {
             </label>
 
             <label className="block" htmlFor="confirmarSenha">
-              <span className="mb-2 block text-[11px] font-medium text-[#111827]">Confirm password</span>
+              <span className="mb-2 block text-[11px] font-medium text-[#111827]">Confirmar senha</span>
               <div className="relative">
                 <input
                   id="confirmarSenha"
@@ -238,7 +238,7 @@ export default function Cadastro() {
                 disabled={loading}
                 className="min-h-[42px] flex-[1.5] rounded-[8px] bg-[#050505] px-4 py-3 text-[12px] font-medium text-white shadow-[0_18px_28px_-22px_rgba(0,0,0,0.9)] transition hover:bg-[#111111] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? 'Criando...' : 'Sign Up'}
+                {loading ? 'Criando...' : 'Criar conta'}
               </button>
             </div>
           </div>

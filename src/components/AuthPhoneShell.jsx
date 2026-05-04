@@ -30,7 +30,7 @@ export default function AuthPhoneShell({
               </Link>
             )}
             {headerTitle ? (
-              <h1 className="relative z-10 pt-12 text-center text-3xl font-medium tracking-[-0.04em] text-white sm:pt-8 sm:text-2xl">
+              <h1 className="relative z-10 pt-12 text-center text-3xl font-medium tracking-[-0.04em] !text-white sm:pt-8 sm:text-2xl">
                 {headerTitle}
               </h1>
             ) : (

@@ -261,7 +261,7 @@ export default function Login() {
     >
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <label className="block" htmlFor="email">
-          <span className="mb-2 block text-[11px] font-medium text-[#111827]">Email</span>
+          <span className="mb-2 block text-[11px] font-medium text-[#111827]">E-mail</span>
           <input
             id="email"
             type="email"
@@ -275,7 +275,7 @@ export default function Login() {
         </label>
 
         <label className="block" htmlFor="senha">
-          <span className="mb-2 block text-[11px] font-medium text-[#111827]">Password</span>
+          <span className="mb-2 block text-[11px] font-medium text-[#111827]">Senha</span>
           <div className="relative">
             <input
               id="senha"
@@ -372,7 +372,7 @@ export default function Login() {
           disabled={loading || bioLoading}
           className="min-h-[42px] w-full rounded-[8px] bg-[#050505] px-4 py-3 text-[12px] font-medium text-white shadow-[0_18px_28px_-22px_rgba(0,0,0,0.9)] transition hover:bg-[#111111] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/35 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? 'Entrando...' : 'Login'}
+          {loading ? 'Entrando...' : 'Entrar'}
         </button>
 
         {webAuthnSupported() && hasWebAuthn && (

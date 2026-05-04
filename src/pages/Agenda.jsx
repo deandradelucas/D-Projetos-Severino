@@ -68,13 +68,20 @@ function localToIso(value) {
   return Number.isNaN(d.getTime()) ? '' : d.toISOString()
 }
 
+function capitalizeDateLabel(value) {
+  return value
+    .replace('.', '')
+    .replace(/(^|,\s*|\s+de\s+)(\p{L})/gu, (_, prefix, letter) => `${prefix}${letter.toLocaleUpperCase('pt-BR')}`)
+}
+
 function formatDate(iso) {
-  return new Intl.DateTimeFormat('pt-BR', {
+  const formatted = new Intl.DateTimeFormat('pt-BR', {
     timeZone: AGENDA_TIME_ZONE,
-    weekday: 'short',
+    weekday: 'long',
     day: '2-digit',
-    month: 'short',
+    month: 'long',
   }).format(new Date(iso))
+  return capitalizeDateLabel(formatted)
 }
 
 function formatTime(iso) {
@@ -91,6 +98,10 @@ function formatReminder(minutes) {
   return `${n} min`
 }
 
+function plural(count, singular, pluralText) {
+  return `${count} ${count === 1 ? singular : pluralText}`
+}
+
 function isToday(iso) {
   return saoPauloDateKey(iso) === saoPauloDateKey(new Date())
 }
@@ -100,6 +111,151 @@ function eventTone(status) {
   if (status === 'CONCLUIDO') return 'done'
   if (status === 'CANCELADO') return 'cancelled'
   return 'scheduled'
+}
+
+function dateKeyToDate(dateKey) {
+  return new Date(`${dateKey}T12:00:00${SAO_PAULO_OFFSET}`)
+}
+
+function dateKeyToMonthKey(dateKey) {
+  return dateKey.slice(0, 7)
+}
+
+function monthKeyToDate(monthKey) {
+  return new Date(`${monthKey}-01T12:00:00${SAO_PAULO_OFFSET}`)
+}
+
+function addMonths(monthKey, amount) {
+  const date = monthKeyToDate(monthKey)
+  date.setMonth(date.getMonth() + amount)
+  return saoPauloDateKey(date).slice(0, 7)
+}
+
+function formatMonthTitle(monthKey) {
+  const formatted = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: AGENDA_TIME_ZONE,
+    month: 'long',
+    year: 'numeric',
+  }).format(monthKeyToDate(monthKey))
+  return capitalizeDateLabel(formatted)
+}
+
+function formatSelectedDayTitle(dateKey) {
+  const formatted = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: AGENDA_TIME_ZONE,
+    day: '2-digit',
+    month: 'long',
+    weekday: 'long',
+  }).format(dateKeyToDate(dateKey))
+  return capitalizeDateLabel(formatted)
+}
+
+function formatCompactDate(dateKey) {
+  const formatted = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: AGENDA_TIME_ZONE,
+    day: '2-digit',
+    month: 'long',
+  }).format(dateKeyToDate(dateKey))
+  return capitalizeDateLabel(formatted)
+}
+
+function buildMonthCalendar(monthKey) {
+  const first = monthKeyToDate(monthKey)
+  const month = first.getMonth()
+  const firstDay = (first.getDay() + 6) % 7
+  const start = new Date(first)
+  start.setDate(first.getDate() - firstDay)
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(start)
+    date.setDate(start.getDate() + index)
+    const key = saoPauloDateKey(date)
+    return {
+      key,
+      day: date.getDate(),
+      isCurrentMonth: date.getMonth() === month,
+    }
+  })
+}
+
+function getWeekRange(dateKey) {
+  const date = dateKeyToDate(dateKey)
+  const start = new Date(date)
+  const mondayOffset = (date.getDay() + 6) % 7
+  start.setDate(date.getDate() - mondayOffset)
+  start.setHours(0, 0, 0, 0)
+  const end = new Date(start)
+  end.setDate(start.getDate() + 6)
+  end.setHours(23, 59, 59, 999)
+  return { start, end }
+}
+
+function isReminderEvent(evento) {
+  const text = `${evento.titulo || ''} ${evento.descricao || ''}`.toLowerCase()
+  return /\b(lembra|lembrete|avise|alerte|notifica[cç][aã]o|pagar|tomar|ligar|renovar|buscar|comprar)\b/.test(text)
+    || /^(quando for|notifica[cç][aã]o)$/i.test(String(evento.titulo || '').trim())
+}
+
+function isMilestoneEvent(evento) {
+  const text = `${evento.titulo || ''} ${evento.descricao || ''}`.toLowerCase()
+  return /\b(marco|milestone|entrega|prazo|vencimento)\b/.test(text)
+}
+
+function agendaItemKind(evento) {
+  if (evento.status === 'CONCLUIDO') return 'done'
+  if (isReminderEvent(evento)) return 'reminder'
+  if (isMilestoneEvent(evento)) return 'milestone'
+  return 'event'
+}
+
+const AGENDA_KIND_META = {
+  event: { label: 'Compromisso', icon: 'calendar', tone: 'event' },
+  reminder: { label: 'Notificação', icon: 'bell', tone: 'reminder' },
+  milestone: { label: 'Marco', icon: 'flag', tone: 'milestone' },
+  done: { label: 'Concluído', icon: 'check', tone: 'done' },
+}
+
+function formatAgendaItemTime(evento, kind) {
+  if (kind === 'reminder') return `Aviso de notificação às ${formatTime(evento.inicio)}`
+  return [
+    formatTime(evento.inicio),
+    evento.fim ? ` - ${formatTime(evento.fim)}` : '',
+    ' · lembrete ',
+    formatReminder(evento.lembrar_minutos_antes),
+  ].join('')
+}
+
+function AgendaKindIcon({ type }) {
+  if (type === 'flag') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M4 22V4" />
+        <path d="M4 4h12l-1 4 1 4H4" />
+      </svg>
+    )
+  }
+  if (type === 'bell') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+      </svg>
+    )
+  }
+  if (type === 'check') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+    )
+  }
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M8 2v4" />
+      <path d="M16 2v4" />
+      <rect width="18" height="18" x="3" y="4" rx="2" />
+      <path d="M3 10h18" />
+    </svg>
+  )
 }
 
 export default function Agenda() {
@@ -112,6 +268,8 @@ export default function Agenda() {
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
+  const [selectedDateKey, setSelectedDateKey] = useState(() => saoPauloDateKey(new Date()))
+  const [calendarMonthKey, setCalendarMonthKey] = useState(() => saoPauloDateKey(new Date()).slice(0, 7))
 
   const usuarioId = usuario?.id ? String(usuario.id).trim() : ''
 
@@ -120,10 +278,13 @@ export default function Agenda() {
     setLoading(true)
     setError('')
     try {
-      const todayKey = saoPauloDateKey(new Date())
-      const from = new Date(`${todayKey}T00:00:00${SAO_PAULO_OFFSET}`)
+      const from = monthKeyToDate(calendarMonthKey)
+      from.setDate(1)
+      from.setDate(from.getDate() - 7)
+      from.setHours(0, 0, 0, 0)
       const to = new Date(from)
-      to.setDate(to.getDate() + 45)
+      to.setMonth(to.getMonth() + 2)
+      to.setDate(7)
       to.setHours(23, 59, 59, 999)
       const params = new URLSearchParams({
         from: from.toISOString(),
@@ -141,40 +302,85 @@ export default function Agenda() {
     } finally {
       setLoading(false)
     }
-  }, [usuarioId])
+  }, [calendarMonthKey, usuarioId])
 
   useEffect(() => {
     void loadAgenda()
   }, [loadAgenda])
 
-  const stats = useMemo(() => {
-    const upcoming = eventos.filter((ev) => ev.status !== 'CANCELADO' && ev.status !== 'CONCLUIDO')
-    return {
-      hoje: upcoming.filter((ev) => isToday(ev.inicio)).length,
-      confirmados: upcoming.filter((ev) => ev.status === 'CONFIRMADO').length,
-      proximos: upcoming.length,
-      whatsapp: upcoming.filter((ev) => ev.whatsapp_notificar).length,
-    }
-  }, [eventos])
-
-  const nextEvento = useMemo(
-    () => eventos.find((ev) => ev.status !== 'CANCELADO' && ev.status !== 'CONCLUIDO') || null,
+  const activeEventos = useMemo(
+    () =>
+      eventos
+        .filter((ev) => ev.status !== 'CANCELADO')
+        .slice()
+        .sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()),
     [eventos]
   )
 
-  const grouped = useMemo(() => {
+  const eventosByDate = useMemo(() => {
     const map = new Map()
-    for (const ev of eventos) {
+    for (const ev of activeEventos) {
       const key = saoPauloDateKey(ev.inicio)
       if (!map.has(key)) map.set(key, [])
       map.get(key).push(ev)
     }
-    return [...map.entries()].map(([key, rows]) => ({ key, rows }))
-  }, [eventos])
+    return map
+  }, [activeEventos])
+
+  const selectedEvents = useMemo(() => eventosByDate.get(selectedDateKey) || [], [eventosByDate, selectedDateKey])
+
+  const calendarDays = useMemo(() => buildMonthCalendar(calendarMonthKey), [calendarMonthKey])
+
+  const eventDateKeys = useMemo(() => new Set(eventosByDate.keys()), [eventosByDate])
+
+  const eventDateKinds = useMemo(() => {
+    const map = new Map()
+    for (const [key, rows] of eventosByDate.entries()) {
+      map.set(key, agendaItemKind(rows[0]))
+    }
+    return map
+  }, [eventosByDate])
+
+  const stats = useMemo(() => {
+    const todayCount = activeEventos.filter((ev) => isToday(ev.inicio) && ev.status !== 'CONCLUIDO').length
+    const { start, end } = getWeekRange(selectedDateKey)
+    const weekCount = activeEventos.filter((ev) => {
+      const date = new Date(ev.inicio)
+      return ev.status !== 'CONCLUIDO' && date >= start && date <= end
+    }).length
+    return {
+      selectedDay: selectedEvents.filter((ev) => ev.status !== 'CONCLUIDO').length,
+      today: todayCount,
+      week: weekCount,
+      reminders: selectedEvents.filter((ev) => agendaItemKind(ev) === 'reminder').length,
+    }
+  }, [activeEventos, selectedDateKey, selectedEvents])
+
+  const nextEvento = useMemo(
+    () => activeEventos.find((ev) => ev.status !== 'CONCLUIDO' && new Date(ev.inicio) >= new Date()) || null,
+    [activeEventos]
+  )
+
+  function goToMonth(amount) {
+    setCalendarMonthKey((currentMonth) => {
+      const nextMonth = addMonths(currentMonth, amount)
+      setSelectedDateKey((currentDate) => {
+        const currentDay = currentDate.slice(8, 10)
+        const desired = new Date(`${nextMonth}-${currentDay}T12:00:00${SAO_PAULO_OFFSET}`)
+        if (Number.isNaN(desired.getTime()) || saoPauloDateKey(desired).slice(0, 7) !== nextMonth) {
+          return `${nextMonth}-01`
+        }
+        return saoPauloDateKey(desired)
+      })
+      return nextMonth
+    })
+  }
 
   function openNew() {
-    const d = new Date()
+    const todayKey = saoPauloDateKey(new Date())
+    const d = selectedDateKey === todayKey ? new Date() : dateKeyToDate(selectedDateKey)
     d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15, 0, 0)
+    if (selectedDateKey !== todayKey) d.setHours(9, 0, 0, 0)
     setEditing(null)
     setForm({ ...EMPTY_FORM, inicio: toDatetimeLocal(d.toISOString()) })
     setModalOpen(true)
@@ -214,12 +420,12 @@ export default function Agenda() {
         body: JSON.stringify(payload),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.message || 'Falha ao salvar compromisso.')
-      showToast(editing ? 'Compromisso atualizado.' : 'Compromisso criado.', 'success')
+      if (!res.ok) throw new Error(data.message || 'Falha ao salvar item da agenda.')
+      showToast(editing ? 'Item atualizado.' : 'Item criado.', 'success')
       setModalOpen(false)
       await loadAgenda()
     } catch (err) {
-      showToast(err.message || 'Falha ao salvar compromisso.', 'error')
+      showToast(err.message || 'Falha ao salvar item da agenda.', 'error')
     } finally {
       setSaving(false)
     }
@@ -258,130 +464,130 @@ export default function Agenda() {
                 <span className="agenda-hero__orb agenda-hero__orb--two" aria-hidden="true" />
                 <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto(true)} />
+                  <div className="agenda-hero__title">
+                    <span>{formatCompactDate(selectedDateKey)}</span>
+                    <strong>Agenda</strong>
+                  </div>
                   <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações da agenda">
                     <button type="button" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={openNew}>
-                      + Novo compromisso
+                      + Novo
                     </button>
                   </div>
                 </div>
-                <div className="agenda-hero__brief" aria-label="Próximo compromisso">
-                  <div className="agenda-hero__brief-main">
-                    <span className="agenda-section-eyebrow">Próximo compromisso</span>
-                    {nextEvento ? (
-                      <div className="agenda-hero__next">
-                        <strong>{nextEvento.titulo}</strong>
-                        <span>{formatDate(nextEvento.inicio)} às {formatTime(nextEvento.inicio)}</span>
-                      </div>
-                    ) : (
-                      <div className="agenda-hero__next">
-                        <strong>Sem pendências imediatas</strong>
-                      </div>
-                    )}
+                <div className="agenda-hero__summary" aria-label="Resumo de compromissos">
+                  <div>
+                    <span>Itens do dia</span>
+                    <strong>{stats.selectedDay}</strong>
                   </div>
-                  <div className="agenda-hero__mini-stats" aria-label="Resumo rápido">
-                    <div>
-                      <strong>{stats.hoje}</strong>
-                      <span>hoje</span>
-                    </div>
-                    <div>
-                      <strong>{stats.whatsapp}</strong>
-                      <span>avisos</span>
-                    </div>
+                  <div>
+                    <span>Nesta semana</span>
+                    <strong>{stats.week}</strong>
                   </div>
+                  {nextEvento ? (
+                    <p>Próximo: {nextEvento.titulo} · {formatDate(nextEvento.inicio)} às {formatTime(nextEvento.inicio)}</p>
+                  ) : (
+                    <p>Sem próximos compromissos ativos.</p>
+                  )}
                 </div>
               </section>
 
-              <section className="agenda-kpis" aria-label="Resumo da agenda">
-                <article className="agenda-kpi agenda-kpi--hero">
-                  <div className="agenda-kpi__top">
-                    <span>Hoje</span>
-                    <i aria-hidden="true">H</i>
+              <section className="agenda-calendar-panel" aria-label="Calendário da agenda">
+                <div className="agenda-calendar-head">
+                  <div>
+                    <strong>{formatMonthTitle(calendarMonthKey)}</strong>
+                    <span>
+                      {plural(stats.today, 'item hoje', 'itens hoje')} · {plural(stats.reminders, 'notificação', 'notificações')} no dia
+                    </span>
                   </div>
-                  <strong>{stats.hoje}</strong>
-                  <p>compromissos ativos</p>
-                </article>
-                <article className="agenda-kpi">
-                  <div className="agenda-kpi__top">
-                    <span>Próximos</span>
-                    <i aria-hidden="true">P</i>
+                  <div className="agenda-calendar-nav" aria-label="Navegar meses">
+                    <button type="button" onClick={() => goToMonth(-1)} aria-label="Mês anterior">
+                      ‹
+                    </button>
+                    <button type="button" onClick={() => goToMonth(1)} aria-label="Próximo mês">
+                      ›
+                    </button>
                   </div>
-                  <strong>{stats.proximos}</strong>
-                  <p>nos próximos 45 dias</p>
-                </article>
-                <article className="agenda-kpi">
-                  <div className="agenda-kpi__top">
-                    <span>Confirmados</span>
-                    <i aria-hidden="true">C</i>
-                  </div>
-                  <strong>{stats.confirmados}</strong>
-                  <p>com presença marcada</p>
-                </article>
-                <article className="agenda-kpi">
-                  <div className="agenda-kpi__top">
-                    <span>WhatsApp</span>
-                    <i aria-hidden="true">W</i>
-                  </div>
-                  <strong>{stats.whatsapp}</strong>
-                  <p>com lembrete ativo</p>
-                </article>
+                </div>
+
+                <div className="agenda-calendar-weekdays" aria-hidden="true">
+                  {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((day) => (
+                    <span key={day}>{day}</span>
+                  ))}
+                </div>
+
+                <div className="agenda-calendar-grid">
+                  {calendarDays.map((day) => {
+                    const isSelected = day.key === selectedDateKey
+                    const hasEvent = eventDateKeys.has(day.key)
+                    const dayKind = eventDateKinds.get(day.key)
+                    const isCurrentDay = day.key === saoPauloDateKey(new Date())
+                    return (
+                      <button
+                        type="button"
+                        key={day.key}
+                        className={[
+                          'agenda-calendar-day',
+                          day.isCurrentMonth ? '' : 'agenda-calendar-day--muted',
+                          isCurrentDay ? 'agenda-calendar-day--today' : '',
+                          isSelected ? 'agenda-calendar-day--selected' : '',
+                          hasEvent ? 'agenda-calendar-day--has-event' : '',
+                          dayKind ? `agenda-calendar-day--kind-${dayKind}` : '',
+                        ].filter(Boolean).join(' ')}
+                        onClick={() => {
+                          setSelectedDateKey(day.key)
+                          setCalendarMonthKey(dateKeyToMonthKey(day.key))
+                        }}
+                        aria-pressed={isSelected}
+                        aria-label={`${day.day} ${hasEvent ? 'com itens' : 'sem itens'}`}
+                      >
+                        <span>{day.day}</span>
+                      </button>
+                    )
+                  })}
+                </div>
               </section>
 
-              <section className="agenda-list-panel" aria-label="Lista de compromissos">
+              <section className="agenda-list-panel agenda-list-panel--daily" aria-label="Lista do dia selecionado">
                 <div className="agenda-list-panel__header">
                   <div>
-                    <span className="agenda-section-eyebrow">Linha do tempo</span>
-                    <h2>Próximos compromissos</h2>
+                    <span className="agenda-section-eyebrow">Agenda do dia</span>
+                    <h2>{formatSelectedDayTitle(selectedDateKey)}</h2>
                   </div>
-                  <button type="button" className="agenda-secondary-btn" onClick={openNew}>Adicionar</button>
+                  <button type="button" className="agenda-floating-add" onClick={openNew} aria-label="Adicionar compromisso ou notificação">+</button>
                 </div>
 
                 {loading ? (
                   <div className="agenda-empty">Carregando agenda...</div>
                 ) : error ? (
                   <div className="agenda-empty agenda-empty--error">{error}</div>
-                ) : grouped.length === 0 ? (
+                ) : selectedEvents.length === 0 ? (
                   <div className="agenda-empty">
-                    <strong>Sua agenda está livre.</strong>
-                    <span>Crie um compromisso no app ou envie “marcar reunião amanhã às 15h” pelo WhatsApp.</span>
+                    <strong>Nenhum item neste dia.</strong>
+                    <span>Toque no + para criar um item ou peça pelo WhatsApp: “me avise de pagar a luz amanhã às 9h”.</span>
                   </div>
                 ) : (
-                  <div className="agenda-days">
-                    {grouped.map((group) => (
-                      <div className="agenda-day" key={group.key}>
-                        <div className="agenda-day__label">{formatDate(group.rows[0].inicio)}</div>
-                        <div className="agenda-day__cards">
-                          {group.rows.map((evento) => (
-                            <article className={`agenda-event agenda-event--${eventTone(evento.status)}`} key={evento.id}>
-                              <span className="agenda-event__halo" aria-hidden="true" />
-                              <div className="agenda-event__time">
-                                <strong>{formatTime(evento.inicio)}</strong>
-                                <span>{formatReminder(evento.lembrar_minutos_antes)}</span>
-                              </div>
-                              <div className="agenda-event__body">
-                                <div className="agenda-event__topline">
-                                  <h3>{evento.titulo}</h3>
-                                  <span className={`agenda-status agenda-status--${eventTone(evento.status)}`}>
-                                    {STATUS_LABEL[evento.status] || evento.status}
-                                  </span>
-                                </div>
-                                {evento.local ? <p className="agenda-event__local">{evento.local}</p> : null}
-                                {evento.descricao ? <p className="agenda-event__desc">{evento.descricao}</p> : null}
-                                <div className="agenda-event__meta">
-                                  <span>{evento.whatsapp_notificar ? 'WhatsApp ativo' : 'Sem WhatsApp'}</span>
-                                  <span>Código {evento.id.slice(0, 8)}</span>
-                                </div>
-                                <div className="agenda-event__actions">
-                                  <button type="button" className="agenda-action agenda-action--ghost" onClick={() => openEdit(evento)}>Editar</button>
-                                  <button type="button" className="agenda-action agenda-action--primary" onClick={() => setStatus(evento, 'CONFIRMADO')}>Confirmar</button>
-                                  <button type="button" className="agenda-action agenda-action--ghost" onClick={() => setStatus(evento, 'CONCLUIDO')}>Concluir</button>
-                                  <button type="button" className="agenda-action agenda-action--danger" onClick={() => setStatus(evento, 'CANCELADO')}>Cancelar</button>
-                                </div>
-                              </div>
-                            </article>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+                  <div className="agenda-daily-list">
+                    {selectedEvents.map((evento) => {
+                      const kind = agendaItemKind(evento)
+                      const meta = AGENDA_KIND_META[kind]
+                      return (
+                        <article className={`agenda-day-item agenda-day-item--${meta.tone} agenda-event--${eventTone(evento.status)}`} key={evento.id}>
+                          <div className="agenda-day-item__icon" aria-hidden="true">
+                            <AgendaKindIcon type={meta.icon} />
+                          </div>
+                          <div className="agenda-day-item__main">
+                            <span className="agenda-day-item__type">{meta.label}</span>
+                            <h3>{evento.titulo}</h3>
+                            <p>{formatAgendaItemTime(evento, kind)}</p>
+                            {evento.local ? <p className="agenda-event__local">{evento.local}</p> : null}
+                          </div>
+                          <div className="agenda-day-item__actions">
+                            <button type="button" onClick={() => openEdit(evento)} aria-label={`Editar ${evento.titulo}`}>Editar</button>
+                            <button type="button" onClick={() => setStatus(evento, 'CONCLUIDO')} aria-label={`Concluir ${evento.titulo}`}>Concluir</button>
+                          </div>
+                        </article>
+                      )
+                    })}
                   </div>
                 )}
               </section>
@@ -391,12 +597,12 @@ export default function Agenda() {
       </div>
 
       {modalOpen && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label={editing ? 'Editar compromisso' : 'Novo compromisso'}>
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label={editing ? 'Editar item da agenda' : 'Novo item da agenda'}>
           <form className="agenda-modal" onSubmit={saveEvent}>
             <div className="agenda-modal__header">
               <div>
-                <span className="agenda-section-eyebrow">{editing ? 'Editar agenda' : 'Novo na agenda'}</span>
-                <h2>{editing ? 'Atualizar compromisso' : 'Criar compromisso'}</h2>
+                <span className="agenda-section-eyebrow">{editing ? 'Editar item' : 'Novo item'}</span>
+                <h2>{editing ? 'Atualizar agenda' : 'Criar item na agenda'}</h2>
               </div>
               <button type="button" className="agenda-modal__close" onClick={() => setModalOpen(false)} aria-label="Fechar">×</button>
             </div>
@@ -406,7 +612,7 @@ export default function Agenda() {
               <input value={form.titulo} onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))} required maxLength={160} placeholder="Ex.: reunião com cliente" />
             </label>
             <label className="agenda-field">
-              <span>Data e hora (São Paulo)</span>
+              <span>Data e hora</span>
               <input type="datetime-local" value={form.inicio} onChange={(e) => setForm((f) => ({ ...f, inicio: e.target.value }))} required />
             </label>
             <label className="agenda-field">
@@ -420,7 +626,7 @@ export default function Agenda() {
 
             <div className="agenda-modal__grid">
               <label className="agenda-field">
-                <span>Lembrete</span>
+                <span>Aviso de notificação</span>
                 <select value={form.lembrar_minutos_antes} onChange={(e) => setForm((f) => ({ ...f, lembrar_minutos_antes: e.target.value }))}>
                   <option value={0}>Na hora</option>
                   <option value={5}>5 min antes</option>
@@ -439,7 +645,7 @@ export default function Agenda() {
             <div className="agenda-modal__actions">
               <button type="button" className="agenda-secondary-btn" onClick={() => setModalOpen(false)}>Cancelar</button>
               <button type="submit" className="dashboard-hub__btn dashboard-hub__btn--primary" disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar compromisso'}
+                {saving ? 'Salvando...' : 'Salvar item'}
               </button>
             </div>
           </form>
