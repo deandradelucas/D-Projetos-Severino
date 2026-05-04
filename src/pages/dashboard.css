@@ -11216,11 +11216,16 @@ body[data-theme='dark'] .agenda-page .agenda-event__time span {
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell,
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell {
+    position: fixed !important;
+    inset: 0 !important;
     width: 100vw !important;
     max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
     min-height: 100dvh !important;
     padding: 0 !important;
-    overflow-x: hidden !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
     background: #f3f4f7 !important;
   }
 
@@ -11236,6 +11241,8 @@ body[data-theme='dark'] .agenda-page .agenda-event__time span {
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     width: 100% !important;
     max-width: none !important;
+    height: 100% !important;
+    max-height: 100% !important;
     min-height: 100dvh !important;
     margin: 0 !important;
     padding: 0 14px calc(136px + var(--safe-bottom)) !important;
@@ -11251,9 +11258,9 @@ body[data-theme='dark'] .agenda-page .agenda-event__time span {
     position: relative !important;
     isolation: isolate;
     width: auto !important;
-    min-height: 176px !important;
-    margin: 0 -14px 0 !important;
-    padding: calc(20px + var(--safe-top)) 14px 48px !important;
+    min-height: calc(220px + var(--safe-top)) !important;
+    margin: calc(-1 * var(--safe-top)) -14px 0 !important;
+    padding: calc(46px + var(--safe-top)) 14px 52px !important;
     overflow: hidden !important;
     border: none !important;
     border-radius: 0 !important;
@@ -11276,6 +11283,11 @@ body[data-theme='dark'] .agenda-page .agenda-event__time span {
     border-top-left-radius: 42px;
     border-top-right-radius: 0;
     background: #ffffff;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    min-height: 118px;
+    align-items: center;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero > * {

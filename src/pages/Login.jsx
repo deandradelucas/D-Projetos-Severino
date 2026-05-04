@@ -259,9 +259,9 @@ export default function Login() {
         </>
       }
     >
-      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" noValidate>
         <label className="block" htmlFor="email">
-          <span className="mb-2 block text-[11px] font-medium text-[#111827]">E-mail</span>
+          <span className="mb-2 block text-[11px] font-medium text-[#111827] sm:text-[12px]">E-mail</span>
           <input
             id="email"
             type="email"
@@ -270,12 +270,12 @@ export default function Login() {
             placeholder="seu@email.com"
             required
             autoComplete="email"
-            className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-[#111827]/15 focus:shadow-[0_18px_34px_-24px_rgba(15,23,42,0.7)] focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+            className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-[#111827]/15 focus:shadow-[0_18px_34px_-24px_rgba(15,23,42,0.7)] focus-visible:ring-2 focus-visible:ring-[#111827]/20 sm:min-h-[46px] sm:px-4 sm:text-[13px]"
           />
         </label>
 
         <label className="block" htmlFor="senha">
-          <span className="mb-2 block text-[11px] font-medium text-[#111827]">Senha</span>
+          <span className="mb-2 block text-[11px] font-medium text-[#111827] sm:text-[12px]">Senha</span>
           <div className="relative">
             <input
               id="senha"
@@ -286,13 +286,13 @@ export default function Login() {
               required
               minLength={6}
               autoComplete="current-password"
-              className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 pr-10 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#cfcfcf] focus:border-[#111827]/15 focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+              className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 pr-10 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#cfcfcf] focus:border-[#111827]/15 focus-visible:ring-2 focus-visible:ring-[#111827]/20 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
             />
             <button
               type="button"
               onClick={() => setShowSenha(!showSenha)}
               aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md text-[#9ca3af] transition hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md text-[#9ca3af] transition hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/20 sm:text-[12px]"
             >
               {showSenha ? 'Ocultar' : 'Ver'}
             </button>
@@ -300,7 +300,7 @@ export default function Login() {
         </label>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <label className="flex items-center gap-2 text-[11px] font-medium text-[#4b5563]">
+          <label className="flex items-center gap-2 text-[11px] font-medium text-[#4b5563] sm:text-[12px]">
             <input
               type="checkbox"
               checked={rememberEmail}
@@ -317,7 +317,7 @@ export default function Login() {
               setForgotEmail(email)
               setForgotPasswordState({ text: '', type: '', link: '' })
             }}
-            className="text-[11px] font-medium text-[#111827] underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+            className="text-[11px] font-medium text-[#111827] underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/20 sm:text-[12px]"
           >
             Esqueceu a senha?
           </a>
@@ -370,7 +370,7 @@ export default function Login() {
         <button
           type="submit"
           disabled={loading || bioLoading}
-          className="min-h-[42px] w-full rounded-[8px] bg-[#050505] px-4 py-3 text-[12px] font-medium text-white shadow-[0_18px_28px_-22px_rgba(0,0,0,0.9)] transition hover:bg-[#111111] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/35 disabled:cursor-not-allowed disabled:opacity-60"
+          className="min-h-[42px] w-full rounded-[8px] bg-[#050505] px-4 py-3 text-[12px] font-medium text-white shadow-[0_18px_28px_-22px_rgba(0,0,0,0.9)] transition hover:bg-[#111111] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/35 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[46px] sm:text-[13px]"
         >
           {loading ? 'Entrando...' : 'Entrar'}
         </button>
@@ -380,7 +380,7 @@ export default function Login() {
             type="button"
             onClick={handleBiometricLogin}
             disabled={loading || bioLoading}
-            className="min-h-[42px] w-full rounded-[8px] border border-[#e5e7eb] bg-white px-4 py-3 text-[12px] font-medium text-[#111827] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-60"
+            className="min-h-[42px] w-full rounded-[8px] border border-[#e5e7eb] bg-white px-4 py-3 text-[12px] font-medium text-[#111827] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[46px] sm:text-[13px]"
           >
             {bioLoading ? 'Abrindo biometria...' : 'Entrar com biometria'}
           </button>
