@@ -11652,14 +11652,12 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__title,
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line,
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong,
-  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .ref-panel__subtitle,
-  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .dashboard-hub__eyebrow {
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .ref-panel__subtitle {
     color: #ffffff !important;
   }
 
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line span,
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .page-pagamento-header-sub,
-  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .page-configuracoes-header-sub,
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .page-admin-header-sub {
     color: rgba(255, 255, 255, 0.64) !important;
   }
@@ -12706,7 +12704,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line,
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong,
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .ref-panel__subtitle,
-  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .dashboard-hub__eyebrow,
   .agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title,
   .agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title span,
   .agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title strong {
@@ -12715,7 +12712,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
 
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line span,
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .page-pagamento-header-sub,
-  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .page-configuracoes-header-sub,
   .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero .page-admin-header-sub {
     color: rgba(255, 255, 255, 0.64) !important;
   }

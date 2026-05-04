@@ -70,6 +70,14 @@ const SAFELIST = new Set([
   'pagamento-orientacao--warning',
   'pagamento-orientacao--danger',
   'pagamento-orientacao--neutral',
+  /* Agenda.jsx: className={`agenda-calendar-day--kind-${dayKind}`} */
+  'agenda-calendar-day--kind-done',
+  'agenda-calendar-day--kind-milestone',
+  'agenda-calendar-day--kind-reminder',
+  /* Agenda.jsx: className={`agenda-day-item--${meta.tone}`} */
+  'agenda-day-item--done',
+  'agenda-day-item--milestone',
+  'agenda-day-item--reminder',
 ])
 
 function referencedInSources(className, bundle, tokens) {
