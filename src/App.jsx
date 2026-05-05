@@ -13,7 +13,6 @@ import ShellStickyHeaderScroll from './components/ShellStickyHeaderScroll'
 import ToastContainer from './components/Toast'
 import {
   Cadastro,
-  RedefinirSenha,
   Dashboard,
   Transacoes,
   Configuracoes,
@@ -44,7 +43,6 @@ function App() {
               <Routes>
                 <Route path="/cadastro" element={<Cadastro />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/redefinir-senha" element={<RedefinirSenha />} />
                 <Route element={<AppSessionOutlet requireAppAccess={false} />}>
                   <Route path="/bem-vindo-assinatura" element={<BemVindoAssinatura />} />
                   <Route path="/pagamento" element={<Pagamento />} />

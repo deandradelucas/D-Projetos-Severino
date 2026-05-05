@@ -16,13 +16,9 @@ export default function Login() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
-  const [forgotEmail, setForgotEmail] = useState('')
   const [rememberEmail, setRememberEmail] = useState(false)
-  const [showForgotPassword, setShowForgotPassword] = useState(false)
-  const [forgotPasswordState, setForgotPasswordState] = useState({ text: '', type: '', link: '' })
   const [mensagem, setMensagem] = useState({ texto: '', tipo: '' })
   const [loading, setLoading] = useState(false)
-  const [requestingReset, setRequestingReset] = useState(false)
   const [showSenha, setShowSenha] = useState(false)
   const [hasWebAuthn, setHasWebAuthn] = useState(false)
   const [bioLoading, setBioLoading] = useState(false)
@@ -32,7 +28,6 @@ export default function Login() {
 
     if (savedEmail) {
       setEmail(savedEmail)
-      setForgotEmail(savedEmail)
       setRememberEmail(true)
     }
   }, [])
@@ -75,59 +70,6 @@ export default function Login() {
       window.localStorage.setItem(REMEMBER_EMAIL_KEY, email)
     }
   }, [email, rememberEmail])
-
-  useEffect(() => {
-    setForgotEmail(email)
-  }, [email])
-
-  async function handleForgotPassword(event) {
-    event.preventDefault()
-    setForgotPasswordState({ text: '', type: '', link: '' })
-
-    const normalizedEmail = forgotEmail.trim().toLowerCase()
-
-    if (!validateEmail(normalizedEmail)) {
-      setForgotPasswordState({ text: 'Informe um e-mail válido para recuperar a senha.', type: 'error', link: '' })
-      return
-    }
-
-    setRequestingReset(true)
-    const controller = new AbortController()
-    const resetRequestTimeoutId = window.setTimeout(() => controller.abort(), 45000)
-
-    try {
-      const response = await fetch(apiUrl('/api/auth/request-password-reset'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: normalizedEmail }),
-        signal: controller.signal,
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        setForgotPasswordState({ text: data.message || 'Nao foi possivel enviar o link de redefinicao.', type: 'error', link: '' })
-        return
-      }
-
-      setForgotPasswordState({
-        text: data.message || 'Enviamos um link para seu e-mail.',
-        type: 'success',
-        link: data.devResetUrl || '',
-      })
-    } catch (error) {
-      if (error?.name === 'AbortError') {
-        setForgotPasswordState({ text: 'O envio demorou mais do que o esperado. Se o problema continuar, tente novamente em alguns instantes.', type: 'error', link: '' })
-        return
-      }
-
-      setForgotPasswordState({ text: 'Erro ao conectar com o servidor.', type: 'error', link: '' })
-    } finally {
-      window.clearTimeout(resetRequestTimeoutId)
-      setRequestingReset(false)
-    }
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -250,7 +192,7 @@ export default function Login() {
       headerTitle="Login"
       heroImageSrc="/images/Login/01.avif"
       subtitle="Bem-vindo de volta. Faça login para continuar."
-      compact={!showForgotPassword && !(webAuthnSupported() && hasWebAuthn)}
+      compact={!(webAuthnSupported() && hasWebAuthn)}
       footer={
         <>
           Não tem conta?{' '}
@@ -342,73 +284,15 @@ export default function Login() {
           </div>
         </label>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium text-emerald-800 sm:text-[12px]">
-            <input
-              type="checkbox"
-              checked={rememberEmail}
-              onChange={(e) => setRememberEmail(e.target.checked)}
-              className="h-4 w-4 cursor-pointer rounded border-emerald-400/80 bg-white text-emerald-600 accent-emerald-600 focus:ring-emerald-500/35 focus:ring-offset-0"
-            />
-            <span>Lembrar e-mail</span>
-          </label>
-          <a
-            href="#"
-            onClick={(event) => {
-              event.preventDefault()
-              setShowForgotPassword((current) => !current)
-              setForgotEmail(email)
-              setForgotPasswordState({ text: '', type: '', link: '' })
-            }}
-            className="cursor-pointer text-[11px] font-medium text-neutral-800 underline-offset-4 hover:text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40 sm:text-[12px]"
-          >
-            Esqueceu a senha?
-          </a>
-        </div>
-
-        {showForgotPassword && (
-          <div className="rounded-[16px] border border-neutral-200/90 bg-white/70 p-3 backdrop-blur-md">
-            <p className="mb-2 text-[11px] leading-snug text-neutral-600">
-              Digite seu e-mail para receber um link seguro de redefinição.
-            </p>
-            <div className="space-y-2">
-              <input
-                type="email"
-                value={forgotEmail}
-                onChange={(event) => setForgotEmail(event.target.value)}
-                placeholder="seu@email.com"
-                className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/35"
-                autoComplete="email"
-                required
-              />
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                disabled={requestingReset}
-                className="w-full cursor-pointer rounded-[12px] border border-neutral-200/90 bg-white px-3 py-2 text-[11px] font-semibold text-neutral-900 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {requestingReset ? 'Enviando link...' : 'Enviar link de redefinição'}
-              </button>
-            </div>
-
-            {forgotPasswordState.text && (
-              <div
-                className={`mt-2 rounded-[10px] border p-2 text-[11px] ${
-                  forgotPasswordState.type === 'success'
-                    ? 'border-success/35 bg-success/10 text-emerald-800'
-                    : 'border-error/35 bg-error/10 text-red-700'
-                }`}
-              >
-                <p>{forgotPasswordState.text}</p>
-                {forgotPasswordState.link && (
-                  <a href={forgotPasswordState.link} className="mt-1 inline-block cursor-pointer font-medium text-emerald-700 underline">
-                    Abrir link de redefinição
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium text-emerald-800 sm:text-[12px]">
+          <input
+            type="checkbox"
+            checked={rememberEmail}
+            onChange={(e) => setRememberEmail(e.target.checked)}
+            className="h-4 w-4 cursor-pointer rounded border-emerald-400/80 bg-white text-emerald-600 accent-emerald-600 focus:ring-emerald-500/35 focus:ring-offset-0"
+          />
+          <span>Lembrar e-mail</span>
+        </label>
 
         <button
           type="submit"

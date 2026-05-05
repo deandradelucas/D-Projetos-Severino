@@ -3,9 +3,6 @@ import { lazy } from 'react'
 const loadCadastro = () => import('./pages/Cadastro.jsx')
 export const Cadastro = lazy(loadCadastro)
 
-const loadRedefinirSenha = () => import('./pages/RedefinirSenha.jsx')
-export const RedefinirSenha = lazy(loadRedefinirSenha)
-
 const loadDashboard = () => import('./pages/Dashboard.jsx')
 export const Dashboard = lazy(loadDashboard)
 
@@ -35,7 +32,6 @@ export const BemVindoAssinatura = lazy(loadBemVindoAssinatura)
 
 const ROUTE_PREFETCH = {
   '/cadastro': loadCadastro,
-  '/redefinir-senha': loadRedefinirSenha,
   '/dashboard': loadDashboard,
   '/transacoes': loadTransacoes,
   '/configuracoes': loadConfiguracoes,

@@ -523,28 +523,6 @@ export default function AdminUsuarios() {
     setConfirmDialog({ kind: 'delete-user', user })
   }
 
-  const handleResetPassword = async (user) => {
-    try {
-      const userSaved = localStorage.getItem('horizonte_user')
-      if (!userSaved) throw new Error('Sessão expirada.')
-      const u = JSON.parse(userSaved)
-      const res = await fetch(apiUrl(`/api/admin/usuarios/${user.id}/solicitar-reset-senha`), {
-        method: 'POST',
-        headers: { 'x-user-id': u.id },
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Falha ao enviar link de redefinição.')
-      if (data.devResetUrl) {
-        setUserActionMessage(`Ambiente dev (sem Resend): ${data.devResetUrl}`)
-      } else {
-        setUserActionMessage(`Se o e-mail existir no cadastro, enviamos o link para ${user.email}.`)
-      }
-      void loadAudit()
-    } catch (e) {
-      setUserActionMessage(e.message)
-    }
-  }
-
   const executeDetailToggleActive = async (nextActive) => {
     if (!detailUser || isSuperAdminEmail(detailUser.email)) return
     try {
@@ -1021,9 +999,6 @@ export default function AdminUsuarios() {
                                       </button>
                                     </>
                                   )}
-                                  <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleResetPassword(row)}>
-                                    Senha
-                                  </button>
                                   {isPrincipal ? (
                                     <span className="admin-acoes-protegido" title="A conta administradora principal não pode ser excluída pelo painel.">
                                       Protegido
@@ -1055,9 +1030,6 @@ export default function AdminUsuarios() {
                                     </button>
                                   </>
                                 )}
-                                <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleResetPassword(row)}>
-                                  Senha
-                                </button>
                                 {isPrincipal ? (
                                   <span
                                     className="admin-acoes-protegido"
@@ -1113,18 +1085,6 @@ export default function AdminUsuarios() {
                               >
                                 Editar
                               </button>
-                              {!isPrincipal ? (
-                                <button
-                                  type="button"
-                                  className="btn-secondary"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleResetPassword(row)
-                                  }}
-                                >
-                                  Senha
-                                </button>
-                              ) : null}
                             </div>
                           </button>
                         </li>
@@ -1228,9 +1188,6 @@ export default function AdminUsuarios() {
                           }}
                         >
                           Editar
-                        </button>
-                        <button type="button" className="btn-secondary" onClick={() => void handleResetPassword(detailUser)}>
-                          Redefinir senha
                         </button>
                         {!isSuperAdminEmail(detailUser.email) ? (
                           <button type="button" className="btn-secondary" onClick={() => void handleDetailToggleActive()}>

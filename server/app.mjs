@@ -6,13 +6,7 @@ import { createApp } from './app-factory.mjs'
 import { httpRequestLogger, pagamentosRequestLogger } from './middleware/request-logger.mjs'
 import { clientIpFromHono } from './lib/http/client-ip.mjs'
 import { getSupabaseAdmin } from './lib/supabase-admin.mjs'
-import {
-  authenticateUser,
-  consumeResetToken,
-  getRequestOrigin,
-  isValidEmail,
-  sendPasswordResetLink,
-} from './lib/password-reset.mjs'
+import { authenticateUser, getRequestOrigin, isValidEmail } from './lib/password-reset.mjs'
 import {
   getCategorias,
   getTransacoes,
@@ -931,70 +925,6 @@ app.post('/api/assinatura/bem-vindo-visto', async (c) => {
   }
 })
 
-app.post('/api/auth/request-password-reset', async (c) => {
-  try {
-    const ip = clientKeyFromHono(c)
-    if (!rateLimitTake(`pw-req:${ip}`, 5, 15 * 60_000)) {
-      return c.json({ message: 'Muitas solicitações. Tente de novo em alguns minutos.' }, 429)
-    }
-    const body = await c.req.json()
-    const email = String(body?.email || '').trim().toLowerCase()
-
-    if (!isValidEmail(email)) {
-      return c.json({ message: 'Informe um e-mail válido.' }, 400)
-    }
-
-    const origin = getRequestOrigin(c)
-    const result = await sendPasswordResetLink(email, origin)
-
-    return c.json({
-      message: 'Enviamos um link para seu e-mail.',
-      devResetUrl: result.devResetUrl || null,
-    })
-  } catch (error) {
-    log.error('request-password-reset failed', error)
-    const mapped = mapSupabaseOrNetworkError(error)
-    if (mapped) return c.json({ message: mapped.message }, mapped.status)
-    return c.json(
-      { message: 'Não foi possível enviar o link agora. Tente novamente em alguns instantes.' },
-      500
-    )
-  }
-})
-
-app.post('/api/auth/reset-password', async (c) => {
-  try {
-    const ip = clientKeyFromHono(c)
-    if (!rateLimitTake(`pw-reset:${ip}`, 20, 15 * 60_000)) {
-      return c.json({ message: 'Muitas tentativas. Aguarde alguns minutos.' }, 429)
-    }
-    const body = await c.req.json()
-    const token = String(body?.token || '').trim()
-    const password = String(body?.password || '')
-
-    if (!token) {
-      return c.json({ message: 'Token inválido.' }, 400)
-    }
-
-    if (password.length < 6) {
-      return c.json({ message: 'A senha deve ter no mínimo 6 caracteres.' }, 400)
-    }
-
-    const updated = await consumeResetToken(token, password)
-
-    if (!updated) {
-      return c.json({ message: 'Link inválido ou expirado.' }, 400)
-    }
-
-    return c.json({ message: 'Senha redefinida com sucesso.' })
-  } catch (error) {
-    log.error('reset-password failed', error)
-    const mapped = mapSupabaseOrNetworkError(error)
-    if (mapped) return c.json({ message: mapped.message }, mapped.status)
-    return c.json({ message: 'Não foi possível redefinir a senha.' }, 500)
-  }
-})
-
 // User preferences & profile
 app.get('/api/usuarios/perfil', async (c) => {
   try {
@@ -1147,42 +1077,6 @@ app.delete('/api/admin/usuarios/:id', async (c) => {
       return c.json({ message: error.message }, 403)
     }
     return c.json({ message: 'Erro ao excluir usuário.' }, 500)
-  }
-})
-
-app.post('/api/admin/usuarios/:id/solicitar-reset-senha', async (c) => {
-  try {
-    const usuarioId = c.req.header('x-user-id')
-    const block = await assertPrincipalAdmin(usuarioId)
-    if (block) return c.json({ message: block.message }, block.status)
-
-    const id = c.req.param('id')
-    const perfil = await getPerfilUsuario(id)
-    if (!perfil?.email) return c.json({ message: 'Usuário não encontrado.' }, 404)
-
-    const origin = getRequestOrigin(c)
-    const result = await sendPasswordResetLink(perfil.email, origin)
-
-    await insertAdminAuditLog({
-      actorUserId: usuarioId,
-      action: 'reset_senha_solicitado',
-      targetUserId: id,
-      targetEmail: perfil.email,
-      clientIp: clientIpFromHono(c),
-    })
-
-    return c.json({
-      message: 'Se o e-mail existir no cadastro, enviamos o link de redefinição.',
-      devResetUrl: result.devResetUrl || null,
-    })
-  } catch (error) {
-    log.error('admin solicitar-reset-senha failed', error)
-    if (error.statusCode === 400) {
-      return c.json({ message: error.message }, 400)
-    }
-    const mapped = mapSupabaseOrNetworkError(error)
-    if (mapped) return c.json({ message: mapped.message }, mapped.status)
-    return c.json({ message: 'Erro ao solicitar redefinição.' }, 500)
   }
 })
 

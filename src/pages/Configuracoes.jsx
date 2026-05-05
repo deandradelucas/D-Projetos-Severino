@@ -24,7 +24,6 @@ export default function Configuracoes() {
   })
 
   const [toast, setToast] = useState('')
-  const [resetSending, setResetSending] = useState(false)
   const [webauthnList, setWebauthnList] = useState([])
   const [webauthnLoading, setWebauthnLoading] = useState(false)
   const [webauthnError, setWebauthnError] = useState(null)
@@ -133,28 +132,6 @@ export default function Configuracoes() {
     navigator.clipboard.writeText(perfil.email).then(() => showToast('E-mail copiado.')).catch(() => {})
   }
 
-  const solicitarRedefinicaoSenha = async () => {
-    if (!perfil.email) return
-    setResetSending(true)
-    try {
-      const res = await fetch('/api/auth/request-password-reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: perfil.email }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (res.ok) {
-        showToast(data.devResetUrl ? 'Link gerado (ambiente de desenvolvimento).' : 'Enviamos um link para seu e-mail.')
-      } else {
-        showToast(data.message || 'Não foi possível enviar o link.')
-      }
-    } catch {
-      showToast('Erro de rede.')
-    } finally {
-      setResetSending(false)
-    }
-  }
-
   return (
     <div className="dashboard-container page-configuracoes ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
@@ -201,9 +178,6 @@ export default function Configuracoes() {
             <div className="config-quick-actions">
               <button type="button" className="config-action-btn" onClick={copiarEmail} disabled={!perfil.email}>
                 Copiar e-mail
-              </button>
-              <button type="button" className="config-action-btn" onClick={solicitarRedefinicaoSenha} disabled={!perfil.email || resetSending}>
-                {resetSending ? 'Enviando…' : 'Redefinir senha'}
               </button>
             </div>
           </section>
