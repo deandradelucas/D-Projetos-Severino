@@ -13477,3 +13477,140 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   }
 }
 
+/* ============================================================
+   STORY 2.4 — Micro-interações & Motion System
+   Keyframes: index.css. Tudo aqui é prefers-reduced-motion aware.
+   NÃO toca no bloco SHELL HUB CONTRATO ESTÁVEL.
+   ============================================================ */
+
+/* --- Page entry: conteúdo autenticado fade + rise ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .dashboard-hub {
+    animation: hz-fade-slide-up 250ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1)) both;
+  }
+}
+
+/* --- KPI cards: scale hover ---- */
+.kpi-summary-card,
+.kpi-widget,
+.hub-kpi-card {
+  transition:
+    transform var(--duration-fast, 150ms) var(--ease-out, cubic-bezier(0, 0, 0.2, 1)),
+    box-shadow var(--duration-fast, 150ms) var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .kpi-summary-card:hover,
+  .kpi-widget:hover,
+  .hub-kpi-card:hover {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-gold, 0 0 30px rgba(212, 168, 75, 0.2));
+  }
+}
+
+/* --- Transaction row hover highlight ---- */
+.transaction-row,
+.transacao-item,
+.tx-row {
+  transition: background-color var(--duration-fast, 150ms) ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .transaction-row:hover,
+  .transacao-item:hover,
+  .tx-row:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+}
+
+/* --- Button gold primary: ripple on click ---- */
+.btn-primary,
+.horizon-btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after,
+.horizon-btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  transform-origin: center;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn-primary:active::after,
+  .horizon-btn-primary:active::after {
+    animation: hz-ripple 300ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1)) forwards;
+  }
+}
+
+/* --- TransactionModal: slide-up override ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .modal-content.modal-content--nova-tx {
+    animation: hz-modal-slide-up 300ms var(--ease-decelerate, cubic-bezier(0, 0, 0.2, 1)) forwards;
+  }
+}
+
+/* --- PWA install prompt: slide-up on appear ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .pwa-install-sheet {
+    animation: hz-slide-up 300ms var(--ease-decelerate, cubic-bezier(0, 0, 0.2, 1)) both;
+  }
+}
+
+/* --- Nav active indicator: fade-in on selection ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .nav-item {
+    transition:
+      background-color var(--duration-fast, 150ms) ease,
+      box-shadow var(--duration-fast, 150ms) ease,
+      color var(--duration-fast, 150ms) ease;
+  }
+}
+
+/* --- Skeleton → content: cross-fade ---- */
+.skeleton-to-content-enter {
+  animation: hz-fade-slide-up 200ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1)) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-to-content-enter {
+    animation: none;
+  }
+}
+
+/* --- Skeleton shimmer (define .skeleton-pulse se não estiver definido antes) ---- */
+@keyframes hz-skeleton-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton-pulse,
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.06) 25%,
+      rgba(255, 255, 255, 0.12) 50%,
+      rgba(255, 255, 255, 0.06) 75%
+    );
+    background-size: 200% 100%;
+    animation: hz-skeleton-shimmer 1.4s ease infinite;
+    border-radius: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-pulse,
+  .skeleton {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 6px;
+  }
+}
+
