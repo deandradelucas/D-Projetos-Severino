@@ -13454,3 +13454,26 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   color: var(--accent, #d4a84b);
 }
 
+/* ============================================================
+   STORY 2.3 — Páginas Core: Refinamento Visual
+   KPI card principal com glow gold, focus rings canônicos.
+   ============================================================ */
+
+/* KPI balance card — elevação gold no card principal */
+.kpi-card--balance,
+.dashboard-hub__balance-card,
+.balance-kpi {
+  transition:
+    box-shadow var(--duration-base, 200ms) var(--ease-out, cubic-bezier(0, 0, 0.2, 1)),
+    transform var(--duration-base, 200ms) var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .kpi-card--balance:hover,
+  .dashboard-hub__balance-card:hover,
+  .balance-kpi:hover {
+    box-shadow: var(--shadow-gold, 0 0 30px rgba(212, 168, 75, 0.2));
+    transform: translateY(-1px);
+  }
+}
+

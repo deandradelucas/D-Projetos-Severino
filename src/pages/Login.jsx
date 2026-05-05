@@ -270,7 +270,7 @@ export default function Login() {
             placeholder="seu@email.com"
             required
             autoComplete="email"
-            className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-[#111827]/15 focus:shadow-[0_18px_34px_-24px_rgba(15,23,42,0.7)] focus-visible:ring-2 focus-visible:ring-[#111827]/20 sm:min-h-[46px] sm:px-4 sm:text-[13px]"
+            className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-accent-gold/30 focus:shadow-[0_18px_34px_-24px_rgba(15,23,42,0.7)] focus-visible:ring-2 focus-visible:ring-accent-gold/40 sm:min-h-[46px] sm:px-4 sm:text-[13px]"
           />
         </label>
 
@@ -286,13 +286,13 @@ export default function Login() {
               required
               minLength={6}
               autoComplete="current-password"
-              className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 pr-10 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#cfcfcf] focus:border-[#111827]/15 focus-visible:ring-2 focus-visible:ring-[#111827]/20 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
+              className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 pr-10 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#cfcfcf] focus:border-accent-gold/30 focus-visible:ring-2 focus-visible:ring-accent-gold/40 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
             />
             <button
               type="button"
               onClick={() => setShowSenha(!showSenha)}
               aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md text-[#9ca3af] transition hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/20 sm:text-[12px]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md text-[#9ca3af] transition hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/40 sm:text-[12px]"
             >
               {showSenha ? 'Ocultar' : 'Ver'}
             </button>
@@ -317,7 +317,7 @@ export default function Login() {
               setForgotEmail(email)
               setForgotPasswordState({ text: '', type: '', link: '' })
             }}
-            className="text-[11px] font-medium text-[#111827] underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/20 sm:text-[12px]"
+            className="text-[11px] font-medium text-[#111827] underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/40 sm:text-[12px]"
           >
             Esqueceu a senha?
           </a>
@@ -334,7 +334,7 @@ export default function Login() {
                 value={forgotEmail}
                 onChange={(event) => setForgotEmail(event.target.value)}
                 placeholder="seu@email.com"
-                className="w-full rounded-[10px] border border-[#e5e7eb] bg-white px-3 py-2.5 text-[12px] text-[#111827] outline-none placeholder:text-[#a3a3a3] focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+                className="w-full rounded-[10px] border border-[#e5e7eb] bg-white px-3 py-2.5 text-[12px] text-[#111827] outline-none placeholder:text-[#a3a3a3] focus-visible:ring-2 focus-visible:ring-accent-gold/40"
                 autoComplete="email"
                 required
               />
@@ -352,8 +352,8 @@ export default function Login() {
               <div
                 className={`mt-2 rounded-[10px] border p-2 text-[11px] ${
                   forgotPasswordState.type === 'success'
-                    ? 'border-[rgba(34,197,94,0.28)] bg-[rgba(34,197,94,0.1)] text-[#15803d]'
-                    : 'border-[rgba(239,68,68,0.25)] bg-[rgba(239,68,68,0.08)] text-[#dc2626]'
+                    ? 'border-success/30 bg-success/10 text-success'
+                    : 'border-error/25 bg-error/10 text-error'
                 }`}
               >
                 <p>{forgotPasswordState.text}</p>
@@ -370,7 +370,7 @@ export default function Login() {
         <button
           type="submit"
           disabled={loading || bioLoading}
-          className="min-h-[42px] w-full rounded-[8px] bg-[#050505] px-4 py-3 text-[12px] font-medium text-white shadow-[0_18px_28px_-22px_rgba(0,0,0,0.9)] transition hover:bg-[#111111] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/35 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[46px] sm:text-[13px]"
+          className="min-h-[42px] w-full rounded-[8px] bg-accent-gold px-4 py-3 text-[12px] font-semibold text-bg-primary shadow-gold transition hover:bg-accent-gold-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/40 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[46px] sm:text-[13px]"
         >
           {loading ? 'Entrando...' : 'Entrar'}
         </button>
@@ -391,8 +391,8 @@ export default function Login() {
         <div
           className={`mt-4 rounded-[10px] border p-2 text-center text-[11px] ${
             mensagem.tipo === 'sucesso'
-              ? 'border-[rgba(34,197,94,0.28)] bg-[rgba(34,197,94,0.1)] text-[#15803d]'
-              : 'border-[rgba(239,68,68,0.25)] bg-[rgba(239,68,68,0.08)] text-[#dc2626]'
+              ? 'border-success/30 bg-success/10 text-success'
+              : 'border-error/25 bg-error/10 text-error'
           }`}
         >
           {mensagem.texto}

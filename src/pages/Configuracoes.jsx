@@ -165,7 +165,7 @@ export default function Configuracoes() {
         <RefDashboardScroll>
         <section className="dashboard-hub__hero page-configuracoes__hero" aria-label="Configurações">
           <div className="dashboard-hub__hero-row">
-            <MobileMenuButton onClick={() => setMenuAberto(true)} aria-label="Abrir menu" />
+            <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} aria-label="Abrir menu" />
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">Configurações</h1>
             </div>

@@ -247,7 +247,7 @@ export default function Pagamento() {
             <RefDashboardScroll>
             <section className="dashboard-hub__hero page-pagamento-header" aria-label="Pagamento">
               <div className="dashboard-hub__hero-row">
-                <MobileMenuButton onClick={() => setMenuAberto(true)} />
+                <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                 <div className="dashboard-hub__hero-text">
                   <h1 className="dashboard-hub__title">Pagamento</h1>
                   <p className="ref-panel__subtitle page-pagamento-header-sub">

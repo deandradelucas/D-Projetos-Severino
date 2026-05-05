@@ -134,7 +134,7 @@ export default function Cadastro() {
                 onChange={(e) => setNome(e.target.value)}
                 placeholder="Seu nome completo"
                 required
-                className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-[#111827]/15 focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+                className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-accent-gold/30 focus-visible:ring-2 focus-visible:ring-accent-gold/40"
               />
               {errors.nome && <p className="mt-1 text-[10px] text-red-500">{errors.nome}</p>}
             </label>
@@ -149,7 +149,7 @@ export default function Cadastro() {
                 placeholder="(00) 00000-0000"
                 required
                 maxLength={15}
-                className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-[#111827]/15 focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+                className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-accent-gold/30 focus-visible:ring-2 focus-visible:ring-accent-gold/40"
               />
               {errors.telefone && <p className="mt-1 text-[10px] text-red-500">{errors.telefone}</p>}
             </label>
@@ -157,7 +157,7 @@ export default function Cadastro() {
             <button
               type="button"
               onClick={handleNext}
-              className="min-h-[42px] w-full rounded-[8px] bg-[#050505] px-4 py-3 text-[12px] font-medium text-white shadow-[0_18px_28px_-22px_rgba(0,0,0,0.9)] transition hover:bg-[#111111] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/35"
+              className="min-h-[42px] w-full rounded-[8px] bg-accent-gold px-4 py-3 text-[12px] font-semibold text-bg-primary shadow-gold transition hover:bg-accent-gold-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/40 focus-visible:ring-offset-1"
             >
               Continuar
             </button>
@@ -175,7 +175,7 @@ export default function Cadastro() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
                 required
-                className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-[#111827]/15 focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+                className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-accent-gold/30 focus-visible:ring-2 focus-visible:ring-accent-gold/40"
               />
               {errors.email && <p className="mt-1 text-[10px] text-red-500">{errors.email}</p>}
             </label>
@@ -190,12 +190,12 @@ export default function Cadastro() {
                   onChange={(e) => setSenha(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 pr-10 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#cfcfcf] focus:border-[#111827]/15 focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+                  className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 pr-10 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#cfcfcf] focus:border-accent-gold/30 focus-visible:ring-2 focus-visible:ring-accent-gold/40"
                 />
                 <button
                   type="button"
                   onClick={() => setShowSenha(!showSenha)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md text-[11px] text-[#9ca3af] transition hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md text-[11px] text-[#9ca3af] transition hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/40"
                 >
                   {showSenha ? 'Ocultar' : 'Ver'}
                 </button>
@@ -212,12 +212,12 @@ export default function Cadastro() {
                   onChange={(e) => setConfirmarSenha(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 pr-10 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#cfcfcf] focus:border-[#111827]/15 focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+                  className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 pr-10 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#cfcfcf] focus:border-accent-gold/30 focus-visible:ring-2 focus-visible:ring-accent-gold/40"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmarSenha(!showConfirmarSenha)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md text-[11px] text-[#9ca3af] transition hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]/20"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md text-[11px] text-[#9ca3af] transition hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/40"
                 >
                   {showConfirmarSenha ? 'Ocultar' : 'Ver'}
                 </button>
@@ -236,7 +236,7 @@ export default function Cadastro() {
               <button
                 type="submit"
                 disabled={loading}
-                className="min-h-[42px] flex-[1.5] rounded-[8px] bg-[#050505] px-4 py-3 text-[12px] font-medium text-white shadow-[0_18px_28px_-22px_rgba(0,0,0,0.9)] transition hover:bg-[#111111] disabled:cursor-not-allowed disabled:opacity-60"
+                className="min-h-[42px] flex-[1.5] rounded-[8px] bg-accent-gold px-4 py-3 text-[12px] font-semibold text-bg-primary shadow-gold transition hover:bg-accent-gold-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? 'Criando...' : 'Criar conta'}
               </button>

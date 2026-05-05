@@ -551,7 +551,7 @@ export default function Agenda() {
                 <span className="agenda-hero__orb agenda-hero__orb--one" aria-hidden="true" />
                 <span className="agenda-hero__orb agenda-hero__orb--two" aria-hidden="true" />
                 <div className="dashboard-hub__hero-row">
-                  <MobileMenuButton onClick={() => setMenuAberto(true)} />
+                  <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                   <div className="agenda-hero__title">
                     <span>{formatCompactDate(selectedDateKey)}</span>
                     <strong>Agenda</strong>

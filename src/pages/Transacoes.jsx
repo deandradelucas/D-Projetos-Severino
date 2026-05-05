@@ -278,7 +278,7 @@ export default function Transacoes() {
         <RefDashboardScroll>
         <section className="dashboard-hub__hero" aria-label="Transações e atalhos">
           <div className="dashboard-hub__hero-row">
-            <MobileMenuButton onClick={() => setMenuAberto(true)} />
+            <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">Transações</h1>
             </div>

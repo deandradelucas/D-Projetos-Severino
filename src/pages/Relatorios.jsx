@@ -391,7 +391,7 @@ export default function Relatorios() {
         <RefDashboardScroll>
         <section className="dashboard-hub__hero" aria-label="Relatórios e exportação">
           <div className="dashboard-hub__hero-row">
-            <MobileMenuButton onClick={() => setMenuAberto(true)} />
+            <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">Relatórios</h1>
             </div>
