@@ -256,7 +256,7 @@ export default function Login() {
           Não tem conta?{' '}
           <Link
             to="/cadastro"
-            className="cursor-pointer font-semibold text-orange-600 underline-offset-4 transition hover:text-orange-500 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            className="cursor-pointer font-semibold text-emerald-600 underline-offset-4 transition hover:text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             Criar conta
           </Link>
@@ -275,7 +275,7 @@ export default function Login() {
               placeholder="seu@email.com"
               required
               autoComplete="email"
-              className="w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 pr-11 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-400 focus:border-orange-400/70 focus:bg-white focus-visible:ring-2 focus-visible:ring-orange-400/35 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
+              className="w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 pr-11 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-400 focus:border-emerald-500/65 focus:bg-white focus-visible:ring-2 focus-visible:ring-emerald-400/35 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
             />
             <span
               className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 sm:right-4"
@@ -310,13 +310,13 @@ export default function Login() {
               required
               minLength={6}
               autoComplete="current-password"
-              className="w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 pr-11 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-300 focus:border-orange-400/70 focus:bg-white focus-visible:ring-2 focus-visible:ring-orange-400/35 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
+              className="w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 pr-11 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-300 focus:border-emerald-500/65 focus:bg-white focus-visible:ring-2 focus-visible:ring-emerald-400/35 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
             />
             <button
               type="button"
               onClick={() => setShowSenha(!showSenha)}
               aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/45 sm:right-3"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/45 sm:right-3"
             >
               {showSenha ? (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
@@ -343,12 +343,12 @@ export default function Login() {
         </label>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium text-neutral-600 sm:text-[12px]">
+          <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium text-emerald-800 sm:text-[12px]">
             <input
               type="checkbox"
               checked={rememberEmail}
               onChange={(e) => setRememberEmail(e.target.checked)}
-              className="h-4 w-4 cursor-pointer rounded border-neutral-300 bg-white text-orange-600 accent-orange-500 focus:ring-orange-400/40 focus:ring-offset-0"
+              className="h-4 w-4 cursor-pointer rounded border-emerald-400/80 bg-white text-emerald-600 accent-emerald-600 focus:ring-emerald-500/35 focus:ring-offset-0"
             />
             <span>Lembrar e-mail</span>
           </label>
@@ -360,7 +360,7 @@ export default function Login() {
               setForgotEmail(email)
               setForgotPasswordState({ text: '', type: '', link: '' })
             }}
-            className="cursor-pointer text-[11px] font-medium text-neutral-800 underline-offset-4 hover:text-orange-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/45 sm:text-[12px]"
+            className="cursor-pointer text-[11px] font-medium text-neutral-800 underline-offset-4 hover:text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40 sm:text-[12px]"
           >
             Esqueceu a senha?
           </a>
@@ -377,7 +377,7 @@ export default function Login() {
                 value={forgotEmail}
                 onChange={(event) => setForgotEmail(event.target.value)}
                 placeholder="seu@email.com"
-                className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-orange-400/35"
+                className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/35"
                 autoComplete="email"
                 required
               />
@@ -401,7 +401,7 @@ export default function Login() {
               >
                 <p>{forgotPasswordState.text}</p>
                 {forgotPasswordState.link && (
-                  <a href={forgotPasswordState.link} className="mt-1 inline-block cursor-pointer font-medium text-orange-700 underline">
+                  <a href={forgotPasswordState.link} className="mt-1 inline-block cursor-pointer font-medium text-emerald-700 underline">
                     Abrir link de redefinição
                   </a>
                 )}
@@ -413,7 +413,7 @@ export default function Login() {
         <button
           type="submit"
           disabled={loading || bioLoading}
-          className="min-h-[46px] w-full cursor-pointer rounded-[14px] bg-gradient-to-r from-orange-500 via-orange-500 to-fuchsia-600 px-4 py-3 text-[13px] font-semibold text-white shadow-[0_12px_36px_-12px_rgba(249,115,22,0.45)] transition hover:brightness-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[48px] sm:text-[14px]"
+          className="min-h-[46px] w-full cursor-pointer rounded-[14px] bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 px-4 py-3 text-[13px] font-semibold text-white shadow-[0_12px_36px_-12px_rgba(16,185,129,0.42)] transition hover:brightness-[1.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/55 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[48px] sm:text-[14px]"
         >
           {loading ? 'Entrando...' : 'Entrar'}
         </button>

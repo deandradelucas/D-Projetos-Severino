@@ -43,7 +43,7 @@ export default function AuthPhoneShell({
         )}
       </div>
 
-      <div className="relative z-[1] grid min-h-dvh w-full place-items-center px-4 pb-[max(8rem,calc(24px+env(safe-area-inset-bottom)))] pt-[max(24px,env(safe-area-inset-top))] sm:px-6">
+      <div className="relative z-[1] box-border grid min-h-dvh w-full place-items-center px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6">
         <div className="auth-shell-glass-card-reflect w-full max-w-[400px]">
           <main
             className={`auth-shell-glass-card w-full rounded-[26px] border border-neutral-200/90 bg-white/40 px-7 py-9 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.14)] backdrop-blur-3xl backdrop-saturate-150 sm:rounded-[28px] sm:px-9 sm:py-10 ${

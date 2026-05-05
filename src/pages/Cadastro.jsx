@@ -99,7 +99,7 @@ export default function Cadastro() {
   }
 
   const inputGlass =
-    'w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-400 focus:border-orange-400/70 focus:bg-white focus-visible:ring-2 focus-visible:ring-orange-400/35 sm:min-h-[46px] sm:px-4 sm:text-[13px]'
+    'w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-400 focus:border-emerald-500/65 focus:bg-white focus-visible:ring-2 focus-visible:ring-emerald-400/35 sm:min-h-[46px] sm:px-4 sm:text-[13px]'
 
   return (
     <AuthPhoneShell
@@ -112,7 +112,7 @@ export default function Cadastro() {
           Já tem conta?{' '}
           <Link
             to="/login"
-            className="cursor-pointer font-semibold text-orange-600 underline-offset-4 transition hover:text-orange-500 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            className="cursor-pointer font-semibold text-emerald-600 underline-offset-4 transition hover:text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             Fazer login
           </Link>
@@ -126,7 +126,7 @@ export default function Cadastro() {
         </div>
         <div className="h-1 overflow-hidden rounded-full bg-neutral-200/90">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 transition-all duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 transition-all duration-500"
             style={{ width: `${(step / 2) * 100}%` }}
           />
         </div>
@@ -169,7 +169,7 @@ export default function Cadastro() {
             <button
               type="button"
               onClick={handleNext}
-              className="min-h-[46px] w-full cursor-pointer rounded-[14px] bg-gradient-to-r from-orange-500 via-orange-500 to-fuchsia-600 px-4 py-3 text-[13px] font-semibold text-white shadow-[0_12px_36px_-12px_rgba(249,115,22,0.45)] transition hover:brightness-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:min-h-[48px] sm:text-[14px]"
+              className="min-h-[46px] w-full cursor-pointer rounded-[14px] bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 px-4 py-3 text-[13px] font-semibold text-white shadow-[0_12px_36px_-12px_rgba(16,185,129,0.42)] transition hover:brightness-[1.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/55 focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:min-h-[48px] sm:text-[14px]"
             >
               Continuar
             </button>
@@ -230,7 +230,7 @@ export default function Cadastro() {
                   type="button"
                   onClick={() => setShowSenha(!showSenha)}
                   aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/45 sm:right-3"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/45 sm:right-3"
                 >
                   {showSenha ? (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
@@ -274,7 +274,7 @@ export default function Cadastro() {
                   type="button"
                   onClick={() => setShowConfirmarSenha(!showConfirmarSenha)}
                   aria-label={showConfirmarSenha ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/45 sm:right-3"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/45 sm:right-3"
                 >
                   {showConfirmarSenha ? (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
@@ -305,14 +305,14 @@ export default function Cadastro() {
               <button
                 type="button"
                 onClick={handleBack}
-                className="min-h-[46px] flex-1 cursor-pointer rounded-[14px] border border-neutral-200/95 bg-white/90 px-4 py-3 text-[12px] font-medium text-neutral-900 backdrop-blur-sm transition hover:bg-neutral-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/35 sm:min-h-[48px] sm:text-[13px]"
+                className="min-h-[46px] flex-1 cursor-pointer rounded-[14px] border border-neutral-200/95 bg-white/90 px-4 py-3 text-[12px] font-medium text-neutral-900 backdrop-blur-sm transition hover:bg-neutral-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/35 sm:min-h-[48px] sm:text-[13px]"
               >
                 Voltar
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="min-h-[46px] flex-[1.5] cursor-pointer rounded-[14px] bg-gradient-to-r from-orange-500 via-orange-500 to-fuchsia-600 px-4 py-3 text-[12px] font-semibold text-white shadow-[0_12px_36px_-12px_rgba(249,115,22,0.45)] transition hover:brightness-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[48px] sm:text-[13px]"
+                className="min-h-[46px] flex-[1.5] cursor-pointer rounded-[14px] bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 px-4 py-3 text-[12px] font-semibold text-white shadow-[0_12px_36px_-12px_rgba(16,185,129,0.42)] transition hover:brightness-[1.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/55 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[48px] sm:text-[13px]"
               >
                 {loading ? 'Criando...' : 'Criar conta'}
               </button>

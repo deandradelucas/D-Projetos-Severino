@@ -89,6 +89,11 @@ html {
   overflow-x: clip;
 }
 
+/* Tema claro: mesmo fundo que theme-color/meta — evita faixa preta por baixo no PWA (html ficava #050607). */
+html:has(body[data-theme='light']) {
+  background-color: #ffffff;
+}
+
 body,
 #root {
   min-height: 100vh;
