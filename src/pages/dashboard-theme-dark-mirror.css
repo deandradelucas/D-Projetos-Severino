@@ -71,12 +71,12 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   min-height: min(420px, 52vh);
   flex: 1 1 auto;
 }
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list {
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-list {
   flex: 1 1 auto;
   min-height: 0;
   -webkit-overflow-scrolling: touch;
 }
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-tx-list .ref-empty-state {
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-list .ref-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1532,8 +1532,8 @@ body[data-theme='dark'] .ref-tx-table-subgrid--actions .ref-tx-row {
     body[data-theme='dark'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-cat-cell,
     body[data-theme='dark'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-sub-cell,
     body[data-theme='dark'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-rec-cell,
-    body[data-theme='dark'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-cell,
-    body[data-theme='dark'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-actions-cell {
+    body[data-theme='dark'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-act-wrap > .ref-tx-val-cell,
+    body[data-theme='dark'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-act-wrap > .ref-tx-actions-cell {
       grid-area: auto;
     }
   }

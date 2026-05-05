@@ -10,6 +10,7 @@ import { useTransactionCache } from '../context/transactionCacheStore'
 import { readHorizonteUser, readHorizonteUserPainelState } from '../lib/horizonteSession'
 import { primeiroNomeExibicao } from '../lib/primeiroNomeExibicao'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
+import { formatTransacaoListDateTime } from '../lib/transacaoDateDisplay'
 import { getSaudacao } from '../lib/getSaudacao'
 import { SkeletonKpi, SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
@@ -255,12 +256,7 @@ export default function Dashboard() {
                   {txRecentes.map((t) => {
                     const mostraIconeRecorrente = Boolean(t.recorrencia_mensal_id) || Boolean(t.recorrente_index)
                     const isRec = t.tipo === 'RECEITA'
-                    const dt = new Date(t.data_transacao)
-                    const dateLine = dt.toLocaleDateString('pt-BR', {
-                      day: '2-digit',
-                      month: 'short',
-                    })
-                    const isoDate = Number.isNaN(dt.getTime()) ? undefined : dt.toISOString().slice(0, 10)
+                    const { line: dateLine, dateTimeAttr } = formatTransacaoListDateTime(t.data_transacao)
                     const catNome = (t.categorias?.nome && String(t.categorias.nome).trim()) || '—'
                     const subRaw = t.subcategorias
                     const subNome =
@@ -285,7 +281,7 @@ export default function Dashboard() {
                           </div>
                         </div>
                         <div className="ref-tx-meta-cell">
-                          <time className="ref-tx-date" dateTime={isoDate}>
+                          <time className="ref-tx-date" dateTime={dateTimeAttr}>
                             {dateLine}
                           </time>
                         </div>

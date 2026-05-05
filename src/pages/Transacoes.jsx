@@ -19,6 +19,7 @@ import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
+import { formatTransacaoListDateTime } from '../lib/transacaoDateDisplay'
 import './dashboard.css'
 
 /** Itens por requisição — menos DOM inicial; “Carregar mais” busca o restante. */
@@ -498,10 +499,10 @@ export default function Transacoes() {
         )}
 
         <article
-          className={`ref-panel ref-panel--transactions page-transacoes-ref-table${refreshing ? ' page-panel--refreshing' : ''}`}
+          className={`ref-panel ref-panel--transactions dashboard-hub__tx-panel page-transacoes-ref-table${refreshing ? ' page-panel--refreshing' : ''}`}
         >
           <div className="ref-panel__head page-transacoes-tx-panel-head">
-            <div>
+            <div className="page-transacoes-tx-panel-head__titles">
               <h2 className="ref-panel__title">Transações</h2>
               {filtroRecorrentesAtivo ? (
                 <p className="ref-panel__subtitle page-transacoes-tx-filter-hint">
@@ -510,7 +511,7 @@ export default function Transacoes() {
               ) : null}
             </div>
           </div>
-          <div className="ref-tx-list page-transacoes-tx-list" aria-busy={loading || refreshing}>
+          <div className="ref-tx-list" aria-busy={loading || refreshing}>
             {loading ? (
               <div className="skeleton-stagger ref-tx-skeleton-stack">
                 <SkeletonTxRow />
@@ -545,20 +546,13 @@ export default function Transacoes() {
                 </div>
                 {transacoes.map((t) => {
                   const isRec = t.tipo === 'RECEITA'
-                  const dt = new Date(t.data_transacao)
-                  const dateLine = dt.toLocaleDateString('pt-BR', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric',
-                  })
-                  const timeLine = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-                  const isoDate = Number.isNaN(dt.getTime()) ? undefined : dt.toISOString().slice(0, 10)
-                  const catNome = (t.categorias?.nome && String(t.categorias.nome).trim()) || 'Sem categoria'
+                  const { line: dateLine, dateTimeAttr } = formatTransacaoListDateTime(t.data_transacao)
+                  const catNome = (t.categorias?.nome && String(t.categorias.nome).trim()) || '—'
                   const subRaw = t.subcategorias
                   const subNome =
                     subRaw && typeof subRaw === 'object' && subRaw.nome && String(subRaw.nome).trim()
                       ? String(subRaw.nome).trim()
-                      : (t.descricao && String(t.descricao).trim()) || '—'
+                      : '—'
                   const valorAbs = Math.abs(parseFloat(t.valor) || 0)
                   const mostraIconeRecorrente = Boolean(t.recorrencia_mensal_id) || Boolean(t.recorrente_index)
                   return (
@@ -579,10 +573,9 @@ export default function Transacoes() {
                         </div>
                       </div>
                       <div className="ref-tx-meta-cell">
-                        <time className="ref-tx-date" dateTime={isoDate}>
+                        <time className="ref-tx-date" dateTime={dateTimeAttr}>
                           {dateLine}
                         </time>
-                        <span className="ref-tx-time-sub">{timeLine}</span>
                       </div>
                       <div className="ref-tx-cat-cell">
                         <span className="ref-tx-field-label">Categoria</span>
@@ -610,46 +603,48 @@ export default function Transacoes() {
                           </span>
                         ) : null}
                       </div>
-                      <div className="ref-tx-val-cell">
-                        <span
-                          className={`ref-tx-val ${isRec ? 'ref-tx-val--pos' : 'ref-tx-val--neg'} ${privacyMode ? 'privacy-blur' : ''}`}
-                        >
-                          <span className="ref-tx-val__amount">
-                            {isRec ? '+' : '−'}
-                            {formatCurrency(valorAbs)}
+                      <div className="ref-tx-val-act-wrap">
+                        <div className="ref-tx-val-cell">
+                          <span
+                            className={`ref-tx-val ${isRec ? 'ref-tx-val--pos' : 'ref-tx-val--neg'} ${privacyMode ? 'privacy-blur' : ''}`}
+                          >
+                            <span className="ref-tx-val__amount">
+                              {isRec ? '+' : '−'}
+                              {formatCurrency(valorAbs)}
+                            </span>
                           </span>
-                        </span>
-                      </div>
-                      <div className="ref-tx-actions-cell">
-                        <div className="transacoes-actions" role="group" aria-label="Ações da transação">
-                          <button
-                            type="button"
-                            className="btn-edit"
-                            onClick={() => {
-                              setEditingTransaction(t)
-                              setIsModalOpen(true)
-                            }}
-                            aria-label={`Editar transação ${t.descricao || 'sem descrição'}`}
-                            title="Editar"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                              <path d="m15 5 4 4" />
-                            </svg>
-                          </button>
-                          <button
-                            type="button"
-                            className="btn-delete"
-                            onClick={() => handleDelete(t)}
-                            aria-label={`Excluir transação ${t.descricao || 'sem descrição'}`}
-                            title="Excluir"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                              <path d="M3 6h18" />
-                              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                            </svg>
-                          </button>
+                        </div>
+                        <div className="ref-tx-actions-cell">
+                          <div className="transacoes-actions" role="group" aria-label="Ações da transação">
+                            <button
+                              type="button"
+                              className="btn-edit"
+                              onClick={() => {
+                                setEditingTransaction(t)
+                                setIsModalOpen(true)
+                              }}
+                              aria-label={`Editar transação ${t.descricao || 'sem descrição'}`}
+                              title="Editar"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                                <path d="m15 5 4 4" />
+                              </svg>
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-delete"
+                              onClick={() => handleDelete(t)}
+                              aria-label={`Excluir transação ${t.descricao || 'sem descrição'}`}
+                              title="Excluir"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                <path d="M3 6h18" />
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
