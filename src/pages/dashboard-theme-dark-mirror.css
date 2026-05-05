@@ -988,6 +988,7 @@ body[data-theme='dark'] .ref-tx-row:last-child::after {
         minmax(24px, 28px)
         auto;
       column-gap: 16px;
+      row-gap: 10px;
       padding-inline: 12px;
       min-width: 0;
       box-sizing: border-box;
@@ -1058,7 +1059,7 @@ body[data-theme='dark'] .ref-tx-row:last-child::after {
   @media (min-width: 769px) {
     body[data-theme='dark'] .ref-tx-table-subgrid {
       column-gap: 12px;
-      row-gap: 0;
+      row-gap: 10px;
       grid-template-columns:
         40px
         minmax(100px, 1.25fr)
@@ -1479,6 +1480,7 @@ body[data-theme='dark'] .ref-tx-table-subgrid--actions .ref-tx-row {
         auto
         max-content;
       column-gap: 16px;
+      row-gap: 10px;
       padding-inline: 12px;
       min-width: 0;
       box-sizing: border-box;
@@ -1552,6 +1554,7 @@ body[data-theme='dark'] .ref-tx-table-subgrid--actions .ref-tx-row {
   @media (min-width: 769px) {
     body[data-theme='dark'] .ref-tx-table-subgrid--actions {
       column-gap: 12px;
+      row-gap: 10px;
       grid-template-columns:
         40px
         minmax(100px, 1.25fr)

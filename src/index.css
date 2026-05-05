@@ -116,7 +116,25 @@ body {
   isolation: isolate;
 }
 
-/* Login/Cadastro glass — reflexo espelhado sob o cartão (Safari/Chrome); Firefox sem reflexo */
+/* Login/Cadastro — fallback atrás da foto (evita flash/branco nas bordas em alguns viewports) */
+.auth-shell-glass--hero {
+  background-color: #0f172a;
+}
+
+.auth-shell-glass--blobs {
+  background-color: #ffffff;
+}
+
+/* Login com foto — overlay separado mobile (cartão sobre foto) vs desktop (só na coluna da imagem) */
+.auth-shell-glass-hero-overlay--mobile {
+  background-color: rgba(255, 255, 255, 0.52);
+}
+
+.auth-shell-glass-hero-overlay--desktop {
+  background: linear-gradient(115deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.45) 100%);
+}
+
+/* Login/Cadastro glass — reflexo sob o cartão só em telas pequenas */
 .auth-shell-glass-card-reflect {
   -webkit-box-reflect: below 14px
     linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.12) 22%, rgba(255, 255, 255, 0.04) 48%, transparent 82%);
@@ -125,6 +143,51 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .auth-shell-glass-card-reflect {
     -webkit-box-reflect: none;
+  }
+}
+
+/* Desktop: layout em duas colunas no login (foto | formulário) — cartão sem “aro” de vidro branco */
+@media (min-width: 1024px) {
+  .auth-shell-glass-card-reflect {
+    -webkit-box-reflect: none;
+  }
+
+  /* Painel do formulário: fundo sólido (não compete com borda do cartão) */
+  .auth-shell-glass--hero .auth-shell-glass-form-column {
+    background-color: #e8edf4;
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.35);
+  }
+
+  /* Cartão: papel branco discreto, sem borda cinza clara */
+  .auth-shell-glass--hero .auth-shell-glass-card {
+    border-color: transparent;
+    border-width: 0;
+    background-color: #ffffff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow:
+      0 18px 48px -28px rgba(15, 23, 42, 0.14),
+      0 0 0 1px rgba(15, 23, 42, 0.05);
+  }
+
+  /* Cadastro: fundo em gradiente + cartão sem contorno branco */
+  .auth-shell-glass--blobs {
+    background-color: #dde5f0;
+    background-image:
+      radial-gradient(ellipse 85% 58% at 14% 10%, rgba(255, 255, 255, 0.75), transparent 56%),
+      radial-gradient(ellipse 72% 52% at 92% 90%, rgba(148, 163, 184, 0.38), transparent 52%),
+      linear-gradient(163deg, #e9eef6 0%, #d7dfea 46%, #c9d4e3 100%);
+  }
+
+  .auth-shell-glass--blobs .auth-shell-glass-card {
+    border-color: transparent;
+    border-width: 0;
+    background-color: rgba(255, 255, 255, 0.94);
+    box-shadow:
+      0 22px 64px -36px rgba(15, 23, 42, 0.16),
+      0 0 0 1px rgba(255, 255, 255, 0.55) inset;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
   }
 }
 

@@ -1,5 +1,6 @@
 /**
- * Lista classes em dashboard.css sem referência em arquivos .jsx/.js em src/.
+ * Lista classes na cascata do dashboard (dashboard.css + @import recursivo)
+ * sem referência em arquivos .jsx/.js em src/.
  * Uso: node scripts/find-unused-dashboard-css.mjs
  */
 import fs from 'node:fs'
@@ -8,6 +9,29 @@ import path from 'node:path'
 const ROOT = path.resolve(import.meta.dirname, '..')
 const CSS_FILE = path.join(ROOT, 'src/pages/dashboard.css')
 const SRC = path.join(ROOT, 'src')
+
+/** Junta o entry com todos os .css locais referenciados por @import (sem media layers). */
+function expandCssImports(entryPath, visited = new Set()) {
+  const resolved = path.resolve(entryPath)
+  if (visited.has(resolved)) return ''
+  visited.add(resolved)
+  const raw = fs.readFileSync(resolved, 'utf8')
+  const dir = path.dirname(resolved)
+  const importRe = /@import\s+(?:url\s*\(\s*)?['"]([^'"]+)['"](?:\s*\))?\s*;/g
+  let out = ''
+  let last = 0
+  let m
+  while ((m = importRe.exec(raw)) !== null) {
+    out += raw.slice(last, m.index)
+    const target = path.resolve(dir, m[1])
+    if (fs.existsSync(target) && target.endsWith('.css')) {
+      out += expandCssImports(target, visited)
+    }
+    last = m.index + m[0].length
+  }
+  out += raw.slice(last)
+  return out
+}
 
 function walkJsx(dir, acc = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -90,7 +114,7 @@ function referencedInSources(className, bundle, tokens) {
   return re.test(bundle)
 }
 
-const cssRaw = fs.readFileSync(CSS_FILE, 'utf8')
+const cssRaw = expandCssImports(CSS_FILE)
 const css = stripCssComments(cssRaw)
 
 const files = walkJsx(SRC)

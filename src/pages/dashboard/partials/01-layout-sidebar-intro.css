@@ -1,0 +1,144 @@
+/* Dark Mode — premium (obsidiana, camadas, ouro) */
+
+/* Cyberpunk — néon ciano / magenta sobre violeta escuro */
+
+/* Off-white — noir monocromático (hierarquia só por luminância, sem croma) */
+
+/* Dark premium — modais, filtros e controles com cores “light-only” no base */
+
+.dashboard-container {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  width: 100%;
+  padding: 24px;
+  gap: 24px;
+  position: relative;
+}
+
+/* Desktop: sidebar + painel como um único “shell” (sem vão entre os dois) */
+@media (min-width: 769px) {
+  .dashboard-container {
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .dashboard-container .sidebar {
+    border-radius: 0;
+    border-right: none;
+    padding: 32px 14px 32px 14px;
+    /* Penumbra interna na borda direita — “respira” com o painel claro */
+    box-shadow:
+      inset -24px 0 32px -18px rgba(0, 0, 0, 0.45),
+      inset -1px 0 0 rgba(255, 255, 255, 0.05),
+      0 24px 48px -20px rgba(0, 0, 0, 0.35);
+  }
+
+  .dashboard-container .main-content {
+    border-radius: 0;
+    margin-left: 0;
+    position: relative;
+    z-index: 10;
+    isolation: isolate;
+  }
+
+  /* Saída suave: sombra ambiente vinda da sidebar (sem linha nem faixa dourada) */
+  .dashboard-container .main-content::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: min(72px, 12vw);
+    pointer-events: none;
+    z-index: 1;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.1) 0%,
+      rgba(0, 0, 0, 0.035) 40%,
+      transparent 100%
+    );
+  }
+
+  /* Demais páginas: volume sem filete duro na junção */
+  .dashboard-container:not(.dashboard-page) .main-content {
+    box-shadow: 0 24px 48px -24px rgba(15, 23, 42, 0.14);
+  }
+
+  /* Item ativo “encostado” — só layout legado (sem .app-horizon-shell no container) */
+  .dashboard-container:not(.app-horizon-shell) .nav-item.active {
+    width: calc(100% + 14px);
+    margin-right: -14px;
+    padding-right: 18px;
+    border-radius: 0;
+    z-index: 25;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+}
+
+/* Typography */
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ref-kpi-card {
+  animation: fadeIn 0.6s ease-out backwards;
+}
+
+.ref-kpi-card:nth-child(2) { animation-delay: 0.1s; }
+.ref-kpi-card:nth-child(3) { animation-delay: 0.2s; }
+
+.ref-panel {
+  animation: fadeIn 0.8s ease-out backwards;
+  animation-delay: 0.3s;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: var(--sidebar-bg);
+  -webkit-backdrop-filter: blur(var(--sidebar-backdrop-blur));
+  backdrop-filter: blur(var(--sidebar-backdrop-blur));
+  border: 1px solid var(--sidebar-border-color);
+  border-radius: 0;
+  padding: 32px 14px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 20;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 16px 48px rgba(0, 0, 0, 0.28);
+  /* overflow: hidden; */ /* Removido para permitir que o 'melt' do menu flua para fora */
+}
+
+/* Textura sutil na sidebar (igual aos cards) */
+.sidebar::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.83v58.34h-58.34l-.83-.83A59.998 59.998 0 0054.627 0zM29.813 0l.83.83v28.34h-28.34l-.83-.83A29.998 29.998 0 0029.813 0z' fill='%23ffffff' fill-opacity='0.02' fill-rule='evenodd'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: -1;
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+

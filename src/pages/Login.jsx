@@ -31,6 +31,14 @@ export default function Login() {
   })
   const [mensagem, setMensagem] = useState({ texto: '', tipo: '' })
   const [loading, setLoading] = useState(false)
+  const [showRecovery, setShowRecovery] = useState(false)
+  const [recoveryEmail, setRecoveryEmail] = useState('')
+  const [recoveryStep, setRecoveryStep] = useState(1)
+  const [otpCode, setOtpCode] = useState('')
+  const [novaSenha, setNovaSenha] = useState('')
+  const [confirmarNovaSenha, setConfirmarNovaSenha] = useState('')
+  const [recoveryMsg, setRecoveryMsg] = useState({ text: '', type: '' })
+  const [recoveryLoading, setRecoveryLoading] = useState(false)
   const [showSenha, setShowSenha] = useState(false)
   const [hasWebAuthn, setHasWebAuthn] = useState(false)
   const [bioLoading, setBioLoading] = useState(false)
@@ -73,6 +81,103 @@ export default function Login() {
       window.localStorage.setItem(REMEMBER_EMAIL_KEY, email)
     }
   }, [email, rememberEmail])
+
+  useEffect(() => {
+    if (showRecovery && recoveryStep === 1) {
+      setRecoveryEmail(email)
+    }
+  }, [email, showRecovery, recoveryStep])
+
+  const openRecovery = (event) => {
+    event.preventDefault()
+    setShowRecovery((prev) => {
+      const next = !prev
+      if (next) {
+        setRecoveryStep(1)
+        setOtpCode('')
+        setNovaSenha('')
+        setConfirmarNovaSenha('')
+        setRecoveryMsg({ text: '', type: '' })
+        setRecoveryEmail(email)
+      }
+      return next
+    })
+  }
+
+  const handleRequestOtp = async () => {
+    setRecoveryMsg({ text: '', type: '' })
+    const normalized = recoveryEmail.trim().toLowerCase()
+    if (!validateEmail(normalized)) {
+      setRecoveryMsg({ text: 'Informe um e-mail válido.', type: 'error' })
+      return
+    }
+    setRecoveryLoading(true)
+    try {
+      const response = await fetch(apiUrl('/api/auth/request-password-otp-whatsapp'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: normalized }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setRecoveryMsg({ text: data.message || 'Não foi possível enviar o código.', type: 'error' })
+        return
+      }
+      setRecoveryMsg({ text: data.message || 'Verifique o WhatsApp cadastrado na sua conta.', type: 'success' })
+      setRecoveryStep(2)
+    } catch {
+      setRecoveryMsg({ text: 'Erro ao conectar com o servidor.', type: 'error' })
+    } finally {
+      setRecoveryLoading(false)
+    }
+  }
+
+  const handleConfirmReset = async () => {
+    setRecoveryMsg({ text: '', type: '' })
+    const normalized = recoveryEmail.trim().toLowerCase()
+    if (!validateEmail(normalized)) {
+      setRecoveryMsg({ text: 'Informe um e-mail válido.', type: 'error' })
+      return
+    }
+    const digits = otpCode.replace(/\D/g, '')
+    if (digits.length !== 6) {
+      setRecoveryMsg({ text: 'Digite o código de 6 dígitos recebido no WhatsApp.', type: 'error' })
+      return
+    }
+    if (novaSenha.length < 6) {
+      setRecoveryMsg({ text: 'A nova senha deve ter no mínimo 6 caracteres.', type: 'error' })
+      return
+    }
+    if (novaSenha !== confirmarNovaSenha) {
+      setRecoveryMsg({ text: 'As senhas não coincidem.', type: 'error' })
+      return
+    }
+    setRecoveryLoading(true)
+    try {
+      const response = await fetch(apiUrl('/api/auth/reset-password-whatsapp'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: normalized, code: digits, password: novaSenha }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setRecoveryMsg({ text: data.message || 'Não foi possível redefinir a senha.', type: 'error' })
+        return
+      }
+      showToast(data.message || 'Senha alterada. Faça login.', 'success')
+      setShowRecovery(false)
+      setRecoveryStep(1)
+      setSenha('')
+      setOtpCode('')
+      setNovaSenha('')
+      setConfirmarNovaSenha('')
+      setRecoveryMsg({ text: '', type: '' })
+    } catch {
+      setRecoveryMsg({ text: 'Erro ao conectar com o servidor.', type: 'error' })
+    } finally {
+      setRecoveryLoading(false)
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -195,7 +300,7 @@ export default function Login() {
       headerTitle="Login"
       heroImageSrc="/images/Login/01.avif"
       subtitle="Bem-vindo de volta. Faça login para continuar."
-      compact={!(webAuthnSupported() && hasWebAuthn)}
+      compact={!showRecovery && !(webAuthnSupported() && hasWebAuthn)}
       footer={
         <>
           Não tem conta?{' '}
@@ -287,15 +392,111 @@ export default function Login() {
           </div>
         </label>
 
-        <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium text-emerald-800 sm:text-[12px]">
-          <input
-            type="checkbox"
-            checked={rememberEmail}
-            onChange={(e) => setRememberEmail(e.target.checked)}
-            className="h-4 w-4 cursor-pointer rounded border-emerald-400/80 bg-white text-emerald-600 accent-emerald-600 focus:ring-emerald-500/35 focus:ring-offset-0"
-          />
-          <span>Lembrar e-mail</span>
-        </label>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium text-emerald-800 sm:text-[12px]">
+            <input
+              type="checkbox"
+              checked={rememberEmail}
+              onChange={(e) => setRememberEmail(e.target.checked)}
+              className="h-4 w-4 cursor-pointer rounded border-emerald-400/80 bg-white text-emerald-600 accent-emerald-600 focus:ring-emerald-500/35 focus:ring-offset-0"
+            />
+            <span>Lembrar e-mail</span>
+          </label>
+          <button
+            type="button"
+            onClick={openRecovery}
+            className="cursor-pointer text-[11px] font-medium text-neutral-800 underline-offset-4 hover:text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40 sm:text-[12px]"
+          >
+            {showRecovery ? 'Fechar recuperação' : 'Esqueceu a senha?'}
+          </button>
+        </div>
+
+        {showRecovery && (
+          <div className="rounded-[16px] border border-neutral-200/90 bg-white/70 p-3 backdrop-blur-md">
+            <p className="mb-2 text-[11px] leading-snug text-neutral-600">
+              Enviamos um código de <strong>6 dígitos</strong> para o <strong>WhatsApp</strong> cadastrado no seu perfil (mesmo número da conta).
+            </p>
+            {recoveryStep === 1 ? (
+              <div className="space-y-2">
+                <input
+                  type="email"
+                  value={recoveryEmail}
+                  onChange={(e) => setRecoveryEmail(e.target.value)}
+                  placeholder="E-mail da conta"
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/35"
+                  autoComplete="email"
+                />
+                <button
+                  type="button"
+                  onClick={() => void handleRequestOtp()}
+                  disabled={recoveryLoading}
+                  className="w-full cursor-pointer rounded-[12px] border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-[11px] font-semibold text-emerald-900 transition hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {recoveryLoading ? 'Enviando…' : 'Enviar código no WhatsApp'}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <input
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="Código (6 dígitos)"
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] tracking-widest text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/35"
+                  autoComplete="one-time-code"
+                />
+                <input
+                  type="password"
+                  value={novaSenha}
+                  onChange={(e) => setNovaSenha(e.target.value)}
+                  placeholder="Nova senha (mín. 6 caracteres)"
+                  minLength={6}
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/35"
+                  autoComplete="new-password"
+                />
+                <input
+                  type="password"
+                  value={confirmarNovaSenha}
+                  onChange={(e) => setConfirmarNovaSenha(e.target.value)}
+                  placeholder="Confirmar nova senha"
+                  minLength={6}
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/35"
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => void handleConfirmReset()}
+                  disabled={recoveryLoading}
+                  className="w-full cursor-pointer rounded-[12px] border border-neutral-200/90 bg-white px-3 py-2 text-[11px] font-semibold text-neutral-900 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {recoveryLoading ? 'Salvando…' : 'Redefinir senha'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRecoveryStep(1)
+                    setRecoveryMsg({ text: '', type: '' })
+                  }}
+                  className="w-full cursor-pointer text-[11px] font-medium text-neutral-600 underline-offset-2 hover:underline"
+                >
+                  Pedir novo código
+                </button>
+              </div>
+            )}
+            {recoveryMsg.text ? (
+              <div
+                className={`mt-2 rounded-[10px] border p-2 text-[11px] ${
+                  recoveryMsg.type === 'success'
+                    ? 'border-success/35 bg-success/10 text-emerald-800'
+                    : 'border-error/35 bg-error/10 text-red-700'
+                }`}
+              >
+                {recoveryMsg.text}
+              </div>
+            ) : null}
+          </div>
+        )}
 
         <button
           type="submit"

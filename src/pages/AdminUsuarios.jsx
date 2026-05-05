@@ -523,6 +523,24 @@ export default function AdminUsuarios() {
     setConfirmDialog({ kind: 'delete-user', user })
   }
 
+  const handleResetPasswordWhatsapp = async (user) => {
+    try {
+      const userSaved = localStorage.getItem('horizonte_user')
+      if (!userSaved) throw new Error('Sessão expirada.')
+      const u = JSON.parse(userSaved)
+      const res = await fetch(apiUrl(`/api/admin/usuarios/${user.id}/solicitar-otp-senha-whatsapp`), {
+        method: 'POST',
+        headers: { 'x-user-id': u.id },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Falha ao solicitar código pelo WhatsApp.')
+      setUserActionMessage(data.message || 'Código enviado.')
+      void loadAudit()
+    } catch (e) {
+      setUserActionMessage(e.message)
+    }
+  }
+
   const executeDetailToggleActive = async (nextActive) => {
     if (!detailUser || isSuperAdminEmail(detailUser.email)) return
     try {
@@ -999,6 +1017,9 @@ export default function AdminUsuarios() {
                                       </button>
                                     </>
                                   )}
+                                  <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleResetPasswordWhatsapp(row)}>
+                                    WhatsApp
+                                  </button>
                                   {isPrincipal ? (
                                     <span className="admin-acoes-protegido" title="A conta administradora principal não pode ser excluída pelo painel.">
                                       Protegido
@@ -1030,6 +1051,9 @@ export default function AdminUsuarios() {
                                     </button>
                                   </>
                                 )}
+                                <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleResetPasswordWhatsapp(row)}>
+                                  WhatsApp
+                                </button>
                                 {isPrincipal ? (
                                   <span
                                     className="admin-acoes-protegido"
@@ -1051,6 +1075,7 @@ export default function AdminUsuarios() {
                   </table>
                   <ul className="page-admin-usuarios-mobile-list" aria-label="Lista de usuários">
                     {pageRows.map((row) => {
+                      const isPrincipal = isSuperAdminEmail(row.email)
                       return (
                         <li key={row.id}>
                           <button type="button" className="page-admin-usuarios-mobile-card" onClick={() => setDetailUser(row)}>
@@ -1084,6 +1109,18 @@ export default function AdminUsuarios() {
                               >
                                 Editar
                               </button>
+                              {!isPrincipal ? (
+                                <button
+                                  type="button"
+                                  className="btn-secondary"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    void handleResetPasswordWhatsapp(row)
+                                  }}
+                                >
+                                  WhatsApp
+                                </button>
+                              ) : null}
                             </div>
                           </button>
                         </li>
@@ -1187,6 +1224,9 @@ export default function AdminUsuarios() {
                           }}
                         >
                           Editar
+                        </button>
+                        <button type="button" className="btn-secondary" onClick={() => void handleResetPasswordWhatsapp(detailUser)}>
+                          Código WhatsApp
                         </button>
                         {!isSuperAdminEmail(detailUser.email) ? (
                           <button type="button" className="btn-secondary" onClick={() => void handleDetailToggleActive()}>

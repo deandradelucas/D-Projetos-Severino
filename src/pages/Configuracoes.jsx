@@ -24,6 +24,7 @@ export default function Configuracoes() {
   })
 
   const [toast, setToast] = useState('')
+  const [resetSending, setResetSending] = useState(false)
   const [webauthnList, setWebauthnList] = useState([])
   const [webauthnLoading, setWebauthnLoading] = useState(false)
   const [webauthnError, setWebauthnError] = useState(null)
@@ -132,6 +133,28 @@ export default function Configuracoes() {
     navigator.clipboard.writeText(perfil.email).then(() => showToast('E-mail copiado.')).catch(() => {})
   }
 
+  const solicitarCodigoSenhaWhatsapp = async () => {
+    if (!perfil.email) return
+    setResetSending(true)
+    try {
+      const res = await fetch(apiUrl('/api/auth/request-password-otp-whatsapp'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: perfil.email }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (res.ok) {
+        showToast(data.message || 'Se houver WhatsApp no cadastro, enviamos o código.')
+      } else {
+        showToast(data.message || 'Não foi possível enviar o código.')
+      }
+    } catch {
+      showToast('Erro de rede.')
+    } finally {
+      setResetSending(false)
+    }
+  }
+
   return (
     <div className="dashboard-container page-configuracoes ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
@@ -178,6 +201,15 @@ export default function Configuracoes() {
             <div className="config-quick-actions">
               <button type="button" className="config-action-btn" onClick={copiarEmail} disabled={!perfil.email}>
                 Copiar e-mail
+              </button>
+              <button
+                type="button"
+                className="config-action-btn"
+                onClick={() => void solicitarCodigoSenhaWhatsapp()}
+                disabled={!perfil.email || resetSending}
+                title="Envia um código de 6 dígitos para o WhatsApp cadastrado. Conclua a troca na tela de login em Esqueceu a senha."
+              >
+                {resetSending ? 'Enviando…' : 'Código no WhatsApp'}
               </button>
             </div>
           </section>
