@@ -747,7 +747,7 @@ body:has(.pwa-install-sheet) .horizon-chat-window {
   }
 
   body:has(.mobile-bottom-nav) .pwa-install-sheet {
-    bottom: calc(94px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(104px + env(safe-area-inset-bottom, 0px));
   }
 
   .pwa-install-sheet__content {
