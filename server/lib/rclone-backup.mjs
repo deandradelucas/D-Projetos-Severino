@@ -2,7 +2,7 @@ import { exec, execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import { existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
-import { loadEnv } from './load-env.mjs'
+import './load-env.mjs'
 import { log } from './logger.mjs'
 
 const execAsync = promisify(exec)
@@ -14,7 +14,6 @@ const DEFAULT_RCLONE_DEST_PATH = 'Backup - Horizonte Financeiro'
 const DEFAULT_SUPABASE_TABLES = ['usuarios']
 
 function getEnv(name, { required = true, fallback = '' } = {}) {
-  loadEnv()
   const value = process.env[name] ?? fallback
   if (required && !String(value).trim()) {
     throw new Error(`Missing required environment variable: ${name}`)

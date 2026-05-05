@@ -18,7 +18,7 @@ export function resolveGeminiModelCandidates() {
 export async function geminiPostGenerateContent(modelId, apiKey, body) {
   const id = encodeURIComponent(String(modelId || DEFAULT_MODEL).trim() || DEFAULT_MODEL)
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${id}:generateContent`
-  
+
   return fetch(url, {
     method: 'POST',
     headers: {
