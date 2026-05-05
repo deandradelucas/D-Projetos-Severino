@@ -1553,6 +1553,21 @@ body:has(.sidebar.open) .horizon-chat-window {
     transform: scale(0.96);
   }
 
+  /* Toque: mesmo tom âmbar/dourado do accent (sidebar ativo) */
+  .mobile-bottom-nav__item:active:not(.mobile-bottom-nav__item--active) {
+    background: rgba(212, 168, 75, 0.16);
+    color: rgba(255, 250, 235, 0.95);
+  }
+
+  .mobile-bottom-nav__item--active:active {
+    filter: brightness(0.94);
+  }
+
+  body[data-theme='light'] .mobile-bottom-nav__item:active:not(.mobile-bottom-nav__item--active) {
+    background: rgba(212, 168, 75, 0.22);
+    color: #78350f;
+  }
+
   .mobile-bottom-nav__item:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
@@ -1611,7 +1626,13 @@ body:has(.sidebar.open) .horizon-chat-window {
   }
 
   body[data-theme='light'] .mobile-bottom-nav__item--active {
-    color: #111827;
+    color: #422006;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.55), transparent 52%),
+      linear-gradient(180deg, #f8e6b8 0%, var(--accent) 100%);
+    box-shadow:
+      0 10px 22px -12px rgba(180, 130, 40, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
   }
 
   .pwa-install-sheet {
@@ -7194,10 +7215,15 @@ body[data-theme='dark']
     padding: 5px 12px 7px;
   }
 
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    margin-bottom: 18px;
+    padding: 8px 14px;
+  }
+
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
-  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   .dashboard-container.page-admin.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
     margin-bottom: 26px;
     padding: 12px 16px;
@@ -8984,24 +9010,24 @@ body[data-theme='light'] .ref-dashboard-inner {
     max-height: 280px;
   }
 
-  /* Transações: mesma faixa hero que o Dashboard (título + atalhos numa linha) */
+  /* Transações: hero compacto (título + atalhos numa linha) */
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
     flex-wrap: nowrap;
     align-items: center;
-    column-gap: 10px;
+    column-gap: 8px;
   }
 
   body[data-theme='light'] .page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn {
-    min-height: 40px;
-    padding: 0 12px;
-    font-size: 12px;
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 11px;
   }
 
   body[data-theme='light'] .page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
   }
 
   /* Relatórios: título + exportações numa linha (alinhado a Transações) */
@@ -9036,14 +9062,16 @@ body[data-theme='light'] .ref-dashboard-inner {
   }
 
   /* Configurações e Admin: título + subtítulo (sem ações no hero) */
-  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row,
   .dashboard-container.page-admin.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
     flex-wrap: nowrap;
     align-items: flex-start;
     column-gap: 10px;
   }
 
-  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text,
   .dashboard-container.page-admin.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
     flex: 1 1 auto;
     min-width: 0;
@@ -11400,6 +11428,178 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
     position: relative;
     z-index: 2;
   }
+
+  /* Configurações — mesmo shell mobile que o dashboard inicial */
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    background: transparent !important;
+  }
+
+  body[data-theme='light']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) #root,
+  body[data-theme='light']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) .app-routes-grow {
+    background: #dcd8d6 !important;
+  }
+
+  body[data-theme='dark']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell),
+  body[data-theme='dark']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) #root,
+  body[data-theme='dark']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) .app-routes-grow {
+    background: #f3f4f7 !important;
+  }
+
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .app-horizon-inner,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 14px calc(144px + var(--safe-bottom)) !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    background: #dcd8d6 !important;
+    background-image: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 14px calc(144px + var(--safe-bottom)) !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: none !important;
+    -webkit-overflow-scrolling: touch !important;
+    background: #f3f4f7 !important;
+    background-image: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    isolation: isolate !important;
+    width: auto !important;
+    max-width: none !important;
+    min-height: calc(82px + var(--safe-top)) !important;
+    margin: calc(-1 * var(--safe-top)) 0 8px !important;
+    padding: calc(8px + var(--safe-top)) 12px 8px !important;
+    overflow: visible !important;
+    border-radius: 18px !important;
+    transform: translateZ(0);
+    z-index: 2 !important;
+    border: 1px solid rgba(163, 163, 163, 0.26) !important;
+    background: rgba(255, 255, 255, 0.36) !important;
+    background-image: none !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.38) inset,
+      0 10px 28px -22px rgba(15, 23, 42, 0.18) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(1.1) !important;
+    backdrop-filter: blur(20px) saturate(1.1) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    -webkit-backdrop-filter: blur(16px) saturate(1.08) !important;
+    backdrop-filter: blur(16px) saturate(1.08) !important;
+    background: rgba(255, 255, 255, 0.32) !important;
+    border: 1px solid rgba(163, 163, 163, 0.26) !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.38) inset,
+      0 10px 28px -20px rgba(15, 23, 42, 0.12) !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    position: relative !important;
+    top: auto !important;
+    isolation: isolate !important;
+    width: auto !important;
+    min-height: calc(92px + var(--safe-top)) !important;
+    margin: calc(-1 * var(--safe-top)) 0 12px !important;
+    padding: calc(10px + var(--safe-top)) 12px 11px !important;
+    overflow: visible !important;
+    border-radius: 18px !important;
+    transform: translateZ(0);
+    z-index: 2 !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    background: rgba(22, 28, 38, 0.55) !important;
+    background-image: none !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.08) inset,
+      0 14px 40px -24px rgba(0, 0, 0, 0.45) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(1.06) !important;
+    backdrop-filter: blur(16px) saturate(1.06) !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    background: rgba(22, 28, 38, 0.68) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.05) !important;
+    backdrop-filter: blur(14px) saturate(1.05) !important;
+  }
+
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    min-height: 0;
+    align-items: center;
+  }
+
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero > * {
+    position: relative;
+    z-index: 2;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -12389,15 +12589,15 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
 
 /* Shell mobile — perna branca final da barra preta — exceto Agenda, dashboard inicial/Transações e Pagamento (vidro) */
 @media (max-width: 900px) {
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero,
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero,
   body[data-theme='light']
-    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page)
+    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes)
     main.ref-dashboard-main--scrolled
     .dashboard-hub__hero,
   body[data-theme='dark']
-    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page)
+    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes)
     main.ref-dashboard-main--scrolled
     .dashboard-hub__hero {
     position: relative !important;
@@ -12408,9 +12608,9 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
     background-image: none !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero::after,
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero::after,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero::after {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero::after,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero::after,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero::after {
     content: '' !important;
     display: block !important;
     position: absolute !important;
@@ -12425,7 +12625,7 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
     background: #ffffff !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero > * {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero > * {
     position: relative !important;
     z-index: 2 !important;
   }
@@ -12433,22 +12633,22 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
 
 /* Shell mobile — mesma barra preta nos hubs legados — exceto Agenda, .dashboard-page e Pagamento */
 @media (max-width: 900px) {
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page),
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page),
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page),
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .app-horizon-inner,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .main-content.ref-dashboard-main,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .ref-dashboard-inner.dashboard-hub,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .ref-dashboard-scroll {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes),
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes),
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes),
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .app-horizon-inner,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .main-content.ref-dashboard-main,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .ref-dashboard-inner.dashboard-hub,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .ref-dashboard-scroll {
     background: #ffffff !important;
     background-image: none !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .main-content.ref-dashboard-main {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .main-content.ref-dashboard-main {
     padding: 0 !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .ref-dashboard-scroll {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .ref-dashboard-scroll {
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
@@ -12459,15 +12659,15 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
     box-shadow: none !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero,
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero,
   body[data-theme='light']
-    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page)
+    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes)
     main.ref-dashboard-main--scrolled
     .dashboard-hub__hero,
   body[data-theme='dark']
-    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page)
+    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes)
     main.ref-dashboard-main--scrolled
     .dashboard-hub__hero {
     left: 50% !important;
@@ -12486,7 +12686,7 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
     backdrop-filter: none !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero::after {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero::after {
     content: '';
     position: absolute;
     right: 0;
@@ -12500,33 +12700,33 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
     background: #ffffff;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero > * {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero > * {
     position: relative;
     z-index: 2;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__title,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__balance-line,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__balance-line strong,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero .ref-panel__subtitle {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__title,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__balance-line,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__balance-line strong,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero .ref-panel__subtitle {
     color: #ffffff !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__balance-line span,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero .page-admin-header-sub {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__balance-line span,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero .page-admin-header-sub {
     color: rgba(255, 255, 255, 0.64) !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .mobile-menu-btn,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__icon-btn {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .mobile-menu-btn,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__icon-btn {
     background: rgba(255, 255, 255, 0.08) !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
     color: #ffffff !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__btn--primary,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__btn--primary,
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__btn--primary {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__btn--primary,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__btn--primary,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__btn--primary {
     background: #ffffff !important;
     border-color: rgba(255, 255, 255, 0.86) !important;
     color: #050505 !important;
@@ -12545,7 +12745,17 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .app-horizon-inner,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .app-horizon-inner,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     background: #dcd8d6 !important;
     background-image: none !important;
   }
@@ -12559,18 +12769,32 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .app-horizon-inner,
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
-  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .app-horizon-inner,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     background: #ffffff !important;
     background-image: none !important;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
     padding: 0 !important;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
@@ -12588,7 +12812,17 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
-  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
     position: relative !important;
     left: auto !important;
     width: auto !important;
@@ -12600,13 +12834,17 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after {
     display: none !important;
     content: none !important;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero > *,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero > * {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero > *,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero > * {
     position: relative;
     z-index: 2;
   }
@@ -12617,7 +12855,11 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
-  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
     background: #000000 !important;
     background-image: none !important;
     border: 0.5px solid #0b0b0b !important;
@@ -12633,7 +12875,9 @@ body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-ho
 }
 
 body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
-body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
+body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
   background: #000000 !important;
   background-image: none !important;
 }
@@ -12772,24 +13016,30 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
 }
 
 /* =============================================================================
-   Dashboard home + Pagamento — mobile slim/minimalista
-   Escopo restrito ao dashboard inicial e página Pagamento (hub alinhado).
+   Dashboard home + Pagamento + Configurações — mobile slim/minimalista
+   Escopo restrito aos hubs alinhados ao dashboard inicial.
    ============================================================================= */
 @media (max-width: 768px) {
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell {
     padding: 0;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .main-content,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .main-content {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .main-content,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .main-content {
     border: none;
     box-shadow: none;
     padding: 8px 8px calc(10px + var(--safe-bottom));
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -12797,7 +13047,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
     margin-bottom: 0;
     min-height: 0;
     padding: 6px 10px;
@@ -12805,14 +13057,20 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
     gap: 6px;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .mobile-menu-btn,
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn,
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .mobile-menu-btn,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
     width: 34px;
     height: 34px;
     min-width: 34px;
@@ -12822,12 +13080,16 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
     gap: 1px;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title,
-  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__title,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__title {
     font-size: clamp(1rem, 3.9vw, 1.22rem);
     font-weight: 850;
     letter-spacing: -0.04em;
@@ -13452,9 +13714,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
 
 /* Shell mobile/PWA — bounce preto só nas páginas hub “faixa escura”; Agenda, dashboard inicial e Pagamento usam fundo próprio */
 @media (max-width: 900px) {
-  body:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento)),
-  body:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento)) #root,
-  body:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento)) .app-routes-grow {
+  body:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes)),
+  body:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes)) #root,
+  body:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes)) .app-routes-grow {
     background: #000000 !important;
   }
 
@@ -13482,9 +13744,18 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     background: #f3f4f7 !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page),
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page),
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page) {
+  body[data-theme='dark']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell),
+  body[data-theme='dark']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) #root,
+  body[data-theme='dark']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) .app-routes-grow {
+    background: #f3f4f7 !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-configuracoes),
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-configuracoes),
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-configuracoes) {
     position: fixed !important;
     inset: 0 !important;
     width: 100vw !important;
@@ -13534,15 +13805,15 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     padding-bottom: calc(130px + var(--safe-bottom)) !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero,
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero,
   body[data-theme='light']
-    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page)
+    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes)
     main.ref-dashboard-main--scrolled
     .dashboard-hub__hero,
   body[data-theme='dark']
-    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page)
+    .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes)
     main.ref-dashboard-main--scrolled
     .dashboard-hub__hero {
     position: relative !important;
@@ -13575,19 +13846,33 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
-  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
     min-height: calc(92px + var(--safe-top)) !important;
     padding: calc(10px + var(--safe-top)) 12px 11px !important;
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     background: #dcd8d6 !important;
     background-image: none !important;
   }
 
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
-  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     background: #f3f4f7 !important;
     background-image: none !important;
   }
@@ -13597,8 +13882,8 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
-    min-height: calc(158px + var(--safe-top)) !important;
-    padding: calc(30px + var(--safe-top)) 14px 40px !important;
+    min-height: calc(76px + var(--safe-top)) !important;
+    padding: calc(6px + var(--safe-top)) 10px 8px !important;
   }
 
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
@@ -13615,7 +13900,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     position: relative !important;
     z-index: 3 !important;
     gap: 14px !important;
-    margin: -18px 0 0 !important;
+    margin: -8px 0 0 !important;
   }
 
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-table {
@@ -13623,30 +13908,55 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
-    min-height: 44px !important;
-    gap: 10px !important;
+    min-height: 0 !important;
+    gap: 6px !important;
+    align-items: center !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+    gap: 1px !important;
   }
 
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
-    font-size: clamp(0.9rem, 3.4vw, 1.06rem) !important;
+    font-size: clamp(0.84rem, 3.1vw, 0.98rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+    font-size: 10px !important;
+    gap: 4px !important;
+    margin-top: 1px !important;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+    gap: 5px !important;
   }
 
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
-    min-height: 42px !important;
-    padding: 0 12px !important;
-    border-radius: 11px !important;
-    font-size: 12px !important;
+    min-height: 34px !important;
+    padding: 0 10px !important;
+    border-radius: 10px !important;
+    font-size: 11px !important;
   }
 
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
-    width: 42px !important;
-    height: 42px !important;
-    border-radius: 12px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 11px !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero::after,
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero::after,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero::after {
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+  }
+
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero::after,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero::after,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero::after {
     content: '' !important;
     position: absolute !important;
     right: 0 !important;
@@ -13661,33 +13971,33 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     background: #ffffff !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero > * {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero > * {
     position: relative !important;
     z-index: 2 !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__title,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__balance-line,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__balance-line strong,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero .ref-panel__subtitle {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__title,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__balance-line,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__balance-line strong,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero .ref-panel__subtitle {
     color: #ffffff !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__balance-line span,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__hero .page-admin-header-sub {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__balance-line span,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__hero .page-admin-header-sub {
     color: rgba(255, 255, 255, 0.64) !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .mobile-menu-btn,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__icon-btn {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .mobile-menu-btn,
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__icon-btn {
     background: rgba(255, 255, 255, 0.08) !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
     color: #ffffff !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__btn--primary,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__btn--primary,
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page) .dashboard-hub__btn--primary {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__btn--primary,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__btn--primary,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes) .dashboard-hub__btn--primary {
     background: #ffffff !important;
     border-color: rgba(255, 255, 255, 0.86) !important;
     color: #050505 !important;
@@ -13753,18 +14063,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     border-radius: 14px !important;
   }
 
-  .mobile-bottom-nav__item.mobile-bottom-nav__item--transactions.mobile-bottom-nav__item--active {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 0.5px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.92) !important;
-    box-shadow: none !important;
-  }
-
-  body[data-theme='light'] .mobile-bottom-nav__item.mobile-bottom-nav__item--transactions.mobile-bottom-nav__item--active {
-    background: rgba(15, 23, 42, 0.035) !important;
-    border-color: rgba(15, 23, 42, 0.06);
-    color: #0f172a !important;
-  }
 }
 
 @media (min-width: 769px) {
@@ -14037,8 +14335,8 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
 }
 
 /* -----------------------------------------------------------------------------
-   Dashboard inicial + Pagamento — tema claro (mobile/PWA): bounce #dcd8d6, hero vidro, texto escuro,
-   botões e CTA esmeralda (mesma linguagem da Agenda).
+   Dashboard inicial + Pagamento + Configurações — tema claro (mobile/PWA): bounce #dcd8d6, hero vidro,
+   texto escuro, botões e CTA esmeralda (mesma linguagem da Agenda).
    ----------------------------------------------------------------------------- */
 @media (max-width: 900px) {
   body[data-theme='light']:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell),
@@ -14046,17 +14344,27 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   body[data-theme='light']:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell) .app-routes-grow,
   body[data-theme='light']:has(.dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell),
   body[data-theme='light']:has(.dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell) #root,
-  body[data-theme='light']:has(.dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell) .app-routes-grow {
+  body[data-theme='light']:has(.dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell) .app-routes-grow,
+  body[data-theme='light']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) #root,
+  body[data-theme='light']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) .app-routes-grow {
     background: #dcd8d6 !important;
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell {
     background: transparent !important;
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     background-color: #dcd8d6 !important;
     background-image: none !important;
     background-size: auto !important;
@@ -14065,7 +14373,11 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
     position: relative !important;
     top: auto !important;
     left: auto !important;
@@ -14089,7 +14401,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     z-index: 2 !important;
   }
 
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
     -webkit-backdrop-filter: blur(16px) saturate(1.08) !important;
     backdrop-filter: blur(16px) saturate(1.08) !important;
     background: rgba(255, 255, 255, 0.32) !important;
@@ -14116,13 +14430,17 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after {
     display: none !important;
     content: none !important;
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__title,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__title {
     color: #0f172a !important;
   }
 
@@ -14130,7 +14448,13 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line span,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero .ref-panel__subtitle,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-header-sub {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-header-sub,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line span,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
     color: #0b0b0b !important;
   }
 
@@ -14144,14 +14468,20 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .mobile-menu-btn,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .mobile-menu-btn,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
     background: rgba(255, 255, 255, 0.55) !important;
     border-color: rgba(148, 163, 184, 0.35) !important;
     color: #0f172a !important;
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
     background: linear-gradient(135deg, #10b981 0%, #059669 52%, #047857 100%) !important;
     border-color: rgba(16, 185, 129, 0.45) !important;
     color: #ffffff !important;
@@ -14159,7 +14489,11 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-panel,
-  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner {
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .config-card,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .config-theme-card {
     background: rgba(255, 255, 255, 0.22) !important;
     border-color: rgba(163, 163, 163, 0.26) !important;
     -webkit-backdrop-filter: blur(18px) saturate(1.05) !important;

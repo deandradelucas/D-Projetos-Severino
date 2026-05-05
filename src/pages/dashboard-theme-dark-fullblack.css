@@ -882,9 +882,13 @@ body[data-theme='dark'] .mobile-bottom-nav__item {
 }
 
 body[data-theme='dark'] .mobile-bottom-nav__item--active {
-  background: linear-gradient(135deg, #8b5cf6 0%, #ff4fb8 100%);
-  color: #ffffff;
-  box-shadow: 0 12px 28px -18px rgba(139, 92, 246, 0.8);
+  color: #0a0a0a;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.42), transparent 48%),
+    linear-gradient(180deg, #efd184 0%, var(--accent, #d4a84b) 100%);
+  box-shadow:
+    0 10px 24px -14px rgba(212, 168, 75, 0.86),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
 }
 
 body[data-theme='dark'] .dashboard-mobile-tx-fab,
