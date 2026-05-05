@@ -14,23 +14,26 @@ function validateEmail(email) {
 
 export default function Login() {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(() => {
+    try {
+      return window.localStorage.getItem(REMEMBER_EMAIL_KEY) || ''
+    } catch {
+      return ''
+    }
+  })
   const [senha, setSenha] = useState('')
-  const [rememberEmail, setRememberEmail] = useState(false)
+  const [rememberEmail, setRememberEmail] = useState(() => {
+    try {
+      return Boolean(window.localStorage.getItem(REMEMBER_EMAIL_KEY))
+    } catch {
+      return false
+    }
+  })
   const [mensagem, setMensagem] = useState({ texto: '', tipo: '' })
   const [loading, setLoading] = useState(false)
   const [showSenha, setShowSenha] = useState(false)
   const [hasWebAuthn, setHasWebAuthn] = useState(false)
   const [bioLoading, setBioLoading] = useState(false)
-
-  useEffect(() => {
-    const savedEmail = window.localStorage.getItem(REMEMBER_EMAIL_KEY)
-
-    if (savedEmail) {
-      setEmail(savedEmail)
-      setRememberEmail(true)
-    }
-  }, [])
 
   /* Aquece o chunk do dashboard enquanto o usuário digita — entrada mais rápida após POST /login */
   useEffect(() => {

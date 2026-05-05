@@ -1051,7 +1051,6 @@ export default function AdminUsuarios() {
                   </table>
                   <ul className="page-admin-usuarios-mobile-list" aria-label="Lista de usuários">
                     {pageRows.map((row) => {
-                      const isPrincipal = isSuperAdminEmail(row.email)
                       return (
                         <li key={row.id}>
                           <button type="button" className="page-admin-usuarios-mobile-card" onClick={() => setDetailUser(row)}>

@@ -7,6 +7,8 @@ import { httpRequestLogger, pagamentosRequestLogger } from './middleware/request
 import { clientIpFromHono } from './lib/http/client-ip.mjs'
 import { getSupabaseAdmin } from './lib/supabase-admin.mjs'
 import { authenticateUser, getRequestOrigin, isValidEmail } from './lib/password-reset.mjs'
+import { sendEvolutionText } from './lib/evolution-send.mjs'
+import { requestPasswordOtpWhatsApp, confirmPasswordOtpWhatsApp } from './lib/password-otp-whatsapp.mjs'
 import {
   getCategorias,
   getTransacoes,
@@ -338,27 +340,6 @@ function buildBotBodyFromEvolutionPayload(payload) {
 function stripRespondaAgendaReminderSuffix(text) {
   if (!text || typeof text !== 'string') return text
   return text.replace(/\s*Responda\s*:\s*[\s\S]*$/i, '').trimEnd()
-}
-
-async function sendEvolutionText({ instance, number, text }) {
-  const baseUrl = firstString(process.env.EVOLUTION_API_URL, process.env.EVOLUTION_SERVER_URL)
-  const apiKey = firstString(process.env.EVOLUTION_API_KEY)
-  if (!baseUrl || !apiKey || !instance || !number || !text) return false
-
-  const response = await fetch(`${baseUrl.replace(/\/+$/, '')}/message/sendText/${encodeURIComponent(instance)}`, {
-    method: 'POST',
-    headers: {
-      apikey: apiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ number, text, delay: 1000 }),
-  })
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '')
-    log.warn('[evolution] sendText failed', { status: response.status, detail: detail.slice(0, 280) })
-    return false
-  }
-  return true
 }
 
 /**
@@ -925,6 +906,69 @@ app.post('/api/assinatura/bem-vindo-visto', async (c) => {
   }
 })
 
+/** Redefinição de senha: código de 6 dígitos pelo WhatsApp (Evolution API). */
+app.post('/api/auth/request-password-otp-whatsapp', async (c) => {
+  try {
+    const ip = clientKeyFromHono(c)
+    if (!rateLimitTake(`pw-otp-wa:${ip}`, 10, 15 * 60_000)) {
+      return c.json({ message: 'Muitas solicitações. Tente de novo em alguns minutos.' }, 429)
+    }
+    let body
+    try {
+      body = await c.req.json()
+    } catch {
+      return c.json({ message: 'Envie JSON com o campo email.' }, 400)
+    }
+    const email = String(body?.email || '').trim().toLowerCase()
+    if (!isValidEmail(email)) {
+      return c.json({ message: 'Informe um e-mail válido.' }, 400)
+    }
+    if (!rateLimitTake(`pw-otp-wa-email:${email}`, 5, 60 * 60_000)) {
+      return c.json({ message: 'Limite de códigos para este e-mail. Tente mais tarde.' }, 429)
+    }
+    const result = await requestPasswordOtpWhatsApp(email)
+    return c.json({ message: result.message })
+  } catch (error) {
+    log.error('request-password-otp-whatsapp failed', error)
+    const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
+    if (status !== 500) {
+      return c.json({ message: error.message || 'Solicitação inválida.' }, status)
+    }
+    const mapped = mapSupabaseOrNetworkError(error)
+    if (mapped) return c.json({ message: mapped.message }, mapped.status)
+    return c.json({ message: 'Não foi possível enviar o código agora.' }, 500)
+  }
+})
+
+app.post('/api/auth/reset-password-whatsapp', async (c) => {
+  try {
+    const ip = clientKeyFromHono(c)
+    if (!rateLimitTake(`pw-reset-wa:${ip}`, 20, 15 * 60_000)) {
+      return c.json({ message: 'Muitas tentativas. Aguarde alguns minutos.' }, 429)
+    }
+    let body
+    try {
+      body = await c.req.json()
+    } catch {
+      return c.json({ message: 'JSON inválido.' }, 400)
+    }
+    const email = String(body?.email || '').trim().toLowerCase()
+    const code = body?.code ?? body?.otp
+    const password = String(body?.password || '')
+    await confirmPasswordOtpWhatsApp(email, code, password)
+    return c.json({ message: 'Senha redefinida com sucesso. Faça login.' })
+  } catch (error) {
+    log.error('reset-password-whatsapp failed', error)
+    const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
+    if (status !== 500) {
+      return c.json({ message: error.message || 'Não foi possível redefinir.' }, status)
+    }
+    const mapped = mapSupabaseOrNetworkError(error)
+    if (mapped) return c.json({ message: mapped.message }, mapped.status)
+    return c.json({ message: 'Não foi possível redefinir a senha.' }, 500)
+  }
+})
+
 // User preferences & profile
 app.get('/api/usuarios/perfil', async (c) => {
   try {
@@ -1077,6 +1121,42 @@ app.delete('/api/admin/usuarios/:id', async (c) => {
       return c.json({ message: error.message }, 403)
     }
     return c.json({ message: 'Erro ao excluir usuário.' }, 500)
+  }
+})
+
+app.post('/api/admin/usuarios/:id/solicitar-otp-senha-whatsapp', async (c) => {
+  try {
+    const usuarioId = c.req.header('x-user-id')
+    const block = await assertPrincipalAdmin(usuarioId)
+    if (block) return c.json({ message: block.message }, block.status)
+
+    const id = c.req.param('id')
+    const perfil = await getPerfilUsuario(id)
+    if (!perfil?.email) return c.json({ message: 'Usuário não encontrado.' }, 404)
+
+    const ip = clientKeyFromHono(c)
+    if (!rateLimitTake(`admin-pw-otp:${usuarioId}:${ip}`, 25, 60 * 60_000)) {
+      return c.json({ message: 'Limite de solicitações. Tente mais tarde.' }, 429)
+    }
+
+    const result = await requestPasswordOtpWhatsApp(perfil.email, { detailedErrors: true })
+    await insertAdminAuditLog({
+      actorUserId: usuarioId,
+      action: 'reset_senha_otp_whatsapp',
+      targetUserId: id,
+      targetEmail: perfil.email,
+      clientIp: clientIpFromHono(c),
+    })
+    return c.json({ message: result.message })
+  } catch (error) {
+    log.error('admin solicitar-otp-senha-whatsapp failed', error)
+    const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
+    if (status !== 500) {
+      return c.json({ message: error.message || 'Solicitação inválida.' }, status)
+    }
+    const mapped = mapSupabaseOrNetworkError(error)
+    if (mapped) return c.json({ message: mapped.message }, mapped.status)
+    return c.json({ message: 'Erro ao solicitar código pelo WhatsApp.' }, 500)
   }
 })
 
