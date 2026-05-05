@@ -84,6 +84,11 @@ function collectClassTokens(source) {
 /** Classes injetadas por libs ou montadas por template (não aparecem como string literal). */
 const SAFELIST = new Set([
   'recharts-legend-item-marker',
+  /* Recharts injeta no DOM (não passa por className no nosso JSX) */
+  'recharts-cartesian-grid-horizontal',
+  'recharts-cartesian-grid-vertical',
+  'recharts-label',
+  'recharts-text',
   'config-theme-preview--light',
   'config-theme-preview--dark',
   /* Transacoes.jsx: className={`badge badge-${status.toLowerCase()}`} */

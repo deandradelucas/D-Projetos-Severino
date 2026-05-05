@@ -1,0 +1,720 @@
+/* ============================================================
+   STORY 2.2 — Shell & Navegação: Consistência Premium
+   Adiciona indicador gold, tokens de motion e hamburger→X.
+   NÃO alterar o bloco SHELL HUB — CONTRATO ESTÁVEL em `04b-layout-reference-hub-chrome.css`.
+   ============================================================ */
+
+/* --- Hamburger → X: estrutura de barras (Story 2.2) --- */
+.mobile-menu-btn {
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mobile-menu-btn__bar {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  transform-origin: center;
+  transition:
+    transform var(--duration-slow, 300ms) var(--ease-out, cubic-bezier(0, 0, 0.2, 1)),
+    opacity var(--duration-slow, 300ms) ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-menu-btn--open .mobile-menu-btn__bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .mobile-menu-btn--open .mobile-menu-btn__bar:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .mobile-menu-btn--open .mobile-menu-btn__bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}
+
+/* --- Mobile menu button: border-radius e transition (Story 2.2) --- */
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    border-radius: 10px;
+    transition:
+      transform var(--duration-fast, 150ms) var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1)),
+      box-shadow var(--duration-fast, 150ms) ease;
+  }
+
+  body[data-theme='dark'] .mobile-menu-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--sidebar-text, #fafafa);
+  }
+}
+
+/* --- Nav item: transition usando tokens de motion (Story 2.2) --- */
+.nav-item {
+  transition:
+    background-color var(--duration-fast, 150ms) var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1)),
+    color var(--duration-fast, 150ms) ease,
+    box-shadow var(--duration-fast, 150ms) ease;
+}
+
+/* --- Indicador gold: inset border esquerdo no item ativo (desktop shell) --- */
+@media (min-width: 769px) {
+  .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
+    background-color: rgba(212, 168, 75, 0.08);
+    color: var(--sidebar-text, #fafafa) !important;
+    box-shadow: inset 3px 0 0 var(--accent, #d4a84b);
+    border-radius: 8px;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
+    background-color: rgba(212, 168, 75, 0.1);
+    color: var(--sidebar-text, #ffffff) !important;
+  }
+}
+
+/* --- Mobile bottom nav: transition usando tokens de motion (Story 2.2) --- */
+@media (max-width: 768px) {
+  .mobile-bottom-nav__item {
+    transition:
+      color var(--duration-fast, 150ms) ease,
+      background var(--duration-fast, 150ms) ease,
+      transform var(--duration-fast, 150ms) ease,
+      box-shadow var(--duration-fast, 150ms) ease;
+  }
+
+  .mobile-bottom-nav__item:focus-visible {
+    outline-color: var(--accent, #d4a84b);
+  }
+}
+
+/* --- Icon wrap: usa CSS vars canônicos (Story 2.2) --- */
+.icon-wrap {
+  transition:
+    background var(--duration-fast, 150ms) ease,
+    box-shadow var(--duration-fast, 150ms) ease,
+    color var(--duration-fast, 150ms) ease;
+}
+
+.nav-item.active .icon-wrap {
+  background: rgba(212, 168, 75, 0.12);
+  color: var(--accent, #d4a84b);
+}
+
+/* ============================================================
+   STORY 2.4 — Micro-interações & Motion System
+   Keyframes: index.css. Tudo aqui é prefers-reduced-motion aware.
+   NÃO alterar o SHELL HUB — CONTRATO ESTÁVEL (`04b-layout-reference-hub-chrome.css`).
+   ============================================================ */
+
+/* --- Page entry: conteúdo autenticado fade + rise ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .dashboard-hub {
+    animation: hz-fade-slide-up 250ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1)) both;
+  }
+}
+
+/* --- Button gold primary: ripple on click ---- */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  transform-origin: center;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn-primary:active::after {
+    animation: hz-ripple 300ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1)) forwards;
+  }
+}
+
+/* --- TransactionModal: slide-up override ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .modal-content.modal-content--nova-tx {
+    animation: hz-modal-slide-up 300ms var(--ease-decelerate, cubic-bezier(0, 0, 0.2, 1)) forwards;
+  }
+}
+
+/* --- PWA install prompt: slide-up on appear ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .pwa-install-sheet {
+    animation: hz-slide-up 300ms var(--ease-decelerate, cubic-bezier(0, 0, 0.2, 1)) both;
+  }
+}
+
+/* --- Nav active indicator: fade-in on selection ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .nav-item {
+    transition:
+      background-color var(--duration-fast, 150ms) ease,
+      box-shadow var(--duration-fast, 150ms) ease,
+      color var(--duration-fast, 150ms) ease;
+  }
+}
+
+/* --- Skeleton shimmer (define .skeleton-pulse se não estiver definido antes) ---- */
+@keyframes hz-skeleton-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton-pulse,
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.06) 25%,
+      rgba(255, 255, 255, 0.12) 50%,
+      rgba(255, 255, 255, 0.06) 75%
+    );
+    background-size: 200% 100%;
+    animation: hz-skeleton-shimmer 1.4s ease infinite;
+    border-radius: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-pulse,
+  .skeleton {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 6px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Dashboard inicial + Pagamento + Configurações + Relatórios — tema claro (mobile/PWA): bounce #dcd8d6,
+   hero vidro, texto escuro, botões e CTA esmeralda (mesma linguagem da Agenda).
+   ----------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  body[data-theme='light']:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell) #root,
+  body[data-theme='light']:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell) .app-routes-grow,
+  body[data-theme='light']:has(.dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell) #root,
+  body[data-theme='light']:has(.dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell) .app-routes-grow,
+  body[data-theme='light']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell) #root,
+  body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) #root,
+  body[data-theme='light']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell) .app-routes-grow,
+  body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) .app-routes-grow {
+    background: #dcd8d6 !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell {
+    background: transparent !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    background-color: #dcd8d6 !important;
+    background-image: none !important;
+    background-size: auto !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    isolation: isolate !important;
+    width: auto !important;
+    max-width: none !important;
+    min-height: calc(82px + var(--safe-top)) !important;
+    margin: calc(-1 * var(--safe-top)) 0 8px !important;
+    padding: calc(8px + var(--safe-top)) 12px 8px !important;
+    overflow: visible !important;
+    border: 1px solid rgba(163, 163, 163, 0.26) !important;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, 0.36) !important;
+    background-image: none !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.38) inset,
+      0 10px 28px -22px rgba(15, 23, 42, 0.18) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(1.1) !important;
+    backdrop-filter: blur(20px) saturate(1.1) !important;
+    transform: translateZ(0);
+    z-index: 2 !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    -webkit-backdrop-filter: blur(16px) saturate(1.08) !important;
+    backdrop-filter: blur(16px) saturate(1.08) !important;
+    background: rgba(255, 255, 255, 0.32) !important;
+    background-image: none !important;
+    border: 1px solid rgba(163, 163, 163, 0.26) !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.38) inset,
+      0 10px 28px -20px rgba(15, 23, 42, 0.12) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border-color: rgba(163, 163, 163, 0.26) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.05) !important;
+    backdrop-filter: blur(18px) saturate(1.05) !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.38) inset,
+      0 10px 28px -22px rgba(15, 23, 42, 0.18) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
+    background: rgba(255, 255, 255, 0.18) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__title,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__title,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+    color: #0f172a !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line span,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero .ref-panel__subtitle,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-header-sub,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line span,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line span,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+    color: #0b0b0b !important;
+  }
+
+  body[data-theme='light']
+    .dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell
+    .dashboard-hub__balance-line
+    span {
+    color: #0b0b0b !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
+    background: rgba(255, 255, 255, 0.55) !important;
+    border-color: rgba(148, 163, 184, 0.35) !important;
+    color: #0f172a !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 52%, #047857 100%) !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 28px -14px rgba(5, 150, 105, 0.55) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-panel,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-card,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-panel.page-relatorios-chart-panel,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-panel.page-relatorios-ref-filters {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border-color: rgba(163, 163, 163, 0.26) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.05) !important;
+    backdrop-filter: blur(18px) saturate(1.05) !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.38) inset,
+      0 10px 28px -22px rgba(15, 23, 42, 0.18) !important;
+  }
+
+  /* Agenda — mesmo fundo rolável e cartões vidro que o dashboard inicial */
+  body[data-theme='light']:has(.dashboard-container.agenda-page.ref-dashboard.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.agenda-page.ref-dashboard.app-horizon-shell) #root,
+  body[data-theme='light']:has(.dashboard-container.agenda-page.ref-dashboard.app-horizon-shell) .app-routes-grow {
+    background: #dcd8d6 !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell {
+    background: transparent !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    background-color: #dcd8d6 !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero.agenda-hero {
+    position: relative !important;
+    isolation: isolate !important;
+    min-height: calc(82px + var(--safe-top)) !important;
+    margin: calc(-1 * var(--safe-top)) 0 8px !important;
+    padding: calc(8px + var(--safe-top)) 12px 12px !important;
+    overflow: visible !important;
+    border: 1px solid rgba(163, 163, 163, 0.26) !important;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, 0.36) !important;
+    background-image: none !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.38) inset,
+      0 10px 28px -22px rgba(15, 23, 42, 0.18) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(1.1) !important;
+    backdrop-filter: blur(20px) saturate(1.1) !important;
+  }
+
+  body[data-theme='light']
+    .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell
+    main.ref-dashboard-main--scrolled
+    .dashboard-hub__hero.agenda-hero {
+    -webkit-backdrop-filter: blur(16px) saturate(1.08) !important;
+    backdrop-filter: blur(16px) saturate(1.08) !important;
+    background: rgba(255, 255, 255, 0.32) !important;
+    background-image: none !important;
+    border: 1px solid rgba(163, 163, 163, 0.26) !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.38) inset,
+      0 10px 28px -20px rgba(15, 23, 42, 0.12) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero .agenda-hero__title span {
+    color: rgba(15, 23, 42, 0.55) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero .agenda-hero__title strong {
+    color: #0f172a !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero .mobile-menu-btn {
+    background: rgba(255, 255, 255, 0.55) !important;
+    border-color: rgba(148, 163, 184, 0.35) !important;
+    color: #0f172a !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero .dashboard-hub__btn--primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 52%, #047857 100%) !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 28px -14px rgba(5, 150, 105, 0.55) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__summary div {
+    border-color: rgba(15, 23, 42, 0.1) !important;
+    background: rgba(255, 255, 255, 0.45) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__summary span {
+    color: rgba(15, 23, 42, 0.48) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__summary strong {
+    color: #0b0b0b !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__summary p {
+    border-color: rgba(15, 23, 42, 0.08) !important;
+    background: rgba(248, 250, 252, 0.78) !important;
+    color: rgba(15, 23, 42, 0.68) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel--daily {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border: 1px solid rgba(163, 163, 163, 0.26) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.05) !important;
+    backdrop-filter: blur(18px) saturate(1.05) !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.38) inset,
+      0 10px 28px -22px rgba(15, 23, 42, 0.18) !important;
+    border-radius: 18px !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel {
+    padding: 14px 14px 16px !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel--daily {
+    padding: 14px !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-floating-add {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border: 1px solid rgba(16, 185, 129, 0.42) !important;
+    box-shadow: 0 12px 28px -14px rgba(5, 150, 105, 0.42) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected span {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-nav button {
+    background: rgba(255, 255, 255, 0.55) !important;
+    border: 1px solid rgba(163, 163, 163, 0.24) !important;
+    color: #374151 !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero {
+    position: relative !important;
+    isolation: isolate !important;
+    min-height: calc(82px + var(--safe-top)) !important;
+    margin: calc(-1 * var(--safe-top)) 0 8px !important;
+    padding: calc(8px + var(--safe-top)) 12px 12px !important;
+    overflow: visible !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: rgba(22, 28, 38, 0.72) !important;
+    background-image: none !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 14px 40px -24px rgba(0, 0, 0, 0.45) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(1.06) !important;
+    backdrop-filter: blur(16px) saturate(1.06) !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel,
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel--daily {
+    background: #000000 !important;
+    border: 0.5px solid #0b0b0b !important;
+    box-shadow: none !important;
+    border-radius: 18px !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel {
+    padding: 14px 14px 16px !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel--daily {
+    padding: 14px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .main-content {
+    background: transparent !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+    background: transparent !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link {
+    color: #059669 !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link:hover {
+    color: #047857 !important;
+  }
+}
+
+/* Agenda — desktop (≥901px): hero vidro + painéis como KPI do dashboard inicial */
+@media (min-width: 901px) {
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero {
+    margin: 0 0 12px !important;
+    min-height: 0 !important;
+    padding: 12px 16px 14px !important;
+    overflow: visible !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(226, 232, 240, 0.95) !important;
+    background: rgba(255, 255, 255, 0.4) !important;
+    background-image: none !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.78) inset,
+      0 14px 42px -26px rgba(15, 23, 42, 0.2) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.1) !important;
+    backdrop-filter: blur(18px) saturate(1.1) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero .agenda-hero__title span {
+    color: rgba(15, 23, 42, 0.55) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero .agenda-hero__title strong {
+    color: #0f172a !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero .mobile-menu-btn {
+    background: rgba(255, 255, 255, 0.55) !important;
+    border-color: rgba(148, 163, 184, 0.35) !important;
+    color: #0f172a !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero .dashboard-hub__btn--primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 52%, #047857 100%) !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 28px -14px rgba(5, 150, 105, 0.55) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__summary div {
+    border-color: rgba(15, 23, 42, 0.1) !important;
+    background: rgba(255, 255, 255, 0.45) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__summary span {
+    color: rgba(15, 23, 42, 0.48) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__summary strong {
+    color: #0b0b0b !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__summary p {
+    border-color: rgba(15, 23, 42, 0.08) !important;
+    background: rgba(248, 250, 252, 0.78) !important;
+    color: rgba(15, 23, 42, 0.68) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel--daily {
+    background: rgba(255, 255, 255, 0.28) !important;
+    border: 1px solid rgba(163, 163, 163, 0.28) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(1.08) !important;
+    backdrop-filter: blur(22px) saturate(1.08) !important;
+    box-shadow:
+      0 8px 28px -18px rgba(15, 23, 42, 0.1),
+      0 1px 0 rgba(255, 255, 255, 0.42) inset !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel--daily {
+    border-radius: 18px !important;
+    padding: 18px !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-floating-add {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border: 1px solid rgba(16, 185, 129, 0.42) !important;
+    box-shadow: 0 12px 28px -14px rgba(5, 150, 105, 0.42) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected span {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-nav button {
+    background: rgba(255, 255, 255, 0.55) !important;
+    border: 1px solid rgba(163, 163, 163, 0.24) !important;
+    color: #374151 !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero {
+    margin: 0 0 12px !important;
+    min-height: 0 !important;
+    padding: 12px 16px 14px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    background: rgba(22, 28, 38, 0.55) !important;
+    background-image: none !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.08) inset,
+      0 14px 40px -24px rgba(0, 0, 0, 0.45) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(1.06) !important;
+    backdrop-filter: blur(16px) saturate(1.06) !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel,
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel,
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel--daily {
+    background: #000000 !important;
+    border: 0.5px solid #0b0b0b !important;
+    box-shadow: none !important;
+  }
+}
+
+body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-modal {
+  border: 1px solid rgba(163, 163, 163, 0.28) !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.06) !important;
+  backdrop-filter: blur(22px) saturate(1.06) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    0 28px 70px -36px rgba(15, 23, 42, 0.35) !important;
+}
+
+body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-modal .dashboard-hub__btn--primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 52%, #047857 100%) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 28px -14px rgba(5, 150, 105, 0.55) !important;
+}
+
+body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-field input:focus-visible,
+body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-field textarea:focus-visible,
+body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-field select:focus-visible,
+body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-secondary-btn:focus-visible,
+body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-modal__close:focus-visible {
+  outline: 2px solid rgba(16, 185, 129, 0.45) !important;
+  outline-offset: 2px;
+}
+
+body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-toggle input {
+  accent-color: #059669;
+}
+
+body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--today:not(.agenda-calendar-day--selected) {
+  color: #047857 !important;
+}

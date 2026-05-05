@@ -5,13 +5,13 @@ import { TransactionCacheProvider } from './context/TransactionCacheContext'
 import RoutePageFallback from './components/RoutePageFallback'
 import SuperAdminOutlet from './components/SuperAdminOutlet'
 import AppSessionOutlet from './components/AppSessionOutlet'
-import Login from './pages/Login'
 import Background from './components/Background'
 import PwaInstallPrompt from './components/PwaInstallPrompt'
 import HorizonChat from './components/HorizonChat'
 import ShellStickyHeaderScroll from './components/ShellStickyHeaderScroll'
 import ToastContainer from './components/Toast'
 import {
+  Login,
   Cadastro,
   Dashboard,
   Transacoes,

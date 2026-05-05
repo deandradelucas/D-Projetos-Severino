@@ -38,7 +38,7 @@ function isPrivateIpv4(hostname) {
   )
 }
 
-export function resolveAppBaseUrl({ explicitOrigin, host, protocol = 'https' }) {
+function resolveAppBaseUrl({ explicitOrigin, host, protocol = 'https' }) {
   const configuredBaseUrl = normalizeBaseUrl(process.env.APP_BASE_URL || process.env.VITE_APP_BASE_URL)
   if (configuredBaseUrl) {
     return configuredBaseUrl

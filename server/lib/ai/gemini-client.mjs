@@ -1,4 +1,4 @@
-import { loadEnv } from '../load-env.mjs'
+import '../load-env.mjs'
 
 const GEMINI_MODEL_FALLBACKS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash']
 const DEFAULT_MODEL = 'gemini-2.0-flash'
@@ -7,7 +7,6 @@ const DEFAULT_MODEL = 'gemini-2.0-flash'
  * Resolve a lista de modelos candidatos baseada no .env e fallbacks.
  */
 export function resolveGeminiModelCandidates() {
-  loadEnv()
   const envModel = process.env.GEMINI_MODEL?.trim()
   const list = [envModel, ...GEMINI_MODEL_FALLBACKS].filter(Boolean)
   return [...new Set(list)]

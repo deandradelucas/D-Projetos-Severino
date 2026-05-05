@@ -1,4 +1,4 @@
-import { loadEnv } from './load-env.mjs'
+import './load-env.mjs'
 import { geminiPostGenerateContent, resolveGeminiModelCandidates } from './ai/gemini-client.mjs'
 import { extractTextFromGeminiResponse } from './ai/parsers.mjs'
 
@@ -6,7 +6,6 @@ import { extractTextFromGeminiResponse } from './ai/parsers.mjs'
  * Fallback: Gemini compara dígitos do webhook (LID/ruído) com telefones cadastrados no Supabase.
  */
 export async function resolverUsuarioIdPorTelefoneGemini(digitosWebhook, usuarios) {
-  loadEnv()
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey || !digitosWebhook || !usuarios?.length) return null
 

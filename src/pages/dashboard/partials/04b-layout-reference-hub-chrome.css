@@ -1,0 +1,2117 @@
+/* --------------------------------------------------------------------------
+   Layout referência (screenshot — sidebar clara, banner IA, 4 KPIs, 3 colunas)
+   -------------------------------------------------------------------------- */
+body[data-theme='light'] .sidebar .brand-logo {
+  display: block;
+  grid-area: 1 / 1;
+  /* ~85% × scale(1.18) ≈ 100% da coluna: evita corte com overflow-x do menu */
+  width: 85%;
+  max-width: 440px;
+  height: auto;
+  margin: 0;
+  justify-self: center;
+  align-self: center;
+  object-fit: contain;
+  filter: none;
+  opacity: 1;
+  transform: scale(1.18);
+  /* Eixo X no meio = marca central; Y no topo = não “sobe” cortando o padding do menu */
+  transform-origin: 50% 0;
+  pointer-events: auto;
+}
+
+body[data-theme='light'] .sidebar .brand-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  justify-items: stretch;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 28px;
+  min-height: 0;
+  overflow: visible;
+  padding-bottom: 14px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+body[data-theme='light'] .sidebar .brand-wrapper .mobile-close-btn {
+  grid-area: 1 / 1;
+  justify-self: end;
+  align-self: center;
+  position: relative;
+  z-index: 2;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  body[data-theme='light'] .sidebar .brand-wrapper {
+    margin-bottom: 12px;
+  }
+}
+
+body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relatorios-header-export {
+  flex-wrap: nowrap;
+}
+
+.dashboard-container.app-horizon-shell .mobile-menu-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 60%, transparent);
+}
+
+.dashboard-container.app-horizon-shell .mobile-close-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 28%, transparent);
+}
+
+/* Dashboard: faixa de KPIs — Saldo, Saída e Entrada na mesma linha (grid no .ref-kpi-row) */
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip {
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+  position: relative;
+  z-index: 0;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Texto dos KPI não “espreme” com o grid: corpo flexível + quebra controlada */
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__body {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__label {
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}
+
+/* Dashboard hub — layout “painel premium” (acento roxo no shell; página inicial clara sobrescreve para esmeralda + vidro) */
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub {
+  --hub-accent: #7c3aed;
+  --hub-accent-hover: #6d28d9;
+  --hub-accent-ring: rgba(124, 58, 237, 0.35);
+  --hub-accent-soft: rgba(124, 58, 237, 0.1);
+  --hub-surface: #ffffff;
+  --hub-border: rgba(148, 163, 184, 0.4);
+  --hub-muted: #64748b;
+  --hub-title: #0f172a;
+  /* Cantos leves (cards / painel / botões) — não “cápsula” */
+  --hub-r: 10px;
+  --hub-r-inner: 8px;
+}
+
+/* Dashboard inicial (claro): acento esmeralda + fundo #dcd8d6 na coluna rolável — demais páginas hub mantêm o roxo */
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub {
+  --hub-accent: #10b981;
+  --hub-accent-hover: #059669;
+  --hub-accent-ring: rgba(16, 185, 129, 0.42);
+  --hub-accent-soft: rgba(16, 185, 129, 0.14);
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  background-color: #dcd8d6;
+  background-image: none;
+  background-size: auto;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main,
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
+  background: transparent;
+}
+
+/* Área principal do scroll: reta; o arredondamento fica nos cards do hub */
+.dashboard-container.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+  border-radius: 0;
+  font-size: clamp(0.9375rem, 0.35vw + 0.85rem, 1.0625rem);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: clip;
+  overflow-y: hidden;
+}
+
+/*
+ * =============================================================================
+ * SHELL HUB — CONTRATO ESTÁVEL (não alterar sem reler AGENTS.md → “Shell hub”)
+ * =============================================================================
+ * - Rolagem: só `.ref-dashboard-scroll`; `<main.ref-dashboard-main>` sem scroll no hub.
+ * - DOM: `.dashboard-hub__hero` é o 1.º filho de `RefDashboardScroll` em todas as páginas hub.
+ * - Hero: `position: sticky; top: 0`; vidro base blur(8px)/blur(10px); com rolagem `main.ref-dashboard-main--scrolled` → blur(1px) (igual grão de `index.css` `.app-routes-grow`).
+ * - Regredir aqui costuma devolver faixa branca / vidro errado no mobile (Safari).
+ * =============================================================================
+ */
+
+/* Coluna única: tudo rola em .ref-dashboard-scroll; o hero é sticky no topo (conteúdo passa por baixo do vidro). */
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  position: relative;
+  z-index: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  overflow-x: clip;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: transparent;
+  isolation: auto;
+}
+
+/* Dashboard inicial: barra de rolagem oculta (scroll por toque/roda/trackpad segue igual) */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Home: espaço uniforme entre hero, KPIs e Transações (só `gap`; margens verticais extra nos filhos foram removidas). */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  gap: 12px;
+}
+
+/* Conteúdo abaixo do hero: mesma pilha — z-index explícito para o vidro sticky ficar por cima ao rolar */
+.dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > :not(.dashboard-hub__hero) {
+  position: relative;
+  z-index: 0;
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
+  background: transparent;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn,
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn,
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel,
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty-state,
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty-cta,
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card {
+  border-radius: var(--hub-r);
+}
+
+/* Dashboard Home — tipografia fluida (escala com a viewport) */
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card__label,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card__label {
+  font-size: clamp(0.625rem, 0.22vw + 0.56rem, 0.75rem);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card__value,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card__value {
+  font-size: clamp(1rem, 1.15vw + 0.7rem, 1.375rem);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--hero .ref-kpi-card__value,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--hero .ref-kpi-card__value {
+  font-size: clamp(1.0625rem, 1.35vw + 0.68rem, 1.5rem);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__title,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__title {
+  font-size: clamp(1rem, 0.6vw + 0.78rem, 1.1875rem);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link {
+  font-size: clamp(0.75rem, 0.26vw + 0.65rem, 0.875rem);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-date,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-date {
+  font-size: clamp(0.8125rem, 0.3vw + 0.68rem, 0.9375rem);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text,
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text {
+  font-size: clamp(0.875rem, 0.32vw + 0.72rem, 1rem);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val {
+  font-size: clamp(0.875rem, 0.38vw + 0.72rem, 1rem);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty {
+  font-size: clamp(0.875rem, 0.35vw + 0.78rem, 1rem);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty-cta,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty-cta {
+  font-size: clamp(0.8125rem, 0.3vw + 0.74rem, 0.9375rem);
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  gap: 14px 18px;
+  min-width: 0;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+  flex: 1 1 200px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 0;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+/* Dashboard inicial: uma linha; título “Olá, nome” com prioridade (ellipsis se não couber) */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
+  flex-shrink: 0;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+  flex: 1 1 0%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  min-width: 0;
+  justify-content: flex-end;
+  flex-shrink: 1;
+}
+
+/* Nome: até 2 linhas (evita “…” numa linha só); o bloco do título ganha prioridade sobre o toolbar */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: clamp(1.02rem, 1.55vw + 0.52rem, 1.38rem);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 5px;
+  color: var(--hub-muted);
+  font-size: clamp(0.7rem, 0.22vw + 0.64rem, 0.8rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+  min-width: 0;
+  color: var(--hub-title);
+  font-size: clamp(0.82rem, 0.38vw + 0.72rem, 0.98rem);
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line,
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line span,
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+  color: #0b0b0b;
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__label {
+  color: #0b0b0b;
+}
+
+/* Transações: uma linha; título com prioridade (ellipsis se não couber) */
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
+  flex-shrink: 0;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: clamp(0.92rem, 1.22vw + 0.46rem, 1.08rem);
+}
+
+body[data-theme='light']
+  .dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell
+  .dashboard-hub__balance-line
+  span {
+  color: #0b0b0b;
+}
+
+/* Relatórios: uma linha; título + exportações (CSV/PDF) */
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
+  flex-shrink: 0;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions.relatorios-header-export {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: stretch;
+  width: 100%;
+  margin: 0 0 18px;
+  padding: 12px 14px 14px;
+  box-sizing: border-box;
+  /* overflow:visible — hidden cortava sombras dos botões (efeito “colado” no fundo do cartão) */
+  overflow: visible;
+  /* Cantos do cartão: não usar --hub-r do .dashboard-hub (10px) — fica “achatado” demais */
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow:
+    0 10px 36px -18px rgba(15, 23, 42, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+  transition:
+    background 0.28s var(--pf-ease, ease),
+    border-color 0.28s var(--pf-ease, ease),
+    box-shadow 0.28s var(--pf-ease, ease);
+}
+
+/* Cabeçalhos do shell: vidro leve; com rolagem o <main> ganha ref-dashboard-main--scrolled — blur(1px) como .app-routes-grow (index.css) */
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(8px) saturate(1.08);
+  backdrop-filter: blur(8px) saturate(1.08);
+  isolation: isolate;
+  background: rgba(255, 255, 255, 0.92);
+  background-image: none;
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  backdrop-filter: blur(18px) saturate(1.1);
+  background: rgba(255, 255, 255, 0.4);
+  background-image: none;
+  border-color: rgba(226, 232, 240, 0.95);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.78) inset,
+    0 14px 42px -26px rgba(15, 23, 42, 0.2);
+}
+
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(10px) saturate(1.06);
+  backdrop-filter: blur(10px) saturate(1.06);
+  isolation: isolate;
+  background: rgba(26, 34, 46, 0.82);
+  background-image: none;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 12px 40px -20px rgba(0, 0, 0, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(16px) saturate(1.06);
+  backdrop-filter: blur(16px) saturate(1.06);
+  background: rgba(22, 28, 38, 0.55);
+  background-image: none;
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 14px 40px -24px rgba(0, 0, 0, 0.45);
+}
+
+/* Dashboard inicial: barra do hero mais baixa (menos padding vertical que outras páginas hub) */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+  margin: 0;
+  padding: 6px 12px 7px;
+}
+
+/* Com rolagem: blur(1px) — mesmo “grão” do fundo do shell (index.css .app-routes-grow). */
+body[data-theme='light']
+  .dashboard-container.ref-dashboard.app-horizon-shell
+  main.ref-dashboard-main--scrolled
+  .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(1px) saturate(1.12);
+  backdrop-filter: blur(1px) saturate(1.12);
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow:
+    0 10px 32px -16px rgba(15, 23, 42, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.45) inset;
+}
+
+body[data-theme='light']
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell
+  main.ref-dashboard-main--scrolled
+  .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(14px) saturate(1.08);
+  backdrop-filter: blur(14px) saturate(1.08);
+  background: rgba(255, 255, 255, 0.36);
+  background-image: none;
+  border-color: rgba(163, 163, 163, 0.26);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.38) inset,
+    0 12px 36px -22px rgba(15, 23, 42, 0.14);
+}
+
+body[data-theme='dark']
+  .dashboard-container.ref-dashboard.app-horizon-shell
+  main.ref-dashboard-main--scrolled
+  .dashboard-hub__hero {
+  -webkit-backdrop-filter: blur(1px) saturate(1.08);
+  backdrop-filter: blur(1px) saturate(1.08);
+  background: rgba(20, 26, 34, 0.48);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 12px 36px -18px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+/*
+ * Mobile: compositing estável no WebKit (hero sticky + vidro no mesmo scrollport que o conteúdo).
+ */
+@media (max-width: 768px) {
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    margin-bottom: 14px;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 11px 12px 13px;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+}
+/* — fim SHELL HUB (contrato acima) — */
+
+/* Páginas com hub: respiro sob o cartão do hero (desktop) */
+@media (min-width: 769px) {
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    margin-bottom: 0;
+    padding: 5px 12px 7px;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    margin-bottom: 18px;
+    padding: 8px 14px;
+  }
+
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  .dashboard-container.page-admin.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    margin-bottom: 26px;
+    padding: 12px 16px;
+  }
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(1.25rem, 2.1vw + 0.55rem, 1.95rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--hub-title);
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: var(--hub-r);
+  font-size: clamp(0.8125rem, 0.3vw + 0.74rem, 0.9375rem);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+  background: var(--hub-accent);
+  color: #fff;
+  box-shadow: 0 8px 22px -12px color-mix(in srgb, var(--hub-accent) 55%, transparent);
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:hover {
+  background: var(--hub-accent-hover);
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--hub-accent-ring);
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary {
+  background: var(--hub-surface);
+  color: var(--hub-title);
+  border: 1px solid var(--hub-border);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary:hover {
+  background: color-mix(in srgb, var(--hub-surface) 92%, var(--hub-accent) 8%);
+  border-color: color-mix(in srgb, var(--hub-border) 70%, var(--hub-accent) 30%);
+  color: var(--hub-accent);
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--hub-accent-ring);
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub {
+  --hub-icon-bg: #f8fafc;
+  --hub-icon-bg-hover: #f1f5f9;
+  --hub-icon-fg: #475569;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: var(--hub-r);
+  border: 1px solid var(--hub-border);
+  background: var(--hub-icon-bg);
+  color: var(--hub-icon-fg);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn:hover {
+  background: var(--hub-icon-bg-hover);
+  border-color: color-mix(in srgb, var(--hub-accent) 35%, transparent);
+  color: var(--hub-accent);
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--hub-accent-ring);
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn--disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn--privacy-on {
+  background: var(--hub-accent-soft);
+  border-color: color-mix(in srgb, var(--hub-accent) 35%, transparent);
+  color: var(--hub-accent);
+}
+
+/* Saldo: ícone em tom violeta (alinha ao acento do hub) */
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__icon {
+  background: linear-gradient(165deg, rgba(237, 233, 254, 0.98) 0%, rgba(221, 214, 254, 0.5) 100%);
+  border: 1px solid rgba(124, 58, 237, 0.28);
+  color: var(--hub-accent);
+  box-shadow: 0 2px 10px -4px rgba(124, 58, 237, 0.35);
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__icon {
+  background: linear-gradient(165deg, rgba(209, 250, 229, 0.98) 0%, rgba(167, 243, 208, 0.52) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  color: #059669;
+  box-shadow: 0 2px 10px -4px rgba(16, 185, 129, 0.35);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
+  border-radius: var(--hub-r);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 18px 40px -32px rgba(15, 23, 42, 0.16);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty-state {
+  padding: 28px 20px 32px;
+  border-radius: var(--hub-r);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9) 0%, rgba(255, 255, 255, 0.5) 100%);
+  border: 1px dashed rgba(148, 163, 184, 0.45);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty-cta {
+  border-radius: var(--hub-r);
+  background: var(--hub-accent);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  padding: 10px 20px;
+  box-shadow: 0 8px 22px -12px rgba(124, 58, 237, 0.5);
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty-cta {
+  box-shadow: 0 8px 22px -12px rgba(16, 185, 129, 0.45);
+}
+
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-empty-cta:hover {
+  background: var(--hub-accent-hover);
+}
+
+/*
+ * Mobile: antes .hero-actions com flex: 1 1 100% quebrava o cabeçalho (ações iam para baixo / largura total)
+ * em Pagamento, etc. — padrão único: toolbar compacta à direita, uma linha quando couber.
+ */
+@media (max-width: 768px) {
+  .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+/* Dashboard inicial (mobile): coluna ~100% do <main>; cabeçalho numa linha; cartões até as bordas úteis */
+@media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-inner,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-inner {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-inline: 0;
+    box-sizing: border-box;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip,
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-bottom-grid {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    padding: 6px 12px 7px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    font-size: clamp(1.08rem, 4.2vw, 1.32rem);
+    line-height: 1.04;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+    gap: 5px;
+    font-size: 10px;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+    font-size: 12px;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  /* Só na home: FAB mobile substitui o botão no hero; Transações mantém o primário visível */
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes) .dashboard-hub__btn--primary {
+    display: none;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+  }
+
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page .ref-panel,
+  body[data-theme='dark'] .dashboard-container.dashboard-page .ref-panel {
+    padding: 12px 10px 10px;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page .ref-tx-row,
+  body[data-theme='dark'] .dashboard-container.dashboard-page .ref-tx-row {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page .ref-tx-row::after,
+  body[data-theme='dark'] .dashboard-container.dashboard-page .ref-tx-row::after {
+    left: 8px;
+    right: 8px;
+  }
+}
+
+/* Tema escuro / vidro: mesma hierarquia, tons adaptados */
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub {
+  --hub-accent: #8b5cf6;
+  --hub-accent-hover: #7c3aed;
+  --hub-accent-ring: rgba(139, 92, 246, 0.45);
+  --hub-accent-soft: rgba(139, 92, 246, 0.15);
+  --hub-surface: rgba(15, 23, 42, 0.55);
+  --hub-border: rgba(148, 163, 184, 0.28);
+  --hub-muted: rgba(203, 213, 225, 0.82);
+  --hub-title: rgba(248, 250, 252, 0.96);
+  --hub-icon-bg: rgba(15, 23, 42, 0.55);
+  --hub-icon-bg-hover: rgba(30, 41, 59, 0.72);
+  --hub-icon-fg: rgba(226, 232, 240, 0.92);
+  --hub-r: 10px;
+  --hub-r-inner: 8px;
+}
+
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__icon {
+  background: linear-gradient(165deg, rgba(91, 33, 182, 0.35) 0%, rgba(76, 29, 149, 0.2) 100%);
+  border-color: rgba(167, 139, 250, 0.35);
+  color: var(--hub-accent);
+}
+
+/* Dashboard Home em full screen no desktop */
+@media (min-width: 769px) {
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner,
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+body[data-theme='light'] .ref-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  color: #0f172a;
+  font-size: 13px;
+}
+
+body[data-theme='light'] .ref-alert__text {
+  flex: 1 1 12rem;
+  min-width: 0;
+  line-height: 1.45;
+}
+
+body[data-theme='light'] .ref-alert__retry {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(185, 28, 28, 0.35);
+  background: #ffffff;
+  color: #991b1b;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s var(--pf-ease, ease), border-color 0.2s var(--pf-ease, ease);
+}
+
+body[data-theme='light'] .ref-alert__retry:hover {
+  background: rgba(254, 242, 242, 0.95);
+  border-color: rgba(185, 28, 28, 0.5);
+}
+
+body[data-theme='light'] .ref-alert__retry:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+}
+
+body[data-theme='light'] .ref-kpi-card--skeleton {
+  pointer-events: none;
+  background: #ffffff;
+  border-color: rgba(226, 232, 240, 0.95);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 1) inset, 0 8px 24px -18px rgba(15, 23, 42, 0.1);
+}
+
+body[data-theme='light'] .ref-kpi-skel-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+}
+
+body[data-theme='light'] .ref-kpi-skel-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  justify-content: center;
+}
+
+body[data-theme='light'] .ref-kpi-skel-line {
+  display: block;
+  border-radius: 6px;
+}
+
+body[data-theme='light'] .ref-kpi-skel-line--label {
+  width: 46%;
+  height: 11px;
+}
+
+body[data-theme='light'] .ref-kpi-skel-line--value {
+  width: 68%;
+  height: 20px;
+}
+
+body[data-theme='light'] .ref-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+/* Relatórios: KPIs — 1 → 2 → 3 colunas conforme largura (evita rolagem horizontal) */
+body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-kpi-row,
+body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row {
+  width: 100%;
+  min-width: 0;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-kpi-row .ref-kpi-card,
+body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row .ref-kpi-card {
+  min-width: 0;
+}
+
+@media (min-width: 520px) {
+  body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-kpi-row,
+  body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-kpi-row,
+  body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Dashboard: KPIs — 1 → 2 → 3 colunas (evita três cards espremidos em tablets / janelas estreitas) */
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 560px) {
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+body[data-theme='light'] .ref-kpi-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-height: 118px;
+  padding: 16px 16px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(226, 232, 240, 0.98);
+  background: #ffffff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 14px 36px -28px rgba(15, 23, 42, 0.18),
+    0 6px 16px -12px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+body[data-theme='light'] .ref-kpi-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.03);
+}
+
+body[data-theme='light'] .ref-kpi-card--balance,
+body[data-theme='light'] .ref-kpi-card--expense,
+body[data-theme='light'] .ref-kpi-card--income {
+  background: #ffffff;
+}
+
+body[data-theme='light'] .ref-kpi-card--hero .ref-kpi-card__value {
+  font-size: clamp(19px, 2.2vw, 24px);
+  letter-spacing: -0.03em;
+}
+
+body[data-theme='light'] .ref-kpi-card--balance .ref-kpi-card__icon {
+  background: linear-gradient(165deg, rgba(219, 234, 254, 0.95) 0%, rgba(191, 219, 254, 0.42) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.22);
+  color: #2563eb;
+  box-shadow: 0 2px 8px -4px rgba(37, 99, 235, 0.32);
+}
+
+body[data-theme='light'] .ref-kpi-card--expense .ref-kpi-card__icon {
+  background: linear-gradient(165deg, rgba(254, 226, 226, 0.95) 0%, rgba(254, 202, 202, 0.45) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+  box-shadow: 0 2px 8px -4px rgba(220, 38, 38, 0.28);
+}
+
+body[data-theme='light'] .ref-kpi-card--income .ref-kpi-card__icon {
+  background: linear-gradient(165deg, rgba(220, 252, 231, 0.95) 0%, rgba(187, 247, 208, 0.45) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: #15803d;
+  box-shadow: 0 2px 8px -4px rgba(22, 163, 74, 0.35);
+}
+
+body[data-theme='light'] .ref-kpi-card__icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+}
+
+body[data-theme='light'] .ref-kpi-card__label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+body[data-theme='light'] .ref-kpi-card__value {
+  margin: 6px 0 0;
+  font-size: clamp(17px, 1.9vw, 21px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+}
+
+/* KPI + painel: desktop mais denso, ícone alinhado ao bloco de texto, raios alinhados ao header */
+@media (min-width: 769px) {
+  body[data-theme='light'] .ref-kpi-row {
+    gap: 16px;
+    margin: 0;
+  }
+
+  body[data-theme='light'] .ref-kpi-card {
+    min-height: 0;
+    align-items: center;
+    padding: 14px 18px;
+    border-radius: 10px;
+    gap: 15px;
+    background: linear-gradient(180deg, #ffffff 0%, #fafbfd 100%);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 18px 44px -30px rgba(15, 23, 42, 0.2),
+      0 8px 20px -14px rgba(15, 23, 42, 0.08);
+  }
+
+  body[data-theme='light'] .ref-kpi-card__value {
+    margin: 4px 0 0;
+  }
+
+  body[data-theme='light'] .ref-panel {
+    border-radius: 10px;
+    padding: 18px 18px 14px;
+    background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 22px 52px -32px rgba(15, 23, 42, 0.2),
+      0 10px 24px -14px rgba(15, 23, 42, 0.08);
+  }
+
+  body[data-theme='light'] .ref-panel.ref-panel--transactions {
+    min-height: 240px;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-kpi-card {
+    background: rgba(255, 255, 255, 0.28);
+    -webkit-backdrop-filter: blur(22px) saturate(1.08);
+    backdrop-filter: blur(22px) saturate(1.08);
+    border: 1px solid rgba(163, 163, 163, 0.28);
+    box-shadow:
+      0 8px 28px -18px rgba(15, 23, 42, 0.1),
+      0 1px 0 rgba(255, 255, 255, 0.42) inset;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-panel {
+    background: rgba(255, 255, 255, 0.24);
+    -webkit-backdrop-filter: blur(24px) saturate(1.06);
+    backdrop-filter: blur(24px) saturate(1.06);
+    border: 1px solid rgba(163, 163, 163, 0.26);
+    box-shadow:
+      0 10px 32px -20px rgba(15, 23, 42, 0.12),
+      0 1px 0 rgba(255, 255, 255, 0.38) inset;
+  }
+
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid > .ref-tx-row {
+    background: rgba(255, 255, 255, 0.26);
+    -webkit-backdrop-filter: blur(14px) saturate(1.05);
+    backdrop-filter: blur(14px) saturate(1.05);
+    border-color: rgba(148, 163, 184, 0.26);
+  }
+}
+
+body[data-theme='light'] .ref-bottom-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) minmax(0, 0.95fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+body[data-theme='light'] .ref-bottom-grid.ref-bottom-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 769px) {
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-bottom-grid,
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-bottom-grid {
+    margin-top: 0;
+  }
+}
+
+body[data-theme='light'] .ref-panel {
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.98);
+  background: #ffffff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 20px 48px -32px rgba(15, 23, 42, 0.18),
+    0 8px 20px -14px rgba(15, 23, 42, 0.06);
+  padding: 16px 16px 12px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+}
+
+body[data-theme='light'] .ref-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.95);
+}
+
+body[data-theme='light'] .ref-panel__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+}
+
+body[data-theme='light'] .ref-panel__subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #64748b;
+  text-transform: capitalize;
+}
+
+body[data-theme='light'] .ref-panel__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 12px 7px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d4ed8;
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.98);
+  transition: background 0.2s var(--pf-ease, ease), border-color 0.2s var(--pf-ease, ease), color 0.2s var(--pf-ease, ease);
+}
+
+body[data-theme='light'] .ref-panel__link-chevron {
+  flex-shrink: 0;
+  opacity: 0.85;
+  transition: transform 0.2s var(--pf-ease-out, ease);
+}
+
+body[data-theme='light'] .ref-panel__link:hover {
+  background: #f8fafc;
+  border-color: rgba(148, 163, 184, 0.35);
+  color: #1e40af;
+}
+
+body[data-theme='light'] .ref-panel__link:hover .ref-panel__link-chevron {
+  transform: translateX(2px);
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link {
+  color: #059669;
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link:hover {
+  color: #047857;
+}
+
+body[data-theme='light'] .ref-tx-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 2px 0 8px;
+  scrollbar-gutter: stable;
+}
+
+/* Cabeçalho tipo tabela (desktop) */
+body[data-theme='light'] .ref-tx-list-head {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  /* Mesmas trilhas no cabeçalho e nas linhas = texto em coluna reta */
+  body[data-theme='light'] .ref-tx-list-head {
+    display: grid;
+    grid-template-columns:
+      40px
+      minmax(108px, 1.15fr)
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      minmax(24px, 28px)
+      auto;
+    grid-template-areas: 'hicon hmeta hcat hsub hrec hval';
+    align-items: end;
+    column-gap: 16px;
+    row-gap: 4px;
+    padding: 6px 12px 10px 12px;
+    margin: 0 0 2px;
+    border-bottom: 1px solid color-mix(in srgb, var(--border-color) 72%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--text-primary) 6%, transparent);
+  }
+
+  body[data-theme='light'] .ref-tx-list-head__icon {
+    grid-area: hicon;
+    justify-self: center;
+  }
+
+  body[data-theme='light'] .ref-tx-list-head__meta {
+    grid-area: hmeta;
+    justify-self: stretch;
+    text-align: start;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 0;
+    margin: 0;
+  }
+
+  body[data-theme='light'] .ref-tx-list-head__cat {
+    grid-area: hcat;
+    justify-self: stretch;
+    text-align: start;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 0;
+    margin: 0;
+  }
+
+  body[data-theme='light'] .ref-tx-list-head__sub {
+    grid-area: hsub;
+    justify-self: stretch;
+    text-align: start;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 0;
+    margin: 0;
+  }
+
+  body[data-theme='light'] .ref-tx-list-head__rec {
+    grid-area: hrec;
+    justify-self: center;
+  }
+
+  body[data-theme='light'] .ref-tx-list-head__val {
+    grid-area: hval;
+    justify-self: end;
+    text-align: end;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 0 6px 0 0;
+    margin: 0;
+  }
+}
+
+body[data-theme='light'] .ref-tx-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  grid-template-areas:
+    'icon meta . val'
+    'icon cat . val'
+    'icon sub rec val';
+  gap: 6px 12px;
+  align-items: center;
+  padding: 12px 12px 14px 12px;
+  margin: 0;
+  border-radius: 8px;
+  border: none;
+  transition: background 0.18s var(--pf-ease, ease);
+}
+
+/* Linha divisória elegante */
+body[data-theme='light'] .ref-tx-row::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--border-color) 40%, transparent) 10%,
+    color-mix(in srgb, var(--border-color) 72%, transparent) 24%,
+    color-mix(in srgb, var(--border-color) 72%, transparent) 76%,
+    color-mix(in srgb, var(--border-color) 40%, transparent) 90%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+body[data-theme='light'] .ref-tx-row:last-child::after {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  body[data-theme='light'] .ref-tx-row {
+    grid-template-columns:
+      40px
+      minmax(108px, 1.15fr)
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      minmax(24px, 28px)
+      auto;
+    grid-template-areas: 'icon meta cat sub rec val';
+    column-gap: 16px;
+    row-gap: 0;
+    align-items: center;
+    padding: 12px 12px 13px 12px;
+  }
+
+  body[data-theme='light'] .ref-tx-row::after {
+    left: 52px;
+    right: 12px;
+  }
+}
+
+/* Desktop: uma única malha de colunas para cabeçalho + linhas (alinha th/td) */
+@supports (grid-template-columns: subgrid) {
+  @media (min-width: 768px) {
+    body[data-theme='light'] .ref-tx-table-subgrid {
+      display: grid;
+      grid-template-columns:
+        40px
+        minmax(108px, 1.15fr)
+        minmax(0, 1fr)
+        minmax(0, 1fr)
+        minmax(24px, 28px)
+        auto;
+      column-gap: 16px;
+      row-gap: 10px;
+      padding-inline: 12px;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-list-head {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-template-areas: none;
+      padding: 6px 0 10px;
+      margin: 0 0 2px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-template-areas: none;
+      padding: 12px 0 13px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-list-head .ref-tx-list-head__icon,
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-list-head .ref-tx-list-head__meta,
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-list-head .ref-tx-list-head__cat,
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-list-head .ref-tx-list-head__sub,
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-list-head .ref-tx-list-head__rec,
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-list-head .ref-tx-list-head__val {
+      grid-area: auto;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row > .ref-tx-icon-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row > .ref-tx-meta-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row > .ref-tx-cat-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row > .ref-tx-sub-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row > .ref-tx-rec-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row > .ref-tx-val-cell {
+      grid-area: auto;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row::after {
+      left: calc(40px + 16px);
+      right: 0;
+    }
+  }
+
+  /* Desktop amplo: colunas mais justas, linhas mais baixas, menos “vazio” antes de Valor (sem moldura interna) */
+  @media (min-width: 769px) {
+    body[data-theme='light'] .ref-tx-table-subgrid {
+      column-gap: 12px;
+      row-gap: 10px;
+      grid-template-columns:
+        40px
+        minmax(100px, 1.25fr)
+        minmax(0, min(28ch, 1.2fr))
+        minmax(0, min(34ch, 1.2fr))
+        minmax(24px, 28px)
+        max-content;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-list-head {
+      padding: 7px 0 9px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row {
+      padding: 9px 0 10px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row::after {
+      left: calc(40px + 12px);
+      right: 0;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row .ref-tx-icon-cell {
+      padding-top: 0;
+      align-self: center;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row .ref-tx-meta-cell {
+      align-self: center;
+      justify-content: center;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row .ref-tx-cat-cell {
+      align-self: center;
+      justify-content: center;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row .ref-tx-sub-cell {
+      align-self: center;
+      justify-content: center;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row .ref-tx-rec-cell {
+      align-self: center;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid > .ref-tx-row .ref-tx-val-cell {
+      align-self: center;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+}
+
+body[data-theme='light'] .ref-tx-row:hover {
+  background: color-mix(in srgb, var(--bg-card-elevated) 88%, var(--text-primary) 12%);
+}
+
+body[data-theme='light'] .ref-tx-row:hover::after {
+  opacity: 0.75;
+}
+
+body[data-theme='light'] .ref-tx-icon-cell {
+  grid-area: icon;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0;
+}
+
+body[data-theme='light'] .ref-tx-meta-cell {
+  grid-area: meta;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-self: stretch;
+  text-align: start;
+}
+
+body[data-theme='light'] .ref-tx-cat-cell {
+  grid-area: cat;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-self: stretch;
+  justify-self: stretch;
+  text-align: start;
+  padding: 0;
+}
+
+body[data-theme='light'] .ref-tx-sub-cell {
+  grid-area: sub;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-self: stretch;
+  justify-self: stretch;
+  text-align: start;
+  padding: 0;
+}
+
+body[data-theme='light'] .ref-tx-rec-cell {
+  grid-area: rec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  align-self: center;
+  min-width: 0;
+  padding: 0;
+}
+
+body[data-theme='light'] .ref-tx-val-cell {
+  grid-area: val;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  justify-self: end;
+  align-self: center;
+  padding: 0 6px 0 0;
+  text-align: end;
+}
+
+.ref-tx-recorrencia-ico-wrap {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.ref-tx-recorrencia-ico {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  body[data-theme='light'] .ref-tx-icon-cell {
+    padding-top: 0;
+  }
+
+  body[data-theme='light'] .ref-tx-meta-cell {
+    align-self: center;
+    justify-content: center;
+  }
+
+  body[data-theme='light'] .ref-tx-cat-cell {
+    align-self: center;
+    justify-content: center;
+  }
+
+  body[data-theme='light'] .ref-tx-sub-cell {
+    align-self: center;
+    justify-content: center;
+  }
+}
+
+/* Rótulos inline removidos: no mobile o cartão já é legível; no desktop o cabeçalho da tabela substitui. */
+body[data-theme='light'] .ref-tx-field-label {
+  display: none;
+}
+
+body[data-theme='light'] .ref-tx-cat-text,
+body[data-theme='light'] .ref-tx-sub-text {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  font-size: 14px;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+  color: var(--text-primary);
+  text-align: start;
+  text-indent: 0;
+  hyphens: none;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+body[data-theme='light'] .ref-tx-cat-text {
+  font-weight: 600;
+}
+
+body[data-theme='light'] .ref-tx-sub-text {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Skeleton linhas da lista */
+body[data-theme='light'] .ref-tx-row--skeleton {
+  pointer-events: none;
+}
+
+body[data-theme='light'] .ref-tx-row--skeleton::after {
+  opacity: 0.5;
+}
+
+body[data-theme='light'] .ref-tx-skel-icon {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+}
+
+body[data-theme='light'] .ref-tx-skel-line {
+  display: block;
+  height: 10px;
+  border-radius: 5px;
+}
+
+body[data-theme='light'] .ref-tx-skel-line--meta {
+  width: 72%;
+  max-width: 140px;
+}
+
+body[data-theme='light'] .ref-tx-skel-line--cat {
+  width: 85%;
+}
+
+body[data-theme='light'] .ref-tx-skel-line--sub {
+  width: 75%;
+}
+
+body[data-theme='light'] .ref-tx-skel-pill {
+  display: block;
+  width: 88px;
+  height: 30px;
+  border-radius: 10px;
+}
+
+body[data-theme='light'] .ref-tx-skeleton-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+body[data-theme='light'] .ref-tx-arrow-wrap {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+}
+
+body[data-theme='light'] .ref-tx-arrow-wrap--up {
+  color: var(--success);
+  background: linear-gradient(165deg, color-mix(in srgb, var(--success) 22%, transparent) 0%, color-mix(in srgb, var(--success) 10%, transparent) 100%);
+  border-color: color-mix(in srgb, var(--success) 35%, transparent);
+  box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--success) 35%, transparent);
+}
+
+body[data-theme='light'] .ref-tx-arrow-wrap--down {
+  color: var(--danger);
+  background: linear-gradient(165deg, color-mix(in srgb, var(--danger) 20%, transparent) 0%, color-mix(in srgb, var(--danger) 10%, transparent) 100%);
+  border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+  box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--danger) 30%, transparent);
+}
+
+body[data-theme='light'] .ref-tx-date {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  text-align: start;
+  text-indent: 0;
+}
+
+body[data-theme='light'] .ref-tx-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  padding: 6px 10px;
+  border-radius: 10px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+body[data-theme='light'] .ref-tx-val__amount {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+body[data-theme='light'] .ref-tx-val--pos {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 28%, transparent);
+}
+body[data-theme='light'] .ref-tx-val--neg {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 24%, transparent);
+}
+
+/* Página Transações: mesma lista do dashboard + coluna Ações */
+body[data-theme='light'] .ref-tx-rec-badge {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-hover);
+  background: var(--accent-muted);
+  padding: 2px 7px;
+  border-radius: 6px;
+  vertical-align: middle;
+}
+
+body[data-theme='light'] .ref-tx-actions-cell {
+  grid-area: act;
+  justify-self: end;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: 0 0 0 4px;
+}
+
+body[data-theme='light'] .ref-tx-actions-cell .btn-edit,
+body[data-theme='light'] .ref-tx-actions-cell .btn-delete {
+  min-width: 40px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row {
+  grid-template-columns: auto 1fr auto auto max-content;
+  grid-template-areas:
+    'icon meta . val act'
+    'icon cat . val act'
+    'icon sub rec val act';
+  column-gap: 10px;
+}
+
+/* Desktop/tablet: valor + ações participam do mesmo grid; no mobile Transações o wrap vira coluna flex */
+.ref-tx-table-subgrid--actions .ref-tx-val-act-wrap {
+  display: contents;
+}
+
+@media (max-width: 767px) {
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row {
+    grid-template-columns: auto minmax(0, 1fr) max-content;
+    grid-template-areas:
+      'icon meta val'
+      'icon cat val'
+      'icon sub val'
+      '. rec act';
+    align-items: start;
+    column-gap: 10px;
+  }
+
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-val-cell {
+    align-self: start;
+    padding: 0;
+  }
+
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-actions-cell {
+    align-self: start;
+    justify-self: end;
+    padding: 2px 0 0;
+  }
+
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .transacoes-actions {
+    gap: 6px;
+    justify-content: flex-end;
+  }
+}
+
+@media (min-width: 768px) {
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row {
+    grid-template-columns:
+      40px
+      minmax(108px, 1.15fr)
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      minmax(24px, 28px)
+      auto
+      max-content;
+    grid-template-areas: 'icon meta cat sub rec val act';
+    column-gap: 16px;
+  }
+
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row::after {
+    left: 52px;
+    right: 12px;
+  }
+
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-list-head {
+    display: grid;
+    grid-template-columns:
+      40px
+      minmax(108px, 1.15fr)
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      minmax(24px, 28px)
+      auto
+      max-content;
+    grid-template-areas: 'hicon hmeta hcat hsub hrec hval hact';
+    align-items: end;
+    column-gap: 16px;
+    row-gap: 4px;
+    padding: 6px 12px 10px 12px;
+    margin: 0 0 2px;
+    border-bottom: 1px solid color-mix(in srgb, var(--border-color) 72%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--text-primary) 6%, transparent);
+  }
+
+  body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-list-head__actions {
+    grid-area: hact;
+    justify-self: end;
+    text-align: end;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 0 6px 0 0;
+    margin: 0;
+  }
+}
+
+@supports (grid-template-columns: subgrid) {
+  @media (min-width: 768px) {
+    body[data-theme='light'] .ref-tx-table-subgrid--actions {
+      display: grid;
+      grid-template-columns:
+        40px
+        minmax(108px, 1.15fr)
+        minmax(0, 1fr)
+        minmax(0, 1fr)
+        minmax(24px, 28px)
+        auto
+        max-content;
+      column-gap: 16px;
+      row-gap: 10px;
+      padding-inline: 12px;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-template-areas: none;
+      padding: 6px 0 10px;
+      margin: 0 0 2px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-template-areas: none;
+      padding: 12px 0 13px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__icon,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__meta,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__cat,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__sub,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__rec,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__val,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head .ref-tx-list-head__actions {
+      grid-area: auto;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-icon-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-meta-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-cat-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-sub-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-rec-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-act-wrap > .ref-tx-val-cell,
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-act-wrap > .ref-tx-actions-cell {
+      grid-area: auto;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row::after {
+      left: calc(40px + 16px);
+      right: 0;
+    }
+  }
+
+  @media (min-width: 769px) {
+    body[data-theme='light'] .ref-tx-table-subgrid--actions {
+      column-gap: 12px;
+      row-gap: 10px;
+      grid-template-columns:
+        40px
+        minmax(100px, 1.25fr)
+        minmax(0, min(28ch, 1.2fr))
+        minmax(0, min(34ch, 1.2fr))
+        minmax(24px, 28px)
+        max-content
+        max-content;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-list-head {
+      padding: 7px 0 9px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row {
+      padding: 9px 0 10px;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row::after {
+      left: calc(40px + 12px);
+      right: 0;
+    }
+
+    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row .ref-tx-actions-cell {
+      align-self: center;
+    }
+  }
+}
+
+body[data-theme='light'] .ref-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px 16px 20px;
+  text-align: center;
+}
+
+body[data-theme='light'] .ref-empty-cta {
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+  background: #111827;
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px -14px rgba(15, 23, 42, 0.45);
+  transition: background 0.2s var(--pf-ease, ease), transform 0.2s var(--pf-ease-out, ease);
+}
+
+body[data-theme='light'] .ref-empty-cta:hover {
+  background: #0f172a;
+}
+
+body[data-theme='light'] .ref-empty-cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35), 0 10px 24px -14px rgba(15, 23, 42, 0.45);
+}
+
+body[data-theme='light'] .ref-empty-cta:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 1200px) {
+  body[data-theme='light'] .ref-kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body[data-theme='light'] .ref-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  body[data-theme='light'] .ref-kpi-row {
+    grid-template-columns: 1fr;
+  }
+}
+

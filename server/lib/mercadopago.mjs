@@ -1,4 +1,4 @@
-import { loadEnv } from './load-env.mjs'
+import './load-env.mjs'
 
 const MP_API = 'https://api.mercadopago.com'
 
@@ -26,12 +26,10 @@ export function isMercadoPagoForbiddenError(err) {
 }
 
 export function getMercadoPagoAccessToken() {
-  loadEnv()
   return process.env.MERCADO_PAGO_ACCESS_TOKEN || ''
 }
 
 export function getMercadoPagoPublicKey() {
-  loadEnv()
   return process.env.MERCADO_PAGO_PUBLIC_KEY || ''
 }
 

@@ -60,7 +60,6 @@ import {
   marcarBemVindoPagamentoVisto,
 } from './lib/assinatura.mjs'
 import { isSuperAdminEmail } from './lib/super-admin.mjs'
-import { loadEnv } from './lib/load-env.mjs'
 import { rateLimitTake, clientKeyFromHono } from './lib/rate-limit.mjs'
 import {
   validateNovaTransacaoBody,
@@ -93,8 +92,6 @@ import {
   registrarFalhaLembreteAgenda,
   registrarLembretesAgendaEnviados,
 } from './lib/domain/agenda.mjs'
-
-loadEnv()
 
 const app = createApp()
 

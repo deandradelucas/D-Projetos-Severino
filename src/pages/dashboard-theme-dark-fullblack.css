@@ -902,14 +902,9 @@ body[data-theme='dark'] .chat-fab-active {
 }
 
 /* Dashboard black: fundo totalmente preto. */
-body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__plain-fill,
-body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__wash {
+body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__plain-fill {
   background: #000000 !important;
   background-image: none !important;
-}
-
-body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__noise {
-  opacity: 0 !important;
 }
 
 body[data-theme='dark'] .dashboard-container.dashboard-page,

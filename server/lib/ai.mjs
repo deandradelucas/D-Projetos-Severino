@@ -1,5 +1,5 @@
+import './load-env.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
-import { loadEnv } from './load-env.mjs'
 import { log } from './logger.mjs'
 import { listarAgendaEventos } from './domain/agenda.mjs'
 import { draftAgendaFromTextHeuristic, snapReminderToAppOptions } from './domain/agenda-whatsapp.mjs'
@@ -25,7 +25,6 @@ const MAX_WHATSAPP_AUDIO_BYTES = 12 * 1024 * 1024
  * ASR para notas de voz do WhatsApp.
  */
 export async function transcribeWhatsAppAudioWithGemini(audioBytes, mimeHint = '') {
-  loadEnv()
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
 
@@ -198,7 +197,6 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
 
   const fallback = () => draftAgendaFromTextHeuristic(trimmed, baseDate)
 
-  loadEnv()
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
     const h = fallback()
@@ -298,7 +296,6 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
  * Pergunta ao Horizon.
  */
 export async function askHorizon(message, usuarioId, historico = []) {
-  loadEnv()
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
 
@@ -375,7 +372,6 @@ ${contextoAgenda ? `--- AGENDA (próximas semanas) ---\n${contextoAgenda}\n--- F
  * Interpreta mensagem de WhatsApp.
  */
 export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
-  loadEnv()
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
 

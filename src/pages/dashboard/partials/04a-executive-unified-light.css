@@ -1,0 +1,223 @@
+/* --------------------------------------------------------------------------
+   Executive unified layout (tema único claro)
+   -------------------------------------------------------------------------- */
+body[data-theme='light'] .dashboard-container {
+  background: #f4f6fc;
+  border-radius: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 42px 80px -34px rgba(37, 65, 120, 0.45);
+  padding: 0;
+  gap: 0;
+  min-height: calc(100dvh - 34px);
+  margin: 16px;
+  overflow: hidden;
+}
+
+body[data-theme='light'] .sidebar {
+  width: 222px;
+  background: #ffffff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-right: 1px solid rgba(226, 232, 240, 0.98);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 24px 16px 20px;
+}
+
+body[data-theme='light'] .sidebar::before {
+  display: none;
+}
+
+body[data-theme='light'] .brand-wrapper {
+  margin-bottom: 20px;
+}
+
+body[data-theme='light'] .brand-logo {
+  width: 170px;
+  filter: saturate(0.72) brightness(0.9);
+  opacity: 0.88;
+}
+
+body[data-theme='light'] .nav-menu {
+  gap: 6px;
+}
+
+body[data-theme='light'] .nav-item {
+  min-height: 44px;
+  border-radius: 12px;
+  color: #334155;
+  font-weight: 600;
+}
+
+body[data-theme='light'] .nav-item:hover:not(.active) {
+  background: rgba(148, 163, 184, 0.14);
+}
+
+body[data-theme='light'] .nav-item.active {
+  background: #dfe8f8;
+  color: #0f172a;
+  box-shadow: none;
+}
+
+body[data-theme='light'] .nav-item.active::before,
+body[data-theme='light'] .nav-item.active::after,
+body[data-theme='light'] .nav-menu::before {
+  display: none !important;
+}
+
+body[data-theme='light'] .logout-btn {
+  border-radius: 12px;
+  background: transparent;
+  color: #334155;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content {
+  background: #f5f7fc;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  padding: 20px 28px 24px;
+}
+
+body[data-theme='light'] .relatorios-chart-card,
+body[data-theme='light'] .config-card {
+  border-radius: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #eef2fa;
+  box-shadow: 0 26px 46px -34px rgba(15, 23, 42, 0.32);
+}
+
+body[data-theme='light'] .btn-primary {
+  background: #111827;
+  color: #f8fafc;
+  border-radius: 12px;
+  box-shadow: 0 16px 30px -20px rgba(15, 23, 42, 0.55);
+}
+
+body[data-theme='light'] .btn-primary:hover {
+  background: #0b1220;
+}
+
+body[data-theme='light'] .data-table thead th {
+  background: rgba(241, 245, 249, 0.75);
+  color: #475569;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+body[data-theme='light'] .data-table tbody td {
+  color: #0f172a;
+}
+
+body[data-theme='light'] .data-table tbody tr:hover {
+  background: rgba(148, 163, 184, 0.08) !important;
+}
+
+body[data-theme='light'] .filter-input,
+body[data-theme='light'] .input-premium {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+@media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container {
+    margin: 0;
+    border-radius: 0;
+    min-height: 100dvh;
+  }
+
+  body[data-theme='light'] .sidebar {
+    width: min(280px, 86vw);
+  }
+
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content {
+    padding: 14px 12px 16px;
+  }
+}
+
+body[data-theme='light'] .sidebar {
+  padding-top: 20px;
+}
+
+body[data-theme='light'] .brand-wrapper {
+  margin-bottom: 18px;
+}
+
+body[data-theme='light'] .brand-logo {
+  width: 180px;
+}
+
+body[data-theme='light'] .nav-item {
+  border-radius: 14px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  font-size: 14px;
+}
+
+/* ===== 1:1 extreme tuning ===== */
+body[data-theme='light'] .dashboard-container {
+  gap: 14px;
+  padding: 14px;
+}
+
+body[data-theme='light'] .sidebar {
+  border-radius: 24px;
+  padding: 16px 10px 14px;
+  box-shadow: 0 10px 30px -22px rgba(15, 23, 42, 0.28);
+}
+body[data-theme='light'] .brand-wrapper { margin-bottom: 10px; }
+body[data-theme='light'] .brand-logo { width: 136px; }
+body[data-theme='light'] .nav-menu { gap: 6px; }
+body[data-theme='light'] .nav-item { gap: 12px; min-height: 40px; padding: 10px 12px; border-radius: 12px; }
+body[data-theme='light'] .icon-wrap { width: 28px; height: 28px; border-radius: 9px; }
+body[data-theme='light'] .icon-wrap svg { width: 16px; height: 16px; }
+body[data-theme='light'] .sidebar .logout-btn {
+  margin-top: auto;
+  min-height: 40px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content {
+  border-radius: 24px;
+  padding: 14px 18px 18px;
+}
+
+body[data-theme='light'] .transacoes-filter-grid,
+body[data-theme='light'] .relatorios-filter-grid {
+  gap: 10px;
+}
+body[data-theme='light'] .filter-input {
+  min-height: 40px;
+  border-radius: 12px;
+}
+body[data-theme='light'] .config-layout {
+  gap: 14px;
+}
+body[data-theme='light'] .config-card {
+  padding: 16px;
+  border-radius: 18px !important;
+}
+
+@media (max-width: 1200px) {
+  body[data-theme='light'] {
+    --app-sidebar-width: clamp(190px, 20vw + 34px, 252px);
+    --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 66px);
+  }
+  body[data-theme='light'] .sidebar {
+    width: var(--app-sidebar-width);
+    min-width: var(--app-sidebar-width);
+  }
+}
+@media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container { padding: 0; gap: 0; }
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content,
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell).page-configuracoes .main-content {
+    border-radius: 0;
+    padding: 10px 10px 18px;
+  }
+}
+
