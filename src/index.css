@@ -111,6 +111,18 @@ body {
   isolation: isolate;
 }
 
+/* Login/Cadastro glass — reflexo espelhado sob o cartão (Safari/Chrome); Firefox sem reflexo */
+.auth-shell-glass-card-reflect {
+  -webkit-box-reflect: below 14px
+    linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.12) 22%, rgba(255, 255, 255, 0.04) 48%, transparent 82%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-shell-glass-card-reflect {
+    -webkit-box-reflect: none;
+  }
+}
+
 /* Encadeia altura no mobile: rotas preenchem a viewport sem scroll lateral */
 .app-layout-shell {
   position: relative;

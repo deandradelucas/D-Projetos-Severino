@@ -248,12 +248,16 @@ export default function Login() {
     <AuthPhoneShell
       title="Login"
       headerTitle="Login"
-      showBodyLogo
+      heroImageSrc="/images/Login/01.avif"
+      subtitle="Bem-vindo de volta. Faça login para continuar."
       compact={!showForgotPassword && !(webAuthnSupported() && hasWebAuthn)}
       footer={
         <>
           Não tem conta?{' '}
-          <Link to="/cadastro" className="font-semibold text-[#050505] underline-offset-4 hover:underline">
+          <Link
+            to="/cadastro"
+            className="cursor-pointer font-semibold text-orange-600 underline-offset-4 transition hover:text-orange-500 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+          >
             Criar conta
           </Link>
         </>
@@ -261,21 +265,41 @@ export default function Login() {
     >
       <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" noValidate>
         <label className="block" htmlFor="email">
-          <span className="mb-2 block text-[11px] font-medium text-[#111827] sm:text-[12px]">E-mail</span>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="seu@email.com"
-            required
-            autoComplete="email"
-            className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#a3a3a3] focus:border-accent-gold/30 focus:shadow-[0_18px_34px_-24px_rgba(15,23,42,0.7)] focus-visible:ring-2 focus-visible:ring-accent-gold/40 sm:min-h-[46px] sm:px-4 sm:text-[13px]"
-          />
+          <span className="mb-2 block text-[11px] font-medium text-neutral-700 sm:text-[12px]">E-mail</span>
+          <div className="relative">
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seu@email.com"
+              required
+              autoComplete="email"
+              className="w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 pr-11 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-400 focus:border-orange-400/70 focus:bg-white focus-visible:ring-2 focus-visible:ring-orange-400/35 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
+            />
+            <span
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 sm:right-4"
+              aria-hidden
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M12 12a3 3 0 100-6 3 3 0 000 6z"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                />
+                <path
+                  d="M20 12c0 2-3.5 6-8 6s-8-4-8-6 3.5-6 8-6 8 4 8 6z"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
+          </div>
         </label>
 
         <label className="block" htmlFor="senha">
-          <span className="mb-2 block text-[11px] font-medium text-[#111827] sm:text-[12px]">Senha</span>
+          <span className="mb-2 block text-[11px] font-medium text-neutral-700 sm:text-[12px]">Senha</span>
           <div className="relative">
             <input
               id="senha"
@@ -286,26 +310,45 @@ export default function Login() {
               required
               minLength={6}
               autoComplete="current-password"
-              className="w-full rounded-[10px] border border-transparent bg-white px-3 py-3 pr-10 text-[12px] text-[#111827] shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition placeholder:text-[#cfcfcf] focus:border-accent-gold/30 focus-visible:ring-2 focus-visible:ring-accent-gold/40 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
+              className="w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 pr-11 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-300 focus:border-orange-400/70 focus:bg-white focus-visible:ring-2 focus-visible:ring-orange-400/35 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
             />
             <button
               type="button"
               onClick={() => setShowSenha(!showSenha)}
               aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md text-[#9ca3af] transition hover:text-[#111827] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/40 sm:text-[12px]"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/45 sm:right-3"
             >
-              {showSenha ? 'Ocultar' : 'Ver'}
+              {showSenha ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                  <path
+                    d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.9 5.1A10.4 10.4 0 0112 5c5 0 9.3 3.8 10 9-.3 1.8-1 3.5-2 4.9M6.1 6.1C4.3 7.7 3 9.7 2 12c.7 5.2 5 9 10 9 1.6 0 3.1-.4 4.5-1"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                  <path
+                    d="M2 12s4.5-7 10-7 10 7 10 7-4.5 7-10 7-10-7-10-7z"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6" />
+                </svg>
+              )}
             </button>
           </div>
         </label>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <label className="flex items-center gap-2 text-[11px] font-medium text-[#4b5563] sm:text-[12px]">
+          <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium text-neutral-600 sm:text-[12px]">
             <input
               type="checkbox"
               checked={rememberEmail}
               onChange={(e) => setRememberEmail(e.target.checked)}
-              className="h-3.5 w-3.5 rounded border border-[#d1d5db] accent-[#050505]"
+              className="h-4 w-4 cursor-pointer rounded border-neutral-300 bg-white text-orange-600 accent-orange-500 focus:ring-orange-400/40 focus:ring-offset-0"
             />
             <span>Lembrar e-mail</span>
           </label>
@@ -317,15 +360,15 @@ export default function Login() {
               setForgotEmail(email)
               setForgotPasswordState({ text: '', type: '', link: '' })
             }}
-            className="text-[11px] font-medium text-[#111827] underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/40 sm:text-[12px]"
+            className="cursor-pointer text-[11px] font-medium text-neutral-800 underline-offset-4 hover:text-orange-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/45 sm:text-[12px]"
           >
             Esqueceu a senha?
           </a>
         </div>
 
         {showForgotPassword && (
-          <div className="rounded-[14px] border border-[#eef0f4] bg-[#fafafa] p-3">
-            <p className="mb-2 text-[11px] leading-snug text-[#4b5563]">
+          <div className="rounded-[16px] border border-neutral-200/90 bg-white/70 p-3 backdrop-blur-md">
+            <p className="mb-2 text-[11px] leading-snug text-neutral-600">
               Digite seu e-mail para receber um link seguro de redefinição.
             </p>
             <div className="space-y-2">
@@ -334,7 +377,7 @@ export default function Login() {
                 value={forgotEmail}
                 onChange={(event) => setForgotEmail(event.target.value)}
                 placeholder="seu@email.com"
-                className="w-full rounded-[10px] border border-[#e5e7eb] bg-white px-3 py-2.5 text-[12px] text-[#111827] outline-none placeholder:text-[#a3a3a3] focus-visible:ring-2 focus-visible:ring-accent-gold/40"
+                className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-orange-400/35"
                 autoComplete="email"
                 required
               />
@@ -342,7 +385,7 @@ export default function Login() {
                 type="button"
                 onClick={handleForgotPassword}
                 disabled={requestingReset}
-                className="w-full rounded-[10px] border border-[#111827]/10 bg-white px-3 py-2 text-[11px] font-semibold text-[#111827] transition hover:bg-[#f3f4f6] disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full cursor-pointer rounded-[12px] border border-neutral-200/90 bg-white px-3 py-2 text-[11px] font-semibold text-neutral-900 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {requestingReset ? 'Enviando link...' : 'Enviar link de redefinição'}
               </button>
@@ -352,13 +395,13 @@ export default function Login() {
               <div
                 className={`mt-2 rounded-[10px] border p-2 text-[11px] ${
                   forgotPasswordState.type === 'success'
-                    ? 'border-success/30 bg-success/10 text-success'
-                    : 'border-error/25 bg-error/10 text-error'
+                    ? 'border-success/35 bg-success/10 text-emerald-800'
+                    : 'border-error/35 bg-error/10 text-red-700'
                 }`}
               >
                 <p>{forgotPasswordState.text}</p>
                 {forgotPasswordState.link && (
-                  <a href={forgotPasswordState.link} className="mt-1 inline-block font-medium underline">
+                  <a href={forgotPasswordState.link} className="mt-1 inline-block cursor-pointer font-medium text-orange-700 underline">
                     Abrir link de redefinição
                   </a>
                 )}
@@ -370,7 +413,7 @@ export default function Login() {
         <button
           type="submit"
           disabled={loading || bioLoading}
-          className="min-h-[42px] w-full rounded-[8px] bg-accent-gold px-4 py-3 text-[12px] font-semibold text-bg-primary shadow-gold transition hover:bg-accent-gold-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/40 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[46px] sm:text-[13px]"
+          className="min-h-[46px] w-full cursor-pointer rounded-[14px] bg-gradient-to-r from-orange-500 via-orange-500 to-fuchsia-600 px-4 py-3 text-[13px] font-semibold text-white shadow-[0_12px_36px_-12px_rgba(249,115,22,0.45)] transition hover:brightness-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[48px] sm:text-[14px]"
         >
           {loading ? 'Entrando...' : 'Entrar'}
         </button>
@@ -380,7 +423,7 @@ export default function Login() {
             type="button"
             onClick={handleBiometricLogin}
             disabled={loading || bioLoading}
-            className="min-h-[42px] w-full rounded-[8px] border border-[#e5e7eb] bg-white px-4 py-3 text-[12px] font-medium text-[#111827] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[46px] sm:text-[13px]"
+            className="min-h-[46px] w-full cursor-pointer rounded-[14px] border border-neutral-200/95 bg-white/90 px-4 py-3 text-[12px] font-medium text-neutral-900 backdrop-blur-sm transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[48px] sm:text-[13px]"
           >
             {bioLoading ? 'Abrindo biometria...' : 'Entrar com biometria'}
           </button>
@@ -389,10 +432,10 @@ export default function Login() {
 
       {mensagem.texto && (
         <div
-          className={`mt-4 rounded-[10px] border p-2 text-center text-[11px] ${
+          className={`mt-4 rounded-[12px] border p-3 text-center text-[11px] sm:text-[12px] ${
             mensagem.tipo === 'sucesso'
-              ? 'border-success/30 bg-success/10 text-success'
-              : 'border-error/25 bg-error/10 text-error'
+              ? 'border-success/35 bg-success/10 text-emerald-800'
+              : 'border-error/35 bg-error/10 text-red-700'
           }`}
         >
           {mensagem.texto}

@@ -1,62 +1,95 @@
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 
+/**
+ * Shell full-screen para Login e Cadastro.
+ * Renderizado em document.body (portal) para centralização estável, sem herdar flex/overflow da app shell.
+ */
 export default function AuthPhoneShell({
   title,
   headerTitle,
+  subtitle,
   showBack = false,
   backTo = '/login',
   children,
   footer,
   compact = false,
   showBodyLogo = false,
+  heroImageSrc,
+  heroImageAlt = '',
 }) {
-  return (
-    <div className="fixed inset-0 z-[20] min-h-dvh w-full overflow-y-auto bg-[#f3f4f7] p-0 text-[#0f172a] sm:px-5 sm:py-6 lg:px-8">
-      <div className="mx-auto flex min-h-dvh w-full items-stretch justify-start sm:min-h-[calc(100dvh-48px)] sm:items-center sm:justify-center">
-        <main
-          className={`relative flex min-h-dvh w-full max-w-none flex-col overflow-hidden rounded-none bg-white shadow-none sm:w-[min(92vw,380px)] sm:rounded-[30px] sm:shadow-[0_30px_78px_-36px_rgba(15,23,42,0.58)] md:w-[400px] lg:w-[420px] ${
-            compact ? 'sm:min-h-[560px] lg:min-h-[590px]' : 'sm:min-h-[660px] lg:min-h-[700px]'
-          }`}
-        >
-          <section className="relative h-[220px] shrink-0 overflow-hidden bg-[#000000] sm:h-[170px] lg:h-[184px]">
-            {showBack && (
+  const shell = (
+    <div className="auth-shell-glass fixed inset-0 z-[100] overflow-x-hidden overflow-y-auto overscroll-y-contain bg-white text-neutral-900">
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+        {heroImageSrc ? (
+          <>
+            <img
+              src={heroImageSrc}
+              alt={heroImageAlt}
+              className="absolute inset-0 h-full w-full object-cover object-center"
+              decoding="async"
+            />
+            <div className="absolute inset-0 bg-white/55" />
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-white" />
+            <div className="absolute -left-[18%] top-[12%] h-[min(52vw,280px)] w-[min(52vw,280px)] rounded-full bg-purple-400/25 blur-[72px] sm:h-[300px] sm:w-[300px] sm:blur-[88px]" />
+            <div className="absolute -right-[12%] top-[8%] h-[min(44vw,220px)] w-[min(44vw,220px)] rounded-full bg-orange-400/20 blur-[64px] sm:h-[260px] sm:w-[260px]" />
+            <div className="absolute bottom-[14%] left-[6%] h-[min(48vw,240px)] w-[min(48vw,240px)] rounded-full bg-violet-400/18 blur-[80px] sm:left-[12%]" />
+            <div className="absolute bottom-[22%] right-[4%] h-[180px] w-[180px] rounded-full bg-fuchsia-400/15 blur-[68px] max-sm:right-[-10%]" />
+          </>
+        )}
+      </div>
+
+      <div className="relative z-[1] grid min-h-dvh w-full place-items-center px-4 pb-[max(8rem,calc(24px+env(safe-area-inset-bottom)))] pt-[max(24px,env(safe-area-inset-top))] sm:px-6">
+        <div className="auth-shell-glass-card-reflect w-full max-w-[400px]">
+          <main
+            className={`auth-shell-glass-card w-full rounded-[26px] border border-neutral-200/90 bg-white/40 px-7 py-9 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.14)] backdrop-blur-3xl backdrop-saturate-150 sm:rounded-[28px] sm:px-9 sm:py-10 ${
+              compact ? 'sm:min-h-0' : ''
+            }`}
+          >
+            {showBack ? (
               <Link
                 to={backTo}
-                className="absolute left-4 top-7 z-10 grid h-8 w-8 place-items-center rounded-full text-white/80 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                className="mb-6 inline-grid h-9 w-9 cursor-pointer place-items-center rounded-full text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/60"
                 aria-label="Voltar"
               >
                 ←
               </Link>
-            )}
+            ) : null}
+
+            {showBodyLogo ? (
+              <div className="mb-6 flex justify-center">
+                <div className="grid h-[56px] w-[56px] place-items-center rounded-[16px] border border-neutral-200/80 bg-white/80 shadow-[0_12px_40px_-22px_rgba(15,23,42,0.18)] backdrop-blur-md sm:h-[60px] sm:w-[60px]">
+                  <img src={BRAND_ASSETS.appIconPng} alt="" className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden />
+                </div>
+              </div>
+            ) : null}
+
             {headerTitle ? (
-              <h1 className="relative z-10 pt-12 text-center text-3xl font-medium tracking-[-0.04em] !text-white sm:pt-9 sm:text-[28px] lg:pt-10 lg:text-[30px]">
+              <h1 className="text-center text-[1.65rem] font-semibold tracking-tight text-neutral-900 sm:text-[1.75rem]">
                 {headerTitle}
               </h1>
             ) : (
-              <div className="relative z-10 flex h-full items-center justify-center pb-8">
-                <div className="grid h-[76px] w-[76px] place-items-center rounded-[22px] bg-white shadow-[0_18px_40px_-20px_rgba(255,255,255,0.75)] sm:h-[64px] sm:w-[64px] sm:rounded-[18px]">
-                  <img src={BRAND_ASSETS.appIconPng} alt="Horizonte Financeiro" className="h-12 w-12 sm:h-10 sm:w-10" />
-                </div>
-              </div>
+              <h1 className="text-center text-[1.65rem] font-semibold tracking-tight text-neutral-900 sm:text-[1.75rem]">{title}</h1>
             )}
-          </section>
 
-          <section className="relative -mt-9 flex flex-1 flex-col rounded-tl-[42px] rounded-tr-none bg-white px-9 pb-[max(28px,env(safe-area-inset-bottom))] pt-12 sm:-mt-8 sm:rounded-tl-[36px] sm:px-8 sm:pb-8 sm:pt-10 lg:px-9 lg:pb-9 lg:pt-11">
-            {showBodyLogo ? (
-              <div className="mb-10 flex justify-center sm:mb-10">
-                <div className="grid h-[64px] w-[64px] place-items-center rounded-[18px] bg-white shadow-[0_18px_40px_-24px_rgba(15,23,42,0.45)] ring-1 ring-[#eef0f4] sm:h-[70px] sm:w-[70px] sm:rounded-[20px]">
-                  <img src={BRAND_ASSETS.appIconPng} alt="Horizonte Financeiro" className="h-10 w-10 sm:h-11 sm:w-11" />
-                </div>
-              </div>
-            ) : !headerTitle ? (
-              <h1 className="mb-10 text-center text-[32px] font-medium tracking-[-0.04em] text-[#111827] sm:mb-10 sm:text-[28px]">{title}</h1>
+            {subtitle ? (
+              <p className="mx-auto mt-2 max-w-[280px] text-center text-[13px] leading-snug text-neutral-500 sm:text-[14px]">{subtitle}</p>
             ) : null}
-            {children}
-            {footer ? <div className="mt-8 text-center text-[11px] font-medium text-[#111827] sm:text-[12px]">{footer}</div> : null}
-          </section>
-        </main>
+
+            <div className={headerTitle || title || subtitle || showBodyLogo ? 'mt-8' : ''}>{children}</div>
+
+            {footer ? (
+              <div className="mt-8 text-center text-[12px] font-medium text-neutral-600 sm:text-[13px]">{footer}</div>
+            ) : null}
+          </main>
+        </div>
       </div>
     </div>
   )
+
+  return createPortal(shell, document.body)
 }
