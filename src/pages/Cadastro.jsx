@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { getSupabaseErrorMessage, parseSupabaseResponse, supabaseKey, supabaseUrl } from '../lib/supabase'
+import AuthPasswordToggleButton from '../components/AuthPasswordToggleButton'
 import AuthPhoneShell from '../components/AuthPhoneShell'
+import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
+import { getSupabaseErrorMessage, parseSupabaseResponse, supabaseKey, supabaseUrl } from '../lib/supabase'
 import { showToast } from '../lib/toastStore'
+import { validateEmail } from '../lib/validateEmail'
 
 function formatTelefone(value) {
   const numbers = value.replace(/\D/g, '')
@@ -10,12 +13,6 @@ function formatTelefone(value) {
   if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`
   return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`
 }
-
-function validateEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
-
-
 
 export default function Cadastro() {
   const navigate = useNavigate()
@@ -88,8 +85,8 @@ export default function Cadastro() {
       }
 
       showToast('Conta criada com sucesso!', 'success')
-
-      setTimeout(() => {
+      setLoading(false)
+      window.setTimeout(() => {
         navigate('/login')
       }, 1500)
     } catch {
@@ -98,13 +95,9 @@ export default function Cadastro() {
     }
   }
 
-  const inputGlass =
-    'w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-400 focus:border-emerald-500/65 focus:bg-white focus-visible:ring-2 focus-visible:ring-emerald-400/35 sm:min-h-[46px] sm:px-4 sm:text-[13px]'
-
   return (
     <AuthPhoneShell
       title="Criar conta"
-      headerTitle="Criar conta"
       subtitle="Preencha seus dados para começar."
       compact={step === 1}
       footer={
@@ -145,7 +138,7 @@ export default function Cadastro() {
                 placeholder="Seu nome completo"
                 required
                 autoComplete="name"
-                className={inputGlass}
+                className={AUTH_SHELL_INPUT_CLASS}
               />
               {errors.nome && <p className="mt-1 text-[10px] text-red-600">{errors.nome}</p>}
             </label>
@@ -161,7 +154,7 @@ export default function Cadastro() {
                 required
                 maxLength={15}
                 autoComplete="tel"
-                className={inputGlass}
+                className={AUTH_SHELL_INPUT_CLASS}
               />
               {errors.telefone && <p className="mt-1 text-[10px] text-red-600">{errors.telefone}</p>}
             </label>
@@ -188,7 +181,7 @@ export default function Cadastro() {
                 placeholder="seu@email.com"
                 required
                 autoComplete="email"
-                className={inputGlass}
+                className={AUTH_SHELL_INPUT_CLASS}
               />
               {errors.email && <p className="mt-1 text-[10px] text-red-600">{errors.email}</p>}
             </label>
@@ -204,35 +197,9 @@ export default function Cadastro() {
                   placeholder="••••••••"
                   required
                   autoComplete="new-password"
-                  className={`${inputGlass} pr-11 sm:pr-12`}
+                  className={`${AUTH_SHELL_INPUT_CLASS} pr-11 placeholder:text-neutral-300 sm:pr-12`}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowSenha(!showSenha)}
-                  aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/45 sm:right-3"
-                >
-                  {showSenha ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                      <path
-                        d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.9 5.1A10.4 10.4 0 0112 5c5 0 9.3 3.8 10 9-.3 1.8-1 3.5-2 4.9M6.1 6.1C4.3 7.7 3 9.7 2 12c.7 5.2 5 9 10 9 1.6 0 3.1-.4 4.5-1"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                      <path
-                        d="M2 12s4.5-7 10-7 10 7 10 7-4.5 7-10 7-10-7-10-7z"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                      />
-                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6" />
-                    </svg>
-                  )}
-                </button>
+                <AuthPasswordToggleButton passwordVisible={showSenha} onToggle={() => setShowSenha((v) => !v)} />
               </div>
               {errors.senha && <p className="mt-1 text-[10px] text-red-600">{errors.senha}</p>}
             </label>
@@ -248,35 +215,14 @@ export default function Cadastro() {
                   placeholder="••••••••"
                   required
                   autoComplete="new-password"
-                  className={`${inputGlass} pr-11 sm:pr-12`}
+                  className={`${AUTH_SHELL_INPUT_CLASS} pr-11 placeholder:text-neutral-300 sm:pr-12`}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmarSenha(!showConfirmarSenha)}
-                  aria-label={showConfirmarSenha ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/45 sm:right-3"
-                >
-                  {showConfirmarSenha ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                      <path
-                        d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.9 5.1A10.4 10.4 0 0112 5c5 0 9.3 3.8 10 9-.3 1.8-1 3.5-2 4.9M6.1 6.1C4.3 7.7 3 9.7 2 12c.7 5.2 5 9 10 9 1.6 0 3.1-.4 4.5-1"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                      <path
-                        d="M2 12s4.5-7 10-7 10 7 10 7-4.5 7-10 7-10-7-10-7z"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                      />
-                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6" />
-                    </svg>
-                  )}
-                </button>
+                <AuthPasswordToggleButton
+                  passwordVisible={showConfirmarSenha}
+                  onToggle={() => setShowConfirmarSenha((v) => !v)}
+                  ariaLabelShow="Mostrar confirmação de senha"
+                  ariaLabelHide="Ocultar confirmação de senha"
+                />
               </div>
               {errors.confirmarSenha && <p className="mt-1 text-[10px] text-red-600">{errors.confirmarSenha}</p>}
             </label>

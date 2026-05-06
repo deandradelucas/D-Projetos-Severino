@@ -16,9 +16,19 @@ export default function AuthPhoneShell({
   footer,
   compact = false,
   showBodyLogo = false,
+  /** Se definido com `showBodyLogo`, exibe imagem larga (wordmark); senão mantém ícone quadrado. */
+  bodyLogoSrc,
+  bodyLogoAlt = '',
   heroImageSrc,
   heroImageAlt = '',
+  /** Se definido, não mostra o `<h1>` visível (ex.: login só com logo); mantém título para leitores de ecrã. */
+  visuallyHiddenTitle,
 }) {
+  const srTitle = typeof visuallyHiddenTitle === 'string' ? visuallyHiddenTitle.trim() : ''
+  const hasVisibleHeading = !srTitle && Boolean(headerTitle || title)
+  const hasHeadingBlock = srTitle || headerTitle || title
+  const logoTopClass = hasVisibleHeading ? 'mt-3 sm:mt-4' : 'mt-0 sm:mt-1'
+
   const shell = (
     <div
       className={`auth-shell-glass fixed inset-0 z-[100] flex flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain text-neutral-900 lg:min-h-0 lg:flex-row ${heroImageSrc ? 'auth-shell-glass--hero' : 'auth-shell-glass--blobs'}`}
@@ -76,27 +86,44 @@ export default function AuthPhoneShell({
               </Link>
             ) : null}
 
-            {showBodyLogo ? (
-              <div className="mb-6 flex justify-center">
-                <div className="grid h-[56px] w-[56px] place-items-center rounded-[16px] border border-neutral-200/80 bg-white/80 shadow-[0_12px_40px_-22px_rgba(15,23,42,0.18)] backdrop-blur-md sm:h-[60px] sm:w-[60px]">
-                  <img src={BRAND_ASSETS.appIconPng} alt="" className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden />
-                </div>
-              </div>
-            ) : null}
-
-            {headerTitle ? (
+            {srTitle ? <h1 className="sr-only">{srTitle}</h1> : null}
+            {!srTitle && headerTitle ? (
               <h1 className="text-center text-[1.65rem] font-semibold tracking-tight text-neutral-900 sm:text-[1.75rem]">
                 {headerTitle}
               </h1>
-            ) : (
+            ) : null}
+            {!srTitle && !headerTitle && title ? (
               <h1 className="text-center text-[1.65rem] font-semibold tracking-tight text-neutral-900 sm:text-[1.75rem]">{title}</h1>
-            )}
-
-            {subtitle ? (
-              <p className="mx-auto mt-2 max-w-[280px] text-center text-[13px] leading-snug text-neutral-500 sm:text-[14px]">{subtitle}</p>
             ) : null}
 
-            <div className={headerTitle || title || subtitle || showBodyLogo ? 'mt-8' : ''}>{children}</div>
+            {showBodyLogo ? (
+              <div className={`flex justify-center ${logoTopClass}`}>
+                {bodyLogoSrc ? (
+                  <div className="flex w-full max-w-[min(420px,96vw)] items-center justify-center sm:max-w-[min(440px,98vw)]">
+                    <img
+                      src={bodyLogoSrc}
+                      alt={bodyLogoAlt || 'Logo'}
+                      className="h-auto max-h-[7rem] w-auto max-w-full object-contain object-center sm:max-h-[9rem] lg:max-h-[10.5rem]"
+                      decoding="async"
+                    />
+                  </div>
+                ) : (
+                  <div className="grid h-[56px] w-[56px] place-items-center rounded-[16px] border border-neutral-200/80 bg-white/80 shadow-[0_12px_40px_-22px_rgba(15,23,42,0.18)] backdrop-blur-md sm:h-[60px] sm:w-[60px]">
+                    <img src={BRAND_ASSETS.appIconPng} alt="" className="h-9 w-9 sm:h-10 sm:w-10" aria-hidden />
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {subtitle ? (
+              <p
+                className={`mx-auto max-w-[280px] text-center text-[13px] leading-snug text-neutral-500 sm:text-[14px] ${showBodyLogo ? 'mt-3' : 'mt-2'}`}
+              >
+                {subtitle}
+              </p>
+            ) : null}
+
+            <div className={hasHeadingBlock || subtitle || showBodyLogo ? 'mt-8' : ''}>{children}</div>
 
             {footer ? (
               <div className="mt-8 text-center text-[12px] font-medium text-neutral-600 sm:text-[13px]">{footer}</div>
