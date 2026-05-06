@@ -6,11 +6,10 @@ import {
   criarAgendaEvento,
   deletarAgendaEvento,
   listarAgendaEventos,
-  listarEMarcarLembretesPendentes,
 } from '../lib/domain/agenda.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { isUuidString } from '../lib/transacao-validate.mjs'
-import { assertAgendaReminderSecret, assertAgendaCronSecret } from '../lib/http/agenda-route-auth.mjs'
+import { assertAgendaCronSecret } from '../lib/http/agenda-route-auth.mjs'
 import { processAgendaReminderCron } from '../lib/domain/agenda-reminder-cron.mjs'
 
 export function registerAgendaRoutes(app) {
@@ -131,28 +130,6 @@ export function registerAgendaRoutes(app) {
     } catch (error) {
       log.error('remover agenda', error)
       return c.json({ message: error.message || 'Erro ao remover compromisso.' }, 500)
-    }
-  })
-
-  app.post('/api/agenda/lembretes/pendentes', async (c) => {
-    const auth = assertAgendaReminderSecret(c)
-    if (!auth.ok) return c.json({ message: auth.message }, auth.status)
-
-    try {
-      let body = {}
-      try {
-        body = await c.req.json()
-      } catch {
-        body = {}
-      }
-      const result = await listarEMarcarLembretesPendentes({
-        limit: body?.limit,
-        janelaMinutos: body?.janelaMinutos,
-      })
-      return c.json(result)
-    } catch (error) {
-      log.error('agenda lembretes pendentes', error)
-      return c.json({ message: error.message || 'Erro ao buscar lembretes.' }, 500)
     }
   })
 
