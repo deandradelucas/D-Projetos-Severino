@@ -8,9 +8,9 @@
 ## Variáveis necessárias no n8n
 
 - `HORIZONTE_API_URL`: URL pública do app, sem barra final.
-- `CRON_SECRET`: opcional; para o fluxo de lembretes o n8n também pode usar `AGENDA_REMINDER_SECRET` ou `WHATSAPP_BOT_SECRET`.
+- `CRON_SECRET`: opcional; `GET /api/cron/agenda-lembretes` também aceita `AGENDA_REMINDER_SECRET` ou `WHATSAPP_BOT_SECRET` no header (ver `assertAgendaCronSecret` no servidor).
 - `WHATSAPP_BOT_SECRET`: segredo já usado pelo bot inbound.
-- `AGENDA_REMINDER_SECRET`: opcional para o endpoint legado `/api/agenda/lembretes/pendentes`; se não existir, a API aceita `WHATSAPP_BOT_SECRET`.
+- `AGENDA_REMINDER_SECRET`: opcional; pode ser enviado no lugar de `CRON_SECRET` para autenticar o cron de lembretes.
 - `EVOLUTION_API_URL`: URL base da Evolution API.
 - `EVOLUTION_INSTANCE`: nome da instância conectada ao WhatsApp.
 - `EVOLUTION_API_KEY`: chave da Evolution API.
