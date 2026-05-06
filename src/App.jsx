@@ -21,6 +21,7 @@ import {
   AdminUsuarios,
   AdminPagamentos,
   AdminAuditoria,
+  AdminMarketing,
   Pagamento,
   BemVindoAssinatura,
 } from './lazyRoutes'
@@ -59,6 +60,7 @@ function App() {
                   <Route path="/admin/usuarios" element={<AdminUsuarios />} />
                   <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
                   <Route path="/admin/auditoria" element={<AdminAuditoria />} />
+                  <Route path="/admin/marketing" element={<AdminMarketing />} />
                 </Route>
                 <Route path="/" element={<Login />} />
               </Routes>

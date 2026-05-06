@@ -28,7 +28,10 @@
       "Bash(echo \"PID: $!\")",
       "Bash(python3 -c \"import sys,json; print\\('Servidor OK' if json.load\\(sys.stdin\\).get\\('ok'\\) else 'FAIL'\\)\")",
       "Bash(grep -E \"\\\\.\\(css|config|json\\)$\")",
-      "Bash(grep -E \"\\\\.jsx$\")"
+      "Bash(grep -E \"\\\\.jsx$\")",
+      "Bash(node --input-type=module --eval \"import './marketing-stats.mjs'\")",
+      "Bash(node --check server/lib/marketing-stats.mjs)",
+      "Bash(node --check server/routes/register-admin.mjs)"
     ]
   }
 }
