@@ -117,7 +117,7 @@ export default function BemVindoAssinatura() {
           <img src={BRAND_ASSETS.logo} alt="" className="h-12 w-auto object-contain" />
         </div>
         <h1 className="text-xl sm:text-2xl font-bold text-center mb-2" style={{ color: 'var(--text-primary)' }}>
-          Bem-vindo ao Horizonte Financeiro
+          Bem-vindo ao Severino
         </h1>
         <p className="text-center text-sm sm:text-base mb-6" style={{ color: 'var(--text-secondary)' }}>
           Você está em um <strong style={{ color: 'var(--text-primary)' }}>teste gratuito de {dias} dias</strong> com acesso

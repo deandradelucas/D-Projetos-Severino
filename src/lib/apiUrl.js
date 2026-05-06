@@ -1,11 +1,10 @@
 /**
  * Monta a URL da API.
- * - Sem `VITE_API_URL`: em dev usa `/api` (proxy Vite). Em produção no front Severino
- *   (`severino.mestredamente.com` ou `www.severino.mestredamente.com`), usa API em
- *   `https://mestredamente.com` (ou `VITE_SEVERINO_API_ORIGIN`).
- * - **Hostinger:** não defina `VITE_API_URL` como o URL do próprio Severino — isso fazia o
- *   cliente usar `/api` no site estático e receber HTML (erro “resposta inválida”). Esse caso
- *   é ignorado e volta-se ao apex da API.
+ * - Dev: `/api` (proxy Vite).
+ * - Produção em `severino.mestredamente.com`: **obrigatório** URL absoluto da API Node no build:
+ *   `VITE_SEVERINO_API_ORIGIN` ou `VITE_API_URL` (ex.: deploy Vercel `https://*.vercel.app`).
+ *   O apex `mestredamente.com` **não** expõe `/api` (404); não há fallback mágico.
+ * - **Hostinger:** não uses `VITE_API_URL` igual ao URL do próprio Severino (só estático).
  * - **Vercel + domínio:** com `VITE_API_URL` explícito e origem ≠ API, sem `VITE_API_ABSOLUTE`,
  *   usa `/api` relativo (rewrites). Esse atalho **não** se aplica no host Severino.
  */
@@ -25,11 +24,11 @@ export function apiUrl(path) {
   let envBase =
     raw === undefined || raw === null ? '' : String(raw).trim().replace(/\/$/, '')
 
-  const severinoApiRaw = import.meta.env.VITE_SEVERINO_API_ORIGIN
+  const severinoApiRaw = import.meta.env.VITE_SEVERINO_API_ORIGIN || import.meta.env.VITE_API_URL
   const defaultSeverinoApi = stripTrailingSlash(
     severinoApiRaw != null && String(severinoApiRaw).trim()
       ? String(severinoApiRaw).trim().replace(/\/$/, '')
-      : 'https://mestredamente.com',
+      : '',
   )
 
   let inferredBase = ''
@@ -40,6 +39,16 @@ export function apiUrl(path) {
     isSeverinoFrontendHost(window.location.hostname)
   ) {
     inferredBase = defaultSeverinoApi
+    if (inferredBase && window.location?.origin) {
+      try {
+        const normalized = /^https?:\/\//i.test(inferredBase) ? inferredBase : `https://${inferredBase}`
+        if (new URL(normalized).origin === window.location.origin) {
+          inferredBase = ''
+        }
+      } catch {
+        /* mantém */
+      }
+    }
   }
 
   // Env apontando para o próprio front Severino (só estático) — tratar como não definido
@@ -91,4 +100,11 @@ export function apiUrl(path) {
   }
 
   return base ? `${base}${p}` : p
+}
+
+/** Produção Severino sem URL da API no bundle → pedidos caem em `/api` estático (não funciona). */
+export function severinoProdApiMisconfigured() {
+  if (!import.meta.env.PROD || typeof window === 'undefined') return false
+  if (!isSeverinoFrontendHost(window.location.hostname)) return false
+  return apiUrl('/api/health').startsWith('/')
 }

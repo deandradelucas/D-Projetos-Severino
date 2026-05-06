@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthPasswordToggleButton from '../components/AuthPasswordToggleButton'
 import AuthPhoneShell from '../components/AuthPhoneShell'
-import { apiUrl } from '../lib/apiUrl'
+import { apiUrl, severinoProdApiMisconfigured } from '../lib/apiUrl'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { prefetchRoute } from '../lazyRoutes'
 import { showToast } from '../lib/toastStore'
@@ -246,11 +246,22 @@ export default function Login() {
       const u = data.user || {}
       navigateAfterLogin(u)
     } catch (err) {
-      const net =
-        err instanceof TypeError && String(err?.message || '').toLowerCase().includes('fetch')
-          ? 'Sem conexão com o servidor. Verifique a internet e se a API está acessível neste endereço.'
-          : 'Erro ao conectar com o servidor.'
-      setFormError(net)
+      const endpoint = apiUrl('/api/auth/login')
+      const detail = err instanceof Error ? err.message : String(err)
+      const fetchLike =
+        err instanceof TypeError &&
+        String(detail || '')
+          .toLowerCase()
+          .match(/fetch|network|failed|load/i)
+      const sslHint =
+        typeof window !== 'undefined' && window.location.protocol === 'http:'
+          ? ' Force HTTPS no domínio do Severino (SSL na Hostinger); em HTTP o navegador pode bloquear o pedido à API.'
+          : ''
+      setFormError(
+        fetchLike
+          ? `Não foi possível contactar a API (${endpoint}). Verifique CORS no servidor da API, se o URL está certo e a ligação.${sslHint} Detalhe: ${detail}`
+          : `Erro ao ligar ao servidor (${endpoint}): ${detail}`,
+      )
       setLoading(false)
     }
   }
@@ -295,7 +306,7 @@ export default function Login() {
       visuallyHiddenTitle="Login"
       showBodyLogo
       bodyLogoSrc={BRAND_ASSETS.loginSeverinoLight}
-      bodyLogoAlt="Horizonte Financeiro"
+      bodyLogoAlt="Severino"
       heroImageSrc="/images/Login/01.avif"
       compact={!showRecovery && !(webAuthnSupported() && hasWebAuthn)}
       footer={
@@ -310,6 +321,23 @@ export default function Login() {
         </>
       }
     >
+      {severinoProdApiMisconfigured() ? (
+        <div
+          className="mb-4 rounded-lg border border-amber-400/80 bg-amber-50 px-3 py-2.5 text-[11px] leading-snug text-amber-950 sm:text-[12px]"
+          role="alert"
+        >
+          <strong className="font-semibold">API não configurada no build.</strong> O site Severino na
+          Hostinger é só o front: é preciso publicar a API Node (ex.: Vercel) e definir no painel da
+          Hostinger, nas variáveis do projeto,{' '}
+          <code className="rounded bg-amber-100/90 px-1 font-mono text-[10px] sm:text-[11px]">
+            VITE_SEVERINO_API_ORIGIN
+          </code>{' '}
+          com o URL da API (termina em <span className="font-mono">.vercel.app</span> ou o domínio onde{' '}
+          <span className="font-mono">/api/health</span> devolve JSON). Depois, novo deploy. O apex{' '}
+          <span className="font-mono">mestredamente.com</span> não expõe <span className="font-mono">/api</span>{' '}
+          neste momento.
+        </div>
+      ) : null}
       <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" noValidate>
         <label className="block" htmlFor="email">
           <span className="mb-2 block text-[11px] font-medium text-neutral-700 sm:text-[12px]">E-mail</span>

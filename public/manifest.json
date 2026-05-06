@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Horizonte Financeiro",
-  "short_name": "Horizonte",
+  "name": "Severino",
+  "short_name": "Severino",
   "description": "Controle suas finanças, registre transações e acompanhe seu saldo pelo celular.",
   "lang": "pt-BR",
   "start_url": "/dashboard",

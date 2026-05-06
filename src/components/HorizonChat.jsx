@@ -160,7 +160,7 @@ export default function HorizonChat() {
     {
       id: 1,
       role: 'model',
-      text: 'Olá! Sou o **Horizon**, seu assistente financeiro pessoal. 👋\n\nPosso ajudar você a entender seus gastos, analisar seu saldo, identificar padrões e dar dicas financeiras. Como posso te ajudar hoje?',
+      text: 'Olá! Sou o **Severino**, seu assistente financeiro pessoal. 👋\n\nPosso ajudar você a entender seus gastos, analisar seu saldo, identificar padrões e dar dicas financeiras. Como posso te ajudar hoje?',
       ts: new Date()
     }
   ])
@@ -192,7 +192,7 @@ export default function HorizonChat() {
     setCarregando(true)
 
     if (!usuarioId) {
-      setErro('Faça login novamente para o Horizon acessar seus dados.')
+      setErro('Faça login novamente para o Severino acessar seus dados.')
       setCarregando(false)
       return
     }
@@ -258,8 +258,8 @@ export default function HorizonChat() {
         className={`horizon-chat-fab ${aberto ? 'chat-fab-active' : ''} ${shellDock ? 'horizon-chat-fab--shell-dock' : ''}`}
         style={shellDock?.fabStyle}
         onClick={() => setAberto(v => !v)}
-        title="Horizon IA"
-        aria-label="Abrir Horizon IA"
+        title="Severino IA"
+        aria-label="Abrir Severino IA"
       >
         {aberto ? (
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -295,7 +295,7 @@ export default function HorizonChat() {
               <img src={BRAND_ASSETS.appIcon} alt="" width={28} height={28} decoding="async" />
             </div>
             <div>
-              <div className="horizon-chat-name">Horizon IA</div>
+              <div className="horizon-chat-name">Severino IA</div>
               <div className="horizon-chat-status">
                 <span className="horizon-status-dot" />
                 Finanças e agenda · Gemini
@@ -391,7 +391,7 @@ export default function HorizonChat() {
             rows={1}
             disabled={carregando}
             id="horizon-chat-input"
-            aria-label="Mensagem para o Horizon"
+            aria-label="Mensagem para o Severino"
           />
           <button
             type="button"

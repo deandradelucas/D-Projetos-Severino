@@ -2,7 +2,7 @@
  * Modelo e cópias da página Pagamento — alinhado ao payload de /api/assinatura/status e linhas de pagamentos_mercadopago.
  */
 
-export const PLANO_PADRAO_TITULO = 'Assinatura mensal Horizonte Financeiro'
+export const PLANO_PADRAO_TITULO = 'Assinatura mensal Severino'
 export const PROVEDOR_PAGAMENTO_LABEL = 'Mercado Pago'
 
 /** @typedef {{ id: string, status?: string|null, status_detail?: string|null, amount?: number|null, description?: string|null, external_reference?: string|null, preference_id?: string|null, preapproval_id?: string|null, payment_id?: string|null, created_at?: string|null }} PagamentoHistoricoRow */
