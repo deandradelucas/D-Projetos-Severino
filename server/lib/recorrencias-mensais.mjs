@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from './supabase-admin.mjs'
 
 const TZ = 'America/Sao_Paulo'
 
-export function monthKeyBrazil(isoOrDate) {
+function monthKeyBrazil(isoOrDate) {
   const d =
     typeof isoOrDate === 'string' || isoOrDate instanceof Date
       ? new Date(isoOrDate)
@@ -19,7 +19,7 @@ export function monthKeyBrazil(isoOrDate) {
   return `${y}-${m}`
 }
 
-export function brazilCalendarFromDate(d = new Date()) {
+function brazilCalendarFromDate(d = new Date()) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: TZ,
     year: 'numeric',
@@ -48,7 +48,7 @@ function compareMonthKeys(a, b) {
 }
 
 /** Dia 1 do mês YYYY-MM, ~09:00 America/Sao_Paulo → 12:00 UTC (offset fixo -3). */
-export function primeiroDiaMesMidMorningIso(ym) {
+function primeiroDiaMesMidMorningIso(ym) {
   const [y, m] = ym.split('-').map(Number)
   return new Date(Date.UTC(y, m - 1, 1, 12, 0, 0)).toISOString()
 }
