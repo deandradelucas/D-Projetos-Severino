@@ -93,7 +93,7 @@
   }
 
   .mobile-bottom-nav__item:focus-visible {
-    outline-color: var(--danger, #ef4444);
+    outline-color: var(--accent, #d4a84b);
   }
 }
 
