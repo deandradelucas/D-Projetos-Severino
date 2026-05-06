@@ -1,6 +1,9 @@
 export const BRAND_ASSETS = {
   /** Wordmark Severino — login e superfícies claras (`public/images/Nova Logo/`) */
   loginSeverinoLight: '/images/Nova Logo/Severino Tema Claro.png',
+  /** Menu lateral — Severino por tema (PNG; no Sidebar o fallback SVG segue Horizonte se o raster falhar) */
+  sidebarLogoLightPng: '/images/Nova Logo/Severino Tema Claro.png',
+  sidebarLogoDarkPng: '/images/Nova Logo/Severino Logo PWA Tema Escuro.png',
   /** Alias usado em telas como BemVindoAssinatura */
   logo: '/images/horizonte_fiel_original_logo_dark.svg',
   logoOnDark: '/images/horizonte_fiel_original_logo_dark.svg',

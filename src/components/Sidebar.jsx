@@ -120,7 +120,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   }, [menuAberto])
 
   const svgSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
-  const pngSrc = theme === 'light' ? BRAND_ASSETS.logoOnLightPng : BRAND_ASSETS.logoOnDarkPng
+  const pngSrc = theme === 'light' ? BRAND_ASSETS.sidebarLogoLightPng : BRAND_ASSETS.sidebarLogoDarkPng
   const [logoSrc, setLogoSrc] = useState(pngSrc)
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           <img
             key={logoSrc}
             src={logoSrc}
-            alt="Horizonte Financeiro"
+            alt="Severino"
             className="brand-logo"
             width={1600}
             height={360}
@@ -158,7 +158,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             onError={() => setLogoSrc(svgSrc)}
           />
           <span className="brand-wordmark" aria-hidden>
-            HORIZONTE
+            SEVERINO
           </span>
           <button
             ref={closeButtonRef}
