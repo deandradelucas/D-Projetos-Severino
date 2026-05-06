@@ -613,6 +613,11 @@ body[data-theme='dark'] {
   --content-border-color: rgba(255, 255, 255, 0.08);
 }
 
+/* PNG de categoria não herda `color`; tintura ~ --danger neo (#ff4d67), como a borda do quadrado. */
+body[data-theme='dark'] .ref-tx-arrow-wrap--down img {
+  filter: brightness(0) saturate(100%) invert(52%) sepia(94%) saturate(3844%) hue-rotate(319deg) brightness(103%) contrast(101%);
+}
+
 body[data-theme='dark'],
 html:has(body[data-theme='dark']) {
   background-color: #000000;
@@ -629,10 +634,8 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .re
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .main-content,
 body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .main-content {
-  background:
-    radial-gradient(circle at 84% 8%, rgba(139, 92, 246, 0.1), transparent 32%),
-    radial-gradient(circle at 18% 88%, rgba(0, 183, 255, 0.06), transparent 28%),
-    linear-gradient(180deg, #050506 0%, #000000 100%);
+  background: #000000;
+  background-image: none;
   color: #ffffff;
 }
 
@@ -865,8 +868,7 @@ body[data-theme='dark'] .horizon-msg-model .horizon-msg-bubble {
   color: rgba(255, 255, 255, 0.9);
 }
 
-body[data-theme='dark'] .horizon-chat-fab,
-body[data-theme='dark'] .mobile-bottom-nav__bar {
+body[data-theme='dark'] .horizon-chat-fab {
   background:
     radial-gradient(circle at 82% 0%, rgba(139, 92, 246, 0.2), transparent 32%),
     linear-gradient(145deg, rgba(20, 20, 24, 0.94) 0%, rgba(5, 5, 6, 0.92) 100%);
@@ -877,21 +879,75 @@ body[data-theme='dark'] .mobile-bottom-nav__bar {
     0 24px 54px -30px rgba(0, 0, 0, 0.88);
 }
 
+/* Menu inferior mobile: vidro + borda neon (--danger neo #ff4d67), alinhado aos quadrados de despesa */
+body[data-theme='dark'] .mobile-bottom-nav__bar {
+  background:
+    linear-gradient(175deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(8, 8, 10, 0.78) 100%),
+    rgba(4, 4, 6, 0.68);
+  border: 1px solid color-mix(in srgb, var(--danger, #ff4d67) 44%, transparent);
+  color: #ffffff;
+  -webkit-backdrop-filter: blur(18px) saturate(1.22);
+  backdrop-filter: blur(18px) saturate(1.22);
+  box-shadow:
+    0 0 32px -10px color-mix(in srgb, var(--danger, #ff4d67) 38%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 22px 52px -28px rgba(0, 0, 0, 0.88);
+}
+
 body[data-theme='dark'] .mobile-bottom-nav__item {
-  color: rgba(255, 255, 255, 0.58);
+  color: rgba(255, 255, 255, 0.62);
 }
 
 body[data-theme='dark'] .mobile-bottom-nav__item--active {
-  color: #0a0a0a;
+  color: #ffffff;
   background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.42), transparent 48%),
-    linear-gradient(180deg, #efd184 0%, var(--accent, #d4a84b) 100%);
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--danger, #ff4d67) 26%, transparent) 0%,
+      color-mix(in srgb, var(--danger, #ff4d67) 11%, transparent) 100%
+    );
+  border: 1px solid color-mix(in srgb, var(--danger, #ff4d67) 48%, transparent);
   box-shadow:
-    0 10px 24px -14px rgba(212, 168, 75, 0.86),
-    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+    0 8px 26px -12px color-mix(in srgb, var(--danger, #ff4d67) 58%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--danger, #ff4d67) 32%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.18);
+  backdrop-filter: blur(14px) saturate(1.18);
 }
 
-body[data-theme='dark'] .dashboard-mobile-tx-fab,
+body[data-theme='dark'] .dashboard-mobile-tx-fab {
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  background:
+    linear-gradient(
+      175deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.07) 44%,
+      rgba(255, 255, 255, 0.16) 52%,
+      rgba(255, 255, 255, 0.1) 100%
+    ) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.25) !important;
+  backdrop-filter: blur(22px) saturate(1.25) !important;
+  box-shadow:
+    0 22px 48px -24px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body[data-theme='dark'] .dashboard-mobile-tx-fab__icon {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(248, 250, 252, 0.82) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+body[data-theme='dark'] .dashboard-mobile-tx-fab__label {
+  background: linear-gradient(185deg, #6ee7b7 0%, #34d399 38%, #059669 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+}
+
 body[data-theme='dark'] .chat-fab-active {
   background: linear-gradient(135deg, #8b5cf6 0%, #ff4fb8 52%, #ffc83d 100%) !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
@@ -901,17 +957,21 @@ body[data-theme='dark'] .chat-fab-active {
     0 18px 44px -22px rgba(139, 92, 246, 0.9) !important;
 }
 
-/* Dashboard black: fundo totalmente preto. */
-body[data-theme='dark']:has(.dashboard-container.dashboard-page) .app-background-root__plain-fill {
+/* Shell ref-dashboard: fundo totalmente preto (Configurações, Transações, etc.). */
+body[data-theme='dark']:has(.dashboard-container.ref-dashboard.app-horizon-shell) .app-background-root__plain-fill {
+  background: #000000 !important;
+  background-image: none !important;
+}
+
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .main-content,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
   background: #000000 !important;
   background-image: none !important;
 }
 
 body[data-theme='dark'] .dashboard-container.dashboard-page,
-body[data-theme='dark'] .dashboard-container.dashboard-page.app-horizon-shell,
-body[data-theme='dark'] .dashboard-container.dashboard-page.app-horizon-shell .main-content,
-body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
-body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+body[data-theme='dark'] .dashboard-container.dashboard-page.app-horizon-shell {
   background: #000000 !important;
   background-image: none !important;
 }

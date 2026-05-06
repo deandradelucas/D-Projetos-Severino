@@ -68,31 +68,185 @@ export function getTransacaoCategoriaIconKey(categoriaNome, subcategoriaNome) {
     test([/tarifa bancaria|saque|transferencia entre contas|pix.*taxa/, /\bbanco\b/], 'bank') ||
     null
 
-  return resolved || byCat || null
+  const key = resolved || byCat || null
+  /* PNG único para toda a categoria Transporte (inclui combustível). */
+  if (c === 'transporte') return 'transportePng'
+  if (c === 'compras e varejo') return 'comprasVarejoPng'
+  if (c === 'alimentacao') return 'alimentacaoPng'
+  if (c === 'cuidados pessoais') return 'cuidadosPessoaisPng'
+  if (c === 'despesas financeiras') return 'despesasFinanceirasPng'
+  if (c === 'doacoes e presentes') return 'doacoesPresentesPng'
+  if (c === 'documentacao e impostos') return 'documentacaoImpostosPng'
+  if (c === 'educacao') return 'educacaoPng'
+  if (c === 'investimentos e patrimonio') return 'investimentosPatrimonioPng'
+  /* Ficheiro «Entreterimento»; aceita também a grafia correta «entretenimento». */
+  if (c === 'lazer e entreterimento' || c === 'lazer e entretenimento') return 'lazerEntreterimentoPng'
+  if (c === 'moradia') return 'moradiaPng'
+  if (c === 'pets e dependentes') return 'petsDependentesPng'
+  if (c === 'saude') return 'saudePng'
+  if (c === 'servicos e assinaturas') return 'servicosAssinaturasPng'
+  if (c === 'tecnologia e gadgets') return 'tecnologiaGadgetsPng'
+  if (c === 'trabalho e negocios') return 'trabalhoNegociosPng'
+  if (c === 'viagens' || c === 'viagem') return 'viagensPng'
+  return key
 }
 
-/** Referência: ícone SVG ↔ categorias / palavras-chave reconhecidas */
+/** Ícone raster para transações na categoria Transporte (mobilidade). */
+export const TRANSPORTE_CATEGORIA_ICON_SRC = '/images/icons/Transportes.png'
+
+/** Ícone raster para a categoria «Compras e Varejo» (nome do ficheiro com espaços). */
+export const COMPRAS_E_VAREJO_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Compras e Varejo.png')
+
+/** Ícone raster para a categoria «Alimentação». */
+export const ALIMENTACAO_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Alimentação.png')
+
+/** Ícone raster para a categoria «Cuidados Pessoais». */
+export const CUIDADOS_PESSOAIS_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Cuidados Pessoais.png')
+
+/** Ícone raster para a categoria «Despesas Financeiras». */
+export const DESPESAS_FINANCEIRAS_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Despesas Financeiras.png')
+
+/** Ícone raster para a categoria «Doações e Presentes». */
+export const DOACOES_E_PRESENTES_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Doações e Presentes.png')
+
+/** Ícone raster para a categoria «Documentação e Impostos». */
+export const DOCUMENTACAO_E_IMPOSTOS_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Documentação e Impostos.png')
+
+/** Ícone raster para a categoria «Educação». */
+export const EDUCACAO_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Educação.png')
+
+/** Ícone raster para a categoria «Investimentos e Patrimônio». */
+export const INVESTIMENTOS_E_PATRIMONIO_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Investimentos e Patrimônio.png')
+
+/** Ícone raster — nome do ficheiro usa «Entreterimento». */
+export const LAZER_E_ENTRETERIMENTO_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Lazer e Entreterimento.png')
+
+/** Ícone raster para a categoria «Moradia». */
+export const MORADIA_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Moradia.png')
+
+/** Ícone raster para a categoria «Pets e Dependentes». */
+export const PETS_E_DEPENDENTES_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Pets e Dependentes.png')
+
+/** Ícone raster para a categoria «Saúde». */
+export const SAUDE_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Saúde.png')
+
+/** Ícone raster para a categoria «Serviços e Assinaturas». */
+export const SERVICOS_E_ASSINATURAS_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Serviços e Assinaturas.png')
+
+/** Ícone raster para a categoria «Tecnologia e Gadgets». */
+export const TECNOLOGIA_E_GADGETS_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Tecnologia e Gadgets.png')
+
+/** Ícone raster para a categoria «Trabalho e Negócios». */
+export const TRABALHO_E_NEGOCIOS_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Trabalho e Negócios.png')
+
+/** Ícone raster para a categoria «Viagens» (também «Viagem» no `byCat`). */
+export const VIAGENS_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Viagens.png')
+
+/** Chaves que renderizam `<img>` em `TransacaoCategoriaIcon`. */
+export const RASTER_CATEGORIA_ICON_SRC_BY_KEY = {
+  transportePng: TRANSPORTE_CATEGORIA_ICON_SRC,
+  comprasVarejoPng: COMPRAS_E_VAREJO_CATEGORIA_ICON_SRC,
+  alimentacaoPng: ALIMENTACAO_CATEGORIA_ICON_SRC,
+  cuidadosPessoaisPng: CUIDADOS_PESSOAIS_CATEGORIA_ICON_SRC,
+  despesasFinanceirasPng: DESPESAS_FINANCEIRAS_CATEGORIA_ICON_SRC,
+  doacoesPresentesPng: DOACOES_E_PRESENTES_CATEGORIA_ICON_SRC,
+  documentacaoImpostosPng: DOCUMENTACAO_E_IMPOSTOS_CATEGORIA_ICON_SRC,
+  educacaoPng: EDUCACAO_CATEGORIA_ICON_SRC,
+  investimentosPatrimonioPng: INVESTIMENTOS_E_PATRIMONIO_CATEGORIA_ICON_SRC,
+  lazerEntreterimentoPng: LAZER_E_ENTRETERIMENTO_CATEGORIA_ICON_SRC,
+  moradiaPng: MORADIA_CATEGORIA_ICON_SRC,
+  petsDependentesPng: PETS_E_DEPENDENTES_CATEGORIA_ICON_SRC,
+  saudePng: SAUDE_CATEGORIA_ICON_SRC,
+  servicosAssinaturasPng: SERVICOS_E_ASSINATURAS_CATEGORIA_ICON_SRC,
+  tecnologiaGadgetsPng: TECNOLOGIA_E_GADGETS_CATEGORIA_ICON_SRC,
+  trabalhoNegociosPng: TRABALHO_E_NEGOCIOS_CATEGORIA_ICON_SRC,
+  viagensPng: VIAGENS_CATEGORIA_ICON_SRC,
+}
+
+/**
+ * Classes Line Awesome (Icons8) — https://icons8.com/line-awesome
+ * No JSX: importável em testes. Usar com prefixo `las` no componente.
+ */
+export const LINE_AWESOME_CLASS_BY_ICON_ID = {
+  utensils: 'la-utensils',
+  fuel: 'la-gas-pump',
+  car: 'la-car',
+  home: 'la-home',
+  health: 'la-stethoscope',
+  education: 'la-graduation-cap',
+  leisure: 'la-film',
+  shopping: 'la-shopping-bag',
+  tech: 'la-mobile-alt',
+  subscription: 'la-credit-card',
+  fitness: 'la-dumbbell',
+  receipt: 'la-file-invoice-dollar',
+  pet: 'la-paw',
+  plane: 'la-plane',
+  gift: 'la-gift',
+  wallet: 'la-wallet',
+  work: 'la-briefcase',
+  investment: 'la-chart-line',
+  child: 'la-baby',
+  bank: 'la-landmark',
+  arrowUp: 'la-arrow-up',
+  arrowDown: 'la-arrow-down',
+}
+
+/** Referência: Line Awesome (Icons8) ↔ categorias / palavras-chave */
 export const LISTA_ICONES_CATEGORIA_TRANSACOES = [
-  { id: 'utensils', nomeIcone: 'Utensílios / refeição', categorias: 'Alimentação; compras tipo mercado', palavras: 'restaurante, lanches, supermercado, delivery, padaria…' },
-  { id: 'fuel', nomeIcone: 'Bomba de combustível', categorias: 'Transporte', palavras: 'combustível, gasolina, etanol, GNV, posto…' },
-  { id: 'car', nomeIcone: 'Carro / mobilidade', categorias: 'Transporte', palavras: 'Uber, táxi, ônibus, metrô, pedágio, estacionamento…' },
-  { id: 'home', nomeIcone: 'Casa', categorias: 'Moradia', palavras: 'aluguel, condomínio, luz, água, internet, IPTU…' },
-  { id: 'health', nomeIcone: 'Coração / saúde', categorias: 'Saúde', palavras: 'farmácia, médico, hospital, plano, odonto…' },
-  { id: 'education', nomeIcone: 'Livro', categorias: 'Educação', palavras: 'escola, faculdade, curso, livro…' },
-  { id: 'leisure', nomeIcone: 'Ticket / lazer', categorias: 'Lazer', palavras: 'cinema, streaming, jogos, bar…' },
-  { id: 'shopping', nomeIcone: 'Sacola', categorias: 'Compras', palavras: 'roupa, calçado, e-commerce…' },
-  { id: 'tech', nomeIcone: 'Smartphone', categorias: 'Tecnologia e gadgets', palavras: 'notebook, software, eletrônicos…' },
-  { id: 'subscription', nomeIcone: 'Cartão', categorias: 'Serviços', palavras: 'assinatura fixa, mensalidade recorrente…' },
-  { id: 'fitness', nomeIcone: 'Halteres', categorias: 'Academia / esporte', palavras: 'musculação, pilates, corrida…' },
-  { id: 'receipt', nomeIcone: 'Nota fiscal', categorias: 'Impostos e taxas', palavras: 'boleto, IPVA, IR…' },
-  { id: 'pet', nomeIcone: 'Pata', categorias: 'Pets', palavras: 'ração, veterinário…' },
-  { id: 'plane', nomeIcone: 'Avião', categorias: 'Viagem', palavras: 'hotel, passagem, turismo…' },
-  { id: 'gift', nomeIcone: 'Presente', categorias: 'Presentes / doações', palavras: 'presente, doação…' },
-  { id: 'wallet', nomeIcone: 'Carteira', categorias: 'Receitas', palavras: 'salário, holerite…' },
-  { id: 'work', nomeIcone: 'Maleta', categorias: 'Receitas', palavras: 'freela, consultoria…' },
-  { id: 'investment', nomeIcone: 'Metas / investimento', categorias: 'Investimentos', palavras: 'dividendo, CDB, cripto…' },
-  { id: 'child', nomeIcone: 'Rosto infantil', categorias: 'Família', palavras: 'creche, fralda…' },
-  { id: 'bank', nomeIcone: 'Banco', categorias: 'Banco', palavras: 'tarifa, PIX com taxa…' },
-  { id: 'arrow-up', nomeIcone: 'Seta ↑', categorias: '(padrão)', palavras: 'Receita sem ícone específico' },
-  { id: 'arrow-down', nomeIcone: 'Seta ↓', categorias: '(padrão)', palavras: 'Despesa sem ícone específico' },
+  { id: 'utensils', lineAwesome: 'las la-utensils', nomeIcone: 'Refeição', categorias: '(fora de Alimentação)', palavras: 'restaurante, lanches, supermercado, delivery…' },
+  { id: 'fuel', lineAwesome: 'las la-gas-pump', nomeIcone: 'Combustível', categorias: '(fora de Transporte)', palavras: 'gasolina, etanol, GNV, posto…' },
+  { id: 'transportePng', assetSrc: TRANSPORTE_CATEGORIA_ICON_SRC, nomeIcone: 'Transportes', categorias: 'Transporte', palavras: 'todas as subcategorias (incl. combustível)' },
+  { id: 'comprasVarejoPng', assetSrc: COMPRAS_E_VAREJO_CATEGORIA_ICON_SRC, nomeIcone: 'Compras e Varejo', categorias: 'Compras e Varejo', palavras: 'todas as subcategorias' },
+  { id: 'alimentacaoPng', assetSrc: ALIMENTACAO_CATEGORIA_ICON_SRC, nomeIcone: 'Alimentação', categorias: 'Alimentação', palavras: 'todas as subcategorias' },
+  { id: 'cuidadosPessoaisPng', assetSrc: CUIDADOS_PESSOAIS_CATEGORIA_ICON_SRC, nomeIcone: 'Cuidados Pessoais', categorias: 'Cuidados Pessoais', palavras: 'todas as subcategorias' },
+  { id: 'despesasFinanceirasPng', assetSrc: DESPESAS_FINANCEIRAS_CATEGORIA_ICON_SRC, nomeIcone: 'Despesas Financeiras', categorias: 'Despesas Financeiras', palavras: 'todas as subcategorias' },
+  { id: 'doacoesPresentesPng', assetSrc: DOACOES_E_PRESENTES_CATEGORIA_ICON_SRC, nomeIcone: 'Doações e Presentes', categorias: 'Doações e Presentes', palavras: 'todas as subcategorias' },
+  { id: 'documentacaoImpostosPng', assetSrc: DOCUMENTACAO_E_IMPOSTOS_CATEGORIA_ICON_SRC, nomeIcone: 'Documentação e Impostos', categorias: 'Documentação e Impostos', palavras: 'todas as subcategorias' },
+  { id: 'educacaoPng', assetSrc: EDUCACAO_CATEGORIA_ICON_SRC, nomeIcone: 'Educação', categorias: 'Educação', palavras: 'todas as subcategorias' },
+  { id: 'investimentosPatrimonioPng', assetSrc: INVESTIMENTOS_E_PATRIMONIO_CATEGORIA_ICON_SRC, nomeIcone: 'Investimentos e Patrimônio', categorias: 'Investimentos e Patrimônio', palavras: 'todas as subcategorias' },
+  { id: 'lazerEntreterimentoPng', assetSrc: LAZER_E_ENTRETERIMENTO_CATEGORIA_ICON_SRC, nomeIcone: 'Lazer e Entreterimento', categorias: 'Lazer e Entreterimento; Lazer e Entretenimento', palavras: 'todas as subcategorias' },
+  { id: 'moradiaPng', assetSrc: MORADIA_CATEGORIA_ICON_SRC, nomeIcone: 'Moradia', categorias: 'Moradia', palavras: 'todas as subcategorias' },
+  { id: 'petsDependentesPng', assetSrc: PETS_E_DEPENDENTES_CATEGORIA_ICON_SRC, nomeIcone: 'Pets e Dependentes', categorias: 'Pets e Dependentes', palavras: 'todas as subcategorias' },
+  { id: 'saudePng', assetSrc: SAUDE_CATEGORIA_ICON_SRC, nomeIcone: 'Saúde', categorias: 'Saúde', palavras: 'todas as subcategorias' },
+  { id: 'servicosAssinaturasPng', assetSrc: SERVICOS_E_ASSINATURAS_CATEGORIA_ICON_SRC, nomeIcone: 'Serviços e Assinaturas', categorias: 'Serviços e Assinaturas', palavras: 'todas as subcategorias' },
+  { id: 'tecnologiaGadgetsPng', assetSrc: TECNOLOGIA_E_GADGETS_CATEGORIA_ICON_SRC, nomeIcone: 'Tecnologia e Gadgets', categorias: 'Tecnologia e Gadgets', palavras: 'todas as subcategorias' },
+  { id: 'trabalhoNegociosPng', assetSrc: TRABALHO_E_NEGOCIOS_CATEGORIA_ICON_SRC, nomeIcone: 'Trabalho e Negócios', categorias: 'Trabalho e Negócios', palavras: 'todas as subcategorias' },
+  { id: 'viagensPng', assetSrc: VIAGENS_CATEGORIA_ICON_SRC, nomeIcone: 'Viagens', categorias: 'Viagens; Viagem', palavras: 'todas as subcategorias' },
+  { id: 'car', lineAwesome: 'las la-car', nomeIcone: 'Carro', categorias: '(outras)', palavras: 'mobilidade quando categoria não é Transporte' },
+  { id: 'home', lineAwesome: 'las la-home', nomeIcone: 'Casa', categorias: '(fora de Moradia)', palavras: 'aluguel, condomínio, luz, água…' },
+  { id: 'health', lineAwesome: 'las la-stethoscope', nomeIcone: 'Saúde', categorias: '(fora da categoria Saúde)', palavras: 'farmácia, médico, hospital…' },
+  { id: 'education', lineAwesome: 'las la-graduation-cap', nomeIcone: 'Formatura', categorias: '(fora de Educação)', palavras: 'escola, faculdade, curso…' },
+  { id: 'leisure', lineAwesome: 'las la-film', nomeIcone: 'Cinema / lazer', categorias: '(fora do PNG Lazer e Entreterimento)', palavras: 'streaming, jogos, bar…' },
+  { id: 'shopping', lineAwesome: 'las la-shopping-bag', nomeIcone: 'Compras', categorias: 'Compras', palavras: 'roupa, e-commerce…' },
+  { id: 'tech', lineAwesome: 'las la-mobile-alt', nomeIcone: 'Celular', categorias: '(fora de Tecnologia e Gadgets)', palavras: 'notebook, software…' },
+  { id: 'subscription', lineAwesome: 'las la-credit-card', nomeIcone: 'Cartão', categorias: '(fora de Serviços e Assinaturas)', palavras: 'assinatura, mensalidade…' },
+  { id: 'fitness', lineAwesome: 'las la-dumbbell', nomeIcone: 'Fitness', categorias: 'Esporte', palavras: 'academia, pilates…' },
+  { id: 'receipt', lineAwesome: 'las la-file-invoice-dollar', nomeIcone: 'Fatura / imposto', categorias: '(fora de Documentação e Impostos)', palavras: 'boleto, IPVA, IR…' },
+  { id: 'pet', lineAwesome: 'las la-paw', nomeIcone: 'Pata', categorias: '(fora de Pets e Dependentes)', palavras: 'ração, veterinário…' },
+  { id: 'plane', lineAwesome: 'las la-plane', nomeIcone: 'Avião', categorias: '(fora de Viagens / Viagem)', palavras: 'hotel, passagem…' },
+  { id: 'gift', lineAwesome: 'las la-gift', nomeIcone: 'Presente', categorias: '(fora de Doações e Presentes)', palavras: 'presente, doação…' },
+  { id: 'wallet', lineAwesome: 'las la-wallet', nomeIcone: 'Carteira', categorias: '(fora de Trabalho e Negócios)', palavras: 'salário, holerite…' },
+  { id: 'work', lineAwesome: 'las la-briefcase', nomeIcone: 'Trabalho', categorias: '(fora de Trabalho e Negócios)', palavras: 'freela, consultoria…' },
+  { id: 'investment', lineAwesome: 'las la-chart-line', nomeIcone: 'Gráfico', categorias: '(fora de Investimentos e Patrimônio)', palavras: 'dividendo, CDB…' },
+  { id: 'child', lineAwesome: 'las la-baby', nomeIcone: 'Bebê', categorias: '(fora de Pets e Dependentes)', palavras: 'creche, fralda…' },
+  { id: 'bank', lineAwesome: 'las la-landmark', nomeIcone: 'Edifício', categorias: 'Banco', palavras: 'tarifa, taxa…' },
+  { id: 'arrow-up', lineAwesome: 'las la-arrow-up', nomeIcone: 'Seta ↑', categorias: '(padrão)', palavras: 'Receita genérica' },
+  { id: 'arrow-down', lineAwesome: 'las la-arrow-down', nomeIcone: 'Seta ↓', categorias: '(padrão)', palavras: 'Despesa genérica' },
 ]

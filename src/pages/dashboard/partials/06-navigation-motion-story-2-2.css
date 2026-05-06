@@ -51,6 +51,11 @@
     border-color: rgba(255, 255, 255, 0.1);
     color: var(--sidebar-text, #fafafa);
   }
+
+  /* Visão Geral mobile: botão menu circular no hero (05-dark-shell; este ficheiro carrega depois). */
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .mobile-menu-btn {
+    border-radius: 50%;
+  }
 }
 
 /* --- Nav item: transition usando tokens de motion (Story 2.2) --- */
@@ -72,7 +77,8 @@
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
     background-color: rgba(212, 168, 75, 0.1);
-    color: var(--sidebar-text, #ffffff) !important;
+    /* Tema claro: texto escuro — não usar --sidebar-text (token do menu escuro = branco). */
+    color: #020617 !important;
   }
 }
 
@@ -87,7 +93,7 @@
   }
 
   .mobile-bottom-nav__item:focus-visible {
-    outline-color: var(--accent, #d4a84b);
+    outline-color: var(--danger, #ef4444);
   }
 }
 
