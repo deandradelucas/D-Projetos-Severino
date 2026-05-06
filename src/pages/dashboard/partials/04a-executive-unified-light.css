@@ -2,10 +2,13 @@
    Executive unified layout (tema único claro)
    -------------------------------------------------------------------------- */
 body[data-theme='light'] .dashboard-container {
-  background: #f4f6fc;
+  background: #ffffff;
   border-radius: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 42px 80px -34px rgba(37, 65, 120, 0.45);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 24px 56px -28px rgba(15, 23, 42, 0.1),
+    0 12px 28px -16px rgba(15, 23, 42, 0.06);
   padding: 0;
   gap: 0;
   min-height: calc(100dvh - 34px);
@@ -73,7 +76,7 @@ body[data-theme='light'] .logout-btn {
 }
 
 body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-content {
-  background: #f5f7fc;
+  background: #ffffff;
   border-radius: 0;
   border: none;
   box-shadow: none;
@@ -82,10 +85,14 @@ body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .main-cont
 
 body[data-theme='light'] .relatorios-chart-card,
 body[data-theme='light'] .config-card {
-  border-radius: 22px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background: #eef2fa;
-  box-shadow: 0 26px 46px -34px rgba(15, 23, 42, 0.32);
+  border-radius: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: #ffffff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 2px 6px rgba(15, 23, 42, 0.04),
+    0 18px 44px -14px rgba(15, 23, 42, 0.14),
+    0 40px 72px -32px rgba(15, 23, 42, 0.12);
 }
 
 body[data-theme='light'] .btn-primary {

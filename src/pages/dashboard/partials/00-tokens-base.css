@@ -1,7 +1,7 @@
 /* Default Reset & Variables (tema claro) */
 :root {
-  --bg-primary: #ecf0f1; 
-  --bg-secondary: #ecf0f1;
+  --bg-primary: #ffffff;
+  --bg-secondary: #ffffff;
   --bg-card: #ffffff;
   --bg-card-elevated: #f8fafc;
   --active-bg: #ffffff; /* Volta ao branco sólido */
