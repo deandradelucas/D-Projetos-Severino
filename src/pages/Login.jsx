@@ -222,8 +222,12 @@ export default function Login() {
       try {
         data = raw ? JSON.parse(raw) : {}
       } catch {
+        const endpoint = apiUrl('/api/auth/login')
+        const looksHtml = /^\s*</.test(raw)
         setFormError(
-          'Resposta inválida do servidor. Em produção, confira se a API está no mesmo domínio ou defina VITE_API_URL no build.',
+          looksHtml
+            ? `A API devolveu HTML em vez de JSON. Pedido: ${endpoint}. No Severino não uses VITE_API_URL igual ao site — a API tem de estar noutro host (ex.: https://mestredamente.com). Confirme no separador Rede do navegador.`
+            : `Resposta inválida do servidor (não é JSON). Pedido: ${endpoint}. Confirme se a API está no ar e o URL correto.`,
         )
         setLoading(false)
         return
