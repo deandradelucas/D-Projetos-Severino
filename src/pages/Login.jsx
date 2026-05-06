@@ -326,16 +326,18 @@ export default function Login() {
           className="mb-4 rounded-lg border border-amber-400/80 bg-amber-50 px-3 py-2.5 text-[11px] leading-snug text-amber-950 sm:text-[12px]"
           role="alert"
         >
-          <strong className="font-semibold">API não configurada no build.</strong> O site Severino na
-          Hostinger é só o front: é preciso publicar a API Node (ex.: Vercel) e definir no painel da
-          Hostinger, nas variáveis do projeto,{' '}
+          <strong className="font-semibold">API não configurada no build.</strong> O deploy Git na
+          Hostinger só publica o front. Escolhe uma: (1){' '}
+          <strong>VPS Hostinger</strong> com Node a correr a API e Nginx/OpenLiteSpeed a enviar{' '}
+          <span className="font-mono">/api</span> para esse processo — nas variáveis do build define{' '}
+          <code className="rounded bg-amber-100/90 px-1 font-mono text-[10px] sm:text-[11px]">
+            VITE_SEVERINO_SAME_ORIGIN_API=1
+          </code>{' '}
+          e novo deploy; (2) API noutro subdomínio — define{' '}
           <code className="rounded bg-amber-100/90 px-1 font-mono text-[10px] sm:text-[11px]">
             VITE_SEVERINO_API_ORIGIN
           </code>{' '}
-          com o URL da API (termina em <span className="font-mono">.vercel.app</span> ou o domínio onde{' '}
-          <span className="font-mono">/api/health</span> devolve JSON). Depois, novo deploy. O apex{' '}
-          <span className="font-mono">mestredamente.com</span> não expõe <span className="font-mono">/api</span>{' '}
-          neste momento.
+          com o URL onde <span className="font-mono">/api/health</span> devolve JSON.
         </div>
       ) : null}
       <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" noValidate>
