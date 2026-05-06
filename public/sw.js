@@ -1,9 +1,9 @@
-const CACHE_NAME = 'horizonte-financeiro-v9'
+const CACHE_NAME = 'horizonte-financeiro-v12'
 const APP_SHELL = [
   '/',
   '/dashboard',
   '/manifest.json',
-  '/images/Nova Logo/Severino Logo PWA Tema Escuro.png',
+  '/icons/pwa-app-icon.png',
 ]
 
 self.addEventListener('install', (event) => {

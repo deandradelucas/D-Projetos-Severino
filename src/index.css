@@ -921,3 +921,76 @@ body:has(.pwa-install-sheet) .horizon-chat-window {
     animation: none;
   }
 }
+
+/*
+ * PWA instalado: fundo preto (alinhado ao manifest).
+ * Tema claro pintava branco/azul via Background.jsx + regras body/html/.app-routes-grow.
+ */
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
+  .app-background-root--plain-light .app-background-root__plain-fill {
+    background: #000000;
+  }
+
+  html,
+  html:has(body[data-theme='light']) {
+    background-color: #000000;
+  }
+
+  body[data-theme='light'] {
+    background-color: #000000;
+    background-image: none;
+  }
+
+  html:has(body[data-theme='light']:has(.app-horizon-shell)),
+  html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+    background-color: #000000;
+  }
+
+  body[data-theme='light']:has(.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+    background-color: #000000;
+    background-image: none;
+  }
+
+  body[data-theme='light']:has(.app-horizon-shell) .app-routes-grow {
+    background-color: #000000;
+  }
+
+  @media (min-width: 769px) {
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) .app-routes-grow {
+      background-color: #000000;
+    }
+
+    html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+      background-color: #000000;
+    }
+
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) {
+      background-color: #000000;
+    }
+
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+      background-color: #000000;
+    }
+  }
+
+  @media (max-width: 768px) {
+    html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+      background-color: #000000;
+    }
+
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell),
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+      background-color: #000000;
+    }
+
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell)::after {
+      background: #000000;
+    }
+
+    body::after {
+      background: #000000;
+    }
+  }
+}
