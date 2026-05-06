@@ -266,7 +266,7 @@ body {
 }
 
 .app-background-root--plain-dark .app-background-root__plain-fill {
-  background: #030303;
+  background: #000000;
 }
 
 /* Tema claro — fundo premium (login e telas sem shell) */
@@ -324,21 +324,21 @@ body[data-theme='light']:has(.app-horizon-shell) .app-routes-grow {
 /* Tema escuro */
 body[data-theme='dark'] {
   color-scheme: dark;
-  background-color: #050607;
+  background-color: #000000;
   background-image: none;
 }
 
 body[data-theme='dark']:has(.app-horizon-shell) {
-  background-color: #030303;
+  background-color: #000000;
   background-image: none;
 }
 
 html:has(body[data-theme='dark']:has(.app-horizon-shell)) {
-  background-color: #030303;
+  background-color: #000000;
 }
 
 body[data-theme='dark']:has(.app-horizon-shell) .app-routes-grow {
-  background-color: #030303;
+  background-color: #000000;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
@@ -454,6 +454,15 @@ button {
   body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell),
   body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
     background-color: #ffffff;
+  }
+
+  html:has(body[data-theme='dark']) {
+    background-color: #000000;
+  }
+
+  body[data-theme='dark'],
+  body[data-theme='dark'] #root {
+    background-color: #000000;
   }
 
   /* Shell autenticado: o cartão já leva safe-area no padding — não duplicar com padding no #root nem faixa fixa */

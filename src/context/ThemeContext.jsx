@@ -9,7 +9,7 @@ const VALID_THEMES = ['light', 'dark']
 /** Cor da UI do sistema (PWA: barra de navegação / overscroll). Evitar azul (#8ca8d4) no light — gerava faixa estranha no fundo. */
 const THEME_COLOR_META = {
   light: '#ffffff',
-  dark: '#030303',
+  dark: '#000000',
 }
 
 /** Remove valores legados (temas antigos não suportados). */

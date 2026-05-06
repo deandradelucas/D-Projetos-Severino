@@ -326,6 +326,9 @@ export default function Configuracoes() {
                 <Link className="config-action-btn" to="/admin/usuarios" onClick={() => setMenuAberto(false)}>
                   Usuários
                 </Link>
+                <Link className="config-action-btn" to="/admin/auditoria" onClick={() => setMenuAberto(false)}>
+                  Auditoria
+                </Link>
                 <Link className="config-action-btn" to="/admin/pagamentos" onClick={() => setMenuAberto(false)}>
                   Pagamentos
                 </Link>

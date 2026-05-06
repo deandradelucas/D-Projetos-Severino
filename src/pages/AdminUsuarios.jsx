@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
-import AdminDataTableSkeleton from '../components/AdminDataTableSkeleton'
+import { SkeletonKpi } from '../components/dashboard/DashboardSkeletons'
 import UserAdminStatusBadge from '../components/admin/UserAdminStatusBadge'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { apiUrl } from '../lib/apiUrl'
@@ -17,22 +17,6 @@ import {
 } from '../lib/usersAdmin'
 import { isSuperAdminEmail, isSuperAdminSession } from '../lib/superAdmin'
 import './dashboard.css'
-
-const USUARIOS_TABLE_HEADERS = [
-  'Nome',
-  'E-mail',
-  'Telefone',
-  'Papel',
-  'Conta',
-  'Status',
-  'Assinatura / pagamento',
-  'Venc. trial',
-  'Próx. cobrança',
-  'Ganho acum.',
-  'Rec. mês',
-  'Último acesso',
-  'Ações',
-]
 
 const ROLE_OPTIONS = [
   { value: 'USER', label: 'Usuário' },
@@ -176,7 +160,7 @@ function AssinaturaPagamentoCell({ row, isEditing, editForm, onField }) {
 function UltimoAcessoCell({ row, getUserConnectionBadge }) {
   if (!row.last_login_at) {
     return (
-      <div>
+      <div className="page-admin-usuarios-acesso-stack">
         <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-secondary)' }}>Nunca acessou</div>
         <div className="admin-subline">Nenhum login registrado no sistema</div>
       </div>
@@ -187,9 +171,9 @@ function UltimoAcessoCell({ row, getUserConnectionBadge }) {
   if (Number.isNaN(when.getTime())) {
     const badgeBad = getUserConnectionBadge(row)
     return (
-      <div>
+      <div className="page-admin-usuarios-acesso-stack">
         <div style={{ fontWeight: 600, fontSize: '13px' }}>Data inválida</div>
-        {badgeBad ? <div style={{ marginTop: 8 }}>{badgeBad}</div> : null}
+        {badgeBad ? <div>{badgeBad}</div> : null}
       </div>
     )
   }
@@ -199,11 +183,229 @@ function UltimoAcessoCell({ row, getUserConnectionBadge }) {
   const badge = getUserConnectionBadge(row)
 
   return (
-    <div>
+    <div className="page-admin-usuarios-acesso-stack">
       <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-primary)' }}>{formatted}</div>
       <div className="admin-subline">{rel}</div>
-      {badge ? <div style={{ marginTop: 8 }}>{badge}</div> : null}
+      {badge ? <div className="page-admin-usuarios-acesso-badge">{badge}</div> : null}
     </div>
+  )
+}
+
+function AdminUsuarioCard({
+  row,
+  isEditing,
+  isPrincipal,
+  principalPodeDarAdmin,
+  roleOptionsEdit,
+  editForm,
+  onChangeField,
+  onSaveUser,
+  onCancelEdit,
+  onOpenDetail,
+  onStartEdit,
+  onWhatsapp,
+  onDelete,
+  getUserConnectionBadge,
+}) {
+  const cardClass = [
+    'page-admin-usuario-card',
+    row.isOverdue ? 'page-admin-usuario-card--alert' : '',
+    isEditing ? 'page-admin-usuario-card--editing' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return (
+    <article className={cardClass} aria-label={row.nome || row.email || 'Usuário'}>
+      <header className="page-admin-usuario-card__head">
+        <div className="page-admin-usuario-card__head-text">
+          {isEditing ? (
+            <input
+              type="text"
+              className="page-admin-inline-input page-admin-usuario-card__input-name"
+              value={editForm.nome}
+              onChange={(e) => onChangeField('nome', e.target.value)}
+              aria-label="Nome"
+            />
+          ) : (
+            <h3 className="page-admin-usuario-card__name">{row.nome || '—'}</h3>
+          )}
+          {isEditing ? (
+            <input
+              type="email"
+              className="page-admin-inline-input page-admin-usuario-card__input-email"
+              value={editForm.email}
+              onChange={(e) => onChangeField('email', e.target.value)}
+              disabled={isPrincipal}
+              title={isPrincipal ? 'E-mail da conta administradora principal não pode ser alterado.' : undefined}
+              aria-label="E-mail"
+            />
+          ) : (
+            <p className="page-admin-usuario-card__email page-admin-email-text">{row.email}</p>
+          )}
+        </div>
+        <div className="page-admin-usuario-card__head-status">
+          <UserAdminStatusBadge paymentStatus={row.paymentStatus} isOverdue={row.isOverdue} />
+          {row.daysToExpire != null && row.daysToExpire >= 0 ? (
+            <span className="page-admin-usuario-card__trial-hint admin-subline">{row.daysToExpire} d</span>
+          ) : null}
+        </div>
+      </header>
+
+      <div className="page-admin-usuario-card__grid">
+        <div className="page-admin-usuario-card__field">
+          <span className="page-admin-usuario-card__label">Telefone</span>
+          <div className="page-admin-usuario-card__value">
+            {isEditing ? (
+              <input
+                type="text"
+                className="page-admin-inline-input"
+                value={editForm.telefone}
+                onChange={(e) => onChangeField('telefone', e.target.value)}
+                placeholder="DDD + número"
+              />
+            ) : (
+              formatPhoneBRDisplay(row.telefone)
+            )}
+          </div>
+        </div>
+
+        <div className="page-admin-usuario-card__field">
+          <span className="page-admin-usuario-card__label">Papel · conta</span>
+          <div className="page-admin-usuario-card__value">
+            <div className="page-admin-usuarios-perfil-stack">
+              <div className="page-admin-usuarios-perfil-stack__role">
+                {isEditing ? (
+                  isPrincipal ? (
+                    <span className={rolePillClassName('ADMIN')} title="A conta principal permanece como administradora.">
+                      {roleDisplayLabel('ADMIN')}
+                    </span>
+                  ) : !principalPodeDarAdmin && normalizeRoleKey(editForm.role) === 'ADMIN' ? (
+                    <span
+                      className={rolePillClassName('ADMIN')}
+                      title="Somente o administrador principal pode alterar ou rebaixar outro Admin."
+                    >
+                      {roleDisplayLabel('ADMIN')}
+                    </span>
+                  ) : (
+                    <select
+                      className="page-admin-filter-select page-admin-filter-select--inline page-admin-filter-select--perfil"
+                      value={editForm.role || 'USER'}
+                      onChange={(e) => onChangeField('role', e.target.value)}
+                      aria-label="Papel"
+                    >
+                      {roleOptionsEdit.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  )
+                ) : (
+                  <span className={rolePillClassName(isPrincipal ? 'ADMIN' : row.role)}>
+                    {roleDisplayLabel(isPrincipal ? 'ADMIN' : row.role)}
+                  </span>
+                )}
+              </div>
+              <div className="page-admin-usuarios-perfil-stack__conta">
+                {isEditing ? (
+                  <label className="page-admin-checkbox-ativo">
+                    <input type="checkbox" checked={editForm.is_active} onChange={(e) => onChangeField('is_active', e.target.checked)} />
+                    Conta ativa
+                  </label>
+                ) : row.is_active === false ? (
+                  <span className="admin-badge-conta admin-badge-conta--off">Desativado</span>
+                ) : (
+                  <span className="admin-badge-conta admin-badge-conta--on">Ativo</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="page-admin-usuario-card__field page-admin-usuario-card__field--wide">
+          <span className="page-admin-usuario-card__label">Assinatura / pagamento</span>
+          <div className="page-admin-usuario-card__value">
+            <AssinaturaPagamentoCell row={row} isEditing={isEditing} editForm={editForm} onField={onChangeField} />
+          </div>
+        </div>
+
+        <div className="page-admin-usuario-card__field">
+          <span className="page-admin-usuario-card__label">Trial / cobrança</span>
+          <div className="page-admin-usuario-card__value">
+            <div className="page-admin-usuarios-compact-block">
+              <div className="page-admin-usuarios-compact-row">
+                <span className="page-admin-usuarios-compact-k">Trial</span>
+                <span className="page-admin-usuarios-compact-v">{formatDatePtBr(row.trial_ends_at)}</span>
+              </div>
+              <div className="page-admin-usuarios-compact-row">
+                <span className="page-admin-usuarios-compact-k">Cobr.</span>
+                <span className="page-admin-usuarios-compact-v">{formatDateTimePtBr(row.nextPaymentDate)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="page-admin-usuario-card__field">
+          <span className="page-admin-usuario-card__label">Receita</span>
+          <div className="page-admin-usuario-card__value">
+            <div className="page-admin-usuarios-compact-block">
+              <div className="page-admin-usuarios-compact-row">
+                <span className="page-admin-usuarios-compact-k">Acum.</span>
+                <span className="page-admin-usuarios-compact-v page-admin-usuarios-compact-v--num">{formatCurrencyBRL(row.accumulatedRevenue)}</span>
+              </div>
+              <div className="page-admin-usuarios-compact-row">
+                <span className="page-admin-usuarios-compact-k">Mês</span>
+                <span className="page-admin-usuarios-compact-v page-admin-usuarios-compact-v--num">{formatCurrencyBRL(row.monthlyRevenue)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="page-admin-usuario-card__field page-admin-usuario-card__field--wide">
+          <span className="page-admin-usuario-card__label">Último acesso</span>
+          <div className="page-admin-usuario-card__value">
+            <UltimoAcessoCell row={row} getUserConnectionBadge={getUserConnectionBadge} />
+          </div>
+        </div>
+      </div>
+
+      <footer className="page-admin-usuario-card__footer">
+        <div className="admin-acoes-btns page-admin-usuario-card__actions">
+          {isEditing ? (
+            <>
+              <button type="button" className="btn-primary admin-acoes-btn" onClick={onSaveUser}>
+                Salvar
+              </button>
+              <button type="button" className="btn-secondary admin-acoes-btn" onClick={onCancelEdit}>
+                Cancelar
+              </button>
+            </>
+          ) : (
+            <>
+              <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => onOpenDetail(row)}>
+                Detalhes
+              </button>
+              <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => onStartEdit(row)}>
+                Editar
+              </button>
+            </>
+          )}
+          <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => void onWhatsapp(row)}>
+            WhatsApp
+          </button>
+          {isPrincipal ? (
+            <span className="admin-acoes-protegido" title="A conta administradora principal não pode ser excluída pelo painel.">
+              Protegido
+            </span>
+          ) : (
+            <button type="button" className="btn-secondary admin-acoes-btn admin-acoes-btn--danger" onClick={() => onDelete(row)}>
+              Excluir
+            </button>
+          )}
+        </div>
+      </footer>
+    </article>
   )
 }
 
@@ -235,10 +437,10 @@ export default function AdminUsuarios() {
   const [userActionMessage, setUserActionMessage] = useState('')
   const [loadError, setLoadError] = useState('')
   const [sessionBanner, setSessionBanner] = useState('')
-  const [auditRows, setAuditRows] = useState([])
-  const [auditLoading, setAuditLoading] = useState(false)
   const [exportingCsv, setExportingCsv] = useState(false)
   const [confirmDialog, setConfirmDialog] = useState(null)
+  /** Filtros avançados (busca, selects, períodos) começam recolhidos para dar foco à tabela. */
+  const [usuariosFiltersOpen, setUsuariosFiltersOpen] = useState(false)
 
   const principalPodeDarAdmin = isSuperAdminSession()
   const roleOptionsEdit = principalPodeDarAdmin ? ROLE_OPTIONS : ROLE_OPTIONS_NON_SUPER
@@ -358,26 +560,6 @@ export default function AdminUsuarios() {
     setFilterTrialEndsFrom('')
     setFilterTrialEndsTo('')
   }
-
-  const loadAudit = useCallback(async () => {
-    setAuditLoading(true)
-    try {
-      const userSaved = localStorage.getItem('horizonte_user')
-      if (!userSaved) return
-      const u = JSON.parse(userSaved)
-      const res = await fetch(apiUrl('/api/admin/audit-log?limit=80'), { headers: { 'x-user-id': u.id } })
-      const data = await res.json().catch(() => [])
-      setAuditRows(Array.isArray(data) ? data : [])
-    } catch {
-      setAuditRows([])
-    } finally {
-      setAuditLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    void loadAudit()
-  }, [loadAudit])
 
   const exportarCsv = async () => {
     setExportingCsv(true)
@@ -535,7 +717,6 @@ export default function AdminUsuarios() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Falha ao solicitar código pelo WhatsApp.')
       setUserActionMessage(data.message || 'Código enviado.')
-      void loadAudit()
     } catch (e) {
       setUserActionMessage(e.message)
     }
@@ -595,73 +776,154 @@ export default function AdminUsuarios() {
   }
 
   return (
-    <div className="dashboard-container page-admin page-admin-usuarios ref-dashboard app-horizon-shell">
+    <div className="dashboard-container dashboard-page page-admin page-admin-usuarios ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
         <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
             <RefDashboardScroll>
-            <section className="dashboard-hub__hero page-admin__hero" aria-label="Usuários">
+            <section className="dashboard-hub__hero" aria-label="Logs de usuários">
               <div className="dashboard-hub__hero-row">
-                <MobileMenuButton onClick={() => setMenuAberto(true)} />
+                <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                 <div className="dashboard-hub__hero-text">
-                  <h1 className="dashboard-hub__title">ADMIN CORE v4</h1>
-                  <p className="ref-panel__subtitle page-admin-header-sub">
-                    Gestão centralizada e auditoria de sistema
-                  </p>
+                  <h1 className="dashboard-hub__title">Logs de usuários</h1>
+                </div>
+                <div className="dashboard-hub__hero-actions page-admin-hero-actions" role="toolbar" aria-label="Atalhos da administração">
+                  <Link to="/cadastro" className="dashboard-hub__btn dashboard-hub__btn--primary">
+                    Nova conta
+                  </Link>
+                  <Link to="/admin/pagamentos" className="dashboard-hub__btn dashboard-hub__btn--secondary">
+                    Logs de pagamentos
+                  </Link>
+                  <Link to="/admin/auditoria" className="dashboard-hub__btn dashboard-hub__btn--secondary">
+                    Auditoria
+                  </Link>
                 </div>
               </div>
             </section>
 
-            <div className="page-admin-compact-grid">
-              {/* KPIs Compactos */}
-              {stats && (
-                <div className="page-admin-kpi-compact-strip">
-                  <div className="kpi-mini"><span>Total:</span> <strong>{stats.total}</strong></div>
-                  <div className="kpi-mini"><span>Ativos:</span> <strong>{stats.ativos}</strong></div>
-                  <div className="kpi-mini"><span>Admins:</span> <strong>{stats.admins}</strong></div>
-                  <div className="kpi-mini"><span>Pagas:</span> <strong>{stats.assinaturas_pagas}</strong></div>
-                  <div className="kpi-mini kpi-mini--accent"><span>Receita:</span> <strong>{formatCurrencyBRL(stats.receita_mensal_total ?? 0)}</strong></div>
-                </div>
-              )}
-
-              {/* Auditoria Compacta Lateral/Topo */}
-              <div className="page-admin-audit-compact-box">
-                <div className="page-admin-audit-header">
-                  <h3 className="page-admin-audit-title">Auditoria</h3>
-                  <button type="button" className="btn-small-ghost" onClick={() => loadAudit()}>
-                    {auditLoading ? '...' : 'Recarregar'}
-                  </button>
-                </div>
-                <div className="page-admin-audit-mini-list">
-                  {auditRows.slice(0, 10).map(row => (
-                    <div key={row.id} className="audit-mini-item">
-                      <span className="audit-mini-icon">⚡</span>
-                      <span className="audit-mini-text"><strong>{row.action}</strong>: {row.target_email || 'Sistema'}</span>
+            <section
+              className="ref-kpi-row ref-dashboard-kpi-strip dashboard-hub__kpis page-admin-usuarios-kpis"
+              aria-label="Resumo de cadastros e assinaturas"
+              aria-busy={loadingUsuarios}
+            >
+              {loadingUsuarios && !stats ? (
+                <>
+                  <SkeletonKpi />
+                  <SkeletonKpi />
+                  <SkeletonKpi />
+                  <SkeletonKpi />
+                  <SkeletonKpi />
+                </>
+              ) : stats ? (
+                <>
+                  <article className="ref-kpi-card ref-kpi-card--balance">
+                    <div className="ref-kpi-card__icon" aria-hidden>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                      </svg>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+                    <div className="ref-kpi-card__body">
+                      <p className="ref-kpi-card__label">Total de cadastros</p>
+                      <p className="ref-kpi-card__value">{stats.total}</p>
+                    </div>
+                  </article>
+                  <article className="ref-kpi-card ref-kpi-card--income">
+                    <div className="ref-kpi-card__icon" aria-hidden>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                      </svg>
+                    </div>
+                    <div className="ref-kpi-card__body">
+                      <p className="ref-kpi-card__label">Contas ativas</p>
+                      <p className="ref-kpi-card__value">{stats.ativos}</p>
+                    </div>
+                  </article>
+                  <article className="ref-kpi-card ref-kpi-card--expense">
+                    <div className="ref-kpi-card__icon" aria-hidden>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                        <path d="m9 12 2 2 4-4" />
+                      </svg>
+                    </div>
+                    <div className="ref-kpi-card__body">
+                      <p className="ref-kpi-card__label">Administradores</p>
+                      <p className="ref-kpi-card__value">{stats.admins}</p>
+                    </div>
+                  </article>
+                  <article className="ref-kpi-card">
+                    <div className="ref-kpi-card__icon" aria-hidden>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect width="20" height="14" x="2" y="5" rx="2" />
+                        <line x1="2" x2="22" y1="10" y2="10" />
+                      </svg>
+                    </div>
+                    <div className="ref-kpi-card__body">
+                      <p className="ref-kpi-card__label">Assinaturas pagas</p>
+                      <p className="ref-kpi-card__value">{stats.assinaturas_pagas}</p>
+                    </div>
+                  </article>
+                  <article className="ref-kpi-card ref-kpi-card--income">
+                    <div className="ref-kpi-card__icon" aria-hidden>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="12" x2="12" y1="2" y2="22" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                      </svg>
+                    </div>
+                    <div className="ref-kpi-card__body">
+                      <p className="ref-kpi-card__label">Receita no mês</p>
+                      <p className="ref-kpi-card__value">{formatCurrencyBRL(stats.receita_mensal_total ?? 0)}</p>
+                    </div>
+                  </article>
+                </>
+              ) : null}
+            </section>
 
             <article
               className="ref-panel page-admin-ref-panel page-admin-ref-panel--table page-admin-usuarios-panel"
               aria-labelledby="admin-users-heading"
             >
               <div className="ref-panel__head page-admin-usuarios-panel-head">
-                <div>
-                  <h2 id="admin-users-heading" className="ref-panel__title">
-                    Cadastros e acessos
-                  </h2>
-                  <p className="ref-panel__subtitle page-admin-usuarios-intro">
-                    Filtre por cadastro, acesso, assinatura e receita. Apenas o administrador principal pode promover alguém a Admin. Edite linhas, redefina senha ou exclua contas (exceto a administradora principal).
-                  </p>
-                </div>
-                <div className="page-admin-usuarios-head-actions">
-                  <Link to="/cadastro" className="btn-secondary page-admin-btn-novo-cadastro">
-                    Nova conta
-                  </Link>
+                <div className="page-admin-usuarios-head-stack">
+                  <div className="page-admin-usuarios-head-top">
+                    <h2 id="admin-users-heading" className="ref-panel__title page-admin-usuarios-panel-title">
+                      Cadastros e acessos
+                    </h2>
+                    <div className="page-admin-usuarios-head-actions page-admin-usuarios-head-actions--always">
+                      <button
+                        type="button"
+                        className="btn-secondary page-admin-toolbar-btn page-admin-usuarios-filters-toggle"
+                        id="admin-users-filters-disclosure"
+                        aria-expanded={usuariosFiltersOpen}
+                        aria-controls="admin-users-filters-region"
+                        onClick={() => setUsuariosFiltersOpen((v) => !v)}
+                      >
+                        {usuariosFiltersOpen ? 'Ocultar filtros' : 'Mostrar filtros'}
+                      </button>
+                      <button type="button" className="btn-secondary page-admin-toolbar-btn" disabled={loadingUsuarios} onClick={() => void refreshUsuarios()}>
+                        {loadingUsuarios ? 'Atualizando…' : 'Atualizar lista'}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-secondary page-admin-toolbar-btn"
+                        disabled={exportingCsv || loadingUsuarios}
+                        onClick={() => void exportarCsv()}
+                      >
+                        {exportingCsv ? 'Exportando…' : 'Exportar CSV'}
+                      </button>
+                    </div>
+                  </div>
+                  {usuariosFiltersOpen ? (
+                    <p id="admin-users-filters-intro" className="ref-panel__subtitle page-admin-usuarios-intro">
+                      Filtre por cadastro, acesso, assinatura e receita. Apenas o administrador principal pode promover alguém a Admin. Edite linhas, redefina senha ou
+                      exclua contas (exceto a administradora principal).
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
@@ -678,159 +940,153 @@ export default function AdminUsuarios() {
 
 
 
-              <div className="page-admin-users-toolbar page-admin-users-toolbar--grid">
-                <div className="page-admin-search-wrap">
-                  <span className="page-admin-search-icon" aria-hidden>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="11" cy="11" r="8" />
-                      <path d="m21 21-4.3-4.3" />
-                    </svg>
-                  </span>
-                  <input
-                    type="search"
-                    className="page-admin-filter-input page-admin-filter-input--search"
-                    placeholder="Buscar nome, e-mail, telefone ou id…"
-                    value={userFilter}
-                    onChange={(e) => setUserFilter(e.target.value)}
-                    autoComplete="off"
-                  />
-                </div>
-                <label className="page-admin-filter-label">
-                  <span>Papel</span>
-                  <select
-                    className="page-admin-filter-select"
-                    value={filterRole}
-                    onChange={(e) => setFilterRole(e.target.value)}
-                  >
-                    <option value="">Todos</option>
-                    {ROLE_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="page-admin-filter-label">
-                  <span>Conta</span>
-                  <select className="page-admin-filter-select" value={filterConta} onChange={(e) => setFilterConta(e.target.value)}>
-                    <option value="">Todas</option>
-                    <option value="ativo">Ativa</option>
-                    <option value="inativo">Desativada</option>
-                  </select>
-                </label>
-                <label className="page-admin-filter-label">
-                  <span>Ordenar</span>
-                  <select className="page-admin-filter-select" value={filterSort} onChange={(e) => setFilterSort(e.target.value)}>
-                    <option value="email_asc">E-mail A–Z</option>
-                    <option value="email_desc">E-mail Z–A</option>
-                    <option value="nome_asc">Nome A–Z</option>
-                    <option value="nome_desc">Nome Z–A</option>
-                    <option value="last_login_desc">Último acesso ↓</option>
-                    <option value="last_login_asc">Último acesso ↑</option>
-                    <option value="trial_asc">Venc. trial ↑</option>
-                    <option value="trial_desc">Venc. trial ↓</option>
-                    <option value="next_pay_asc">Próx. cobrança ↑</option>
-                    <option value="next_pay_desc">Próx. cobrança ↓</option>
-                    <option value="revenue_desc">Ganho acumulado ↓</option>
-                    <option value="revenue_asc">Ganho acumulado ↑</option>
-                    <option value="created_desc">Cadastro ↓</option>
-                    <option value="created_asc">Cadastro ↑</option>
-                  </select>
-                </label>
-                <label className="page-admin-filter-label">
-                  <span>Assinatura</span>
-                  <select className="page-admin-filter-select" value={filterAssinatura} onChange={(e) => setFilterAssinatura(e.target.value)}>
-                    <option value="">Todas</option>
-                    <option value="pago">Com pagamento aprovado</option>
-                    <option value="nao_pago">Sem pagamento aprovado</option>
-                    <option value="trial">Em trial</option>
-                    <option value="isento">Isentos</option>
-                    <option value="inadimplente">Inadimplentes (trial vencido)</option>
-                  </select>
-                </label>
-                <label className="page-admin-filter-label">
-                  <span>Acesso</span>
-                  <select className="page-admin-filter-select" value={filterLogin} onChange={(e) => setFilterLogin(e.target.value)}>
-                    <option value="">Qualquer</option>
-                    <option value="nunca">Nunca acessou</option>
-                    <option value="stale">Sem login há 30 dias</option>
-                  </select>
-                </label>
-                <div className="page-admin-toolbar-btns">
-                  <button type="button" className="btn-secondary page-admin-toolbar-btn" disabled={loadingUsuarios} onClick={() => void refreshUsuarios()}>
-                    {loadingUsuarios ? 'Atualizando…' : 'Atualizar lista'}
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-secondary page-admin-toolbar-btn"
-                    disabled={exportingCsv || loadingUsuarios}
-                    onClick={() => void exportarCsv()}
-                  >
-                    {exportingCsv ? 'Exportando…' : 'Exportar CSV'}
-                  </button>
-                  <button type="button" className="btn-secondary page-admin-toolbar-btn" onClick={clearFilters}>
-                    Limpar filtros
-                  </button>
-                </div>
-              </div>
+              {usuariosFiltersOpen ? (
+                <div
+                  id="admin-users-filters-region"
+                  className="page-admin-usuarios-filters-region"
+                  role="region"
+                  aria-labelledby="admin-users-filters-disclosure"
+                >
+                  <div className="page-admin-users-toolbar page-admin-users-toolbar--grid">
+                    <div className="page-admin-search-wrap">
+                      <span className="page-admin-search-icon" aria-hidden>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="11" cy="11" r="8" />
+                          <path d="m21 21-4.3-4.3" />
+                        </svg>
+                      </span>
+                      <input
+                        type="search"
+                        className="page-admin-filter-input page-admin-filter-input--search"
+                        placeholder="Buscar nome, e-mail, telefone ou id…"
+                        value={userFilter}
+                        onChange={(e) => setUserFilter(e.target.value)}
+                        autoComplete="off"
+                      />
+                    </div>
+                    <label className="page-admin-filter-label">
+                      <span>Papel</span>
+                      <select className="page-admin-filter-select" value={filterRole} onChange={(e) => setFilterRole(e.target.value)}>
+                        <option value="">Todos</option>
+                        {ROLE_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>
+                            {o.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="page-admin-filter-label">
+                      <span>Conta</span>
+                      <select className="page-admin-filter-select" value={filterConta} onChange={(e) => setFilterConta(e.target.value)}>
+                        <option value="">Todas</option>
+                        <option value="ativo">Ativa</option>
+                        <option value="inativo">Desativada</option>
+                      </select>
+                    </label>
+                    <label className="page-admin-filter-label">
+                      <span>Ordenar</span>
+                      <select className="page-admin-filter-select" value={filterSort} onChange={(e) => setFilterSort(e.target.value)}>
+                        <option value="email_asc">E-mail A–Z</option>
+                        <option value="email_desc">E-mail Z–A</option>
+                        <option value="nome_asc">Nome A–Z</option>
+                        <option value="nome_desc">Nome Z–A</option>
+                        <option value="last_login_desc">Último acesso ↓</option>
+                        <option value="last_login_asc">Último acesso ↑</option>
+                        <option value="trial_asc">Venc. trial ↑</option>
+                        <option value="trial_desc">Venc. trial ↓</option>
+                        <option value="next_pay_asc">Próx. cobrança ↑</option>
+                        <option value="next_pay_desc">Próx. cobrança ↓</option>
+                        <option value="revenue_desc">Ganho acumulado ↓</option>
+                        <option value="revenue_asc">Ganho acumulado ↑</option>
+                        <option value="created_desc">Cadastro ↓</option>
+                        <option value="created_asc">Cadastro ↑</option>
+                      </select>
+                    </label>
+                    <label className="page-admin-filter-label">
+                      <span>Assinatura</span>
+                      <select className="page-admin-filter-select" value={filterAssinatura} onChange={(e) => setFilterAssinatura(e.target.value)}>
+                        <option value="">Todas</option>
+                        <option value="pago">Com pagamento aprovado</option>
+                        <option value="nao_pago">Sem pagamento aprovado</option>
+                        <option value="trial">Em trial</option>
+                        <option value="isento">Isentos</option>
+                        <option value="inadimplente">Inadimplentes (trial vencido)</option>
+                      </select>
+                    </label>
+                    <label className="page-admin-filter-label">
+                      <span>Acesso</span>
+                      <select className="page-admin-filter-select" value={filterLogin} onChange={(e) => setFilterLogin(e.target.value)}>
+                        <option value="">Qualquer</option>
+                        <option value="nunca">Nunca acessou</option>
+                        <option value="stale">Sem login há 30 dias</option>
+                      </select>
+                    </label>
+                    <div className="page-admin-toolbar-btns">
+                      <button type="button" className="btn-secondary page-admin-toolbar-btn" onClick={clearFilters}>
+                        Limpar filtros
+                      </button>
+                    </div>
+                  </div>
 
-              <div className="page-admin-usuarios-adv-filters">
-                <p className="page-admin-usuarios-adv-title">Períodos e datas</p>
-                <div className="page-admin-usuarios-adv-grid">
-                  <label className="page-admin-filter-label">
-                    <span>Cadastro de</span>
-                    <input
-                      type="date"
-                      className="page-admin-filter-input"
-                      value={filterCreatedFrom}
-                      onChange={(e) => setFilterCreatedFrom(e.target.value)}
-                    />
-                  </label>
-                  <label className="page-admin-filter-label">
-                    <span>até</span>
-                    <input type="date" className="page-admin-filter-input" value={filterCreatedTo} onChange={(e) => setFilterCreatedTo(e.target.value)} />
-                  </label>
-                  <label className="page-admin-filter-label">
-                    <span>Último acesso de</span>
-                    <input
-                      type="date"
-                      className="page-admin-filter-input"
-                      value={filterAccessFrom}
-                      onChange={(e) => setFilterAccessFrom(e.target.value)}
-                    />
-                  </label>
-                  <label className="page-admin-filter-label">
-                    <span>até</span>
-                    <input type="date" className="page-admin-filter-input" value={filterAccessTo} onChange={(e) => setFilterAccessTo(e.target.value)} />
-                  </label>
-                  <label className="page-admin-filter-label">
-                    <span>Próx. cobrança de</span>
-                    <input type="date" className="page-admin-filter-input" value={filterPayFrom} onChange={(e) => setFilterPayFrom(e.target.value)} />
-                  </label>
-                  <label className="page-admin-filter-label">
-                    <span>até</span>
-                    <input type="date" className="page-admin-filter-input" value={filterPayTo} onChange={(e) => setFilterPayTo(e.target.value)} />
-                  </label>
-                  <label className="page-admin-filter-label">
-                    <span>Fim do trial de</span>
-                    <input
-                      type="date"
-                      className="page-admin-filter-input"
-                      value={filterTrialEndsFrom}
-                      onChange={(e) => setFilterTrialEndsFrom(e.target.value)}
-                    />
-                  </label>
-                  <label className="page-admin-filter-label">
-                    <span>até</span>
-                    <input
-                      type="date"
-                      className="page-admin-filter-input"
-                      value={filterTrialEndsTo}
-                      onChange={(e) => setFilterTrialEndsTo(e.target.value)}
-                    />
-                  </label>
+                  <div className="page-admin-usuarios-adv-filters">
+                    <p className="page-admin-usuarios-adv-title">Períodos e datas</p>
+                    <div className="page-admin-usuarios-adv-grid">
+                      <label className="page-admin-filter-label">
+                        <span>Cadastro de</span>
+                        <input
+                          type="date"
+                          className="page-admin-filter-input"
+                          value={filterCreatedFrom}
+                          onChange={(e) => setFilterCreatedFrom(e.target.value)}
+                        />
+                      </label>
+                      <label className="page-admin-filter-label">
+                        <span>até</span>
+                        <input type="date" className="page-admin-filter-input" value={filterCreatedTo} onChange={(e) => setFilterCreatedTo(e.target.value)} />
+                      </label>
+                      <label className="page-admin-filter-label">
+                        <span>Último acesso de</span>
+                        <input
+                          type="date"
+                          className="page-admin-filter-input"
+                          value={filterAccessFrom}
+                          onChange={(e) => setFilterAccessFrom(e.target.value)}
+                        />
+                      </label>
+                      <label className="page-admin-filter-label">
+                        <span>até</span>
+                        <input type="date" className="page-admin-filter-input" value={filterAccessTo} onChange={(e) => setFilterAccessTo(e.target.value)} />
+                      </label>
+                      <label className="page-admin-filter-label">
+                        <span>Próx. cobrança de</span>
+                        <input type="date" className="page-admin-filter-input" value={filterPayFrom} onChange={(e) => setFilterPayFrom(e.target.value)} />
+                      </label>
+                      <label className="page-admin-filter-label">
+                        <span>até</span>
+                        <input type="date" className="page-admin-filter-input" value={filterPayTo} onChange={(e) => setFilterPayTo(e.target.value)} />
+                      </label>
+                      <label className="page-admin-filter-label">
+                        <span>Fim do trial de</span>
+                        <input
+                          type="date"
+                          className="page-admin-filter-input"
+                          value={filterTrialEndsFrom}
+                          onChange={(e) => setFilterTrialEndsFrom(e.target.value)}
+                        />
+                      </label>
+                      <label className="page-admin-filter-label">
+                        <span>até</span>
+                        <input
+                          type="date"
+                          className="page-admin-filter-input"
+                          value={filterTrialEndsTo}
+                          onChange={(e) => setFilterTrialEndsTo(e.target.value)}
+                        />
+                      </label>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : null}
 
               <p className="page-admin-usuarios-meta" aria-live="polite">
                 {loadingUsuarios
@@ -842,9 +1098,33 @@ export default function AdminUsuarios() {
                     })()}
               </p>
 
-              <div className="page-admin-table-scroll">
+              <div className="page-admin-usuarios-cards-wrap">
                 {loadingUsuarios ? (
-                  <AdminDataTableSkeleton headers={USUARIOS_TABLE_HEADERS} rows={10} tableClassName="admin-usuarios-table" />
+                  <ul className="page-admin-usuarios-cards" aria-busy="true" aria-label="Carregando usuários">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <li key={`usuarios-skel-${i}`}>
+                        <div className="page-admin-usuario-card page-admin-usuario-card--skeleton">
+                          <div className="page-admin-usuario-card__sk-head">
+                            <span className="skeleton skeleton-pulse page-admin-usuario-card__sk-bar page-admin-usuario-card__sk-bar--lg" />
+                            <span className="skeleton skeleton-pulse page-admin-usuario-card__sk-bar page-admin-usuario-card__sk-bar--md" />
+                          </div>
+                          <div className="page-admin-usuario-card__sk-grid">
+                            {Array.from({ length: 4 }).map((__, j) => (
+                              <div key={j} className="page-admin-usuario-card__sk-field">
+                                <span className="skeleton skeleton-pulse page-admin-usuario-card__sk-bar page-admin-usuario-card__sk-bar--xs" />
+                                <span className="skeleton skeleton-pulse page-admin-usuario-card__sk-bar" />
+                              </div>
+                            ))}
+                          </div>
+                          <div className="page-admin-usuario-card__sk-actions">
+                            <span className="skeleton skeleton-pulse page-admin-usuario-card__sk-pill" />
+                            <span className="skeleton skeleton-pulse page-admin-usuario-card__sk-pill" />
+                            <span className="skeleton skeleton-pulse page-admin-usuario-card__sk-pill" />
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 ) : !loadingUsuarios && totalLista === 0 && stats && stats.total === 0 ? (
                   <div className="page-admin-empty-block">
                     <p className="page-admin-empty">Nenhum usuário cadastrado ainda.</p>
@@ -858,276 +1138,32 @@ export default function AdminUsuarios() {
                     </button>
                   </div>
                 ) : (
-                  <>
-                  <table className="admin-usuarios-table admin-usuarios-table--enhanced admin-usuarios-table--desktop">
-                    <thead>
-                      <tr>
-                        <th className="cell-nome">Nome</th>
-                        <th className="cell-email">E-mail</th>
-                        <th className="cell-fone page-admin-usuarios-col--md">Telefone</th>
-                        <th>Papel</th>
-                        <th>Conta</th>
-                        <th className="cell-status-fin">Status</th>
-                        <th className="cell-assinatura">Assinatura / pagamento</th>
-                        <th className="page-admin-usuarios-col--sm">Venc. trial</th>
-                        <th className="page-admin-usuarios-col--sm">Próx. cobr.</th>
-                        <th className="page-admin-usuarios-col--num">Ganho</th>
-                        <th className="page-admin-usuarios-col--num page-admin-usuarios-col--md">Mês</th>
-                        <th className="cell-acesso">Último acesso</th>
-                        <th className="cell-acoes">Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {pageRows.map((row) => {
-                        const isEditing = editingUserId === row.id
-                        const isPrincipal = isSuperAdminEmail(row.email)
-                        return (
-                          <tr key={row.id} className={row.isOverdue ? 'admin-usuarios-tr--alert' : undefined}>
-                            <td className="cell-nome">
-                              {isEditing ? (
-                                <input
-                                  type="text"
-                                  value={editForm.nome}
-                                  onChange={(e) => handleChangeField('nome', e.target.value)}
-                                  className="page-admin-inline-input"
-                                />
-                              ) : (
-                                <span className="page-admin-cell-strong">{row.nome || '—'}</span>
-                              )}
-                            </td>
-                            <td className="cell-email">
-                              {isEditing ? (
-                                <input
-                                  type="email"
-                                  value={editForm.email}
-                                  onChange={(e) => handleChangeField('email', e.target.value)}
-                                  className="page-admin-inline-input"
-                                  disabled={isPrincipal}
-                                  title={isPrincipal ? 'E-mail da conta administradora principal não pode ser alterado.' : undefined}
-                                />
-                              ) : (
-                                <span title={row.email}>{row.email}</span>
-                              )}
-                            </td>
-                            <td className="cell-fone">
-                              {isEditing ? (
-                                <input
-                                  type="text"
-                                  value={editForm.telefone}
-                                  onChange={(e) => handleChangeField('telefone', e.target.value)}
-                                  className="page-admin-inline-input"
-                                  placeholder="DDD + número"
-                                />
-                              ) : (
-                                formatPhoneBRDisplay(row.telefone)
-                              )}
-                            </td>
-                            <td>
-                              {isEditing ? (
-                                isPrincipal ? (
-                                  <span
-                                    className={rolePillClassName('ADMIN')}
-                                    title="A conta principal permanece como administradora."
-                                  >
-                                    {roleDisplayLabel('ADMIN')}
-                                  </span>
-                                ) : !principalPodeDarAdmin && normalizeRoleKey(editForm.role) === 'ADMIN' ? (
-                                  <span
-                                    className={rolePillClassName('ADMIN')}
-                                    title="Somente o administrador principal pode alterar ou rebaixar outro Admin."
-                                  >
-                                    {roleDisplayLabel('ADMIN')}
-                                  </span>
-                                ) : (
-                                  <select
-                                    className="page-admin-filter-select page-admin-filter-select--inline"
-                                    value={editForm.role || 'USER'}
-                                    onChange={(e) => handleChangeField('role', e.target.value)}
-                                  >
-                                    {roleOptionsEdit.map((opt) => (
-                                      <option key={opt.value} value={opt.value}>
-                                        {opt.label}
-                                      </option>
-                                    ))}
-                                  </select>
-                                )
-                              ) : (
-                                <span className={rolePillClassName(isPrincipal ? 'ADMIN' : row.role)}>
-                                  {roleDisplayLabel(isPrincipal ? 'ADMIN' : row.role)}
-                                </span>
-                              )}
-                            </td>
-                            <td>
-                              {isEditing ? (
-                                <label className="page-admin-checkbox-ativo">
-                                  <input
-                                    type="checkbox"
-                                    checked={editForm.is_active}
-                                    onChange={(e) => handleChangeField('is_active', e.target.checked)}
-                                  />
-                                  Ativo
-                                </label>
-                              ) : row.is_active === false ? (
-                                <span className="admin-badge-conta admin-badge-conta--off">Desativado</span>
-                              ) : (
-                                <span className="admin-badge-conta admin-badge-conta--on">Ativo</span>
-                              )}
-                            </td>
-                            <td className="cell-status-fin">
-                              <UserAdminStatusBadge paymentStatus={row.paymentStatus} isOverdue={row.isOverdue} />
-                              {row.daysToExpire != null && row.daysToExpire >= 0 ? (
-                                <div className="admin-subline">{row.daysToExpire} d</div>
-                              ) : null}
-                            </td>
-                            <td className="cell-assinatura">
-                              <AssinaturaPagamentoCell
-                                row={row}
-                                isEditing={isEditing}
-                                editForm={editForm}
-                                onField={handleChangeField}
-                              />
-                            </td>
-                            <td className="page-admin-usuarios-col--sm">{formatDatePtBr(row.trial_ends_at)}</td>
-                            <td className="page-admin-usuarios-col--sm">{formatDateTimePtBr(row.nextPaymentDate)}</td>
-                            <td className="page-admin-usuarios-col--num">{formatCurrencyBRL(row.accumulatedRevenue)}</td>
-                            <td className="page-admin-usuarios-col--num">{formatCurrencyBRL(row.monthlyRevenue)}</td>
-                            <td className="cell-acesso">
-                              <UltimoAcessoCell row={row} getUserConnectionBadge={getUserConnectionBadge} />
-                            </td>
-                            <td className="cell-acoes">
-                              <details className="page-admin-acoes-dd">
-                                <summary className="page-admin-acoes-dd-summary">Ações</summary>
-                                <div className="page-admin-acoes-dd-body">
-                                  {isEditing ? (
-                                    <>
-                                      <button type="button" className="btn-primary admin-acoes-btn" onClick={handleSaveUser}>
-                                        Salvar
-                                      </button>
-                                      <button type="button" className="btn-secondary admin-acoes-btn" onClick={handleCancelEdit}>
-                                        Cancelar
-                                      </button>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => setDetailUser(row)}>
-                                        Detalhes
-                                      </button>
-                                      <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleEditUser(row)}>
-                                        Editar
-                                      </button>
-                                    </>
-                                  )}
-                                  <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleResetPasswordWhatsapp(row)}>
-                                    WhatsApp
-                                  </button>
-                                  {isPrincipal ? (
-                                    <span className="admin-acoes-protegido" title="A conta administradora principal não pode ser excluída pelo painel.">
-                                      Protegido
-                                    </span>
-                                  ) : (
-                                    <button type="button" className="btn-secondary admin-acoes-btn admin-acoes-btn--danger" onClick={() => handleDeleteUser(row)}>
-                                      Excluir
-                                    </button>
-                                  )}
-                                </div>
-                              </details>
-                              <div className="admin-acoes-btns page-admin-acoes-desktop">
-                                {isEditing ? (
-                                  <>
-                                    <button type="button" className="btn-primary admin-acoes-btn" onClick={handleSaveUser}>
-                                      Salvar
-                                    </button>
-                                    <button type="button" className="btn-secondary admin-acoes-btn" onClick={handleCancelEdit}>
-                                      Cancelar
-                                    </button>
-                                  </>
-                                ) : (
-                                  <>
-                                    <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => setDetailUser(row)}>
-                                      Detalhes
-                                    </button>
-                                    <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleEditUser(row)}>
-                                      Editar
-                                    </button>
-                                  </>
-                                )}
-                                <button type="button" className="btn-secondary admin-acoes-btn" onClick={() => handleResetPasswordWhatsapp(row)}>
-                                  WhatsApp
-                                </button>
-                                {isPrincipal ? (
-                                  <span
-                                    className="admin-acoes-protegido"
-                                    title="A conta administradora principal não pode ser excluída pelo painel."
-                                  >
-                                    Protegido
-                                  </span>
-                                ) : (
-                                  <button type="button" className="btn-secondary admin-acoes-btn admin-acoes-btn--danger" onClick={() => handleDeleteUser(row)}>
-                                    Excluir
-                                  </button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                  <ul className="page-admin-usuarios-mobile-list" aria-label="Lista de usuários">
+                  <ul className="page-admin-usuarios-cards" aria-label="Lista de usuários">
                     {pageRows.map((row) => {
+                      const isEditing = editingUserId === row.id
                       const isPrincipal = isSuperAdminEmail(row.email)
                       return (
                         <li key={row.id}>
-                          <button type="button" className="page-admin-usuarios-mobile-card" onClick={() => setDetailUser(row)}>
-                            <div className="page-admin-usuarios-mobile-top">
-                              <span className="page-admin-usuarios-mobile-name">{row.nome || row.email || '—'}</span>
-                              <UserAdminStatusBadge paymentStatus={row.paymentStatus} isOverdue={row.isOverdue} />
-                            </div>
-                            <p className="page-admin-usuarios-mobile-email">{row.email}</p>
-                            <div className="page-admin-usuarios-mobile-row">
-                              <span>{formatCurrencyBRL(row.accumulatedRevenue)}</span>
-                              <span className="page-admin-usuarios-mobile-muted">{formatDateTimePtBr(row.last_login_at)}</span>
-                            </div>
-                            <div className="page-admin-usuarios-mobile-actions">
-                              <button
-                                type="button"
-                                className="btn-secondary"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setDetailUser(row)
-                                }}
-                              >
-                                Detalhes
-                              </button>
-                              <button
-                                type="button"
-                                className="btn-secondary"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleEditUser(row)
-                                }}
-                              >
-                                Editar
-                              </button>
-                              {!isPrincipal ? (
-                                <button
-                                  type="button"
-                                  className="btn-secondary"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    void handleResetPasswordWhatsapp(row)
-                                  }}
-                                >
-                                  WhatsApp
-                                </button>
-                              ) : null}
-                            </div>
-                          </button>
+                          <AdminUsuarioCard
+                            row={row}
+                            isEditing={isEditing}
+                            isPrincipal={isPrincipal}
+                            principalPodeDarAdmin={principalPodeDarAdmin}
+                            roleOptionsEdit={roleOptionsEdit}
+                            editForm={editForm}
+                            onChangeField={handleChangeField}
+                            onSaveUser={handleSaveUser}
+                            onCancelEdit={handleCancelEdit}
+                            onOpenDetail={setDetailUser}
+                            onStartEdit={handleEditUser}
+                            onWhatsapp={handleResetPasswordWhatsapp}
+                            onDelete={handleDeleteUser}
+                            getUserConnectionBadge={getUserConnectionBadge}
+                          />
                         </li>
                       )
                     })}
                   </ul>
-                  </>
                 )}
               </div>
 

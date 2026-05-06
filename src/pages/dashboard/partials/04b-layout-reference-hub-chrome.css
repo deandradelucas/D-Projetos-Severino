@@ -376,6 +376,23 @@ body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-h
   color: #0b0b0b;
 }
 
+/* Saldo no hero: positivo verde, negativo vermelho (sobrepõe `--hub-title` / preto do tema claro e mobile `!important`) */
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive {
+  color: #4ade80 !important;
+}
+
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative {
+  color: #f87171 !important;
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive {
+  color: #15803d !important;
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative {
+  color: #dc2626 !important;
+}
+
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card__label {
   color: #0b0b0b;
 }
@@ -846,8 +863,8 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
     align-items: center;
   }
 
-  /* Só na home: FAB mobile substitui o botão no hero; Transações mantém o primário visível */
-  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes) .dashboard-hub__btn--primary {
+  /* FAB mobile substitui o primário no hero (Visão Geral + Transações); Admin mantém CTAs no hero */
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin) .dashboard-hub__btn--primary {
     display: none;
   }
 
@@ -856,13 +873,6 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
     height: 38px;
     min-width: 38px;
     min-height: 38px;
-  }
-
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
-    flex: 0 1 auto;
-    min-width: 0;
-    padding-left: 12px;
-    padding-right: 12px;
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page .ref-panel,
@@ -1805,6 +1815,11 @@ body[data-theme='light'] .ref-tx-arrow-wrap--down {
   background: linear-gradient(165deg, color-mix(in srgb, var(--danger) 20%, transparent) 0%, color-mix(in srgb, var(--danger) 10%, transparent) 100%);
   border-color: color-mix(in srgb, var(--danger) 35%, transparent);
   box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--danger) 30%, transparent);
+}
+
+/* Ícones raster (PNG): não herdam `color` — tintura ~ --danger (#ef4444 claro). */
+body[data-theme='light'] .ref-tx-arrow-wrap--down img {
+  filter: brightness(0) saturate(100%) invert(35%) sepia(93%) saturate(7456%) hue-rotate(342deg) brightness(97%) contrast(96%);
 }
 
 body[data-theme='light'] .ref-tx-date {

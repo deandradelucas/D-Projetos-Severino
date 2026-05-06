@@ -20,6 +20,7 @@ import {
   Agenda,
   AdminUsuarios,
   AdminPagamentos,
+  AdminAuditoria,
   Pagamento,
   BemVindoAssinatura,
 } from './lazyRoutes'
@@ -57,6 +58,7 @@ function App() {
                 <Route element={<SuperAdminOutlet />}>
                   <Route path="/admin/usuarios" element={<AdminUsuarios />} />
                   <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
+                  <Route path="/admin/auditoria" element={<AdminAuditoria />} />
                 </Route>
                 <Route path="/" element={<Login />} />
               </Routes>

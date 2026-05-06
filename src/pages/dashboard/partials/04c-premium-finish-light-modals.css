@@ -315,20 +315,65 @@ body[data-theme='light'] .ref-dashboard-inner {
     column-gap: 10px;
   }
 
-  /* Configurações, Relatórios e Admin: título + subtítulo (sem ações no hero) */
+  /* Configurações e Relatórios: título + subtítulo (sem ações no hero) */
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row,
-  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row,
-  .dashboard-container.page-admin.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
     flex-wrap: nowrap;
     align-items: flex-start;
     column-gap: 10px;
   }
 
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text,
-  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text,
-  .dashboard-container.page-admin.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
     flex: 1 1 auto;
     min-width: 0;
+  }
+
+  /* Admin — logs de usuários / auditoria: hero com subtítulo + atalhos (família Relatórios / hub) */
+  .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row,
+  .dashboard-container.page-admin-auditoria.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    column-gap: 10px;
+    row-gap: 10px;
+    min-width: 0;
+  }
+
+  .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text,
+  .dashboard-container.page-admin-auditoria.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+
+  .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .page-admin-hero-actions,
+  .dashboard-container.page-admin-auditoria.ref-dashboard.app-horizon-shell .page-admin-hero-actions {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  body[data-theme='light'] .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .page-admin-hero-actions .dashboard-hub__btn,
+  body[data-theme='light'] .dashboard-container.page-admin-auditoria.ref-dashboard.app-horizon-shell .page-admin-hero-actions .dashboard-hub__btn {
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  @media (min-width: 520px) {
+    .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row,
+    .dashboard-container.page-admin-auditoria.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+
+    .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .page-admin-hero-actions,
+    .dashboard-container.page-admin-auditoria.ref-dashboard.app-horizon-shell .page-admin-hero-actions {
+      flex: 0 1 auto;
+      justify-content: flex-end;
+    }
   }
 
 }
@@ -1501,9 +1546,13 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     border-radius: 9px !important;
   }
 
-  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap svg {
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap svg,
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap i,
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap img {
     width: 14px !important;
     height: 14px !important;
+    font-size: 14px !important;
+    object-fit: contain;
   }
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-recorrencia-ico-wrap {
@@ -2355,9 +2404,14 @@ body[data-theme='dark'] .agenda-page .agenda-toggle {
 }
 
 .agenda-page .main-content.ref-dashboard-main,
-body[data-theme='dark'] .agenda-page .main-content.ref-dashboard-main,
 body[data-theme='light'] .agenda-page .main-content.ref-dashboard-main {
   background: #f3f4f7 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body[data-theme='dark'] .agenda-page .main-content.ref-dashboard-main {
+  background: #000000 !important;
   border: none !important;
   box-shadow: none !important;
 }
@@ -2368,6 +2422,11 @@ body[data-theme='light'] .agenda-page .main-content.ref-dashboard-main {
   padding: 0 18px 18px !important;
   gap: 14px;
   box-shadow: 0 28px 70px -44px rgba(15, 23, 42, 0.44);
+}
+
+body[data-theme='dark'] .agenda-page .ref-dashboard-scroll {
+  background: #000000;
+  box-shadow: none;
 }
 
 .agenda-page .agenda-hero,
@@ -2403,6 +2462,10 @@ body[data-theme='light'] .agenda-page .agenda-hero {
   border-top-left-radius: 42px;
   border-top-right-radius: 0;
   background: #ffffff;
+}
+
+body[data-theme='dark'] .agenda-page .agenda-hero::after {
+  background: #000000;
 }
 
 .agenda-page .agenda-hero > * {
@@ -2499,14 +2562,22 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
 
 @media (max-width: 900px) {
   .agenda-page.dashboard-container,
-  body[data-theme='light'] .agenda-page.dashboard-container,
-  body[data-theme='dark'] .agenda-page.dashboard-container {
+  body[data-theme='light'] .agenda-page.dashboard-container {
     width: 100vw !important;
     max-width: 100vw !important;
     min-height: 100dvh !important;
     padding: 0 !important;
     overflow-x: hidden !important;
     background: #f3f4f7 !important;
+  }
+
+  body[data-theme='dark'] .agenda-page.dashboard-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    background: #000000 !important;
   }
 
   .agenda-page .app-horizon-inner,
@@ -2563,7 +2634,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
   body[data-theme='dark']:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell),
   body[data-theme='dark']:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell) #root,
   body[data-theme='dark']:has(.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell) .app-routes-grow {
-    background: #f3f4f7 !important;
+    background: #000000 !important;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .app-horizon-inner,
@@ -2603,7 +2674,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
     overflow-y: auto !important;
     overscroll-behavior-y: none !important;
     -webkit-overflow-scrolling: touch !important;
-    background: #f3f4f7 !important;
+    background: #000000 !important;
     background-image: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
@@ -2721,7 +2792,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
   body[data-theme='dark']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) #root,
   body[data-theme='dark']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell) .app-routes-grow,
   body[data-theme='dark']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) .app-routes-grow {
-    background: #f3f4f7 !important;
+    background: #000000 !important;
   }
 
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .app-horizon-inner,
@@ -2766,7 +2837,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
     overflow-y: auto !important;
     overscroll-behavior-y: none !important;
     -webkit-overflow-scrolling: touch !important;
-    background: #f3f4f7 !important;
+    background: #000000 !important;
     background-image: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;

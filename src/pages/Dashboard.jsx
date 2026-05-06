@@ -99,6 +99,9 @@ export default function Dashboard() {
 
   const formatCurrency = formatCurrencyBRL
 
+  const saldoValorClass =
+    saldoTotal > 0 ? 'dashboard-hub__balance-value--positive' : saldoTotal < 0 ? 'dashboard-hub__balance-value--negative' : ''
+
   return (
     <>
     <div className="dashboard-container dashboard-page ref-dashboard app-horizon-shell">
@@ -116,8 +119,10 @@ export default function Dashboard() {
                 {getSaudacao()}, <span className={privacyMode ? 'privacy-blur' : ''}>{nomeExibicao}</span>
               </h1>
               <div className="dashboard-hub__balance-line" aria-label="Saldo disponível no painel">
-                <span>Saldo disponível</span>
-                <strong className={privacyMode ? 'privacy-blur' : ''}>{formatCurrency(saldoTotal)}</strong>
+                <span>Saldo disponível:</span>
+                <strong className={[privacyMode ? 'privacy-blur' : '', saldoValorClass].filter(Boolean).join(' ')}>
+                  {formatCurrency(saldoTotal)}
+                </strong>
               </div>
             </div>
             <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos do painel">

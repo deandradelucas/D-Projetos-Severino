@@ -316,36 +316,16 @@ export default function Login() {
       <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" noValidate>
         <label className="block" htmlFor="email">
           <span className="mb-2 block text-[11px] font-medium text-neutral-700 sm:text-[12px]">E-mail</span>
-          <div className="relative">
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="seu@email.com"
-              required
-              autoComplete="email"
-              className="w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 pr-11 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-400 focus:border-emerald-500/65 focus:bg-white focus-visible:ring-2 focus-visible:ring-emerald-400/35 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
-            />
-            <span
-              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 sm:right-4"
-              aria-hidden
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M12 12a3 3 0 100-6 3 3 0 000 6z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                />
-                <path
-                  d="M20 12c0 2-3.5 6-8 6s-8-4-8-6 3.5-6 8-6 8 4 8 6z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>
-          </div>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="seu@email.com"
+            required
+            autoComplete="email"
+            className="w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-400 focus:border-emerald-500/65 focus:bg-white focus-visible:ring-2 focus-visible:ring-emerald-400/35 sm:min-h-[46px] sm:px-4 sm:text-[13px]"
+          />
         </label>
 
         <label className="block" htmlFor="senha">

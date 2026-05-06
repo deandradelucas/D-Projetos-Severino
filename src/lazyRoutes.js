@@ -27,6 +27,9 @@ export const AdminUsuarios = lazy(loadAdminUsuarios)
 const loadAdminPagamentos = () => import('./pages/AdminPagamentos.jsx')
 export const AdminPagamentos = lazy(loadAdminPagamentos)
 
+const loadAdminAuditoria = () => import('./pages/AdminAuditoria.jsx')
+export const AdminAuditoria = lazy(loadAdminAuditoria)
+
 const loadPagamento = () => import('./features/pagamentos/PagamentoPage.jsx')
 export const Pagamento = lazy(loadPagamento)
 
@@ -44,6 +47,7 @@ const ROUTE_PREFETCH = {
   '/agenda': loadAgenda,
   '/admin/usuarios': loadAdminUsuarios,
   '/admin/pagamentos': loadAdminPagamentos,
+  '/admin/auditoria': loadAdminAuditoria,
   '/pagamento': loadPagamento,
   '/bem-vindo-assinatura': loadBemVindoAssinatura,
 }

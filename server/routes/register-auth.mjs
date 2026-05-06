@@ -91,9 +91,11 @@ export function registerAuthRoutes(app) {
 
       await insertAdminAuditLog({
         actorUserId: user.id,
+        targetUserId: user.id,
+        targetEmail: user.email,
         action: 'login_sucesso',
         clientIp: clientIpFromHono(c),
-        detail: { email: user.email },
+        detail: { email: user.email, method: 'senha' },
       })
 
       return c.json({
@@ -247,6 +249,17 @@ export function registerAuthRoutes(app) {
       const out = await finishAuthentication({ c, challengeId, credential, log })
       if (!out) {
         return c.json({ message: 'Biometria não reconhecida. Use a senha ou tente de novo.' }, 401)
+      }
+      const u = out.user
+      if (u?.id && u?.email) {
+        await insertAdminAuditLog({
+          actorUserId: u.id,
+          targetUserId: u.id,
+          targetEmail: u.email,
+          action: 'login_sucesso',
+          clientIp: clientIpFromHono(c),
+          detail: { email: u.email, method: 'webauthn' },
+        })
       }
       return c.json(out)
     } catch (error) {

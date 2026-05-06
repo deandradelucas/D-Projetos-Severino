@@ -336,9 +336,13 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   box-shadow: none;
 }
 
-.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap svg {
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap svg,
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap i,
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap img {
   width: 14px;
   height: 14px;
+  font-size: 14px;
+  object-fit: contain;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-val-act-wrap > .ref-tx-val-cell,
@@ -419,9 +423,13 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   border-radius: 11px !important;
 }
 
-.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap svg {
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap svg,
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap i,
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img {
   width: 14px !important;
   height: 14px !important;
+  font-size: 14px !important;
+  object-fit: contain;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val {
@@ -528,9 +536,13 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     border-radius: 10px !important;
   }
 
-  .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap svg {
+  .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap svg,
+  .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap i,
+  .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img {
     width: 13px !important;
     height: 13px !important;
+    font-size: 13px !important;
+    object-fit: contain;
   }
 }
 

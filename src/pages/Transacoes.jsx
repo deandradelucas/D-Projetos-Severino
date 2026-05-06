@@ -675,6 +675,26 @@ export default function Transacoes() {
       </div>
     </div>
 
+    {!isModalOpen && (
+      <button
+        type="button"
+        className="dashboard-mobile-tx-fab"
+        onClick={() => {
+          setEditingTransaction(null)
+          setIsModalOpen(true)
+        }}
+        aria-label="Criar nova transação"
+      >
+        <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
+        </span>
+        <span className="dashboard-mobile-tx-fab__label">Nova transação</span>
+      </button>
+    )}
+
     <TransactionModal
       isOpen={isModalOpen}
       onClose={() => {
