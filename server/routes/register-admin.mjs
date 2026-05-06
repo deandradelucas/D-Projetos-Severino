@@ -16,9 +16,23 @@ import { requestPasswordOtpWhatsApp } from '../lib/password-otp-whatsapp.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { mapSupabaseOrNetworkError } from '../lib/http/hono-error-map.mjs'
 import { assertPrincipalAdmin } from '../lib/admin/assert-principal-admin.mjs'
+import { getMarketingStatsAdmin } from '../lib/marketing-stats.mjs'
 
 export function registerAdminRoutes(app) {
   /** Painel interno: token MP configurado e path do webhook (sem segredos). */
+  app.get('/api/admin/marketing/stats', async (c) => {
+    try {
+      const usuarioId = c.req.header('x-user-id')
+      const block = await assertPrincipalAdmin(usuarioId)
+      if (block) return c.json({ message: block.message }, block.status)
+      const stats = await getMarketingStatsAdmin()
+      return c.json(stats)
+    } catch (error) {
+      log.error('get admin marketing stats failed', error)
+      return c.json({ message: 'Erro ao carregar estatísticas de marketing.' }, 500)
+    }
+  })
+
   app.get('/api/admin/mp-saude', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
