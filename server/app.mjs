@@ -19,7 +19,8 @@ function corsAllowedOrigin(origin) {
   ) {
     return origin
   }
-  if (/^https:\/\/([a-z0-9-]+\.)*mestredamente\.com$/i.test(origin)) return origin
+  /* http + https: evita preflight bloqueado se o front abrir sem TLS (Hostinger em HTTP). */
+  if (/^https?:\/\/([a-z0-9-]+\.)*mestredamente\.com$/i.test(origin)) return origin
   const extra = (process.env.CORS_ORIGINS || '')
     .split(',')
     .map((s) => s.trim())

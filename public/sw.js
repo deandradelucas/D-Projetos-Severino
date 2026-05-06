@@ -1,4 +1,4 @@
-const CACHE_NAME = 'horizonte-financeiro-v12'
+const CACHE_NAME = 'severino-financeiro-v1'
 const APP_SHELL = [
   '/',
   '/dashboard',

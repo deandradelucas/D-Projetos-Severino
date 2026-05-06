@@ -5,7 +5,7 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { normalizeUsuarioRow, stripSenha } from './usuario-schema.mjs'
 
-const DEFAULT_PUBLIC_APP_URL = 'https://horizontefinanceiro.mestredamente.com'
+const DEFAULT_PUBLIC_APP_URL = 'https://severino.mestredamente.com'
 
 export function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)

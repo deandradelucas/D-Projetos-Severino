@@ -94,7 +94,7 @@ export default function PwaInstallPrompt() {
 
         <div className="pwa-install-sheet__body">
           <p className="pwa-install-sheet__eyebrow">App pronto para instalar</p>
-          <h2 className="pwa-install-sheet__title" id="pwa-install-title">Horizonte na tela inicial</h2>
+          <h2 className="pwa-install-sheet__title" id="pwa-install-title">Severino na tela inicial</h2>
           <p className="pwa-install-sheet__text">
             Abra em tela cheia, com atalhos para Dashboard, Transações e Relatórios.
           </p>
