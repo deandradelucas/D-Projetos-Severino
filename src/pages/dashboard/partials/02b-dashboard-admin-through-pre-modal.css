@@ -585,7 +585,7 @@ body:has(.sidebar.open) .horizon-chat-window {
     width: min(520px, 100%);
     margin: 0;
     padding: 8px;
-    border: 1px solid color-mix(in srgb, var(--danger, #f87171) 36%, transparent);
+    border: none;
     border-radius: 26px;
     background:
       linear-gradient(175deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 42%, rgba(12, 12, 14, 0.82) 100%),
@@ -593,7 +593,6 @@ body:has(.sidebar.open) .horizon-chat-window {
     -webkit-backdrop-filter: blur(16px) saturate(1.12);
     backdrop-filter: blur(16px) saturate(1.12);
     box-shadow:
-      0 0 26px -12px color-mix(in srgb, var(--danger, #f87171) 28%, transparent),
       0 20px 50px -22px rgba(0, 0, 0, 0.72),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
     pointer-events: auto;
@@ -612,7 +611,7 @@ body:has(.sidebar.open) .horizon-chat-window {
     border-radius: 20px;
     border: 1px solid transparent;
     box-sizing: border-box;
-    color: rgba(245, 245, 245, 0.64);
+    color: rgba(255, 255, 255, 0.88);
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
     transition:
@@ -628,8 +627,8 @@ body:has(.sidebar.open) .horizon-chat-window {
   }
 
   .mobile-bottom-nav__item:active:not(.mobile-bottom-nav__item--active) {
-    background: color-mix(in srgb, var(--danger, #f87171) 14%, transparent);
-    color: rgba(255, 250, 250, 0.96);
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.95);
   }
 
   .mobile-bottom-nav__item--active:active {
@@ -637,12 +636,12 @@ body:has(.sidebar.open) .horizon-chat-window {
   }
 
   body[data-theme='light'] .mobile-bottom-nav__item:active:not(.mobile-bottom-nav__item--active) {
-    background: color-mix(in srgb, var(--danger, #ef4444) 16%, transparent);
-    color: #7f1d1d;
+    background: rgba(15, 23, 42, 0.06);
+    color: rgba(15, 23, 42, 0.78);
   }
 
   .mobile-bottom-nav__item:focus-visible {
-    outline: 2px solid var(--danger, #ef4444);
+    outline: 2px solid var(--accent, #d4a84b);
     outline-offset: 2px;
   }
 
@@ -675,50 +674,35 @@ body:has(.sidebar.open) .horizon-chat-window {
   }
 
   .mobile-bottom-nav__item--active {
-    color: #ffffff;
-    background:
-      linear-gradient(
-        165deg,
-        color-mix(in srgb, var(--danger, #f87171) 22%, transparent) 0%,
-        color-mix(in srgb, var(--danger, #f87171) 10%, transparent) 100%
-      );
-    border-color: color-mix(in srgb, var(--danger, #f87171) 45%, transparent);
-    box-shadow:
-      0 8px 24px -14px color-mix(in srgb, var(--danger, #f87171) 50%, transparent),
-      inset 0 1px 0 color-mix(in srgb, var(--danger, #f87171) 28%, transparent);
+    color: var(--accent, #e4bc6a);
+    background: color-mix(in srgb, var(--accent, #e4bc6a) 15%, transparent);
+    border-color: transparent;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent, #e4bc6a) 22%, transparent);
     -webkit-backdrop-filter: blur(12px) saturate(1.12);
     backdrop-filter: blur(12px) saturate(1.12);
   }
 
   body[data-theme='light'] .mobile-bottom-nav__bar {
-    border: 1px solid color-mix(in srgb, var(--danger, #ef4444) 38%, transparent);
+    border: none;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(248, 250, 252, 0.72)),
       rgba(255, 255, 255, 0.58);
     -webkit-backdrop-filter: blur(16px) saturate(1.1);
     backdrop-filter: blur(16px) saturate(1.1);
     box-shadow:
-      0 0 28px -14px color-mix(in srgb, var(--danger, #ef4444) 22%, transparent),
       0 20px 48px -24px rgba(15, 23, 42, 0.38),
       inset 0 1px 0 rgba(255, 255, 255, 0.88);
   }
 
   body[data-theme='light'] .mobile-bottom-nav__item {
-    color: rgba(15, 23, 42, 0.58);
+    color: rgba(15, 23, 42, 0.62);
   }
 
   body[data-theme='light'] .mobile-bottom-nav__item--active {
-    color: #ffffff;
-    background:
-      linear-gradient(
-        165deg,
-        color-mix(in srgb, var(--danger, #ef4444) 52%, transparent) 0%,
-        color-mix(in srgb, var(--danger, #ef4444) 34%, transparent) 100%
-      );
-    border-color: color-mix(in srgb, var(--danger, #ef4444) 55%, transparent);
-    box-shadow:
-      0 8px 26px -14px color-mix(in srgb, var(--danger, #ef4444) 38%, transparent),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    color: var(--accent, #d4a84b);
+    background: color-mix(in srgb, var(--accent, #d4a84b) 14%, transparent);
+    border-color: transparent;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent, #d4a84b) 28%, transparent);
     -webkit-backdrop-filter: blur(12px) saturate(1.08);
     backdrop-filter: blur(12px) saturate(1.08);
   }

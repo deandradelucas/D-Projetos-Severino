@@ -1097,47 +1097,64 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
   background: transparent !important;
   background-image: none !important;
-  border: 1px solid transparent !important;
+  border: none !important;
   border-radius: 12px !important;
   box-shadow: none !important;
+}
+
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) {
+  color: rgba(255, 255, 255, 0.92) !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active),
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:hover {
   background: rgba(255, 255, 255, 0.07) !important;
-  border-color: transparent !important;
+  border: none !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-  background: rgba(255, 255, 255, 0.1) !important;
+  font-weight: 800;
+  background: color-mix(in srgb, var(--accent, #e4bc6a) 13%, transparent) !important;
   background-image: none !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
-  color: #f8fafc !important;
-  box-shadow:
-    0 12px 32px -22px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.09) !important;
+  border: none !important;
+  color: var(--accent, #e4bc6a) !important;
+  box-shadow: none !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) .icon-wrap {
   background: rgba(255, 255, 255, 0.06) !important;
   background-image: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: none !important;
   border-radius: 11px !important;
   box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.95) !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap {
   background: rgba(255, 255, 255, 0.1) !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
+  border: none !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
-  background: rgba(212, 168, 75, 0.16) !important;
+  background: color-mix(in srgb, var(--accent, #e4bc6a) 20%, transparent) !important;
   background-image: none !important;
-  border-color: rgba(212, 168, 75, 0.38) !important;
-  color: var(--accent) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  border: none !important;
+  color: var(--accent, #e4bc6a) !important;
+  box-shadow: none !important;
+}
+
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn:hover {
+  border: none !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
@@ -1152,14 +1169,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   color: #fecaca !important;
 }
 
-@media (max-width: 768px) {
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-    box-shadow:
-      inset 3px 0 0 var(--accent, #d4a84b),
-      0 12px 32px -22px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.09) !important;
-  }
-}
 
 /* =============================================================================
    Dashboard home + Pagamento + Configurações + Relatórios — mobile slim/minimalista
@@ -1528,6 +1537,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     max-width: none;
     padding: 0 13px 0 9px;
     font-size: 12px;
+  }
+
+  body[data-theme='light'] .dashboard-mobile-tx-fab {
     box-shadow:
       0 20px 42px -22px rgba(15, 23, 42, 0.28),
       inset 0 1px 0 rgba(255, 255, 255, 0.85),

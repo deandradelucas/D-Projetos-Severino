@@ -123,55 +123,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   }
 }
 
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
-  color: rgba(250, 250, 250, 0.78);
-}
-
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: none;
-  color: #fafafa;
-}
-
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-  font-weight: 800;
-  color: #fafafa !important;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(212, 168, 75, 0.12) 100%);
-  border-color: rgba(212, 168, 75, 0.38);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.08) inset,
-    0 12px 32px -20px rgba(0, 0, 0, 0.6);
-}
-
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: rgba(250, 250, 250, 0.88);
-}
-
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #fafafa;
-}
-
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
-  background: rgba(212, 168, 75, 0.16);
-  border-color: rgba(212, 168, 75, 0.42);
-  color: var(--accent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) {
-  color: rgba(250, 250, 250, 0.76);
-}
-
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) .icon-wrap {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: rgba(250, 250, 250, 0.88);
-}
+/* Sidebar shell — estados de nav consolidados no bloco neo abaixo (evita bordas / roxo duplicado). */
 
 /* KPIs e painéis */
 body[data-theme='dark'] .ref-kpi-card {
@@ -651,19 +603,26 @@ body[data-theme='dark'] .sidebar {
     0 28px 68px -38px rgba(0, 0, 0, 0.85);
 }
 
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
 body[data-theme='dark'] .nav-item {
   color: rgba(255, 255, 255, 0.72);
 }
 
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active),
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
+  color: rgba(255, 255, 255, 0.92);
+}
+
 body[data-theme='dark'] .nav-item:hover:not(.active) {
   background: rgba(255, 255, 255, 0.075);
   border-color: rgba(255, 255, 255, 0.12);
   color: #ffffff;
 }
 
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active,
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.075);
+  border-color: transparent;
+  color: #ffffff;
+}
+
 body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .nav-item.active,
 body[data-theme='dark'] .nav-item.active {
   background:
@@ -676,20 +635,26 @@ body[data-theme='dark'] .nav-item.active {
     0 12px 34px -22px rgba(139, 92, 246, 0.9);
 }
 
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
+  font-weight: 800;
+  background: color-mix(in srgb, var(--accent, #e4bc6a) 13%, transparent);
+  border-color: transparent;
+  color: var(--accent, #e4bc6a) !important;
+  box-shadow: none;
+}
+
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) .icon-wrap {
   background: rgba(255, 255, 255, 0.055);
-  border-color: rgba(255, 255, 255, 0.11);
-  color: rgba(255, 255, 255, 0.82);
+  border: none;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
-  background: rgba(139, 92, 246, 0.22);
-  border-color: rgba(0, 183, 255, 0.3);
-  color: #ffffff;
-  box-shadow:
-    0 0 18px rgba(139, 92, 246, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background: color-mix(in srgb, var(--accent, #e4bc6a) 20%, transparent);
+  border: none;
+  color: var(--accent, #e4bc6a);
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .btn-primary,
@@ -879,69 +844,67 @@ body[data-theme='dark'] .horizon-chat-fab {
     0 24px 54px -30px rgba(0, 0, 0, 0.88);
 }
 
-/* Menu inferior mobile: vidro + borda neon (--danger neo #ff4d67), alinhado aos quadrados de despesa */
+/* Menu inferior mobile: inativos brancos; só o ativo em --accent */
 body[data-theme='dark'] .mobile-bottom-nav__bar {
   background:
     linear-gradient(175deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(8, 8, 10, 0.78) 100%),
     rgba(4, 4, 6, 0.68);
-  border: 1px solid color-mix(in srgb, var(--danger, #ff4d67) 44%, transparent);
-  color: #ffffff;
+  border: none;
   -webkit-backdrop-filter: blur(18px) saturate(1.22);
   backdrop-filter: blur(18px) saturate(1.22);
   box-shadow:
-    0 0 32px -10px color-mix(in srgb, var(--danger, #ff4d67) 38%, transparent),
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 22px 52px -28px rgba(0, 0, 0, 0.88);
 }
 
 body[data-theme='dark'] .mobile-bottom-nav__item {
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(255, 255, 255, 0.88);
 }
 
 body[data-theme='dark'] .mobile-bottom-nav__item--active {
-  color: #ffffff;
-  background:
-    linear-gradient(
-      165deg,
-      color-mix(in srgb, var(--danger, #ff4d67) 26%, transparent) 0%,
-      color-mix(in srgb, var(--danger, #ff4d67) 11%, transparent) 100%
-    );
-  border: 1px solid color-mix(in srgb, var(--danger, #ff4d67) 48%, transparent);
-  box-shadow:
-    0 8px 26px -12px color-mix(in srgb, var(--danger, #ff4d67) 58%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--danger, #ff4d67) 32%, transparent);
+  color: var(--accent, #e4bc6a);
+  background: color-mix(in srgb, var(--accent, #e4bc6a) 16%, transparent);
+  border-color: transparent;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent, #e4bc6a) 22%, transparent);
   -webkit-backdrop-filter: blur(14px) saturate(1.18);
   backdrop-filter: blur(14px) saturate(1.18);
 }
 
 body[data-theme='dark'] .dashboard-mobile-tx-fab {
-  border-color: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
   background:
     linear-gradient(
-      175deg,
-      rgba(255, 255, 255, 0.22) 0%,
-      rgba(255, 255, 255, 0.07) 44%,
-      rgba(255, 255, 255, 0.16) 52%,
-      rgba(255, 255, 255, 0.1) 100%
-    ) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(1.25) !important;
-  backdrop-filter: blur(22px) saturate(1.25) !important;
+      148deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.05) 22%,
+      transparent 40%,
+      transparent 100%
+    ),
+    linear-gradient(180deg, rgba(26, 26, 28, 0.88) 0%, rgba(10, 10, 12, 0.94) 100%),
+    rgba(0, 0, 0, 0.45) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.2) !important;
+  backdrop-filter: blur(20px) saturate(1.2) !important;
   box-shadow:
-    0 22px 48px -24px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.38),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+    0 20px 48px -26px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35) !important;
 }
 
 body[data-theme='dark'] .dashboard-mobile-tx-fab__icon {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: rgba(248, 250, 252, 0.82) !important;
+  background: rgba(255, 255, 255, 0.11) !important;
+  color: #ffffff !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32) !important;
 }
 
 body[data-theme='dark'] .dashboard-mobile-tx-fab__label {
-  background: linear-gradient(185deg, #6ee7b7 0%, #34d399 38%, #059669 100%);
+  background: linear-gradient(
+    185deg,
+    #a7f3d0 0%,
+    var(--success, #10d68f) 38%,
+    #059669 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent !important;
