@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import AuthPasswordToggleButton from '../components/AuthPasswordToggleButton'
 import AuthPhoneShell from '../components/AuthPhoneShell'
 import { apiUrl } from '../lib/apiUrl'
+import { BRAND_ASSETS } from '../lib/brandAssets'
 import { prefetchRoute } from '../lazyRoutes'
 import { showToast } from '../lib/toastStore'
 import { webAuthnSupported, fetchWebAuthnStatus, loginWithWebAuthn } from '../lib/webauthnBrowser'
+import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
+import { validateEmail } from '../lib/validateEmail'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
-
-function validateEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
 
 export default function Login() {
   const navigate = useNavigate()
@@ -29,7 +29,7 @@ export default function Login() {
       return false
     }
   })
-  const [mensagem, setMensagem] = useState({ texto: '', tipo: '' })
+  const [formError, setFormError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showRecovery, setShowRecovery] = useState(false)
   const [recoveryEmail, setRecoveryEmail] = useState('')
@@ -181,19 +181,19 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setMensagem({ texto: '', tipo: '' })
+    setFormError('')
 
     if (!validateEmail(email)) {
-      setMensagem({ texto: 'E-mail inválido', tipo: 'erro' })
+      setFormError('E-mail inválido')
       return
     }
 
     if (!senha) {
-      setMensagem({ texto: 'Preencha a senha', tipo: 'erro' })
+      setFormError('Preencha a senha')
       return
     }
     if (senha.length < 6) {
-      setMensagem({ texto: 'A senha deve ter no mínimo 6 caracteres', tipo: 'erro' })
+      setFormError('A senha deve ter no mínimo 6 caracteres')
       return
     }
 
@@ -222,11 +222,9 @@ export default function Login() {
       try {
         data = raw ? JSON.parse(raw) : {}
       } catch {
-        setMensagem({
-          texto:
-            'Resposta inválida do servidor. Em produção, confira se a API está no mesmo domínio ou defina VITE_API_URL no build.',
-          tipo: 'erro',
-        })
+        setFormError(
+          'Resposta inválida do servidor. Em produção, confira se a API está no mesmo domínio ou defina VITE_API_URL no build.',
+        )
         setLoading(false)
         return
       }
@@ -248,7 +246,7 @@ export default function Login() {
         err instanceof TypeError && String(err?.message || '').toLowerCase().includes('fetch')
           ? 'Sem conexão com o servidor. Verifique a internet e se a API está acessível neste endereço.'
           : 'Erro ao conectar com o servidor.'
-      setMensagem({ texto: net, tipo: 'erro' })
+      setFormError(net)
       setLoading(false)
     }
   }
@@ -265,16 +263,13 @@ export default function Login() {
   }
 
   const handleBiometricLogin = async () => {
-    setMensagem({ texto: '', tipo: '' })
+    setFormError('')
     if (!validateEmail(email)) {
-      setMensagem({ texto: 'Informe o e-mail cadastrado para usar a biometria.', tipo: 'erro' })
+      setFormError('Informe o e-mail cadastrado para usar a biometria.')
       return
     }
     if (!webAuthnSupported()) {
-      setMensagem({
-        texto: 'Biometria requer HTTPS (ou localhost) e um navegador compatível no celular.',
-        tipo: 'erro',
-      })
+      setFormError('Biometria requer HTTPS (ou localhost) e um navegador compatível no celular.')
       return
     }
     setBioLoading(true)
@@ -286,20 +281,18 @@ export default function Login() {
       const u = data.user || {}
       navigateAfterLogin(u)
     } catch (err) {
-      setMensagem({
-        texto: err instanceof Error ? err.message : 'Não foi possível entrar com biometria.',
-        tipo: 'erro',
-      })
+      setFormError(err instanceof Error ? err.message : 'Não foi possível entrar com biometria.')
       setBioLoading(false)
     }
   }
 
   return (
     <AuthPhoneShell
-      title="Login"
-      headerTitle="Login"
+      visuallyHiddenTitle="Login"
+      showBodyLogo
+      bodyLogoSrc={BRAND_ASSETS.loginSeverinoLight}
+      bodyLogoAlt="Horizonte Financeiro"
       heroImageSrc="/images/Login/01.avif"
-      subtitle="Bem-vindo de volta. Faça login para continuar."
       compact={!showRecovery && !(webAuthnSupported() && hasWebAuthn)}
       footer={
         <>
@@ -324,7 +317,7 @@ export default function Login() {
             placeholder="seu@email.com"
             required
             autoComplete="email"
-            className="w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-400 focus:border-emerald-500/65 focus:bg-white focus-visible:ring-2 focus-visible:ring-emerald-400/35 sm:min-h-[46px] sm:px-4 sm:text-[13px]"
+            className={AUTH_SHELL_INPUT_CLASS}
           />
         </label>
 
@@ -340,35 +333,9 @@ export default function Login() {
               required
               minLength={6}
               autoComplete="current-password"
-              className="w-full rounded-[14px] border border-neutral-200/95 bg-white/75 px-3 py-3 pr-11 text-[12px] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none backdrop-blur-sm transition placeholder:text-neutral-300 focus:border-emerald-500/65 focus:bg-white focus-visible:ring-2 focus-visible:ring-emerald-400/35 sm:min-h-[46px] sm:px-4 sm:pr-12 sm:text-[13px]"
+              className={`${AUTH_SHELL_INPUT_CLASS} pr-11 placeholder:text-neutral-300 sm:pr-12`}
             />
-            <button
-              type="button"
-              onClick={() => setShowSenha(!showSenha)}
-              aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/45 sm:right-3"
-            >
-              {showSenha ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                  <path
-                    d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.9 5.1A10.4 10.4 0 0112 5c5 0 9.3 3.8 10 9-.3 1.8-1 3.5-2 4.9M6.1 6.1C4.3 7.7 3 9.7 2 12c.7 5.2 5 9 10 9 1.6 0 3.1-.4 4.5-1"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                  <path
-                    d="M2 12s4.5-7 10-7 10 7 10 7-4.5 7-10 7-10-7-10-7z"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6" />
-                </svg>
-              )}
-            </button>
+            <AuthPasswordToggleButton passwordVisible={showSenha} onToggle={() => setShowSenha((v) => !v)} />
           </div>
         </label>
 
@@ -498,17 +465,11 @@ export default function Login() {
         )}
       </form>
 
-      {mensagem.texto && (
-        <div
-          className={`mt-4 rounded-[12px] border p-3 text-center text-[11px] sm:text-[12px] ${
-            mensagem.tipo === 'sucesso'
-              ? 'border-success/35 bg-success/10 text-emerald-800'
-              : 'border-error/35 bg-error/10 text-red-700'
-          }`}
-        >
-          {mensagem.texto}
+      {formError ? (
+        <div className="mt-4 rounded-[12px] border border-error/35 bg-error/10 p-3 text-center text-[11px] text-red-700 sm:text-[12px]">
+          {formError}
         </div>
-      )}
+      ) : null}
     </AuthPhoneShell>
   )
 }
