@@ -19,6 +19,7 @@ import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
+import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon'
 import { formatTransacaoListDateTime } from '../lib/transacaoDateDisplay'
 import './dashboard.css'
 
@@ -559,17 +560,12 @@ export default function Transacoes() {
                     <div key={t.id} className="ref-tx-row">
                       <div className="ref-tx-icon-cell">
                         <div className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}`} aria-hidden>
-                          {isRec ? (
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M12 19V5" />
-                              <path d="m5 12 7-7 7 7" />
-                            </svg>
-                          ) : (
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M12 5v14" />
-                              <path d="m19 12-7 7-7-7" />
-                            </svg>
-                          )}
+                          <TransacaoCategoriaIcon
+                            categoriaNome={catNome}
+                            subcategoriaNome={subNome}
+                            isReceita={isRec}
+                            size={16}
+                          />
                         </div>
                       </div>
                       <div className="ref-tx-meta-cell">

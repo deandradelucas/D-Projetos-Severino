@@ -112,7 +112,7 @@ body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relat
   --hub-r-inner: 8px;
 }
 
-/* Dashboard inicial (claro): acento esmeralda + fundo #dcd8d6 na coluna rolável — demais páginas hub mantêm o roxo */
+/* Dashboard inicial (claro): acento esmeralda + coluna rolável branca — demais páginas hub mantêm o roxo */
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub {
   --hub-accent: #10b981;
   --hub-accent-hover: #059669;
@@ -121,7 +121,7 @@ body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-h
 }
 
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-  background-color: #dcd8d6;
+  background-color: #ffffff;
   background-image: none;
   background-size: auto;
   background-position: center;
@@ -352,9 +352,9 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   display: inline-flex;
   max-width: 100%;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   color: var(--hub-muted);
-  font-size: clamp(0.7rem, 0.22vw + 0.64rem, 0.8rem);
+  font-size: clamp(0.88rem, 0.38vw + 0.72rem, 1.02rem);
   font-weight: 700;
   line-height: 1.15;
 }
@@ -362,7 +362,7 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
   min-width: 0;
   color: var(--hub-title);
-  font-size: clamp(0.82rem, 0.38vw + 0.72rem, 0.98rem);
+  font-size: clamp(1.05rem, 0.52vw + 0.86rem, 1.22rem);
   font-weight: 900;
   letter-spacing: -0.025em;
   overflow: hidden;
@@ -826,12 +826,12 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
-    gap: 5px;
-    font-size: 10px;
+    gap: 6px;
+    font-size: clamp(0.8125rem, 3.15vw, 0.97rem);
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
-    font-size: 12px;
+    font-size: clamp(0.97rem, 3.65vw, 1.125rem);
   }
 
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
@@ -1065,13 +1065,14 @@ body[data-theme='light'] .ref-kpi-card {
   gap: 14px;
   min-height: 118px;
   padding: 16px 16px 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(226, 232, 240, 0.98);
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
   background: #ffffff;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 1) inset,
-    0 14px 36px -28px rgba(15, 23, 42, 0.18),
-    0 6px 16px -12px rgba(15, 23, 42, 0.06);
+    0 2px 6px rgba(15, 23, 42, 0.05),
+    0 20px 44px -18px rgba(15, 23, 42, 0.14),
+    0 36px 64px -32px rgba(15, 23, 42, 0.1);
   overflow: hidden;
 }
 
@@ -1154,13 +1155,14 @@ body[data-theme='light'] .ref-kpi-card__value {
     min-height: 0;
     align-items: center;
     padding: 14px 18px;
-    border-radius: 10px;
+    border-radius: 18px;
     gap: 15px;
-    background: linear-gradient(180deg, #ffffff 0%, #fafbfd 100%);
+    background: #ffffff;
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 1) inset,
-      0 18px 44px -30px rgba(15, 23, 42, 0.2),
-      0 8px 20px -14px rgba(15, 23, 42, 0.08);
+      0 2px 8px rgba(15, 23, 42, 0.05),
+      0 22px 48px -20px rgba(15, 23, 42, 0.16),
+      0 40px 72px -36px rgba(15, 23, 42, 0.11);
   }
 
   body[data-theme='light'] .ref-kpi-card__value {
@@ -1168,13 +1170,14 @@ body[data-theme='light'] .ref-kpi-card__value {
   }
 
   body[data-theme='light'] .ref-panel {
-    border-radius: 10px;
+    border-radius: 20px;
     padding: 18px 18px 14px;
-    background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
+    background: #ffffff;
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 1) inset,
-      0 22px 52px -32px rgba(15, 23, 42, 0.2),
-      0 10px 24px -14px rgba(15, 23, 42, 0.08);
+      0 2px 8px rgba(15, 23, 42, 0.05),
+      0 24px 52px -22px rgba(15, 23, 42, 0.15),
+      0 44px 80px -38px rgba(15, 23, 42, 0.12);
   }
 
   body[data-theme='light'] .ref-panel.ref-panel--transactions {
@@ -1182,30 +1185,37 @@ body[data-theme='light'] .ref-kpi-card__value {
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-kpi-card {
-    background: rgba(255, 255, 255, 0.28);
-    -webkit-backdrop-filter: blur(22px) saturate(1.08);
-    backdrop-filter: blur(22px) saturate(1.08);
-    border: 1px solid rgba(163, 163, 163, 0.28);
+    background: #ffffff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 1px solid rgba(226, 232, 240, 0.98);
     box-shadow:
-      0 8px 28px -18px rgba(15, 23, 42, 0.1),
-      0 1px 0 rgba(255, 255, 255, 0.42) inset;
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 2px 8px rgba(15, 23, 42, 0.05),
+      0 22px 48px -20px rgba(15, 23, 42, 0.16),
+      0 40px 72px -36px rgba(15, 23, 42, 0.11);
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-panel {
-    background: rgba(255, 255, 255, 0.24);
-    -webkit-backdrop-filter: blur(24px) saturate(1.06);
-    backdrop-filter: blur(24px) saturate(1.06);
-    border: 1px solid rgba(163, 163, 163, 0.26);
+    background: #ffffff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 1px solid rgba(226, 232, 240, 0.98);
     box-shadow:
-      0 10px 32px -20px rgba(15, 23, 42, 0.12),
-      0 1px 0 rgba(255, 255, 255, 0.38) inset;
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 2px 8px rgba(15, 23, 42, 0.05),
+      0 24px 52px -22px rgba(15, 23, 42, 0.15),
+      0 44px 80px -38px rgba(15, 23, 42, 0.12);
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid > .ref-tx-row {
-    background: rgba(255, 255, 255, 0.26);
-    -webkit-backdrop-filter: blur(14px) saturate(1.05);
-    backdrop-filter: blur(14px) saturate(1.05);
-    border-color: rgba(148, 163, 184, 0.26);
+    background: #ffffff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-color: rgba(226, 232, 240, 0.95);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 10px 28px -16px rgba(15, 23, 42, 0.1);
   }
 }
 
@@ -1228,13 +1238,14 @@ body[data-theme='light'] .ref-bottom-grid.ref-bottom-grid--single {
 }
 
 body[data-theme='light'] .ref-panel {
-  border-radius: 20px;
+  border-radius: 22px;
   border: 1px solid rgba(226, 232, 240, 0.98);
   background: #ffffff;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 1) inset,
-    0 20px 48px -32px rgba(15, 23, 42, 0.18),
-    0 8px 20px -14px rgba(15, 23, 42, 0.06);
+    0 2px 6px rgba(15, 23, 42, 0.05),
+    0 20px 48px -20px rgba(15, 23, 42, 0.14),
+    0 38px 70px -34px rgba(15, 23, 42, 0.1);
   padding: 16px 16px 12px;
   min-height: 280px;
   display: flex;

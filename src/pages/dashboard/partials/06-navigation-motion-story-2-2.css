@@ -195,7 +195,7 @@
 }
 
 /* -----------------------------------------------------------------------------
-   Dashboard inicial + Pagamento + Configurações + Relatórios — tema claro (mobile/PWA): bounce #dcd8d6,
+   Dashboard inicial + Pagamento + Configurações + Relatórios — tema claro (mobile/PWA): bounce branco,
    hero vidro, texto escuro, botões e CTA esmeralda (mesma linguagem da Agenda).
    ----------------------------------------------------------------------------- */
 @media (max-width: 900px) {
@@ -211,7 +211,7 @@
   body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) #root,
   body[data-theme='light']:has(.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell) .app-routes-grow,
   body[data-theme='light']:has(.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell) .app-routes-grow {
-    background: #dcd8d6 !important;
+    background: #ffffff !important;
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell,
@@ -225,7 +225,7 @@
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    background-color: #dcd8d6 !important;
+    background-color: #ffffff !important;
     background-image: none !important;
     background-size: auto !important;
     background-position: center !important;
@@ -276,17 +276,23 @@
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
-    background: rgba(255, 255, 255, 0.22) !important;
-    border-color: rgba(163, 163, 163, 0.26) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(1.05) !important;
-    backdrop-filter: blur(18px) saturate(1.05) !important;
+    background: #ffffff !important;
+    border-color: rgba(226, 232, 240, 0.98) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.38) inset,
-      0 10px 28px -22px rgba(15, 23, 42, 0.18) !important;
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 2px 8px rgba(15, 23, 42, 0.05),
+      0 22px 48px -20px rgba(15, 23, 42, 0.16),
+      0 40px 72px -36px rgba(15, 23, 42, 0.11) !important;
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
-    background: rgba(255, 255, 255, 0.18) !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 2px 8px rgba(15, 23, 42, 0.05),
+      0 24px 52px -22px rgba(15, 23, 42, 0.15),
+      0 44px 80px -38px rgba(15, 23, 42, 0.12) !important;
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,
@@ -354,20 +360,22 @@
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-card,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-panel.page-relatorios-chart-panel,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-panel.page-relatorios-ref-filters {
-    background: rgba(255, 255, 255, 0.22) !important;
-    border-color: rgba(163, 163, 163, 0.26) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(1.05) !important;
-    backdrop-filter: blur(18px) saturate(1.05) !important;
+    background: #ffffff !important;
+    border-color: rgba(226, 232, 240, 0.95) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.38) inset,
-      0 10px 28px -22px rgba(15, 23, 42, 0.18) !important;
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 2px 8px rgba(15, 23, 42, 0.05),
+      0 22px 48px -20px rgba(15, 23, 42, 0.14),
+      0 40px 72px -36px rgba(15, 23, 42, 0.11) !important;
   }
 
   /* Agenda — mesmo fundo rolável e cartões vidro que o dashboard inicial */
   body[data-theme='light']:has(.dashboard-container.agenda-page.ref-dashboard.app-horizon-shell),
   body[data-theme='light']:has(.dashboard-container.agenda-page.ref-dashboard.app-horizon-shell) #root,
   body[data-theme='light']:has(.dashboard-container.agenda-page.ref-dashboard.app-horizon-shell) .app-routes-grow {
-    background: #dcd8d6 !important;
+    background: #ffffff !important;
   }
 
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell {
@@ -375,7 +383,7 @@
   }
 
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    background-color: #dcd8d6 !important;
+    background-color: #ffffff !important;
     background-image: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
