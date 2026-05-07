@@ -10,9 +10,33 @@
  * - Subdomínio extra só para o **front** (ex.: `app.severino…`): lista em `VITE_SEVERINO_FRONT_HOST`.
  * - **Front Hostinger + API na Vercel:** no build da Hostinger define
  *   `VITE_SEVERINO_API_ORIGIN=https://<projeto>.vercel.app` (sem `/api`). Sem isto, `/api` relativo não existe no estático.
- * - **Vercel:** mesmo projeto front+API usa `/api` relativo (rewrites); no host Severino não se aplica.
+ * - **Vercel:** mesmo projeto front+API em `severino.mestredamente.com`: use `/api` na mesma origem.
+ *   Se o build ainda tiver `VITE_SEVERINO_API_ORIGIN=https://api.severino.mestredamente.com` sem DNS,
+ *   esse host é ignorado e volta a usar `/api` relativo (escape: `VITE_SEVERINO_ALLOW_LEGACY_API_SUBDOMAIN=1`).
  */
 const SEVERINO_HOST_RE = /^(?:www\.)?severino\.mestredamente\.com$/i
+
+/** Documentação antiga sugeria este host; na prática o DNS muitas vezes não existe → “Failed to fetch”. */
+const LEGACY_API_SUBDOMAIN_RE = /^api\.severino\.mestredamente\.com$/i
+
+function allowLegacyApiSubdomain() {
+  return (
+    import.meta.env.VITE_SEVERINO_ALLOW_LEGACY_API_SUBDOMAIN === '1' ||
+    import.meta.env.VITE_SEVERINO_ALLOW_LEGACY_API_SUBDOMAIN === 'true'
+  )
+}
+
+/** Devolve base vazia se apontar só para o subdomínio legado sem DNS (exceto com env de opt-in). */
+function sanitizeBrokenLegacyApiBase(base) {
+  if (allowLegacyApiSubdomain() || !base || typeof base !== 'string') return base
+  try {
+    const normalized = /^https?:\/\//i.test(base) ? base : `https://${base}`
+    const host = new URL(normalized).hostname
+    return LEGACY_API_SUBDOMAIN_RE.test(host) ? '' : base
+  } catch {
+    return base
+  }
+}
 
 function extraSeverinoFrontHosts() {
   const raw = import.meta.env.VITE_SEVERINO_FRONT_HOST || ''
@@ -59,11 +83,22 @@ export function apiUrl(path) {
     raw === undefined || raw === null ? '' : String(raw).trim().replace(/\/$/, '')
 
   const severinoApiRaw = import.meta.env.VITE_SEVERINO_API_ORIGIN || import.meta.env.VITE_API_URL
-  const defaultSeverinoApi = stripTrailingSlash(
+  let defaultSeverinoApi = stripTrailingSlash(
     severinoApiRaw != null && String(severinoApiRaw).trim()
       ? String(severinoApiRaw).trim().replace(/\/$/, '')
       : '',
   )
+
+  const onSeverinoProdBrowser =
+    import.meta.env.PROD &&
+    typeof window !== 'undefined' &&
+    window.location?.hostname &&
+    isSeverinoFrontendHost(window.location.hostname)
+
+  if (onSeverinoProdBrowser) {
+    envBase = sanitizeBrokenLegacyApiBase(envBase)
+    defaultSeverinoApi = sanitizeBrokenLegacyApiBase(defaultSeverinoApi)
+  }
 
   let inferredBase = ''
   if (
@@ -141,5 +176,7 @@ export function severinoProdApiMisconfigured() {
   if (!import.meta.env.PROD || typeof window === 'undefined') return false
   if (!isSeverinoFrontendHost(window.location.hostname)) return false
   if (severinoSameOriginApiFlag()) return false
+  /* Build na Vercel: `/api` relativo é válido (rewrites); não mostrar aviso de Hostinger estático. */
+  if (import.meta.env.VITE_VERCEL === '1') return false
   return apiUrl('/api/health').startsWith('/')
 }
