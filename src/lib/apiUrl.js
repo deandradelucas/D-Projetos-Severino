@@ -8,13 +8,11 @@
  *   - **API noutro host/subdomínio:** `VITE_SEVERINO_API_ORIGIN` ou `VITE_API_URL` com URL absoluto.
  * - **Hostinger só Git estático** (sem proxy `/api`): não funciona — falta Node ou outro host da API.
  * - Subdomínio extra só para o **front** (ex.: `app.severino…`): lista em `VITE_SEVERINO_FRONT_HOST`.
- * - Subdomínio para a **API**: `VITE_SEVERINO_API_ORIGIN` sobrescreve; se vazio, usa por defeito
- *   `https://api.severino.mestredamente.com` no host Severino.
- * - **Vercel:** `VITE_API_URL` + mesmo projeto usa `/api` relativo (rewrites); no host Severino não se aplica.
+ * - **Front Hostinger + API na Vercel:** no build da Hostinger define
+ *   `VITE_SEVERINO_API_ORIGIN=https://<projeto>.vercel.app` (sem `/api`). Sem isto, `/api` relativo não existe no estático.
+ * - **Vercel:** mesmo projeto front+API usa `/api` relativo (rewrites); no host Severino não se aplica.
  */
 const SEVERINO_HOST_RE = /^(?:www\.)?severino\.mestredamente\.com$/i
-/** API pública Severino (Hostinger) quando não há env no build. */
-const DEFAULT_SEVERINO_API_ORIGIN = 'https://api.severino.mestredamente.com'
 
 function extraSeverinoFrontHosts() {
   const raw = import.meta.env.VITE_SEVERINO_FRONT_HOST || ''
@@ -64,7 +62,7 @@ export function apiUrl(path) {
   const defaultSeverinoApi = stripTrailingSlash(
     severinoApiRaw != null && String(severinoApiRaw).trim()
       ? String(severinoApiRaw).trim().replace(/\/$/, '')
-      : DEFAULT_SEVERINO_API_ORIGIN,
+      : '',
   )
 
   let inferredBase = ''
