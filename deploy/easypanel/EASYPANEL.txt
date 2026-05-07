@@ -1,0 +1,46 @@
+================================================================================
+Severino — API no EasyPanel (Docker)
+================================================================================
+O repositório tem Dockerfile na raiz: só a API Node (Hono). O front pode ficar na
+Hostinger (Git Vite) como já tens; o browser usa por defeito:
+https://api.severino.mestredamente.com
+
+1) EasyPanel — novo serviço / app
+   - Tipo: **Docker** (build a partir do Git ou upload).
+   - Repositório: **D-Projetos-Severino**, branch **main**.
+   - Dockerfile: caminho **Dockerfile** (raiz do repo).
+   - **Porta interna exposta:** **3001** (é o API_PORT do container).
+
+2) Variáveis de ambiente (no painel do serviço — não commits!)
+   Copiar do teu env.example / produção, no mínimo:
+   - SUPABASE_URL  (ou VITE_SUPABASE_URL — o servidor aceita ambos no código admin)
+   - SUPABASE_SERVICE_ROLE_KEY
+   - (opcional) GEMINI_API_KEY, MERCADO_PAGO_ACCESS_TOKEN, etc.
+
+   Se o EasyPanel injeta **PORT** diferente de 3001, define também:
+   - API_PORT=<mesmo valor que o proxy espera>
+   - API_HOST=0.0.0.0   (já é o default na imagem)
+
+3) Domínio / SSL no EasyPanel
+   - Adiciona hostname: **api.severino.mestredamente.com**
+   - SSL automático (Let’s Encrypt) pelo próprio EasyPanel.
+   - Na zona DNS do domínio: **A** ou **CNAME** para o servidor onde corre o EasyPanel
+     (conforme o painel indica — pode ser IP do VPS ou target da CDN).
+
+4) Health check (opcional no EasyPanel)
+   - HTTP GET **/api/health**
+   - Esperado: JSON com "ok": true
+
+5) Deploy / rebuild
+   - Cada push ao **main** pode disparar rebuild conforme configurares webhooks.
+   - Depois do deploy: abre no browser
+     https://api.severino.mestredamente.com/api/health
+
+6) Front Hostinger
+   - Não precisas de VITE_SEVERINO_API_ORIGIN se o código já usa o default
+     api.severino.mestredamente.com (push recente).
+   - Se usares outro URL de API, define VITE_SEVERINO_API_ORIGIN no build Git.
+
+Resolução de problemas:
+   - 502/503 no domínio: serviço parado, porta errada, ou health falhou no deploy.
+   - CORS: origem https://severino.mestredamente.com já é aceite pelo servidor (*.mestredamente.com).

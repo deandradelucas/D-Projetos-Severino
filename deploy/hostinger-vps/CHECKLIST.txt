@@ -1,0 +1,64 @@
+================================================================================
+Severino — VPS Hostinger (api.severino.mestredamente.com)
+================================================================================
+Estado verificado de fora (sem login na tua conta):
+  - severino.mestredamente.com        → front OK (login Severino)
+  - api.severino.../api/health        → 503 = proxy/DNS existe mas upstream Node falha ou Hostinger sem app
+
+Eu não consigo SSH na tua VPS nem abrir o teu hPanel. Segue isto na VPS (Ubuntu/Debian típico):
+
+1) DNS / domínio
+   - A api.severino → IP da VPS (já criaste)
+   - Nameservers do mestredamente.com devem servir essa zona (evitar só dns-parking sem registo)
+
+2) Firewall
+   sudo ufw allow 22/tcp
+   sudo ufw allow 80/tcp
+   sudo ufw allow 443/tcp
+   sudo ufw enable
+
+3) Node 22 (ou >=20)
+   curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+   sudo apt install -y nodejs
+
+4) Clonar repo e dependências de produção
+   sudo mkdir -p /var/www/severino && sudo chown $USER:$USER /var/www/severino
+   cd /var/www/severino
+   git clone <URL_DO_TEU_REPO> .
+   cp env.example .env   # editar .env — obrigatório SUPABASE_* para a API
+
+   Automático (instala deps + teste local 5s):
+   chmod +x deploy/hostinger-vps/bootstrap-vps.sh
+   ./deploy/hostinger-vps/bootstrap-vps.sh
+
+   Ou manual: npm ci --omit=dev
+
+5) Ficheiro .env na raiz /var/www/severino (nunca commits!)
+   Copiar de env.example: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, etc.
+
+6) Testar API à mão
+   API_HOST=127.0.0.1 API_PORT=3001 node server/index.mjs
+   Noutra sessão: curl -s http://127.0.0.1:3001/api/health
+   Deve devolver JSON {"ok":true,...}
+
+7) PM2
+   sudo npm install -g pm2
+   Editar deploy/hostinger-vps/ecosystem.config.cjs → cwd = /var/www/severino
+   pm2 start deploy/hostinger-vps/ecosystem.config.cjs
+   pm2 save && pm2 startup
+
+8) Nginx
+   sudo apt install -y nginx
+   Copiar nginx-api-severino.conf para sites-available, ajustar ssl_* após certbot
+   sudo nginx -t && sudo systemctl reload nginx
+
+9) SSL (Let's Encrypt)
+   sudo apt install -y certbot python3-certbot-nginx
+   sudo certbot --nginx -d api.severino.mestredamente.com
+
+10) Confirmar público
+   curl -sS https://api.severino.mestredamente.com/api/health
+
+Hostinger “Website” só estático NÃO corre isto — precisas de VPS ou servidor onde faças estes passos.
+
+Front severino.mestredamente.com já usa por defeito https://api.severino.mestredamente.com no código.

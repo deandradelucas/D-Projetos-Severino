@@ -333,11 +333,12 @@ export default function Login() {
           <code className="rounded bg-amber-100/90 px-1 font-mono text-[10px] sm:text-[11px]">
             VITE_SEVERINO_SAME_ORIGIN_API=1
           </code>{' '}
-          e novo deploy; (2) API noutro subdomínio — define{' '}
+          e novo deploy;           (2) API na Vercel ou outro host — no build da Hostinger define{' '}
           <code className="rounded bg-amber-100/90 px-1 font-mono text-[10px] sm:text-[11px]">
             VITE_SEVERINO_API_ORIGIN
           </code>{' '}
-          com o URL onde <span className="font-mono">/api/health</span> devolve JSON.
+          com o URL base (ex. <span className="font-mono">https://teu-app.vercel.app</span>, sem{' '}
+          <span className="font-mono">/api</span>) onde <span className="font-mono">/api/health</span> devolve JSON.
         </div>
       ) : null}
       <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" noValidate>
