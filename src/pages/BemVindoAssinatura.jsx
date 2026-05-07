@@ -122,8 +122,7 @@ export default function BemVindoAssinatura() {
         <p className="text-center text-sm sm:text-base mb-6" style={{ color: 'var(--text-secondary)' }}>
           Você está em um <strong style={{ color: 'var(--text-primary)' }}>teste gratuito de {dias} dias</strong> com acesso
           completo ao aplicativo. Depois desse período, para continuar usando é necessário concluir a assinatura pelo{' '}
-          <strong style={{ color: 'var(--text-primary)' }}>Mercado Pago</strong> (checkout seguro com cartão, Pix e outros
-          meios).
+          <strong style={{ color: 'var(--text-primary)' }}>Asaas</strong> (checkout seguro com cartão, Pix e outros meios).
         </p>
 
         {trialEndStr && (
@@ -150,7 +149,7 @@ export default function BemVindoAssinatura() {
             className="btn-primary text-center no-underline"
             style={{ padding: '12px 20px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            Assinar com Mercado Pago
+            Assinar agora
           </Link>
           <button
             type="button"

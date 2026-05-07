@@ -278,7 +278,7 @@ export default function Login() {
         const looksHtml = /^\s*</.test(raw)
         setFormError(
           looksHtml
-            ? `A API devolveu HTML em vez de JSON. Pedido: ${endpoint}. No Severino não uses VITE_API_URL igual ao site — a API tem de estar noutro host (ex.: https://mestredamente.com). Confirme no separador Rede do navegador.`
+            ? `A API devolveu HTML em vez de JSON. Pedido: ${endpoint}. Em https://severino.mestredamente.com a API deve ser a mesma origem (/api) ou use VITE_SEVERINO_API_ORIGIN com o host onde /api/health responde JSON. Veja o separador Rede.`
             : `Resposta inválida do servidor (não é JSON). Pedido: ${endpoint}. Confirme se a API está no ar e o URL correto.`,
         )
         setLoading(false)

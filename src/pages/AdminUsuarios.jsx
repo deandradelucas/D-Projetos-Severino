@@ -15,6 +15,7 @@ import {
   formatDateTimePtBr,
   rowsToUsersAdminCsv,
 } from '../lib/usersAdmin'
+import { pagamentoStatusLabelPt } from '../lib/pagamentoPageModel.js'
 import { isSuperAdminEmail, isSuperAdminSession } from '../lib/superAdmin'
 import './dashboard.css'
 
@@ -55,15 +56,6 @@ function downloadTextFile(filename, text) {
   URL.revokeObjectURL(a.href)
 }
 
-function mpStatusLabel(status) {
-  if (!status) return '—'
-  const s = String(status).toLowerCase()
-  if (s === 'approved' || s === 'authorized') return 'Aprovado'
-  if (s === 'pending' || s === 'in_process' || s === 'in_mediation') return 'Pendente'
-  if (s === 'rejected' || s === 'cancelled' || s === 'refunded' || s === 'charged_back') return 'Recusado / estornado'
-  return String(status)
-}
-
 function formatRelativeAgo(date) {
   const diffMin = (Date.now() - date.getTime()) / 60000
   if (diffMin < 1) return 'agora'
@@ -88,17 +80,17 @@ function AssinaturaPagamentoCell({ row, isEditing, editForm, onField }) {
         <span className="admin-pill" style={{ backgroundColor: 'rgba(34,197,94,0.15)', color: '#16a34a' }}>
           Isento
         </span>
-        <div className="admin-subline">Sem cobrança Mercado Pago</div>
+        <div className="admin-subline">Sem cobrança Asaas</div>
       </div>
     )
   }
 
   if (row.pagamento_aprovado) {
     const amt =
-      row.mp_ultimo_amount != null && row.mp_ultimo_amount !== ''
-        ? `R$ ${Number(row.mp_ultimo_amount).toFixed(2)}`
+      row.pagamento_ultimo_amount != null && row.pagamento_ultimo_amount !== ''
+        ? `R$ ${Number(row.pagamento_ultimo_amount).toFixed(2)}`
         : null
-    const quando = row.mp_ultimo_em ? new Date(row.mp_ultimo_em) : null
+    const quando = row.pagamento_ultimo_em ? new Date(row.pagamento_ultimo_em) : null
     return (
       <div>
         <span className="admin-pill" style={{ backgroundColor: 'rgba(34,197,94,0.15)', color: '#15803d' }}>
@@ -122,8 +114,8 @@ function AssinaturaPagamentoCell({ row, isEditing, editForm, onField }) {
           Sem trial
         </span>
         <div className="admin-subline">Ainda sem período de teste (ex.: primeiro login não registrou)</div>
-        {row.mp_ultimo_status && (
-          <div className="admin-subline">Último MP: {mpStatusLabel(row.mp_ultimo_status)}</div>
+        {row.pagamento_ultimo_status && (
+          <div className="admin-subline">Última cobrança: {pagamentoStatusLabelPt(row.pagamento_ultimo_status)}</div>
         )}
       </div>
     )
@@ -137,8 +129,8 @@ function AssinaturaPagamentoCell({ row, isEditing, editForm, onField }) {
           Teste ativo
         </span>
         <div className="admin-subline">Até {trialEnd.toLocaleDateString('pt-BR', { dateStyle: 'long' })}</div>
-        {row.mp_ultimo_status && (
-          <div className="admin-subline">Último MP: {mpStatusLabel(row.mp_ultimo_status)}</div>
+        {row.pagamento_ultimo_status && (
+          <div className="admin-subline">Última cobrança: {pagamentoStatusLabelPt(row.pagamento_ultimo_status)}</div>
         )}
       </div>
     )
@@ -150,8 +142,8 @@ function AssinaturaPagamentoCell({ row, isEditing, editForm, onField }) {
         Teste encerrado
       </span>
       <div className="admin-subline">Sem pagamento aprovado</div>
-      {row.mp_ultimo_status && (
-        <div className="admin-subline">Último MP: {mpStatusLabel(row.mp_ultimo_status)}</div>
+      {row.pagamento_ultimo_status && (
+        <div className="admin-subline">Última cobrança: {pagamentoStatusLabelPt(row.pagamento_ultimo_status)}</div>
       )}
     </div>
   )
@@ -1240,7 +1232,7 @@ export default function AdminUsuarios() {
                         <dt>Receita no mês</dt>
                         <dd>{formatCurrencyBRL(detailUser.monthlyRevenue)}</dd>
                         <dt>Último pagamento</dt>
-                        <dd>{formatDateTimePtBr(detailUser.lastPaymentDate || detailUser.mp_ultimo_em)}</dd>
+                        <dd>{formatDateTimePtBr(detailUser.lastPaymentDate || detailUser.pagamento_ultimo_em)}</dd>
                         <dt>Próxima cobrança</dt>
                         <dd>{formatDateTimePtBr(detailUser.nextPaymentDate)}</dd>
                         <dt>Fim do trial</dt>

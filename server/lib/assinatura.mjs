@@ -2,12 +2,12 @@ import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { isSuperAdminEmail } from './super-admin.mjs'
 import { resolveEscopoUsuario } from './conta-familiar.mjs'
-import { isMercadoPagoForbiddenError } from './mercadopago.mjs'
+import { isAsaasForbiddenError, urlPortalAssinaturaAsaasPadrao } from './asaas.mjs'
 import {
   sincronizarPagamentosPendentesDoUsuario,
-  sincronizarPreapprovalUsuario,
+  sincronizarSubscriptionUsuario,
   usuarioTemPagamentoAprovado,
-} from './pagamentos-mp.mjs'
+} from './pagamentos-asaas.mjs'
 
 export const TRIAL_DIAS = Number.parseInt(process.env.HORIZONTE_TRIAL_DIAS || '7', 10) || 7
 
@@ -21,35 +21,36 @@ function isMissingColumnError(err, column) {
   return msg.includes(c) && (msg.includes('does not exist') || msg.includes('não existe'))
 }
 
-/** Status MP em que a assinatura não cobra / não mantém acesso pago. */
-const MP_STATUS_BLOQUEIA_ACESSO = new Set(['paused', 'cancelled', 'canceled'])
+/** Assinatura Asaas sem cobrança ativa — INACTIVE (pausada) ou EXPIRED. */
+const ASAAS_STATUS_BLOQUEIA_ACESSO = new Set(['inactive', 'expired'])
 
-export function mpStatusBloqueiaAcesso(status) {
+export function asaasSubscriptionBloqueiaAcesso(status) {
   const s = String(status || '').trim().toLowerCase()
-  return s !== '' && MP_STATUS_BLOQUEIA_ACESSO.has(s)
+  return s !== '' && ASAAS_STATUS_BLOQUEIA_ACESSO.has(s)
 }
 
-export function mensagemBloqueioAssinaturaMp(status) {
+/** @deprecated use asaasSubscriptionBloqueiaAcesso */
+export function mpStatusBloqueiaAcesso(status) {
+  return asaasSubscriptionBloqueiaAcesso(status)
+}
+
+export function mensagemBloqueioAssinaturaAsaas(status) {
   const s = String(status || '').trim().toLowerCase()
-  if (s === 'paused') {
-    return 'Sua assinatura está pausada no Mercado Pago. Reative o débito em Pagamento ou no site do MP para continuar.'
+  if (s === 'inactive') {
+    return 'Sua assinatura está pausada no Asaas. Reative em Pagamento ou no portal Asaas para continuar.'
   }
-  if (s === 'cancelled' || s === 'canceled') {
-    return 'Sua assinatura foi cancelada. Acesse Pagamento para assinar novamente e voltar a usar o app.'
+  if (s === 'expired') {
+    return 'Sua assinatura encerrou. Acesse Pagamento para assinar novamente e voltar a usar o app.'
   }
   return 'Assinatura inativa ou período de teste encerrado. Conclua o pagamento no aplicativo para continuar.'
 }
 
-function situacaoAssinatura({ trialActive, assinatura_paga_efetiva, assinatura_mp_status, mpBloqueia }) {
+function situacaoAssinatura({ trialActive, assinatura_paga_efetiva, assinatura_asaas_status, gwBloqueia }) {
   if (trialActive && !assinatura_paga_efetiva) return 'trial'
-  if (mpBloqueia) return String(assinatura_mp_status || '').toLowerCase() === 'paused' ? 'pausada' : 'cancelada'
+  if (gwBloqueia) return String(assinatura_asaas_status || '').toLowerCase() === 'inactive' ? 'pausada' : 'cancelada'
   if (assinatura_paga_efetiva) return 'ativo'
   if (trialActive) return 'trial'
   return 'inativa'
-}
-
-export function urlGerenciarMercadoPagoPadrão() {
-  return String(process.env.MERCADO_PAGO_URL_GESTAO || 'https://www.mercadopago.com.br/subscriptions').trim()
 }
 
 function addDaysIso(days) {
@@ -114,15 +115,15 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
     out.bem_vindo_pagamento_visto_at = tBv.data.bem_vindo_pagamento_visto_at
   }
 
-  const tMp = await supabase
+  const tGw = await supabase
     .from('usuarios')
-    .select('mp_preapproval_id, assinatura_proxima_cobranca, assinatura_mp_status')
+    .select('asaas_subscription_id, assinatura_proxima_cobranca, assinatura_asaas_status')
     .eq('id', uid)
     .maybeSingle()
-  if (!tMp.error && tMp.data) {
-    out.mp_preapproval_id = tMp.data.mp_preapproval_id ?? null
-    out.assinatura_proxima_cobranca = tMp.data.assinatura_proxima_cobranca ?? null
-    out.assinatura_mp_status = tMp.data.assinatura_mp_status ?? null
+  if (!tGw.error && tGw.data) {
+    out.asaas_subscription_id = tGw.data.asaas_subscription_id ?? null
+    out.assinatura_proxima_cobranca = tGw.data.assinatura_proxima_cobranca ?? null
+    out.assinatura_asaas_status = tGw.data.assinatura_asaas_status ?? null
   }
 
   return out
@@ -134,14 +135,14 @@ export function computeAssinaturaFlags({
   trial_ends_at,
   bem_vindo_pagamento_visto_at,
   assinatura_paga,
-  assinatura_mp_status,
+  assinatura_asaas_status,
 }) {
   if (isSuperAdminEmail(email) || isento_pagamento === true) {
     return {
       assinatura_paga: true,
       acesso_app_liberado: true,
       mostrar_bem_vindo_assinatura: false,
-      assinatura_mp_bloqueada: false,
+      assinatura_asaas_bloqueada: false,
       motivo_bloqueio_acesso: null,
       assinatura_situacao: isento_pagamento === true ? 'isento' : 'admin',
     }
@@ -149,34 +150,31 @@ export function computeAssinaturaFlags({
 
   const trialEnd = trial_ends_at ? new Date(trial_ends_at) : null
   const trialActive = trialEnd != null && !Number.isNaN(trialEnd.getTime()) && trialEnd > new Date()
-  const mpBloqueia = mpStatusBloqueiaAcesso(assinatura_mp_status)
+  const gwBloqueia = asaasSubscriptionBloqueiaAcesso(assinatura_asaas_status)
   const pagoHistorico = assinatura_paga === true
-  const pagoEfetivo = pagoHistorico && !mpBloqueia
+  const pagoEfetivo = pagoHistorico && !gwBloqueia
 
   let acesso = pagoEfetivo || trialActive
-  if (mpBloqueia && !trialActive) acesso = false
+  if (gwBloqueia && !trialActive) acesso = false
 
-  /* Boas-vindas: com acesso (trial ou similar) e ainda sem pagamento efetivo; não exibir se MP bloqueou (vai para /pagamento). */
   const mostrarBemVindo =
-    acesso &&
-    !bem_vindo_pagamento_visto_at &&
-    !pagoEfetivo &&
-    !mpBloqueia
+    acesso && !bem_vindo_pagamento_visto_at && !pagoEfetivo && !gwBloqueia
 
-  const motivoBloqueio = !acesso && mpBloqueia && !trialActive ? mensagemBloqueioAssinaturaMp(assinatura_mp_status) : null
+  const motivoBloqueio =
+    !acesso && gwBloqueia && !trialActive ? mensagemBloqueioAssinaturaAsaas(assinatura_asaas_status) : null
 
   const situacao = situacaoAssinatura({
     trialActive,
     assinatura_paga_efetiva: pagoEfetivo,
-    assinatura_mp_status,
-    mpBloqueia,
+    assinatura_asaas_status,
+    gwBloqueia,
   })
 
   return {
     assinatura_paga: pagoEfetivo,
     acesso_app_liberado: acesso,
     mostrar_bem_vindo_assinatura: mostrarBemVindo,
-    assinatura_mp_bloqueada: mpBloqueia && !trialActive,
+    assinatura_asaas_bloqueada: gwBloqueia && !trialActive,
     motivo_bloqueio_acesso: motivoBloqueio,
     assinatura_situacao: situacao,
   }
@@ -211,18 +209,18 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   const isento = partialUser.isento_pagamento === true || row.isento_pagamento === true
 
   await sincronizarPagamentosPendentesDoUsuario(billingUid).catch((e) => {
-    if (isMercadoPagoForbiddenError(e)) {
-      log.debug('[buildAssinaturaUsuarioPayload] sync MP 403:', e?.message || e)
+    if (isAsaasForbiddenError(e)) {
+      log.debug('[buildAssinaturaUsuarioPayload] sync Asaas 401/403:', e?.message || e)
       return
     }
-    log.warn('[buildAssinaturaUsuarioPayload] sync MP:', e?.message || e)
+    log.warn('[buildAssinaturaUsuarioPayload] sync pagamentos:', e?.message || e)
   })
-  await sincronizarPreapprovalUsuario(billingUid).catch((e) => {
-    if (isMercadoPagoForbiddenError(e)) {
-      log.debug('[buildAssinaturaUsuarioPayload] sync preapproval 403:', e?.message || e)
+  await sincronizarSubscriptionUsuario(billingUid).catch((e) => {
+    if (isAsaasForbiddenError(e)) {
+      log.debug('[buildAssinaturaUsuarioPayload] sync subscription 401/403:', e?.message || e)
       return
     }
-    log.warn('[buildAssinaturaUsuarioPayload] sync preapproval:', e?.message || e)
+    log.warn('[buildAssinaturaUsuarioPayload] sync subscription:', e?.message || e)
   })
 
   row = await fetchAssinaturaCamposUsuario(billingUid)
@@ -234,10 +232,9 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     trial_ends_at: trialEnds || row.trial_ends_at,
     bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at,
     assinatura_paga: hasPay,
-    assinatura_mp_status: row.assinatura_mp_status,
+    assinatura_asaas_status: row.assinatura_asaas_status,
   })
 
-  /* Membro da família: privilégios de super-admin pelo próprio e-mail continuam válidos */
   if (emailExibicao && isSuperAdminEmail(emailExibicao)) {
     const flagsAdmin = computeAssinaturaFlags({
       email: emailExibicao,
@@ -245,7 +242,7 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
       trial_ends_at: trialEnds || row.trial_ends_at,
       bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at,
       assinatura_paga: true,
-      assinatura_mp_status: row.assinatura_mp_status,
+      assinatura_asaas_status: row.assinatura_asaas_status,
     })
     const precoMensalAdm = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
     const planoPrecoAdm = Number.isFinite(precoMensalAdm) && precoMensalAdm > 0 ? precoMensalAdm : 10
@@ -257,12 +254,12 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
       mostrar_bem_vindo_assinatura: flagsAdmin.mostrar_bem_vindo_assinatura,
       trial_dias_gratis: TRIAL_DIAS,
       assinatura_proxima_cobranca: row.assinatura_proxima_cobranca ?? null,
-      assinatura_mp_status: row.assinatura_mp_status ?? null,
+      assinatura_asaas_status: row.assinatura_asaas_status ?? null,
       plano_preco_mensal: planoPrecoAdm,
       assinatura_situacao: flagsAdmin.assinatura_situacao,
-      assinatura_mp_bloqueada: flagsAdmin.assinatura_mp_bloqueada,
+      assinatura_asaas_bloqueada: flagsAdmin.assinatura_asaas_bloqueada,
       motivo_bloqueio_acesso: flagsAdmin.motivo_bloqueio_acesso,
-      mp_gerenciar_url: null,
+      asaas_portal_url: null,
       conta_familiar_membro: membroConta || undefined,
       familia_papel: escopoMembro?.familiaPapel ?? undefined,
       conta_familiar_titular_id: membroConta ? billingUid : undefined,
@@ -272,12 +269,8 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   const precoMensal = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
   const planoPreco = Number.isFinite(precoMensal) && precoMensal > 0 ? precoMensal : 10
 
-  const mpLink =
-    !isento && !isSuperAdminEmail(emailParaFlags)
-      ? membroConta
-        ? null
-        : urlGerenciarMercadoPagoPadrão()
-      : null
+  const portalLink =
+    !isento && !isSuperAdminEmail(emailParaFlags) ? (membroConta ? null : urlPortalAssinaturaAsaasPadrao()) : null
 
   const base = {
     trial_ends_at: trialEnds || row.trial_ends_at || null,
@@ -287,12 +280,12 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     mostrar_bem_vindo_assinatura: flags.mostrar_bem_vindo_assinatura,
     trial_dias_gratis: TRIAL_DIAS,
     assinatura_proxima_cobranca: row.assinatura_proxima_cobranca ?? null,
-    assinatura_mp_status: row.assinatura_mp_status ?? null,
+    assinatura_asaas_status: row.assinatura_asaas_status ?? null,
     plano_preco_mensal: planoPreco,
     assinatura_situacao: flags.assinatura_situacao,
-    assinatura_mp_bloqueada: flags.assinatura_mp_bloqueada,
+    assinatura_asaas_bloqueada: flags.assinatura_asaas_bloqueada,
     motivo_bloqueio_acesso: flags.motivo_bloqueio_acesso,
-    mp_gerenciar_url: mpLink,
+    asaas_portal_url: portalLink,
   }
 
   if (membroConta) {
@@ -363,7 +356,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
   let uerr = null
   ;({ data: urow, error: uerr } = await supabase
     .from('usuarios')
-    .select('email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_mp_status')
+    .select('email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status')
     .eq('id', billingUid)
     .maybeSingle())
 
@@ -373,7 +366,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
     )
     ;({ data: urow, error: uerr } = await supabase
       .from('usuarios')
-      .select('email, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_mp_status')
+      .select('email, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status')
       .eq('id', billingUid)
       .maybeSingle())
   }
@@ -389,8 +382,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
   const email = urow.email ?? ''
   const hasPay = await usuarioTemPagamentoAprovado(billingUid, email)
 
-  const isento =
-    'isento_pagamento' in urow ? urow.isento_pagamento === true : false
+  const isento = 'isento_pagamento' in urow ? urow.isento_pagamento === true : false
 
   const flags = computeAssinaturaFlags({
     email,
@@ -398,7 +390,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
     trial_ends_at,
     bem_vindo_pagamento_visto_at: urow.bem_vindo_pagamento_visto_at,
     assinatura_paga: hasPay,
-    assinatura_mp_status: urow.assinatura_mp_status,
+    assinatura_asaas_status: urow.assinatura_asaas_status,
   })
 
   if (!flags.acesso_app_liberado) {

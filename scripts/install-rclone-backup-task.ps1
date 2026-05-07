@@ -24,7 +24,7 @@ Register-ScheduledTask `
   -Action $action `
   -Trigger $trigger `
   -Settings $settings `
-  -Description 'Executa o backup rclone do Horizonte Financeiro para o Google Drive.' `
+  -Description 'Executa o backup rclone do Severino para o Google Drive.' `
   -Force | Out-Null
 
 Write-Host "Tarefa agendada criada/atualizada com sucesso."

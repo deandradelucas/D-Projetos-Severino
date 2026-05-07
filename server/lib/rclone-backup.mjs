@@ -10,7 +10,7 @@ const execFileAsync = promisify(execFile)
 
 const DEFAULT_RCLONE_REMOTE = 'gdrive-backup'
 const BACKUP_DIR = '.backup-temp'
-const DEFAULT_RCLONE_DEST_PATH = 'Backup - Horizonte Financeiro'
+const DEFAULT_RCLONE_DEST_PATH = 'Backup - Severino'
 const DEFAULT_SUPABASE_TABLES = ['usuarios']
 
 function getEnv(name, { required = true, fallback = '' } = {}) {
@@ -103,7 +103,7 @@ async function fetchDatabaseBackup() {
 
   const tables = getSupabaseBackupTables()
   const backup = {
-    app: 'Horizonte Financeiro',
+    app: 'Severino',
     provider: 'Supabase',
     generatedAt: new Date().toISOString(),
     tables: {},

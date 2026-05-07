@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from './supabase-admin.mjs'
 import {
   resumoPagamentosPorUsuarioIds,
   STATUS_PAGAMENTO_LIBERA_ACESSO,
-} from './pagamentos-mp.mjs'
+} from './pagamentos-asaas.mjs'
 
 const STATUSES_APROVADOS = [...STATUS_PAGAMENTO_LIBERA_ACESSO]
 
@@ -12,7 +12,7 @@ const USER_IDS_CHUNK = 250
 
 /**
  * Agrega métricas de marketing para o desafio do primeiro milhão.
- * Fonte: `usuarios` (trial / isenção) + `pagamentos_mercadopago` (aprovados → assinante + receita).
+ * Fonte: `usuarios` (trial / isenção) + `pagamentos_asaas` (aprovados → assinante + receita).
  */
 export async function getMarketingStatsAdmin() {
   const sb = getSupabaseAdmin()
@@ -71,7 +71,7 @@ export async function getMarketingStatsAdmin() {
 
   try {
     const { data: pagamentos, error: pagErr } = await sb
-      .from('pagamentos_mercadopago')
+      .from('pagamentos_asaas')
       .select('amount, status, created_at')
       .in('status', STATUSES_APROVADOS)
 

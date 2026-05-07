@@ -1,11 +1,11 @@
 /**
- * Modelo e cópias da página Pagamento — alinhado ao payload de /api/assinatura/status e linhas de pagamentos_mercadopago.
+ * Modelo e cópias da página Pagamento — alinhado ao payload de /api/assinatura/status e pagamentos_asaas.
  */
 
 export const PLANO_PADRAO_TITULO = 'Assinatura mensal Severino'
-export const PROVEDOR_PAGAMENTO_LABEL = 'Mercado Pago'
+export const PROVEDOR_PAGAMENTO_LABEL = 'Asaas'
 
-/** @typedef {{ id: string, status?: string|null, status_detail?: string|null, amount?: number|null, description?: string|null, external_reference?: string|null, preference_id?: string|null, preapproval_id?: string|null, payment_id?: string|null, created_at?: string|null }} PagamentoHistoricoRow */
+/** @typedef {{ id: string, status?: string|null, status_detail?: string|null, amount?: number|null, description?: string|null, external_reference?: string|null, checkout_id?: string|null, subscription_id?: string|null, payment_id?: string|null, preference_id?: string|null, preapproval_id?: string|null, created_at?: string|null }} PagamentoHistoricoRow */
 
 /**
  * @param {string|undefined|null} status
@@ -14,9 +14,11 @@ export const PROVEDOR_PAGAMENTO_LABEL = 'Mercado Pago'
 export function pagamentoStatusLabelPt(status) {
   if (status == null || String(status).trim() === '') return '—'
   const s = String(status).toLowerCase()
-  if (s === 'approved' || s === 'authorized' || s === 'accredited') return 'Aprovado'
+  if (s === 'approved' || s === 'authorized' || s === 'accredited' || s === 'received' || s === 'confirmed') return 'Aprovado'
   if (s === 'pending' || s === 'in_process') return 'Pendente'
-  if (s === 'in_mediation') return 'Em análise'
+  if (s === 'awaiting_risk_analysis') return 'Em análise'
+  if (s === 'overdue') return 'Vencido'
+  if (s === 'in_mediation') return 'Em mediação'
   if (s === 'refunded') return 'Estornado'
   if (s === 'charged_back') return 'Contestado'
   if (s === 'rejected') return 'Recusado'
@@ -34,8 +36,8 @@ export function situacaoAssinaturaLabel(code) {
     isento: 'Conta isenta de pagamento',
     trial: 'Período de teste',
     ativo: 'Assinatura ativa',
-    pausada: 'Assinatura pausada no Mercado Pago',
-    cancelada: 'Assinatura cancelada no Mercado Pago',
+    pausada: 'Assinatura pausada no Asaas',
+    cancelada: 'Assinatura encerrada no Asaas',
     inativa: 'Sem assinatura ativa',
   }
   return m[String(code || '')] || ''
@@ -49,23 +51,34 @@ export function painelAssinaturaFromUser(u) {
     return {
       situacao: null,
       label: '',
-      mpUrl: '',
+      portalUrl: '',
       bloqueada: false,
       motivo: '',
       paga: false,
-      mpStatus: null,
+      assinaturaGatewayStatus: null,
       trialEndsAt: null,
     }
   }
   const code = u.assinatura_situacao
+  const portal =
+    typeof u.asaas_portal_url === 'string'
+      ? u.asaas_portal_url.trim()
+      : typeof u.mp_gerenciar_url === 'string'
+        ? u.mp_gerenciar_url.trim()
+        : ''
   return {
     situacao: code != null ? String(code) : null,
     label: code ? situacaoAssinaturaLabel(String(code)) : '',
-    mpUrl: typeof u.mp_gerenciar_url === 'string' ? u.mp_gerenciar_url.trim() : '',
-    bloqueada: !!u.assinatura_mp_bloqueada,
+    portalUrl: portal,
+    bloqueada: !!(u.assinatura_asaas_bloqueada ?? u.assinatura_mp_bloqueada),
     motivo: typeof u.motivo_bloqueio_acesso === 'string' ? u.motivo_bloqueio_acesso : '',
     paga: u.assinatura_paga === true,
-    mpStatus: u.assinatura_mp_status != null ? String(u.assinatura_mp_status) : null,
+    assinaturaGatewayStatus:
+      u.assinatura_asaas_status != null
+        ? String(u.assinatura_asaas_status)
+        : u.assinatura_mp_status != null
+          ? String(u.assinatura_mp_status)
+          : null,
     trialEndsAt: u.trial_ends_at != null ? String(u.trial_ends_at) : null,
   }
 }
@@ -88,6 +101,10 @@ export function referenciaPagamentoCurta(row) {
   if (ext) return ext.length > 28 ? `${ext.slice(0, 14)}…${ext.slice(-8)}` : ext
   const pid = row.payment_id && String(row.payment_id).trim()
   if (pid) return `Pag. ${pid.length > 18 ? `${pid.slice(0, 10)}…` : pid}`
+  const chk = row.checkout_id && String(row.checkout_id).trim()
+  if (chk) return `Checkout ${chk.length > 14 ? `${chk.slice(0, 8)}…` : chk}`
+  const sub = row.subscription_id && String(row.subscription_id).trim()
+  if (sub) return `Assin. ${sub.length > 16 ? `${sub.slice(0, 8)}…` : sub}`
   const pref = row.preference_id && String(row.preference_id).trim()
   if (pref) return `Pref. ${pref.length > 16 ? `${pref.slice(0, 8)}…` : pref}`
   const pre = row.preapproval_id && String(row.preapproval_id).trim()
@@ -118,7 +135,7 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'success',
       title: 'Conta isenta',
-      body: 'Não é necessário pagar pelo Mercado Pago.',
+      body: 'Não é necessário pagar assinatura nesta conta.',
     }
   }
 
@@ -126,7 +143,7 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'neutral',
       title: 'Pagamentos em configuração',
-      body: 'O checkout será habilitado quando o servidor estiver configurado.',
+      body: 'O checkout será habilitado quando o servidor estiver configurado (Asaas).',
     }
   }
 
@@ -134,7 +151,7 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'success',
       title: 'Assinatura ativa',
-      body: 'Renovação automática no cartão autorizado até você cancelar no Mercado Pago.',
+      body: 'Renovação automática até você cancelar no portal Asaas.',
     }
   }
 
@@ -142,7 +159,7 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'neutral',
       title: 'Período de teste',
-      body: 'Ao terminar, assine no Mercado Pago para manter o acesso.',
+      body: 'Ao terminar, conclua a assinatura na página Pagamento para manter o acesso.',
     }
   }
 
@@ -150,15 +167,15 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'warning',
       title: 'Assinatura pausada',
-      body: 'Use “Gerenciar no Mercado Pago” para detalhes ou reativação.',
+      body: 'Use “Portal Asaas” para detalhes ou regularizar a cobrança.',
     }
   }
 
   if (painel.situacao === 'cancelada') {
     return {
       variant: 'danger',
-      title: 'Assinatura cancelada',
-      body: 'Para voltar, autorize uma nova assinatura no Mercado Pago.',
+      title: 'Assinatura encerrada',
+      body: 'Para voltar, inicie uma nova assinatura na página Pagamento.',
     }
   }
 
@@ -174,7 +191,7 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'warning',
       title: 'Assinatura não ativa',
-      body: 'Conclua a autorização no Mercado Pago para liberar o acesso.',
+      body: 'Conclua o checkout seguro (cartão ou Pix) para liberar o acesso.',
     }
   }
 

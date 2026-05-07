@@ -1,8 +1,8 @@
 /**
- * Badge de status Mercado Pago: aprovado (verde), pendente (laranja).
+ * Badge de status de cobrança (Asaas + valores legados).
  * @param {{ status?: string|null, label?: string, className?: string }} props
  */
-export default function MpStatusBadge({ status, label, className = '' }) {
+export default function PagamentoStatusBadge({ status, label, className = '' }) {
   const base = {
     padding: '4px 8px',
     borderRadius: '4px',
@@ -23,16 +23,29 @@ export default function MpStatusBadge({ status, label, className = '' }) {
 
   const s = String(status).toLowerCase()
 
-  if (s === 'approved' || s === 'authorized' || s === 'accredited') {
+  if (
+    s === 'approved' ||
+    s === 'authorized' ||
+    s === 'accredited' ||
+    s === 'received' ||
+    s === 'confirmed'
+  ) {
     return (
       <span className={`mp-status-badge mp-status-badge--ok${cn}`} style={{ ...base, backgroundColor: 'rgba(34, 197, 94, 0.15)', color: '#16a34a' }}>
         {show}
       </span>
     )
   }
-  if (s === 'pending' || s === 'in_process' || s === 'in_mediation') {
+  if (s === 'pending' || s === 'in_process' || s === 'in_mediation' || s === 'awaiting_risk_analysis') {
     return (
       <span className={`mp-status-badge mp-status-badge--pending${cn}`} style={{ ...base, backgroundColor: 'rgba(249, 115, 22, 0.14)', color: '#ea580c' }}>
+        {show}
+      </span>
+    )
+  }
+  if (s === 'overdue') {
+    return (
+      <span className={`mp-status-badge mp-status-badge--pending${cn}`} style={{ ...base, backgroundColor: 'rgba(234, 179, 8, 0.2)', color: '#a16207' }}>
         {show}
       </span>
     )

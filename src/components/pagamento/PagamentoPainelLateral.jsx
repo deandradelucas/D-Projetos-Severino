@@ -11,7 +11,7 @@ export default function PagamentoPainelLateral({
   loading,
   configReady,
   isento,
-  mpUrl,
+  portalUrl,
   disabledAssinar,
   checkoutError,
 }) {
@@ -26,11 +26,11 @@ export default function PagamentoPainelLateral({
             disabled={disabledAssinar || paying || loading}
             onClick={onAssinar}
           >
-            {paying ? 'Redirecionando…' : 'Assinar no Mercado Pago'}
+            {paying ? 'Redirecionando…' : 'Assinar com Asaas'}
           </button>
-          {mpUrl ? (
-            <a className="btn-secondary pagamento-aside__btn-link" href={mpUrl} target="_blank" rel="noopener noreferrer">
-              Gerenciar no Mercado Pago
+          {portalUrl ? (
+            <a className="btn-secondary pagamento-aside__btn-link" href={portalUrl} target="_blank" rel="noopener noreferrer">
+              Portal Asaas
             </a>
           ) : null}
           <button type="button" className="btn-secondary" disabled={loading} onClick={onAtualizar}>
@@ -38,7 +38,7 @@ export default function PagamentoPainelLateral({
           </button>
         </div>
         {!configReady && !loading ? (
-          <p className="pagamento-aside__footnote">Configure o Mercado Pago no servidor para habilitar o checkout.</p>
+          <p className="pagamento-aside__footnote">Configure a API Asaas no servidor (ASAAS_API_KEY) para habilitar o checkout.</p>
         ) : null}
         {isento ? <p className="pagamento-aside__footnote">Conta isenta — sem pagamento aqui.</p> : null}
         {checkoutError ? <p className="pagamento-checkout-error">{checkoutError}</p> : null}

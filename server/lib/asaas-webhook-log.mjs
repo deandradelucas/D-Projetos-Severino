@@ -1,9 +1,9 @@
 import { log } from './logger.mjs'
 
 /** Log estruturado para grep / agregador (Datadog, etc.). */
-export function logMpWebhook(event) {
+export function logAsaasWebhook(event) {
   const line = {
-    svc: 'mercadopago-webhook',
+    svc: 'asaas-webhook',
     t: new Date().toISOString(),
     ...event,
   }

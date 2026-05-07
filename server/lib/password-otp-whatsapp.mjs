@@ -98,7 +98,7 @@ export async function requestPasswordOtpWhatsApp(email, options = {}) {
   if (upErr) throw upErr
 
   const instance = String(process.env.EVOLUTION_INSTANCE || '').trim()
-  const text = `Horizonte Financeiro — código para redefinir sua senha: ${otp}\n\nVálido por 15 minutos. Se não foi você, ignore esta mensagem.`
+  const text = `Severino — código para redefinir sua senha: ${otp}\n\nVálido por 15 minutos. Se não foi você, ignore esta mensagem.`
 
   const ok = await sendEvolutionText({ instance, number, text })
   if (!ok) {
