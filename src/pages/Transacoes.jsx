@@ -5,7 +5,7 @@ import TransactionModal from '../components/TransactionModal'
 import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { useTheme } from '../context/ThemeContext'
-import { useTransactionCache } from '../context/transactionCacheStore'
+import { useTransactionCache, TRANSACOES_REVALIDATED_EVENT } from '../context/transactionCacheStore'
 import { apiUrl } from '../lib/apiUrl'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
@@ -190,6 +190,17 @@ export default function Transacoes() {
     }
   }, [usuario.id, fetchCategorias, fetchTransacoes, fetchRecorrencias])
 
+  /** Lista filtrada: alinhar ao cache global quando há novo fetch (ex.: despesa/receita pelo WhatsApp). */
+  useEffect(() => {
+    const onRevalidated = () => {
+      const session = readHorizonteUser()
+      if (!session?.id) return
+      void fetchTransacoes()
+    }
+    window.addEventListener(TRANSACOES_REVALIDATED_EVENT, onRevalidated)
+    return () => window.removeEventListener(TRANSACOES_REVALIDATED_EVENT, onRevalidated)
+  }, [fetchTransacoes])
+
   const encerrarRecorrencia = async (id) => {
     const session = readHorizonteUser()
     if (!session?.id) return
@@ -265,7 +276,7 @@ export default function Transacoes() {
 
   const filtroRecorrentesAtivo = filters.lancamentos === 'recorrentes'
 
-  const whatsappContactUrl = 'https://wa.me/5547999895014'
+  const whatsappContactUrl = 'https://wa.me/5554992605447'
 
   return (
     <>

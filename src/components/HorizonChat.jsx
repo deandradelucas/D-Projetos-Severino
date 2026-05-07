@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
 import { parseApiJsonResponse } from '../lib/apiErrors'
+import { readHorizonteUserProfile } from '../lib/horizonteSession'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 /* Estilos do FAB/janela (.horizon-*). Deve carregar no bundle principal: antes do lazy Dashboard,
    AppSessionOutlet pode bloquear a rota e o import em Dashboard.jsx não roda — chat ficava sem CSS. */
@@ -130,15 +131,6 @@ function useHorizonShellDock() {
   return dock
 }
 
-function getUsuarioId() {
-  try {
-    const saved = localStorage.getItem('horizonte_user')
-    return saved ? JSON.parse(saved)?.id : null
-  } catch {
-    return null
-  }
-}
-
 function MarkdownText({ text }) {
   // Render simple markdown: **bold**, *italic*, bullet lists, line breaks
   const html = text
@@ -181,7 +173,7 @@ export default function HorizonChat() {
     const msg = input.trim()
     if (!msg || carregando) return
 
-    const usuarioId = getUsuarioId()
+    const usuarioId = readHorizonteUserProfile().id || null
     
     setMensagens(prev => [
       ...prev,

@@ -310,7 +310,7 @@ export async function askHorizon(message, usuarioId, historico = []) {
     log.warn('[askHorizon] contexto paralelo indisponível', e?.message || e)
   }
 
-  const systemPrompt = `Você é o Horizon, um assistente financeiro pessoal inteligente, amigável e proativo.
+  const systemPrompt = `Você é o Severino, assistente financeiro pessoal inteligente, amigável e proativo (o utilizador vê o nome "Severino IA" na app).
 Sua missão é ajudar o usuário a entender suas finanças, dar dicas de economia e responder dúvidas sobre seus gastos.
 
 REGRAS:
@@ -391,7 +391,7 @@ REGRAS OBRIGATÓRIAS:
    - Opcional: "data_transacao" em ISO 8601 completo se o usuário mencionar QUANDO ocorreu ("hoje às 14h", "ontem", "dia 15/03 às 9h", "amanhã de manhã"). Use o fuso America/Sao_Paulo. Se não houver menção de data/hora, use null.
 2. Se NÃO for transação (ex: comentários, perguntas, saudações, filosofia):
    - Identifique o TIPO como "CHAT".
-   - Crie uma RESPOSTA curta, inteligente e amigável na voz do "Horizon".
+   - Crie uma RESPOSTA curta, inteligente e amigável na voz do "Severino" (só usada se o servidor não puder chamar o assistente completo).
    - Deixe valor, categoria_id, subcategoria_id e data_transacao como null.
 3. Retorne APENAS o bloco JSON puro.
 

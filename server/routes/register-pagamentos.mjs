@@ -22,6 +22,8 @@ import {
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { logMpWebhook } from '../lib/mp-webhook-log.mjs'
 import { errorToText } from '../lib/http/hono-error-map.mjs'
+import { assertAcessoAppUsuario } from '../lib/assinatura.mjs'
+import { resolveEscopoUsuario } from '../lib/conta-familiar.mjs'
 
 export function registerPagamentosRoutes(app) {
   app.get('/api/pagamentos/config', async (c) => {
@@ -47,9 +49,18 @@ export function registerPagamentosRoutes(app) {
     try {
       const usuarioId = c.req.header('x-user-id')
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
-      await sincronizarPagamentosPendentesDoUsuario(usuarioId)
-      await sincronizarPreapprovalUsuario(usuarioId).catch(() => {})
-      const rows = await listPagamentosUsuario(usuarioId)
+      const gate = await assertAcessoAppUsuario(usuarioId)
+      if (gate) return c.json({ message: gate.message }, gate.status)
+      let billingId = usuarioId
+      try {
+        const escopo = await resolveEscopoUsuario(usuarioId)
+        billingId = escopo.dataUsuarioId
+      } catch {
+        /* mantém usuarioId */
+      }
+      await sincronizarPagamentosPendentesDoUsuario(billingId)
+      await sincronizarPreapprovalUsuario(billingId).catch(() => {})
+      const rows = await listPagamentosUsuario(billingId)
       return c.json(rows)
     } catch (error) {
       log.error('list pagamentos failed', error)
@@ -61,6 +72,22 @@ export function registerPagamentosRoutes(app) {
     try {
       const usuarioId = c.req.header('x-user-id')
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const gate = await assertAcessoAppUsuario(usuarioId)
+      if (gate) return c.json({ message: gate.message }, gate.status)
+      try {
+        const escopo = await resolveEscopoUsuario(usuarioId)
+        if (escopo.isMembroConta) {
+          return c.json(
+            {
+              message:
+                'Quem paga a assinatura é o titular da conta familiar. Peça para ele concluir o pagamento em Configurações ou Pagamento.',
+            },
+            403,
+          )
+        }
+      } catch {
+        return c.json({ message: 'Não autorizado.' }, 401)
+      }
       const ip = clientKeyFromHono(c)
       if (!rateLimitTake(`mp-pref:${usuarioId}:${ip}`, 15, 60 * 60_000)) {
         return c.json({ message: 'Limite de solicitações de pagamento. Tente de novo em até uma hora.' }, 429)

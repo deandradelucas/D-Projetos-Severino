@@ -65,7 +65,7 @@ Prefixo `/api`. Autenticação: login grava `horizonte_user` no `localStorage` (
 - Preferir **alterações mínimas** e alinhadas ao estilo existente (nomes em português na UI, comentários curtos onde ajudam).
 - **Segredo:** nunca commitar `.env`; variáveis em Vercel / ambiente local.
 - **Usuários:** tabela `usuarios`; coluna de nome pode ser `nome` ou legado `usuario` — ver `server/lib/usuario-schema.mjs`.
-- **Organização:** seguir `docs/code-organization.md` para aliases (`@`, `@components`, `@features`, `@shared`), fronteiras entre `pages`/`features`/`shared` e extração gradual de rotas Hono.
+- **Organização:** seguir `docs/code-organization.md` para aliases (`@`, `@components`), fronteiras entre `pages`/`components`/`lib` e extração gradual de rotas Hono.
 
 ### Shell hub (cabeçalho em vidro — **não mexer sem necessidade**)
 

@@ -1,6 +1,7 @@
 import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { isSuperAdminEmail } from './super-admin.mjs'
+import { resolveEscopoUsuario } from './conta-familiar.mjs'
 import { isMercadoPagoForbiddenError } from './mercadopago.mjs'
 import {
   sincronizarPagamentosPendentesDoUsuario,
@@ -186,25 +187,37 @@ export function computeAssinaturaFlags({
  */
 export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {}) {
   const uid = String(usuarioId || '').trim()
+  let billingUid = uid
+  let escopoMembro = null
+  try {
+    escopoMembro = await resolveEscopoUsuario(uid)
+    billingUid = escopoMembro.dataUsuarioId
+  } catch (e) {
+    log.warn('[buildAssinaturaUsuarioPayload] escopo conta familiar:', e?.message || e)
+  }
+
+  const membroConta = Boolean(escopoMembro?.isMembroConta && billingUid !== uid)
+
   let trialEnds = null
   try {
-    trialEnds = await ensureTrialIniciado(uid)
+    trialEnds = await ensureTrialIniciado(billingUid)
   } catch (e) {
     log.warn('[buildAssinaturaUsuarioPayload] trial:', e?.message || e)
   }
 
-  let row = await fetchAssinaturaCamposUsuario(uid)
-  const email = partialUser.email ?? row.email ?? ''
+  let row = await fetchAssinaturaCamposUsuario(billingUid)
+  const emailParaFlags = row.email ?? ''
+  const emailExibicao = partialUser.email ?? emailParaFlags ?? ''
   const isento = partialUser.isento_pagamento === true || row.isento_pagamento === true
 
-  await sincronizarPagamentosPendentesDoUsuario(uid).catch((e) => {
+  await sincronizarPagamentosPendentesDoUsuario(billingUid).catch((e) => {
     if (isMercadoPagoForbiddenError(e)) {
       log.debug('[buildAssinaturaUsuarioPayload] sync MP 403:', e?.message || e)
       return
     }
     log.warn('[buildAssinaturaUsuarioPayload] sync MP:', e?.message || e)
   })
-  await sincronizarPreapprovalUsuario(uid).catch((e) => {
+  await sincronizarPreapprovalUsuario(billingUid).catch((e) => {
     if (isMercadoPagoForbiddenError(e)) {
       log.debug('[buildAssinaturaUsuarioPayload] sync preapproval 403:', e?.message || e)
       return
@@ -212,11 +225,11 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     log.warn('[buildAssinaturaUsuarioPayload] sync preapproval:', e?.message || e)
   })
 
-  row = await fetchAssinaturaCamposUsuario(uid)
+  row = await fetchAssinaturaCamposUsuario(billingUid)
 
-  const hasPay = await usuarioTemPagamentoAprovado(uid, email)
+  const hasPay = await usuarioTemPagamentoAprovado(billingUid, emailParaFlags)
   const flags = computeAssinaturaFlags({
-    email,
+    email: emailParaFlags,
     isento_pagamento: isento,
     trial_ends_at: trialEnds || row.trial_ends_at,
     bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at,
@@ -224,13 +237,49 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     assinatura_mp_status: row.assinatura_mp_status,
   })
 
+  /* Membro da família: privilégios de super-admin pelo próprio e-mail continuam válidos */
+  if (emailExibicao && isSuperAdminEmail(emailExibicao)) {
+    const flagsAdmin = computeAssinaturaFlags({
+      email: emailExibicao,
+      isento_pagamento: true,
+      trial_ends_at: trialEnds || row.trial_ends_at,
+      bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at,
+      assinatura_paga: true,
+      assinatura_mp_status: row.assinatura_mp_status,
+    })
+    const precoMensalAdm = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
+    const planoPrecoAdm = Number.isFinite(precoMensalAdm) && precoMensalAdm > 0 ? precoMensalAdm : 10
+    return {
+      trial_ends_at: trialEnds || row.trial_ends_at || null,
+      bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at || null,
+      assinatura_paga: flagsAdmin.assinatura_paga,
+      acesso_app_liberado: flagsAdmin.acesso_app_liberado,
+      mostrar_bem_vindo_assinatura: flagsAdmin.mostrar_bem_vindo_assinatura,
+      trial_dias_gratis: TRIAL_DIAS,
+      assinatura_proxima_cobranca: row.assinatura_proxima_cobranca ?? null,
+      assinatura_mp_status: row.assinatura_mp_status ?? null,
+      plano_preco_mensal: planoPrecoAdm,
+      assinatura_situacao: flagsAdmin.assinatura_situacao,
+      assinatura_mp_bloqueada: flagsAdmin.assinatura_mp_bloqueada,
+      motivo_bloqueio_acesso: flagsAdmin.motivo_bloqueio_acesso,
+      mp_gerenciar_url: null,
+      conta_familiar_membro: membroConta || undefined,
+      familia_papel: escopoMembro?.familiaPapel ?? undefined,
+      conta_familiar_titular_id: membroConta ? billingUid : undefined,
+    }
+  }
+
   const precoMensal = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
   const planoPreco = Number.isFinite(precoMensal) && precoMensal > 0 ? precoMensal : 10
 
   const mpLink =
-    !isento && !isSuperAdminEmail(email) ? urlGerenciarMercadoPagoPadrão() : null
+    !isento && !isSuperAdminEmail(emailParaFlags)
+      ? membroConta
+        ? null
+        : urlGerenciarMercadoPagoPadrão()
+      : null
 
-  return {
+  const base = {
     trial_ends_at: trialEnds || row.trial_ends_at || null,
     bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at || null,
     assinatura_paga: flags.assinatura_paga,
@@ -245,16 +294,35 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     motivo_bloqueio_acesso: flags.motivo_bloqueio_acesso,
     mp_gerenciar_url: mpLink,
   }
+
+  if (membroConta) {
+    return {
+      ...base,
+      mostrar_bem_vindo_assinatura: false,
+      conta_familiar_membro: true,
+      familia_papel: escopoMembro?.familiaPapel ?? null,
+      conta_familiar_titular_id: billingUid,
+    }
+  }
+
+  return base
 }
 
 export async function marcarBemVindoPagamentoVisto(usuarioId) {
   const uid = String(usuarioId || '').trim()
+  let targetId = uid
+  try {
+    const escopo = await resolveEscopoUsuario(uid)
+    targetId = escopo.dataUsuarioId
+  } catch {
+    /* mantém uid */
+  }
   const supabase = getSupabaseAdmin()
   const nowIso = new Date().toISOString()
   const { error } = await supabase
     .from('usuarios')
     .update({ bem_vindo_pagamento_visto_at: nowIso })
-    .eq('id', uid)
+    .eq('id', targetId)
 
   if (error) throw error
   return nowIso
@@ -268,19 +336,35 @@ export async function assertAcessoAppUsuario(usuarioId) {
   const uid = String(usuarioId || '').trim()
   if (!uid) return { status: 401, message: 'Não autorizado.' }
 
+  let billingUid = uid
   try {
-    await ensureTrialIniciado(uid)
+    const escopo = await resolveEscopoUsuario(uid)
+    billingUid = escopo.dataUsuarioId
+  } catch (e) {
+    log.warn('[assertAcessoAppUsuario] escopo:', e?.message || e)
+    return { status: 401, message: 'Não autorizado.' }
+  }
+
+  const supabase = getSupabaseAdmin()
+
+  const { data: actorPeek } = await supabase.from('usuarios').select('email').eq('id', uid).maybeSingle()
+  const actorEmail = actorPeek?.email ?? ''
+  if (actorEmail && isSuperAdminEmail(actorEmail)) {
+    return null
+  }
+
+  try {
+    await ensureTrialIniciado(billingUid)
   } catch (e) {
     log.warn('[assertAcessoAppUsuario] ensureTrialIniciado:', e?.message || e)
   }
 
-  const supabase = getSupabaseAdmin()
   let urow = null
   let uerr = null
   ;({ data: urow, error: uerr } = await supabase
     .from('usuarios')
     .select('email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_mp_status')
-    .eq('id', uid)
+    .eq('id', billingUid)
     .maybeSingle())
 
   if (uerr && isMissingColumnError(uerr, 'isento_pagamento')) {
@@ -290,7 +374,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
     ;({ data: urow, error: uerr } = await supabase
       .from('usuarios')
       .select('email, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_mp_status')
-      .eq('id', uid)
+      .eq('id', billingUid)
       .maybeSingle())
   }
 
@@ -303,7 +387,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
   const trial_ends_at = urow.trial_ends_at ?? null
 
   const email = urow.email ?? ''
-  const hasPay = await usuarioTemPagamentoAprovado(uid, email)
+  const hasPay = await usuarioTemPagamentoAprovado(billingUid, email)
 
   const isento =
     'isento_pagamento' in urow ? urow.isento_pagamento === true : false

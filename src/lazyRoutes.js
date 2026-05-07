@@ -33,7 +33,7 @@ export const AdminAuditoria = lazy(loadAdminAuditoria)
 const loadAdminMarketing = () => import('./pages/AdminMarketing.jsx')
 export const AdminMarketing = lazy(loadAdminMarketing)
 
-const loadPagamento = () => import('./features/pagamentos/PagamentoPage.jsx')
+const loadPagamento = () => import('./pages/Pagamento.jsx')
 export const Pagamento = lazy(loadPagamento)
 
 const loadBemVindoAssinatura = () => import('./pages/BemVindoAssinatura.jsx')

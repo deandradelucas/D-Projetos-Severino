@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useMemo } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthPasswordToggleButton from '../components/AuthPasswordToggleButton'
 import AuthPhoneShell from '../components/AuthPhoneShell'
 import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
@@ -14,8 +14,23 @@ function formatTelefone(value) {
   return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`
 }
 
+const FAMILIA_CONVITE_SESSION_KEY = 'severino_familia_convite'
+
 export default function Cadastro() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const conviteQuery = useMemo(() => searchParams.get('convite')?.trim() || '', [searchParams])
+
+  useEffect(() => {
+    if (!conviteQuery) return
+    try {
+      window.sessionStorage.setItem(FAMILIA_CONVITE_SESSION_KEY, conviteQuery)
+    } catch {
+      /* ignore */
+    }
+  }, [conviteQuery])
+
+  const loginHref = conviteQuery ? `/login?convite=${encodeURIComponent(conviteQuery)}` : '/login'
   const [step, setStep] = useState(1)
   const [nome, setNome] = useState('')
   const [telefone, setTelefone] = useState('')
@@ -87,7 +102,7 @@ export default function Cadastro() {
       showToast('Conta criada com sucesso!', 'success')
       setLoading(false)
       window.setTimeout(() => {
-        navigate('/login')
+        navigate(loginHref)
       }, 1500)
     } catch {
       showToast('Erro ao conectar com o servidor', 'error')
@@ -104,7 +119,7 @@ export default function Cadastro() {
         <>
           Já tem conta?{' '}
           <Link
-            to="/login"
+            to={loginHref}
             className="cursor-pointer font-semibold text-emerald-600 underline-offset-4 transition hover:text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             Fazer login

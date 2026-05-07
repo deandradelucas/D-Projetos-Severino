@@ -111,12 +111,15 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
     return (
       <div
         style={{
-          minHeight: '100dvh',
+          flex: 1,
+          minHeight: 0,
+          width: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'var(--text-secondary, #64748b)',
           fontSize: '14px',
+          boxSizing: 'border-box',
         }}
       >
         Carregando…

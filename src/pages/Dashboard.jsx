@@ -95,7 +95,7 @@ export default function Dashboard() {
 
   const nomeExibicao = useMemo(() => primeiroNomeExibicao(usuario), [usuario])
 
-  const whatsappContactUrl = 'https://wa.me/5547999895014'
+  const whatsappContactUrl = 'https://wa.me/5554992605447'
 
   const formatCurrency = formatCurrencyBRL
 

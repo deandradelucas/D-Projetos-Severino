@@ -93,9 +93,13 @@
   color: rgba(255, 255, 255, 0.68);
   font-size: 0.72rem;
   font-weight: 620;
-  line-height: 1.2;
+  line-height: 1.35;
+  max-height: 3.2em;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 @media (min-width: 901px) {
@@ -110,6 +114,11 @@
   .agenda-page .agenda-hero__summary p {
     grid-column: auto;
     min-width: 0;
+    -webkit-line-clamp: 3;
+    max-height: none;
+    white-space: nowrap;
+    display: block;
+    text-overflow: ellipsis;
   }
 }
 
@@ -313,10 +322,11 @@
 }
 
 .agenda-page .agenda-day-item {
-  display: grid;
-  grid-template-columns: 36px minmax(0, 1fr);
-  gap: 13px;
-  padding: 14px 2px 14px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px 14px;
+  padding: 14px 4px 14px 0;
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   background: transparent !important;
   box-shadow: none !important;
@@ -324,14 +334,18 @@
 
 .agenda-page .agenda-day-item__icon {
   display: grid;
-  width: 24px;
-  height: 24px;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
   place-items: center;
-  margin-top: 16px;
+  margin-top: 2px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.06);
   color: #2563eb;
 }
 
 .agenda-page .agenda-day-item--reminder .agenda-day-item__icon {
+  background: rgba(124, 58, 237, 0.08);
   color: #7c3aed;
 }
 
@@ -352,15 +366,18 @@
 }
 
 .agenda-page .agenda-day-item--milestone .agenda-day-item__icon {
+  background: rgba(245, 158, 11, 0.12);
   color: #f59e0b;
 }
 
 .agenda-page .agenda-day-item--done .agenda-day-item__icon {
+  background: rgba(100, 116, 139, 0.1);
   color: #64748b;
 }
 
 .agenda-page .agenda-day-item__main {
-  min-width: 0;
+  flex: 1 1 min(0, 100%);
+  min-width: min(100%, 12rem);
 }
 
 .agenda-page .agenda-day-item__type {
@@ -394,24 +411,84 @@
 
 .agenda-page .agenda-day-item__actions {
   display: flex;
-  grid-column: 2;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 0;
+  justify-content: stretch;
 }
 
 .agenda-page .agenda-day-item__actions button {
-  min-height: 34px;
-  padding: 0 10px;
+  flex: 1 1 calc(50% - 4px);
+  min-height: 40px;
+  padding: 0 12px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 10px;
   background: #ffffff;
   color: #111827;
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
+  cursor: pointer;
+}
+
+.agenda-page .agenda-day-item__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.agenda-page .agenda-day-item__actions .agenda-day-item__btn--danger {
+  flex: 1 1 100%;
+  border-color: color-mix(in srgb, #ef4444 42%, rgba(15, 23, 42, 0.08));
+  color: #b91c1c;
+  background: color-mix(in srgb, #ef4444 9%, #ffffff);
+}
+
+.agenda-page .agenda-day-item__actions .agenda-day-item__btn--danger:focus-visible {
+  outline: 2px solid color-mix(in srgb, #ef4444 55%, transparent);
+  outline-offset: 2px;
+}
+
+@media (min-width: 560px) {
+  .agenda-page .agenda-day-item__main {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .agenda-page .agenda-day-item__actions {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    align-self: flex-start;
+    margin-top: 2px;
+    margin-left: auto;
+    width: auto;
+    justify-content: flex-end;
+  }
+
+  .agenda-page .agenda-day-item__actions button {
+    flex: 0 1 auto;
+    min-width: 4.25rem;
+    min-height: 38px;
+  }
+
+  .agenda-page .agenda-day-item__actions .agenda-day-item__btn--danger {
+    flex: 0 1 auto;
+    min-width: 4.25rem;
+  }
 }
 
 @media (min-width: 769px) {
+  /* Hero superior: mesma coluna que calendário + lista (nunca ultrapassa as laterais) */
+  .agenda-page .dashboard-hub__hero.agenda-hero {
+    width: min(720px, 100%) !important;
+    max-width: 720px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+    border-radius: 28px !important;
+    overflow: hidden !important;
+  }
+
   .agenda-page .agenda-calendar-panel,
   .agenda-page .agenda-list-panel--daily {
     width: min(720px, 100%);
@@ -508,17 +585,16 @@
   }
 
   .agenda-page .agenda-calendar-head span {
-    max-width: 190px;
-    line-height: 1.25;
+    max-width: none;
+    line-height: 1.35;
   }
 
-  .agenda-page .agenda-day-item__actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .agenda-page .agenda-calendar-head > div:first-child {
+    min-width: 0;
   }
 
   .agenda-page .agenda-day-item__actions button {
-    min-height: 38px;
+    min-height: 40px;
   }
 }
 
@@ -585,8 +661,14 @@
   }
 
   .agenda-page .agenda-day-item {
-    grid-template-columns: 30px minmax(0, 1fr);
-    gap: 10px;
+    gap: 10px 12px;
+    padding-inline-end: 0;
+  }
+
+  .agenda-page .agenda-day-item__icon {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
   }
 }
 
@@ -1938,10 +2020,21 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
 
 /* Shell mobile/PWA — bounce preto só nas páginas hub “faixa escura”; Agenda, dashboard inicial, Pagamento, Configurações e Relatórios usam fundo próprio */
 @media (max-width: 900px) {
-  body:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes):not(.page-relatorios)),
-  body:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes):not(.page-relatorios)) #root,
-  body:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes):not(.page-relatorios)) .app-routes-grow {
+  /* “Faixa escura” só no tema escuro; no claro usar superfície do scroll (#f3f4f7) — evita barra preta em baixo no PWA */
+  body[data-theme='dark']:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes):not(.page-relatorios)),
+  body[data-theme='dark']:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes):not(.page-relatorios))
+    #root,
+  body[data-theme='dark']:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes):not(.page-relatorios))
+    .app-routes-grow {
     background: #000000 !important;
+  }
+
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes):not(.page-relatorios)),
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes):not(.page-relatorios))
+    #root,
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-pagamento):not(.page-configuracoes):not(.page-relatorios))
+    .app-routes-grow {
+    background: #f3f4f7 !important;
   }
 
   body:has(.dashboard-container.agenda-page.ref-dashboard.app-horizon-shell),
@@ -1977,20 +2070,32 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     background: #000000 !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios),
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios),
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) {
     position: fixed !important;
     inset: 0 !important;
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-    min-height: 100dvh !important;
+    height: 100svh !important;
+    max-height: 100svh !important;
+    min-height: 100svh !important;
     padding: 0 !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
     background: #000000 !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100svh !important;
+    max-height: 100svh !important;
+    min-height: 100svh !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    background: #f3f4f7 !important;
   }
 
   .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page) .app-horizon-inner,
@@ -2012,7 +2117,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     max-width: none !important;
     height: 100% !important;
     max-height: 100% !important;
-    min-height: 100dvh !important;
+    min-height: 100% !important;
     margin: 0 !important;
     padding: 0 14px calc(120px + var(--safe-bottom)) !important;
     overflow-x: hidden !important;
@@ -2248,7 +2353,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
 @media (min-width: 769px) {
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper {
-    min-height: 62px;
+    min-height: 76px;
     margin-bottom: 12px;
     gap: 0;
   }
@@ -2256,9 +2361,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo {
     width: auto;
-    height: 58px;
-    min-height: 58px;
-    max-height: 58px;
+    height: 72px;
+    min-height: 72px;
+    max-height: 72px;
     max-width: 100%;
     object-fit: contain;
   }

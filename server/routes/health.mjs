@@ -8,6 +8,7 @@ healthRoutes.get('/health', (c) =>
     ok: true,
     t: new Date().toISOString(),
     mercadopago: { configured: isMercadoPagoConfigured() },
+    gemini: { configured: Boolean(String(process.env.GEMINI_API_KEY || '').trim()) },
   })
 )
 

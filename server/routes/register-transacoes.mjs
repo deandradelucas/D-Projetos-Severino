@@ -1,6 +1,5 @@
 import { log } from '../lib/logger.mjs'
 import { clientIpFromHono } from '../lib/http/client-ip.mjs'
-import { assertAcessoAppUsuario } from '../lib/assinatura.mjs'
 import {
   getCategorias,
   getTransacoes,
@@ -21,19 +20,16 @@ import {
   isUuidString,
 } from '../lib/transacao-validate.mjs'
 import { TransactionService } from '../lib/services/transaction-service.mjs'
+import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 
 export function registerTransacoesRoutes(app) {
   app.get('/api/categorias', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) {
-        return c.json({ message: 'Não autorizado.' }, 401)
-      }
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-
-      const data = await getCategorias(usuarioId)
+      const data = await getCategorias(parsed.dataUsuarioId)
       return c.json(data)
     } catch (error) {
       log.error('get categories failed', error)
@@ -44,12 +40,8 @@ export function registerTransacoesRoutes(app) {
   app.get('/api/transacoes', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) {
-        return c.json({ message: 'Não autorizado.' }, 401)
-      }
-
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
       const listQ = validateTransacoesListQuery({
         limit: c.req.query('limit'),
@@ -60,7 +52,7 @@ export function registerTransacoesRoutes(app) {
       }
 
       const ip = clientIpFromHono(c)
-      if (!rateLimitTake(`tx-list:${usuarioId}:${ip}`, 240, 60_000)) {
+      if (!rateLimitTake(`tx-list:${parsed.actorId}:${ip}`, 240, 60_000)) {
         return c.json({ message: 'Muitas consultas. Aguarde um momento.' }, 429)
       }
 
@@ -77,7 +69,7 @@ export function registerTransacoesRoutes(app) {
         offset: qOff !== undefined && qOff !== '' ? parseInt(String(qOff), 10) : undefined,
       }
 
-      const data = await getTransacoes(usuarioId, filters)
+      const data = await getTransacoes(parsed.dataUsuarioId, filters)
       return c.json(data)
     } catch (error) {
       log.error('get transactions failed', error)
@@ -88,14 +80,10 @@ export function registerTransacoesRoutes(app) {
   app.post('/api/transacoes', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) {
-        return c.json({ message: 'Não autorizado.' }, 401)
-      }
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-
-      if (!rateLimitTake(`tx-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      if (!rateLimitTake(`tx-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -111,7 +99,7 @@ export function registerTransacoesRoutes(app) {
         return c.json({ message: val.message }, 400)
       }
 
-      const data = await TransactionService.createTransaction(usuarioId, body)
+      const data = await TransactionService.createTransaction(parsed.dataUsuarioId, body)
 
       return c.json({ message: 'Transação inserida com sucesso.', data }, 201)
     } catch (error) {
@@ -123,14 +111,10 @@ export function registerTransacoesRoutes(app) {
   app.post('/api/recorrencias-mensais/sincronizar', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) {
-        return c.json({ message: 'Não autorizado.' }, 401)
-      }
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-
-      const result = await processarRecorrenciasPendentes(usuarioId)
+      const result = await processarRecorrenciasPendentes(parsed.dataUsuarioId)
       return c.json(result)
     } catch (error) {
       log.error('sincronizar recorrências mensais', error)
@@ -141,14 +125,10 @@ export function registerTransacoesRoutes(app) {
   app.get('/api/recorrencias-mensais', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) {
-        return c.json({ message: 'Não autorizado.' }, 401)
-      }
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-
-      const data = await listarRecorrenciasMensais(usuarioId)
+      const data = await listarRecorrenciasMensais(parsed.dataUsuarioId)
       return c.json(data)
     } catch (error) {
       log.error('listar recorrências mensais', error)
@@ -160,14 +140,10 @@ export function registerTransacoesRoutes(app) {
     try {
       const id = c.req.param('id')
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) {
-        return c.json({ message: 'Não autorizado.' }, 401)
-      }
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-
-      await desativarRecorrenciaMensal(id, usuarioId)
+      await desativarRecorrenciaMensal(id, parsed.dataUsuarioId)
       return c.json({ message: 'Recorrência encerrada.' })
     } catch (error) {
       log.error('desativar recorrência mensal', error)
@@ -193,18 +169,14 @@ export function registerTransacoesRoutes(app) {
     try {
       const id = c.req.param('id')
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) {
-        return c.json({ message: 'Não autorizado.' }, 401)
-      }
-
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
       if (!isUuidString(id)) {
         return c.json({ message: 'ID inválido.' }, 400)
       }
 
-      if (!rateLimitTake(`tx-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      if (!rateLimitTake(`tx-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -220,7 +192,7 @@ export function registerTransacoesRoutes(app) {
         return c.json({ message: vBody.message }, 400)
       }
 
-      await atualizarTransacao(id, usuarioId, body)
+      await atualizarTransacao(id, parsed.dataUsuarioId, body)
       return c.json({ message: 'Transação atualizada com sucesso.' })
     } catch (error) {
       log.error('update transaction failed', error)
@@ -232,22 +204,18 @@ export function registerTransacoesRoutes(app) {
     try {
       const id = c.req.param('id')
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) {
-        return c.json({ message: 'Não autorizado.' }, 401)
-      }
-
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
       if (!isUuidString(id)) {
         return c.json({ message: 'ID inválido.' }, 400)
       }
 
-      if (!rateLimitTake(`tx-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      if (!rateLimitTake(`tx-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
-      await deletarTransacao(id, usuarioId)
+      await deletarTransacao(id, parsed.dataUsuarioId)
       return c.json({ message: 'Transação excluída com sucesso.' })
     } catch (error) {
       log.error('delete transaction failed', error)

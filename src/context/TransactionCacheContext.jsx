@@ -8,6 +8,7 @@
  */
 import React, {
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from 'react'
@@ -16,7 +17,7 @@ import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { readHorizonteUser } from '../lib/horizonteSession'
-import { TransactionCacheContext } from './transactionCacheStore'
+import { TransactionCacheContext, TRANSACOES_REVALIDATED_EVENT } from './transactionCacheStore'
 
 /**
  * Provider — deve envolver o App (ou pelo menos as páginas autenticadas).
@@ -70,6 +71,9 @@ export function TransactionCacheProvider({ children }) {
         setTransacoes(Array.isArray(data) ? data : [])
         hasDataRef.current = true
         setError('')
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent(TRANSACOES_REVALIDATED_EVENT))
+        }
         return
       }
 
@@ -83,6 +87,34 @@ export function TransactionCacheProvider({ children }) {
       fetchingRef.current = false
     }
   }, [])
+
+  /**
+   * Lançamentos pelo WhatsApp não chegam por push ao browser (API custom + x-user-id).
+   * Revalidamos ao voltar ao separador e em intervalo curto com o app visível.
+   */
+  useEffect(() => {
+    const POLL_MS = 45_000
+    let debounceVis
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return
+      const session = readHorizonteUser()
+      if (!session?.id) return
+      clearTimeout(debounceVis)
+      debounceVis = window.setTimeout(() => void fetchTransacoes({ silent: true }), 450)
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    const intervalId = window.setInterval(() => {
+      if (document.visibilityState !== 'visible') return
+      const session = readHorizonteUser()
+      if (!session?.id) return
+      void fetchTransacoes({ silent: true })
+    }, POLL_MS)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      clearInterval(intervalId)
+      clearTimeout(debounceVis)
+    }
+  }, [fetchTransacoes])
 
   /**
    * Adiciona uma transação localmente de forma otimista,

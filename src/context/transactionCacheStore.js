@@ -1,5 +1,8 @@
 import { createContext, useContext } from 'react'
 
+/** Disparado após `/api/transacoes` atualizar o cache (ex.: lançamento pelo WhatsApp). */
+export const TRANSACOES_REVALIDATED_EVENT = 'horizonte-transacoes-revalidated'
+
 export const TransactionCacheContext = createContext(null)
 
 /**
