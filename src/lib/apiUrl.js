@@ -89,16 +89,10 @@ export function apiUrl(path) {
       : '',
   )
 
-  const onSeverinoProdBrowser =
-    import.meta.env.PROD &&
-    typeof window !== 'undefined' &&
-    window.location?.hostname &&
-    isSeverinoFrontendHost(window.location.hostname)
-
-  if (onSeverinoProdBrowser) {
-    envBase = sanitizeBrokenLegacyApiBase(envBase)
-    defaultSeverinoApi = sanitizeBrokenLegacyApiBase(defaultSeverinoApi)
-  }
+  /* Em qualquer host: `api.severino…` sem DNS no bundle quebra o login. Só voltar a usar com
+   * VITE_SEVERINO_ALLOW_LEGACY_API_SUBDOMAIN após criares o registo DNS real. */
+  envBase = sanitizeBrokenLegacyApiBase(envBase)
+  defaultSeverinoApi = sanitizeBrokenLegacyApiBase(defaultSeverinoApi)
 
   let inferredBase = ''
   if (
