@@ -100,15 +100,6 @@ function RelatoriosChartsLoadingShell() {
             </div>
             <RelatoriosChartSkelBody />
           </article>
-          <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
-            <div className="ref-panel__head">
-              <div>
-                <h2 className="ref-panel__title">Compras recorrentes por mês</h2>
-                <p className="ref-panel__subtitle">Soma das despesas marcadas como recorrentes (regra mensal ou parcelamento) por mês</p>
-              </div>
-            </div>
-            <RelatoriosChartSkelBody />
-          </article>
         </div>
       </section>
       <div className="relatorios-charts__pair">
@@ -131,6 +122,22 @@ function RelatoriosChartsLoadingShell() {
           <RelatoriosChartSkelBody pie />
         </article>
       </div>
+      <section className="relatorios-charts__section" aria-labelledby="rel-recorrentes-heading-skel">
+        <h3 id="rel-recorrentes-heading-skel" className="relatorios-charts__section-title">
+          Recorrentes
+        </h3>
+        <div className="relatorios-charts__section-grid">
+          <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+            <div className="ref-panel__head">
+              <div>
+                <h2 className="ref-panel__title">Compras recorrentes por mês</h2>
+                <p className="ref-panel__subtitle">Soma das despesas marcadas como recorrentes (regra mensal ou parcelamento) por mês</p>
+              </div>
+            </div>
+            <RelatoriosChartSkelBody />
+          </article>
+        </div>
+      </section>
     </div>
   )
 }
@@ -604,97 +611,6 @@ export default function Relatorios() {
                     )}
                   </div>
                 </article>
-
-                <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
-                  <div className="ref-panel__head">
-                    <div>
-                      <h2 className="ref-panel__title">Recorrentes</h2>
-                      <p className="ref-panel__subtitle">
-                        Despesas fixas e parceladas
-                        {totalComprasRecorrentesPeriodo > 0 ? (
-                          <>
-                            {' '}
-                            · total no período:{' '}
-                            <span className={privacyMode ? 'privacy-blur' : ''}>
-                              {formatCurrency(totalComprasRecorrentesPeriodo)}
-                            </span>
-                          </>
-                        ) : null}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="relatorios-chart-card__body">
-                    {totalComprasRecorrentesPeriodo > 0 ? (
-                      <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
-                        <BarChart
-                          data={chartDataComprasRecorrentesMes}
-                          margin={{ top: 12, right: 8, left: 0, bottom: 4 }}
-                          barGap={2}
-                          barCategoryGap="22%"
-                        >
-                          <defs>
-                            <linearGradient id="relGradRecurrMes" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={chart.barRecurrTop} stopOpacity={1} />
-                              <stop offset="100%" stopColor={chart.barRecurrBot} stopOpacity={0.92} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="4 8" stroke={chart.axis} strokeOpacity={0.18} vertical={false} />
-                          <XAxis
-                            dataKey="name"
-                            stroke={chart.axis}
-                            fontSize={isMobile ? 10 : 11}
-                            tickMargin={8}
-                            tick={{ fill: chart.tickFill }}
-                            axisLine={false}
-                            tickLine={false}
-                            interval={0}
-                            angle={isMobile ? -35 : 0}
-                            textAnchor={isMobile ? 'end' : 'middle'}
-                            height={isMobile ? 56 : 32}
-                          />
-                          <YAxis
-                            stroke={chart.axis}
-                            fontSize={isMobile ? 10 : 11}
-                            tickLine={false}
-                            axisLine={false}
-                            tick={{ fill: chart.tickFill }}
-                            tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)}
-                            width={isMobile ? 56 : 64}
-                          />
-                          <Tooltip
-                            content={({ active, payload, label }) => {
-                              if (!active || !payload?.length) return null
-                              const v = payload[0]?.value
-                              return (
-                                <div className="relatorios-tooltip">
-                                  <div className="relatorios-tooltip__label">{label}</div>
-                                  <div className="relatorios-tooltip__row">
-                                    <span className="relatorios-tooltip__dot" style={{ background: chart.barRecurrTop }} />
-                                    <span className="relatorios-tooltip__name">Despesas recorrentes</span>
-                                    <span className="relatorios-tooltip__val">{formatCurrency(v)}</span>
-                                  </div>
-                                </div>
-                              )
-                            }}
-                            cursor={{ fill: chart.cursorFill }}
-                          />
-                          <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: chart.legend, fontSize: 12 }} />
-                          <Bar
-                            dataKey="total"
-                            name="Despesas recorrentes"
-                            fill="url(#relGradRecurrMes)"
-                            radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]}
-                            maxBarSize={44}
-                          />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="relatorios-chart-empty">
-                        Nenhuma recorrência no período.
-                      </div>
-                    )}
-                  </div>
-                </article>
               </div>
             </section>
 
@@ -825,6 +741,104 @@ export default function Relatorios() {
                 </div>
               </article>
             </div>
+
+            <section className="relatorios-charts__section" aria-labelledby="rel-recorrentes-heading">
+              <h3 id="rel-recorrentes-heading" className="relatorios-charts__section-title">
+                Recorrentes
+              </h3>
+              <div className="relatorios-charts__section-grid">
+                <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+                  <div className="ref-panel__head">
+                    <div>
+                      <h2 className="ref-panel__title">Recorrentes</h2>
+                      <p className="ref-panel__subtitle">
+                        Despesas fixas e parceladas
+                        {totalComprasRecorrentesPeriodo > 0 ? (
+                          <>
+                            {' '}
+                            · total no período:{' '}
+                            <span className={privacyMode ? 'privacy-blur' : ''}>
+                              {formatCurrency(totalComprasRecorrentesPeriodo)}
+                            </span>
+                          </>
+                        ) : null}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="relatorios-chart-card__body">
+                    {totalComprasRecorrentesPeriodo > 0 ? (
+                      <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
+                        <BarChart
+                          data={chartDataComprasRecorrentesMes}
+                          margin={{ top: 12, right: 8, left: 0, bottom: 4 }}
+                          barGap={2}
+                          barCategoryGap="22%"
+                        >
+                          <defs>
+                            <linearGradient id="relGradRecurrMes" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor={chart.barRecurrTop} stopOpacity={1} />
+                              <stop offset="100%" stopColor={chart.barRecurrBot} stopOpacity={0.92} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="4 8" stroke={chart.axis} strokeOpacity={0.18} vertical={false} />
+                          <XAxis
+                            dataKey="name"
+                            stroke={chart.axis}
+                            fontSize={isMobile ? 10 : 11}
+                            tickMargin={8}
+                            tick={{ fill: chart.tickFill }}
+                            axisLine={false}
+                            tickLine={false}
+                            interval={0}
+                            angle={isMobile ? -35 : 0}
+                            textAnchor={isMobile ? 'end' : 'middle'}
+                            height={isMobile ? 56 : 32}
+                          />
+                          <YAxis
+                            stroke={chart.axis}
+                            fontSize={isMobile ? 10 : 11}
+                            tickLine={false}
+                            axisLine={false}
+                            tick={{ fill: chart.tickFill }}
+                            tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)}
+                            width={isMobile ? 56 : 64}
+                          />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (!active || !payload?.length) return null
+                              const v = payload[0]?.value
+                              return (
+                                <div className="relatorios-tooltip">
+                                  <div className="relatorios-tooltip__label">{label}</div>
+                                  <div className="relatorios-tooltip__row">
+                                    <span className="relatorios-tooltip__dot" style={{ background: chart.barRecurrTop }} />
+                                    <span className="relatorios-tooltip__name">Despesas recorrentes</span>
+                                    <span className="relatorios-tooltip__val">{formatCurrency(v)}</span>
+                                  </div>
+                                </div>
+                              )
+                            }}
+                            cursor={{ fill: chart.cursorFill }}
+                          />
+                          <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: chart.legend, fontSize: 12 }} />
+                          <Bar
+                            dataKey="total"
+                            name="Despesas recorrentes"
+                            fill="url(#relGradRecurrMes)"
+                            radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]}
+                            maxBarSize={44}
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="relatorios-chart-empty">
+                        Nenhuma recorrência no período.
+                      </div>
+                    )}
+                  </div>
+                </article>
+              </div>
+            </section>
           </div>
         )}
         </RefDashboardScroll>

@@ -1,21 +1,17 @@
 import { log } from '../lib/logger.mjs'
-import { assertAcessoAppUsuario } from '../lib/assinatura.mjs'
 import {
   askHorizon,
   parseAgendaFromTextWithAI,
 } from '../lib/ai.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
+import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 
 export function registerAiRoutes(app) {
   app.post('/api/ai/chat', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) {
-        return c.json({ message: 'Não autorizado.' }, 401)
-      }
-
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
       const body = await c.req.json()
       const message = String(body?.message || '').trim()
@@ -25,7 +21,11 @@ export function registerAiRoutes(app) {
         return c.json({ message: 'Mensagem não pode estar vazia.' }, 400)
       }
 
-      const resposta = await askHorizon(message, usuarioId, historico)
+      if (!rateLimitTake(`ai-chat:${parsed.actorId}:${clientKeyFromHono(c)}`, 40, 60_000)) {
+        return c.json({ message: 'Muitas mensagens seguidas. Aguarde cerca de um minuto e tente de novo.' }, 429)
+      }
+
+      const resposta = await askHorizon(message, parsed.dataUsuarioId, historico)
 
       return c.json({ resposta })
     } catch (error) {
@@ -87,12 +87,10 @@ export function registerAiRoutes(app) {
   app.post('/api/ai/agenda-parse', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-
-      if (!rateLimitTake(`ai-parse:${usuarioId}:${clientKeyFromHono(c)}`, 24, 60_000)) {
+      if (!rateLimitTake(`ai-parse:${parsed.actorId}:${clientKeyFromHono(c)}`, 24, 60_000)) {
         return c.json({ message: 'Muitas interpretações seguidas. Aguarde um minuto.' }, 429)
       }
 

@@ -6,9 +6,9 @@ const STORAGE_KEY = 'horizonte_theme'
 
 const VALID_THEMES = ['light', 'dark']
 
-/** Cor da UI do sistema (PWA: barra de navegação / overscroll). Mantém #000000 em ambos para fundo/chrome preto no instalado. */
+/** Cor da UI do sistema (PWA / Chrome). Claro = branco para alinhar ao shell e evitar faixa escura na área do gesto (Android). */
 const THEME_COLOR_META = {
-  light: '#000000',
+  light: '#ffffff',
   dark: '#000000',
 }
 

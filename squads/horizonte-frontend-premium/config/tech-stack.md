@@ -28,6 +28,6 @@
 - `npm run test` = unit + lint + build
 
 ## Convenções
-- Aliases: `@` = `src/`, `@components` = `src/components/`, `@features` = `src/features/`, `@shared` = `src/shared/`
+- Aliases: `@` = `src/`, `@components` = `src/components/`
 - Nomes de UI em português (labels, placeholders, mensagens)
 - Comentários curtos apenas onde o WHY não é óbvio

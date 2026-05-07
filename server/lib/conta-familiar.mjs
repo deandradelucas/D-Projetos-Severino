@@ -1,0 +1,349 @@
+import { createHash, randomBytes } from 'node:crypto'
+import { getSupabaseAdmin } from './supabase-admin.mjs'
+
+export const FAMILIA_MAX_MEMBROS_TOTAL =
+  Number.parseInt(process.env.FAMILIA_MAX_MEMBROS || '5', 10) || 5
+
+const INVITE_VALID_DAYS = Number.parseInt(process.env.FAMILIA_CONVITE_DIAS || '7', 10) || 7
+
+/** @returns {string} */
+export function hashFamiliaToken(plain) {
+  return createHash('sha256').update(String(plain).trim(), 'utf8').digest('hex')
+}
+
+/** @returns {string} token em texto claro (mostrar uma vez ao titular) */
+export function gerarTokenConvitePlain() {
+  return randomBytes(24).toString('base64url')
+}
+
+function addDaysIso(days) {
+  const d = new Date()
+  d.setUTCDate(d.getUTCDate() + days)
+  return d.toISOString()
+}
+
+/**
+ * @param {string} actorUsuarioId
+ * @returns {Promise<{ actorId: string, dataUsuarioId: string, familiaPapel: string | null, isMembroConta: boolean }>}
+ */
+export async function resolveEscopoUsuario(actorUsuarioId) {
+  const actorId = String(actorUsuarioId || '').trim()
+  if (!actorId) {
+    throw new Error('Usuário inválido.')
+  }
+  const supabase = getSupabaseAdmin()
+  const { data: row, error } = await supabase
+    .from('usuarios')
+    .select('id, vinculo_conta_principal_id, familia_papel')
+    .eq('id', actorId)
+    .maybeSingle()
+
+  if (error) throw error
+  if (!row) throw new Error('Usuário não encontrado.')
+
+  const principal = row.vinculo_conta_principal_id
+    ? String(row.vinculo_conta_principal_id).trim()
+    : null
+
+  if (!principal) {
+    return {
+      actorId,
+      dataUsuarioId: actorId,
+      familiaPapel: null,
+      isMembroConta: false,
+    }
+  }
+
+  const { data: titular, error: terr } = await supabase
+    .from('usuarios')
+    .select('id')
+    .eq('id', principal)
+    .maybeSingle()
+
+  if (terr) throw terr
+  if (!titular) {
+    throw new Error('Conta principal não encontrada. Contacte o suporte.')
+  }
+
+  const papel = row.familia_papel ? String(row.familia_papel).toUpperCase() : 'MEMBER'
+  const familiaPapel = ['ADMIN', 'MEMBER', 'VIEWER'].includes(papel) ? papel : 'MEMBER'
+
+  return {
+    actorId,
+    dataUsuarioId: principal,
+    familiaPapel,
+    isMembroConta: true,
+  }
+}
+
+/**
+ * VIEWER não altera dados (transações, agenda, recorrências).
+ * @returns {null | { status: number, message: string }}
+ */
+export function assertFamiliaPodeEscrever(escopo) {
+  if (!escopo?.isMembroConta) return null
+  if (escopo.familiaPapel === 'VIEWER') {
+    return {
+      status: 403,
+      message: 'Seu convite é só leitura. Peça ao titular da conta um convite com permissão para editar.',
+    }
+  }
+  return null
+}
+
+async function countMembrosDoTitular(titularId) {
+  const tid = String(titularId || '').trim()
+  const supabase = getSupabaseAdmin()
+  const { count, error } = await supabase
+    .from('usuarios')
+    .select('id', { count: 'exact', head: true })
+    .eq('vinculo_conta_principal_id', tid)
+
+  if (error) throw error
+  return Number(count || 0)
+}
+
+async function assertTitularPodeConvidar(actorId) {
+  const escopo = await resolveEscopoUsuario(actorId)
+  if (escopo.isMembroConta) {
+    throw new Error('Apenas o titular da conta pode criar convites.')
+  }
+  const n = await countMembrosDoTitular(actorId)
+  const maxMembers = Math.max(1, FAMILIA_MAX_MEMBROS_TOTAL) - 1
+  if (n >= maxMembers) {
+    throw new Error(
+      `Limite de ${FAMILIA_MAX_MEMBROS_TOTAL} pessoas nesta conta foi atingido. Remova um membro ou convite para continuar.`,
+    )
+  }
+}
+
+/**
+ * @param {string} titularUsuarioId
+ * @param {'ADMIN'|'MEMBER'|'VIEWER'} papel
+ */
+export async function criarConviteFamilia(titularUsuarioId, papel = 'MEMBER') {
+  await assertTitularPodeConvidar(titularUsuarioId)
+
+  const p = String(papel || 'MEMBER').toUpperCase()
+  const papelConvite = ['ADMIN', 'MEMBER', 'VIEWER'].includes(p) ? p : 'MEMBER'
+
+  const plain = gerarTokenConvitePlain()
+  const token_hash = hashFamiliaToken(plain)
+  const expires_at = addDaysIso(INVITE_VALID_DAYS)
+
+  const supabase = getSupabaseAdmin()
+  const { data, error } = await supabase
+    .from('familia_convites')
+    .insert({
+      titular_usuario_id: titularUsuarioId,
+      token_hash,
+      papel_convite: papelConvite,
+      expires_at,
+    })
+    .select('id, papel_convite, expires_at, created_at')
+    .single()
+
+  if (error) throw error
+
+  return {
+    convite: data,
+    token_plain: plain,
+    dias_validade: INVITE_VALID_DAYS,
+  }
+}
+
+export async function listarConvitesPendentes(titularUsuarioId) {
+  const supabase = getSupabaseAdmin()
+  const now = new Date().toISOString()
+  const { data, error } = await supabase
+    .from('familia_convites')
+    .select('id, papel_convite, expires_at, created_at')
+    .eq('titular_usuario_id', titularUsuarioId)
+    .is('revoked_at', null)
+    .is('consumed_at', null)
+    .gt('expires_at', now)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data || []
+}
+
+export async function revogarConviteFamilia(titularUsuarioId, conviteId) {
+  const supabase = getSupabaseAdmin()
+  const { data: row, error: selErr } = await supabase
+    .from('familia_convites')
+    .select('id')
+    .eq('id', conviteId)
+    .eq('titular_usuario_id', titularUsuarioId)
+    .maybeSingle()
+
+  if (selErr) throw selErr
+  if (!row) throw new Error('Convite não encontrado.')
+
+  const { error } = await supabase
+    .from('familia_convites')
+    .update({ revoked_at: new Date().toISOString() })
+    .eq('id', conviteId)
+
+  if (error) throw error
+}
+
+export async function buscarInfoConvitePorToken(plainToken) {
+  const token_hash = hashFamiliaToken(plainToken)
+  const supabase = getSupabaseAdmin()
+  const now = new Date().toISOString()
+
+  const { data: conv, error } = await supabase
+    .from('familia_convites')
+    .select('id, titular_usuario_id, papel_convite, expires_at, revoked_at, consumed_at')
+    .eq('token_hash', token_hash)
+    .maybeSingle()
+
+  if (error) throw error
+  if (!conv) {
+    return { valido: false, motivo: 'Convite não encontrado ou já utilizado.' }
+  }
+  if (conv.revoked_at) return { valido: false, motivo: 'Este convite foi revogado.' }
+  if (conv.consumed_at) return { valido: false, motivo: 'Este convite já foi utilizado.' }
+  if (conv.expires_at <= now) return { valido: false, motivo: 'Este convite expirou.' }
+
+  const { data: titular, error: uerr } = await supabase
+    .from('usuarios')
+    .select('nome, email')
+    .eq('id', conv.titular_usuario_id)
+    .maybeSingle()
+
+  if (uerr) throw uerr
+
+  const nomeTitular = titular?.nome ? String(titular.nome).trim() : 'Titular'
+  const emailMask = titular?.email
+    ? String(titular.email).replace(/(^.).*(@.*$)/, '$1***$2')
+    : null
+
+  return {
+    valido: true,
+    papel_convite: conv.papel_convite,
+    expires_at: conv.expires_at,
+    titular_preview: { nome: nomeTitular, email_mascarado: emailMask },
+  }
+}
+
+/**
+ * Vincula o usuário autenticado (actor) ao titular do convite.
+ * @param {string} actorUsuarioId
+ * @param {string} plainToken
+ */
+export async function aceitarConviteFamilia(actorUsuarioId, plainToken) {
+  const actorId = String(actorUsuarioId || '').trim()
+  const token_hash = hashFamiliaToken(plainToken)
+
+  const supabase = getSupabaseAdmin()
+
+  const { data: self, error: sErr } = await supabase
+    .from('usuarios')
+    .select('id, vinculo_conta_principal_id')
+    .eq('id', actorId)
+    .maybeSingle()
+
+  if (sErr) throw sErr
+  if (!self) throw new Error('Usuário não encontrado.')
+
+  if (self.vinculo_conta_principal_id) {
+    throw new Error('Esta conta já está vinculada a uma família. Saia da conta compartilhada antes de aceitar outro convite.')
+  }
+
+  const now = new Date().toISOString()
+  const { data: conv, error: cErr } = await supabase
+    .from('familia_convites')
+    .select('*')
+    .eq('token_hash', token_hash)
+    .maybeSingle()
+
+  if (cErr) throw cErr
+  if (!conv) throw new Error('Convite inválido.')
+  if (conv.revoked_at) throw new Error('Convite revogado.')
+  if (conv.consumed_at) throw new Error('Convite já utilizado.')
+  if (conv.expires_at <= now) throw new Error('Convite expirado.')
+
+  const titularId = String(conv.titular_usuario_id).trim()
+  if (titularId === actorId) {
+    throw new Error('Você não pode aceitar um convite da própria conta.')
+  }
+
+  const { data: titularRow } = await supabase
+    .from('usuarios')
+    .select('vinculo_conta_principal_id')
+    .eq('id', titularId)
+    .maybeSingle()
+
+  if (titularRow?.vinculo_conta_principal_id) {
+    throw new Error('O titular deste convite não pode ser conta vinculada.')
+  }
+
+  const n = await countMembrosDoTitular(titularId)
+  const maxMembers = Math.max(1, FAMILIA_MAX_MEMBROS_TOTAL) - 1
+  if (n >= maxMembers) {
+    throw new Error('Esta família já atingiu o número máximo de membros.')
+  }
+
+  const papel = String(conv.papel_convite || 'MEMBER').toUpperCase()
+  const familiaPapel = ['ADMIN', 'MEMBER', 'VIEWER'].includes(papel) ? papel : 'MEMBER'
+
+  const { error: upUserErr } = await supabase
+    .from('usuarios')
+    .update({
+      vinculo_conta_principal_id: titularId,
+      familia_papel: familiaPapel,
+    })
+    .eq('id', actorId)
+
+  if (upUserErr) throw upUserErr
+
+  const { error: upConvErr } = await supabase
+    .from('familia_convites')
+    .update({
+      consumed_at: now,
+      consumed_by_usuario_id: actorId,
+    })
+    .eq('id', conv.id)
+
+  if (upConvErr) throw upConvErr
+
+  return { titular_usuario_id: titularId, familia_papel: familiaPapel }
+}
+
+export async function listarMembrosFamilia(titularUsuarioId) {
+  const supabase = getSupabaseAdmin()
+  const { data, error } = await supabase
+    .from('usuarios')
+    .select('id, nome, email, familia_papel, created_at')
+    .eq('vinculo_conta_principal_id', titularUsuarioId)
+    .order('created_at', { ascending: true })
+
+  if (error) throw error
+  return data || []
+}
+
+export async function removerMembroFamilia(titularUsuarioId, membroUsuarioId) {
+  const tid = String(titularUsuarioId || '').trim()
+  const mid = String(membroUsuarioId || '').trim()
+  if (tid === mid) throw new Error('Operação inválida.')
+
+  const supabase = getSupabaseAdmin()
+  const { data: row, error } = await supabase
+    .from('usuarios')
+    .select('id')
+    .eq('id', mid)
+    .eq('vinculo_conta_principal_id', tid)
+    .maybeSingle()
+
+  if (error) throw error
+  if (!row) throw new Error('Membro não encontrado nesta conta.')
+
+  const { error: upErr } = await supabase
+    .from('usuarios')
+    .update({ vinculo_conta_principal_id: null, familia_papel: null })
+    .eq('id', mid)
+
+  if (upErr) throw upErr
+}

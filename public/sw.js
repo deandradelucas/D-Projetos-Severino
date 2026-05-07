@@ -1,4 +1,4 @@
-const CACHE_NAME = 'severino-financeiro-v2'
+const CACHE_NAME = 'severino-financeiro-v4'
 const APP_SHELL = [
   '/',
   '/dashboard',

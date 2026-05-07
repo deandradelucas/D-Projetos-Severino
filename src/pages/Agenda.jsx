@@ -269,6 +269,8 @@ export default function Agenda() {
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  /** Exclusão direta na lista do dia (confirmação em `ConfirmDialog`). */
+  const [pendingDelete, setPendingDelete] = useState(null)
   const [nlTexto, setNlTexto] = useState('')
   const [nlBusy, setNlBusy] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
@@ -498,25 +500,40 @@ export default function Agenda() {
     }
   }
 
+  async function removeAgendaItem(id) {
+    if (!usuarioId || !id) throw new Error('Sessão inválida.')
+    const res = await fetch(apiUrl(`/api/agenda/${id}`), {
+      method: 'DELETE',
+      headers: { 'x-user-id': usuarioId },
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(data.message || 'Falha ao remover item da agenda.')
+  }
+
   async function deleteEvent() {
     if (!usuarioId || !editing?.id) return
     setSaving(true)
     try {
-      const res = await fetch(apiUrl(`/api/agenda/${editing.id}`), {
-        method: 'DELETE',
-        headers: { 'x-user-id': usuarioId },
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.message || 'Falha ao remover item da agenda.')
+      await removeAgendaItem(editing.id)
       showToast('Item removido.', 'success')
       setModalOpen(false)
       setEditing(null)
+      setConfirmDeleteOpen(false)
       await loadAgenda()
     } catch (err) {
       showToast(err.message || 'Falha ao remover item da agenda.', 'error')
+      throw err
     } finally {
       setSaving(false)
     }
+  }
+
+  async function confirmDeleteFromList() {
+    const id = pendingDelete?.id
+    if (!id || !usuarioId) return
+    await removeAgendaItem(id)
+    showToast('Item removido.', 'success')
+    await loadAgenda()
   }
 
   async function setStatus(evento, status) {
@@ -675,6 +692,14 @@ export default function Agenda() {
                           <div className="agenda-day-item__actions">
                             <button type="button" onClick={() => openEdit(evento)} aria-label={`Editar ${evento.titulo}`}>Editar</button>
                             <button type="button" onClick={() => setStatus(evento, 'CONCLUIDO')} aria-label={`Concluir ${evento.titulo}`}>Concluir</button>
+                            <button
+                              type="button"
+                              className="agenda-day-item__btn agenda-day-item__btn--danger"
+                              onClick={() => setPendingDelete(evento)}
+                              aria-label={`Excluir ${evento.titulo}`}
+                            >
+                              Excluir
+                            </button>
                           </div>
                         </article>
                       )
@@ -784,6 +809,14 @@ export default function Agenda() {
         confirmLabel="Remover"
         onConfirm={deleteEvent}
         onClose={() => setConfirmDeleteOpen(false)}
+      />
+      <ConfirmDialog
+        open={pendingDelete != null}
+        title="Remover item?"
+        message={`"${pendingDelete?.titulo || 'Este item'}" será removido da agenda.`}
+        confirmLabel="Remover"
+        onConfirm={confirmDeleteFromList}
+        onClose={() => setPendingDelete(null)}
       />
     </div>
   )

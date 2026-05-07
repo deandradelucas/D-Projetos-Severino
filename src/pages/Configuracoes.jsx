@@ -30,12 +30,77 @@ export default function Configuracoes() {
   const [webauthnError, setWebauthnError] = useState(null)
   const [bioRegistering, setBioRegistering] = useState(false)
   const [confirmBiometricRemoval, setConfirmBiometricRemoval] = useState(null)
+  const [familiaTitular, setFamiliaTitular] = useState(null)
+  const [familiaMembros, setFamiliaMembros] = useState([])
+  const [familiaConvites, setFamiliaConvites] = useState([])
+  const [familiaLoadErr, setFamiliaLoadErr] = useState(null)
+  const [familiaBusy, setFamiliaBusy] = useState(false)
+  const [novoConvitePapel, setNovoConvitePapel] = useState('MEMBER')
+  const [ultimoTokenConvite, setUltimoTokenConvite] = useState('')
+  const [familiaConfirm, setFamiliaConfirm] = useState(null)
   const usuarioIdHeader = String(perfil?.id ?? '').trim()
 
   const showToast = useCallback((msg) => {
     setToast(msg)
     setTimeout(() => setToast(''), 4200)
   }, [])
+
+  const refreshAssinaturaPerfil = useCallback(async () => {
+    if (!usuarioIdHeader) return
+    try {
+      const res = await fetch(apiUrl('/api/assinatura/status'), {
+        headers: { 'x-user-id': usuarioIdHeader },
+        cache: 'no-store',
+      })
+      if (!res.ok) return
+      const assin = await res.json().catch(() => ({}))
+      setPerfil((p) => ({ ...p, ...assin }))
+      try {
+        const raw = localStorage.getItem('horizonte_user')
+        const u = { ...(raw ? JSON.parse(raw) : {}), ...assin }
+        localStorage.setItem('horizonte_user', JSON.stringify(u))
+        window.dispatchEvent(new Event('horizonte-session-refresh'))
+      } catch {
+        /* ignore */
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [usuarioIdHeader])
+
+  const loadFamiliaPainel = useCallback(async () => {
+    if (!usuarioIdHeader) return
+    setFamiliaLoadErr(null)
+    try {
+      const resM = await fetch(apiUrl('/api/familia/membros'), { headers: { 'x-user-id': usuarioIdHeader } })
+      if (resM.status === 403) {
+        setFamiliaTitular(false)
+        setFamiliaMembros([])
+        setFamiliaConvites([])
+        return
+      }
+      if (!resM.ok) {
+        setFamiliaTitular(null)
+        return
+      }
+      setFamiliaTitular(true)
+      const m = await resM.json().catch(() => ({}))
+      setFamiliaMembros(Array.isArray(m.membros) ? m.membros : [])
+      const resC = await fetch(apiUrl('/api/familia/convites'), { headers: { 'x-user-id': usuarioIdHeader } })
+      const c = resC.ok ? await resC.json().catch(() => ({})) : {}
+      setFamiliaConvites(Array.isArray(c.convites) ? c.convites : [])
+    } catch {
+      setFamiliaLoadErr('Não foi possível carregar a conta familiar.')
+    }
+  }, [usuarioIdHeader])
+
+  useEffect(() => {
+    void refreshAssinaturaPerfil()
+  }, [refreshAssinaturaPerfil])
+
+  useEffect(() => {
+    void loadFamiliaPainel()
+  }, [loadFamiliaPainel])
 
   useEffect(() => {
     if (!usuarioIdHeader) return
@@ -133,6 +198,97 @@ export default function Configuracoes() {
     navigator.clipboard.writeText(perfil.email).then(() => showToast('E-mail copiado.')).catch(() => {})
   }
 
+  const copiarTexto = (t, okMsg = 'Copiado.') => {
+    if (!t) return
+    navigator.clipboard.writeText(t).then(() => showToast(okMsg)).catch(() => {})
+  }
+
+  const papelFamiliaLabel = (p) => {
+    const x = String(p || '').toUpperCase()
+    if (x === 'ADMIN') return 'Administrador familiar'
+    if (x === 'VIEWER') return 'Só leitura'
+    return 'Membro'
+  }
+
+  const loginConviteHref =
+    typeof window !== 'undefined' && ultimoTokenConvite
+      ? `${window.location.origin}/login?convite=${encodeURIComponent(ultimoTokenConvite)}`
+      : ''
+
+  const criarConviteFamilia = async () => {
+    if (!usuarioIdHeader || familiaBusy) return
+    setFamiliaBusy(true)
+    try {
+      const res = await fetch(apiUrl('/api/familia/convites'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioIdHeader },
+        body: JSON.stringify({ papel: novoConvitePapel }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        showToast(data.message || 'Não foi possível criar o convite.')
+        return
+      }
+      setUltimoTokenConvite(String(data.token || '').trim())
+      showToast(data.message || 'Convite criado.')
+      await loadFamiliaPainel()
+    } catch {
+      showToast('Erro de rede ao criar convite.')
+    } finally {
+      setFamiliaBusy(false)
+    }
+  }
+
+  const executarFamiliaConfirm = async () => {
+    if (!familiaConfirm || !usuarioIdHeader) return
+    setFamiliaBusy(true)
+    try {
+      if (familiaConfirm.type === 'revoke') {
+        const res = await fetch(apiUrl(`/api/familia/convites/${familiaConfirm.id}`), {
+          method: 'DELETE',
+          headers: { 'x-user-id': usuarioIdHeader },
+        })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) {
+          showToast(data.message || 'Não foi possível revogar.')
+          return
+        }
+        showToast(data.message || 'Convite revogado.')
+        await loadFamiliaPainel()
+      } else if (familiaConfirm.type === 'remove') {
+        const res = await fetch(apiUrl(`/api/familia/membros/${familiaConfirm.usuarioId}`), {
+          method: 'DELETE',
+          headers: { 'x-user-id': usuarioIdHeader },
+        })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) {
+          showToast(data.message || 'Não foi possível remover.')
+          return
+        }
+        showToast(data.message || 'Membro removido.')
+        await loadFamiliaPainel()
+      } else if (familiaConfirm.type === 'sair') {
+        const res = await fetch(apiUrl('/api/familia/sair'), {
+          method: 'POST',
+          headers: { 'x-user-id': usuarioIdHeader },
+        })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) {
+          showToast(data.message || 'Não foi possível sair.')
+          return
+        }
+        showToast(data.message || 'Você saiu da conta familiar.')
+        await refreshAssinaturaPerfil()
+        await loadFamiliaPainel()
+      }
+    } catch {
+      showToast('Erro de rede.')
+    } finally {
+      setFamiliaBusy(false)
+      setFamiliaConfirm(null)
+    }
+  }
+
   const solicitarCodigoSenhaWhatsapp = async () => {
     if (!perfil.email) return
     setResetSending(true)
@@ -213,6 +369,158 @@ export default function Configuracoes() {
               </button>
             </div>
           </section>
+
+          {familiaTitular === true && (
+            <section className="config-card config-card--full">
+              <div className="config-card-head">
+                <span className="config-card-kicker">Família</span>
+                <h2 className="config-card-title-clean">Conta familiar</h2>
+                <p className="config-card-subtitle">
+                  Convites com link ou código curto, validade e revogação. Cada familiar usa login próprio; você define o papel (leitura ou lançamentos).
+                </p>
+              </div>
+
+              {familiaLoadErr ? <p className="config-empty-note">{familiaLoadErr}</p> : null}
+
+              <div className="config-field-grid" style={{ marginBottom: '1rem' }}>
+                <label className="config-field" htmlFor="familia-papel-convite">
+                  <span>Papel do próximo convite</span>
+                  <select
+                    id="familia-papel-convite"
+                    className="config-action-btn"
+                    style={{ width: '100%', cursor: 'pointer' }}
+                    value={novoConvitePapel}
+                    onChange={(e) => setNovoConvitePapel(e.target.value)}
+                    disabled={familiaBusy}
+                  >
+                    <option value="MEMBER">Membro — pode lançar e editar (exceto pagamento do titular)</option>
+                    <option value="VIEWER">Só leitura — não altera transações nem agenda</option>
+                    <option value="ADMIN">Administrador familiar — mesmo nível de escrita que membro</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="config-quick-actions" style={{ marginBottom: '1.25rem' }}>
+                <button
+                  type="button"
+                  className="config-action-btn config-action-btn--primary"
+                  disabled={familiaBusy || !usuarioIdHeader}
+                  onClick={() => void criarConviteFamilia()}
+                >
+                  {familiaBusy ? 'Gerando…' : 'Gerar convite'}
+                </button>
+              </div>
+
+              {ultimoTokenConvite ? (
+                <div className="config-security-panel" style={{ marginBottom: '1.25rem' }}>
+                  <p className="config-card-subtitle" style={{ marginBottom: '0.5rem' }}>
+                    <strong>Guarde agora:</strong> o código só aparece uma vez. Quem receber deve abrir o link ou colar o código após criar conta / login.
+                  </p>
+                  <div
+                    className="config-field"
+                    style={{
+                      wordBreak: 'break-all',
+                      fontFamily: 'ui-monospace, monospace',
+                      fontSize: '0.85rem',
+                      padding: '0.75rem',
+                      borderRadius: '12px',
+                      background: 'color-mix(in srgb, var(--color-neutral-500, #737373) 8%, transparent)',
+                    }}
+                  >
+                    {ultimoTokenConvite}
+                  </div>
+                  <div className="config-quick-actions" style={{ marginTop: '0.75rem' }}>
+                    <button type="button" className="config-action-btn" onClick={() => copiarTexto(ultimoTokenConvite, 'Código copiado.')}>
+                      Copiar código
+                    </button>
+                    {loginConviteHref ? (
+                      <button type="button" className="config-action-btn" onClick={() => copiarTexto(loginConviteHref, 'Link copiado.')}>
+                        Copiar link
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="config-card-head" style={{ marginTop: '0.5rem' }}>
+                <h3 className="config-card-title-clean" style={{ fontSize: '1rem' }}>
+                  Convites pendentes
+                </h3>
+              </div>
+              {familiaConvites.length === 0 ? (
+                <p className="config-empty-note">Nenhum convite ativo.</p>
+              ) : (
+                <ul className="config-bio-list">
+                  {familiaConvites.map((c) => (
+                    <li key={c.id} className="config-bio-item">
+                      <span>
+                        <strong>{papelFamiliaLabel(c.papel_convite)}</strong>
+                        <small>
+                          Expira em{' '}
+                          {c.expires_at
+                            ? new Date(c.expires_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+                            : '—'}
+                        </small>
+                      </span>
+                      <button type="button" className="config-action-btn" onClick={() => setFamiliaConfirm({ type: 'revoke', id: c.id })}>
+                        Revogar
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="config-card-head" style={{ marginTop: '1rem' }}>
+                <h3 className="config-card-title-clean" style={{ fontSize: '1rem' }}>
+                  Membros
+                </h3>
+              </div>
+              {familiaMembros.length === 0 ? (
+                <p className="config-empty-note">Nenhum familiar vinculado ainda.</p>
+              ) : (
+                <ul className="config-bio-list">
+                  {familiaMembros.map((mem) => (
+                    <li key={mem.id} className="config-bio-item">
+                      <span>
+                        <strong>{mem.nome || mem.email || mem.id}</strong>
+                        <small>
+                          {mem.email ? `${mem.email} · ` : ''}
+                          {papelFamiliaLabel(mem.familia_papel)}
+                        </small>
+                      </span>
+                      <button type="button" className="config-action-btn" onClick={() => setFamiliaConfirm({ type: 'remove', usuarioId: mem.id })}>
+                        Remover
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+
+          {familiaTitular === false && perfil.conta_familiar_membro ? (
+            <section className="config-card config-card--full">
+              <div className="config-card-head">
+                <span className="config-card-kicker">Família</span>
+                <h2 className="config-card-title-clean">Conta vinculada</h2>
+                <p className="config-card-subtitle">
+                  Você acessa os dados da conta do titular com seu próprio login. Papel:{' '}
+                  <strong>{papelFamiliaLabel(perfil.familia_papel)}</strong>.
+                  {String(perfil.familia_papel || '').toUpperCase() === 'VIEWER'
+                    ? ' Alterações em transações e agenda não são permitidas.'
+                    : null}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="config-action-btn"
+                disabled={familiaBusy}
+                onClick={() => setFamiliaConfirm({ type: 'sair' })}
+              >
+                Sair da conta familiar
+              </button>
+            </section>
+          ) : null}
 
           <section className="config-card">
             <div className="config-card-head">
@@ -348,6 +656,26 @@ export default function Configuracoes() {
         confirmLabel="Remover"
         onConfirm={() => handleRemoveBiometric(confirmBiometricRemoval)}
         onClose={() => setConfirmBiometricRemoval(null)}
+      />
+      <ConfirmDialog
+        open={Boolean(familiaConfirm)}
+        title={
+          familiaConfirm?.type === 'revoke'
+            ? 'Revogar convite?'
+            : familiaConfirm?.type === 'remove'
+              ? 'Remover familiar?'
+              : 'Sair da conta familiar?'
+        }
+        message={
+          familiaConfirm?.type === 'revoke'
+            ? 'O link e o código deste convite deixarão de funcionar.'
+            : familiaConfirm?.type === 'remove'
+              ? 'O familiar voltará a ver apenas os dados da própria conta.'
+              : 'Você deixa de acessar os dados do titular; sua conta e seus próprios dados permanecem.'
+        }
+        confirmLabel={familiaConfirm?.type === 'sair' ? 'Sair' : 'Confirmar'}
+        onConfirm={() => void executarFamiliaConfirm()}
+        onClose={() => setFamiliaConfirm(null)}
       />
     </div>
   )

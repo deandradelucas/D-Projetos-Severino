@@ -118,8 +118,13 @@ body[data-theme='light'] .ref-dashboard-inner {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell {
     width: min(100%, var(--app-shell-max, 1580px));
     max-width: var(--app-shell-max, 1580px);
+    /* Cobre margin/padding do tema executivo (04a) e margens do shell escuro — precisa auto nas laterais para centralizar no PC/PWA */
+    margin-top: max(10px, env(safe-area-inset-top, 0px));
+    margin-bottom: max(12px, env(safe-area-inset-bottom, 0px));
     margin-left: auto;
     margin-right: auto;
+    padding: 0;
+    gap: 0;
     align-self: center;
     box-sizing: border-box;
   }
@@ -623,24 +628,22 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     margin-bottom: 8px;
     padding-bottom: 0;
     /* Evita “salto” logo → 1.º item: cada rota remonta o Sidebar e a PNG pode vir com altura 0 até decodificar */
-    min-height: 54px;
+    min-height: 72px;
     gap: 11px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: 54px;
-    min-height: 54px;
-    max-height: 54px;
+    height: 72px;
+    min-height: 72px;
+    max-height: 72px;
     object-fit: contain;
     object-position: left center;
     transform: none;
     transform-origin: 50% 50%;
     filter: none;
     opacity: 1;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
     margin: 0;
   }
 
@@ -665,24 +668,22 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     width: 100%;
     margin-bottom: 8px;
     padding-bottom: 0;
-    min-height: 54px;
+    min-height: 72px;
     gap: 11px;
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: 54px;
-    min-height: 54px;
-    max-height: 54px;
+    height: 72px;
+    min-height: 72px;
+    max-height: 72px;
     object-fit: contain;
     object-position: left center;
     transform: none;
     transform-origin: 50% 50%;
     filter: none;
     opacity: 1;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
     margin: 0;
   }
 
@@ -867,9 +868,9 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     /* Raio à direita: bloco max-width 768px abaixo (.dashboard-container.app-horizon-shell .sidebar) com !important */
-    min-height: 100dvh;
+    min-height: 100svh;
     min-height: -webkit-fill-available;
-    max-height: 100dvh;
+    max-height: 100svh;
     height: auto;
     top: 0;
     bottom: 0;
@@ -2435,7 +2436,8 @@ body[data-theme='light'] .agenda-page .agenda-hero {
   position: relative;
   isolation: isolate;
   min-height: 230px;
-  margin: 0 -18px 2px;
+  /* Mesma faixa horizontal que calendário/lista (.ref-dashboard-scroll já define o padding) */
+  margin: 0 auto;
   padding: 26px 22px 28px !important;
   overflow: hidden;
   border: none !important;
@@ -2451,21 +2453,13 @@ body[data-theme='light'] .agenda-page .agenda-hero {
 }
 
 .agenda-page .agenda-hero::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  bottom: -1px;
-  left: 0;
-  z-index: 1;
-  height: 42px;
-  pointer-events: none;
-  border-top-left-radius: 42px;
-  border-top-right-radius: 0;
-  background: #ffffff;
+  display: none !important;
+  content: none !important;
 }
 
 body[data-theme='dark'] .agenda-page .agenda-hero::after {
-  background: #000000;
+  display: none !important;
+  content: none !important;
 }
 
 .agenda-page .agenda-hero > * {
@@ -2548,7 +2542,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
   body[data-theme='dark'] .agenda-page .agenda-hero,
   body[data-theme='light'] .agenda-page .agenda-hero {
     min-height: 255px;
-    margin: 0 -16px 0;
+    margin: 0 auto;
     padding: calc(24px + var(--safe-top)) 18px 28px !important;
     border-radius: 0 !important;
   }
@@ -2565,7 +2559,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
   body[data-theme='light'] .agenda-page.dashboard-container {
     width: 100vw !important;
     max-width: 100vw !important;
-    min-height: 100dvh !important;
+    min-height: 100svh !important;
     padding: 0 !important;
     overflow-x: hidden !important;
     background: #f3f4f7 !important;
@@ -2574,7 +2568,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
   body[data-theme='dark'] .agenda-page.dashboard-container {
     width: 100vw !important;
     max-width: 100vw !important;
-    min-height: 100dvh !important;
+    min-height: 100svh !important;
     padding: 0 !important;
     overflow-x: hidden !important;
     background: #000000 !important;
@@ -2592,7 +2586,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
   .agenda-page .ref-dashboard-scroll {
     width: 100% !important;
     max-width: none !important;
-    min-height: 100dvh !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 14px calc(120px + var(--safe-bottom)) !important;
     border-radius: 0 !important;
@@ -2603,7 +2597,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
   body[data-theme='dark'] .agenda-page .agenda-hero,
   body[data-theme='light'] .agenda-page .agenda-hero {
     width: auto !important;
-    margin: 0 -14px 0 !important;
+    margin: 0 auto !important;
     padding: calc(20px + var(--safe-top)) 14px 28px !important;
   }
 }
@@ -2616,9 +2610,9 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
     inset: 0 !important;
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-    min-height: 100dvh !important;
+    height: 100svh !important;
+    max-height: 100svh !important;
+    min-height: 100svh !important;
     padding: 0 !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
@@ -2651,7 +2645,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
     max-width: none !important;
     height: 100% !important;
     max-height: 100% !important;
-    min-height: 100dvh !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 14px calc(144px + var(--safe-bottom)) !important;
     overflow-y: auto !important;
@@ -2668,7 +2662,7 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
     max-width: none !important;
     height: 100% !important;
     max-height: 100% !important;
-    min-height: 100dvh !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 14px calc(144px + var(--safe-bottom)) !important;
     overflow-y: auto !important;

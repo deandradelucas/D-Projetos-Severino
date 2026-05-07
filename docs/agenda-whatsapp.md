@@ -7,7 +7,7 @@
 
 ## Variáveis necessárias no n8n
 
-- `HORIZONTE_API_URL`: URL pública do app, sem barra final.
+- `HORIZONTE_API_URL`: URL pública da API/app (ex.: `https://severino.mestredamente.com` se front e `/api` na mesma origem), sem barra final.
 - `CRON_SECRET`: opcional; `GET /api/cron/agenda-lembretes` também aceita `AGENDA_REMINDER_SECRET` ou `WHATSAPP_BOT_SECRET` no header (ver `assertAgendaCronSecret` no servidor).
 - `WHATSAPP_BOT_SECRET`: segredo já usado pelo bot inbound.
 - `AGENDA_REMINDER_SECRET`: opcional; pode ser enviado no lugar de `CRON_SECRET` para autenticar o cron de lembretes.
@@ -27,6 +27,10 @@
 - `me avise 30 minutos antes`
 
 Os números dos comandos correspondem à lista retornada por `agenda hoje` ou `próximos compromissos`. Também é possível usar o código curto do compromisso exibido nas respostas.
+
+## Severino IA (conversa)
+
+Mensagens classificadas como conversa (não como lançamento na primeira análise) usam o mesmo motor do chat no app (`askHorizon`), com contexto de transações e agenda. Exige **`GEMINI_API_KEY`** na API. As palavras **ajuda**, **help** ou **menu** mostram o texto de comandos sem chamar o assistente longo.
 
 ## Áudio no WhatsApp
 

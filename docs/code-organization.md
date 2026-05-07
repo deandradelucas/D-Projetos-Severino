@@ -5,9 +5,8 @@ Este projeto usa uma migração estrutural gradual. A regra principal é preserv
 ## Fronteiras
 
 - `src/pages`: apenas componentes ligados diretamente ao router.
-- `src/features`: código por domínio de produto quando uma área crescer além de uma página simples.
-- `src/components`: componentes globais de shell ou UI reutilizável.
-- `src/shared`: utilitários sem JSX compartilhados entre domínios.
+- `src/components`: componentes globais de shell ou UI reutilizável (subpastas por área, ex. `pagamento/`).
+- `src/lib`: utilitários e helpers usados pelo front (sem JSX).
 - `server/routes`: handlers HTTP por contexto.
 - `server/middleware`: preocupações transversais de HTTP, segurança e request lifecycle.
 - `server/lib`: domínio, serviços, integrações e persistência do backend.
@@ -20,8 +19,6 @@ Aliases disponíveis no Vite e no editor:
 
 - `@/*` aponta para `src/*`.
 - `@components/*` aponta para `src/components/*`.
-- `@features/*` aponta para `src/features/*`.
-- `@shared/*` aponta para `src/shared/*`.
 
 Use aliases em arquivos novos e em migrações pequenas. Não misture reorganização de diretórios com refactors funcionais.
 

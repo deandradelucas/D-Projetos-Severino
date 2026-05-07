@@ -7,6 +7,7 @@ import { registerAgendaRoutes } from './register-agenda.mjs'
 import { registerPagamentosRoutes } from './register-pagamentos.mjs'
 import { registerAiRoutes } from './register-ai.mjs'
 import { registerWhatsappRoutes } from './register-whatsapp.mjs'
+import { registerFamiliaRoutes } from './register-familia.mjs'
 
 /** Regista todas as rotas `/api/*` (exceto health, montado em app.mjs). */
 export function registerApiDomainRoutes(app) {
@@ -19,4 +20,5 @@ export function registerApiDomainRoutes(app) {
   registerPagamentosRoutes(app)
   registerAiRoutes(app)
   registerWhatsappRoutes(app)
+  registerFamiliaRoutes(app)
 }

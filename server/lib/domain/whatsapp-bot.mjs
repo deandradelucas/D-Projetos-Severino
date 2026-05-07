@@ -1,10 +1,11 @@
 import { log } from '../logger.mjs'
 import { buscarUsuarioPorTelefone } from '../usuarios.mjs'
 import { getCategorias, inserirTransacao } from '../transacoes.mjs'
-import { parseWhatsAppMessageWithAI } from '../ai.mjs'
+import { askHorizon, parseWhatsAppMessageWithAI } from '../ai.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
 import { detectExtratoPedido, montarRespostaExtratoWhatsApp } from './whatsapp-extrato.mjs'
+import { resolveEscopoUsuario, assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 
 const SALDO_RE =
   /\b(saldo|quanto[\s-]tenho|meu[\s-]saldo|balan[çc]o|quanto[\s-]sobrou|resumo financeiro)\b/i
@@ -75,7 +76,17 @@ function formatDataTransacaoReplyPtBr(iso) {
 }
 
 const AJUDA =
-  '🤖 *Horizonte Bot*\n\nPosso registrar:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico de gastos do dia", "receitas da semana", "extrato do mês"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite uma dessas!'
+  '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite *ajuda* para ver isto de novo.'
+
+/** WhatsApp: limite útil de caracteres; resume **markdown** do modelo para *negrito* WA. */
+function formatAssistantReplyForWhatsApp(text) {
+  let s = String(text || '').trim()
+  s = s.replace(/\*\*(.+?)\*\*/g, '*$1*')
+  s = s.replace(/^[-*]\s+/gm, '• ')
+  const max = 3800
+  if (s.length > max) s = `${s.slice(0, max - 3)}...`
+  return s
+}
 
 /**
  * Ponto central do bot — recebe telefone + mensagem bruta do n8n e retorna o texto de resposta.
@@ -97,19 +108,37 @@ export async function processarMensagemBot(phone, rawMessage) {
     return {
       ok: false,
       reply:
-        '❌ Número não cadastrado no *Horizonte Financeiro*.\n\nAcesse o app e adicione seu telefone em *Perfil* para usar o bot.',
+        '❌ Número não cadastrado no *Severino*.\n\nAcesse o app e adicione seu telefone em *Perfil* para usar o assistente pelo WhatsApp.',
     }
+  }
+
+  let familiaEscopo = {
+    actorId: usuario.id,
+    dataUsuarioId: usuario.id,
+    familiaPapel: null,
+    isMembroConta: false,
+  }
+  try {
+    familiaEscopo = await resolveEscopoUsuario(usuario.id)
+  } catch {
+    /* mantém titular */
+  }
+  const dataUsuarioId = familiaEscopo.dataUsuarioId
+  const usuarioBot = { ...usuario, dataUsuarioId, familiaEscopo }
+
+  if (/^(ajuda|help|menu)$/i.test(message.replace(/\s+/g, ' ').trim())) {
+    return { ok: true, reply: AJUDA }
   }
 
   // 2. Agenda via WhatsApp — antes do parser financeiro para não confundir compromissos com transações
   if (isAgendaMessage(message)) {
-    return processarMensagemAgenda(usuario, phone, message)
+    return processarMensagemAgenda(usuarioBot, phone, message)
   }
 
   // Extrato / histórico (dia, semana ou mês) — antes da IA para não cair em CHAT genérico
   if (detectExtratoPedido(message)) {
     try {
-      const texto = await montarRespostaExtratoWhatsApp(usuario.id, message)
+      const texto = await montarRespostaExtratoWhatsApp(dataUsuarioId, message)
       if (texto) return { ok: true, reply: texto }
     } catch (e) {
       log.error('[whatsapp-bot] montarRespostaExtratoWhatsApp error', e)
@@ -120,7 +149,7 @@ export async function processarMensagemBot(phone, rawMessage) {
   // Consulta de saldo
   if (isSaldoQuery(message)) {
     try {
-      const { saldo, receitas, despesas } = await calcularSaldo(usuario.id)
+      const { saldo, receitas, despesas } = await calcularSaldo(dataUsuarioId)
       const nome = usuario.nome ? ` ${usuario.nome.split(' ')[0]}` : ''
       return {
         ok: true,
@@ -135,7 +164,7 @@ export async function processarMensagemBot(phone, rawMessage) {
   // 3. Parse de transação via IA
   let categorias
   try {
-    categorias = await getCategorias(usuario.id)
+    categorias = await getCategorias(dataUsuarioId)
   } catch (e) {
     log.error('[whatsapp-bot] getCategorias error', e)
     return { ok: false, reply: '❌ Erro ao carregar categorias. Tente novamente.' }
@@ -149,10 +178,16 @@ export async function processarMensagemBot(phone, rawMessage) {
     return { ok: false, reply: '⚠️ Não consegui processar sua mensagem agora. Tente novamente.' }
   }
 
-  // 4. Mensagem de chat (não é transação)
+  // 4. Conversa — mesmo motor do Severino IA no app (contexto financeiro + agenda)
   if (parsed.tipo === 'CHAT') {
-    const resposta = parsed.resposta || AJUDA
-    return { ok: true, reply: resposta }
+    try {
+      const full = await askHorizon(message, dataUsuarioId, [])
+      return { ok: true, reply: formatAssistantReplyForWhatsApp(full) }
+    } catch (e) {
+      log.warn('[whatsapp-bot] askHorizon (WhatsApp CHAT)', e?.message || e)
+      const resposta = parsed.resposta || AJUDA
+      return { ok: true, reply: formatAssistantReplyForWhatsApp(resposta) }
+    }
   }
 
   // 5. Validação mínima
@@ -161,10 +196,15 @@ export async function processarMensagemBot(phone, rawMessage) {
   }
 
   // 6. Inserir transação
+  const bloqueio = assertFamiliaPodeEscrever(familiaEscopo)
+  if (bloqueio) {
+    return { ok: false, reply: `❌ ${bloqueio.message}` }
+  }
+
   const { iso: dataTransacaoIso, explicit: dataExplicita } = resolveDataTransacaoParaBot(parsed)
   try {
     await inserirTransacao({
-      usuario_id: usuario.id,
+      usuario_id: dataUsuarioId,
       tipo: parsed.tipo,
       valor: parsed.valor,
       descricao: parsed.descricao || message.slice(0, 100),
@@ -181,7 +221,7 @@ export async function processarMensagemBot(phone, rawMessage) {
   // 7. Montar resposta de confirmação com saldo atualizado
   let saldoAtual = null
   try {
-    const { saldo } = await calcularSaldo(usuario.id)
+    const { saldo } = await calcularSaldo(dataUsuarioId)
     saldoAtual = saldo
   } catch {
     // não crítico

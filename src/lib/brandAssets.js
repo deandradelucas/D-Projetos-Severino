@@ -1,3 +1,9 @@
+/** Dimensões reais dos PNG Severino (IHDR). Evita proporção errada no layout e ajuda o escalonamento. */
+export const BRAND_LOGO_PIXEL_SIZE = {
+  severinoTemaClaro: { width: 1009, height: 382 },
+  severinoPwaEscuro: { width: 415, height: 468 },
+}
+
 export const BRAND_ASSETS = {
   /** Wordmark Severino — login e superfícies claras (`public/images/Nova Logo/`) */
   loginSeverinoLight: '/images/Nova Logo/Severino Tema Claro.png',

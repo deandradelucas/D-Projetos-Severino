@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthPasswordToggleButton from '../components/AuthPasswordToggleButton'
 import AuthPhoneShell from '../components/AuthPhoneShell'
 import { apiUrl, severinoProdApiMisconfigured } from '../lib/apiUrl'
-import { BRAND_ASSETS } from '../lib/brandAssets'
+import { BRAND_ASSETS, BRAND_LOGO_PIXEL_SIZE } from '../lib/brandAssets'
 import { prefetchRoute } from '../lazyRoutes'
 import { showToast } from '../lib/toastStore'
 import { webAuthnSupported, fetchWebAuthnStatus, loginWithWebAuthn } from '../lib/webauthnBrowser'
@@ -11,9 +11,51 @@ import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
 import { validateEmail } from '../lib/validateEmail'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
+const FAMILIA_CONVITE_SESSION_KEY = 'severino_familia_convite'
+
+async function aplicarConviteFamiliaAposLogin(user) {
+  if (!user?.id) return user
+  let token = ''
+  try {
+    token = window.sessionStorage.getItem(FAMILIA_CONVITE_SESSION_KEY) || ''
+  } catch {
+    return user
+  }
+  if (!token.trim()) return user
+  try {
+    const res = await fetch(apiUrl('/api/familia/aceitar'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': String(user.id).trim(),
+      },
+      body: JSON.stringify({ token: token.trim() }),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (res.ok) {
+      try {
+        window.sessionStorage.removeItem(FAMILIA_CONVITE_SESSION_KEY)
+      } catch {
+        /* ignore */
+      }
+      const assinRes = await fetch(apiUrl('/api/assinatura/status'), {
+        headers: { 'x-user-id': String(user.id).trim() },
+        cache: 'no-store',
+      })
+      const assin = assinRes.ok ? await assinRes.json().catch(() => ({})) : {}
+      showToast(data.message || 'Convite familiar aceito.', 'success')
+      return { ...user, ...assin }
+    }
+    showToast(data.message || 'Não foi possível aceitar o convite familiar.', 'warning')
+  } catch {
+    showToast('Erro de rede ao aceitar convite familiar.', 'warning')
+  }
+  return user
+}
 
 export default function Login() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [email, setEmail] = useState(() => {
     try {
       return window.localStorage.getItem(REMEMBER_EMAIL_KEY) || ''
@@ -49,6 +91,16 @@ export default function Login() {
     prefetchRoute('/pagamento')
     prefetchRoute('/bem-vindo-assinatura')
   }, [])
+
+  useEffect(() => {
+    const t = searchParams.get('convite')?.trim()
+    if (!t) return
+    try {
+      window.sessionStorage.setItem(FAMILIA_CONVITE_SESSION_KEY, t)
+    } catch {
+      /* ignore */
+    }
+  }, [searchParams])
 
   useEffect(() => {
     let cancelled = false
@@ -239,11 +291,12 @@ export default function Login() {
         return
       }
 
-      if (data.user) {
-        window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
+      let u = data.user || {}
+      u = await aplicarConviteFamiliaAposLogin(u)
+      if (u?.id) {
+        window.localStorage.setItem('horizonte_user', JSON.stringify(u))
       }
 
-      const u = data.user || {}
       navigateAfterLogin(u)
     } catch (err) {
       const endpoint = apiUrl('/api/auth/login')
@@ -290,10 +343,11 @@ export default function Login() {
     setBioLoading(true)
     try {
       const data = await loginWithWebAuthn(email)
-      if (data.user) {
-        window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
+      let u = data.user || {}
+      u = await aplicarConviteFamiliaAposLogin(u)
+      if (u?.id) {
+        window.localStorage.setItem('horizonte_user', JSON.stringify(u))
       }
-      const u = data.user || {}
       navigateAfterLogin(u)
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Não foi possível entrar com biometria.')
@@ -306,6 +360,7 @@ export default function Login() {
       visuallyHiddenTitle="Login"
       showBodyLogo
       bodyLogoSrc={BRAND_ASSETS.loginSeverinoLight}
+      bodyLogoIntrinsicSize={BRAND_LOGO_PIXEL_SIZE.severinoTemaClaro}
       bodyLogoAlt="Severino"
       heroImageSrc="/images/Login/01.avif"
       compact={!showRecovery && !(webAuthnSupported() && hasWebAuthn)}

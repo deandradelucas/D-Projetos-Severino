@@ -96,9 +96,8 @@ html:has(body[data-theme='light']) {
 
 body,
 #root {
-  min-height: 100vh;
+  min-height: 100%;
   min-height: 100svh;
-  min-height: 100dvh;
 }
 
 body {
@@ -209,6 +208,12 @@ body {
     height: 100%;
     min-height: 0;
   }
+
+  .app-routes-grow > .dashboard-container.app-horizon-shell {
+    flex: 1 1 auto;
+    min-height: 0;
+    align-self: stretch;
+  }
 }
 
 .app-routes-grow {
@@ -235,6 +240,27 @@ body {
   overflow-x: clip;
 }
 
+/*
+ * Desktop / PWA em janela larga: encadeia altura como no mobile e permite centralizar o shell
+ * (.dashboard-container.app-horizon-shell usa margin auto + largura máxima em dashboard.css).
+ */
+@media (min-width: 769px) {
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+  }
+
+  .app-layout-shell {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .app-routes-grow:has(.dashboard-container.app-horizon-shell) {
+    align-items: center;
+  }
+}
+
 /* Camada de foto + vinheta: fixa na viewport, sem “andar” lateral no mobile */
 .app-background-root {
   position: fixed;
@@ -243,7 +269,6 @@ body {
   width: 100%;
   max-width: 100%;
   height: 100%;
-  min-height: 100dvh;
   min-height: 100svh;
   overflow: hidden;
   transform: translateZ(0);
@@ -407,11 +432,15 @@ button {
 
 
 @media (max-width: 768px) {
+  /*
+   * 100svh ≈ viewport visível estável; 100dvh em PWA/mobile costuma ser maior que a área útil
+   * e deixa faixa escura/clara em baixo ou “desloca” o layout.
+   */
   html {
     overflow: hidden;
     overflow-x: clip;
-    min-height: 100dvh;
-    height: 100dvh;
+    min-height: 100svh;
+    height: 100svh;
     overscroll-behavior: none;
     background-color: #050607;
   }
@@ -420,9 +449,9 @@ button {
   #root {
     width: 100%;
     max-width: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
-    min-height: 100dvh;
+    height: 100svh;
+    max-height: 100svh;
+    min-height: 100svh;
     overflow: hidden;
     overflow-x: clip;
     overscroll-behavior: none;
@@ -433,8 +462,8 @@ button {
   #root {
     display: flex;
     flex-direction: column;
-    height: 100dvh;
-    min-height: 100dvh;
+    height: 100svh;
+    min-height: 100svh;
     flex: 1;
   }
 
@@ -442,17 +471,21 @@ button {
     position: fixed;
     inset: 0;
     width: 100vw;
-    height: 100dvh;
+    height: 100svh;
     overscroll-behavior-y: none;
   }
 
-  /* Shell autenticado (tema claro): alinha html/#root/body ao branco do painel — evita faixas escuras no dev/mobile */
-  html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+  /* Shell autenticado (tema claro): qualquer .app-horizon-shell — evita moldura escura nas páginas sem .ref-dashboard */
+  html:has(body[data-theme='light'] .dashboard-container.app-horizon-shell) {
     background-color: #ffffff;
   }
 
-  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell),
-  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+  body[data-theme='light']:has(.dashboard-container.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.app-horizon-shell) #root {
+    background-color: #ffffff;
+  }
+
+  body[data-theme='light']:has(.dashboard-container.app-horizon-shell) .app-routes-grow {
     background-color: #ffffff;
   }
 
@@ -465,30 +498,24 @@ button {
     background-color: #000000;
   }
 
-  /* Shell autenticado: o cartão já leva safe-area no padding — não duplicar com padding no #root nem faixa fixa */
+  /* Shell autenticado: safe-area já nos painéis internos / FAB — não somar padding aqui */
   .app-routes-grow:has(.dashboard-container.app-horizon-shell) {
     padding-bottom: 0;
   }
 
-  /* iOS safe-area paint: páginas sem shell (login, etc.) */
   body::after {
-    content: "";
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: max(12px, env(safe-area-inset-bottom));
-    background: #050607;
-    pointer-events: none;
-    z-index: 9999;
+    display: none !important;
+    content: none !important;
   }
 
-  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell)::after {
-    background: #ffffff;
+  /* Por baixo do portal (tema claro): fundo claro consistente com o cartão — evita moldura escura nas bordas */
+  html:has(body[data-theme='light'] .auth-shell-glass) {
+    background-color: #eef2f7;
   }
 
-  body:has(.dashboard-container.app-horizon-shell)::after {
-    display: none;
+  body[data-theme='light']:has(.auth-shell-glass),
+  body[data-theme='light']:has(.auth-shell-glass) #root {
+    background-color: #eef2f7;
   }
 
   input,
@@ -923,41 +950,42 @@ body:has(.pwa-install-sheet) .horizon-chat-window {
 }
 
 /*
- * PWA instalado: fundo preto (alinhado ao manifest).
- * Tema claro pintava branco/azul via Background.jsx + regras body/html/.app-routes-grow.
+ * PWA instalado:
+ * - Desktop: fundo preto por trás do shell centralizado (letterboxing, manifest).
+ * - Mobile tema claro + shell: mantém branco (as regras globais + Background); o preto forçava faixa inferior / desalinhamento visual no safe area.
  */
 @media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
-  .app-background-root--plain-light .app-background-root__plain-fill {
-    background: #000000;
-  }
-
-  html,
-  html:has(body[data-theme='light']) {
-    background-color: #000000;
-  }
-
-  body[data-theme='light'] {
-    background-color: #000000;
-    background-image: none;
-  }
-
-  html:has(body[data-theme='light']:has(.app-horizon-shell)),
-  html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
-    background-color: #000000;
-  }
-
-  body[data-theme='light']:has(.app-horizon-shell),
-  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell),
-  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
-    background-color: #000000;
-    background-image: none;
-  }
-
-  body[data-theme='light']:has(.app-horizon-shell) .app-routes-grow {
-    background-color: #000000;
-  }
-
   @media (min-width: 769px) {
+    .app-background-root--plain-light .app-background-root__plain-fill {
+      background: #000000;
+    }
+
+    html,
+    html:has(body[data-theme='light']) {
+      background-color: #000000;
+    }
+
+    body[data-theme='light'] {
+      background-color: #000000;
+      background-image: none;
+    }
+
+    html:has(body[data-theme='light']:has(.app-horizon-shell)),
+    html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+      background-color: #000000;
+    }
+
+    body[data-theme='light']:has(.app-horizon-shell),
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell),
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+      background-color: #000000;
+      background-image: none;
+    }
+
+    body[data-theme='light']:has(.app-horizon-shell) .app-routes-grow {
+      background-color: #000000;
+    }
+
     body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) .app-routes-grow {
       background-color: #000000;
     }
@@ -975,22 +1003,27 @@ body:has(.pwa-install-sheet) .horizon-chat-window {
     }
   }
 
+  /* Mobile instalado: tema claro + shell autenticado = mesma pintura que no browser (sem barra preta em baixo). */
   @media (max-width: 768px) {
-    html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
-      background-color: #000000;
+    html:has(body[data-theme='light']:has(.dashboard-container.app-horizon-shell)),
+    html:has(body[data-theme='light'] .dashboard-container.app-horizon-shell) {
+      background-color: #ffffff;
     }
 
-    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell),
-    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
-      background-color: #000000;
+    body[data-theme='light']:has(.dashboard-container.app-horizon-shell),
+    body[data-theme='light']:has(.dashboard-container.app-horizon-shell) #root {
+      background-color: #ffffff;
+      background-image: none;
     }
 
-    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell)::after {
-      background: #000000;
+    body[data-theme='light']:has(.dashboard-container.app-horizon-shell) .app-routes-grow {
+      background-color: #ffffff;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
     }
 
-    body::after {
-      background: #000000;
+    .app-background-root--plain-light .app-background-root__plain-fill {
+      background: #ffffff;
     }
   }
 }

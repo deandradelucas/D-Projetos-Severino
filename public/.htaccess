@@ -1,8 +1,10 @@
 # SPA (React Router): Apache / LiteSpeed na Hostinger — envia rotas para index.html
+# Não reescrever /api/*: senão /api/health mostra o app em branco em vez de JSON (confunde com API na Vercel).
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
   RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_URI} !^/api/
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]

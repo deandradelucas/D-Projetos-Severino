@@ -1,5 +1,4 @@
 import { log } from '../lib/logger.mjs'
-import { assertAcessoAppUsuario } from '../lib/assinatura.mjs'
 import {
   atualizarAgendaEvento,
   atualizarAgendaStatus,
@@ -11,17 +10,16 @@ import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { isUuidString } from '../lib/transacao-validate.mjs'
 import { assertAgendaCronSecret } from '../lib/http/agenda-route-auth.mjs'
 import { processAgendaReminderCron } from '../lib/domain/agenda-reminder-cron.mjs'
+import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 
 export function registerAgendaRoutes(app) {
   app.get('/api/agenda', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-
-      const data = await listarAgendaEventos(usuarioId, {
+      const data = await listarAgendaEventos(parsed.dataUsuarioId, {
         from: c.req.query('from'),
         to: c.req.query('to'),
         status: c.req.query('status'),
@@ -37,12 +35,10 @@ export function registerAgendaRoutes(app) {
   app.post('/api/agenda', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-
-      if (!rateLimitTake(`agenda-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      if (!rateLimitTake(`agenda-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -53,7 +49,7 @@ export function registerAgendaRoutes(app) {
         return c.json({ message: 'JSON inválido.' }, 400)
       }
 
-      const data = await criarAgendaEvento(usuarioId, body, 'APP')
+      const data = await criarAgendaEvento(parsed.dataUsuarioId, body, 'APP')
       return c.json({ message: 'Compromisso criado.', data }, 201)
     } catch (error) {
       log.error('criar agenda', error)
@@ -65,13 +61,11 @@ export function registerAgendaRoutes(app) {
     try {
       const id = c.req.param('id')
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
 
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-
-      if (!rateLimitTake(`agenda-mut:${usuarioId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      if (!rateLimitTake(`agenda-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -82,7 +76,7 @@ export function registerAgendaRoutes(app) {
         return c.json({ message: 'JSON inválido.' }, 400)
       }
 
-      const data = await atualizarAgendaEvento(id, usuarioId, body)
+      const data = await atualizarAgendaEvento(id, parsed.dataUsuarioId, body)
       return c.json({ message: 'Compromisso atualizado.', data })
     } catch (error) {
       log.error('atualizar agenda', error)
@@ -94,11 +88,9 @@ export function registerAgendaRoutes(app) {
     try {
       const id = c.req.param('id')
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
-
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
 
       let body
       try {
@@ -107,7 +99,7 @@ export function registerAgendaRoutes(app) {
         return c.json({ message: 'JSON inválido.' }, 400)
       }
 
-      const data = await atualizarAgendaStatus(id, usuarioId, body?.status)
+      const data = await atualizarAgendaStatus(id, parsed.dataUsuarioId, body?.status)
       return c.json({ message: 'Status atualizado.', data })
     } catch (error) {
       log.error('status agenda', error)
@@ -119,13 +111,11 @@ export function registerAgendaRoutes(app) {
     try {
       const id = c.req.param('id')
       const usuarioId = c.req.header('x-user-id')
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
 
-      const gate = await assertAcessoAppUsuario(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-
-      await deletarAgendaEvento(id, usuarioId)
+      await deletarAgendaEvento(id, parsed.dataUsuarioId)
       return c.json({ message: 'Compromisso removido.' })
     } catch (error) {
       log.error('remover agenda', error)

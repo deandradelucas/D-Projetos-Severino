@@ -8,6 +8,7 @@ import {
   ultimoEventoAgendaCriadoRecentemente,
   AGENDA_TZ,
 } from './agenda.mjs'
+import { assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 
 const AGENDA_KEYWORD_RE =
   /\b(agenda|compromisso|compromissos|reuni[aã]o|reuniao|evento|consulta|consult[óo]rio|dentista|m[eé]dico|agendar|marcar|anotar|anota|cancelar|desmarcar|reagendar|remarcar|confirmar|concluir|finalizar|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar)\b/i
@@ -309,21 +310,30 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
   let intent = 'agenda_chat'
   let ok = true
 
+  const uid = usuario?.dataUsuarioId ?? usuario?.id
+  const familiaEscopo = usuario?.familiaEscopo || { isMembroConta: false }
+  const bloqueioEscritaViewer = () => {
+    const b = assertFamiliaPodeEscrever(familiaEscopo)
+    return b ? `❌ ${b.message}` : null
+  }
+
   try {
     const trimmedMsg = message.trim()
     const menuDigit =
       trimmedMsg.match(/^([1-5])$/)?.[1] ?? trimmedMsg.match(/^aviso([1-5])$/i)?.[1]
     if (menuDigit) {
+      const bloq = bloqueioEscritaViewer()
+      if (bloq) return { ok: false, reply: bloq }
       intent = 'agenda_reminder_menu'
       const minutesMap = { '1': 0, '2': 5, '3': 10, '4': 30, '5': 60 }
       const minutes = minutesMap[menuDigit]
-      const recent = await ultimoEventoAgendaCriadoRecentemente(usuario.id, 30)
+      const recent = await ultimoEventoAgendaCriadoRecentemente(uid, 30)
       if (!recent) {
         reply =
           'Responda com *1* a *5* logo após criar o compromisso (ex.: marcar reunião amanhã 15h, depois envie *4* para 30 min antes).'
         return { ok: true, reply }
       }
-      const updated = await atualizarAgendaEvento(recent.id, usuario.id, {
+      const updated = await atualizarAgendaEvento(recent.id, uid, {
         lembrar_minutos_antes: minutes,
         whatsapp_notificar: true,
       })
@@ -338,59 +348,69 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
 
     if (/\b(minha agenda|agenda hoje|compromissos hoje|hoje)\b/.test(text) && !createIntent) {
       intent = 'agenda_list_today'
-      reply = formatLista(await listarProximos(usuario.id, true), 'Agenda de hoje')
+      reply = formatLista(await listarProximos(uid, true), 'Agenda de hoje')
       return { ok: true, reply }
     }
 
     if (/\b(proximos|próximos|minha agenda|agenda|compromissos)\b/.test(message) && !createIntent) {
       intent = 'agenda_list'
-      reply = formatLista(await listarProximos(usuario.id, false), 'Próximos compromissos')
+      reply = formatLista(await listarProximos(uid, false), 'Próximos compromissos')
       return { ok: true, reply }
     }
 
     const cancelToken = targetToken(message, 'cancelar|desmarcar')
     if (cancelToken) {
+      const bloq = bloqueioEscritaViewer()
+      if (bloq) return { ok: false, reply: bloq }
       intent = 'agenda_cancel'
-      const evento = await resolveEvento(usuario.id, cancelToken)
+      const evento = await resolveEvento(uid, cancelToken)
       if (!evento) throw new Error('Não encontrei esse compromisso.')
-      await atualizarAgendaStatus(evento.id, usuario.id, 'CANCELADO')
+      await atualizarAgendaStatus(evento.id, uid, 'CANCELADO')
       reply = `🗓️ Compromisso cancelado: *${evento.titulo}*.`
       return { ok: true, reply }
     }
 
     const confirmToken = targetToken(message, 'confirmar')
     if (confirmToken) {
+      const bloq = bloqueioEscritaViewer()
+      if (bloq) return { ok: false, reply: bloq }
       intent = 'agenda_confirm'
-      const evento = await resolveEvento(usuario.id, confirmToken)
+      const evento = await resolveEvento(uid, confirmToken)
       if (!evento) throw new Error('Não encontrei esse compromisso.')
-      await atualizarAgendaStatus(evento.id, usuario.id, 'CONFIRMADO')
+      await atualizarAgendaStatus(evento.id, uid, 'CONFIRMADO')
       reply = `✅ Confirmado: *${evento.titulo}* em ${formatAgendaDateTime(evento.inicio, evento.timezone || AGENDA_TZ)}.`
       return { ok: true, reply }
     }
 
     const doneToken = targetToken(message, 'concluir|finalizar')
     if (doneToken) {
+      const bloq = bloqueioEscritaViewer()
+      if (bloq) return { ok: false, reply: bloq }
       intent = 'agenda_done'
-      const evento = await resolveEvento(usuario.id, doneToken)
+      const evento = await resolveEvento(uid, doneToken)
       if (!evento) throw new Error('Não encontrei esse compromisso.')
-      await atualizarAgendaStatus(evento.id, usuario.id, 'CONCLUIDO')
+      await atualizarAgendaStatus(evento.id, uid, 'CONCLUIDO')
       reply = `🏁 Concluído: *${evento.titulo}*.`
       return { ok: true, reply }
     }
 
     const rescheduleToken = targetToken(message, 'reagendar|remarcar')
     if (rescheduleToken) {
+      const bloq = bloqueioEscritaViewer()
+      if (bloq) return { ok: false, reply: bloq }
       intent = 'agenda_reschedule'
-      const evento = await resolveEvento(usuario.id, rescheduleToken)
+      const evento = await resolveEvento(uid, rescheduleToken)
       if (!evento) throw new Error('Não encontrei esse compromisso.')
       const inicio = parseAgendaDateTime(message)
       if (!inicio) throw new Error('Me diga a nova data e horário. Ex.: reagendar 1 para amanhã 10h.')
-      const data = await atualizarAgendaEvento(evento.id, usuario.id, { inicio: inicio.toISOString(), status: 'AGENDADO' })
+      const data = await atualizarAgendaEvento(evento.id, uid, { inicio: inicio.toISOString(), status: 'AGENDADO' })
       reply = `🔁 Reagendado: *${data.titulo}* para ${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}.`
       return { ok: true, reply }
     }
 
     if (createIntent) {
+      const bloq = bloqueioEscritaViewer()
+      if (bloq) return { ok: false, reply: bloq }
       intent = 'agenda_create'
       const inicio = inicioParaCriar
       if (!inicio) {
@@ -399,7 +419,7 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
       }
       const explicitReminder = parseReminderMinutes(message)
       const reminderCreate = isReminderCreateMessage(message)
-      const data = await criarAgendaEvento(usuario.id, {
+      const data = await criarAgendaEvento(uid, {
         titulo: titleForCreate(message),
         descricao: reminderCreate ? 'Notificação criada pelo WhatsApp.' : undefined,
         inicio: inicio.toISOString(),
@@ -419,12 +439,14 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
 
     const reminderMinutes = parseReminderMinutes(message)
     if (reminderMinutes !== null) {
+      const bloq = bloqueioEscritaViewer()
+      if (bloq) return { ok: false, reply: bloq }
       intent = 'agenda_reminder_config'
       const rawToken = targetToken(message, 'avise|avisar|lembre|lembrete')
       const token = rawToken === String(reminderMinutes) ? '1' : rawToken || '1'
-      const evento = await resolveEvento(usuario.id, token)
+      const evento = await resolveEvento(uid, token)
       if (!evento) throw new Error('Não encontrei compromisso para configurar o lembrete.')
-      await atualizarAgendaEvento(evento.id, usuario.id, {
+      await atualizarAgendaEvento(evento.id, uid, {
         lembrar_minutos_antes: reminderMinutes,
         whatsapp_notificar: true,
       })
