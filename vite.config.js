@@ -33,8 +33,18 @@ export default defineConfig(({ mode }) => {
   /* process.env primeiro: scripts/dev.mjs define API_PORT dinâmico antes de subir o Vite */
   const apiPort = process.env.API_PORT || env.API_PORT || '3001'
   const apiTarget = `http://127.0.0.1:${apiPort}`
+  const viteVercelFlag =
+    process.env.VERCEL === '1' ||
+    process.env.VERCEL === 'true' ||
+    env.VITE_VERCEL === '1' ||
+    env.VITE_VERCEL === 'true'
+      ? '1'
+      : ''
 
   return {
+    define: {
+      'import.meta.env.VITE_VERCEL': JSON.stringify(viteVercelFlag),
+    },
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
