@@ -1,4 +1,4 @@
-# Horizonte Financeiro — guia para agentes (IA e humanos)
+# Severino — guia para agentes (IA e humanos)
 
 ## Framework mandante — Segunda-feira (DOMINA-IA)
 
@@ -14,7 +14,7 @@ A orquestração de agentes, skills, regras de governança, SDC (Story Developme
 | Comandos / orquestradores | `segunda-feira/commands/` |
 | Automação (n8n, Make, webhooks, Evolution API, cron, pipelines) | `segunda-feira/agents/automation-architect.md` (**Wire**) |
 
-Em tarefas de IA, trate o Segunda-feira como **mandante de processo**: persona por `@agente`, skills com `/nome`, leitura das regras quando o assunto for workflow, autoridade, MCP ou consciência. O bloco **Stack** abaixo continua sendo a fonte deste app (React, Hono, Supabase, pastas do Horizonte).
+Em tarefas de IA, trate o Segunda-feira como **mandante de processo**: persona por `@agente`, skills com `/nome`, leitura das regras quando o assunto for workflow, autoridade, MCP ou consciência. O bloco **Stack** abaixo continua sendo a fonte deste app (React, Hono, Supabase, pastas do Severino).
 
 CLI (opcional, ambiente local): `npm install -g ./segunda-feira` a partir da raiz do repo; comando `segunda-feira` instala/atualiza artefatos no diretório do Claude Code (`~/.claude` no perfil do utilizador), útil se usares Claude Code em paralelo.
 
@@ -81,5 +81,5 @@ Se precisar mudar blur, stacking ou ordem do DOM, testar Dashboard e uma página
 
 - `src/pages/` — telas (Dashboard, Transacoes, Login, admin, etc.)
 - `src/components/` — Sidebar, modais, chat, PWA
-- `server/lib/` — lógica de domínio (transações, usuários, MP, WhatsApp, AI)
+- `server/lib/` — lógica de domínio (transações, usuários, pagamentos Asaas, WhatsApp, AI)
 - `api/` — apenas entrada Vercel

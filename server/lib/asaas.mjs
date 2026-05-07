@@ -9,7 +9,14 @@ export function getAsaasApiBase() {
 }
 
 export function getAsaasAccessToken() {
-  return String(process.env.ASAAS_API_KEY || process.env.ASAAS_ACCESS_TOKEN || '').trim()
+  let t = String(process.env.ASAAS_API_KEY || process.env.ASAAS_ACCESS_TOKEN || '').trim()
+  if (
+    (t.startsWith('"') && t.endsWith('"')) ||
+    (t.startsWith("'") && t.endsWith("'"))
+  ) {
+    t = t.slice(1, -1).trim()
+  }
+  return t
 }
 
 export function isAsaasConfigured() {

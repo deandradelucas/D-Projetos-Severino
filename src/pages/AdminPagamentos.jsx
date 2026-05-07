@@ -135,7 +135,7 @@ export default function AdminPagamentos() {
                 <div className="dashboard-hub__hero-text">
                   <h1 className="dashboard-hub__title">PAYMENTS CORE v4</h1>
                   <p className="ref-panel__subtitle page-admin-header-sub">
-                    Gestão financeira e conciliação Mercado Pago
+                    Gestão financeira e conciliação Asaas
                   </p>
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function AdminPagamentos() {
         open={confirmDeletePendingOpen}
         title="Excluir logs pendentes?"
         message={
-          'Excluir todos os registros cujo status no Mercado Pago está pendente, em processamento ou em mediação? ' +
+          'Excluir todos os registros cujo status no Asaas está pendente, em análise ou vencido? ' +
           'Aprovados, recusados e estornados não serão removidos. Esta ação não pode ser desfeita.'
         }
         confirmLabel="Excluir"

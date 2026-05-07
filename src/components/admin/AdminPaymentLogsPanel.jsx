@@ -126,7 +126,7 @@ export default function AdminPaymentLogsPanel({
               Registros e indicadores
             </h2>
             <p className="ref-panel__subtitle">
-              Preferências Mercado Pago, status de cobrança, isenções e receita aprovada — filtros combinam com o período do registro.
+              Checkouts e cobranças Asaas, isenções e receita aprovada — filtros combinam com o período do registro.
             </p>
           </div>
           <div className="page-admin-payment-logs__head-actions">

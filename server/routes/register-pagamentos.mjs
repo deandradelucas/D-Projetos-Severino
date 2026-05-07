@@ -3,31 +3,26 @@ import { log } from '../lib/logger.mjs'
 import { getRequestOrigin } from '../lib/password-reset.mjs'
 import { getPerfilUsuario } from '../lib/usuarios.mjs'
 import {
-  buscarPagamentoPorId,
-  criarPreapprovalAssinaturaMensal,
-  getMercadoPagoAccessToken,
-  getMercadoPagoPublicKey,
-  isMercadoPagoConfigured,
-  useSandboxCheckout,
-} from '../lib/mercadopago.mjs'
+  criarCheckoutAssinaturaRecorrente,
+  isAsaasConfigured,
+  montarUrlCheckoutAsaas,
+} from '../lib/asaas.mjs'
 import {
-  insertPreferenciaRecord,
+  insertCheckoutRecord,
   listPagamentosUsuario,
   sincronizarPagamentosPendentesDoUsuario,
-  sincronizarPreapprovalUsuario,
-  sincronizarPreapprovalPorIdFromWebhook,
-  atualizarUsuarioDePreapprovalResponse,
-  upsertFromWebhookPayment,
-} from '../lib/pagamentos-mp.mjs'
+  sincronizarSubscriptionPorIdFromWebhook,
+  sincronizarSubscriptionUsuario,
+  upsertFromWebhookAsaasPayment,
+} from '../lib/pagamentos-asaas.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
-import { logMpWebhook } from '../lib/mp-webhook-log.mjs'
+import { logAsaasWebhook } from '../lib/asaas-webhook-log.mjs'
 import { errorToText } from '../lib/http/hono-error-map.mjs'
 import { assertAcessoAppUsuario } from '../lib/assinatura.mjs'
 import { resolveEscopoUsuario } from '../lib/conta-familiar.mjs'
 
 export function registerPagamentosRoutes(app) {
   app.get('/api/pagamentos/config', async (c) => {
-    const pk = getMercadoPagoPublicKey()
     let isento_pagamento = false
     const uid = c.req.header('x-user-id')
     if (uid) {
@@ -39,8 +34,8 @@ export function registerPagamentosRoutes(app) {
       }
     }
     return c.json({
-      publicKey: pk || null,
-      ready: isMercadoPagoConfigured(),
+      publicKey: null,
+      ready: isAsaasConfigured(),
       isento_pagamento,
     })
   })
@@ -59,7 +54,7 @@ export function registerPagamentosRoutes(app) {
         /* mantém usuarioId */
       }
       await sincronizarPagamentosPendentesDoUsuario(billingId)
-      await sincronizarPreapprovalUsuario(billingId).catch(() => {})
+      await sincronizarSubscriptionUsuario(billingId).catch(() => {})
       const rows = await listPagamentosUsuario(billingId)
       return c.json(rows)
     } catch (error) {
@@ -89,15 +84,15 @@ export function registerPagamentosRoutes(app) {
         return c.json({ message: 'Não autorizado.' }, 401)
       }
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`mp-pref:${usuarioId}:${ip}`, 15, 60 * 60_000)) {
+      if (!rateLimitTake(`asaas-checkout:${usuarioId}:${ip}`, 15, 60 * 60_000)) {
         return c.json({ message: 'Limite de solicitações de pagamento. Tente de novo em até uma hora.' }, 429)
       }
-      if (!isMercadoPagoConfigured()) {
-        return c.json({ message: 'Pagamentos não configurados no servidor (MERCADO_PAGO_ACCESS_TOKEN).' }, 503)
+      if (!isAsaasConfigured()) {
+        return c.json({ message: 'Pagamentos não configurados no servidor (ASAAS_API_KEY).' }, 503)
       }
 
       const body = await c.req.json().catch(() => ({}))
-      const titulo = String(body?.titulo || 'Assinatura Horizonte Financeiro').trim() || 'Assinatura Horizonte Financeiro'
+      const titulo = String(body?.titulo || 'Assinatura Severino').trim() || 'Assinatura Severino'
       const valorRaw = body?.valor
       const defaultPreco = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
       const valor = Number(valorRaw != null && valorRaw !== '' ? valorRaw : defaultPreco)
@@ -116,146 +111,108 @@ export function registerPagamentosRoutes(app) {
       }
 
       const baseUrl = getRequestOrigin(c).replace(/\/+$/, '')
-      const externalRef = `hf-${randomUUID()}`
+      const externalRef = `hf-${usuarioId}-${randomUUID()}`
 
-      const pre = await criarPreapprovalAssinaturaMensal({
-        baseUrl,
+      const checkout = await criarCheckoutAssinaturaRecorrente({
+        baseUrlApp: baseUrl,
         usuarioId,
         email: perfil.email,
-        title: `${titulo} (mensal)`,
-        unitPrice: valor,
+        nome: perfil.nome ?? perfil.usuario ?? '',
+        telefone: perfil.telefone ?? '',
+        tituloItem: `${titulo} (mensal)`,
+        valorMensal: valor,
         externalReference: externalRef,
       })
 
-      await insertPreferenciaRecord({
+      const checkoutId =
+        checkout?.id != null
+          ? String(checkout.id)
+          : checkout?.checkoutSessionId != null
+            ? String(checkout.checkoutSessionId)
+            : checkout?.checkoutId != null
+              ? String(checkout.checkoutId)
+              : ''
+
+      if (!checkoutId) {
+        log.error('asaas checkout sem id', checkout)
+        return c.json({ message: 'Resposta inválida do Asaas ao criar checkout.' }, 502)
+      }
+
+      const checkoutUrl = montarUrlCheckoutAsaas(checkoutId)
+      if (!checkoutUrl) {
+        return c.json({ message: 'Não foi possível montar o link do checkout.' }, 502)
+      }
+
+      await insertCheckoutRecord({
         usuario_id: usuarioId,
-        preference_id: null,
-        preapproval_id: String(pre.id),
+        checkout_id: checkoutId,
         external_reference: externalRef,
         amount: valor,
         description: `${titulo} — assinatura mensal`,
       })
 
-      await atualizarUsuarioDePreapprovalResponse(usuarioId, {
-        id: pre.id,
-        status: pre.status,
-        next_payment_date: pre.next_payment_date,
-        metadata: { usuario_id: usuarioId },
-      })
-
-      const token = getMercadoPagoAccessToken()
-      const useSandbox = useSandboxCheckout(token)
-
       return c.json({
-        preapproval_id: pre.id,
+        checkout_id: checkoutId,
+        checkout_url: checkoutUrl,
+        preapproval_id: null,
         preference_id: null,
-        init_point: pre.init_point,
-        sandbox_init_point: pre.sandbox_init_point,
-        use_sandbox: useSandbox,
+        init_point: checkoutUrl,
+        sandbox_init_point: checkoutUrl,
+        use_sandbox: false,
       })
     } catch (error) {
-      log.error('criar preferencia mp failed', error)
+      log.error('criar checkout asaas failed', error)
       return c.json({ message: error.message || 'Erro ao criar pagamento.' }, 500)
     }
   })
 
-  /** Mercado Pago envia notificações (IPN / webhooks). Responda 200 rápido. */
   app.get('/api/pagamentos/webhook', (c) => c.json({ ok: true }))
 
   app.post('/api/pagamentos/webhook', async (c) => {
-    let paymentId = null
-    let preapprovalWebhookId = null
-    let qsTopic = ''
-    try {
+    const secret = String(process.env.ASAAS_WEBHOOK_TOKEN || '').trim()
+    if (secret) {
       const url = new URL(c.req.url)
-      qsTopic = (url.searchParams.get('topic') || url.searchParams.get('type') || '').toLowerCase()
-      const qsId = url.searchParams.get('id') || url.searchParams.get('data.id')
-      if (qsTopic === 'payment' && qsId) paymentId = String(qsId)
-      if (
-        (qsTopic === 'preapproval' || qsTopic === 'subscription_preapproval' || qsTopic === 'subscription') &&
-        qsId
-      ) {
-        preapprovalWebhookId = String(qsId)
+      const tok = url.searchParams.get('token') || ''
+      if (tok !== secret) {
+        return c.json({ message: 'Forbidden.' }, 403)
       }
-
-      const ct = c.req.header('content-type') || ''
-      if (ct.includes('application/json')) {
-        const body = await c.req.json().catch(() => ({}))
-        const t = String(body?.type || body?.topic || body?.action || '').toLowerCase()
-        if (!paymentId && body?.data?.id != null && t === 'payment') {
-          paymentId = String(body.data.id)
-        }
-        if (!paymentId && body?.id && (t === 'payment' || String(body?.topic || '').toLowerCase() === 'payment')) {
-          paymentId = String(body.id)
-        }
-        if (!paymentId && body?.data?.id != null) {
-          const action = String(body?.action || '').toLowerCase()
-          if (action.includes('payment')) paymentId = String(body.data.id)
-        }
-        if (
-          !preapprovalWebhookId &&
-          (t === 'preapproval' || t === 'subscription_preapproval' || t === 'subscription')
-        ) {
-          const pid = body?.data?.id ?? body?.id
-          if (pid != null) preapprovalWebhookId = String(pid)
-        }
-      } else if (!paymentId && !preapprovalWebhookId) {
-        const text = await c.req.text()
-        if (text) {
-          const params = new URLSearchParams(text)
-          const tp = (params.get('topic') || '').toLowerCase()
-          if (tp === 'payment' && params.get('id')) paymentId = String(params.get('id'))
-          if ((tp === 'preapproval' || tp === 'subscription_preapproval') && params.get('id')) {
-            preapprovalWebhookId = String(params.get('id'))
-          }
-        }
-      }
-    } catch (e) {
-      logMpWebhook({ stage: 'parse_error', err: errorToText(e) })
-      log.error('[MP webhook] parse', e)
     }
 
-    logMpWebhook({
-      stage: 'received',
-      topic: qsTopic || undefined,
-      payment_id: paymentId || undefined,
-      preapproval_id: preapprovalWebhookId || undefined,
-    })
-
-    if (preapprovalWebhookId) {
-      try {
-        await sincronizarPreapprovalPorIdFromWebhook(preapprovalWebhookId)
-        logMpWebhook({ stage: 'preapproval_ok', preapproval_id: preapprovalWebhookId })
-      } catch (e) {
-        logMpWebhook({ stage: 'preapproval_error', preapproval_id: preapprovalWebhookId, err: errorToText(e) })
-        log.error('[MP webhook] preapproval', e)
-      }
+    let body = {}
+    try {
+      body = await c.req.json()
+    } catch (e) {
+      logAsaasWebhook({ stage: 'parse_error', err: errorToText(e) })
       return c.json({ ok: true })
     }
 
-    if (!paymentId) {
-      return c.json({ received: true })
-    }
+    const ev = String(body?.event || '')
+    logAsaasWebhook({ stage: 'received', event: ev || undefined })
 
     try {
-      const payment = await buscarPagamentoPorId(paymentId)
-      const extRef =
-        payment?.external_reference != null
-          ? String(payment.external_reference)
-          : payment?.metadata?.external_reference != null
-            ? String(payment.metadata.external_reference)
-            : undefined
-      logMpWebhook({
-        stage: 'payment_fetch_ok',
-        payment_id: paymentId,
-        external_reference: extRef,
-        status: payment?.status != null ? String(payment.status) : undefined,
-      })
-      await upsertFromWebhookPayment(payment)
-      logMpWebhook({ stage: 'payment_upsert_ok', payment_id: paymentId })
+      if (body.subscription && ev.startsWith('SUBSCRIPTION_')) {
+        const sid = body.subscription.id ?? body.subscription.subscription
+        if (sid) {
+          await sincronizarSubscriptionPorIdFromWebhook(String(sid))
+          logAsaasWebhook({ stage: 'subscription_ok', subscription_id: String(sid) })
+        }
+        return c.json({ ok: true })
+      }
+
+      if (body.payment && ev.startsWith('PAYMENT_')) {
+        await upsertFromWebhookAsaasPayment(body.payment)
+        logAsaasWebhook({ stage: 'payment_ok', payment_id: body.payment.id })
+        return c.json({ ok: true })
+      }
+
+      if (body.object === 'payment' && body.id) {
+        await upsertFromWebhookAsaasPayment(body)
+        logAsaasWebhook({ stage: 'payment_ok', payment_id: body.id })
+        return c.json({ ok: true })
+      }
     } catch (e) {
-      logMpWebhook({ stage: 'payment_error', payment_id: paymentId, err: errorToText(e) })
-      log.error('[MP webhook] process', e)
+      logAsaasWebhook({ stage: 'handler_error', err: errorToText(e) })
+      log.error('[Asaas webhook]', e)
     }
 
     return c.json({ ok: true })

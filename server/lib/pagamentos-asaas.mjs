@@ -348,7 +348,6 @@ export async function aggregatePagamentosFinanceirosPorUsuarioIds(userIds) {
   const supabase = getSupabaseAdmin()
   let from = 0
   const pageSize = 1000
-  const okList = [...STATUS_PAGAMENTO_LIBERA_ACESSO]
 
   for (;;) {
     const { data, error } = await supabase

@@ -15,6 +15,21 @@ function normalizeBaseUrl(url) {
   return String(url || '').trim().replace(/\/+$/, '')
 }
 
+/**
+ * APP_BASE_URL deve ser só a origem do front (ex.: https://severino.mestredamente.com).
+ * Se vier uma URL completa com path (ex.: …/api/pagamentos/webhook), usa só scheme+host para redirects do checkout.
+ */
+function configuredPublicOrigin(raw) {
+  const s = normalizeBaseUrl(raw)
+  if (!s) return ''
+  try {
+    const u = new URL(/^https?:\/\//i.test(s) ? s : `https://${s}`)
+    return u.origin
+  } catch {
+    return s
+  }
+}
+
 function isLocalHost(hostname) {
   return (
     hostname === 'localhost' ||
@@ -39,7 +54,7 @@ function isPrivateIpv4(hostname) {
 }
 
 function resolveAppBaseUrl({ explicitOrigin, host, protocol = 'https' }) {
-  const configuredBaseUrl = normalizeBaseUrl(process.env.APP_BASE_URL || process.env.VITE_APP_BASE_URL)
+  const configuredBaseUrl = configuredPublicOrigin(process.env.APP_BASE_URL || process.env.VITE_APP_BASE_URL)
   if (configuredBaseUrl) {
     return configuredBaseUrl
   }

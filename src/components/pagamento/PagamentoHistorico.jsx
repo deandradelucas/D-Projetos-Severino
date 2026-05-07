@@ -1,5 +1,5 @@
 import AdminDataTableSkeleton from '../AdminDataTableSkeleton.jsx'
-import MpStatusBadge from '../MpStatusBadge.jsx'
+import PagamentoStatusBadge from '../PagamentoStatusBadge.jsx'
 import { pagamentoStatusLabelPt, referenciaPagamentoCurta } from '../../lib/pagamentoPageModel.js'
 
 const HEADERS = ['Data', 'Valor', 'Status', 'Ref.']
@@ -43,7 +43,7 @@ export default function PagamentoHistorico({ historico, loading, formatCurrency,
                     </td>
                     <td>{row.amount != null ? formatCurrency(Number(row.amount)) : '—'}</td>
                     <td className="pagamento-hist-cell--status">
-                      <MpStatusBadge status={row.status} label={pagamentoStatusLabelPt(row.status)} className="pagamento-hist-badge" />
+                      <PagamentoStatusBadge status={row.status} label={pagamentoStatusLabelPt(row.status)} className="pagamento-hist-badge" />
                       {detail ? (
                         <span className="pagamento-hist-status-detail" title={detail}>
                           {detail.length > 72 ? `${detail.slice(0, 69)}…` : detail}
@@ -76,7 +76,7 @@ export default function PagamentoHistorico({ historico, loading, formatCurrency,
                 <div className="pagamento-hist-card__row">
                   <span className="pagamento-hist-card__label">Status</span>
                   <span className="pagamento-hist-card__val pagamento-hist-card__val--status">
-                    <MpStatusBadge status={row.status} label={pagamentoStatusLabelPt(row.status)} className="pagamento-hist-badge" />
+                    <PagamentoStatusBadge status={row.status} label={pagamentoStatusLabelPt(row.status)} className="pagamento-hist-badge" />
                     {detail ? (
                       <span className="pagamento-hist-status-detail" title={detail}>
                         {detail.length > 120 ? `${detail.slice(0, 117)}…` : detail}

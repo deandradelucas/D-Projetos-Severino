@@ -260,7 +260,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               to="/pagamento"
               end
               {...navPrefetchHandlers('/pagamento')}
-              title="Assinatura mensal Mercado Pago"
+              title="Assinatura mensal (Asaas)"
               className={({ isActive }) => mergeNavItemClass(isActive, '/pagamento', pathname)}
               onClick={closeMenu}
             >

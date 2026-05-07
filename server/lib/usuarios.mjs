@@ -5,7 +5,7 @@ import {
   agregarPagamentosAprovadosGlobais,
   fetchUsuarioIdsComPagamentoAprovado,
   resumoPagamentosPorUsuarioIds,
-} from './pagamentos-mp.mjs'
+} from './pagamentos-asaas.mjs'
 import { resolverUsuarioIdPorTelefoneGemini } from './ai.mjs'
 import { normalizeUsuarioRow, stripSenha } from './usuario-schema.mjs'
 import { isSuperAdminEmail, superAdminEmail } from './super-admin.mjs'
@@ -319,16 +319,16 @@ function toAdminUsuarioDto(rawRow, latestByUser, approvedIds, financeMap) {
     trial_ends_at: n.trial_ends_at ?? null,
     bem_vindo_pagamento_visto_at: n.bem_vindo_pagamento_visto_at ?? null,
     pagamento_aprovado: paid,
-    mp_ultimo_status: latest?.status ?? null,
-    mp_ultimo_amount: latest?.amount ?? null,
-    mp_ultimo_em: latest?.updated_at ?? latest?.created_at ?? null,
-    mp_ultimo_detalhe: latest?.status_detail ?? null,
+    pagamento_ultimo_status: latest?.status ?? null,
+    pagamento_ultimo_amount: latest?.amount ?? null,
+    pagamento_ultimo_em: latest?.updated_at ?? latest?.created_at ?? null,
+    pagamento_ultimo_detalhe: latest?.status_detail ?? null,
     accumulatedRevenue: agg?.accumulatedRevenue ?? 0,
     monthlyRevenue: agg?.monthlyRevenue ?? 0,
     lastPaymentDate: agg?.lastPaymentDate ?? null,
     nextPaymentDate: n.assinatura_proxima_cobranca ?? null,
     dueDate: n.trial_ends_at ?? null,
-    subscriptionStatus: n.assinatura_mp_status ?? null,
+    subscriptionStatus: n.assinatura_asaas_status ?? null,
     billingCycle: null,
     planName: null,
     paymentStatus,

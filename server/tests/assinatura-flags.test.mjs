@@ -1,19 +1,22 @@
 import { describe, it, expect } from 'vitest'
-import { computeAssinaturaFlags, mpStatusBloqueiaAcesso } from '../lib/assinatura.mjs'
+import { asaasSubscriptionBloqueiaAcesso, computeAssinaturaFlags, mpStatusBloqueiaAcesso } from '../lib/assinatura.mjs'
 
 const futureIso = () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 const pastIso = () => new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
-describe('mpStatusBloqueiaAcesso', () => {
-  it('bloqueia paused e cancelled', () => {
-    expect(mpStatusBloqueiaAcesso('paused')).toBe(true)
-    expect(mpStatusBloqueiaAcesso('cancelled')).toBe(true)
-    expect(mpStatusBloqueiaAcesso('canceled')).toBe(true)
+describe('asaasSubscriptionBloqueiaAcesso / mpStatusBloqueiaAcesso (alias)', () => {
+  it('bloqueia inactive e expired', () => {
+    expect(asaasSubscriptionBloqueiaAcesso('inactive')).toBe(true)
+    expect(asaasSubscriptionBloqueiaAcesso('INACTIVE')).toBe(true)
+    expect(asaasSubscriptionBloqueiaAcesso('expired')).toBe(true)
+    expect(asaasSubscriptionBloqueiaAcesso('EXPIRED')).toBe(true)
+    expect(mpStatusBloqueiaAcesso('inactive')).toBe(true)
   })
-  it('não bloqueia vazio ou authorized', () => {
-    expect(mpStatusBloqueiaAcesso('')).toBe(false)
-    expect(mpStatusBloqueiaAcesso(null)).toBe(false)
-    expect(mpStatusBloqueiaAcesso('authorized')).toBe(false)
+  it('não bloqueia vazio ou active', () => {
+    expect(asaasSubscriptionBloqueiaAcesso('')).toBe(false)
+    expect(asaasSubscriptionBloqueiaAcesso(null)).toBe(false)
+    expect(asaasSubscriptionBloqueiaAcesso('active')).toBe(false)
+    expect(asaasSubscriptionBloqueiaAcesso('ACTIVE')).toBe(false)
   })
 })
 
@@ -25,11 +28,11 @@ describe('computeAssinaturaFlags', () => {
       trial_ends_at: pastIso(),
       bem_vindo_pagamento_visto_at: null,
       assinatura_paga: false,
-      assinatura_mp_status: 'paused',
+      assinatura_asaas_status: 'INACTIVE',
     })
     expect(f.acesso_app_liberado).toBe(true)
     expect(f.assinatura_situacao).toBe('admin')
-    expect(f.assinatura_mp_bloqueada).toBe(false)
+    expect(f.assinatura_asaas_bloqueada).toBe(false)
   })
 
   it('isento: situacao isento', () => {
@@ -39,7 +42,7 @@ describe('computeAssinaturaFlags', () => {
       trial_ends_at: null,
       bem_vindo_pagamento_visto_at: null,
       assinatura_paga: false,
-      assinatura_mp_status: null,
+      assinatura_asaas_status: null,
     })
     expect(f.assinatura_situacao).toBe('isento')
     expect(f.acesso_app_liberado).toBe(true)
@@ -52,50 +55,50 @@ describe('computeAssinaturaFlags', () => {
       trial_ends_at: futureIso(),
       bem_vindo_pagamento_visto_at: null,
       assinatura_paga: false,
-      assinatura_mp_status: null,
+      assinatura_asaas_status: null,
     })
     expect(f.assinatura_situacao).toBe('trial')
     expect(f.acesso_app_liberado).toBe(true)
-    expect(f.assinatura_mp_bloqueada).toBe(false)
+    expect(f.assinatura_asaas_bloqueada).toBe(false)
   })
 
-  it('pagamento efetivo e MP ok: ativo', () => {
+  it('pagamento efetivo e assinatura ACTIVE: ativo', () => {
     const f = computeAssinaturaFlags({
       email: 'user@example.com',
       isento_pagamento: false,
       trial_ends_at: pastIso(),
       bem_vindo_pagamento_visto_at: '2020-01-01T00:00:00.000Z',
       assinatura_paga: true,
-      assinatura_mp_status: 'authorized',
+      assinatura_asaas_status: 'ACTIVE',
     })
     expect(f.assinatura_situacao).toBe('ativo')
     expect(f.assinatura_paga).toBe(true)
     expect(f.acesso_app_liberado).toBe(true)
   })
 
-  it('MP pausado e trial encerrado: bloqueia acesso', () => {
+  it('Assaas inactive e trial encerrado: bloqueia acesso', () => {
     const f = computeAssinaturaFlags({
       email: 'user@example.com',
       isento_pagamento: false,
       trial_ends_at: pastIso(),
       bem_vindo_pagamento_visto_at: null,
       assinatura_paga: true,
-      assinatura_mp_status: 'paused',
+      assinatura_asaas_status: 'INACTIVE',
     })
     expect(f.acesso_app_liberado).toBe(false)
     expect(f.assinatura_situacao).toBe('pausada')
-    expect(f.assinatura_mp_bloqueada).toBe(true)
+    expect(f.assinatura_asaas_bloqueada).toBe(true)
     expect(f.motivo_bloqueio_acesso).toMatch(/pausada/i)
   })
 
-  it('MP pausado mas trial ainda ativo: acesso por trial; rotulo trial', () => {
+  it('Assaas inactive mas trial ainda ativo: acesso por trial; rotulo trial', () => {
     const f = computeAssinaturaFlags({
       email: 'user@example.com',
       isento_pagamento: false,
       trial_ends_at: futureIso(),
       bem_vindo_pagamento_visto_at: null,
       assinatura_paga: true,
-      assinatura_mp_status: 'paused',
+      assinatura_asaas_status: 'INACTIVE',
     })
     expect(f.acesso_app_liberado).toBe(true)
     expect(f.assinatura_situacao).toBe('trial')

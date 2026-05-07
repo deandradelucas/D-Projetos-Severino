@@ -107,10 +107,13 @@ export function mapSupabaseOrNetworkError(error) {
         'O serviço de inteligência artificial está temporariamente indisponível ou sem quota. Tente novamente em alguns minutos.',
     }
   }
-  if (/api\.mercadopago\.com|Mercado\s*Pago|mercadopago/i.test(raw) && /ECONNRESET|ETIMEDOUT|5\d\d|fetch failed/i.test(raw)) {
+  if (
+    /api\.asaas\.com|sandbox\.asaas\.com|www\.asaas\.com|Asaas/i.test(raw) &&
+    /ECONNRESET|ETIMEDOUT|5\d\d|fetch failed/i.test(raw)
+  ) {
     return {
       status: 503,
-      message: 'O gateway de pagamentos está indisponível no momento. Tente novamente em instantes.',
+      message: 'O gateway de pagamentos (Asaas) está indisponível no momento. Tente novamente em instantes.',
     }
   }
   return null

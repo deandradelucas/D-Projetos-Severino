@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $projectRoot
 
-Write-Host "Iniciando backup automatico do Horizonte Financeiro..."
+Write-Host "Iniciando backup automatico do Severino..."
 & npm run backup:rclone
 
 if ($LASTEXITCODE -ne 0) {

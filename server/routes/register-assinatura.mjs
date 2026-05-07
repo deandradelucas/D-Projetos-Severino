@@ -21,12 +21,12 @@ export function registerAssinaturaRoutes(app) {
         mostrar_bem_vindo_assinatura: false,
         trial_dias_gratis: 7,
         assinatura_proxima_cobranca: null,
-        assinatura_mp_status: null,
+        assinatura_asaas_status: null,
         plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
         assinatura_situacao: 'inativa',
-        assinatura_mp_bloqueada: false,
+        assinatura_asaas_bloqueada: false,
         motivo_bloqueio_acesso: null,
-        mp_gerenciar_url: null,
+        asaas_portal_url: null,
       })
     }
   })

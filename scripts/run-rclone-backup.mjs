@@ -1,6 +1,6 @@
 import { runRcloneBackup } from '../server/lib/rclone-backup.mjs'
 
-console.log('Iniciando backup do Horizonte Financeiro...\n')
+console.log('Iniciando backup do Severino...\n')
 
 try {
   await runRcloneBackup()

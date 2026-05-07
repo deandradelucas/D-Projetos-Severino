@@ -3,9 +3,9 @@ import {
   ensureFutureMonthlyAnchor,
   normalizarProximaCobrancaMensal,
   shiftToFollowingCalendarMonth,
-} from '../lib/pagamentos-mp.mjs'
+} from '../lib/pagamento-datas-mensais.mjs'
 
-describe('pagamentos-mp helpers', () => {
+describe('pagamento-datas-mensais', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })

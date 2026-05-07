@@ -1,6 +1,6 @@
 import { log } from '../lib/logger.mjs'
 import { clientIpFromHono } from '../lib/http/client-ip.mjs'
-import { isMercadoPagoConfigured } from '../lib/mercadopago.mjs'
+import { isAsaasConfigured } from '../lib/asaas.mjs'
 import {
   listUsuariosAdminPaged,
   updateUsuarioAdmin,
@@ -11,7 +11,7 @@ import { insertAdminAuditLog, listAdminAuditLog } from '../lib/admin-audit.mjs'
 import {
   listPagamentosAdminPayload,
   deletePagamentosPendentesAdmin,
-} from '../lib/pagamentos-mp.mjs'
+} from '../lib/pagamentos-asaas.mjs'
 import { requestPasswordOtpWhatsApp } from '../lib/password-otp-whatsapp.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { mapSupabaseOrNetworkError } from '../lib/http/hono-error-map.mjs'
@@ -19,7 +19,6 @@ import { assertPrincipalAdmin } from '../lib/admin/assert-principal-admin.mjs'
 import { getMarketingStatsAdmin } from '../lib/marketing-stats.mjs'
 
 export function registerAdminRoutes(app) {
-  /** Painel interno: token MP configurado e path do webhook (sem segredos). */
   app.get('/api/admin/marketing/stats', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
@@ -33,19 +32,20 @@ export function registerAdminRoutes(app) {
     }
   })
 
-  app.get('/api/admin/mp-saude', async (c) => {
+  /** Asaas + webhook (sem segredos). */
+  app.get('/api/admin/pagamentos-saude', async (c) => {
     try {
       const usuarioId = c.req.header('x-user-id')
       const block = await assertPrincipalAdmin(usuarioId)
       if (block) return c.json({ message: block.message }, block.status)
       return c.json({
-        mercado_pago_access_token_configured: isMercadoPagoConfigured(),
+        asaas_api_configured: isAsaasConfigured(),
         webhook_get_post: '/api/pagamentos/webhook',
         nota:
-          'No painel Mercado Pago, a URL de notificação deve apontar para este path e responder 200. Logs estruturados: svc=mercadopago-webhook no stdout.',
+          'No painel Asaas, configure webhooks de cobrança e assinatura para esta URL (POST). Opcional: ?token=ASAAS_WEBHOOK_TOKEN. Logs: svc=asaas-webhook.',
       })
     } catch (error) {
-      log.error('mp-saude failed', error)
+      log.error('pagamentos-saude failed', error)
       return c.json({ message: 'Erro ao montar painel.' }, 500)
     }
   })

@@ -199,7 +199,7 @@ export default function AdminMarketing() {
                   <div className="page-admin-marketing-panel-body">
                     <div className="page-admin-marketing-meta-row">
                       <div>
-                        <div className="page-admin-marketing-meta-row__label">Total aprovado (Mercado Pago)</div>
+                        <div className="page-admin-marketing-meta-row__label">Total aprovado (Asaas)</div>
                         {loading ? (
                           <div
                             style={{
@@ -432,7 +432,7 @@ export default function AdminMarketing() {
                   <div className="page-admin-marketing-panel-body">
                     <ul className="page-admin-marketing-actions-list">
                       {[
-                        { prazo: 'Dias 1–3', acao: 'Definir pricing final e ativar pagamento no Mercado Pago' },
+                        { prazo: 'Dias 1–3', acao: 'Definir pricing final e validar checkout Asaas em produção' },
                         { prazo: 'Dias 4–7', acao: 'Gravar 3 vídeos demonstrando o WhatsApp Bot em uso real' },
                         { prazo: 'Dias 8–12', acao: 'Oferta beta para contatos: meta de primeiros pagantes' },
                         { prazo: 'Dias 13–18', acao: 'Cadastrar em diretórios como alternativa a apps de finanças' },

@@ -40,8 +40,8 @@ export default function Pagamento() {
   const [painelAssinatura, setPainelAssinatura] = useState(() => painelAssinaturaFromUser(null))
 
   const statusUrl = searchParams.get('status')
-  const mpSub = searchParams.get('mp')
-  const expirado = searchParams.get('expirado') === '1'
+  const asaasCb = searchParams.get('asaas')
+  const expirado = searchParams.get('expirado') === '1' || asaasCb === 'expirado'
 
   const formatCurrency = formatCurrencyBRL
 
@@ -132,7 +132,7 @@ export default function Pagamento() {
   }, [fetchDados])
 
   useEffect(() => {
-    if (mpSub !== 'sub_ok') return
+    if (asaasCb !== 'ok') return
     let cancelled = false
     const sync = async () => {
       try {
@@ -168,7 +168,7 @@ export default function Pagamento() {
         setSearchParams(
           (prev) => {
             const next = new URLSearchParams(prev)
-            next.delete('mp')
+            next.delete('asaas')
             return next
           },
           { replace: true }
@@ -179,7 +179,7 @@ export default function Pagamento() {
     return () => {
       cancelled = true
     }
-  }, [mpSub, setSearchParams])
+  }, [asaasCb, setSearchParams])
 
   const handlePagar = async () => {
     setError('')
@@ -213,7 +213,7 @@ export default function Pagamento() {
       if (!urlCheckout) throw new Error('URL de checkout indisponível.')
       window.location.href = urlCheckout
     } catch (e) {
-      setError(e.message || 'Erro ao redirecionar para o Mercado Pago.')
+      setError(e.message || 'Erro ao abrir o checkout Asaas.')
     } finally {
       setPaying(false)
     }
@@ -268,7 +268,29 @@ export default function Pagamento() {
                 {expirado ? (
                   <div className="pagamento-banner pagamento-banner--danger" role="alert">
                     <p className="pagamento-banner__title">Teste encerrado ou assinatura inativa.</p>
-                    <p className="pagamento-banner__text">Conclua o pagamento no Mercado Pago e use &quot;Atualizar status&quot;.</p>
+                    <p className="pagamento-banner__text">Conclua o pagamento no checkout Asaas e use &quot;Atualizar status&quot;.</p>
+                  </div>
+                ) : null}
+
+                {asaasCb === 'cancel' ? (
+                  <div className="pagamento-banner pagamento-banner--warning" role="status">
+                    <p className="pagamento-banner__title">Checkout cancelado. Você pode tentar de novo quando quiser.</p>
+                    <button
+                      type="button"
+                      className="btn-secondary btn-secondary--compact"
+                      onClick={() => {
+                        setSearchParams(
+                          (prev) => {
+                            const next = new URLSearchParams(prev)
+                            next.delete('asaas')
+                            return next
+                          },
+                          { replace: true },
+                        )
+                      }}
+                    >
+                      Fechar aviso
+                    </button>
                   </div>
                 ) : null}
 
@@ -278,7 +300,7 @@ export default function Pagamento() {
                       {statusUrl === 'success'
                         ? 'Pagamento recebido — o status atualiza em instantes no histórico.'
                         : statusUrl === 'pending'
-                          ? 'Pagamento pendente. A confirmação vem pelo Mercado Pago.'
+                          ? 'Pagamento pendente. A confirmação vem pelo Asaas.'
                           : 'Não foi possível concluir. Tente outro meio ou novamente.'}
                     </p>
                     <button type="button" className="btn-secondary btn-secondary--compact" onClick={limparStatusUrl}>
@@ -289,7 +311,7 @@ export default function Pagamento() {
 
                 {!config.ready && !loading ? (
                   <p className="pagamento-config-alert">
-                    Checkout indisponível: configure <code>MERCADO_PAGO_ACCESS_TOKEN</code> no servidor.
+                    Checkout indisponível: configure <code>ASAAS_API_KEY</code> no servidor.
                   </p>
                 ) : null}
 
@@ -307,10 +329,14 @@ export default function Pagamento() {
                   formatCurrency={formatCurrency}
                 />
 
-                {ultimo && (ultimo.status === 'rejected' || ultimo.status === 'cancelled' || ultimo.status === 'refunded') ? (
+                {ultimo &&
+                ['rejected', 'cancelled', 'refunded', 'charged_back', 'overdue'].includes(
+                  String(ultimo.status || '').toLowerCase(),
+                ) ? (
                   <div className="pagamento-banner pagamento-banner--warning" role="status">
                     <p className="pagamento-banner__text">
-                      Última cobrança ({formatCurrency(Number(ultimo.amount || 0))}) não foi concluída. Atualize o cartão ou o meio de pagamento no Mercado Pago.
+                      Última cobrança ({formatCurrency(Number(ultimo.amount || 0))}) não está em dia. Regularize no portal Asaas ou use
+                      &quot;Atualizar status&quot;.
                     </p>
                   </div>
                 ) : null}
@@ -326,7 +352,7 @@ export default function Pagamento() {
                 loading={loading}
                 configReady={config.ready}
                 isento={config.isento_pagamento}
-                mpUrl={painelAssinatura.mpUrl}
+                portalUrl={painelAssinatura.portalUrl}
                 disabledAssinar={!config.ready || paying || loading || config.isento_pagamento}
                 checkoutError={error}
               />

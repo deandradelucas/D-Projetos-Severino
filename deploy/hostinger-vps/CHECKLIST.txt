@@ -61,4 +61,5 @@ Eu não consigo SSH na tua VPS nem abrir o teu hPanel. Segue isto na VPS (Ubuntu
 
 Hostinger “Website” só estático NÃO corre isto — precisas de VPS ou servidor onde faças estes passos.
 
-Front severino.mestredamente.com já usa por defeito https://api.severino.mestredamente.com no código.
+Se o front em severino.mestredamente.com tiver proxy /api → Node na mesma origem, não precisas de api.severino no DNS.
+Se a API for só em api.severino…, define VITE_SEVERINO_API_ORIGIN nesse host no build estático.
