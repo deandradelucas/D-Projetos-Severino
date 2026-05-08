@@ -10,7 +10,6 @@ export default function PagamentoPainelLateral({
   paying,
   loading,
   configReady,
-  stripeCheckoutReady = false,
   isento,
   portalUrl,
   disabledAssinar,
@@ -53,10 +52,9 @@ export default function PagamentoPainelLateral({
             Atualizar status
           </button>
         </div>
-        {!configReady && !stripeCheckoutReady && !loading ? (
+        {!configReady && !loading ? (
           <p className="pagamento-aside__footnote">
-            Configure <code>ASAAS_API_KEY</code> (Asaas) e/ou <code>STRIPE_SECRET_KEY</code> (Stripe) no servidor para habilitar
-            pagamentos.
+            Configure <code>ASAAS_API_KEY</code> no servidor para habilitar o checkout de pagamentos.
           </p>
         ) : null}
         {isento ? <p className="pagamento-aside__footnote">Conta isenta — sem pagamento aqui.</p> : null}

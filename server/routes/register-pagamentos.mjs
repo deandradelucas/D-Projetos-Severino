@@ -110,16 +110,6 @@ export function registerPagamentosRoutes(app) {
       const planoRaw = String(body?.plano || 'mensal').trim().toLowerCase()
       const plano = planoRaw === 'anual' ? 'anual' : 'mensal'
 
-      if (plano === 'mensal' && isStripeConfigured()) {
-        return c.json(
-          {
-            message:
-              'Plano mensal com cartão: use o botão “Pagar com cartão (Stripe)” nesta página. O Asaas não é usado para o mensal quando o Stripe está configurado.',
-          },
-          409,
-        )
-      }
-
       const cycle = plano === 'anual' ? 'YEARLY' : 'MONTHLY'
       const valor = plano === 'anual' ? pa : pm
 
@@ -137,9 +127,8 @@ export function registerPagamentosRoutes(app) {
       const externalRef = `hf-${usuarioId}-${randomUUID()}`
 
       const labelCiclo = plano === 'anual' ? 'anual' : 'mensal'
-      /** Anual com Stripe: só Pix no Asaas. Sem Stripe: cartão + Pix. Mensal sem Stripe: só cartão. */
-      const billingTypes =
-        plano === 'anual' ? (isStripeConfigured() ? ['PIX'] : ['CREDIT_CARD', 'PIX']) : ['CREDIT_CARD']
+      /** Checkout hospedado Asaas: mensal cartão; anual cartão + Pix. */
+      const billingTypes = plano === 'anual' ? ['CREDIT_CARD', 'PIX'] : ['CREDIT_CARD']
 
       const checkout = await criarCheckoutAssinatura({
         baseUrlApp: baseUrl,

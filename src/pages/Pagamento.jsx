@@ -30,8 +30,6 @@ export default function Pagamento() {
 
   const [config, setConfig] = useState({
     ready: false,
-    stripe_checkout_ready: false,
-    stripe_publishable_key: null,
     publicKey: null,
     isento_pagamento: false,
   })
@@ -114,8 +112,6 @@ export default function Pagamento() {
         const c = await cfgRes.json()
         setConfig({
           ready: !!c.ready,
-          stripe_checkout_ready: !!c.stripe_checkout_ready,
-          stripe_publishable_key: c.stripe_publishable_key || null,
           publicKey: c.publicKey,
           isento_pagamento: !!c.isento_pagamento,
         })
@@ -230,40 +226,6 @@ export default function Pagamento() {
     }
   }
 
-  const handlePagarStripe = async () => {
-    setError('')
-    setPaying(true)
-    try {
-      const userSaved = localStorage.getItem('horizonte_user')
-      if (!userSaved) {
-        window.location.href = '/login'
-        return
-      }
-      const u = JSON.parse(userSaved)
-
-      const res = await fetch(apiUrl('/api/pagamentos/stripe/checkout'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': u.id,
-        },
-        body: JSON.stringify({
-          plano: planoCheckout === 'anual' ? 'anual' : 'mensal',
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Não foi possível iniciar o checkout Stripe.')
-
-      const urlCheckout = data.use_sandbox ? data.sandbox_init_point : data.init_point
-      if (!urlCheckout) throw new Error('URL de checkout indisponível.')
-      window.location.href = urlCheckout
-    } catch (e) {
-      setError(e.message || 'Erro ao abrir o checkout Stripe.')
-    } finally {
-      setPaying(false)
-    }
-  }
-
   const handleGerarPixQrAnual = async () => {
     setPixError('')
     setPixLoading(true)
@@ -310,12 +272,9 @@ export default function Pagamento() {
   }
 
   const ultimo = ultimoPagamentoHistorico(historico)
-  const stripePronto = !!config.stripe_checkout_ready
-  const configAlgumCheckout = config.ready || stripePronto
-
   const orientacao = buildOrientacaoUsuario({
     painel: painelAssinatura,
-    configReady: configAlgumCheckout,
+    configReady: config.ready,
     isento: config.isento_pagamento,
     historicoLen: historico.length,
   })
@@ -323,39 +282,17 @@ export default function Pagamento() {
   const valorCicloSelecionado = planoCheckout === 'anual' ? precosCatalogo.anual : precosCatalogo.mensal
   const unidadeCiclo = planoCheckout === 'anual' ? 'ano' : 'mês'
 
-  const showAsaasPrimario =
-    (planoCheckout === 'anual' && config.ready) || (planoCheckout === 'mensal' && !stripePronto && config.ready)
-
-  const showStripePrimario =
-    (planoCheckout === 'mensal' && stripePronto) || (planoCheckout === 'anual' && stripePronto && !config.ready)
-
-  const showStripeSecundarioAnual = planoCheckout === 'anual' && stripePronto && config.ready
-
-  const assinarLabelAsaas =
+  const assinarLabelCheckout =
     planoCheckout === 'anual'
-      ? showStripeSecundarioAnual
-        ? `Pagar ${formatCurrency(precosCatalogo.anual)} / ano com Pix (Asaas)`
-        : `Pagar ${formatCurrency(precosCatalogo.anual)} / ano (Pix ou cartão Asaas)`
-      : `Pagar ${formatCurrency(precosCatalogo.mensal)} / mês com cartão (Asaas)`
+      ? `Pagar ${formatCurrency(precosCatalogo.anual)} / ano no Asaas (Pix ou cartão)`
+      : `Pagar ${formatCurrency(precosCatalogo.mensal)} / mês no Asaas (cartão)`
 
-  const assinarLabelStripe = `Pagar ${formatCurrency(valorCicloSelecionado)} / ${unidadeCiclo} com cartão (Stripe)`
-
-  const lateralPrimaryOnClick = showStripePrimario && !showAsaasPrimario ? handlePagarStripe : handlePagarAsaas
-  const lateralPrimaryLabel = showStripePrimario && !showAsaasPrimario ? assinarLabelStripe : assinarLabelAsaas
-  const disabledAsaas = !config.ready || paying || loading || config.isento_pagamento
-  const disabledStripe = !stripePronto || paying || loading || config.isento_pagamento
-  const lateralPrimaryDisabled = showStripePrimario && !showAsaasPrimario ? disabledStripe : disabledAsaas
+  const disabledCheckout = !config.ready || paying || loading || config.isento_pagamento
 
   const meiosDetalhes =
     planoCheckout === 'anual'
-      ? showStripeSecundarioAnual
-        ? 'Pix no Asaas ou cartão no Stripe (página segura da Stripe)'
-        : stripePronto
-          ? 'Cartão no Stripe (página segura da Stripe)'
-          : 'Pix ou cartão de crédito no Asaas'
-      : stripePronto
-        ? 'Cartão no Stripe (página segura da Stripe)'
-        : 'Cartão de crédito no Asaas'
+      ? 'Pix ou cartão de crédito no checkout Asaas'
+      : 'Cartão de crédito no checkout Asaas'
 
   return (
     <div className="dashboard-container page-pagamento ref-dashboard app-horizon-shell">
@@ -389,7 +326,7 @@ export default function Pagamento() {
                   <div className="pagamento-banner pagamento-banner--danger" role="alert">
                     <p className="pagamento-banner__title">Teste encerrado ou assinatura inativa.</p>
                     <p className="pagamento-banner__text">
-                      Conclua o pagamento no checkout (Asaas ou Stripe) e use &quot;Atualizar status&quot;.
+                      Conclua o pagamento no checkout Asaas e use &quot;Atualizar status&quot;.
                     </p>
                   </div>
                 ) : null}
@@ -453,9 +390,9 @@ export default function Pagamento() {
                   </div>
                 ) : null}
 
-                {!configAlgumCheckout && !loading ? (
+                {!config.ready && !loading ? (
                   <p className="pagamento-config-alert">
-                    Checkout indisponível: configure <code>ASAAS_API_KEY</code> e/ou <code>STRIPE_SECRET_KEY</code> no servidor.
+                    Checkout indisponível: configure <code>ASAAS_API_KEY</code> no servidor.
                   </p>
                 ) : null}
 
@@ -479,9 +416,7 @@ export default function Pagamento() {
                         <span className="page-pagamento-planos__option-title">Mensal</span>
                         <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.mensal)} / mês</span>
                         <span className="page-pagamento-planos__option-hint">
-                          {stripePronto
-                            ? `Cartão no Stripe; cobrança mensal (${formatCurrency(precosCatalogo.mensal)}/mês)`
-                            : `Cartão no Asaas; cobrança automática (${formatCurrency(precosCatalogo.mensal)}/mês)`}
+                          {`Checkout Asaas — cobrança mensal (${formatCurrency(precosCatalogo.mensal)}/mês)`}
                         </span>
                       </button>
                       <button
@@ -494,11 +429,7 @@ export default function Pagamento() {
                         <span className="page-pagamento-planos__option-title">Anual</span>
                         <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.anual)} / ano</span>
                         <span className="page-pagamento-planos__option-hint">
-                          {stripePronto && config.ready
-                            ? `Pix no Asaas ou cartão no Stripe (${formatCurrency(precosCatalogo.anual)}/ano)`
-                            : stripePronto
-                              ? `Cartão no Stripe (${formatCurrency(precosCatalogo.anual)}/ano)`
-                              : `Pix ou cartão no Asaas (${formatCurrency(precosCatalogo.anual)}/ano)`}
+                          {`Pix ou cartão no Asaas (${formatCurrency(precosCatalogo.anual)}/ano)`}
                         </span>
                       </button>
                     </div>
@@ -547,20 +478,16 @@ export default function Pagamento() {
 
               <PagamentoPainelLateral
                 orientacao={orientacao}
-                onAssinar={lateralPrimaryOnClick}
+                onAssinar={handlePagarAsaas}
                 onAtualizar={onAtualizar}
                 paying={paying}
                 loading={loading}
                 configReady={config.ready}
-                stripeCheckoutReady={stripePronto}
                 isento={config.isento_pagamento}
                 portalUrl={painelAssinatura.portalUrl}
-                disabledAssinar={lateralPrimaryDisabled}
+                disabledAssinar={disabledCheckout}
                 checkoutError={error}
-                assinarLabel={lateralPrimaryLabel}
-                onSegundoCheckout={showStripeSecundarioAnual ? handlePagarStripe : undefined}
-                segundoCheckoutLabel={showStripeSecundarioAnual ? assinarLabelStripe : undefined}
-                disabledSegundoCheckout={disabledStripe}
+                assinarLabel={assinarLabelCheckout}
               />
             </div>
 
