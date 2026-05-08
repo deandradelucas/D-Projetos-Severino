@@ -5,7 +5,10 @@ export const ASAAS_CHECKOUT_ITEM_IMAGE_B64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
 
 export function getAsaasApiBase() {
-  return String(process.env.ASAAS_API_BASE_URL || 'https://api.asaas.com/v3').replace(/\/+$/, '')
+  let u = String(process.env.ASAAS_API_BASE_URL || 'https://api.asaas.com/v3').trim()
+  // Colagem de planilha / .env mal formatado pode prefixar '=' (fetch falha a parsear URL).
+  while (u.startsWith('=')) u = u.slice(1).trim()
+  return u.replace(/\/+$/, '')
 }
 
 export function getAsaasAccessToken() {
@@ -86,13 +89,17 @@ export async function asaasFetch(path, options = {}) {
   const token = getAsaasAccessToken()
   const p = path.startsWith('/') ? path : `/${path}`
   const url = `${getAsaasApiBase()}${p}`
+  const method = String(options.method || 'GET').toUpperCase()
+  const headers = {
+    access_token: token,
+    ...(options.headers || {}),
+  }
+  if (method !== 'GET' && method !== 'HEAD') {
+    headers['Content-Type'] = 'application/json'
+  }
   const res = await fetch(url, {
     ...options,
-    headers: {
-      access_token: token,
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   })
   const json = await res.json().catch(() => ({}))
   if (!res.ok) throw asaasHttpError(res, json, 'Asaas')
@@ -111,8 +118,21 @@ export async function buscarAssinaturaAsaas(subscriptionId) {
   return asaasFetch(`/subscriptions/${encodeURIComponent(id)}`, { method: 'GET' })
 }
 
+/** @param {unknown} v */
+function normalizeBillingTypes(v) {
+  const allowed = new Set(['CREDIT_CARD', 'PIX'])
+  if (!Array.isArray(v) || v.length === 0) return ['CREDIT_CARD', 'PIX']
+  const out = []
+  for (const x of v) {
+    const s = String(x || '').trim().toUpperCase()
+    if (allowed.has(s) && !out.includes(s)) out.push(s)
+  }
+  return out.length > 0 ? out : ['CREDIT_CARD', 'PIX']
+}
+
 /**
- * Checkout recorrente mensal (cartão / Pix conforme billingTypes).
+ * Checkout de assinatura recorrente no Asaas.
+ * Defina `billingTypes`: mensal costuma ser só cartão; anual pode incluir Pix.
  * @param {{
  *   baseUrlApp: string
  *   usuarioId: string
@@ -120,25 +140,31 @@ export async function buscarAssinaturaAsaas(subscriptionId) {
  *   nome?: string|null
  *   telefone?: string|null
  *   tituloItem: string
- *   valorMensal: number
+ *   valor: number
+ *   cycle?: 'MONTHLY' | 'YEARLY'
  *   externalReference: string
+ *   billingTypes?: ('CREDIT_CARD' | 'PIX')[]
  * }} opts
  */
-export async function criarCheckoutAssinaturaRecorrente(opts) {
+export async function criarCheckoutAssinatura(opts) {
   const token = getAsaasAccessToken()
   if (!token) throw new Error('ASAAS_API_KEY não configurada no servidor.')
 
+  const billingTypes = normalizeBillingTypes(opts.billingTypes)
+  const cycle = opts.cycle === 'YEARLY' ? 'YEARLY' : 'MONTHLY'
   const baseUrlApp = String(opts.baseUrlApp || '').replace(/\/+$/, '')
-  const titulo = String(opts.tituloItem || 'Assinatura mensal').trim()
+  const titulo = String(opts.tituloItem || 'Assinatura').trim()
   const itemName = titulo.slice(0, 30)
   const phoneDigits = String(opts.telefone || '').replace(/\D/g, '').slice(0, 16)
+  const valor = Number(opts.valor ?? opts.valorMensal)
+  if (!Number.isFinite(valor) || valor <= 0) throw new Error('Valor do plano inválido.')
 
   const now = new Date()
   const nextDue = formatYmd(now)
   const endDate = formatYmd(addYears(now, 10))
 
   const body = {
-    billingTypes: ['CREDIT_CARD', 'PIX'],
+    billingTypes,
     chargeTypes: ['RECURRENT'],
     minutesToExpire: 1440,
     externalReference: String(opts.externalReference || '').trim(),
@@ -152,7 +178,7 @@ export async function criarCheckoutAssinaturaRecorrente(opts) {
         name: itemName || 'Assinatura',
         description: titulo.slice(0, 150),
         quantity: 1,
-        value: Number(opts.valorMensal),
+        value: valor,
         imageBase64: ASAAS_CHECKOUT_ITEM_IMAGE_B64,
       },
     ],
@@ -162,11 +188,20 @@ export async function criarCheckoutAssinaturaRecorrente(opts) {
       ...(phoneDigits ? { phone: phoneDigits } : {}),
     },
     subscription: {
-      cycle: 'MONTHLY',
+      cycle,
       nextDueDate: nextDue,
       endDate,
     },
   }
 
   return asaasFetch('/checkouts', { method: 'POST', body: JSON.stringify(body) })
+}
+
+/** @deprecated use criarCheckoutAssinatura com cycle MONTHLY */
+export async function criarCheckoutAssinaturaRecorrente(opts) {
+  return criarCheckoutAssinatura({
+    ...opts,
+    valor: opts.valorMensal,
+    cycle: 'MONTHLY',
+  })
 }

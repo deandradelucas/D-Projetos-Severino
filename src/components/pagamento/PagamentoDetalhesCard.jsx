@@ -5,7 +5,12 @@ import { PROVEDOR_PAGAMENTO_LABEL } from '../../lib/pagamentoPageModel.js'
  */
 export default function PagamentoDetalhesCard({
   tituloPlano,
-  precoMensal,
+  /** Valor do ciclo escolhido para novo checkout (mensal ou anual). */
+  valorCicloSelecionado,
+  /** 'mês' | 'ano' */
+  unidadeCiclo,
+  /** Texto curto dos meios aceitos no checkout (varia por plano). */
+  meiosPagamentoResumo = 'Pix ou cartão de crédito',
   painel,
   proximaCobranca,
   formatCurrency,
@@ -22,7 +27,9 @@ export default function PagamentoDetalhesCard({
           <h2 id="pagamento-detalhes-heading" className="ref-panel__title">
             Sua assinatura
           </h2>
-          <p className="ref-panel__subtitle">Cobrança recorrente no {PROVEDOR_PAGAMENTO_LABEL}</p>
+          <p className="ref-panel__subtitle">
+            Cobrança recorrente no {PROVEDOR_PAGAMENTO_LABEL} — {meiosPagamentoResumo}
+          </p>
         </div>
       </div>
       <dl className="pagamento-detalhes-dl">
@@ -33,7 +40,8 @@ export default function PagamentoDetalhesCard({
         <div className="pagamento-detalhes-dl__row">
           <dt>Valor</dt>
           <dd>
-            {formatCurrency(precoMensal)} / mês <span className="pagamento-detalhes-dl__muted">(renovação automática)</span>
+            {formatCurrency(valorCicloSelecionado)} / {unidadeCiclo}{' '}
+            <span className="pagamento-detalhes-dl__muted">(renovação automática)</span>
           </dd>
         </div>
         <div className="pagamento-detalhes-dl__row">

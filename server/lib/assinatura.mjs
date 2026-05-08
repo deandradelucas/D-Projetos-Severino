@@ -8,6 +8,7 @@ import {
   sincronizarSubscriptionUsuario,
   usuarioTemPagamentoAprovado,
 } from './pagamentos-asaas.mjs'
+import { sincronizarStripeUsuario } from './pagamentos-stripe.mjs'
 
 export const TRIAL_DIAS = Number.parseInt(process.env.HORIZONTE_TRIAL_DIAS || '7', 10) || 7
 
@@ -43,6 +44,11 @@ export function mensagemBloqueioAssinaturaAsaas(status) {
     return 'Sua assinatura encerrou. Acesse Pagamento para assinar novamente e voltar a usar o app.'
   }
   return 'Assinatura inativa ou período de teste encerrado. Conclua o pagamento no aplicativo para continuar.'
+}
+
+function stripeSubscriptionLiberaAcesso(stripeStatus) {
+  const s = String(stripeStatus || '').trim().toLowerCase()
+  return s === 'active' || s === 'trialing'
 }
 
 function situacaoAssinatura({ trialActive, assinatura_paga_efetiva, assinatura_asaas_status, gwBloqueia }) {
@@ -126,6 +132,20 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
     out.assinatura_asaas_status = tGw.data.assinatura_asaas_status ?? null
   }
 
+  out.stripe_subscription_id = null
+  out.stripe_subscription_status = null
+  const tStripe = await supabase
+    .from('usuarios')
+    .select('stripe_subscription_id, stripe_subscription_status')
+    .eq('id', uid)
+    .maybeSingle()
+  if (!tStripe.error && tStripe.data) {
+    out.stripe_subscription_id = tStripe.data.stripe_subscription_id ?? null
+    out.stripe_subscription_status = tStripe.data.stripe_subscription_status ?? null
+  } else if (tStripe.error && !isMissingColumnError(tStripe.error, 'stripe_subscription_id')) {
+    log.warn('[fetchAssinaturaCamposUsuario] stripe:', tStripe.error.message || tStripe.error)
+  }
+
   return out
 }
 
@@ -136,6 +156,7 @@ export function computeAssinaturaFlags({
   bem_vindo_pagamento_visto_at,
   assinatura_paga,
   assinatura_asaas_status,
+  stripe_subscription_status = null,
 }) {
   if (isSuperAdminEmail(email) || isento_pagamento === true) {
     return {
@@ -150,7 +171,8 @@ export function computeAssinaturaFlags({
 
   const trialEnd = trial_ends_at ? new Date(trial_ends_at) : null
   const trialActive = trialEnd != null && !Number.isNaN(trialEnd.getTime()) && trialEnd > new Date()
-  const gwBloqueia = asaasSubscriptionBloqueiaAcesso(assinatura_asaas_status)
+  const stripeOk = stripeSubscriptionLiberaAcesso(stripe_subscription_status)
+  const gwBloqueia = asaasSubscriptionBloqueiaAcesso(assinatura_asaas_status) && !stripeOk
   const pagoHistorico = assinatura_paga === true
   const pagoEfetivo = pagoHistorico && !gwBloqueia
 
@@ -222,6 +244,9 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     }
     log.warn('[buildAssinaturaUsuarioPayload] sync subscription:', e?.message || e)
   })
+  await sincronizarStripeUsuario(billingUid).catch((e) => {
+    log.warn('[buildAssinaturaUsuarioPayload] sync stripe:', e?.message || e)
+  })
 
   row = await fetchAssinaturaCamposUsuario(billingUid)
 
@@ -233,6 +258,7 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at,
     assinatura_paga: hasPay,
     assinatura_asaas_status: row.assinatura_asaas_status,
+    stripe_subscription_status: row.stripe_subscription_status,
   })
 
   if (emailExibicao && isSuperAdminEmail(emailExibicao)) {
@@ -243,6 +269,7 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
       bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at,
       assinatura_paga: true,
       assinatura_asaas_status: row.assinatura_asaas_status,
+      stripe_subscription_status: row.stripe_subscription_status,
     })
     const precoMensalAdm = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
     const planoPrecoAdm = Number.isFinite(precoMensalAdm) && precoMensalAdm > 0 ? precoMensalAdm : 10
@@ -322,6 +349,42 @@ export async function marcarBemVindoPagamentoVisto(usuarioId) {
 }
 
 /**
+ * Sessão válida para API de pagamentos (histórico, checkout, Pix QR).
+ * Não exige assinatura ativa nem trial — quem está bloqueado precisa destas rotas para pagar.
+ * @returns {null | { status: number, message: string }}
+ */
+export async function assertSessaoRotasPagamento(usuarioId) {
+  const uid = String(usuarioId || '').trim()
+  if (!uid) return { status: 401, message: 'Não autorizado.' }
+
+  let escopo
+  try {
+    escopo = await resolveEscopoUsuario(uid)
+  } catch (e) {
+    log.warn('[assertSessaoRotasPagamento] escopo:', e?.message || e)
+    return { status: 401, message: 'Não autorizado.' }
+  }
+
+  const billingUid = escopo.dataUsuarioId
+  const supabase = getSupabaseAdmin()
+
+  const { data: actorPeek } = await supabase.from('usuarios').select('email').eq('id', uid).maybeSingle()
+  const actorEmail = actorPeek?.email ?? ''
+  if (actorEmail && isSuperAdminEmail(actorEmail)) {
+    return null
+  }
+
+  const { data: billingRow, error: uerr } = await supabase.from('usuarios').select('id').eq('id', billingUid).maybeSingle()
+  if (uerr) {
+    log.warn('[assertSessaoRotasPagamento] leitura usuarios:', uerr.message || uerr)
+    return { status: 401, message: 'Não autorizado.' }
+  }
+  if (!billingRow) return { status: 401, message: 'Não autorizado.' }
+
+  return null
+}
+
+/**
  * Verifica trial/pagamento/isento/super-admin (sem alterar trial — isso ocorre no login).
  * @returns {null | { status: number, message: string }}
  */
@@ -356,7 +419,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
   let uerr = null
   ;({ data: urow, error: uerr } = await supabase
     .from('usuarios')
-    .select('email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status')
+    .select('email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status, stripe_subscription_status')
     .eq('id', billingUid)
     .maybeSingle())
 
@@ -367,6 +430,14 @@ export async function assertAcessoAppUsuario(usuarioId) {
     ;({ data: urow, error: uerr } = await supabase
       .from('usuarios')
       .select('email, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status')
+      .eq('id', billingUid)
+      .maybeSingle())
+  }
+
+  if (uerr && isMissingColumnError(uerr, 'stripe_subscription_status')) {
+    ;({ data: urow, error: uerr } = await supabase
+      .from('usuarios')
+      .select('email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status')
       .eq('id', billingUid)
       .maybeSingle())
   }
@@ -391,6 +462,7 @@ export async function assertAcessoAppUsuario(usuarioId) {
     bem_vindo_pagamento_visto_at: urow.bem_vindo_pagamento_visto_at,
     assinatura_paga: hasPay,
     assinatura_asaas_status: urow.assinatura_asaas_status,
+    stripe_subscription_status: urow.stripe_subscription_status ?? null,
   })
 
   if (!flags.acesso_app_liberado) {

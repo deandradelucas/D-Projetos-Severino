@@ -2,7 +2,7 @@
  * Modelo e cópias da página Pagamento — alinhado ao payload de /api/assinatura/status e pagamentos_asaas.
  */
 
-export const PLANO_PADRAO_TITULO = 'Assinatura mensal Severino'
+export const PLANO_PADRAO_TITULO = 'Assinatura Severino'
 export const PROVEDOR_PAGAMENTO_LABEL = 'Asaas'
 
 /** @typedef {{ id: string, status?: string|null, status_detail?: string|null, amount?: number|null, description?: string|null, external_reference?: string|null, checkout_id?: string|null, subscription_id?: string|null, payment_id?: string|null, preference_id?: string|null, preapproval_id?: string|null, created_at?: string|null }} PagamentoHistoricoRow */
@@ -191,7 +191,7 @@ export function buildOrientacaoUsuario(p) {
     return {
       variant: 'warning',
       title: 'Assinatura não ativa',
-      body: 'Conclua o checkout seguro (cartão ou Pix) para liberar o acesso.',
+      body: 'Escolha o plano na página e conclua o checkout seguro no Asaas para liberar o acesso.',
     }
   }
 

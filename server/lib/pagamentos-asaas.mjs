@@ -7,6 +7,7 @@ import {
   isAsaasForbiddenError,
   parseUsuarioIdFromExternalReference,
 } from './asaas.mjs'
+import { usuarioStripeSubscriptionLiberaAcesso } from './pagamentos-stripe.mjs'
 
 const asaas403DebugLast = new Map()
 const ASAAS403_DEBUG_MIN_INTERVAL_MS = 5 * 60 * 1000
@@ -273,9 +274,12 @@ export async function usuarioTemPagamentoAprovado(usuario_id, payerEmail = null)
 
     if (error) {
       log.warn('[usuarioTemPagamentoAprovado] por usuario_id:', error.message || error)
-    } else if ((data || []).some(linhaPagamentoAprovada)) {
+    } else     if ((data || []).some(linhaPagamentoAprovada)) {
       return true
     }
+
+    const stripeOk = await usuarioStripeSubscriptionLiberaAcesso(uid)
+    if (stripeOk) return true
 
     const em = String(payerEmail || '').trim().toLowerCase()
     if (!em) return false
