@@ -6,6 +6,7 @@ import RefDashboardScroll from '@components/RefDashboardScroll'
 import PagamentoPainelLateral from '../components/pagamento/PagamentoPainelLateral.jsx'
 import PagamentoDetalhesCard from '../components/pagamento/PagamentoDetalhesCard.jsx'
 import PagamentoHistorico from '../components/pagamento/PagamentoHistorico.jsx'
+import PagamentoPixQrModal from '../components/pagamento/PagamentoPixQrModal.jsx'
 import { apiUrl } from '../lib/apiUrl'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import {
@@ -27,20 +28,34 @@ export default function Pagamento() {
   const [searchParams, setSearchParams] = useSearchParams()
   const historicoRef = useRef(null)
 
-  const [config, setConfig] = useState({ ready: false, publicKey: null, isento_pagamento: false })
+  const [config, setConfig] = useState({
+    ready: false,
+    stripe_checkout_ready: false,
+    stripe_publishable_key: null,
+    publicKey: null,
+    isento_pagamento: false,
+  })
+  const [precosCatalogo, setPrecosCatalogo] = useState({ mensal: 10, anual: 100 })
+  const [planoCheckout, setPlanoCheckout] = useState(() => /** @type {'mensal' | 'anual'} */ ('mensal'))
   const [historico, setHistorico] = useState([])
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
   const [dadosErro, setDadosErro] = useState('')
-  const [valor] = useState('10.00')
   const [titulo] = useState(PLANO_PADRAO_TITULO)
   const [proximaCobranca, setProximaCobranca] = useState(null)
-  const [precoMensal, setPrecoMensal] = useState(10)
   const [painelAssinatura, setPainelAssinatura] = useState(() => painelAssinaturaFromUser(null))
+
+  const [pixModalOpen, setPixModalOpen] = useState(false)
+  const [pixLoading, setPixLoading] = useState(false)
+  const [pixError, setPixError] = useState('')
+  const [pixNeedsCpf, setPixNeedsCpf] = useState(false)
+  const [pixCpfCnpj, setPixCpfCnpj] = useState('')
+  const [pixData, setPixData] = useState(null)
 
   const statusUrl = searchParams.get('status')
   const asaasCb = searchParams.get('asaas')
+  const stripeCb = searchParams.get('stripe')
   const expirado = searchParams.get('expirado') === '1' || asaasCb === 'expirado'
 
   const formatCurrency = formatCurrencyBRL
@@ -62,10 +77,6 @@ export default function Pagamento() {
       if (uid && u) {
         setPainelAssinatura(painelAssinaturaFromUser(u))
         if (u.assinatura_proxima_cobranca) setProximaCobranca(u.assinatura_proxima_cobranca)
-        if (u.plano_preco_mensal != null) {
-          const p = Number(u.plano_preco_mensal)
-          if (Number.isFinite(p) && p > 0) setPrecoMensal(p)
-        }
         try {
           const stRes = await fetch(apiUrl('/api/assinatura/status'), { headers: { 'x-user-id': uid } })
           if (stRes.ok) {
@@ -76,10 +87,6 @@ export default function Pagamento() {
             setPainelAssinatura(painelAssinaturaFromUser(merged))
             if (assinatura.assinatura_proxima_cobranca) {
               setProximaCobranca(assinatura.assinatura_proxima_cobranca)
-            }
-            if (assinatura.plano_preco_mensal != null) {
-              const p = Number(assinatura.plano_preco_mensal)
-              if (Number.isFinite(p) && p > 0) setPrecoMensal(p)
             }
           }
         } catch {
@@ -107,8 +114,16 @@ export default function Pagamento() {
         const c = await cfgRes.json()
         setConfig({
           ready: !!c.ready,
+          stripe_checkout_ready: !!c.stripe_checkout_ready,
+          stripe_publishable_key: c.stripe_publishable_key || null,
           publicKey: c.publicKey,
           isento_pagamento: !!c.isento_pagamento,
+        })
+        const pm = Number(c.preco_mensal)
+        const pa = Number(c.preco_anual)
+        setPrecosCatalogo({
+          mensal: Number.isFinite(pm) && pm > 0 ? pm : 10,
+          anual: Number.isFinite(pa) && pa > 0 ? pa : 100,
         })
       } else {
         setDadosErro((prev) => prev || 'Não foi possível carregar a configuração de pagamentos.')
@@ -132,7 +147,9 @@ export default function Pagamento() {
   }, [fetchDados])
 
   useEffect(() => {
-    if (asaasCb !== 'ok') return
+    const okAsaas = asaasCb === 'ok'
+    const okStripe = stripeCb === 'ok'
+    if (!okAsaas && !okStripe) return
     let cancelled = false
     const sync = async () => {
       try {
@@ -150,10 +167,6 @@ export default function Pagamento() {
             if (assinatura.assinatura_proxima_cobranca) {
               setProximaCobranca(assinatura.assinatura_proxima_cobranca)
             }
-            if (assinatura.plano_preco_mensal != null) {
-              const p = Number(assinatura.plano_preco_mensal)
-              if (Number.isFinite(p) && p > 0) setPrecoMensal(p)
-            }
           }
         }
         const hRes = await fetch(apiUrl('/api/pagamentos/minhas'), { headers: { 'x-user-id': u.id }, cache: 'no-store' })
@@ -168,7 +181,8 @@ export default function Pagamento() {
         setSearchParams(
           (prev) => {
             const next = new URLSearchParams(prev)
-            next.delete('asaas')
+            if (okAsaas) next.delete('asaas')
+            if (okStripe) next.delete('stripe')
             return next
           },
           { replace: true }
@@ -179,9 +193,9 @@ export default function Pagamento() {
     return () => {
       cancelled = true
     }
-  }, [asaasCb, setSearchParams])
+  }, [asaasCb, stripeCb, setSearchParams])
 
-  const handlePagar = async () => {
+  const handlePagarAsaas = async () => {
     setError('')
     setPaying(true)
     try {
@@ -191,12 +205,6 @@ export default function Pagamento() {
         return
       }
       const u = JSON.parse(userSaved)
-      const v = Number(String(valor).replace(',', '.'))
-      if (!Number.isFinite(v) || v <= 0) {
-        setError('Informe um valor válido.')
-        setPaying(false)
-        return
-      }
 
       const res = await fetch(apiUrl('/api/pagamentos/preferencia'), {
         method: 'POST',
@@ -204,7 +212,10 @@ export default function Pagamento() {
           'Content-Type': 'application/json',
           'x-user-id': u.id,
         },
-        body: JSON.stringify({ valor: v, titulo: titulo.trim() || PLANO_PADRAO_TITULO }),
+        body: JSON.stringify({
+          plano: planoCheckout === 'anual' ? 'anual' : 'mensal',
+          titulo: titulo.trim() || PLANO_PADRAO_TITULO,
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Não foi possível iniciar o pagamento.')
@@ -219,6 +230,75 @@ export default function Pagamento() {
     }
   }
 
+  const handlePagarStripe = async () => {
+    setError('')
+    setPaying(true)
+    try {
+      const userSaved = localStorage.getItem('horizonte_user')
+      if (!userSaved) {
+        window.location.href = '/login'
+        return
+      }
+      const u = JSON.parse(userSaved)
+
+      const res = await fetch(apiUrl('/api/pagamentos/stripe/checkout'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': u.id,
+        },
+        body: JSON.stringify({
+          plano: planoCheckout === 'anual' ? 'anual' : 'mensal',
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Não foi possível iniciar o checkout Stripe.')
+
+      const urlCheckout = data.use_sandbox ? data.sandbox_init_point : data.init_point
+      if (!urlCheckout) throw new Error('URL de checkout indisponível.')
+      window.location.href = urlCheckout
+    } catch (e) {
+      setError(e.message || 'Erro ao abrir o checkout Stripe.')
+    } finally {
+      setPaying(false)
+    }
+  }
+
+  const handleGerarPixQrAnual = async () => {
+    setPixError('')
+    setPixLoading(true)
+    try {
+      const userSaved = localStorage.getItem('horizonte_user')
+      if (!userSaved) {
+        window.location.href = '/login'
+        return
+      }
+      const u = JSON.parse(userSaved)
+      const res = await fetch(apiUrl('/api/pagamentos/asaas/pix-anual-qrcode'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': u.id,
+        },
+        body: JSON.stringify({ cpf_cnpj: pixCpfCnpj }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (res.status === 422 && data.needs_cpf) {
+        setPixNeedsCpf(true)
+        setPixError(data.message || 'Informe CPF ou CNPJ.')
+        setPixData(null)
+        return
+      }
+      if (!res.ok) throw new Error(data.message || 'Não foi possível gerar o QR Code Pix.')
+      setPixNeedsCpf(false)
+      setPixData(data)
+    } catch (e) {
+      setPixError(e.message || 'Erro ao gerar QR Code Pix.')
+    } finally {
+      setPixLoading(false)
+    }
+  }
+
   const limparStatusUrl = () => {
     searchParams.delete('status')
     setSearchParams(searchParams, { replace: true })
@@ -230,12 +310,52 @@ export default function Pagamento() {
   }
 
   const ultimo = ultimoPagamentoHistorico(historico)
+  const stripePronto = !!config.stripe_checkout_ready
+  const configAlgumCheckout = config.ready || stripePronto
+
   const orientacao = buildOrientacaoUsuario({
     painel: painelAssinatura,
-    configReady: config.ready,
+    configReady: configAlgumCheckout,
     isento: config.isento_pagamento,
     historicoLen: historico.length,
   })
+
+  const valorCicloSelecionado = planoCheckout === 'anual' ? precosCatalogo.anual : precosCatalogo.mensal
+  const unidadeCiclo = planoCheckout === 'anual' ? 'ano' : 'mês'
+
+  const showAsaasPrimario =
+    (planoCheckout === 'anual' && config.ready) || (planoCheckout === 'mensal' && !stripePronto && config.ready)
+
+  const showStripePrimario =
+    (planoCheckout === 'mensal' && stripePronto) || (planoCheckout === 'anual' && stripePronto && !config.ready)
+
+  const showStripeSecundarioAnual = planoCheckout === 'anual' && stripePronto && config.ready
+
+  const assinarLabelAsaas =
+    planoCheckout === 'anual'
+      ? showStripeSecundarioAnual
+        ? `Pagar ${formatCurrency(precosCatalogo.anual)} / ano com Pix (Asaas)`
+        : `Pagar ${formatCurrency(precosCatalogo.anual)} / ano (Pix ou cartão Asaas)`
+      : `Pagar ${formatCurrency(precosCatalogo.mensal)} / mês com cartão (Asaas)`
+
+  const assinarLabelStripe = `Pagar ${formatCurrency(valorCicloSelecionado)} / ${unidadeCiclo} com cartão (Stripe)`
+
+  const lateralPrimaryOnClick = showStripePrimario && !showAsaasPrimario ? handlePagarStripe : handlePagarAsaas
+  const lateralPrimaryLabel = showStripePrimario && !showAsaasPrimario ? assinarLabelStripe : assinarLabelAsaas
+  const disabledAsaas = !config.ready || paying || loading || config.isento_pagamento
+  const disabledStripe = !stripePronto || paying || loading || config.isento_pagamento
+  const lateralPrimaryDisabled = showStripePrimario && !showAsaasPrimario ? disabledStripe : disabledAsaas
+
+  const meiosDetalhes =
+    planoCheckout === 'anual'
+      ? showStripeSecundarioAnual
+        ? 'Pix no Asaas ou cartão no Stripe (página segura da Stripe)'
+        : stripePronto
+          ? 'Cartão no Stripe (página segura da Stripe)'
+          : 'Pix ou cartão de crédito no Asaas'
+      : stripePronto
+        ? 'Cartão no Stripe (página segura da Stripe)'
+        : 'Cartão de crédito no Asaas'
 
   return (
     <div className="dashboard-container page-pagamento ref-dashboard app-horizon-shell">
@@ -268,7 +388,31 @@ export default function Pagamento() {
                 {expirado ? (
                   <div className="pagamento-banner pagamento-banner--danger" role="alert">
                     <p className="pagamento-banner__title">Teste encerrado ou assinatura inativa.</p>
-                    <p className="pagamento-banner__text">Conclua o pagamento no checkout Asaas e use &quot;Atualizar status&quot;.</p>
+                    <p className="pagamento-banner__text">
+                      Conclua o pagamento no checkout (Asaas ou Stripe) e use &quot;Atualizar status&quot;.
+                    </p>
+                  </div>
+                ) : null}
+
+                {stripeCb === 'cancel' ? (
+                  <div className="pagamento-banner pagamento-banner--warning" role="status">
+                    <p className="pagamento-banner__title">Checkout Stripe cancelado. Você pode tentar de novo quando quiser.</p>
+                    <button
+                      type="button"
+                      className="btn-secondary btn-secondary--compact"
+                      onClick={() => {
+                        setSearchParams(
+                          (prev) => {
+                            const next = new URLSearchParams(prev)
+                            next.delete('stripe')
+                            return next
+                          },
+                          { replace: true },
+                        )
+                      }}
+                    >
+                      Fechar aviso
+                    </button>
                   </div>
                 ) : null}
 
@@ -309,9 +453,9 @@ export default function Pagamento() {
                   </div>
                 ) : null}
 
-                {!config.ready && !loading ? (
+                {!configAlgumCheckout && !loading ? (
                   <p className="pagamento-config-alert">
-                    Checkout indisponível: configure <code>ASAAS_API_KEY</code> no servidor.
+                    Checkout indisponível: configure <code>ASAAS_API_KEY</code> e/ou <code>STRIPE_SECRET_KEY</code> no servidor.
                   </p>
                 ) : null}
 
@@ -321,9 +465,66 @@ export default function Pagamento() {
                   </div>
                 ) : null}
 
+                {!config.isento_pagamento && !loading ? (
+                  <div className="ref-panel page-pagamento-planos" role="radiogroup" aria-label="Plano de assinatura">
+                    <p className="page-pagamento-planos__legend">Escolha o plano</p>
+                    <div className="page-pagamento-planos__grid">
+                      <button
+                        type="button"
+                        className={`page-pagamento-planos__option${planoCheckout === 'mensal' ? ' page-pagamento-planos__option--active' : ''}`}
+                        role="radio"
+                        aria-checked={planoCheckout === 'mensal'}
+                        onClick={() => setPlanoCheckout('mensal')}
+                      >
+                        <span className="page-pagamento-planos__option-title">Mensal</span>
+                        <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.mensal)} / mês</span>
+                        <span className="page-pagamento-planos__option-hint">
+                          {stripePronto
+                            ? `Cartão no Stripe; cobrança mensal (${formatCurrency(precosCatalogo.mensal)}/mês)`
+                            : `Cartão no Asaas; cobrança automática (${formatCurrency(precosCatalogo.mensal)}/mês)`}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        className={`page-pagamento-planos__option${planoCheckout === 'anual' ? ' page-pagamento-planos__option--active' : ''}`}
+                        role="radio"
+                        aria-checked={planoCheckout === 'anual'}
+                        onClick={() => setPlanoCheckout('anual')}
+                      >
+                        <span className="page-pagamento-planos__option-title">Anual</span>
+                        <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.anual)} / ano</span>
+                        <span className="page-pagamento-planos__option-hint">
+                          {stripePronto && config.ready
+                            ? `Pix no Asaas ou cartão no Stripe (${formatCurrency(precosCatalogo.anual)}/ano)`
+                            : stripePronto
+                              ? `Cartão no Stripe (${formatCurrency(precosCatalogo.anual)}/ano)`
+                              : `Pix ou cartão no Asaas (${formatCurrency(precosCatalogo.anual)}/ano)`}
+                        </span>
+                      </button>
+                    </div>
+                    {!config.isento_pagamento && config.ready && planoCheckout === 'anual' ? (
+                      <div className="page-pagamento-planos__pix-inline">
+                        <button
+                          type="button"
+                          className="btn-secondary btn-secondary--compact"
+                          disabled={loading || paying}
+                          onClick={() => {
+                            setPixModalOpen(true)
+                            setPixError('')
+                          }}
+                        >
+                          Ver QR Code Pix no app (sem abrir checkout)
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+
                 <PagamentoDetalhesCard
                   tituloPlano={titulo}
-                  precoMensal={precoMensal}
+                  valorCicloSelecionado={valorCicloSelecionado}
+                  unidadeCiclo={unidadeCiclo}
+                  meiosPagamentoResumo={meiosDetalhes}
                   painel={painelAssinatura}
                   proximaCobranca={proximaCobranca}
                   formatCurrency={formatCurrency}
@@ -346,17 +547,34 @@ export default function Pagamento() {
 
               <PagamentoPainelLateral
                 orientacao={orientacao}
-                onAssinar={handlePagar}
+                onAssinar={lateralPrimaryOnClick}
                 onAtualizar={onAtualizar}
                 paying={paying}
                 loading={loading}
                 configReady={config.ready}
+                stripeCheckoutReady={stripePronto}
                 isento={config.isento_pagamento}
                 portalUrl={painelAssinatura.portalUrl}
-                disabledAssinar={!config.ready || paying || loading || config.isento_pagamento}
+                disabledAssinar={lateralPrimaryDisabled}
                 checkoutError={error}
+                assinarLabel={lateralPrimaryLabel}
+                onSegundoCheckout={showStripeSecundarioAnual ? handlePagarStripe : undefined}
+                segundoCheckoutLabel={showStripeSecundarioAnual ? assinarLabelStripe : undefined}
+                disabledSegundoCheckout={disabledStripe}
               />
             </div>
+
+            <PagamentoPixQrModal
+              open={pixModalOpen}
+              onClose={() => setPixModalOpen(false)}
+              loading={pixLoading}
+              error={pixError}
+              needsCpf={pixNeedsCpf}
+              cpfCnpj={pixCpfCnpj}
+              onCpfCnpjChange={setPixCpfCnpj}
+              pixData={pixData}
+              onGerar={handleGerarPixQrAnual}
+            />
             </RefDashboardScroll>
           </div>
         </main>

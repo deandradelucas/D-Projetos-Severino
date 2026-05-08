@@ -41,8 +41,24 @@ export function registerAdminRoutes(app) {
       return c.json({
         asaas_api_configured: isAsaasConfigured(),
         webhook_get_post: '/api/pagamentos/webhook',
+        eventos_recomendados_asaas: {
+          cobranca: [
+            'PAYMENT_CREATED',
+            'PAYMENT_CONFIRMED',
+            'PAYMENT_RECEIVED',
+            'PAYMENT_OVERDUE',
+            'PAYMENT_REFUNDED',
+            'PAYMENT_UPDATED',
+          ],
+          assinatura: [
+            'SUBSCRIPTION_CREATED',
+            'SUBSCRIPTION_UPDATED',
+            'SUBSCRIPTION_INACTIVATED',
+            'SUBSCRIPTION_DELETED',
+          ],
+        },
         nota:
-          'No painel Asaas, configure webhooks de cobrança e assinatura para esta URL (POST). Opcional: ?token=ASAAS_WEBHOOK_TOKEN. Logs: svc=asaas-webhook.',
+          'No painel Asaas, aponte POST para webhook_get_post (mesma base do app). Marque os eventos em eventos_recomendados_asaas (cobrança + assinatura). Opcional na URL: ?token= alinhado a ASAAS_WEBHOOK_TOKEN. Logs: svc=asaas-webhook.',
       })
     } catch (error) {
       log.error('pagamentos-saude failed', error)
