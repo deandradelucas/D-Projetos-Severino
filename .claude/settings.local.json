@@ -31,7 +31,18 @@
       "Bash(grep -E \"\\\\.jsx$\")",
       "Bash(node --input-type=module --eval \"import './marketing-stats.mjs'\")",
       "Bash(node --check server/lib/marketing-stats.mjs)",
-      "Bash(node --check server/routes/register-admin.mjs)"
+      "Bash(node --check server/routes/register-admin.mjs)",
+      "WebSearch",
+      "WebFetch(domain:docs.asaas.com)",
+      "WebFetch(domain:hyperproof.io)",
+      "Bash(xargs grep *)",
+      "WebFetch(domain:www.mercadopago.com.br)",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); deps={**p.get\\('dependencies',{}\\),**p.get\\('devDependencies',{}\\)}; [print\\(k,v\\) for k,v in sorted\\(deps.items\\(\\)\\) if any\\(x in k.lower\\(\\) for x in ['stripe','mercado','asaas','payment','react-query','axios','fetch']\\)]\")",
+      "WebFetch(domain:www.mercadopago.com.ar)",
+      "WebFetch(domain:www.mercadopago.cl)",
+      "WebFetch(domain:omega.mercadopago.com.mx)",
+      "WebFetch(domain:www.ombulabs.ai)",
+      "WebFetch(domain:docs.stripe.com)"
     ]
   }
 }
