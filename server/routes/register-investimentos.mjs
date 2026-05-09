@@ -46,7 +46,13 @@ export function registerInvestimentosRoutes(app) {
       log.error('criar investimento', error)
       const msg = error.message || 'Erro ao criar investimento.'
       const status =
-        msg.includes('mínimo') || msg.includes('lista') || msg.includes('banco') || msg.includes('corretora')
+        msg.includes('mínimo') ||
+        msg.includes('lista') ||
+        msg.includes('banco') ||
+        msg.includes('corretora') ||
+        msg.includes('valor') ||
+        msg.includes('Percentual') ||
+        msg.includes('CDI')
           ? 400
           : 500
       return c.json({ message: msg }, status)

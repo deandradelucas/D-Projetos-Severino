@@ -5,6 +5,7 @@ import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
 import { BRAND_ASSETS, BRAND_LOGO_PIXEL_SIZE } from '../lib/brandAssets'
 import { useTheme } from '../context/ThemeContext'
 import TaxaSelicBadge from './TaxaSelicBadge.jsx'
+import TaxaCdiBadge from './TaxaCdiBadge.jsx'
 
 function mergeNavItemClass(isActive, href, pathname, extraClass = '') {
   const on = Boolean(isActive) || pathname === href
@@ -231,7 +232,10 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               </span>
               <span className="nav-item__label-col nav-item__label-col--investimentos">
                 <span className="nav-item__label">Investimentos</span>
-                <TaxaSelicBadge variant="sidebar" />
+                <span className="nav-item__investimentos-rates">
+                  <TaxaSelicBadge variant="sidebar" />
+                  <TaxaCdiBadge variant="sidebar" />
+                </span>
               </span>
             </NavLink>
           </li>

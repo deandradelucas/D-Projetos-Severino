@@ -1,4 +1,6 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { maskCurrencyBRLInput, parseCurrencyBRLMasked } from '../../lib/currencyMaskBr'
+import { parsePercentualCdiInput } from '../../lib/percentualCdiInput'
 import { INVESTIMENTOS_PRESETS_LIST } from '../../lib/investimentosPresets'
 import { filtrarInstituicoesFinanceiras, labelTipoInstituicao } from '../../lib/instituicoesFinanceiras'
 
@@ -6,7 +8,7 @@ import { filtrarInstituicoesFinanceiras, labelTipoInstituicao } from '../../lib/
  * @param {{
  *   open: boolean
  *   onClose: () => void
- *   onSubmit: (payload: { instituicao_nome: string, preset?: string, nome_custom?: string }) => Promise<void>
+ *   onSubmit: (payload: { instituicao_nome: string, preset?: string, nome_custom?: string, valor_investido: number, percentual_cdi: number }) => Promise<void>
  *   submitting?: boolean
  * }} props
  */
@@ -15,8 +17,12 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
   const stepInstTitleId = useId()
   const stepTipoTitleId = useId()
   const stepOutroTitleId = useId()
+  const stepValorTitleId = useId()
+  const stepPercTitleId = useId()
   const instListId = useId()
   const instInputId = useId()
+  const valorInputId = useId()
+  const percInputId = useId()
   const blurTimerRef = useRef(null)
   const comboboxWrapRef = useRef(null)
 
@@ -26,6 +32,8 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
 
   const [preset, setPreset] = useState(/** @type {string | null} */ ('LCA'))
   const [customNome, setCustomNome] = useState('')
+  const [valorInput, setValorInput] = useState('')
+  const [percInput, setPercInput] = useState('')
   const [formError, setFormError] = useState('')
 
   const instituicoesFiltradas = useMemo(() => filtrarInstituicoesFinanceiras(instQuery), [instQuery])
@@ -82,13 +90,41 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
       return
     }
 
+    const valorRounded = parseCurrencyBRLMasked(valorInput)
+    if (!Number.isFinite(valorRounded) || valorRounded < 0.01) {
+      setFormError('Informe o valor investido (mínimo R$ 0,01). Digite só números — os dois últimos são centavos.')
+      return
+    }
+    if (valorRounded > 999_999_999_999.99) {
+      setFormError('Valor acima do limite permitido.')
+      return
+    }
+
+    let percRounded
+    try {
+      percRounded = parsePercentualCdiInput(percInput)
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : 'Percentual do CDI inválido.')
+      return
+    }
+
     const trimmed = customNome.trim()
     if (trimmed.length >= 2) {
-      await onSubmit({ instituicao_nome: instFinal, nome_custom: trimmed })
+      await onSubmit({
+        instituicao_nome: instFinal,
+        nome_custom: trimmed,
+        valor_investido: valorRounded,
+        percentual_cdi: percRounded,
+      })
       return
     }
     if (preset) {
-      await onSubmit({ instituicao_nome: instFinal, preset })
+      await onSubmit({
+        instituicao_nome: instFinal,
+        preset,
+        valor_investido: valorRounded,
+        percentual_cdi: percRounded,
+      })
       return
     }
     if (trimmed.length === 1) {
@@ -122,114 +158,237 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="modal-body page-investimentos-modal__body">
             <p className="page-investimentos-modal__lead">
-              Indique onde o investimento está custodiado; depois escolha o tipo ou informe outro nome.
+              Cinco passos: instituição, tipo ou nome livre, valor aplicado e % do CDI contratada.
             </p>
 
-            <fieldset className="page-investimentos-modal__fieldset">
-              <legend className="page-investimentos-modal__legend">Banco ou corretora</legend>
-              <div ref={comboboxWrapRef} className="page-investimentos-inst-combobox">
-                <label htmlFor={instInputId} className="page-investimentos-modal__label page-investimentos-modal__label--inline">
-                  Pesquisar instituição
+            <section className="page-investimentos-modal__card" aria-labelledby={stepInstTitleId}>
+              <div className="page-investimentos-modal__card-head">
+                <span className="page-investimentos-modal__step-num" aria-hidden>
+                  1
+                </span>
+                <div className="page-investimentos-modal__card-head-text">
+                  <h4 id={stepInstTitleId} className="page-investimentos-modal__card-title">
+                    Banco ou corretora
+                  </h4>
+                  <p className="page-investimentos-modal__card-desc">Custódia do investimento</p>
+                </div>
+              </div>
+              <fieldset className="page-investimentos-modal__fieldset" aria-labelledby={stepInstTitleId}>
+                <legend className="sr-only">Banco ou corretora</legend>
+                <div ref={comboboxWrapRef} className="page-investimentos-inst-combobox">
+                  <label htmlFor={instInputId} className="page-investimentos-modal__label page-investimentos-modal__label--inline">
+                    Pesquisar instituição
+                  </label>
+                  <input
+                    id={instInputId}
+                    type="text"
+                    className="page-investimentos-modal__input"
+                    placeholder="Ex.: Sicredi, Nubank, XP, Banco do Brasil…"
+                    maxLength={120}
+                    autoComplete="off"
+                    aria-autocomplete="list"
+                    aria-expanded={instListOpen}
+                    aria-controls={instListId}
+                    disabled={submitting}
+                    value={instQuery}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      setInstQuery(v)
+                      if (instChosen != null && v !== instChosen) setInstChosen(null)
+                    }}
+                    onFocus={() => {
+                      cancelCloseList()
+                      setInstListOpen(true)
+                    }}
+                    onBlur={(e) => {
+                      const next = e.relatedTarget
+                      if (next instanceof Node && comboboxWrapRef.current?.contains(next)) return
+                      scheduleCloseList()
+                    }}
+                  />
+                  {instListOpen ? (
+                    <ul id={instListId} className="page-investimentos-inst-dropdown" role="listbox">
+                      {instituicoesFiltradas.length === 0 ? (
+                        <li className="page-investimentos-inst-dropdown__empty" role="presentation">
+                          Nenhum resultado na lista. Você pode usar o texto digitado acima como instituição ao adicionar.
+                        </li>
+                      ) : (
+                        instituicoesFiltradas.map((row) => (
+                          <li key={row.nome} role="option" className="page-investimentos-inst-dropdown__item-wrap">
+                            <button
+                              type="button"
+                              className="page-investimentos-inst-option"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => selecionarInstituicao(row.nome)}
+                            >
+                              <span className="page-investimentos-inst-option__nome">{row.nome}</span>
+                              <span className="page-investimentos-inst-option__tipo">{labelTipoInstituicao(row.tipo)}</span>
+                            </button>
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  ) : null}
+                </div>
+                <p className="page-investimentos-modal__hint">
+                  Toque num resultado para preencher ou digite o nome completo se não aparecer na lista.
+                </p>
+              </fieldset>
+            </section>
+
+            <section className="page-investimentos-modal__card" aria-labelledby={stepTipoTitleId}>
+              <div className="page-investimentos-modal__card-head">
+                <span className="page-investimentos-modal__step-num" aria-hidden>
+                  2
+                </span>
+                <div className="page-investimentos-modal__card-head-text">
+                  <h4 id={stepTipoTitleId} className="page-investimentos-modal__card-title">
+                    Tipo de aplicação
+                  </h4>
+                  <p className="page-investimentos-modal__card-desc">Atalhos para os produtos mais comuns</p>
+                </div>
+              </div>
+              <fieldset className="page-investimentos-modal__fieldset" aria-labelledby={stepTipoTitleId}>
+                <legend className="sr-only">Tipo de investimento</legend>
+                <div className="page-investimentos-preset-grid" role="group" aria-label="Tipo de investimento">
+                  {INVESTIMENTOS_PRESETS_LIST.map((p) => {
+                    const active = preset === p.key
+                    return (
+                      <button
+                        key={p.key}
+                        type="button"
+                        className={`page-investimentos-preset-chip${active ? ' page-investimentos-preset-chip--active' : ''}`}
+                        aria-pressed={active}
+                        disabled={submitting}
+                        onClick={() => {
+                          setPreset(p.key)
+                          setCustomNome('')
+                        }}
+                      >
+                        <span className="page-investimentos-preset-chip__label">{p.label}</span>
+                        {p.hint ? <span className="page-investimentos-preset-chip__hint">{p.hint}</span> : null}
+                      </button>
+                    )
+                  })}
+                </div>
+              </fieldset>
+            </section>
+
+            <section
+              className="page-investimentos-modal__card page-investimentos-modal__card--soft"
+              aria-labelledby={stepOutroTitleId}
+            >
+              <div className="page-investimentos-modal__card-head">
+                <span className="page-investimentos-modal__step-num page-investimentos-modal__step-num--optional" aria-hidden>
+                  3
+                </span>
+                <div className="page-investimentos-modal__card-head-text">
+                  <h4 id={stepOutroTitleId} className="page-investimentos-modal__card-title">
+                    Outro nome <span className="page-investimentos-modal__optional-tag">opcional</span>
+                  </h4>
+                  <p className="page-investimentos-modal__card-desc">Substitui o tipo escolhido em cima quando preenchido</p>
+                </div>
+              </div>
+              <div className="page-investimentos-modal__custom">
+                <label htmlFor="investimento-outro-nome" className="page-investimentos-modal__label">
+                  Nome livre
                 </label>
                 <input
-                  id={instInputId}
+                  id="investimento-outro-nome"
                   type="text"
                   className="page-investimentos-modal__input"
-                  placeholder="Ex.: Sicredi, Nubank, XP, Banco do Brasil…"
+                  placeholder="Ex.: Tesouro Selic, debêntures, fundo multimercado…"
                   maxLength={120}
-                  autoComplete="off"
-                  aria-autocomplete="list"
-                  aria-expanded={instListOpen}
-                  aria-controls={instListId}
+                  value={customNome}
                   disabled={submitting}
-                  value={instQuery}
                   onChange={(e) => {
-                    const v = e.target.value
-                    setInstQuery(v)
-                    if (instChosen != null && v !== instChosen) setInstChosen(null)
-                  }}
-                  onFocus={() => {
-                    cancelCloseList()
-                    setInstListOpen(true)
-                  }}
-                  onBlur={(e) => {
-                    const next = e.relatedTarget
-                    if (next instanceof Node && comboboxWrapRef.current?.contains(next)) return
-                    scheduleCloseList()
+                    setCustomNome(e.target.value)
+                    setPreset(null)
                   }}
                 />
-                {instListOpen ? (
-                  <ul id={instListId} className="page-investimentos-inst-dropdown" role="listbox">
-                    {instituicoesFiltradas.length === 0 ? (
-                      <li className="page-investimentos-inst-dropdown__empty" role="presentation">
-                        Nenhum resultado na lista. Você pode usar o texto digitado acima como instituição ao adicionar.
-                      </li>
-                    ) : (
-                      instituicoesFiltradas.map((row) => (
-                        <li key={row.nome} role="option" className="page-investimentos-inst-dropdown__item-wrap">
-                          <button
-                            type="button"
-                            className="page-investimentos-inst-option"
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => selecionarInstituicao(row.nome)}
-                          >
-                            <span className="page-investimentos-inst-option__nome">{row.nome}</span>
-                            <span className="page-investimentos-inst-option__tipo">{labelTipoInstituicao(row.tipo)}</span>
-                          </button>
-                        </li>
-                      ))
-                    )}
-                  </ul>
-                ) : null}
+                <p className="page-investimentos-modal__hint">
+                  Útil quando o produto não está na grelha ou quer um rótulo próprio na carteira.
+                </p>
               </div>
-              <p className="page-investimentos-modal__hint">
-                Toque num resultado para preencher ou digite o nome completo se não aparecer na lista.
-              </p>
-            </fieldset>
+            </section>
 
-            <fieldset className="page-investimentos-modal__fieldset">
-              <legend className="page-investimentos-modal__legend">Tipos principais</legend>
-              <div className="page-investimentos-preset-grid" role="group" aria-label="Tipo de investimento">
-                {INVESTIMENTOS_PRESETS_LIST.map((p) => {
-                  const active = preset === p.key
-                  return (
-                    <button
-                      key={p.key}
-                      type="button"
-                      className={`page-investimentos-preset-chip${active ? ' page-investimentos-preset-chip--active' : ''}`}
-                      aria-pressed={active}
-                      onClick={() => {
-                        setPreset(p.key)
-                        setCustomNome('')
-                      }}
-                    >
-                      <span className="page-investimentos-preset-chip__label">{p.label}</span>
-                      {p.hint ? <span className="page-investimentos-preset-chip__hint">{p.hint}</span> : null}
-                    </button>
-                  )
-                })}
+            <section className="page-investimentos-modal__card" aria-labelledby={stepValorTitleId}>
+              <div className="page-investimentos-modal__card-head">
+                <span className="page-investimentos-modal__step-num" aria-hidden>
+                  4
+                </span>
+                <div className="page-investimentos-modal__card-head-text">
+                  <h4 id={stepValorTitleId} className="page-investimentos-modal__card-title">
+                    Valor investido
+                  </h4>
+                  <p className="page-investimentos-modal__card-desc">Quanto você aplicou nesta posição (referência em reais)</p>
+                </div>
               </div>
-            </fieldset>
+              <div className="page-investimentos-modal__valor-field">
+                <label htmlFor={valorInputId} className="page-investimentos-modal__label">
+                  Valor (R$)
+                </label>
+                <div className="page-investimentos-modal__valor-input-wrap">
+                  <span className="page-investimentos-modal__valor-prefix" aria-hidden>
+                    R$
+                  </span>
+                  <input
+                    id={valorInputId}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    className="page-investimentos-modal__input page-investimentos-modal__input--valor"
+                    placeholder="0,00"
+                    disabled={submitting}
+                    value={valorInput}
+                    onChange={(e) => setValorInput(maskCurrencyBRLInput(e.target.value))}
+                  />
+                </div>
+                <p className="page-investimentos-modal__hint">
+                  Igual à transação: só números — formata em real (ex.: digitar 150050 vira 1.500,50). Referência só para o seu acompanhamento.
+                </p>
+              </div>
+            </section>
 
-            <div className="page-investimentos-modal__custom">
-              <label htmlFor="investimento-outro-nome" className="page-investimentos-modal__label">
-                Outro investimento
-              </label>
-              <input
-                id="investimento-outro-nome"
-                type="text"
-                className="page-investimentos-modal__input"
-                placeholder="Ex.: Tesouro Selic, debêntures, fundo multimercado…"
-                maxLength={120}
-                value={customNome}
-                disabled={submitting}
-                onChange={(e) => {
-                  setCustomNome(e.target.value)
-                  setPreset(null)
-                }}
-              />
-              <p className="page-investimentos-modal__hint">Ao digitar aqui, usa-se este nome em vez do tipo selecionado acima.</p>
-            </div>
+            <section className="page-investimentos-modal__card" aria-labelledby={stepPercTitleId}>
+              <div className="page-investimentos-modal__card-head">
+                <span className="page-investimentos-modal__step-num" aria-hidden>
+                  5
+                </span>
+                <div className="page-investimentos-modal__card-head-text">
+                  <h4 id={stepPercTitleId} className="page-investimentos-modal__card-title">
+                    % do CDI contratada
+                  </h4>
+                  <p className="page-investimentos-modal__card-desc">
+                    Taxa pactuada em relação ao CDI (ex.: 100% do CDI ou 110%)
+                  </p>
+                </div>
+              </div>
+              <div className="page-investimentos-modal__perc-field">
+                <label htmlFor={percInputId} className="page-investimentos-modal__label">
+                  Percentual
+                </label>
+                <div className="page-investimentos-modal__perc-input-wrap">
+                  <input
+                    id={percInputId}
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
+                    className="page-investimentos-modal__input page-investimentos-modal__input--perc"
+                    placeholder="100"
+                    disabled={submitting}
+                    value={percInput}
+                    onChange={(e) => setPercInput(e.target.value)}
+                  />
+                  <span className="page-investimentos-modal__perc-suffix" aria-hidden>
+                    % do CDI
+                  </span>
+                </div>
+                <p className="page-investimentos-modal__hint">
+                  Use vírgula para decimais (ex.: 105,5). Pode incluir ou não o símbolo %.
+                </p>
+              </div>
+            </section>
 
             {formError ? (
               <p className="page-investimentos-modal__error" role="alert">
@@ -238,12 +397,15 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
             ) : null}
           </div>
           <div className="page-investimentos-modal__footer">
-            <button type="button" className="btn-secondary" onClick={onClose} disabled={submitting}>
-              Cancelar
-            </button>
-            <button type="submit" className="btn-primary" disabled={submitting}>
-              {submitting ? 'A guardar…' : 'Adicionar'}
-            </button>
+            <p className="page-investimentos-modal__footer-hint">Os dados ficam só na sua conta.</p>
+            <div className="page-investimentos-modal__footer-actions">
+              <button type="button" className="btn-secondary" onClick={onClose} disabled={submitting}>
+                Cancelar
+              </button>
+              <button type="submit" className="btn-primary" disabled={submitting}>
+                {submitting ? 'A guardar…' : 'Adicionar'}
+              </button>
+            </div>
           </div>
         </form>
       </div>
