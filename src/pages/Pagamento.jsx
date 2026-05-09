@@ -489,6 +489,16 @@ export default function Pagamento() {
                     >
                       {paying ? 'Redirecionando para Asaas…' : assinarLabelCheckout}
                     </button>
+
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      style={{ width: '100%' }}
+                      disabled={loading || paying}
+                      onClick={onAtualizar}
+                    >
+                      Atualizar status
+                    </button>
                   </div>
                 ) : null}
 
@@ -517,15 +527,7 @@ export default function Pagamento() {
                 <PagamentoHistorico historicoRef={historicoRef} historico={historico} loading={loading} formatCurrency={formatCurrency} />
               </div>
 
-              <PagamentoPainelLateral
-                orientacao={orientacao}
-                onAtualizar={onAtualizar}
-                paying={paying}
-                loading={loading}
-                configReady={config.ready}
-                isento={config.isento_pagamento}
-                portalUrl={painelAssinatura.portalUrl}
-              />
+              <PagamentoPainelLateral orientacao={orientacao} />
             </div>
 
             <PagamentoPixQrModal
