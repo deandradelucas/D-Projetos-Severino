@@ -1,0 +1,31 @@
+{
+  "http": {
+    "routers": {
+      "severino-http": {
+        "rule": "Host(`severino.mestredamente.com`)",
+        "entryPoints": ["web"],
+        "middlewares": ["redirect-to-https"],
+        "service": "severino"
+      },
+      "severino-https": {
+        "rule": "Host(`severino.mestredamente.com`)",
+        "entryPoints": ["websecure"],
+        "tls": {
+          "certResolver": "letsencrypt"
+        },
+        "service": "severino"
+      }
+    },
+    "services": {
+      "severino": {
+        "loadBalancer": {
+          "servers": [
+            {
+              "url": "http://172.17.0.1:3001"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
