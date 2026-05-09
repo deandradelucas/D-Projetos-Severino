@@ -111,6 +111,21 @@ export function contarDiasUteisComJurosDesdeIso(iso, dataReferencia = new Date()
   return n
 }
 
+/**
+ * Indica se a data (por defeito “hoje”, fuso local do dispositivo) é dia com pregão CDI:
+ * segunda a sexta e fora dos feriados nacionais considerados em {@link contarDiasUteisComJurosDesdeIso}.
+ *
+ * @param {Date} [dataReferencia=new Date()]
+ * @returns {boolean}
+ */
+export function ehDiaUtilComPregaoCdi(dataReferencia = new Date()) {
+  const d = new Date(dataReferencia.getFullYear(), dataReferencia.getMonth(), dataReferencia.getDate())
+  const dow = d.getDay()
+  if (dow === 0 || dow === 6) return false
+  const k = chaveDataLocal(d)
+  return !feriadosNacionaisBrKeysParaAno(d.getFullYear()).has(k)
+}
+
 /** Linhas da tabela regressiva (UI + mesmas faixas de {@link aliquotaIrRendaFixaPfPorPrazoDias}). */
 export const IR_RENDA_FIXA_REGRESSIVO_UI = [
   { prazo: 'Até 180 dias', aliquota: '22,5%' },
