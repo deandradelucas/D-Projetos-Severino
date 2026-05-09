@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { log } from '../lib/logger.mjs'
 import { getRequestOrigin } from '../lib/password-reset.mjs'
 import { getPerfilUsuario } from '../lib/usuarios.mjs'
-import { criarCheckoutAssinatura, isAsaasConfigured, montarUrlCheckoutAsaas } from '../lib/asaas.mjs'
+import { criarAssinaturaComLink, isAsaasConfigured } from '../lib/asaas.mjs'
 import {
   insertCheckoutRecord,
   listPagamentosUsuario,
@@ -133,7 +133,7 @@ export function registerPagamentosRoutes(app) {
       const labelCiclo = plano === 'anual' ? 'anual' : 'mensal'
       const billingTypes = ['CREDIT_CARD']
 
-      const checkout = await criarCheckoutAssinatura({
+      const resultado = await criarAssinaturaComLink({
         baseUrlApp: baseUrl,
         usuarioId,
         email: perfil.email,
@@ -144,27 +144,10 @@ export function registerPagamentosRoutes(app) {
         valor,
         cycle,
         externalReference: externalRef,
-        billingTypes,
       })
 
-      const checkoutId =
-        checkout?.id != null
-          ? String(checkout.id)
-          : checkout?.checkoutSessionId != null
-            ? String(checkout.checkoutSessionId)
-            : checkout?.checkoutId != null
-              ? String(checkout.checkoutId)
-              : ''
-
-      if (!checkoutId) {
-        log.error('asaas checkout sem id', checkout)
-        return c.json({ message: 'Resposta inválida do Asaas ao criar checkout.' }, 502)
-      }
-
-      const checkoutUrl = montarUrlCheckoutAsaas(checkoutId)
-      if (!checkoutUrl) {
-        return c.json({ message: 'Não foi possível montar o link do checkout.' }, 502)
-      }
+      const checkoutUrl = resultado.checkoutUrl
+      const checkoutId = String(resultado.id || '')
 
       await insertCheckoutRecord({
         usuario_id: usuarioId,
