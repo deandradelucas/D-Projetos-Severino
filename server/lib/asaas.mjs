@@ -131,72 +131,83 @@ function normalizeBillingTypes(v) {
 }
 
 /**
- * Checkout de assinatura recorrente no Asaas.
- * Defina `billingTypes`: mensal costuma ser só cartão; anual pode incluir Pix.
- * @param {{
- *   baseUrlApp: string
- *   usuarioId: string
- *   email: string
- *   nome?: string|null
- *   telefone?: string|null
- *   tituloItem: string
- *   valor: number
- *   cycle?: 'MONTHLY' | 'YEARLY'
- *   externalReference: string
- *   billingTypes?: ('CREDIT_CARD' | 'PIX')[]
- * }} opts
+ * Localiza cliente Asaas pelo CPF/CNPJ ou e-mail. Cria se não encontrar.
+ * Retorna o customerId.
  */
-export async function criarCheckoutAssinatura(opts) {
+export async function findOrCreateAsaasCustomer({ name, email, cpfCnpj, phone }) {
+  const cpf = String(cpfCnpj || '').replace(/\D/g, '')
+  const emailClean = String(email || '').trim().toLowerCase()
+
+  if (cpf) {
+    const res = await asaasFetch(`/customers?cpfCnpj=${encodeURIComponent(cpf)}&limit=1`)
+    const existing = res?.data?.[0]
+    if (existing?.id) return existing.id
+  }
+
+  const customer = await asaasFetch('/customers', {
+    method: 'POST',
+    body: JSON.stringify({
+      name: String(name || 'Cliente').trim().slice(0, 80) || 'Cliente',
+      email: emailClean,
+      ...(cpf ? { cpfCnpj: cpf } : {}),
+      ...(phone ? { mobilePhone: String(phone).replace(/\D/g, '').slice(0, 11) } : {}),
+    }),
+  })
+  return customer.id
+}
+
+/**
+ * Cria assinatura recorrente no Asaas via API (não checkout session).
+ * Retorna { id, checkoutUrl } onde checkoutUrl é o invoiceUrl do 1º pagamento.
+ */
+export async function criarAssinaturaComLink(opts) {
   const token = getAsaasAccessToken()
   if (!token) throw new Error('ASAAS_API_KEY não configurada no servidor.')
 
-  const billingTypes = normalizeBillingTypes(opts.billingTypes)
   const cycle = opts.cycle === 'YEARLY' ? 'YEARLY' : 'MONTHLY'
-  const baseUrlApp = String(opts.baseUrlApp || '').replace(/\/+$/, '')
-  const titulo = String(opts.tituloItem || 'Assinatura').trim()
-  const itemName = titulo.slice(0, 30)
-  const phoneDigits = String(opts.telefone || '').replace(/\D/g, '').slice(0, 16)
-  const cpfCnpjDigits = String(opts.cpfCnpj || '').replace(/\D/g, '').slice(0, 14)
   const valor = Number(opts.valor ?? opts.valorMensal)
   if (!Number.isFinite(valor) || valor <= 0) throw new Error('Valor do plano inválido.')
 
+  const cpfCnpjDigits = String(opts.cpfCnpj || '').replace(/\D/g, '').slice(0, 14)
+  const phoneDigits = String(opts.telefone || '').replace(/\D/g, '').slice(0, 11)
+
+  const customerId = await findOrCreateAsaasCustomer({
+    name: opts.nome,
+    email: opts.email,
+    cpfCnpj: cpfCnpjDigits,
+    phone: phoneDigits,
+  })
+
   const now = new Date()
-  const nextDue = formatYmd(now)
-  const endDate = formatYmd(addYears(now, 10))
-
-  const body = {
-    billingTypes,
-    chargeTypes: ['RECURRENT'],
-    minutesToExpire: 1440,
-    externalReference: String(opts.externalReference || '').trim(),
-    callback: {
-      successUrl: `${baseUrlApp}/pagamento?asaas=ok`,
-      cancelUrl: `${baseUrlApp}/pagamento?asaas=cancel`,
-      expiredUrl: `${baseUrlApp}/pagamento?asaas=expirado`,
-    },
-    items: [
-      {
-        name: itemName || 'Assinatura',
-        description: titulo.slice(0, 150),
-        quantity: 1,
-        value: valor,
-        imageBase64: ASAAS_CHECKOUT_ITEM_IMAGE_B64,
-      },
-    ],
-    customerData: {
-      name: String(opts.nome || 'Cliente').trim().slice(0, 80) || 'Cliente',
-      email: String(opts.email || '').trim().toLowerCase(),
-      ...(phoneDigits ? { phone: phoneDigits } : {}),
-      ...(cpfCnpjDigits ? { cpfCnpj: cpfCnpjDigits } : {}),
-    },
-    subscription: {
+  const subscription = await asaasFetch('/subscriptions', {
+    method: 'POST',
+    body: JSON.stringify({
+      customer: customerId,
+      billingType: 'CREDIT_CARD',
+      nextDueDate: formatYmd(now),
+      value: valor,
       cycle,
-      nextDueDate: nextDue,
-      endDate,
-    },
-  }
+      description: String(opts.tituloItem || 'Assinatura').trim().slice(0, 100),
+      externalReference: String(opts.externalReference || '').trim(),
+    }),
+  })
 
-  return asaasFetch('/checkouts', { method: 'POST', body: JSON.stringify(body) })
+  if (!subscription?.id) throw new Error('Asaas não retornou ID da assinatura.')
+
+  const paymentsRes = await asaasFetch(
+    `/payments?subscription=${encodeURIComponent(subscription.id)}&limit=1`,
+  )
+  const firstPayment = paymentsRes?.data?.[0]
+  const checkoutUrl = firstPayment?.invoiceUrl || ''
+
+  if (!checkoutUrl) throw new Error('Asaas não retornou link de pagamento para a assinatura.')
+
+  return { id: subscription.id, checkoutUrl, checkoutSessionId: subscription.id }
+}
+
+/** @deprecated — usar criarAssinaturaComLink */
+export async function criarCheckoutAssinatura(opts) {
+  return criarAssinaturaComLink(opts)
 }
 
 /** @deprecated use criarCheckoutAssinatura com cycle MONTHLY */
