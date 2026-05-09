@@ -20,6 +20,7 @@ import {
   contarDiasUteisComJurosDesdeIso,
   diasCorridosDesdeIso,
   ehDiaUtilComPregaoCdi,
+  estimativaRendimentoAcumuladoAteHoje,
   estimativaRendimentoDiarioComIr,
   formatMoedaDiariaEstimativa,
   investimentoIsentoIrPessoaFisica,
@@ -67,12 +68,12 @@ function textoHintRendimentoCartao({
   const prefixSemPregao = semPregaoCdiHoje
     ? 'Hoje não há pregão CDI (fim de semana ou feriado); rendimento do dia exibido como R$ 0,00. '
     : ''
-  let s = `${prefixSemPregao}Estimativa por dia útil (252 dias/ano; fins de semana sem pregão CDI). ~${du} dias úteis com pregão desde ${origem} · ${cdiFmt} · pro rata linear.`
+  let s = `${prefixSemPregao}Acumulado desde ${origem}: ~${du} dias úteis com pregão até hoje (intervalo inclusivo). Rendimento por dia útil × esse total · CDI ${cdiFmt} · pro rata linear (252 dias/ano).`
   if (!isentoIr) {
     const ir = temDataAquisicao
-      ? `IR regressivo conforme ${diasRegisto ?? 0} dias corridos até hoje (faixa do imposto).`
-      : `IR regressivo conforme ${diasRegisto ?? 0} dias corridos desde o registo até hoje (faixa do imposto).`
-    s = `${s} ${ir}`
+      ? ` IR sobre o bruto acumulado na faixa aos ${diasRegisto ?? 0} dias corridos até hoje (aprox.).`
+      : ` IR sobre o bruto acumulado na faixa aos ${diasRegisto ?? 0} dias corridos desde o registo até hoje (aprox.).`
+    s = `${s}${ir}`
   }
   return s
 }
@@ -377,6 +378,16 @@ export default function Investimentos() {
                             estRendimento && !pregaoCdiHoje
                               ? { ...estRendimento, bruto: 0, imposto: 0, liquido: 0 }
                               : estRendimento
+                          const estAcumulado = estRendimento
+                            ? estimativaRendimentoAcumuladoAteHoje(
+                                Number(row.valor_investido),
+                                percNum,
+                                cdiAa,
+                                diasRegisto,
+                                isentoIr,
+                                diasUteisComJuros ?? 0,
+                              )
+                            : null
                           const nomeRow = String(row.nome ?? '').trim()
                           const tituloRedundanteComChipTipo =
                             tipoLb != null &&
@@ -471,13 +482,51 @@ export default function Investimentos() {
                                                 {formatMoedaDiariaEstimativa(estRendimentoExibicao.liquido)}
                                               </dd>
                                             </div>
+                                            {estAcumulado ? (
+                                              <>
+                                                <div className="page-investimentos-card__metric page-investimentos-card__metric--span">
+                                                  <dt className="page-investimentos-card__metric-label">Rendimento bruto acumulado (est.)</dt>
+                                                  <dd
+                                                    className="page-investimentos-card__metric-value"
+                                                    title={`~${estAcumulado.diasUteisAcumulacao} dias úteis com pregão desde a data de referência`}
+                                                  >
+                                                    {formatCurrencyBRL(estAcumulado.brutoAcumulado)}
+                                                  </dd>
+                                                </div>
+                                                <div className="page-investimentos-card__metric">
+                                                  <dt className="page-investimentos-card__metric-label">IR acumulado (est.)</dt>
+                                                  <dd className="page-investimentos-card__metric-value">
+                                                    {estAcumulado.isento ? (
+                                                      <span className="page-investimentos-card__ir-isento">{estAcumulado.aliquotaFmt}</span>
+                                                    ) : (
+                                                      <>
+                                                        {formatCurrencyBRL(estAcumulado.impostoAcumulado)}
+                                                        <span className="page-investimentos-card__metric-suffix">
+                                                          {' '}
+                                                          ({estAcumulado.aliquotaFmt})
+                                                        </span>
+                                                      </>
+                                                    )}
+                                                  </dd>
+                                                </div>
+                                                <div className="page-investimentos-card__metric">
+                                                  <dt className="page-investimentos-card__metric-label">Rendimento líquido acumulado (est.)</dt>
+                                                  <dd className="page-investimentos-card__metric-value">
+                                                    {formatCurrencyBRL(estAcumulado.liquidoAcumulado)}
+                                                  </dd>
+                                                </div>
+                                              </>
+                                            ) : null}
                                             <div className="page-investimentos-card__metric">
-                                              <dt className="page-investimentos-card__metric-label">Total</dt>
+                                              <dt className="page-investimentos-card__metric-label">Total estimado</dt>
                                               <dd
                                                 className="page-investimentos-card__metric-value"
-                                                title="Valor aplicado + rendimento líquido de um dia útil estimado (hoje)"
+                                                title="Valor aplicado + rendimento líquido acumulado estimado até hoje"
                                               >
-                                                {formatCurrencyBRL(Number(row.valor_investido) + estRendimentoExibicao.liquido)}
+                                                {formatCurrencyBRL(
+                                                  Number(row.valor_investido) +
+                                                    (estAcumulado?.liquidoAcumulado ?? estRendimentoExibicao.liquido),
+                                                )}
                                               </dd>
                                             </div>
                                           </>
