@@ -1,5 +1,6 @@
 import { HTTPException } from 'hono/http-exception'
 import { cors } from 'hono/cors'
+import { serveStatic } from '@hono/node-server/serve-static'
 import { log } from './lib/logger.mjs'
 import { createApp } from './app-factory.mjs'
 import { httpRequestLogger, pagamentosRequestLogger } from './middleware/request-logger.mjs'
@@ -44,6 +45,9 @@ app.use('/api/pagamentos/*', pagamentosRequestLogger)
 app.route('/api', healthRoutes)
 
 registerApiDomainRoutes(app)
+
+app.use('*', serveStatic({ root: './dist' }))
+app.use('*', serveStatic({ path: './dist/index.html' }))
 
 app.notFound((c) => c.json({ message: 'Recurso não encontrado.' }, 404))
 
