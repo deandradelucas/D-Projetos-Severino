@@ -15,6 +15,7 @@ dist-ssr
 # Environment variables (NUNCA fazer commit)
 .env
 .env.local
+.env.production
 .env.*.local
 src/lib/supabase_config.js
 
