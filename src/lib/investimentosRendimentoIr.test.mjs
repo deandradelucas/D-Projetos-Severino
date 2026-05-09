@@ -1,10 +1,31 @@
 import { describe, expect, it } from 'vitest'
 import {
   contarDiasUteisComJurosDesdeIso,
+  diasCorridosDesdeIso,
   ehDiaUtilComPregaoCdi,
   estimativaRendimentoAcumuladoAteHoje,
   estimativaRendimentoDiarioComIr,
+  extrairYyyyMmDdReferencia,
 } from './investimentosRendimentoIr.js'
+
+describe('extrairYyyyMmDdReferencia', () => {
+  it('extrai prefixo YYYY-MM-DD de ISO com hora', () => {
+    expect(extrairYyyyMmDdReferencia('2025-11-10T03:00:00.000Z')).toBe('2025-11-10')
+  })
+
+  it('aceita número (ms)', () => {
+    const ms = Date.parse('2025-11-10T12:00:00')
+    expect(extrairYyyyMmDdReferencia(ms)).toBeTruthy()
+  })
+})
+
+describe('diasCorridosDesdeIso', () => {
+  it('usa calendário local a partir de ISO com sufixo', () => {
+    const n = diasCorridosDesdeIso('2025-11-10T00:00:00.000Z')
+    expect(n).not.toBeNull()
+    expect(Number.isFinite(n)).toBe(true)
+  })
+})
 
 describe('contarDiasUteisComJurosDesdeIso', () => {
   it('no mesmo dia útil conta 1', () => {

@@ -22,8 +22,17 @@ function localDateInputToday() {
 function dataAquisicaoInicialParaInput(edit) {
   const raw = edit?.data_aquisicao
   if (raw != null && String(raw).trim() !== '') {
-    const s = String(raw).trim().slice(0, 10)
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
+    const s = String(raw).trim()
+    const head = s.match(/^(\d{4}-\d{2}-\d{2})/)
+    if (head) return head[1]
+    const t = Date.parse(s)
+    if (!Number.isNaN(t)) {
+      const d = new Date(t)
+      const y = d.getFullYear()
+      const m = String(d.getMonth() + 1).padStart(2, '0')
+      const day = String(d.getDate()).padStart(2, '0')
+      return `${y}-${m}-${day}`
+    }
   }
   return localDateInputToday()
 }
@@ -104,6 +113,44 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
       window.removeEventListener('keydown', onKey)
     }
   }, [open, onClose, submitting])
+
+  useEffect(() => {
+    if (!open) return
+    const inst = String(initialEdit?.instituicao_nome ?? '').trim()
+    setInstQuery(inst)
+    setInstChosen(inst.length >= 2 ? inst : null)
+    setInstListOpen(false)
+    if (!initialEdit?.id) {
+      setPreset('LCA')
+      setCustomNome('')
+    } else {
+      const tp = initialEdit.tipo_preset
+      if (tp != null && String(tp).trim() !== '') {
+        setPreset(String(tp).trim().toUpperCase())
+        setCustomNome('')
+      } else {
+        setPreset(null)
+        setCustomNome(String(initialEdit.nome ?? '').trim())
+      }
+    }
+    setValorInput(
+      initialEdit?.valor_investido != null && Number.isFinite(Number(initialEdit.valor_investido))
+        ? valorToMaskedBRL(Number(initialEdit.valor_investido))
+        : '',
+    )
+    setPercInput(percentualGravadoParaInput(initialEdit?.percentual_cdi))
+    setDataAquisicaoInput(dataAquisicaoInicialParaInput(initialEdit))
+    setFormError('')
+  }, [
+    open,
+    initialEdit?.id,
+    initialEdit?.instituicao_nome,
+    initialEdit?.tipo_preset,
+    initialEdit?.nome,
+    initialEdit?.valor_investido,
+    initialEdit?.percentual_cdi,
+    initialEdit?.data_aquisicao,
+  ])
 
   if (!open) return null
 

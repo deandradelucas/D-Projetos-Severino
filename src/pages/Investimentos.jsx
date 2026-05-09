@@ -22,6 +22,7 @@ import {
   ehDiaUtilComPregaoCdi,
   estimativaRendimentoAcumuladoAteHoje,
   estimativaRendimentoDiarioComIr,
+  extrairYyyyMmDdReferencia,
   formatMoedaDiariaEstimativa,
   investimentoIsentoIrPessoaFisica,
 } from '../lib/investimentosRendimentoIr'
@@ -33,18 +34,18 @@ function labelTipoInvestimentoPreset(key) {
 }
 
 function isoOuDataParaCalculoDias(dataAquisicao, criadoEm) {
-  if (dataAquisicao != null && String(dataAquisicao).trim() !== '') {
-    const s = String(dataAquisicao).trim().slice(0, 10)
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return `${s}T12:00:00`
-  }
+  const da = extrairYyyyMmDdReferencia(dataAquisicao)
+  if (da) return `${da}T12:00:00`
+  const dc = extrairYyyyMmDdReferencia(criadoEm)
+  if (dc) return `${dc}T12:00:00`
   return criadoEm
 }
 
 function formatDataAquisicaoCartao(raw) {
-  if (!raw) return '—'
-  const s = String(raw).slice(0, 10)
+  const ymd = extrairYyyyMmDdReferencia(raw)
+  if (!ymd) return '—'
   try {
-    return new Date(`${s}T12:00:00`).toLocaleDateString('pt-BR', {
+    return new Date(`${ymd}T12:00:00`).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -61,14 +62,23 @@ function textoHintRendimentoCartao({
   temDataAquisicao,
   isentoIr,
   semPregaoCdiHoje,
+  ymdInicioCalculo,
 }) {
   const cdiFmt = `${cdiAa.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}% a.a.`
   const du = diasUteisComJuros == null ? '—' : String(diasUteisComJuros)
   const origem = temDataAquisicao ? 'a data de aquisição' : 'o registo neste painel'
+  const inicioFmt =
+    ymdInicioCalculo != null
+      ? new Date(`${ymdInicioCalculo}T12:00:00`).toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+        })
+      : '—'
   const prefixSemPregao = semPregaoCdiHoje
     ? 'Hoje não há pregão CDI (fim de semana ou feriado); rendimento do dia exibido como R$ 0,00. '
     : ''
-  let s = `${prefixSemPregao}Acumulado desde ${origem}: ~${du} dias úteis com pregão até hoje (intervalo inclusivo). Rendimento por dia útil × esse total · CDI ${cdiFmt} · pro rata linear (252 dias/ano).`
+  let s = `${prefixSemPregao}Período no cálculo: desde ${inicioFmt} (${temDataAquisicao ? 'data de aquisição' : 'fallback: dia do registo — edite e guarde a data de compra se estiver errado'}). Acumulado desde ${origem}: ~${du} dias úteis com pregão até hoje (intervalo inclusivo). Rendimento por dia útil × esse total · CDI ${cdiFmt} · pro rata linear (252 dias/ano).`
   if (!isentoIr) {
     const ir = temDataAquisicao
       ? ` IR sobre o bruto acumulado na faixa aos ${diasRegisto ?? 0} dias corridos até hoje (aprox.).`
@@ -360,6 +370,7 @@ export default function Investimentos() {
                           const percNum = Number(row.percentual_cdi)
                           const percOk = Number.isFinite(percNum) && percNum > 0
                           const isentoIr = investimentoIsentoIrPessoaFisica(row.tipo_preset)
+                          const dataAquisicaoYmd = extrairYyyyMmDdReferencia(row.data_aquisicao)
                           const isoCalculoDias = isoOuDataParaCalculoDias(row.data_aquisicao, row.criado_em)
                           const diasRegisto = diasCorridosDesdeIso(isoCalculoDias)
                           const diasUteisComJuros = contarDiasUteisComJurosDesdeIso(isoCalculoDias)
@@ -422,6 +433,14 @@ export default function Investimentos() {
                                   {temValor || percLista ? (
                                     <>
                                       <dl className="page-investimentos-card__metrics" aria-label="Detalhes do investimento">
+                                        {mostrarRendimento && cdiDisponivel && !dataAquisicaoYmd ? (
+                                          <div className="page-investimentos-card__metric page-investimentos-card__metric--span">
+                                            <dt className="sr-only">Data de aquisição</dt>
+                                            <dd className="page-investimentos-card__missing-date-banner" role="alert">
+                                              Não há data de aquisição gravada neste investimento. Abra Editar, confira a data da compra e guarde — sem isso o período usa só o dia em que criou o registo e o acumulado pode ficar zerado ao fim de semana.
+                                            </dd>
+                                          </div>
+                                        ) : null}
                                         {temValor ? (
                                           <div className="page-investimentos-card__metric">
                                             <dt className="page-investimentos-card__metric-label">Valor aplicado</dt>
@@ -538,19 +557,20 @@ export default function Investimentos() {
                                             cdiAa,
                                             diasUteisComJuros,
                                             diasRegisto,
-                                            temDataAquisicao: Boolean(row.data_aquisicao),
+                                            temDataAquisicao: Boolean(dataAquisicaoYmd),
                                             isentoIr: estRendimento.isento,
                                             semPregaoCdiHoje: !pregaoCdiHoje,
+                                            ymdInicioCalculo: extrairYyyyMmDdReferencia(isoCalculoDias),
                                           })}
                                         </p>
                                       ) : null}
                                     </>
                                   ) : null}
                                   <p className="page-investimentos-card__meta">
-                                    {row.data_aquisicao ? (
+                                    {dataAquisicaoYmd ? (
                                       <>
                                         <span className="page-investimentos-card__date-label">Adquirido em</span>{' '}
-                                        <time dateTime={String(row.data_aquisicao).slice(0, 10)}>
+                                        <time dateTime={dataAquisicaoYmd}>
                                           {formatDataAquisicaoCartao(row.data_aquisicao)}
                                         </time>
                                       </>
