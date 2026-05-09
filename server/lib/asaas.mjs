@@ -156,6 +156,7 @@ export async function criarCheckoutAssinatura(opts) {
   const titulo = String(opts.tituloItem || 'Assinatura').trim()
   const itemName = titulo.slice(0, 30)
   const phoneDigits = String(opts.telefone || '').replace(/\D/g, '').slice(0, 16)
+  const cpfCnpjDigits = String(opts.cpfCnpj || '').replace(/\D/g, '').slice(0, 14)
   const valor = Number(opts.valor ?? opts.valorMensal)
   if (!Number.isFinite(valor) || valor <= 0) throw new Error('Valor do plano inválido.')
 
@@ -186,6 +187,7 @@ export async function criarCheckoutAssinatura(opts) {
       name: String(opts.nome || 'Cliente').trim().slice(0, 80) || 'Cliente',
       email: String(opts.email || '').trim().toLowerCase(),
       ...(phoneDigits ? { phone: phoneDigits } : {}),
+      ...(cpfCnpjDigits ? { cpfCnpj: cpfCnpjDigits } : {}),
     },
     subscription: {
       cycle,
