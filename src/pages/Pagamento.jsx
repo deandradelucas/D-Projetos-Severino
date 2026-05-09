@@ -286,8 +286,8 @@ export default function Pagamento() {
 
   const assinarLabelCheckout =
     planoCheckout === 'anual'
-      ? `Pagar ${formatCurrency(precosCatalogo.anual)} / ano no Asaas (Pix ou cartão)`
-      : `Pagar ${formatCurrency(precosCatalogo.mensal)} / mês no Asaas (cartão)`
+      ? `Pagar ${formatCurrency(precosCatalogo.anual)} / ano`
+      : `Pagar ${formatCurrency(precosCatalogo.mensal)} / mês`
 
   const disabledCheckout = !config.ready || paying || loading || config.isento_pagamento
 
@@ -435,21 +435,6 @@ export default function Pagamento() {
                         </span>
                       </button>
                     </div>
-                    {!config.isento_pagamento && config.ready && planoCheckout === 'anual' ? (
-                      <div className="page-pagamento-planos__pix-inline">
-                        <button
-                          type="button"
-                          className="btn-secondary btn-secondary--compact"
-                          disabled={loading || paying}
-                          onClick={() => {
-                            setPixModalOpen(true)
-                            setPixError('')
-                          }}
-                        >
-                          Ver QR Code Pix no app (sem abrir checkout)
-                        </button>
-                      </div>
-                    ) : null}
                   </div>
                 ) : null}
 
