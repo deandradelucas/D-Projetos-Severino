@@ -1,39 +1,84 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { maskCurrencyBRLInput, parseCurrencyBRLMasked } from '../../lib/currencyMaskBr'
+import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../../lib/currencyMaskBr'
 import { parsePercentualCdiInput } from '../../lib/percentualCdiInput'
 import { INVESTIMENTOS_PRESETS_LIST } from '../../lib/investimentosPresets'
 import { filtrarInstituicoesFinanceiras, labelTipoInstituicao } from '../../lib/instituicoesFinanceiras'
+
+function percentualGravadoParaInput(raw) {
+  if (raw == null || raw === '') return ''
+  const n = Number(raw)
+  if (!Number.isFinite(n)) return ''
+  return n.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2, useGrouping: false })
+}
+
+function localDateInputToday() {
+  const d = new Date()
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+function dataAquisicaoInicialParaInput(edit) {
+  const raw = edit?.data_aquisicao
+  if (raw != null && String(raw).trim() !== '') {
+    const s = String(raw).trim().slice(0, 10)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
+  }
+  return localDateInputToday()
+}
 
 /**
  * @param {{
  *   open: boolean
  *   onClose: () => void
- *   onSubmit: (payload: { instituicao_nome: string, preset?: string, nome_custom?: string, valor_investido: number, percentual_cdi: number }) => Promise<void>
+ *   onSubmit: (payload: { instituicao_nome: string, preset?: string, nome_custom?: string, valor_investido: number, percentual_cdi: number, data_aquisicao: string }) => Promise<void>
  *   submitting?: boolean
+ *   initialEdit?: { id: string, instituicao_nome?: string | null, tipo_preset?: string | null, nome?: string | null, valor_investido?: number | null, percentual_cdi?: number | null, data_aquisicao?: string | null } | null
  * }} props
  */
-export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitting = false }) {
+export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitting = false, initialEdit = null }) {
   const titleId = useId()
   const stepInstTitleId = useId()
   const stepTipoTitleId = useId()
   const stepOutroTitleId = useId()
+  const stepDataTitleId = useId()
   const stepValorTitleId = useId()
   const stepPercTitleId = useId()
   const instListId = useId()
   const instInputId = useId()
+  const dataInputId = useId()
   const valorInputId = useId()
   const percInputId = useId()
   const blurTimerRef = useRef(null)
   const comboboxWrapRef = useRef(null)
 
-  const [instQuery, setInstQuery] = useState('')
-  const [instChosen, setInstChosen] = useState(/** @type {string | null} */ (null))
+  const [instQuery, setInstQuery] = useState(() => String(initialEdit?.instituicao_nome ?? '').trim())
+  const [instChosen, setInstChosen] = useState(() => {
+    const n = String(initialEdit?.instituicao_nome ?? '').trim()
+    return n.length >= 2 ? n : null
+  })
   const [instListOpen, setInstListOpen] = useState(false)
 
-  const [preset, setPreset] = useState(/** @type {string | null} */ ('LCA'))
-  const [customNome, setCustomNome] = useState('')
-  const [valorInput, setValorInput] = useState('')
-  const [percInput, setPercInput] = useState('')
+  const [preset, setPreset] = useState(() => {
+    if (!initialEdit?.id) return 'LCA'
+    const tp = initialEdit.tipo_preset
+    if (tp != null && String(tp).trim() !== '') return String(tp).trim().toUpperCase()
+    return null
+  })
+  const [customNome, setCustomNome] = useState(() => {
+    if (!initialEdit?.id) return ''
+    const tp = initialEdit.tipo_preset
+    if (tp != null && String(tp).trim() !== '') return ''
+    return String(initialEdit.nome ?? '').trim()
+  })
+  const [valorInput, setValorInput] = useState(() =>
+    initialEdit?.valor_investido != null && Number.isFinite(Number(initialEdit.valor_investido))
+      ? valorToMaskedBRL(Number(initialEdit.valor_investido))
+      : '',
+  )
+  const [percInput, setPercInput] = useState(() => percentualGravadoParaInput(initialEdit?.percentual_cdi))
+  const [dataAquisicaoInput, setDataAquisicaoInput] = useState(() => dataAquisicaoInicialParaInput(initialEdit))
   const [formError, setFormError] = useState('')
 
   const instituicoesFiltradas = useMemo(() => filtrarInstituicoesFinanceiras(instQuery), [instQuery])
@@ -62,13 +107,12 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
 
   if (!open) return null
 
+  const editando = Boolean(initialEdit?.id)
+  const tituloModal = editando ? 'Editar investimento' : 'Novo investimento'
+
   const scheduleCloseList = () => {
     if (blurTimerRef.current) window.clearTimeout(blurTimerRef.current)
     blurTimerRef.current = window.setTimeout(() => setInstListOpen(false), 160)
-  }
-
-  const cancelCloseList = () => {
-    if (blurTimerRef.current) window.clearTimeout(blurTimerRef.current)
   }
 
   const handleBackdropDown = (e) => {
@@ -108,6 +152,12 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
       return
     }
 
+    const dataStr = String(dataAquisicaoInput ?? '').trim().slice(0, 10)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) {
+      setFormError('Informe a data de aquisição.')
+      return
+    }
+
     const trimmed = customNome.trim()
     if (trimmed.length >= 2) {
       await onSubmit({
@@ -115,6 +165,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         nome_custom: trimmed,
         valor_investido: valorRounded,
         percentual_cdi: percRounded,
+        data_aquisicao: dataStr,
       })
       return
     }
@@ -124,6 +175,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         preset,
         valor_investido: valorRounded,
         percentual_cdi: percRounded,
+        data_aquisicao: dataStr,
       })
       return
     }
@@ -150,7 +202,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <h3 id={titleId}>Novo investimento</h3>
+          <h3 id={titleId}>{tituloModal}</h3>
           <button type="button" onClick={onClose} className="close-btn" aria-label="Fechar" disabled={submitting}>
             ×
           </button>
@@ -158,7 +210,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="modal-body page-investimentos-modal__body">
             <p className="page-investimentos-modal__lead">
-              Cinco passos: instituição, tipo ou nome livre, valor aplicado e % do CDI contratada.
+              Instituição, tipo ou nome livre, data de aquisição, valor aplicado e % do CDI contratada.
             </p>
 
             <section className="page-investimentos-modal__card" aria-labelledby={stepInstTitleId}>
@@ -195,15 +247,16 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                       const v = e.target.value
                       setInstQuery(v)
                       if (instChosen != null && v !== instChosen) setInstChosen(null)
-                    }}
-                    onFocus={() => {
-                      cancelCloseList()
-                      setInstListOpen(true)
+                      const temBusca = String(v).trim().length > 0
+                      setInstListOpen(temBusca)
                     }}
                     onBlur={(e) => {
                       const next = e.relatedTarget
                       if (next instanceof Node && comboboxWrapRef.current?.contains(next)) return
                       scheduleCloseList()
+                    }}
+                    onFocus={() => {
+                      if (blurTimerRef.current) window.clearTimeout(blurTimerRef.current)
                     }}
                   />
                   {instListOpen ? (
@@ -231,7 +284,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                   ) : null}
                 </div>
                 <p className="page-investimentos-modal__hint">
-                  Toque num resultado para preencher ou digite o nome completo se não aparecer na lista.
+                  Digite para ver sugestões; escolha uma opção ou use o nome completo se não aparecer na lista.
                 </p>
               </fieldset>
             </section>
@@ -312,10 +365,42 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
               </div>
             </section>
 
-            <section className="page-investimentos-modal__card" aria-labelledby={stepValorTitleId}>
+            <section className="page-investimentos-modal__card" aria-labelledby={stepDataTitleId}>
               <div className="page-investimentos-modal__card-head">
                 <span className="page-investimentos-modal__step-num" aria-hidden>
                   4
+                </span>
+                <div className="page-investimentos-modal__card-head-text">
+                  <h4 id={stepDataTitleId} className="page-investimentos-modal__card-title">
+                    Data de aquisição
+                  </h4>
+                  <p className="page-investimentos-modal__card-desc">Quando passou a deter esta posição</p>
+                </div>
+              </div>
+              <div className="page-investimentos-modal__data-field">
+                <label htmlFor={dataInputId} className="page-investimentos-modal__label">
+                  Data
+                </label>
+                <input
+                  id={dataInputId}
+                  type="date"
+                  className="page-investimentos-modal__input page-investimentos-modal__input--date"
+                  required
+                  max={localDateInputToday()}
+                  disabled={submitting}
+                  value={dataAquisicaoInput}
+                  onChange={(e) => setDataAquisicaoInput(e.target.value)}
+                />
+                <p className="page-investimentos-modal__hint">
+                  Usada para estimar o IR regressivo sobre o rendimento (prazo desde a aquisição).
+                </p>
+              </div>
+            </section>
+
+            <section className="page-investimentos-modal__card" aria-labelledby={stepValorTitleId}>
+              <div className="page-investimentos-modal__card-head">
+                <span className="page-investimentos-modal__step-num" aria-hidden>
+                  5
                 </span>
                 <div className="page-investimentos-modal__card-head-text">
                   <h4 id={stepValorTitleId} className="page-investimentos-modal__card-title">
@@ -353,7 +438,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
             <section className="page-investimentos-modal__card" aria-labelledby={stepPercTitleId}>
               <div className="page-investimentos-modal__card-head">
                 <span className="page-investimentos-modal__step-num" aria-hidden>
-                  5
+                  6
                 </span>
                 <div className="page-investimentos-modal__card-head-text">
                   <h4 id={stepPercTitleId} className="page-investimentos-modal__card-title">
@@ -403,7 +488,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                 Cancelar
               </button>
               <button type="submit" className="btn-primary" disabled={submitting}>
-                {submitting ? 'A guardar…' : 'Adicionar'}
+                {submitting ? 'A guardar…' : editando ? 'Guardar' : 'Adicionar'}
               </button>
             </div>
           </div>
