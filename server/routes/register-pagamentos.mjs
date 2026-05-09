@@ -128,8 +128,7 @@ export function registerPagamentosRoutes(app) {
       const externalRef = `hf-${usuarioId}-${randomUUID()}`
 
       const labelCiclo = plano === 'anual' ? 'anual' : 'mensal'
-      /** Checkout hospedado Asaas: mensal cartão; anual cartão + Pix. */
-      const billingTypes = plano === 'anual' ? ['CREDIT_CARD', 'PIX'] : ['CREDIT_CARD']
+      const billingTypes = ['CREDIT_CARD', 'PIX']
 
       const checkout = await criarCheckoutAssinatura({
         baseUrlApp: baseUrl,
