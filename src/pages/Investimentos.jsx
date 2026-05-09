@@ -19,6 +19,7 @@ import {
   IR_RENDA_FIXA_REGRESSIVO_UI,
   contarDiasUteisComJurosDesdeIso,
   diasCorridosDesdeIso,
+  ehDiaUtilComPregaoCdi,
   estimativaRendimentoDiarioComIr,
   formatMoedaDiariaEstimativa,
   investimentoIsentoIrPessoaFisica,
@@ -58,11 +59,15 @@ function textoHintRendimentoCartao({
   diasRegisto,
   temDataAquisicao,
   isentoIr,
+  semPregaoCdiHoje,
 }) {
   const cdiFmt = `${cdiAa.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}% a.a.`
   const du = diasUteisComJuros == null ? '—' : String(diasUteisComJuros)
   const origem = temDataAquisicao ? 'a data de aquisição' : 'o registo neste painel'
-  let s = `Estimativa por dia útil (252 dias/ano; fins de semana sem pregão CDI). ~${du} dias úteis com pregão desde ${origem} · ${cdiFmt} · pro rata linear.`
+  const prefixSemPregao = semPregaoCdiHoje
+    ? 'Hoje não há pregão CDI (fim de semana ou feriado); rendimento do dia exibido como R$ 0,00. '
+    : ''
+  let s = `${prefixSemPregao}Estimativa por dia útil (252 dias/ano; fins de semana sem pregão CDI). ~${du} dias úteis com pregão desde ${origem} · ${cdiFmt} · pro rata linear.`
   if (!isentoIr) {
     const ir = temDataAquisicao
       ? `IR regressivo conforme ${diasRegisto ?? 0} dias corridos até hoje (faixa do imposto).`
@@ -87,6 +92,7 @@ export default function Investimentos() {
 
   const session = readHorizonteUser()
   const uid = session?.id ? String(session.id).trim() : ''
+  const pregaoCdiHoje = ehDiaUtilComPregaoCdi()
 
   const carregar = useCallback(async () => {
     if (!uid) return
@@ -367,6 +373,10 @@ export default function Investimentos() {
                                 isentoIr,
                               )
                             : null
+                          const estRendimentoExibicao =
+                            estRendimento && !pregaoCdiHoje
+                              ? { ...estRendimento, bruto: 0, imposto: 0, liquido: 0 }
+                              : estRendimento
                           const nomeRow = String(row.nome ?? '').trim()
                           const tituloRedundanteComChipTipo =
                             tipoLb != null &&
@@ -431,25 +441,25 @@ export default function Investimentos() {
                                             </dd>
                                           </div>
                                         ) : null}
-                                        {estRendimento ? (
+                                        {estRendimentoExibicao ? (
                                           <>
                                             <div className="page-investimentos-card__metric">
                                               <dt className="page-investimentos-card__metric-label">Rendimento bruto por dia útil (est.)</dt>
                                               <dd className="page-investimentos-card__metric-value">
-                                                {formatMoedaDiariaEstimativa(estRendimento.bruto)}
+                                                {formatMoedaDiariaEstimativa(estRendimentoExibicao.bruto)}
                                               </dd>
                                             </div>
                                             <div className="page-investimentos-card__metric">
                                               <dt className="page-investimentos-card__metric-label">IR sobre rendimento (est.)</dt>
                                               <dd className="page-investimentos-card__metric-value">
-                                                {estRendimento.isento ? (
-                                                  <span className="page-investimentos-card__ir-isento">{estRendimento.aliquotaFmt}</span>
+                                                {estRendimentoExibicao.isento ? (
+                                                  <span className="page-investimentos-card__ir-isento">{estRendimentoExibicao.aliquotaFmt}</span>
                                                 ) : (
                                                   <>
-                                                    {formatMoedaDiariaEstimativa(estRendimento.imposto)}
+                                                    {formatMoedaDiariaEstimativa(estRendimentoExibicao.imposto)}
                                                     <span className="page-investimentos-card__metric-suffix">
                                                       {' '}
-                                                      ({estRendimento.aliquotaFmt})
+                                                      ({estRendimentoExibicao.aliquotaFmt})
                                                     </span>
                                                   </>
                                                 )}
@@ -458,16 +468,16 @@ export default function Investimentos() {
                                             <div className="page-investimentos-card__metric">
                                               <dt className="page-investimentos-card__metric-label">Rendimento líquido por dia útil (est.)</dt>
                                               <dd className="page-investimentos-card__metric-value">
-                                                {formatMoedaDiariaEstimativa(estRendimento.liquido)}
+                                                {formatMoedaDiariaEstimativa(estRendimentoExibicao.liquido)}
                                               </dd>
                                             </div>
                                             <div className="page-investimentos-card__metric">
                                               <dt className="page-investimentos-card__metric-label">Total</dt>
                                               <dd
                                                 className="page-investimentos-card__metric-value"
-                                                title="Valor aplicado + rendimento líquido de um dia útil estimado"
+                                                title="Valor aplicado + rendimento líquido de um dia útil estimado (hoje)"
                                               >
-                                                {formatCurrencyBRL(Number(row.valor_investido) + estRendimento.liquido)}
+                                                {formatCurrencyBRL(Number(row.valor_investido) + estRendimentoExibicao.liquido)}
                                               </dd>
                                             </div>
                                           </>
@@ -481,6 +491,7 @@ export default function Investimentos() {
                                             diasRegisto,
                                             temDataAquisicao: Boolean(row.data_aquisicao),
                                             isentoIr: estRendimento.isento,
+                                            semPregaoCdiHoje: !pregaoCdiHoje,
                                           })}
                                         </p>
                                       ) : null}

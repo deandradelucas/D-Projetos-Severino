@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { contarDiasUteisComJurosDesdeIso } from './investimentosRendimentoIr.js'
+import { contarDiasUteisComJurosDesdeIso, ehDiaUtilComPregaoCdi } from './investimentosRendimentoIr.js'
 
 describe('contarDiasUteisComJurosDesdeIso', () => {
   it('retorna 0 no mesmo dia civil', () => {
@@ -24,5 +24,20 @@ describe('contarDiasUteisComJurosDesdeIso', () => {
   it('retorna null para ISO inválido', () => {
     expect(contarDiasUteisComJurosDesdeIso('', new Date('2025-01-01'))).toBe(null)
     expect(contarDiasUteisComJurosDesdeIso(null, new Date('2025-01-01'))).toBe(null)
+  })
+})
+
+describe('ehDiaUtilComPregaoCdi', () => {
+  it('sábado e domingo retornam false', () => {
+    expect(ehDiaUtilComPregaoCdi(new Date('2026-05-09T12:00:00'))).toBe(false)
+    expect(ehDiaUtilComPregaoCdi(new Date('2026-05-10T12:00:00'))).toBe(false)
+  })
+
+  it('segunda-feira comum retorna true', () => {
+    expect(ehDiaUtilComPregaoCdi(new Date('2026-05-11T12:00:00'))).toBe(true)
+  })
+
+  it('Sexta-feira Santa retorna false', () => {
+    expect(ehDiaUtilComPregaoCdi(new Date('2025-04-18T12:00:00'))).toBe(false)
   })
 })
