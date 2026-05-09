@@ -925,3 +925,115 @@ body[data-theme='light'] .pagamento-banner {
   align-self: flex-start;
 }
 
+/* Badge de desconto no plano anual */
+.page-pagamento-planos__option-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-pagamento-planos__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: color-mix(in srgb, #22c55e 18%, transparent);
+  color: #16a34a;
+  border: 1px solid color-mix(in srgb, #22c55e 30%, transparent);
+}
+
+body[data-theme='dark'] .page-pagamento-planos__badge {
+  color: #4ade80;
+  background: color-mix(in srgb, #22c55e 14%, transparent);
+}
+
+/* Skeleton loader para checkout panel */
+@keyframes pagamento-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.pagamento-checkout-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pagamento-skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  background: var(--bg-card, #1a1a1f);
+}
+
+.pagamento-skeleton-line {
+  height: 14px;
+  width: 55%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--bg-secondary, #2a2a30) 25%, color-mix(in srgb, var(--bg-secondary, #2a2a30) 70%, transparent) 50%, var(--bg-secondary, #2a2a30) 75%);
+  background-size: 800px 100%;
+  animation: pagamento-shimmer 1.6s ease-in-out infinite;
+}
+
+.pagamento-skeleton-line--sm {
+  height: 11px;
+  width: 75%;
+}
+
+.pagamento-skeleton-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 519px) {
+  .pagamento-skeleton-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pagamento-skeleton-option {
+  height: 72px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--bg-secondary, #2a2a30) 25%, color-mix(in srgb, var(--bg-secondary, #2a2a30) 70%, transparent) 50%, var(--bg-secondary, #2a2a30) 75%);
+  background-size: 800px 100%;
+  animation: pagamento-shimmer 1.6s ease-in-out infinite;
+  animation-delay: 0.1s;
+}
+
+.pagamento-skeleton-input {
+  height: 44px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--bg-secondary, #2a2a30) 25%, color-mix(in srgb, var(--bg-secondary, #2a2a30) 70%, transparent) 50%, var(--bg-secondary, #2a2a30) 75%);
+  background-size: 800px 100%;
+  animation: pagamento-shimmer 1.6s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+.pagamento-skeleton-btn {
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--bg-secondary, #2a2a30) 25%, color-mix(in srgb, var(--bg-secondary, #2a2a30) 70%, transparent) 50%, var(--bg-secondary, #2a2a30) 75%);
+  background-size: 800px 100%;
+  animation: pagamento-shimmer 1.6s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+/* Link "Pagar fatura" em banners de inadimplência */
+.pagamento-banner__link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.pagamento-banner__link:hover {
+  opacity: 0.8;
+}
+
