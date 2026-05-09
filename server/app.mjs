@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { HTTPException } from 'hono/http-exception'
 import { cors } from 'hono/cors'
 import { serveStatic } from '@hono/node-server/serve-static'
@@ -47,7 +49,22 @@ app.route('/api', healthRoutes)
 registerApiDomainRoutes(app)
 
 app.use('*', serveStatic({ root: './dist' }))
-app.use('*', serveStatic({ path: './dist/index.html' }))
+
+// SPA fallback — sem cache para evitar UI desatualizada no browser
+app.use('*', async (c) => {
+  try {
+    const html = await readFile(join(process.cwd(), 'dist', 'index.html'), 'utf-8')
+    return new Response(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-store',
+      },
+    })
+  } catch {
+    return c.json({ message: 'Recurso não encontrado.' }, 404)
+  }
+})
 
 app.notFound((c) => c.json({ message: 'Recurso não encontrado.' }, 404))
 
