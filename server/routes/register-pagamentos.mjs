@@ -128,7 +128,7 @@ export function registerPagamentosRoutes(app) {
       const externalRef = `hf-${usuarioId}-${randomUUID()}`
 
       const labelCiclo = plano === 'anual' ? 'anual' : 'mensal'
-      const billingTypes = ['CREDIT_CARD', 'PIX']
+      const billingTypes = ['CREDIT_CARD']
 
       const checkout = await criarCheckoutAssinatura({
         baseUrlApp: baseUrl,

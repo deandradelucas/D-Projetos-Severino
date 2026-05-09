@@ -194,6 +194,10 @@ export default function Pagamento() {
 
   const handlePagarAsaas = async () => {
     setError('')
+    if (!cpfCnpj.replace(/\D/g, '')) {
+      setError('Informe seu CPF ou CNPJ para continuar.')
+      return
+    }
     setPaying(true)
     try {
       const userSaved = localStorage.getItem('horizonte_user')
@@ -286,8 +290,8 @@ export default function Pagamento() {
 
   const assinarLabelCheckout =
     planoCheckout === 'anual'
-      ? `Pagar ${formatCurrency(precosCatalogo.anual)} / ano`
-      : `Pagar ${formatCurrency(precosCatalogo.mensal)} / mês`
+      ? `Pagar ${formatCurrency(precosCatalogo.anual)} / ano com cartão`
+      : `Pagar ${formatCurrency(precosCatalogo.mensal)} / mês com cartão`
 
   const disabledCheckout = !config.ready || paying || loading || config.isento_pagamento
 
