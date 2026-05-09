@@ -6,6 +6,36 @@
 
 export const DIAS_UTEIS_ANO_RENDIMENTO = 252
 
+/**
+ * Extrai calendário `YYYY-MM-DD` de valores vindos da API (DATE, ISO, número ms).
+ * Usado em contagens de dias úteis e dias corridos para não falhar com formatos estranhos.
+ * @param {unknown} raw
+ * @returns {string | null}
+ */
+export function extrairYyyyMmDdReferencia(raw) {
+  if (raw == null || raw === '') return null
+  if (typeof raw === 'number' && Number.isFinite(raw)) {
+    const d = new Date(raw)
+    if (Number.isNaN(d.getTime())) return null
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+  const s = String(raw).trim()
+  const head = s.match(/^(\d{4}-\d{2}-\d{2})/)
+  if (head) return head[1]
+  const t = Date.parse(s)
+  if (!Number.isNaN(t)) {
+    const d = new Date(t)
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+  return null
+}
+
 /** @param {number} y */
 function domingoPascoalGregorian(y) {
   const a = y % 19
@@ -64,10 +94,9 @@ function feriadosNacionaisBrKeysParaAno(year) {
 
 /** @param {string | undefined | null} iso */
 function dataLocalInicioApartirDeIso(iso) {
-  if (iso == null || String(iso).trim() === '') return null
-  const s = String(iso).trim().slice(0, 10)
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null
-  const [y, m, d] = s.split('-').map(Number)
+  const ymd = extrairYyyyMmDdReferencia(iso)
+  if (!ymd) return null
+  const [y, m, d] = ymd.split('-').map(Number)
   if (!y || !m || !d) return null
   const dt = new Date(y, m - 1, d)
   if (Number.isNaN(dt.getTime())) return null
@@ -150,11 +179,14 @@ export function aliquotaIrRendaFixaPfPorPrazoDias(dias) {
  * @returns {number | null} dias corridos desde iso até “hoje” (timezone local), ou null se inválido
  */
 export function diasCorridosDesdeIso(iso) {
-  if (iso == null || String(iso).trim() === '') return null
-  const start = new Date(iso)
+  const ymd = extrairYyyyMmDdReferencia(iso)
+  if (!ymd) return null
+  const [y, mo, d] = ymd.split('-').map(Number)
+  const start = new Date(y, mo - 1, d)
   if (Number.isNaN(start.getTime())) return null
   const now = new Date()
-  const ms = now.getTime() - start.getTime()
+  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const ms = end.getTime() - start.getTime()
   if (!Number.isFinite(ms)) return null
   return Math.max(0, Math.floor(ms / (24 * 60 * 60 * 1000)))
 }

@@ -54,6 +54,10 @@ describe('investimentos.mjs — parseDataAquisicao', () => {
     expect(parseDataAquisicao('2020-01-02')).toBe('2020-01-02')
   })
 
+  it('aceita ISO com hora (prefixo data)', () => {
+    expect(parseDataAquisicao('2020-01-02T15:30:00.000Z')).toBe('2020-01-02')
+  })
+
   it('rejeita data inválida', () => {
     expect(() => parseDataAquisicao('2020-13-40')).toThrow(/inválida/)
     expect(() => parseDataAquisicao('não')).toThrow(/inválida/)

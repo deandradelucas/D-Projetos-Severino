@@ -65,11 +65,33 @@ export function dataAquisicaoPadraoHojeIso() {
   return `${y}-${m}-${d}`
 }
 
+/**
+ * DATE / timestamptz do Postgres ou ISO → `YYYY-MM-DD` para API e validações.
+ * @param {unknown} raw
+ * @returns {string | null}
+ */
+export function extrairDataYyyyMmDdInvestimento(raw) {
+  if (raw == null || raw === '') return null
+  const s = String(raw).trim()
+  const head = s.match(/^(\d{4}-\d{2}-\d{2})/)
+  if (head) return head[1]
+  const t = Date.parse(s)
+  if (!Number.isNaN(t)) {
+    const d = new Date(t)
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+  return null
+}
+
 export function parseDataAquisicao(raw) {
   if (raw === undefined || raw === null || String(raw).trim() === '') {
     throw new Error('Informe a data de aquisição.')
   }
-  const s = String(raw).trim().slice(0, 10)
+  const s = extrairDataYyyyMmDdInvestimento(raw)
+  if (!s) throw new Error('Data de aquisição inválida.')
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
   if (!m) throw new Error('Data de aquisição inválida.')
   const y = Number(m[1])
@@ -83,7 +105,7 @@ export function parseDataAquisicao(raw) {
   const endToday = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
   const picked = Date.UTC(y, mo - 1, d)
   if (picked > endToday) throw new Error('A data de aquisição não pode ser no futuro.')
-  return s
+  return m[0]
 }
 
 export function parsePercentualCdi(raw) {
@@ -166,7 +188,7 @@ function rowToApi(row) {
     instituicao_nome: row.instituicao_nome,
     valor_investido: vi != null ? Number(vi) : null,
     percentual_cdi: pc != null ? Number(pc) : null,
-    data_aquisicao: row.data_aquisicao != null ? String(row.data_aquisicao).slice(0, 10) : null,
+    data_aquisicao: extrairDataYyyyMmDdInvestimento(row.data_aquisicao),
     criado_em: row.criado_em,
   }
 }
