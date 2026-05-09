@@ -421,9 +421,7 @@ export default function Pagamento() {
                       >
                         <span className="page-pagamento-planos__option-title">Mensal</span>
                         <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.mensal)} / mês</span>
-                        <span className="page-pagamento-planos__option-hint">
-                          {`Checkout Asaas — cobrança mensal (${formatCurrency(precosCatalogo.mensal)}/mês)`}
-                        </span>
+                        <span className="page-pagamento-planos__option-hint">Cobrança mensal no cartão</span>
                       </button>
                       <button
                         type="button"
@@ -434,11 +432,63 @@ export default function Pagamento() {
                       >
                         <span className="page-pagamento-planos__option-title">Anual</span>
                         <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.anual)} / ano</span>
-                        <span className="page-pagamento-planos__option-hint">
-                          {`Pix ou cartão no Asaas (${formatCurrency(precosCatalogo.anual)}/ano)`}
-                        </span>
+                        <span className="page-pagamento-planos__option-hint">Cobrança anual no cartão</span>
                       </button>
                     </div>
+                  </div>
+                ) : null}
+
+                {!config.isento_pagamento && config.ready && !loading ? (
+                  <div className="ref-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem' }}>
+                    <div>
+                      <p style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '0.25rem' }}>
+                        Finalizar assinatura
+                      </p>
+                      <p style={{ fontSize: '0.85rem', opacity: 0.65 }}>
+                        Você será redirecionado para o checkout seguro da Asaas para inserir os dados do cartão.
+                      </p>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                      <label htmlFor="cpf-checkout" style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                        CPF ou CNPJ <span style={{ color: '#ef4444' }}>*</span>
+                      </label>
+                      <input
+                        id="cpf-checkout"
+                        type="text"
+                        value={cpfCnpj}
+                        onChange={(e) => setCpfCnpj(e.target.value)}
+                        placeholder="000.000.000-00"
+                        maxLength={18}
+                        disabled={paying}
+                        style={{
+                          width: '100%',
+                          padding: '0.625rem 0.875rem',
+                          border: '1.5px solid #d1d5db',
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          outline: 'none',
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                      <p style={{ fontSize: '0.8rem', opacity: 0.55 }}>
+                        Exigido pela Asaas para identificar o pagador.
+                      </p>
+                    </div>
+
+                    {error ? (
+                      <p style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.9rem' }}>{error}</p>
+                    ) : null}
+
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      style={{ width: '100%', fontSize: '1rem', padding: '0.75rem' }}
+                      disabled={disabledCheckout || paying}
+                      onClick={handlePagarAsaas}
+                    >
+                      {paying ? 'Redirecionando para Asaas…' : assinarLabelCheckout}
+                    </button>
                   </div>
                 ) : null}
 
@@ -469,18 +519,12 @@ export default function Pagamento() {
 
               <PagamentoPainelLateral
                 orientacao={orientacao}
-                onAssinar={handlePagarAsaas}
                 onAtualizar={onAtualizar}
                 paying={paying}
                 loading={loading}
                 configReady={config.ready}
                 isento={config.isento_pagamento}
                 portalUrl={painelAssinatura.portalUrl}
-                disabledAssinar={disabledCheckout}
-                checkoutError={error}
-                assinarLabel={assinarLabelCheckout}
-                cpfCnpj={cpfCnpj}
-                onCpfCnpjChange={setCpfCnpj}
               />
             </div>
 
