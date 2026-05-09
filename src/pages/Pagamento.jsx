@@ -47,6 +47,7 @@ export default function Pagamento() {
   const [pixModalOpen, setPixModalOpen] = useState(false)
   const [pixLoading, setPixLoading] = useState(false)
   const [pixError, setPixError] = useState('')
+  const [cpfCnpj, setCpfCnpj] = useState('')
   const [pixNeedsCpf, setPixNeedsCpf] = useState(false)
   const [pixCpfCnpj, setPixCpfCnpj] = useState('')
   const [pixData, setPixData] = useState(null)
@@ -211,6 +212,7 @@ export default function Pagamento() {
         body: JSON.stringify({
           plano: planoCheckout === 'anual' ? 'anual' : 'mensal',
           titulo: titulo.trim() || PLANO_PADRAO_TITULO,
+          cpf_cnpj: cpfCnpj.replace(/\D/g, ''),
         }),
       })
       const data = await res.json()
@@ -488,6 +490,8 @@ export default function Pagamento() {
                 disabledAssinar={disabledCheckout}
                 checkoutError={error}
                 assinarLabel={assinarLabelCheckout}
+                cpfCnpj={cpfCnpj}
+                onCpfCnpjChange={setCpfCnpj}
               />
             </div>
 

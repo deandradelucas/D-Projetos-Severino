@@ -15,6 +15,8 @@ export default function PagamentoPainelLateral({
   disabledAssinar,
   checkoutError,
   assinarLabel,
+  cpfCnpj,
+  onCpfCnpjChange,
   /** Segundo checkout (ex.: Stripe quando o primeiro é Pix Asaas). */
   onSegundoCheckout,
   segundoCheckoutLabel,
@@ -25,6 +27,23 @@ export default function PagamentoPainelLateral({
       <div className="pagamento-aside__actions ref-panel">
         <h2 className="pagamento-aside__title">Ações</h2>
         <div className="pagamento-aside__btn-stack">
+          {typeof onCpfCnpjChange === 'function' && (
+            <div className="pagamento-aside__cpf-field">
+              <label htmlFor="cpf-cnpj-checkout" className="pagamento-aside__cpf-label">
+                CPF ou CNPJ
+              </label>
+              <input
+                id="cpf-cnpj-checkout"
+                type="text"
+                className="pagamento-aside__cpf-input"
+                placeholder="000.000.000-00"
+                value={cpfCnpj || ''}
+                onChange={(e) => onCpfCnpjChange(e.target.value)}
+                maxLength={18}
+                disabled={paying || loading}
+              />
+            </div>
+          )}
           <button
             type="button"
             className="btn-primary page-pagamento-cta"

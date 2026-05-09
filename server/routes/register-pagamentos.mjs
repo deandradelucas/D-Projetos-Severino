@@ -101,6 +101,7 @@ export function registerPagamentosRoutes(app) {
 
       const body = await c.req.json().catch(() => ({}))
       const titulo = String(body?.titulo || 'Assinatura Severino').trim() || 'Assinatura Severino'
+      const cpfCnpj = String(body?.cpf_cnpj || '').replace(/\D/g, '').slice(0, 14)
 
       const precoMensalCfg = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
       const precoAnualCfg = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO_ANUAL || '100')
@@ -136,6 +137,7 @@ export function registerPagamentosRoutes(app) {
         email: perfil.email,
         nome: perfil.nome ?? perfil.usuario ?? '',
         telefone: perfil.telefone ?? '',
+        cpfCnpj,
         tituloItem: `${titulo} (${labelCiclo})`,
         valor,
         cycle,
