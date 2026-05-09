@@ -12,6 +12,9 @@ import { filtrarInstituicoesFinanceiras, labelTipoInstituicao } from '../../lib/
  */
 export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitting = false }) {
   const titleId = useId()
+  const stepInstTitleId = useId()
+  const stepTipoTitleId = useId()
+  const stepOutroTitleId = useId()
   const instListId = useId()
   const instInputId = useId()
   const blurTimerRef = useRef(null)

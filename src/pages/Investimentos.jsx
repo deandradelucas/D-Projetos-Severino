@@ -10,6 +10,13 @@ import { apiUrl } from '../lib/apiUrl'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
+import { INVESTIMENTOS_PRESETS_LIST } from '../lib/investimentosPresets'
+
+function labelTipoInvestimentoPreset(key) {
+  if (key == null || String(key).trim() === '') return null
+  const k = String(key).toUpperCase()
+  return INVESTIMENTOS_PRESETS_LIST.find((p) => p.key === k)?.label || k
+}
 
 export default function Investimentos() {
   const [menuAberto, setMenuAberto] = useState(false)
@@ -114,14 +121,19 @@ export default function Investimentos() {
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
             <RefDashboardScroll>
-              <section className="dashboard-hub__hero" aria-label="Investimentos">
-                <div className="dashboard-hub__hero-row">
+              <section className="dashboard-hub__hero page-investimentos-hero" aria-label="Investimentos">
+                <div className="dashboard-hub__hero-row page-investimentos-hero__row">
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} aria-label="Abrir menu" />
-                  <div className="dashboard-hub__hero-text dashboard-hub__hero-text--investimentos-selic">
+                  <div className="dashboard-hub__hero-text page-investimentos-hero__text">
                     <h1 className="dashboard-hub__title">Investimentos</h1>
-                    <TaxaSelicBadge variant="hero" />
+                    <p className="ref-panel__subtitle page-investimentos-hero__sub">
+                      Custódia, tipo de aplicação e referência da Selic
+                    </p>
+                    <div className="page-investimentos-hero__selic">
+                      <TaxaSelicBadge variant="hero" />
+                    </div>
                   </div>
-                  <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Investimentos">
+                  <div className="dashboard-hub__hero-actions page-investimentos-hero__actions" role="toolbar" aria-label="Ações">
                     <button
                       type="button"
                       className="dashboard-hub__btn dashboard-hub__btn--primary"
@@ -137,40 +149,78 @@ export default function Investimentos() {
                 </div>
               </section>
 
-              <section className="page-investimentos-list" aria-label="Lista de investimentos">
-                {loading ? (
-                  <p className="page-investimentos-empty">A carregar…</p>
-                ) : lista.length === 0 ? (
-                  <p className="page-investimentos-empty">Nenhum investimento registado. Use &quot;+ Novo investimento&quot; para começar.</p>
-                ) : (
-                  <ul className="page-investimentos-cards">
-                    {lista.map((row) => (
-                      <li key={row.id}>
-                        <article className="page-investimentos-card">
-                          <div>
-                            <h2 className="page-investimentos-card__title">{row.nome}</h2>
-                            <p className="page-investimentos-card__meta">
-                              <span className="page-investimentos-card__inst">
-                                {row.instituicao_nome || '—'}
-                              </span>
-                              {' · '}
-                              {!row.tipo_preset ? 'Personalizado · ' : null}
-                              Adicionado em {formatData(row.criado_em)}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            className="page-investimentos-card__remove"
-                            onClick={() => setRemoveTarget({ id: row.id, nome: row.nome })}
-                          >
-                            Remover
-                          </button>
-                        </article>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
+              <div className="page-investimentos-list">
+                <article className="ref-panel page-investimentos-panel" aria-labelledby="inv-panel-title">
+                  <div className="ref-panel__head page-investimentos-panel__head">
+                    <div>
+                      <h2 id="inv-panel-title" className="ref-panel__title">
+                        A sua carteira
+                      </h2>
+                      <p className="ref-panel__subtitle">Instituição e tipo que indicou no cadastro</p>
+                    </div>
+                    {!loading && lista.length > 0 ? (
+                      <span className="page-investimentos-panel__count" aria-label={`${lista.length} itens`}>
+                        {lista.length}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="page-investimentos-panel__body">
+                    {loading ? (
+                      <div className="page-investimentos-skeleton" aria-hidden>
+                        <div className="page-investimentos-skeleton__row" />
+                        <div className="page-investimentos-skeleton__row" />
+                        <div className="page-investimentos-skeleton__row page-investimentos-skeleton__row--short" />
+                      </div>
+                    ) : lista.length === 0 ? (
+                      <div className="page-investimentos-empty-state" role="status">
+                        <p className="page-investimentos-empty-state__title">Nada por aqui ainda</p>
+                        <p className="page-investimentos-empty-state__text">
+                          Registe o banco ou corretora e o tipo (LCA, CDB, etc.) para organizar a sua carteira.
+                        </p>
+                      </div>
+                    ) : (
+                      <ul className="page-investimentos-cards">
+                        {lista.map((row) => {
+                          const tipoLb = labelTipoInvestimentoPreset(row.tipo_preset)
+                          return (
+                            <li key={row.id}>
+                              <article className="page-investimentos-card">
+                                <div className="page-investimentos-card__main">
+                                  <div className="page-investimentos-card__badges" aria-label="Etiquetas">
+                                    <span className="page-investimentos-chip page-investimentos-chip--inst">
+                                      {row.instituicao_nome || '—'}
+                                    </span>
+                                    {tipoLb ? (
+                                      <span className="page-investimentos-chip page-investimentos-chip--tipo">{tipoLb}</span>
+                                    ) : (
+                                      <span className="page-investimentos-chip page-investimentos-chip--custom">
+                                        Personalizado
+                                      </span>
+                                    )}
+                                  </div>
+                                  <h3 className="page-investimentos-card__title">{row.nome}</h3>
+                                  <p className="page-investimentos-card__meta">
+                                    <span className="page-investimentos-card__date-label">Registado em</span>{' '}
+                                    <time dateTime={row.criado_em || undefined}>{formatData(row.criado_em)}</time>
+                                  </p>
+                                </div>
+                                <button
+                                  type="button"
+                                  className="page-investimentos-card__remove"
+                                  onClick={() => setRemoveTarget({ id: row.id, nome: row.nome })}
+                                >
+                                  Remover
+                                </button>
+                              </article>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                </article>
+              </div>
             </RefDashboardScroll>
           </div>
         </main>

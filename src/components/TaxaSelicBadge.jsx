@@ -12,11 +12,10 @@ export default function TaxaSelicBadge({ variant = 'hero' }) {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    setErr('')
     fetchTaxaSelicDeduplicated()
       .then((data) => {
         if (cancelled) return
+        setErr('')
         setValorFmt(formatSelicPercentPtBr(data.valor_aa))
         setDataRef(data.data_referencia ? `Ref. ${data.data_referencia}` : '')
       })
