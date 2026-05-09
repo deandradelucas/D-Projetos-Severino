@@ -75,9 +75,9 @@ function dataLocalInicioApartirDeIso(iso) {
 }
 
 /**
- * Conta dias úteis (seg–sex, exceto feriados nacionais) em que há pregão CDI,
- * no intervalo **(data de início, data de referência]** — alinhado a “dias corridos decorridos”
- * (o mesmo dia da aquisição não conta como dia completo de rendimento acumulado).
+ * Conta dias úteis (seg–sex, exceto feriados nacionais) com pregão CDI no intervalo
+ * **[data de início, data de referência]** (ambos inclusivos no calendário local).
+ * Usado para acumular rendimento estimado desde a data de aquisição até “hoje”.
  *
  * @param {string | undefined | null} iso Data inicial (YYYY-MM-DD ou ISO com prefixo data).
  * @param {Date} [dataReferencia=new Date()] “Hoje” para o corte (date-only no fuso local).
@@ -87,9 +87,7 @@ export function contarDiasUteisComJurosDesdeIso(iso, dataReferencia = new Date()
   const start = dataLocalInicioApartirDeIso(iso)
   if (!start) return null
   const end = new Date(dataReferencia.getFullYear(), dataReferencia.getMonth(), dataReferencia.getDate())
-  const cursor = new Date(start.getFullYear(), start.getMonth(), start.getDate())
-  cursor.setDate(cursor.getDate() + 1)
-  if (cursor > end) return 0
+  if (end < start) return 0
 
   /** @type {Map<number, Set<string>>} */
   const cache = new Map()
@@ -99,7 +97,7 @@ export function contarDiasUteisComJurosDesdeIso(iso, dataReferencia = new Date()
   }
 
   let n = 0
-  const walk = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate())
+  const walk = new Date(start.getFullYear(), start.getMonth(), start.getDate())
   while (walk <= end) {
     const dow = walk.getDay()
     const isWeekday = dow >= 1 && dow <= 5
@@ -230,6 +228,46 @@ export function estimativaRendimentoDiarioComIr(valor, percentualCdi, cdiAa, dia
     liquido: bruto - imposto,
     isento: false,
     diasPrazoUsados: d,
+  }
+}
+
+/**
+ * Rendimento acumulado estimado: (valor diário bruto × dias úteis) com IR sobre o bruto acumulado
+ * usando a alíquota regressiva atual pelo prazo em dias corridos (aproximação; CDI e capital constantes).
+ *
+ * @param {number | null | undefined} diasUteisAcumulacao resultado de {@link contarDiasUteisComJurosDesdeIso}
+ */
+export function estimativaRendimentoAcumuladoAteHoje(
+  valor,
+  percentualCdi,
+  cdiAa,
+  diasPrazoIr,
+  isentoIrPf,
+  diasUteisAcumulacao,
+) {
+  const du = Math.max(0, Math.floor(Number(diasUteisAcumulacao)) || 0)
+  const daily = estimativaRendimentoDiarioComIr(valor, percentualCdi, cdiAa, diasPrazoIr, isentoIrPf)
+  if (!daily) return null
+  const brutoAcum = daily.bruto * du
+  if (daily.isento) {
+    return {
+      brutoAcumulado: brutoAcum,
+      impostoAcumulado: 0,
+      liquidoAcumulado: brutoAcum,
+      diasUteisAcumulacao: du,
+      aliquotaFmt: daily.aliquotaFmt,
+      isento: true,
+    }
+  }
+  const impostoAcum = brutoAcum * daily.aliquota
+  return {
+    brutoAcumulado: brutoAcum,
+    impostoAcumulado: impostoAcum,
+    liquidoAcumulado: brutoAcum - impostoAcum,
+    diasUteisAcumulacao: du,
+    aliquota: daily.aliquota,
+    aliquotaFmt: daily.aliquotaFmt,
+    isento: false,
   }
 }
 
