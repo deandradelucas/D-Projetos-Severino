@@ -55,39 +55,6 @@ function formatDataAquisicaoCartao(raw) {
   }
 }
 
-function textoHintRendimentoCartao({
-  cdiAa,
-  diasUteisComJuros,
-  diasRegisto,
-  temDataAquisicao,
-  isentoIr,
-  semPregaoCdiHoje,
-  ymdInicioCalculo,
-}) {
-  const cdiFmt = `${cdiAa.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}% a.a.`
-  const du = diasUteisComJuros == null ? '—' : String(diasUteisComJuros)
-  const origem = temDataAquisicao ? 'a data de aquisição' : 'o registo neste painel'
-  const inicioFmt =
-    ymdInicioCalculo != null
-      ? new Date(`${ymdInicioCalculo}T12:00:00`).toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        })
-      : '—'
-  const prefixSemPregao = semPregaoCdiHoje
-    ? 'Hoje não há pregão CDI (fim de semana ou feriado); rendimento do dia exibido como R$ 0,00. '
-    : ''
-  let s = `${prefixSemPregao}Período no cálculo: desde ${inicioFmt} (${temDataAquisicao ? 'data de aquisição' : 'fallback: dia do registo — edite e guarde a data de compra se estiver errado'}). Acumulado desde ${origem}: ~${du} dias úteis com pregão até hoje (intervalo inclusivo). Rendimento por dia útil × esse total · CDI ${cdiFmt} · pro rata linear (252 dias/ano).`
-  if (!isentoIr) {
-    const ir = temDataAquisicao
-      ? ` IR sobre o bruto acumulado na faixa aos ${diasRegisto ?? 0} dias corridos até hoje (aprox.).`
-      : ` IR sobre o bruto acumulado na faixa aos ${diasRegisto ?? 0} dias corridos desde o registo até hoje (aprox.).`
-    s = `${s}${ir}`
-  }
-  return s
-}
-
 export default function Investimentos() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [lista, setLista] = useState([])
@@ -441,6 +408,16 @@ export default function Investimentos() {
                                             </dd>
                                           </div>
                                         ) : null}
+                                        {dataAquisicaoYmd ? (
+                                          <div className="page-investimentos-card__metric page-investimentos-card__metric--span page-investimentos-card__metric--aquisicao">
+                                            <dt className="page-investimentos-card__metric-label">Adquirido em</dt>
+                                            <dd className="page-investimentos-card__metric-value page-investimentos-card__metric-value--date">
+                                              <time dateTime={dataAquisicaoYmd}>
+                                                {formatDataAquisicaoCartao(row.data_aquisicao)}
+                                              </time>
+                                            </dd>
+                                          </div>
+                                        ) : null}
                                         {temValor ? (
                                           <div className="page-investimentos-card__metric">
                                             <dt className="page-investimentos-card__metric-label">Valor aplicado</dt>
@@ -503,7 +480,7 @@ export default function Investimentos() {
                                             </div>
                                             {estAcumulado ? (
                                               <>
-                                                <div className="page-investimentos-card__metric page-investimentos-card__metric--span">
+                                                <div className="page-investimentos-card__metric">
                                                   <dt className="page-investimentos-card__metric-label">Rendimento bruto acumulado (est.)</dt>
                                                   <dd
                                                     className="page-investimentos-card__metric-value"
@@ -536,7 +513,7 @@ export default function Investimentos() {
                                                 </div>
                                               </>
                                             ) : null}
-                                            <div className="page-investimentos-card__metric">
+                                            <div className="page-investimentos-card__metric page-investimentos-card__metric--total">
                                               <dt className="page-investimentos-card__metric-label">Total estimado</dt>
                                               <dd
                                                 className="page-investimentos-card__metric-value"
@@ -551,36 +528,25 @@ export default function Investimentos() {
                                           </>
                                         ) : null}
                                       </dl>
-                                      {estRendimento ? (
-                                        <p className="page-investimentos-card__rendimento-hint">
-                                          {textoHintRendimentoCartao({
-                                            cdiAa,
-                                            diasUteisComJuros,
-                                            diasRegisto,
-                                            temDataAquisicao: Boolean(dataAquisicaoYmd),
-                                            isentoIr: estRendimento.isento,
-                                            semPregaoCdiHoje: !pregaoCdiHoje,
-                                            ymdInicioCalculo: extrairYyyyMmDdReferencia(isoCalculoDias),
-                                          })}
-                                        </p>
-                                      ) : null}
                                     </>
                                   ) : null}
-                                  <p className="page-investimentos-card__meta">
-                                    {dataAquisicaoYmd ? (
-                                      <>
-                                        <span className="page-investimentos-card__date-label">Adquirido em</span>{' '}
-                                        <time dateTime={dataAquisicaoYmd}>
-                                          {formatDataAquisicaoCartao(row.data_aquisicao)}
-                                        </time>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <span className="page-investimentos-card__date-label">Registado em</span>{' '}
-                                        <time dateTime={row.criado_em || undefined}>{formatData(row.criado_em)}</time>
-                                      </>
-                                    )}
-                                  </p>
+                                  {!(dataAquisicaoYmd && (temValor || percLista)) ? (
+                                    <p className="page-investimentos-card__meta">
+                                      {dataAquisicaoYmd ? (
+                                        <>
+                                          <span className="page-investimentos-card__date-label">Adquirido em</span>{' '}
+                                          <time dateTime={dataAquisicaoYmd}>
+                                            {formatDataAquisicaoCartao(row.data_aquisicao)}
+                                          </time>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <span className="page-investimentos-card__date-label">Registado em</span>{' '}
+                                          <time dateTime={row.criado_em || undefined}>{formatData(row.criado_em)}</time>
+                                        </>
+                                      )}
+                                    </p>
+                                  ) : null}
                                 </div>
                                 <div className="page-investimentos-card__actions">
                                   <button
