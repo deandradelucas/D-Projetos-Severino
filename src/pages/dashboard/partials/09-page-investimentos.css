@@ -1,21 +1,93 @@
-/* Página Investimentos — lista + modal novo */
+/* Página Investimentos — lista + modal novo (shell alinhado ao dashboard-page) */
 
-.page-investimentos-list {
-  padding: 0 1rem 1.5rem;
+.page-investimentos-hero__rates-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.65rem;
+  margin-top: 0.35rem;
 }
 
-@media (min-width: 640px) {
-  .page-investimentos-list {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+.page-investimentos-panel {
+  margin-top: 0;
+}
+
+.page-investimentos-panel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-investimentos-panel__count {
+  flex-shrink: 0;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #0f172a);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: color-mix(in srgb, var(--accent, #d4a84b) 12%, transparent);
+}
+
+.page-investimentos-panel__list .page-investimentos-skeleton {
+  padding-bottom: 4px;
+}
+
+.page-investimentos-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 0 8px;
+}
+
+.page-investimentos-skeleton__row {
+  height: 52px;
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0.14) 0%,
+    rgba(148, 163, 184, 0.22) 45%,
+    rgba(148, 163, 184, 0.14) 90%
+  );
+  background-size: 200% 100%;
+  animation: page-investimentos-shimmer 1.1s ease-in-out infinite;
+}
+
+.page-investimentos-skeleton__row--short {
+  width: 62%;
+  height: 44px;
+}
+
+@keyframes page-investimentos-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
   }
 }
 
-.page-investimentos-empty {
+.page-investimentos-empty-state.ref-empty-state .ref-empty {
   margin: 0;
-  padding: 1rem 1.25rem;
-  font-size: 0.95rem;
+}
+
+.page-investimentos-empty-state .page-investimentos-empty-state__text {
+  margin: 0.55rem 0 0;
+  font-size: clamp(0.8125rem, 0.28vw + 0.74rem, 0.9375rem);
+  line-height: 1.45;
   color: var(--text-secondary, #64748b);
+  text-align: center;
+}
+
+body[data-theme='dark'] .page-investimentos-empty-state .page-investimentos-empty-state__text {
+  color: rgba(248, 250, 252, 0.62);
 }
 
 .page-investimentos-cards {
@@ -24,58 +96,154 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
 .page-investimentos-card {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.9rem 1rem;
-  border-radius: 14px;
+  gap: 0.85rem;
+  padding: 1rem 1.05rem;
+  border-radius: 16px;
   border: 1px solid rgba(148, 163, 184, 0.22);
   background: var(--bg-secondary, rgba(255, 255, 255, 0.04));
+  box-shadow: 0 10px 28px -22px rgba(15, 23, 42, 0.35);
 }
 
 body[data-theme='light'] .page-investimentos-card {
-  background: rgba(255, 255, 255, 0.72);
-  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(148, 163, 184, 0.32);
+}
+
+.page-investimentos-card__main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.page-investimentos-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 0.45rem;
+}
+
+.page-investimentos-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--text-secondary, #64748b);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-investimentos-chip--inst {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: var(--text-primary, #0f172a);
+  background: color-mix(in srgb, var(--accent, #d4a84b) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 35%, transparent);
+}
+
+.page-investimentos-chip--tipo {
+  border-color: rgba(59, 130, 246, 0.28);
+  background: rgba(59, 130, 246, 0.1);
+  color: color-mix(in srgb, #2563eb 85%, var(--text-primary, #0f172a));
+}
+
+.page-investimentos-chip--custom {
+  border-style: dashed;
+  font-weight: 700;
 }
 
 .page-investimentos-card__title {
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text-primary, #0f172a);
 }
 
 .page-investimentos-card__meta {
-  margin: 0.2rem 0 0;
+  margin: 0.35rem 0 0;
   font-size: 0.8rem;
   color: var(--text-secondary, #64748b);
 }
 
-.page-investimentos-card__inst {
-  font-weight: 700;
+.page-investimentos-card__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.65rem 1rem;
+  margin: 0.5rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.06);
+}
+
+body[data-theme='light'] .page-investimentos-card__metrics {
+  background: rgba(248, 250, 252, 0.9);
+}
+
+.page-investimentos-card__metric {
+  margin: 0;
+  min-width: 0;
+}
+
+.page-investimentos-card__metric-label {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #64748b);
+}
+
+.page-investimentos-card__metric-value {
+  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text-primary, #0f172a);
+}
+
+.page-investimentos-card__date-label {
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
 }
 
 .page-investimentos-card__remove {
   flex-shrink: 0;
-  padding: 0.35rem 0.65rem;
+  align-self: center;
+  padding: 0.4rem 0.75rem;
   font-size: 0.8rem;
-  font-weight: 600;
-  border-radius: 8px;
+  font-weight: 650;
+  border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.35);
   background: transparent;
   color: var(--text-secondary, #64748b);
   cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
 }
 
 .page-investimentos-card__remove:hover {
   border-color: rgba(239, 68, 68, 0.45);
   color: var(--danger, #ef4444);
+  background: rgba(239, 68, 68, 0.06);
 }
 
 .page-investimentos-modal-backdrop.modal-backdrop {
@@ -83,15 +251,24 @@ body[data-theme='light'] .page-investimentos-card {
 }
 
 .page-investimentos-modal.modal-content {
-  width: min(520px, calc(100vw - 32px));
-  max-height: min(92vh, 720px);
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(92vh, 920px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  border-radius: 18px;
 }
 
 .page-investimentos-modal .modal-header {
-  margin-bottom: 1rem;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.page-investimentos-modal .modal-header h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .page-investimentos-modal .modal-form {
@@ -108,14 +285,91 @@ body[data-theme='light'] .page-investimentos-card {
 }
 
 .page-investimentos-modal__lead {
-  margin: 0 0 1rem;
+  margin: 0 0 1.1rem;
   font-size: 0.9rem;
-  line-height: 1.45;
+  line-height: 1.5;
+  color: var(--text-secondary, #64748b);
+}
+
+.page-investimentos-modal__card {
+  margin: 0 0 0.85rem;
+  padding: 0.95rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: var(--bg-secondary, rgba(255, 255, 255, 0.03));
+}
+
+body[data-theme='light'] .page-investimentos-modal__card {
+  background: rgba(248, 250, 252, 0.95);
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+.page-investimentos-modal__card--soft {
+  border-style: dashed;
+  background: transparent;
+}
+
+body[data-theme='light'] .page-investimentos-modal__card--soft {
+  background: rgba(248, 250, 252, 0.55);
+}
+
+.page-investimentos-modal__card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.page-investimentos-modal__step-num {
+  flex-shrink: 0;
+  width: 1.85rem;
+  height: 1.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-primary, #0f172a);
+  background: color-mix(in srgb, var(--accent, #d4a84b) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 38%, transparent);
+}
+
+.page-investimentos-modal__step-num--optional {
+  background: rgba(148, 163, 184, 0.14);
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+.page-investimentos-modal__card-head-text {
+  min-width: 0;
+}
+
+.page-investimentos-modal__card-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #0f172a);
+}
+
+.page-investimentos-modal__optional-tag {
+  font-size: 0.68rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #64748b);
+  vertical-align: middle;
+}
+
+.page-investimentos-modal__card-desc {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
   color: var(--text-secondary, #64748b);
 }
 
 .page-investimentos-modal__fieldset {
-  margin: 0 0 1.25rem;
+  margin: 0;
   padding: 0;
   border: none;
   min-width: 0;
@@ -238,15 +492,21 @@ body[data-theme='dark'] .page-investimentos-inst-dropdown {
   transition:
     border-color 0.15s ease,
     background 0.15s ease,
-    box-shadow 0.15s ease;
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
 }
 
 body[data-theme='light'] .page-investimentos-preset-chip {
   background: rgba(248, 250, 252, 0.9);
 }
 
-.page-investimentos-preset-chip:hover {
+.page-investimentos-preset-chip:hover:not(:disabled) {
   border-color: rgba(212, 168, 75, 0.45);
+}
+
+.page-investimentos-preset-chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .page-investimentos-preset-chip--active {
@@ -270,6 +530,102 @@ body[data-theme='light'] .page-investimentos-preset-chip {
 
 .page-investimentos-modal__custom {
   margin-bottom: 0.5rem;
+}
+
+.page-investimentos-modal__valor-field {
+  margin-bottom: 0;
+}
+
+.page-investimentos-modal__valor-input-wrap {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: var(--bg-primary, #fff);
+  overflow: hidden;
+}
+
+body[data-theme='dark'] .page-investimentos-modal__valor-input-wrap {
+  background: rgba(15, 23, 42, 0.55);
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.page-investimentos-modal__valor-prefix {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 0 10px 12px;
+  font-size: 0.95rem;
+  font-weight: 750;
+  color: var(--text-secondary, #64748b);
+}
+
+.page-investimentos-modal__input.page-investimentos-modal__input--valor {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  border-radius: 0;
+  padding-left: 6px;
+  padding-right: 12px;
+  background: transparent;
+}
+
+.page-investimentos-modal__input.page-investimentos-modal__input--valor:focus {
+  outline: none;
+}
+
+.page-investimentos-modal__valor-input-wrap:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 55%, rgba(148, 163, 184, 0.35));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #d4a84b) 18%, transparent);
+}
+
+.page-investimentos-modal__perc-field {
+  margin-bottom: 0;
+}
+
+.page-investimentos-modal__perc-input-wrap {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: var(--bg-primary, #fff);
+  overflow: hidden;
+}
+
+body[data-theme='dark'] .page-investimentos-modal__perc-input-wrap {
+  background: rgba(15, 23, 42, 0.55);
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.page-investimentos-modal__input.page-investimentos-modal__input--perc {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  border-radius: 0;
+  padding: 10px 8px 10px 12px;
+  background: transparent;
+}
+
+.page-investimentos-modal__input.page-investimentos-modal__input--perc:focus {
+  outline: none;
+}
+
+.page-investimentos-modal__perc-suffix {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 12px 10px 0;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--text-secondary, #64748b);
+  white-space: nowrap;
+}
+
+.page-investimentos-modal__perc-input-wrap:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 55%, rgba(148, 163, 184, 0.35));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #d4a84b) 18%, transparent);
 }
 
 .page-investimentos-modal__label {
@@ -319,27 +675,55 @@ body[data-theme='dark'] .page-investimentos-modal__input {
 .page-investimentos-modal__footer {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding-top: 1rem;
   margin-top: auto;
   border-top: 1px solid rgba(148, 163, 184, 0.18);
 }
 
-/* Selic ao lado de Investimentos (hero + sidebar) */
-.dashboard-hub__hero-text--investimentos-selic {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 0.45rem 1rem;
-  min-width: 0;
+.page-investimentos-modal__footer-hint {
+  margin: 0;
+  flex: 1 1 160px;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--text-secondary, #64748b);
 }
 
-.taxa-selic-badge {
+.page-investimentos-modal__footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 420px) {
+  .page-investimentos-modal__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-investimentos-modal__footer-actions {
+    width: 100%;
+  }
+
+  .page-investimentos-modal__footer-actions .btn-primary,
+  .page-investimentos-modal__footer-actions .btn-secondary {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
+
+/* Selic + CDI (hero Investimentos + sidebar) */
+
+.taxa-selic-badge,
+.taxa-cdi-badge {
   box-sizing: border-box;
 }
 
-.taxa-selic-badge--hero {
+.taxa-selic-badge--hero,
+.taxa-cdi-badge--hero {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -350,12 +734,14 @@ body[data-theme='dark'] .page-investimentos-modal__input {
   background: color-mix(in srgb, var(--accent, #d4a84b) 8%, transparent);
 }
 
-body[data-theme='light'] .taxa-selic-badge--hero {
+body[data-theme='light'] .taxa-selic-badge--hero,
+body[data-theme='light'] .taxa-cdi-badge--hero {
   background: rgba(212, 168, 75, 0.12);
   border-color: rgba(212, 168, 75, 0.35);
 }
 
-.taxa-selic-badge__k {
+.taxa-selic-badge__k,
+.taxa-cdi-badge__k {
   font-size: 0.68rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -363,25 +749,29 @@ body[data-theme='light'] .taxa-selic-badge--hero {
   color: var(--text-secondary, #64748b);
 }
 
-.taxa-selic-badge__pill {
+.taxa-selic-badge__pill,
+.taxa-cdi-badge__pill {
   font-size: 0.88rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-primary, #0f172a);
 }
 
-.taxa-selic-badge__pill--muted {
+.taxa-selic-badge__pill--muted,
+.taxa-cdi-badge__pill--muted {
   font-weight: 650;
   opacity: 0.65;
 }
 
-.taxa-selic-badge__pill--warn {
+.taxa-selic-badge__pill--warn,
+.taxa-cdi-badge__pill--warn {
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--danger, #b45309);
 }
 
-.taxa-selic-badge__ref {
+.taxa-selic-badge__ref,
+.taxa-cdi-badge__ref {
   width: 100%;
   flex-basis: 100%;
   font-size: 0.7rem;
@@ -390,13 +780,15 @@ body[data-theme='light'] .taxa-selic-badge--hero {
 }
 
 @media (min-width: 480px) {
-  .taxa-selic-badge__ref {
+  .taxa-selic-badge__ref,
+  .taxa-cdi-badge__ref {
     width: auto;
     flex-basis: auto;
   }
 }
 
-.taxa-selic-badge--sidebar {
+.taxa-selic-badge--sidebar,
+.taxa-cdi-badge--sidebar {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -404,27 +796,38 @@ body[data-theme='light'] .taxa-selic-badge--hero {
   max-width: 100%;
 }
 
-.taxa-selic-badge--sidebar .taxa-selic-badge__k {
+.taxa-selic-badge--sidebar .taxa-selic-badge__k,
+.taxa-cdi-badge--sidebar .taxa-cdi-badge__k {
   font-size: 10px;
   letter-spacing: 0.05em;
   color: var(--sidebar-text-muted, rgba(255, 255, 255, 0.55));
 }
 
-.taxa-selic-badge--sidebar .taxa-selic-badge__v {
+.taxa-selic-badge--sidebar .taxa-selic-badge__v,
+.taxa-cdi-badge--sidebar .taxa-cdi-badge__v {
   font-size: 11px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--sidebar-text, rgba(255, 255, 255, 0.92));
 }
 
-.taxa-selic-badge--sidebar .taxa-selic-badge__v--muted {
+.taxa-selic-badge--sidebar .taxa-selic-badge__v--muted,
+.taxa-cdi-badge--sidebar .taxa-cdi-badge__v--muted {
   font-weight: 700;
   opacity: 0.55;
 }
 
-.taxa-selic-badge--sidebar .taxa-selic-badge__v--warn {
+.taxa-selic-badge--sidebar .taxa-selic-badge__v--warn,
+.taxa-cdi-badge--sidebar .taxa-cdi-badge__v--warn {
   font-weight: 700;
   opacity: 0.65;
+}
+
+.nav-item__investimentos-rates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
 }
 
 .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--investimentos-row {
@@ -445,10 +848,12 @@ body[data-theme='light'] .taxa-selic-badge--hero {
   min-width: 0;
 }
 
-.dashboard-container.app-horizon-shell .sidebar .nav-item.active.nav-item--investimentos-row .taxa-selic-badge__k {
+.dashboard-container.app-horizon-shell .sidebar .nav-item.active.nav-item--investimentos-row .taxa-selic-badge__k,
+.dashboard-container.app-horizon-shell .sidebar .nav-item.active.nav-item--investimentos-row .taxa-cdi-badge__k {
   color: rgba(15, 23, 42, 0.55);
 }
 
-.dashboard-container.app-horizon-shell .sidebar .nav-item.active.nav-item--investimentos-row .taxa-selic-badge__v {
+.dashboard-container.app-horizon-shell .sidebar .nav-item.active.nav-item--investimentos-row .taxa-selic-badge__v,
+.dashboard-container.app-horizon-shell .sidebar .nav-item.active.nav-item--investimentos-row .taxa-cdi-badge__v {
   color: #0f172a;
 }

@@ -10,10 +10,12 @@ import { registerWhatsappRoutes } from './register-whatsapp.mjs'
 import { registerFamiliaRoutes } from './register-familia.mjs'
 import { registerInvestimentosRoutes } from './register-investimentos.mjs'
 import { registerTaxaSelicRoutes } from './register-taxa-selic.mjs'
+import { registerTaxaCdiRoutes } from './register-taxa-cdi.mjs'
 
 /** Regista todas as rotas `/api/*` (exceto health, montado em app.mjs). */
 export function registerApiDomainRoutes(app) {
   registerTaxaSelicRoutes(app)
+  registerTaxaCdiRoutes(app)
   registerAdminRoutes(app)
   registerAuthRoutes(app)
   registerAssinaturaRoutes(app)

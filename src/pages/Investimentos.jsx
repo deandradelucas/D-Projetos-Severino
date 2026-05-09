@@ -6,10 +6,13 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import InvestimentoNovoModal from '../components/investimentos/InvestimentoNovoModal.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import TaxaSelicBadge from '../components/TaxaSelicBadge.jsx'
+import TaxaCdiBadge from '../components/TaxaCdiBadge.jsx'
 import { apiUrl } from '../lib/apiUrl'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
+import { formatPercentualCdiLista } from '../lib/percentualCdiInput'
 import { INVESTIMENTOS_PRESETS_LIST } from '../lib/investimentosPresets'
 
 function labelTipoInvestimentoPreset(key) {
@@ -114,26 +117,24 @@ export default function Investimentos() {
   }
 
   return (
-    <div className="dashboard-container page-investimentos ref-dashboard app-horizon-shell">
+    <div className="dashboard-container dashboard-page page-investimentos ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
         <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
             <RefDashboardScroll>
-              <section className="dashboard-hub__hero page-investimentos-hero" aria-label="Investimentos">
-                <div className="dashboard-hub__hero-row page-investimentos-hero__row">
+              <section className="dashboard-hub__hero" aria-label="Investimentos">
+                <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} aria-label="Abrir menu" />
-                  <div className="dashboard-hub__hero-text page-investimentos-hero__text">
+                  <div className="dashboard-hub__hero-text">
                     <h1 className="dashboard-hub__title">Investimentos</h1>
-                    <p className="ref-panel__subtitle page-investimentos-hero__sub">
-                      Custódia, tipo de aplicação e referência da Selic
-                    </p>
-                    <div className="page-investimentos-hero__selic">
+                    <div className="page-investimentos-hero__rates-row" aria-label="Taxas de referência BCB">
                       <TaxaSelicBadge variant="hero" />
+                      <TaxaCdiBadge variant="hero" />
                     </div>
                   </div>
-                  <div className="dashboard-hub__hero-actions page-investimentos-hero__actions" role="toolbar" aria-label="Ações">
+                  <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações">
                     <button
                       type="button"
                       className="dashboard-hub__btn dashboard-hub__btn--primary"
@@ -149,14 +150,19 @@ export default function Investimentos() {
                 </div>
               </section>
 
-              <div className="page-investimentos-list">
-                <article className="ref-panel page-investimentos-panel" aria-labelledby="inv-panel-title">
+              <section className="ref-bottom-grid ref-bottom-grid--single" aria-label="Investimentos registados">
+                <article
+                  className="ref-panel ref-panel--transactions dashboard-hub__tx-panel page-investimentos-panel"
+                  aria-labelledby="inv-panel-title"
+                >
                   <div className="ref-panel__head page-investimentos-panel__head">
                     <div>
                       <h2 id="inv-panel-title" className="ref-panel__title">
                         A sua carteira
                       </h2>
-                      <p className="ref-panel__subtitle">Instituição e tipo que indicou no cadastro</p>
+                      <p className="ref-panel__subtitle">
+                        Instituição, produto, valor, % do CDI contratada e data de registo
+                      </p>
                     </div>
                     {!loading && lista.length > 0 ? (
                       <span className="page-investimentos-panel__count" aria-label={`${lista.length} itens`}>
@@ -165,7 +171,7 @@ export default function Investimentos() {
                     ) : null}
                   </div>
 
-                  <div className="page-investimentos-panel__body">
+                  <div className="ref-tx-list page-investimentos-panel__list">
                     {loading ? (
                       <div className="page-investimentos-skeleton" aria-hidden>
                         <div className="page-investimentos-skeleton__row" />
@@ -173,8 +179,8 @@ export default function Investimentos() {
                         <div className="page-investimentos-skeleton__row page-investimentos-skeleton__row--short" />
                       </div>
                     ) : lista.length === 0 ? (
-                      <div className="page-investimentos-empty-state" role="status">
-                        <p className="page-investimentos-empty-state__title">Nada por aqui ainda</p>
+                      <div className="ref-empty-state page-investimentos-empty-state" role="status">
+                        <p className="ref-empty">Nada por aqui ainda</p>
                         <p className="page-investimentos-empty-state__text">
                           Registe o banco ou corretora e o tipo (LCA, CDB, etc.) para organizar a sua carteira.
                         </p>
@@ -183,6 +189,9 @@ export default function Investimentos() {
                       <ul className="page-investimentos-cards">
                         {lista.map((row) => {
                           const tipoLb = labelTipoInvestimentoPreset(row.tipo_preset)
+                          const temValor =
+                            row.valor_investido != null && Number.isFinite(Number(row.valor_investido))
+                          const percLista = formatPercentualCdiLista(row.percentual_cdi)
                           return (
                             <li key={row.id}>
                               <article className="page-investimentos-card">
@@ -200,6 +209,24 @@ export default function Investimentos() {
                                     )}
                                   </div>
                                   <h3 className="page-investimentos-card__title">{row.nome}</h3>
+                                  {temValor || percLista ? (
+                                    <dl className="page-investimentos-card__metrics" aria-label="Detalhes do investimento">
+                                      {temValor ? (
+                                        <div className="page-investimentos-card__metric">
+                                          <dt className="page-investimentos-card__metric-label">Valor aplicado</dt>
+                                          <dd className="page-investimentos-card__metric-value">
+                                            {formatCurrencyBRL(Number(row.valor_investido))}
+                                          </dd>
+                                        </div>
+                                      ) : null}
+                                      {percLista ? (
+                                        <div className="page-investimentos-card__metric">
+                                          <dt className="page-investimentos-card__metric-label">% do CDI contratada</dt>
+                                          <dd className="page-investimentos-card__metric-value">{percLista}</dd>
+                                        </div>
+                                      ) : null}
+                                    </dl>
+                                  ) : null}
                                   <p className="page-investimentos-card__meta">
                                     <span className="page-investimentos-card__date-label">Registado em</span>{' '}
                                     <time dateTime={row.criado_em || undefined}>{formatData(row.criado_em)}</time>
@@ -220,7 +247,7 @@ export default function Investimentos() {
                     )}
                   </div>
                 </article>
-              </div>
+              </section>
             </RefDashboardScroll>
           </div>
         </main>
