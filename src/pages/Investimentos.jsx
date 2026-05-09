@@ -14,11 +14,62 @@ import { showToast } from '../lib/toastStore'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { formatPercentualCdiLista } from '../lib/percentualCdiInput'
 import { INVESTIMENTOS_PRESETS_LIST } from '../lib/investimentosPresets'
+import { fetchTaxaCdiDeduplicated } from '../lib/taxaCdiClient'
+import {
+  IR_RENDA_FIXA_REGRESSIVO_UI,
+  contarDiasUteisComJurosDesdeIso,
+  diasCorridosDesdeIso,
+  estimativaRendimentoDiarioComIr,
+  formatMoedaDiariaEstimativa,
+  investimentoIsentoIrPessoaFisica,
+} from '../lib/investimentosRendimentoIr'
 
 function labelTipoInvestimentoPreset(key) {
   if (key == null || String(key).trim() === '') return null
   const k = String(key).toUpperCase()
   return INVESTIMENTOS_PRESETS_LIST.find((p) => p.key === k)?.label || k
+}
+
+function isoOuDataParaCalculoDias(dataAquisicao, criadoEm) {
+  if (dataAquisicao != null && String(dataAquisicao).trim() !== '') {
+    const s = String(dataAquisicao).trim().slice(0, 10)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return `${s}T12:00:00`
+  }
+  return criadoEm
+}
+
+function formatDataAquisicaoCartao(raw) {
+  if (!raw) return '—'
+  const s = String(raw).slice(0, 10)
+  try {
+    return new Date(`${s}T12:00:00`).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })
+  } catch {
+    return '—'
+  }
+}
+
+function textoHintRendimentoCartao({
+  cdiAa,
+  diasUteisComJuros,
+  diasRegisto,
+  temDataAquisicao,
+  isentoIr,
+}) {
+  const cdiFmt = `${cdiAa.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}% a.a.`
+  const du = diasUteisComJuros == null ? '—' : String(diasUteisComJuros)
+  const origem = temDataAquisicao ? 'a data de aquisição' : 'o registo neste painel'
+  let s = `Estimativa por dia útil (252 dias/ano; fins de semana sem pregão CDI). ~${du} dias úteis com pregão desde ${origem} · ${cdiFmt} · pro rata linear.`
+  if (!isentoIr) {
+    const ir = temDataAquisicao
+      ? `IR regressivo conforme ${diasRegisto ?? 0} dias corridos até hoje (faixa do imposto).`
+      : `IR regressivo conforme ${diasRegisto ?? 0} dias corridos desde o registo até hoje (faixa do imposto).`
+    s = `${s} ${ir}`
+  }
+  return s
 }
 
 export default function Investimentos() {
@@ -29,6 +80,10 @@ export default function Investimentos() {
   const [modalResetKey, setModalResetKey] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [removeTarget, setRemoveTarget] = useState(null)
+  const [editTarget, setEditTarget] = useState(null)
+  const [irTabelaExpandida, setIrTabelaExpandida] = useState(false)
+  const [cdiAa, setCdiAa] = useState(null)
+  const [cdiLoading, setCdiLoading] = useState(true)
 
   const session = readHorizonteUser()
   const uid = session?.id ? String(session.id).trim() : ''
@@ -60,12 +115,33 @@ export default function Investimentos() {
     void carregar()
   }, [carregar])
 
-  const handleAdicionar = async (payload) => {
+  useEffect(() => {
+    let cancelled = false
+    fetchTaxaCdiDeduplicated()
+      .then((data) => {
+        if (cancelled) return
+        const v = Number(data?.valor_aa)
+        setCdiAa(Number.isFinite(v) ? v : null)
+      })
+      .catch(() => {
+        if (cancelled) return
+        setCdiAa(null)
+      })
+      .finally(() => {
+        if (!cancelled) setCdiLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const handleSalvarInvestimento = async (payload) => {
     if (!uid) return
+    const editingId = editTarget?.id ? String(editTarget.id).trim() : ''
     setSubmitting(true)
     try {
-      const res = await fetch(apiUrl('/api/investimentos'), {
-        method: 'POST',
+      const res = await fetch(apiUrl(editingId ? `/api/investimentos/${editingId}` : '/api/investimentos'), {
+        method: editingId ? 'PATCH' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-user-id': uid,
@@ -74,12 +150,13 @@ export default function Investimentos() {
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.message || 'Não foi possível adicionar.')
-      showToast('Investimento adicionado.')
+      if (!res.ok) throw new Error(data.message || (editingId ? 'Não foi possível atualizar.' : 'Não foi possível adicionar.'))
+      showToast(editingId ? 'Investimento atualizado.' : 'Investimento adicionado.')
       setModalOpen(false)
+      setEditTarget(null)
       await carregar()
     } catch (e) {
-      showToast(e.message || 'Erro ao adicionar.', 'error')
+      showToast(e.message || (editingId ? 'Erro ao atualizar.' : 'Erro ao adicionar.'), 'error')
     } finally {
       setSubmitting(false)
     }
@@ -139,6 +216,7 @@ export default function Investimentos() {
                       type="button"
                       className="dashboard-hub__btn dashboard-hub__btn--primary"
                       onClick={() => {
+                        setEditTarget(null)
                         setModalResetKey((k) => k + 1)
                         setModalOpen(true)
                       }}
@@ -152,6 +230,89 @@ export default function Investimentos() {
 
               <section className="ref-bottom-grid ref-bottom-grid--single" aria-label="Investimentos registados">
                 <article
+                  className={`ref-panel dashboard-hub__tx-panel page-investimentos-ir-panel${irTabelaExpandida ? ' page-investimentos-ir-panel--expanded' : ' page-investimentos-ir-panel--collapsed'}`}
+                  aria-labelledby="inv-ir-title"
+                >
+                  <div className="ref-panel__head page-investimentos-ir-panel__head">
+                    <h2 className="page-investimentos-ir-panel__heading">
+                      <button
+                        type="button"
+                        id="inv-ir-toggle"
+                        className="page-investimentos-ir-panel__toggle"
+                        aria-expanded={irTabelaExpandida}
+                        aria-controls="inv-ir-details"
+                        onClick={() => setIrTabelaExpandida((v) => !v)}
+                      >
+                        <span className="page-investimentos-ir-panel__toggle-text">
+                          <span id="inv-ir-title" className="page-investimentos-ir-panel__toggle-title">
+                            Imposto de renda na renda fixa
+                          </span>
+                          <span className="page-investimentos-ir-panel__toggle-desc">
+                            {irTabelaExpandida
+                              ? 'Alíquotas regressivas sobre o rendimento (referência — consulte regras vigentes)'
+                              : 'Tabela regressiva 22,5%–15% · LCA e LCI isentos para PF'}
+                          </span>
+                        </span>
+                        <span className="page-investimentos-ir-panel__chevron" aria-hidden>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="page-investimentos-ir-panel__chevron-svg"
+                          >
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                        </span>
+                      </button>
+                    </h2>
+                  </div>
+                  <div
+                    id="inv-ir-details"
+                    role="region"
+                    aria-labelledby="inv-ir-toggle"
+                    hidden={!irTabelaExpandida}
+                    className="page-investimentos-ir-panel__body"
+                  >
+                    <div className="page-investimentos-ir-table-wrap" role="region" aria-label="Tabela regressiva de IR">
+                      <table className="page-investimentos-ir-table">
+                        <caption className="sr-only">
+                          Alíquotas regressivas de IR sobre o rendimento em investimentos tributados (ex.: CDB)
+                        </caption>
+                        <thead>
+                          <tr>
+                            <th scope="col">Prazo do investimento</th>
+                            <th scope="col">Alíquota do IR</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {IR_RENDA_FIXA_REGRESSIVO_UI.map((row) => (
+                            <tr key={row.prazo}>
+                              <td>{row.prazo}</td>
+                              <td>
+                                <span className="page-investimentos-ir-table__pct">{row.aliquota}</span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="page-investimentos-ir-isento" role="note">
+                      <p className="page-investimentos-ir-isento__title">Isentos para pessoa física</p>
+                      <p className="page-investimentos-ir-isento__text">
+                        <strong>LCA</strong> e <strong>LCI</strong> não incidem IR sobre o rendimento para o investidor
+                        pessoa física (regras da instituição e do produto podem variar).
+                      </p>
+                    </div>
+                  </div>
+                </article>
+
+                <article
                   className="ref-panel ref-panel--transactions dashboard-hub__tx-panel page-investimentos-panel"
                   aria-labelledby="inv-panel-title"
                 >
@@ -160,9 +321,6 @@ export default function Investimentos() {
                       <h2 id="inv-panel-title" className="ref-panel__title">
                         A sua carteira
                       </h2>
-                      <p className="ref-panel__subtitle">
-                        Instituição, produto, valor, % do CDI contratada e data de registo
-                      </p>
                     </div>
                     {!loading && lista.length > 0 ? (
                       <span className="page-investimentos-panel__count" aria-label={`${lista.length} itens`}>
@@ -192,9 +350,38 @@ export default function Investimentos() {
                           const temValor =
                             row.valor_investido != null && Number.isFinite(Number(row.valor_investido))
                           const percLista = formatPercentualCdiLista(row.percentual_cdi)
+                          const percNum = Number(row.percentual_cdi)
+                          const percOk = Number.isFinite(percNum) && percNum > 0
+                          const isentoIr = investimentoIsentoIrPessoaFisica(row.tipo_preset)
+                          const isoCalculoDias = isoOuDataParaCalculoDias(row.data_aquisicao, row.criado_em)
+                          const diasRegisto = diasCorridosDesdeIso(isoCalculoDias)
+                          const diasUteisComJuros = contarDiasUteisComJurosDesdeIso(isoCalculoDias)
+                          const mostrarRendimento = temValor && percOk
+                          const cdiDisponivel = !cdiLoading && cdiAa != null && Number.isFinite(cdiAa) && cdiAa > 0
+                          const estRendimento = mostrarRendimento && cdiDisponivel
+                            ? estimativaRendimentoDiarioComIr(
+                                Number(row.valor_investido),
+                                percNum,
+                                cdiAa,
+                                diasRegisto,
+                                isentoIr,
+                              )
+                            : null
+                          const nomeRow = String(row.nome ?? '').trim()
+                          const tituloRedundanteComChipTipo =
+                            tipoLb != null &&
+                            nomeRow !== '' &&
+                            nomeRow.toUpperCase() === String(tipoLb).trim().toUpperCase()
                           return (
                             <li key={row.id}>
-                              <article className="page-investimentos-card">
+                              <article
+                                className="page-investimentos-card"
+                                aria-label={
+                                  tituloRedundanteComChipTipo
+                                    ? `${row.instituicao_nome || 'Investimento'}, ${tipoLb}`
+                                    : undefined
+                                }
+                              >
                                 <div className="page-investimentos-card__main">
                                   <div className="page-investimentos-card__badges" aria-label="Etiquetas">
                                     <span className="page-investimentos-chip page-investimentos-chip--inst">
@@ -208,37 +395,133 @@ export default function Investimentos() {
                                       </span>
                                     )}
                                   </div>
-                                  <h3 className="page-investimentos-card__title">{row.nome}</h3>
+                                  {!tituloRedundanteComChipTipo ? (
+                                    <h3 className="page-investimentos-card__title">{row.nome}</h3>
+                                  ) : null}
                                   {temValor || percLista ? (
-                                    <dl className="page-investimentos-card__metrics" aria-label="Detalhes do investimento">
-                                      {temValor ? (
-                                        <div className="page-investimentos-card__metric">
-                                          <dt className="page-investimentos-card__metric-label">Valor aplicado</dt>
-                                          <dd className="page-investimentos-card__metric-value">
-                                            {formatCurrencyBRL(Number(row.valor_investido))}
-                                          </dd>
-                                        </div>
+                                    <>
+                                      <dl className="page-investimentos-card__metrics" aria-label="Detalhes do investimento">
+                                        {temValor ? (
+                                          <div className="page-investimentos-card__metric">
+                                            <dt className="page-investimentos-card__metric-label">Valor aplicado</dt>
+                                            <dd className="page-investimentos-card__metric-value">
+                                              {formatCurrencyBRL(Number(row.valor_investido))}
+                                            </dd>
+                                          </div>
+                                        ) : null}
+                                        {percLista ? (
+                                          <div className="page-investimentos-card__metric">
+                                            <dt className="page-investimentos-card__metric-label">% do CDI contratada</dt>
+                                            <dd className="page-investimentos-card__metric-value">{percLista}</dd>
+                                          </div>
+                                        ) : null}
+                                        {mostrarRendimento && cdiLoading ? (
+                                          <div className="page-investimentos-card__metric page-investimentos-card__metric--span">
+                                            <dt className="page-investimentos-card__metric-label">Rendimento por dia útil (est.)</dt>
+                                            <dd className="page-investimentos-card__metric-value page-investimentos-card__metric-value--muted">
+                                              A carregar taxa CDI…
+                                            </dd>
+                                          </div>
+                                        ) : null}
+                                        {mostrarRendimento && !cdiLoading && !cdiDisponivel ? (
+                                          <div className="page-investimentos-card__metric page-investimentos-card__metric--span">
+                                            <dt className="page-investimentos-card__metric-label">Rendimento por dia útil (est.)</dt>
+                                            <dd className="page-investimentos-card__metric-value page-investimentos-card__metric-value--muted">
+                                              Indisponível (taxa CDI)
+                                            </dd>
+                                          </div>
+                                        ) : null}
+                                        {estRendimento ? (
+                                          <>
+                                            <div className="page-investimentos-card__metric">
+                                              <dt className="page-investimentos-card__metric-label">Rendimento bruto por dia útil (est.)</dt>
+                                              <dd className="page-investimentos-card__metric-value">
+                                                {formatMoedaDiariaEstimativa(estRendimento.bruto)}
+                                              </dd>
+                                            </div>
+                                            <div className="page-investimentos-card__metric">
+                                              <dt className="page-investimentos-card__metric-label">IR sobre rendimento (est.)</dt>
+                                              <dd className="page-investimentos-card__metric-value">
+                                                {estRendimento.isento ? (
+                                                  <span className="page-investimentos-card__ir-isento">{estRendimento.aliquotaFmt}</span>
+                                                ) : (
+                                                  <>
+                                                    {formatMoedaDiariaEstimativa(estRendimento.imposto)}
+                                                    <span className="page-investimentos-card__metric-suffix">
+                                                      {' '}
+                                                      ({estRendimento.aliquotaFmt})
+                                                    </span>
+                                                  </>
+                                                )}
+                                              </dd>
+                                            </div>
+                                            <div className="page-investimentos-card__metric">
+                                              <dt className="page-investimentos-card__metric-label">Rendimento líquido por dia útil (est.)</dt>
+                                              <dd className="page-investimentos-card__metric-value">
+                                                {formatMoedaDiariaEstimativa(estRendimento.liquido)}
+                                              </dd>
+                                            </div>
+                                            <div className="page-investimentos-card__metric">
+                                              <dt className="page-investimentos-card__metric-label">Total</dt>
+                                              <dd
+                                                className="page-investimentos-card__metric-value"
+                                                title="Valor aplicado + rendimento líquido de um dia útil estimado"
+                                              >
+                                                {formatCurrencyBRL(Number(row.valor_investido) + estRendimento.liquido)}
+                                              </dd>
+                                            </div>
+                                          </>
+                                        ) : null}
+                                      </dl>
+                                      {estRendimento ? (
+                                        <p className="page-investimentos-card__rendimento-hint">
+                                          {textoHintRendimentoCartao({
+                                            cdiAa,
+                                            diasUteisComJuros,
+                                            diasRegisto,
+                                            temDataAquisicao: Boolean(row.data_aquisicao),
+                                            isentoIr: estRendimento.isento,
+                                          })}
+                                        </p>
                                       ) : null}
-                                      {percLista ? (
-                                        <div className="page-investimentos-card__metric">
-                                          <dt className="page-investimentos-card__metric-label">% do CDI contratada</dt>
-                                          <dd className="page-investimentos-card__metric-value">{percLista}</dd>
-                                        </div>
-                                      ) : null}
-                                    </dl>
+                                    </>
                                   ) : null}
                                   <p className="page-investimentos-card__meta">
-                                    <span className="page-investimentos-card__date-label">Registado em</span>{' '}
-                                    <time dateTime={row.criado_em || undefined}>{formatData(row.criado_em)}</time>
+                                    {row.data_aquisicao ? (
+                                      <>
+                                        <span className="page-investimentos-card__date-label">Adquirido em</span>{' '}
+                                        <time dateTime={String(row.data_aquisicao).slice(0, 10)}>
+                                          {formatDataAquisicaoCartao(row.data_aquisicao)}
+                                        </time>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <span className="page-investimentos-card__date-label">Registado em</span>{' '}
+                                        <time dateTime={row.criado_em || undefined}>{formatData(row.criado_em)}</time>
+                                      </>
+                                    )}
                                   </p>
                                 </div>
-                                <button
-                                  type="button"
-                                  className="page-investimentos-card__remove"
-                                  onClick={() => setRemoveTarget({ id: row.id, nome: row.nome })}
-                                >
-                                  Remover
-                                </button>
+                                <div className="page-investimentos-card__actions">
+                                  <button
+                                    type="button"
+                                    className="page-investimentos-card__edit"
+                                    onClick={() => {
+                                      setEditTarget(row)
+                                      setModalOpen(true)
+                                    }}
+                                    disabled={!uid}
+                                  >
+                                    Editar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="page-investimentos-card__remove"
+                                    onClick={() => setRemoveTarget({ id: row.id, nome: row.nome })}
+                                  >
+                                    Remover
+                                  </button>
+                                </div>
                               </article>
                             </li>
                           )
@@ -253,11 +536,48 @@ export default function Investimentos() {
         </main>
       </div>
 
+      {!modalOpen && (
+        <button
+          type="button"
+          className="dashboard-mobile-tx-fab"
+          onClick={() => {
+            setEditTarget(null)
+            setModalResetKey((k) => k + 1)
+            setModalOpen(true)
+          }}
+          disabled={!uid}
+          aria-label="Criar novo investimento"
+        >
+          <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+          </span>
+          <span className="dashboard-mobile-tx-fab__label">Novo investimento</span>
+        </button>
+      )}
+
       <InvestimentoNovoModal
-        key={modalResetKey}
+        key={editTarget?.id ?? `novo-${modalResetKey}`}
         open={modalOpen}
-        onClose={() => !submitting && setModalOpen(false)}
-        onSubmit={handleAdicionar}
+        initialEdit={editTarget}
+        onClose={() => {
+          if (!submitting) {
+            setModalOpen(false)
+            setEditTarget(null)
+          }
+        }}
+        onSubmit={handleSalvarInvestimento}
         submitting={submitting}
       />
 

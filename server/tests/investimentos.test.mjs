@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   INVESTIMENTO_PRESETS,
+  parseDataAquisicao,
   parseInvestimentoCreateBody,
   parsePercentualCdi,
   parseValorInvestido,
@@ -9,6 +10,7 @@ import {
 const BB = 'Banco do Brasil'
 const V100 = 100
 const P100 = 100
+const DATA_PASS = '2022-06-15'
 
 describe('investimentos.mjs — parseValorInvestido', () => {
   it('exige valor', () => {
@@ -42,23 +44,73 @@ describe('investimentos.mjs — parsePercentualCdi', () => {
   })
 })
 
+describe('investimentos.mjs — parseDataAquisicao', () => {
+  it('exige data', () => {
+    expect(() => parseDataAquisicao(undefined)).toThrow(/aquisição/)
+    expect(() => parseDataAquisicao('')).toThrow(/aquisição/)
+  })
+
+  it('aceita YYYY-MM-DD', () => {
+    expect(parseDataAquisicao('2020-01-02')).toBe('2020-01-02')
+  })
+
+  it('rejeita data inválida', () => {
+    expect(() => parseDataAquisicao('2020-13-40')).toThrow(/inválida/)
+    expect(() => parseDataAquisicao('não')).toThrow(/inválida/)
+  })
+
+  it('rejeita data futura', () => {
+    const far = new Date()
+    far.setFullYear(far.getFullYear() + 2)
+    const y = far.getFullYear()
+    const m = String(far.getMonth() + 1).padStart(2, '0')
+    const d = String(far.getDate()).padStart(2, '0')
+    expect(() => parseDataAquisicao(`${y}-${m}-${d}`)).toThrow(/futuro/)
+  })
+})
+
 describe('investimentos.mjs — parseInvestimentoCreateBody', () => {
   it('exige instituição', () => {
     expect(() =>
-      parseInvestimentoCreateBody({ preset: 'lca', valor_investido: V100, percentual_cdi: P100 }),
+      parseInvestimentoCreateBody({
+        preset: 'lca',
+        valor_investido: V100,
+        percentual_cdi: P100,
+        data_aquisicao: DATA_PASS,
+      }),
     ).toThrow(/banco/)
   })
 
   it('exige valor investido', () => {
     expect(() =>
-      parseInvestimentoCreateBody({ preset: 'lca', instituicao_nome: BB, percentual_cdi: P100 }),
+      parseInvestimentoCreateBody({ preset: 'lca', instituicao_nome: BB, percentual_cdi: P100, data_aquisicao: DATA_PASS }),
     ).toThrow(/valor investido/)
   })
 
   it('exige percentual CDI', () => {
     expect(() =>
-      parseInvestimentoCreateBody({ preset: 'lca', instituicao_nome: BB, valor_investido: V100 }),
+      parseInvestimentoCreateBody({ preset: 'lca', instituicao_nome: BB, valor_investido: V100, data_aquisicao: DATA_PASS }),
     ).toThrow(/CDI/)
+  })
+
+  it('exige data de aquisição (PATCH / modo estrito)', () => {
+    expect(() =>
+      parseInvestimentoCreateBody({ preset: 'lca', instituicao_nome: BB, valor_investido: V100, percentual_cdi: P100 }),
+    ).toThrow(/aquisição/)
+  })
+
+  it('POST: usa hoje quando data de aquisição omitida', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-05-09T12:00:00'))
+    try {
+      const r = parseInvestimentoCreateBody(
+        { preset: 'lca', instituicao_nome: BB, valor_investido: V100, percentual_cdi: P100 },
+        { defaultDataAquisicaoHoje: true },
+      )
+      expect(r.data_aquisicao).toBe('2026-05-09')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('aceita preset LCA com instituição', () => {
@@ -67,6 +119,7 @@ describe('investimentos.mjs — parseInvestimentoCreateBody', () => {
       instituicao_nome: BB,
       valor_investido: V100,
       percentual_cdi: P100,
+      data_aquisicao: DATA_PASS,
     })
     expect(r).toEqual({
       tipo_preset: 'LCA',
@@ -74,6 +127,7 @@ describe('investimentos.mjs — parseInvestimentoCreateBody', () => {
       instituicao_nome: BB,
       valor_investido: 100,
       percentual_cdi: 100,
+      data_aquisicao: DATA_PASS,
     })
   })
 
@@ -83,6 +137,7 @@ describe('investimentos.mjs — parseInvestimentoCreateBody', () => {
       instituicao_nome: ' XP ',
       valor_investido: 50.25,
       percentual_cdi: '105%',
+      data_aquisicao: DATA_PASS,
     })
     expect(r).toEqual({
       tipo_preset: null,
@@ -90,6 +145,7 @@ describe('investimentos.mjs — parseInvestimentoCreateBody', () => {
       instituicao_nome: 'XP',
       valor_investido: 50.25,
       percentual_cdi: 105,
+      data_aquisicao: DATA_PASS,
     })
   })
 
@@ -100,6 +156,7 @@ describe('investimentos.mjs — parseInvestimentoCreateBody', () => {
         instituicao_nome: BB,
         valor_investido: 1,
         percentual_cdi: 100,
+        data_aquisicao: DATA_PASS,
       }),
     ).toThrow(/investimento/)
   })
@@ -112,6 +169,7 @@ describe('investimentos.mjs — parseInvestimentoCreateBody', () => {
         instituicao_nome: BB,
         valor_investido: 1,
         percentual_cdi: 100,
+        data_aquisicao: DATA_PASS,
       }),
     ).toThrow(/lista/)
   })

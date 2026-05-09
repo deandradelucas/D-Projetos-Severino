@@ -49,3 +49,16 @@ export function parseCurrencyBRLMasked(masked) {
   const n = parseInt(digits, 10) / 100
   return Math.round(n * 100) / 100
 }
+
+/**
+ * Converte valor em reais para o mesmo formato da máscara do input (ex.: edição de investimento).
+ * @param {number} valorReais
+ * @returns {string}
+ */
+export function valorToMaskedBRL(valorReais) {
+  const n = Number(valorReais)
+  if (!Number.isFinite(n)) return ''
+  const cents = Math.round(n * 100)
+  if (cents < 0) return ''
+  return formatBRLFromDigits(String(cents))
+}

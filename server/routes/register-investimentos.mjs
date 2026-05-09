@@ -1,5 +1,6 @@
 import { log } from '../lib/logger.mjs'
 import {
+  atualizarInvestimentoUsuario,
   criarInvestimentoUsuario,
   listarInvestimentosUsuario,
   removerInvestimentoUsuario,
@@ -52,9 +53,51 @@ export function registerInvestimentosRoutes(app) {
         msg.includes('corretora') ||
         msg.includes('valor') ||
         msg.includes('Percentual') ||
-        msg.includes('CDI')
+        msg.includes('CDI') ||
+        msg.includes('aquisição')
           ? 400
           : 500
+      return c.json({ message: msg }, status)
+    }
+  })
+
+  app.patch('/api/investimentos/:id', async (c) => {
+    try {
+      const id = c.req.param('id')
+      const usuarioId = c.req.header('x-user-id')
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+      if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
+
+      if (!rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
+        return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
+      }
+
+      let body
+      try {
+        body = await c.req.json()
+      } catch {
+        return c.json({ message: 'JSON inválido.' }, 400)
+      }
+
+      const data = await atualizarInvestimentoUsuario(id, parsed.dataUsuarioId, body)
+      return c.json(data)
+    } catch (error) {
+      log.error('atualizar investimento', error)
+      const msg = error.message || 'Erro ao atualizar investimento.'
+      const status =
+        msg.includes('não encontrado')
+          ? 404
+          : msg.includes('mínimo') ||
+              msg.includes('lista') ||
+              msg.includes('banco') ||
+              msg.includes('corretora') ||
+              msg.includes('valor') ||
+              msg.includes('Percentual') ||
+              msg.includes('CDI') ||
+              msg.includes('aquisição')
+            ? 400
+            : 500
       return c.json({ message: msg }, status)
     }
   })

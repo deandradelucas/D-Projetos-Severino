@@ -51,6 +51,41 @@ export function parseValorInvestido(raw) {
  * @param {unknown} raw
  * @returns {number}
  */
+/**
+ * Data de aquisição (YYYY-MM-DD). Não pode ser futura.
+ * @param {unknown} raw
+ * @returns {string}
+ */
+/** Data local do servidor em YYYY-MM-DD (mesmo critério de “hoje” em {@link parseDataAquisicao}). */
+export function dataAquisicaoPadraoHojeIso() {
+  const today = new Date()
+  const y = today.getFullYear()
+  const m = String(today.getMonth() + 1).padStart(2, '0')
+  const d = String(today.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+export function parseDataAquisicao(raw) {
+  if (raw === undefined || raw === null || String(raw).trim() === '') {
+    throw new Error('Informe a data de aquisição.')
+  }
+  const s = String(raw).trim().slice(0, 10)
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
+  if (!m) throw new Error('Data de aquisição inválida.')
+  const y = Number(m[1])
+  const mo = Number(m[2])
+  const d = Number(m[3])
+  const dt = new Date(Date.UTC(y, mo - 1, d))
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) {
+    throw new Error('Data de aquisição inválida.')
+  }
+  const today = new Date()
+  const endToday = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
+  const picked = Date.UTC(y, mo - 1, d)
+  if (picked > endToday) throw new Error('A data de aquisição não pode ser no futuro.')
+  return s
+}
+
 export function parsePercentualCdi(raw) {
   if (raw === undefined || raw === null) {
     throw new Error('Informe o percentual do CDI contratado.')
@@ -78,9 +113,11 @@ export function parsePercentualCdi(raw) {
 
 /**
  * @param {Record<string, unknown>} body
- * @returns {{ tipo_preset: string | null, nome: string, instituicao_nome: string, valor_investido: number, percentual_cdi: number }}
+ * @param {{ defaultDataAquisicaoHoje?: boolean }} [options] — em criação (POST), usar `defaultDataAquisicaoHoje: true` se o cliente omitir a data (evita NOT NULL no banco).
+ * @returns {{ tipo_preset: string | null, nome: string, instituicao_nome: string, valor_investido: number, percentual_cdi: number, data_aquisicao: string }}
  */
-export function parseInvestimentoCreateBody(body) {
+export function parseInvestimentoCreateBody(body, options = {}) {
+  const { defaultDataAquisicaoHoje = false } = options
   const instituicao_nome = cleanInstituicao(body?.instituicao_nome)
   if (instituicao_nome.length < 2) {
     throw new Error('Informe o banco ou corretora (mínimo 2 caracteres).')
@@ -88,6 +125,13 @@ export function parseInvestimentoCreateBody(body) {
 
   const valor_investido = parseValorInvestido(body?.valor_investido)
   const percentual_cdi = parsePercentualCdi(body?.percentual_cdi)
+  const rawDa = body?.data_aquisicao
+  const data_aquisicao =
+    rawDa === undefined || rawDa === null || String(rawDa).trim() === ''
+      ? defaultDataAquisicaoHoje
+        ? dataAquisicaoPadraoHojeIso()
+        : parseDataAquisicao(rawDa)
+      : parseDataAquisicao(rawDa)
 
   const presetRaw = String(body?.preset ?? '').trim().toUpperCase()
   const custom = cleanNomeCustom(body?.nome_custom)
@@ -99,6 +143,7 @@ export function parseInvestimentoCreateBody(body) {
       instituicao_nome,
       valor_investido,
       percentual_cdi,
+      data_aquisicao,
     }
   }
 
@@ -106,7 +151,7 @@ export function parseInvestimentoCreateBody(body) {
     throw new Error('Escolha um tipo na lista ou informe outro investimento (mínimo 2 caracteres).')
   }
 
-  return { tipo_preset: null, nome: custom, instituicao_nome, valor_investido, percentual_cdi }
+  return { tipo_preset: null, nome: custom, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao }
 }
 
 function rowToApi(row) {
@@ -121,6 +166,7 @@ function rowToApi(row) {
     instituicao_nome: row.instituicao_nome,
     valor_investido: vi != null ? Number(vi) : null,
     percentual_cdi: pc != null ? Number(pc) : null,
+    data_aquisicao: row.data_aquisicao != null ? String(row.data_aquisicao).slice(0, 10) : null,
     criado_em: row.criado_em,
   }
 }
@@ -132,7 +178,7 @@ export async function listarInvestimentosUsuario(usuarioId) {
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
     .from('investimentos_usuario')
-    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, criado_em')
+    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, criado_em')
     .eq('usuario_id', usuarioId)
     .order('criado_em', { ascending: false })
 
@@ -145,7 +191,8 @@ export async function listarInvestimentosUsuario(usuarioId) {
  * @param {Record<string, unknown>} body
  */
 export async function criarInvestimentoUsuario(usuarioId, body) {
-  const { tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi } = parseInvestimentoCreateBody(body)
+  const { tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao } =
+    parseInvestimentoCreateBody(body, { defaultDataAquisicaoHoje: true })
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
     .from('investimentos_usuario')
@@ -156,8 +203,9 @@ export async function criarInvestimentoUsuario(usuarioId, body) {
       instituicao_nome,
       valor_investido,
       percentual_cdi,
+      data_aquisicao,
     })
-    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, criado_em')
+    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, criado_em')
     .maybeSingle()
 
   if (error) throw new Error(error.message || 'Erro ao criar investimento.')
@@ -179,4 +227,33 @@ export async function removerInvestimentoUsuario(id, usuarioId) {
 
   if (error) throw new Error(error.message || 'Erro ao remover investimento.')
   if (!data?.length) throw new Error('Investimento não encontrado.')
+}
+
+/**
+ * @param {string} id
+ * @param {string} usuarioId
+ * @param {Record<string, unknown>} body
+ */
+export async function atualizarInvestimentoUsuario(id, usuarioId, body) {
+  const { tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao } =
+    parseInvestimentoCreateBody(body)
+  const supabase = getSupabaseAdmin()
+  const { data, error } = await supabase
+    .from('investimentos_usuario')
+    .update({
+      tipo_preset,
+      nome,
+      instituicao_nome,
+      valor_investido,
+      percentual_cdi,
+      data_aquisicao,
+    })
+    .eq('id', id)
+    .eq('usuario_id', usuarioId)
+    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, criado_em')
+    .maybeSingle()
+
+  if (error) throw new Error(error.message || 'Erro ao atualizar investimento.')
+  if (!data) throw new Error('Investimento não encontrado.')
+  return rowToApi(data)
 }

@@ -38,7 +38,7 @@ const RAW = [
   { nome: 'Caixa Econômica Federal', tipo: 'banco' },
   { nome: 'Clear Corretora', tipo: 'corretora' },
   { nome: 'Cora Sociedade de Crédito', tipo: 'fintech' },
-  { nome: 'Cresol Confederação', tipo: 'cooperativa' },
+  { nome: 'Cresol', tipo: 'cooperativa' },
   { nome: 'Creditas Bank', tipo: 'fintech' },
   { nome: 'Elite Investimentos', tipo: 'corretora' },
   { nome: 'Genial Investimentos', tipo: 'corretora' },
