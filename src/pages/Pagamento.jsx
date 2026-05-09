@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Sidebar from '@components/Sidebar'
 import MobileMenuButton from '@components/MobileMenuButton'
@@ -8,6 +8,7 @@ import PagamentoDetalhesCard from '../components/pagamento/PagamentoDetalhesCard
 import PagamentoHistorico from '../components/pagamento/PagamentoHistorico.jsx'
 import PagamentoPixQrModal from '../components/pagamento/PagamentoPixQrModal.jsx'
 import { apiUrl } from '../lib/apiUrl'
+import { maskCpfCnpj, validateCpfCnpj } from '../lib/cpfCnpjUtils.js'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import {
   PLANO_PADRAO_TITULO,
@@ -22,6 +23,16 @@ function pagamentoStatusBannerClass(statusUrl) {
   if (statusUrl === 'pending') return 'pagamento-banner pagamento-banner--warning'
   return 'pagamento-banner pagamento-banner--danger'
 }
+
+/** Cobrança ainda pode mudar de estado no Asaas — vale continuar a sincronizar. */
+function pagamentoHistoricoStatusPendente(status) {
+  if (status == null || String(status).trim() === '') return false
+  const s = String(status).toLowerCase()
+  return s === 'pending' || s === 'in_process' || s === 'awaiting_risk_analysis'
+}
+
+const POLL_ASSINATURA_MS = 18_000
+const POLL_ASSINATURA_MAX_MS = 4 * 60_000
 
 export default function Pagamento() {
   const [menuAberto, setMenuAberto] = useState(false)
@@ -52,6 +63,11 @@ export default function Pagamento() {
   const [pixCpfCnpj, setPixCpfCnpj] = useState('')
   const [pixData, setPixData] = useState(null)
 
+  useEffect(() => {
+    const saved = localStorage.getItem('horizonte_cpf_cnpj')
+    if (saved) setCpfCnpj(saved)
+  }, [])
+
   const statusUrl = searchParams.get('status')
   const asaasCb = searchParams.get('asaas')
   const stripeCb = searchParams.get('stripe')
@@ -59,8 +75,17 @@ export default function Pagamento() {
 
   const formatCurrency = formatCurrencyBRL
 
-  const fetchDados = useCallback(async () => {
-    setDadosErro('')
+  const fetchDados = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) {
+      setDadosErro('')
+      setLoading(true)
+    }
+    /** Leitura após sincronizar — usado pelo polling pós-checkout. */
+    const snapshot = {
+      assinaturaAtiva: false,
+      isento: false,
+      ultimoHistoricoStatus: null,
+    }
     try {
       const userSaved = localStorage.getItem('horizonte_user')
       let uid = ''
@@ -77,7 +102,10 @@ export default function Pagamento() {
         setPainelAssinatura(painelAssinaturaFromUser(u))
         if (u.assinatura_proxima_cobranca) setProximaCobranca(u.assinatura_proxima_cobranca)
         try {
-          const stRes = await fetch(apiUrl('/api/assinatura/status'), { headers: { 'x-user-id': uid } })
+          const stRes = await fetch(apiUrl('/api/assinatura/status'), {
+            headers: { 'x-user-id': uid },
+            cache: silent ? 'no-store' : undefined,
+          })
           if (stRes.ok) {
             const assinatura = await stRes.json()
             const merged = { ...u, ...assinatura }
@@ -87,6 +115,8 @@ export default function Pagamento() {
             if (assinatura.assinatura_proxima_cobranca) {
               setProximaCobranca(assinatura.assinatura_proxima_cobranca)
             }
+            snapshot.assinaturaAtiva =
+              merged.assinatura_paga === true && String(merged.assinatura_situacao || '') === 'ativo'
           }
         } catch {
           /* ignore */
@@ -105,16 +135,21 @@ export default function Pagamento() {
         fetch(apiUrl('/api/pagamentos/config'), { headers: cfgHeaders }),
         (async () => {
           if (!uidHistorico) return { ok: false, status: 0 }
-          return fetch(apiUrl('/api/pagamentos/minhas'), { headers: { 'x-user-id': uidHistorico } })
+          return fetch(apiUrl('/api/pagamentos/minhas'), {
+            headers: { 'x-user-id': uidHistorico },
+            cache: silent ? 'no-store' : undefined,
+          })
         })(),
       ])
 
       if (cfgRes.ok) {
         const c = await cfgRes.json()
+        const isento = !!c.isento_pagamento
+        snapshot.isento = isento
         setConfig({
           ready: !!c.ready,
           publicKey: c.publicKey,
-          isento_pagamento: !!c.isento_pagamento,
+          isento_pagamento: isento,
         })
         const pm = Number(c.preco_mensal)
         const pa = Number(c.preco_anual)
@@ -122,80 +157,142 @@ export default function Pagamento() {
           mensal: Number.isFinite(pm) && pm > 0 ? pm : 10,
           anual: Number.isFinite(pa) && pa > 0 ? pa : 100,
         })
-      } else {
+      } else if (!silent) {
         setDadosErro((prev) => prev || 'Não foi possível carregar a configuração de pagamentos.')
       }
 
       if (histRes.ok) {
         const h = await histRes.json()
-        setHistorico(Array.isArray(h) ? h : [])
-      } else if (uidHistorico) {
+        const rows = Array.isArray(h) ? h : []
+        setHistorico(rows)
+        snapshot.ultimoHistoricoStatus = rows[0]?.status != null ? String(rows[0].status) : null
+      } else if (uidHistorico && !silent) {
         setDadosErro((prev) => prev || 'Não foi possível carregar o histórico de cobranças.')
       }
     } catch {
-      setDadosErro('Erro de rede ao carregar a página. Tente novamente.')
+      if (!silent) setDadosErro('Erro de rede ao carregar a página. Tente novamente.')
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
+    try {
+      const raw = localStorage.getItem('horizonte_user')
+      const lu = raw ? JSON.parse(raw) : null
+      if (lu && !snapshot.assinaturaAtiva) {
+        snapshot.assinaturaAtiva =
+          lu.assinatura_paga === true && String(lu.assinatura_situacao || '') === 'ativo'
+      }
+    } catch {
+      /* ignore */
+    }
+    return snapshot
   }, [])
 
   useEffect(() => {
-    fetchDados()
+    void fetchDados()
   }, [fetchDados])
 
+  const ultimo = useMemo(() => ultimoPagamentoHistorico(historico), [historico])
+  const ultimoHistoricoPendente = useMemo(
+    () => pagamentoHistoricoStatusPendente(ultimo?.status),
+    [ultimo],
+  )
+
+  const descontoAnual = useMemo(() => {
+    const base = precosCatalogo.mensal * 12
+    if (base <= 0 || precosCatalogo.anual >= base) return 0
+    return Math.round((1 - precosCatalogo.anual / base) * 100)
+  }, [precosCatalogo])
+
+  /**
+   * Volta do checkout / cobrança pendente: sincroniza de pouco em pouco (aba visível), sem piscar o skeleton.
+   * Para quando a assinatura fica ativa, a conta é isenta, o último registro deixa de estar pendente, ou esgota o tempo máximo.
+   */
   useEffect(() => {
-    const okAsaas = asaasCb === 'ok'
-    const okStripe = stripeCb === 'ok'
-    if (!okAsaas && !okStripe) return
+    const checkoutOk = asaasCb === 'ok' || stripeCb === 'ok'
+    const urlPending = statusUrl === 'pending'
+    const aguardandoCobranca =
+      ultimoHistoricoPendente &&
+      !config.isento_pagamento &&
+      painelAssinatura.situacao !== 'admin' &&
+      !painelAssinatura.paga
+
+    const shouldPoll = checkoutOk || urlPending || aguardandoCobranca
+    if (!shouldPoll) return undefined
+
     let cancelled = false
-    const sync = async () => {
-      try {
-        const raw = localStorage.getItem('horizonte_user')
-        const u = raw ? JSON.parse(raw) : null
-        if (!u?.id) return
-        const stRes = await fetch(apiUrl('/api/assinatura/status'), { headers: { 'x-user-id': u.id }, cache: 'no-store' })
-        if (stRes.ok) {
-          const assinatura = await stRes.json()
-          const merged = { ...u, ...assinatura }
-          localStorage.setItem('horizonte_user', JSON.stringify(merged))
-          window.dispatchEvent(new Event('horizonte-session-refresh'))
-          if (!cancelled) {
-            setPainelAssinatura(painelAssinaturaFromUser(merged))
-            if (assinatura.assinatura_proxima_cobranca) {
-              setProximaCobranca(assinatura.assinatura_proxima_cobranca)
-            }
+    let intervalId = null
+    const started = Date.now()
+
+    const limparParamsQuandoAplicavel = () => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev)
+          if (checkoutOk) {
+            next.delete('asaas')
+            next.delete('stripe')
           }
-        }
-        const hRes = await fetch(apiUrl('/api/pagamentos/minhas'), { headers: { 'x-user-id': u.id }, cache: 'no-store' })
-        if (hRes.ok && !cancelled) {
-          const h = await hRes.json()
-          setHistorico(Array.isArray(h) ? h : [])
-        }
-      } catch {
-        /* ignore */
-      }
-      if (!cancelled) {
-        setSearchParams(
-          (prev) => {
-            const next = new URLSearchParams(prev)
-            if (okAsaas) next.delete('asaas')
-            if (okStripe) next.delete('stripe')
-            return next
-          },
-          { replace: true }
-        )
-      }
+          if (urlPending) next.delete('status')
+          return next
+        },
+        { replace: true },
+      )
     }
-    sync()
+
+    const encerrarPolling = () => {
+      if (intervalId != null) {
+        window.clearInterval(intervalId)
+        intervalId = null
+      }
+      limparParamsQuandoAplicavel()
+    }
+
+    const cicloResolvido = (snap) =>
+      snap.isento ||
+      snap.assinaturaAtiva ||
+      (snap.ultimoHistoricoStatus != null && !pagamentoHistoricoStatusPendente(snap.ultimoHistoricoStatus))
+
+    const tick = async () => {
+      if (cancelled || document.visibilityState !== 'visible') return
+      if (Date.now() - started > POLL_ASSINATURA_MAX_MS) {
+        encerrarPolling()
+        return
+      }
+      const snap = await fetchDados({ silent: true })
+      if (cancelled) return
+      if (cicloResolvido(snap)) encerrarPolling()
+    }
+
+    void tick()
+    intervalId = window.setInterval(() => void tick(), POLL_ASSINATURA_MS)
     return () => {
       cancelled = true
+      if (intervalId != null) window.clearInterval(intervalId)
     }
-  }, [asaasCb, stripeCb, setSearchParams])
+  }, [
+    asaasCb,
+    stripeCb,
+    statusUrl,
+    ultimoHistoricoPendente,
+    config.isento_pagamento,
+    painelAssinatura.paga,
+    painelAssinatura.situacao,
+    fetchDados,
+    setSearchParams,
+  ])
+
+  const handleCpfChange = useCallback((e) => {
+    setCpfCnpj(maskCpfCnpj(e.target.value))
+  }, [])
 
   const handlePagarAsaas = async () => {
     setError('')
-    if (!cpfCnpj.replace(/\D/g, '')) {
+    const cpfDigits = cpfCnpj.replace(/\D/g, '')
+    if (!cpfDigits) {
       setError('Informe seu CPF ou CNPJ para continuar.')
+      return
+    }
+    if (!validateCpfCnpj(cpfDigits)) {
+      setError('CPF ou CNPJ inválido. Verifique os dígitos e tente novamente.')
       return
     }
     setPaying(true)
@@ -224,6 +321,7 @@ export default function Pagamento() {
 
       const urlCheckout = data.use_sandbox ? data.sandbox_init_point : data.init_point
       if (!urlCheckout) throw new Error('URL de checkout indisponível.')
+      localStorage.setItem('horizonte_cpf_cnpj', cpfCnpj)
       window.location.href = urlCheckout
     } catch (e) {
       setError(e.message || 'Erro ao abrir o checkout Asaas.')
@@ -273,11 +371,8 @@ export default function Pagamento() {
   }
 
   const onAtualizar = async () => {
-    setLoading(true)
-    await fetchDados()
+    await fetchDados({ silent: true })
   }
-
-  const ultimo = ultimoPagamentoHistorico(historico)
   const orientacao = buildOrientacaoUsuario({
     painel: painelAssinatura,
     configReady: config.ready,
@@ -408,6 +503,24 @@ export default function Pagamento() {
                   </div>
                 ) : null}
 
+                {loading && !config.isento_pagamento ? (
+                  <div className="pagamento-checkout-skeleton" aria-busy="true" aria-label="Carregando opções de pagamento">
+                    <div className="pagamento-skeleton-card">
+                      <div className="pagamento-skeleton-line" />
+                      <div className="pagamento-skeleton-grid">
+                        <div className="pagamento-skeleton-option" />
+                        <div className="pagamento-skeleton-option" />
+                      </div>
+                    </div>
+                    <div className="pagamento-skeleton-card">
+                      <div className="pagamento-skeleton-line" />
+                      <div className="pagamento-skeleton-line pagamento-skeleton-line--sm" />
+                      <div className="pagamento-skeleton-input" />
+                      <div className="pagamento-skeleton-btn" />
+                    </div>
+                  </div>
+                ) : null}
+
                 {!config.isento_pagamento && !loading ? (
                   <div className="ref-panel page-pagamento-planos" role="radiogroup" aria-label="Plano de assinatura">
                     <p className="page-pagamento-planos__legend">Escolha o plano</p>
@@ -430,7 +543,12 @@ export default function Pagamento() {
                         aria-checked={planoCheckout === 'anual'}
                         onClick={() => setPlanoCheckout('anual')}
                       >
-                        <span className="page-pagamento-planos__option-title">Anual</span>
+                        <span className="page-pagamento-planos__option-title">
+                          Anual
+                          {descontoAnual > 0 ? (
+                            <span className="page-pagamento-planos__badge">-{descontoAnual}%</span>
+                          ) : null}
+                        </span>
                         <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.anual)} / ano</span>
                         <span className="page-pagamento-planos__option-hint">Cobrança anual no cartão</span>
                       </button>
@@ -457,7 +575,7 @@ export default function Pagamento() {
                         id="cpf-checkout"
                         type="text"
                         value={cpfCnpj}
-                        onChange={(e) => setCpfCnpj(e.target.value)}
+                        onChange={handleCpfChange}
                         placeholder="000.000.000-00"
                         maxLength={18}
                         disabled={paying}
@@ -499,6 +617,21 @@ export default function Pagamento() {
                     >
                       Atualizar status
                     </button>
+
+                    {planoCheckout === 'anual' ? (
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        style={{ width: '100%' }}
+                        disabled={paying || loading}
+                        onClick={() => {
+                          setPixCpfCnpj(cpfCnpj.replace(/\D/g, ''))
+                          setPixModalOpen(true)
+                        }}
+                      >
+                        Pagar com Pix (plano anual, à vista)
+                      </button>
+                    ) : null}
                   </div>
                 ) : null}
 
@@ -518,8 +651,20 @@ export default function Pagamento() {
                 ) ? (
                   <div className="pagamento-banner pagamento-banner--warning" role="status">
                     <p className="pagamento-banner__text">
-                      Última cobrança ({formatCurrency(Number(ultimo.amount || 0))}) não está em dia. Regularize no portal Asaas ou use
-                      &quot;Atualizar status&quot;.
+                      Última cobrança ({formatCurrency(Number(ultimo.amount || 0))}) não está em dia.{' '}
+                      {painelAssinatura.portalUrl ? (
+                        <a
+                          href={painelAssinatura.portalUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="pagamento-banner__link"
+                        >
+                          Regularize no portal Asaas
+                        </a>
+                      ) : (
+                        'Regularize no portal Asaas'
+                      )}
+                      {' '}ou use &quot;Atualizar status&quot;.
                     </p>
                   </div>
                 ) : null}

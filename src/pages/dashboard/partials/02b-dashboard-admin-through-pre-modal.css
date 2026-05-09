@@ -580,9 +580,9 @@ body:has(.sidebar.open) .horizon-chat-window {
 
   .mobile-bottom-nav__bar {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 2px;
-    width: min(520px, 100%);
+    width: min(580px, 100%);
     margin: 0;
     padding: 8px;
     border: none;

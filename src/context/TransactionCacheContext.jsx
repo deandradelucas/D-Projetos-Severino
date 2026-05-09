@@ -94,9 +94,17 @@ export function TransactionCacheProvider({ children }) {
    */
   useEffect(() => {
     const POLL_MS = 45_000
+    /** Evita revalidar transações em rotas onde o utilizador não usa o lançamentos (menos ruído na página Pagamento). */
+    const shouldPollTransacoesPath = () => {
+      if (typeof window === 'undefined') return false
+      const path = (window.location.pathname || '/').replace(/\/+$/, '') || '/'
+      const skip = ['/pagamento', '/investimentos', '/login', '/cadastro', '/bem-vindo-assinatura']
+      return !skip.includes(path)
+    }
     let debounceVis
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return
+      if (!shouldPollTransacoesPath()) return
       const session = readHorizonteUser()
       if (!session?.id) return
       clearTimeout(debounceVis)
@@ -105,6 +113,7 @@ export function TransactionCacheProvider({ children }) {
     document.addEventListener('visibilitychange', onVisible)
     const intervalId = window.setInterval(() => {
       if (document.visibilityState !== 'visible') return
+      if (!shouldPollTransacoesPath()) return
       const session = readHorizonteUser()
       if (!session?.id) return
       void fetchTransacoes({ silent: true })

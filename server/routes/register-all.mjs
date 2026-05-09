@@ -8,9 +8,12 @@ import { registerPagamentosRoutes } from './register-pagamentos.mjs'
 import { registerAiRoutes } from './register-ai.mjs'
 import { registerWhatsappRoutes } from './register-whatsapp.mjs'
 import { registerFamiliaRoutes } from './register-familia.mjs'
+import { registerInvestimentosRoutes } from './register-investimentos.mjs'
+import { registerTaxaSelicRoutes } from './register-taxa-selic.mjs'
 
 /** Regista todas as rotas `/api/*` (exceto health, montado em app.mjs). */
 export function registerApiDomainRoutes(app) {
+  registerTaxaSelicRoutes(app)
   registerAdminRoutes(app)
   registerAuthRoutes(app)
   registerAssinaturaRoutes(app)
@@ -21,4 +24,5 @@ export function registerApiDomainRoutes(app) {
   registerAiRoutes(app)
   registerWhatsappRoutes(app)
   registerFamiliaRoutes(app)
+  registerInvestimentosRoutes(app)
 }

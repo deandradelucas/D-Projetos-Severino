@@ -29,6 +29,18 @@ const MOBILE_NAV_ITEMS = [
     ),
   },
   {
+    to: '/investimentos',
+    label: 'Investimentos',
+    end: true,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M3 3v18h18" />
+        <path d="m19 9-5 5-4-4-3 3" />
+        <path d="M14 9h5v5" />
+      </svg>
+    ),
+  },
+  {
     to: '/relatorios',
     label: 'Relatórios',
     end: true,

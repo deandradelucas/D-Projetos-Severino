@@ -42,7 +42,10 @@
       "WebFetch(domain:www.mercadopago.cl)",
       "WebFetch(domain:omega.mercadopago.com.mx)",
       "WebFetch(domain:www.ombulabs.ai)",
-      "WebFetch(domain:docs.stripe.com)"
+      "WebFetch(domain:docs.stripe.com)",
+      "Bash(git push *)",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('scripts',{}\\), indent=2\\)\\)\")",
+      "Bash(python3 *)"
     ]
   }
 }

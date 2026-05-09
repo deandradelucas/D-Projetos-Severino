@@ -12,6 +12,9 @@ export const Dashboard = lazy(loadDashboard)
 const loadTransacoes = () => import('./pages/Transacoes.jsx')
 export const Transacoes = lazy(loadTransacoes)
 
+const loadInvestimentos = () => import('./pages/Investimentos.jsx')
+export const Investimentos = lazy(loadInvestimentos)
+
 const loadConfiguracoes = () => import('./pages/Configuracoes.jsx')
 export const Configuracoes = lazy(loadConfiguracoes)
 
@@ -45,6 +48,7 @@ const ROUTE_PREFETCH = {
   '/cadastro': loadCadastro,
   '/dashboard': loadDashboard,
   '/transacoes': loadTransacoes,
+  '/investimentos': loadInvestimentos,
   '/configuracoes': loadConfiguracoes,
   '/relatorios': loadRelatorios,
   '/agenda': loadAgenda,
@@ -69,7 +73,7 @@ export function prefetchRoute(path) {
 }
 
 /** Rotas do menu principal (shell autenticado) — pré-carrega para troca de aba rápida. */
-const APP_NAV_PATHS = ['/dashboard', '/transacoes', '/relatorios', '/agenda', '/pagamento', '/configuracoes']
+const APP_NAV_PATHS = ['/dashboard', '/transacoes', '/investimentos', '/relatorios', '/agenda', '/pagamento', '/configuracoes']
 
 /** Dispara `import()` de todas as telas do menu (deduplicado). Útil ao abrir o menu no mobile. */
 export function prefetchAppNavChunksNow() {

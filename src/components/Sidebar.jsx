@@ -4,6 +4,7 @@ import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
 import { BRAND_ASSETS, BRAND_LOGO_PIXEL_SIZE } from '../lib/brandAssets'
 import { useTheme } from '../context/ThemeContext'
+import TaxaSelicBadge from './TaxaSelicBadge.jsx'
 
 function mergeNavItemClass(isActive, href, pathname, extraClass = '') {
   const on = Boolean(isActive) || pathname === href
@@ -209,6 +210,29 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                 </svg>
               </span>
               <span className="nav-item__label">Transações</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/investimentos"
+              end
+              {...navPrefetchHandlers('/investimentos')}
+              className={({ isActive }) =>
+                `${mergeNavItemClass(isActive, '/investimentos', pathname)} nav-item--investimentos-row`.trim()
+              }
+              onClick={closeMenu}
+            >
+              <span className="icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M3 3v18h18" />
+                  <path d="m19 9-5 5-4-4-3 3" />
+                  <path d="M14 9h5v5" />
+                </svg>
+              </span>
+              <span className="nav-item__label-col nav-item__label-col--investimentos">
+                <span className="nav-item__label">Investimentos</span>
+                <TaxaSelicBadge variant="sidebar" />
+              </span>
             </NavLink>
           </li>
           <li>

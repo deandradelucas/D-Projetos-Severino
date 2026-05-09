@@ -21,6 +21,8 @@ import { assertSessaoRotasPagamento } from '../lib/assinatura.mjs'
 import { resolveEscopoUsuario } from '../lib/conta-familiar.mjs'
 import { subscriptionIdFromAsaasWebhookBody } from '../lib/asaas-webhook-subscription-id.mjs'
 import { AsaasPixPrecisaCpfError, criarPixAnualComQrCode } from '../lib/asaas-pix-qr.mjs'
+import { assertAgendaCronSecret } from '../lib/http/agenda-route-auth.mjs'
+import { processExtratoRenovacaoCron } from '../lib/extrato-renovacao.mjs'
 
 export function registerPagamentosRoutes(app) {
   app.get('/api/pagamentos/config', async (c) => {
@@ -388,5 +390,19 @@ export function registerPagamentosRoutes(app) {
     }
 
     return c.json({ ok: true })
+  })
+
+  app.get('/api/cron/extrato-renovacao', async (c) => {
+    const auth = assertAgendaCronSecret(c)
+    if (!auth.ok) return c.json({ message: auth.message }, auth.status)
+    try {
+      const daysAhead = Math.max(1, Math.min(7, Number(c.req.query('days') || '3')))
+      const result = await processExtratoRenovacaoCron({ daysAhead })
+      log.info('[cron] extrato-renovacao', result)
+      return c.json(result)
+    } catch (error) {
+      log.error('cron extrato-renovacao', error)
+      return c.json({ message: error.message || 'Erro no cron de extrato.' }, 500)
+    }
   })
 }
