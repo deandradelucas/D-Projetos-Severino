@@ -324,12 +324,12 @@ body:has(.sidebar.open) .horizon-chat-window {
     backface-visibility: hidden;
   }
 
-  /* Shell autenticado: drawer um pouco mais largo + menos padding lateral (mais espaço para rótulos) */
+  /* Shell autenticado: drawer proporcional à viewport — compacto mas legível */
   .dashboard-container.app-horizon-shell .sidebar {
-    width: min(86vw, 320px);
-    max-width: 320px;
-    padding-left: 10px;
-    padding-right: 10px;
+    width: min(84vw, 300px);
+    max-width: 300px;
+    padding-left: max(8px, env(safe-area-inset-left, 0px));
+    padding-right: max(8px, env(safe-area-inset-right, 0px));
   }
 
   .sidebar .nav-menu {
@@ -366,12 +366,12 @@ body:has(.sidebar.open) .horizon-chat-window {
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    gap: 12px;
+    gap: clamp(9px, 2vw + 6px, 12px);
     white-space: normal;
     height: auto;
-    min-height: 46px;
-    padding: 10px 12px;
-    font-size: 14px;
+    min-height: clamp(40px, 3.5vw + 30px, 46px);
+    padding: clamp(8px, 1.8vw + 5px, 10px) clamp(10px, 2.5vw + 6px, 12px);
+    font-size: clamp(13px, 0.35vw + 12px, 14px);
     font-weight: 600;
   }
 
@@ -385,24 +385,24 @@ body:has(.sidebar.open) .horizon-chat-window {
     text-overflow: ellipsis;
     word-break: normal;
     line-height: 1.3;
-    font-size: 14px;
+    font-size: clamp(13px, 0.35vw + 12px, 14px);
     font-weight: 600;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
+    width: clamp(32px, 2.5vw + 26px, 36px);
+    height: clamp(32px, 2.5vw + 26px, 36px);
+    min-width: clamp(32px, 2.5vw + 26px, 36px);
+    min-height: clamp(32px, 2.5vw + 26px, 36px);
     border-radius: 11px;
     flex-shrink: 0;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item svg,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item svg {
-    width: 22px;
-    height: 22px;
+    width: clamp(19px, 0.6vw + 17px, 22px);
+    height: clamp(19px, 0.6vw + 17px, 22px);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text,
@@ -413,17 +413,17 @@ body:has(.sidebar.open) .horizon-chat-window {
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
-    min-height: 46px;
-    font-size: 14px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    min-height: clamp(40px, 3.5vw + 30px, 46px);
+    font-size: clamp(13px, 0.35vw + 12px, 14px);
+    padding-top: clamp(9px, 1.8vw + 6px, 12px);
+    padding-bottom: clamp(9px, 1.8vw + 6px, 12px);
     justify-content: center;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn svg,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn svg {
-    width: 22px;
-    height: 22px;
+    width: clamp(19px, 0.6vw + 17px, 22px);
+    height: clamp(19px, 0.6vw + 17px, 22px);
   }
 
   /* Drawer mobile: logo + botão fechar na mesma linha — evita cortar “Horizonte” na imagem */

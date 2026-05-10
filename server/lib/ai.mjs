@@ -366,7 +366,7 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
 /**
  * Pergunta ao Horizon.
  */
-export async function askHorizon(message, usuarioId, historico = []) {
+export async function askHorizon(message, usuarioId, historico = [], nomeUsuario = null) {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
 
@@ -383,11 +383,19 @@ export async function askHorizon(message, usuarioId, historico = []) {
     log.warn('[askHorizon] contexto paralelo indisponível', e?.message || e)
   }
 
+  const agora = new Date().toLocaleString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    dateStyle: 'full',
+    timeStyle: 'short',
+  })
+
   const systemPrompt = `Você é o Severino, assistente financeiro pessoal inteligente, amigável e proativo (o utilizador vê o nome "Severino IA" na app).
 Sua missão é ajudar o usuário a entender suas finanças, dar dicas de economia e responder dúvidas sobre seus gastos e investimentos.
 
+Data e hora atual (Brasília): ${agora}${nomeUsuario ? `\nNome do usuário: ${nomeUsuario}` : ''}
+
 REGRAS:
-1. Seja educado e use o nome do usuário se disponível.
+1. Seja educado e use o nome do usuário quando disponível (o nome está no campo "Nome do usuário" acima).
 2. Use os dados financeiros e de investimentos fornecidos para embasar suas respostas de forma técnica mas compreensível.
 3. Se o usuário perguntar algo fora do escopo financeiro, tente gentilmente trazer de volta para o tema de gestão de dinheiro.
 4. Se o usuário estiver gastando muito em uma categoria, você pode sugerir cautela de forma amigável.

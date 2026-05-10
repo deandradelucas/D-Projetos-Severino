@@ -49,7 +49,9 @@
       "Bash(git stash *)",
       "Bash(npx vite *)",
       "Bash(npx eslint *)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(node --check server/lib/domain/whatsapp-bot.mjs)",
+      "Bash(node --check server/lib/ai.mjs)"
     ]
   }
 }
