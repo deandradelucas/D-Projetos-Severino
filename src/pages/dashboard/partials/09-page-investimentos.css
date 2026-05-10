@@ -2089,13 +2089,6 @@ body[data-theme='dark'] .page-investimentos-card__projecao-input {
   color-scheme: dark;
 }
 
-.page-investimentos-card__projecao-hint {
-  margin: 0.4rem 0 0;
-  font-size: 0.72rem;
-  line-height: 1.4;
-  color: var(--text-secondary, #64748b);
-}
-
 .page-investimentos-card__projecao-erro {
   margin: 0.35rem 0 0;
   font-size: 0.78rem;
@@ -2117,20 +2110,6 @@ body[data-theme='dark'] .page-investimentos-card__projecao-hint {
 
 body[data-theme='dark'] .page-investimentos-card__projecao-erro {
   color: #f87171;
-}
-
-/* Disclaimer único no rodapé do card */
-.page-investimentos-card__disclaimer {
-  margin: 0.4rem 0 0;
-  font-size: 0.65rem;
-  font-style: italic;
-  color: var(--text-secondary, #64748b);
-  opacity: 0.8;
-}
-
-body[data-theme='dark'] .page-investimentos-card__disclaimer {
-  color: rgba(248, 250, 252, 0.38);
-  opacity: 1;
 }
 
 /* Responsividade do primary block */

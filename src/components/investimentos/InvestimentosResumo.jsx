@@ -11,6 +11,7 @@ import {
 } from '../../lib/investimentosRendimentoIr'
 import { formatCurrencyBRL } from '../../lib/formatCurrency'
 import { INVESTIMENTOS_PRESETS_LIST } from '../../lib/investimentosPresets'
+import { ymdLocalFromDate, ymdMaxProjecaoLocal, formatYmdPtBr, isoParaCalculoDias } from '../../lib/investimentosUtils'
 
 const CHART_COLORS = ['#d4a84b', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4']
 
@@ -20,39 +21,6 @@ function labelTipo(key) {
   return INVESTIMENTOS_PRESETS_LIST.find((p) => p.key === k)?.label ?? k
 }
 
-function isoParaCalculo(dataAquisicao, criadoEm) {
-  const da = extrairYyyyMmDdReferencia(dataAquisicao)
-  if (da) return `${da}T12:00:00`
-  const dc = extrairYyyyMmDdReferencia(criadoEm)
-  if (dc) return `${dc}T12:00:00`
-  return criadoEm
-}
-
-function ymdLocalFromDate(d = new Date()) {
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-}
-
-function ymdMaxProjecaoLocal() {
-  const d = new Date()
-  d.setFullYear(d.getFullYear() + 50)
-  return ymdLocalFromDate(d)
-}
-
-function formatYmdPtBr(ymd) {
-  if (!ymd) return ''
-  try {
-    return new Date(`${ymd}T12:00:00`).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    })
-  } catch {
-    return ymd
-  }
-}
 
 function CustomTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null
@@ -104,7 +72,7 @@ export default function InvestimentosResumo({ lista, cdiAa, cdiLoading }) {
       if (!Number.isFinite(perc) || perc <= 0) continue
       if (!Number.isFinite(valor) || valor <= 0) continue
 
-      const isoCalc = isoParaCalculo(row.data_aquisicao, row.criado_em)
+      const isoCalc = isoParaCalculoDias(row.data_aquisicao, row.criado_em)
       const diasCorridos = usarProjecao
         ? diasCorridosEntreReferenciasIso(isoCalc, projecaoYmd)
         : diasCorridosDesdeIso(isoCalc)
@@ -278,11 +246,15 @@ export default function InvestimentosResumo({ lista, cdiAa, cdiLoading }) {
                   iconType="circle"
                   iconSize={7}
                   wrapperStyle={{ fontSize: '0.75rem', paddingTop: '8px' }}
-                  formatter={(value) => (
-                    <span style={{ color: 'var(--text-secondary, #64748b)', fontWeight: 600 }}>
-                      {value}
-                    </span>
-                  )}
+                  formatter={(value, entry) => {
+                    const total = chartData.reduce((s, d) => s + d.value, 0)
+                    const pct = total > 0 ? ((entry.payload.value / total) * 100).toFixed(1) : '0'
+                    return (
+                      <span style={{ color: 'var(--text-secondary, #64748b)', fontWeight: 600 }}>
+                        {value} · {pct}%
+                      </span>
+                    )
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
