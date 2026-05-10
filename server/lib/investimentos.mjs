@@ -1,6 +1,7 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 
 // Coluna tipo_indexador: scripts/migrations/28_investimentos_usuario_tipo_indexador.sql
+// Aportes: scripts/migrations/30_investimento_aportes.sql
 
 /** Chaves aceites no POST `preset`; `nome` gravado é o valor legível. */
 export const INVESTIMENTO_PRESETS = Object.freeze({
@@ -16,6 +17,9 @@ export const INVESTIMENTO_PRESETS = Object.freeze({
 })
 
 const PRESET_KEYS = new Set(Object.keys(INVESTIMENTO_PRESETS))
+
+const SELECT_COLS =
+  'id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, data_vencimento, criado_em, tipo_indexador, aportes:investimento_aportes(id, valor, data_aquisicao, criado_em)'
 
 function cleanNomeCustom(value) {
   return String(value ?? '').trim().slice(0, 120)
@@ -62,7 +66,7 @@ export function parseValorInvestido(raw) {
  * @param {unknown} raw
  * @returns {string}
  */
-/** Data local do servidor em YYYY-MM-DD (mesmo critério de “hoje” em {@link parseDataAquisicao}). */
+/** Data local do servidor em YYYY-MM-DD (mesmo critério de "hoje" em {@link parseDataAquisicao}). */
 export function dataAquisicaoPadraoHojeIso() {
   const today = new Date()
   const y = today.getFullYear()
@@ -222,20 +226,38 @@ export function parseInvestimentoCreateBody(body, options = {}) {
 
 function rowToApi(row) {
   if (!row) return row
-  const vi = row.valor_investido
   const pc = row.percentual_cdi
+
+  const aportes = (row.aportes || [])
+    .map((a) => ({
+      id: a.id,
+      valor: Number(a.valor),
+      data_aquisicao: extrairDataYyyyMmDdInvestimento(a.data_aquisicao),
+      criado_em: a.criado_em,
+    }))
+    .filter((a) => Number.isFinite(a.valor) && a.valor > 0 && a.data_aquisicao)
+    .sort((a, b) => a.data_aquisicao.localeCompare(b.data_aquisicao))
+
+  const valorInvestidoEfetivo =
+    aportes.length > 0
+      ? Math.round(aportes.reduce((s, a) => s + a.valor, 0) * 100) / 100
+      : row.valor_investido != null
+        ? Number(row.valor_investido)
+        : null
+
   return {
     id: row.id,
     usuario_id: row.usuario_id,
     tipo_preset: row.tipo_preset,
     nome: row.nome,
     instituicao_nome: row.instituicao_nome,
-    valor_investido: vi != null ? Number(vi) : null,
+    valor_investido: valorInvestidoEfetivo,
     percentual_cdi: pc != null ? Number(pc) : null,
     data_aquisicao: extrairDataYyyyMmDdInvestimento(row.data_aquisicao),
     data_vencimento: extrairDataYyyyMmDdInvestimento(row.data_vencimento),
     criado_em: row.criado_em,
     tipo_indexador: row.tipo_indexador ?? 'CDI',
+    aportes,
   }
 }
 
@@ -246,7 +268,7 @@ export async function listarInvestimentosUsuario(usuarioId) {
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
     .from('investimentos_usuario')
-    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, data_vencimento, criado_em, tipo_indexador')
+    .select(SELECT_COLS)
     .eq('usuario_id', usuarioId)
     .order('criado_em', { ascending: false })
 
@@ -279,7 +301,21 @@ export async function criarInvestimentoUsuario(usuarioId, body) {
     .maybeSingle()
 
   if (error) throw new Error(error.message || 'Erro ao criar investimento.')
-  return rowToApi(data)
+
+  // Criar aporte inicial
+  const { error: aporteError } = await supabase
+    .from('investimento_aportes')
+    .insert({ investimento_id: data.id, valor: valor_investido, data_aquisicao })
+  if (aporteError) throw new Error(aporteError.message || 'Erro ao criar aporte inicial.')
+
+  // Buscar com aportes
+  const { data: full, error: fetchError } = await supabase
+    .from('investimentos_usuario')
+    .select(SELECT_COLS)
+    .eq('id', data.id)
+    .maybeSingle()
+  if (fetchError) throw new Error(fetchError.message || 'Erro ao buscar investimento criado.')
+  return rowToApi(full)
 }
 
 /**
@@ -322,10 +358,101 @@ export async function atualizarInvestimentoUsuario(id, usuarioId, body) {
     })
     .eq('id', id)
     .eq('usuario_id', usuarioId)
-    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, data_vencimento, criado_em, tipo_indexador')
+    .select(SELECT_COLS)
     .maybeSingle()
 
   if (error) throw new Error(error.message || 'Erro ao atualizar investimento.')
   if (!data) throw new Error('Investimento não encontrado.')
+  return rowToApi(data)
+}
+
+/**
+ * @param {Record<string, unknown>} body
+ * @returns {{ valor: number, data_aquisicao: string }}
+ */
+export function parseAporteBody(body) {
+  const valor = parseValorInvestido(body?.valor)
+  const rawDa = body?.data_aquisicao
+  const data_aquisicao =
+    rawDa === undefined || rawDa === null || String(rawDa).trim() === ''
+      ? dataAquisicaoPadraoHojeIso()
+      : parseDataAquisicao(rawDa)
+  return { valor, data_aquisicao }
+}
+
+/**
+ * @param {string} investimentoId
+ * @param {string} usuarioId
+ * @param {Record<string, unknown>} body
+ */
+export async function criarAporteInvestimento(investimentoId, usuarioId, body) {
+  const { valor, data_aquisicao } = parseAporteBody(body)
+  const supabase = getSupabaseAdmin()
+
+  // Verificar ownership
+  const { data: inv } = await supabase
+    .from('investimentos_usuario')
+    .select('id')
+    .eq('id', investimentoId)
+    .eq('usuario_id', usuarioId)
+    .maybeSingle()
+  if (!inv) throw new Error('Investimento não encontrado.')
+
+  const { error: aporteError } = await supabase
+    .from('investimento_aportes')
+    .insert({ investimento_id: investimentoId, valor, data_aquisicao })
+  if (aporteError) throw new Error(aporteError.message || 'Erro ao criar aporte.')
+
+  // Retornar investimento atualizado com todos os aportes
+  const { data, error } = await supabase
+    .from('investimentos_usuario')
+    .select(SELECT_COLS)
+    .eq('id', investimentoId)
+    .maybeSingle()
+  if (error) throw new Error(error.message || 'Erro ao buscar investimento atualizado.')
+  return rowToApi(data)
+}
+
+/**
+ * @param {string} aporteId
+ * @param {string} investimentoId
+ * @param {string} usuarioId
+ */
+export async function removerAporteInvestimento(aporteId, investimentoId, usuarioId) {
+  const supabase = getSupabaseAdmin()
+
+  // Verificar ownership
+  const { data: inv } = await supabase
+    .from('investimentos_usuario')
+    .select('id')
+    .eq('id', investimentoId)
+    .eq('usuario_id', usuarioId)
+    .maybeSingle()
+  if (!inv) throw new Error('Investimento não encontrado.')
+
+  // Contar aportes — bloquear remoção do último
+  const { count } = await supabase
+    .from('investimento_aportes')
+    .select('id', { count: 'exact', head: true })
+    .eq('investimento_id', investimentoId)
+  if ((count ?? 0) <= 1) {
+    throw new Error('Não é possível remover o único aporte. Para deletar o investimento, use Remover.')
+  }
+
+  const { data: deleted, error } = await supabase
+    .from('investimento_aportes')
+    .delete()
+    .eq('id', aporteId)
+    .eq('investimento_id', investimentoId)
+    .select('id')
+  if (error) throw new Error(error.message || 'Erro ao remover aporte.')
+  if (!deleted?.length) throw new Error('Aporte não encontrado.')
+
+  const { data, error: fetchError } = await supabase
+    .from('investimentos_usuario')
+    .select(SELECT_COLS)
+    .eq('id', investimentoId)
+    .maybeSingle()
+  if (fetchError) throw new Error(fetchError.message || 'Erro ao buscar investimento.')
   return rowToApi(data)
 }
