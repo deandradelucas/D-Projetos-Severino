@@ -6,12 +6,128 @@ import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
 import { detectExtratoPedido, montarRespostaExtratoWhatsApp } from './whatsapp-extrato.mjs'
 import { resolveEscopoUsuario, assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
+import { listarInvestimentosUsuario } from '../investimentos.mjs'
+import {
+  buscarTaxaCdiAa,
+  calcularRendimentoInvestimento,
+  ehDiaUtilHoje,
+} from '../investimentos-rendimento.mjs'
 
 const SALDO_RE =
   /\b(saldo|quanto[\s-]tenho|meu[\s-]saldo|balan[çc]o|quanto[\s-]sobrou|resumo financeiro)\b/i
 
 export function isSaldoQuery(message) {
   return SALDO_RE.test(String(message || ''))
+}
+
+const INVESTIMENTO_RE =
+  /\b(investimento[s]?|investindo|invest[iu]|aplica[çc][aã]o|aplica[çc][õo]es|renda[\s-]fixa|cdb|lci|lca|cri|cra|tesouro|poupan[çc]a|quanto[\s-]tenho[\s-]investido|meus[\s-]investimentos|carteira[\s-]de[\s-]investimento[s]?|rendimento[s]?|aportes?)\b/i
+
+export function isInvestimentoQuery(message) {
+  return INVESTIMENTO_RE.test(String(message || ''))
+}
+
+export async function montarRespostaInvestimentosWhatsApp(usuarioId) {
+  const [investimentos, cdiAa] = await Promise.all([
+    listarInvestimentosUsuario(usuarioId),
+    buscarTaxaCdiAa(),
+  ])
+
+  if (!investimentos || investimentos.length === 0) {
+    return '📈 Você ainda não tem investimentos cadastrados no *Severino*.\n\nAbra o app e cadastre seus investimentos para eu poder acompanhar junto com você!'
+  }
+
+  const fmtBrl = (v) =>
+    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v ?? 0)
+  const fmtData = (s) => {
+    if (!s) return null
+    return new Date(s + 'T00:00:00Z').toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+  }
+  const fmtSinal = (v) => (v >= 0 ? `+${fmtBrl(v)}` : fmtBrl(v))
+
+  const diaUtil = ehDiaUtilHoje()
+
+  let totalInvestido = 0
+  let totalRendDiarioBruto = 0
+  let totalRendDiarioLiquido = 0
+  let totalAcumBruto = 0
+  let totalAcumLiquido = 0
+
+  const linhas = investimentos.map((inv) => {
+    const valor = Number(inv.valor_investido) || 0
+    totalInvestido += valor
+
+    const indexador =
+      inv.tipo_indexador === 'PREFIXADO'
+        ? `${inv.percentual_cdi}% a.a. (prefixado)`
+        : `${inv.percentual_cdi}% do CDI`
+
+    const venc = fmtData(inv.data_vencimento)
+    const inicio = fmtData(inv.data_aquisicao)
+    const inst = inv.instituicao_nome ? ` | ${inv.instituicao_nome}` : ''
+    const numAportes = (inv.aportes || []).length
+
+    const rend = calcularRendimentoInvestimento(inv, cdiAa)
+
+    let rendLinhas = ''
+    if (rend) {
+      totalAcumBruto += rend.brutoAcum
+      totalAcumLiquido += rend.liquidoAcum
+
+      const irFmt = rend.isento
+        ? 'Isento IR'
+        : `IR ${(rend.aliquota * 100).toLocaleString('pt-BR', { minimumFractionDigits: 1 })}%`
+
+      const acumLinha = rend.isento
+        ? `  💹 Acumulado: *${fmtSinal(rend.brutoAcum)}* (${irFmt})`
+        : `  💹 Acumulado: ${fmtSinal(rend.brutoAcum)} bruto → *${fmtSinal(rend.liquidoAcum)}* líq. (${irFmt})`
+
+      if (diaUtil) {
+        totalRendDiarioBruto += rend.bruto
+        totalRendDiarioLiquido += rend.liquido
+        const diaLinha = rend.isento
+          ? `  📈 Hoje: *${fmtSinal(rend.bruto)}*`
+          : `  📈 Hoje: ${fmtSinal(rend.bruto)} bruto / *${fmtSinal(rend.liquido)}* líq.`
+        rendLinhas = `\n${diaLinha}\n${acumLinha}`
+      } else {
+        rendLinhas = `\n${acumLinha}`
+      }
+
+      rendLinhas += `\n  ⏱ ${rend.diasCorr} dias corridos | ${rend.diasUteis} dias úteis`
+    }
+
+    return (
+      `• *${inv.nome}*${inst}\n` +
+      `  💰 ${fmtBrl(valor)} — ${indexador}` +
+      `${inicio ? `\n  📅 Início: ${inicio}${venc ? ` | Vence: ${venc}` : ''}` : venc ? `\n  📅 Vence: ${venc}` : ''}` +
+      `${numAportes > 1 ? `\n  📌 ${numAportes} aportes` : ''}` +
+      rendLinhas
+    )
+  })
+
+  const cabecalho = `📊 *Seus Investimentos* (${investimentos.length})\n`
+  const separador = '─────────────────────\n'
+
+  let rodape = `\n${separador}💼 *Total investido: ${fmtBrl(totalInvestido)}*`
+
+  if (totalAcumBruto > 0) {
+    if (diaUtil && totalRendDiarioBruto > 0) {
+      rodape += `\n📈 *Rendimento hoje: ${fmtSinal(totalRendDiarioLiquido)}* (líq.)`
+    }
+    rodape += `\n💹 *Acumulado estimado: ${fmtSinal(totalAcumLiquido)}* (líq.)`
+  }
+
+  if (cdiAa) {
+    rodape += `\n📉 CDI atual: ${cdiAa.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}% a.a.`
+  }
+
+  if (!diaUtil) {
+    rodape += '\n\n_ℹ️ Hoje não é dia útil — rendimento diário não calculado._'
+  }
+
+  rodape += '\n\n_Estimativas baseadas no CDI do BCB. Não consideram eventos específicos do emissor._'
+
+  return cabecalho + '\n' + linhas.join('\n\n') + rodape
 }
 
 export function assertBotSecret(authHeader) {
@@ -76,7 +192,7 @@ function formatDataTransacaoReplyPtBr(iso) {
 }
 
 const AJUDA =
-  '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite *ajuda* para ver isto de novo.'
+  '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n📈 *Investimentos:* "meus investimentos", "quanto tenho investido"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite *ajuda* para ver isto de novo.'
 
 /** WhatsApp: limite útil de caracteres; resume **markdown** do modelo para *negrito* WA. */
 function formatAssistantReplyForWhatsApp(text) {
@@ -143,6 +259,17 @@ export async function processarMensagemBot(phone, rawMessage) {
     } catch (e) {
       log.error('[whatsapp-bot] montarRespostaExtratoWhatsApp error', e)
       return { ok: false, reply: '❌ Erro ao buscar seu histórico. Tente novamente.' }
+    }
+  }
+
+  // Consulta de investimentos
+  if (isInvestimentoQuery(message)) {
+    try {
+      const texto = await montarRespostaInvestimentosWhatsApp(dataUsuarioId)
+      return { ok: true, reply: texto }
+    } catch (e) {
+      log.error('[whatsapp-bot] montarRespostaInvestimentosWhatsApp error', e)
+      return { ok: false, reply: '❌ Erro ao buscar seus investimentos. Tente novamente.' }
     }
   }
 

@@ -2141,3 +2141,33 @@ body[data-theme='light'] .ref-empty-cta:active {
   }
 }
 
+/* Saldo zerado — tom neutro */
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
+  color: var(--text-secondary, #a3a3a3);
+}
+
+body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
+  color: var(--text-secondary, #64748b);
+}
+
+/* KPI card Saldo — cor do valor conforme positivo/negativo/zero */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--pos {
+  color: #059669;
+}
+
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--pos {
+  color: #34d399;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--neg {
+  color: #dc2626;
+}
+
+body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--neg {
+  color: #f87171;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--zero {
+  color: var(--text-secondary, #64748b);
+}
+

@@ -1,25 +1,41 @@
+import http from 'node:http'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+/** Sem keep-alive: evita ECONNRESET ao reutilizar socket que o Node já fechou (reinício da API / idle). */
+const apiProxyAgent = new http.Agent({ keepAlive: false })
+
 /** Proxy /api → mesma porta que `server/index.mjs` (API_PORT no .env). */
 function createApiProxy(apiTarget) {
   return {
     target: apiTarget,
     changeOrigin: true,
+    agent: apiProxyAgent,
+    /** Rotas como /api/assinatura/status podem demorar (sync Asaas/Stripe); evita corte prematuro. */
+    timeout: 120_000,
+    proxyTimeout: 120_000,
     configure(proxy) {
+      proxy.on('proxyReq', (proxyReq) => {
+        proxyReq.setHeader('Connection', 'close')
+      })
       proxy.on('error', (err, _req, res) => {
         if (!res || typeof res.writeHead !== 'function' || res.writableEnded || res.headersSent) {
           return
         }
+        const resetOuPipe =
+          err?.code === 'ECONNRESET' || err?.code === 'EPIPE' || err?.code === 'ECONNABORTED'
         const unreachable =
           err?.code === 'ECONNREFUSED' ||
           err?.code === 'ETIMEDOUT' ||
-          err?.code === 'ENOTFOUND'
+          err?.code === 'ENOTFOUND' ||
+          resetOuPipe
         const message = unreachable
-          ? `A API não responde em ${apiTarget}. Verifique se dev:api está ativo, se API_PORT no .env bate com essa URL e libere a porta se outro processo estiver usando-a.`
+          ? resetOuPipe
+            ? `Conexão com a API em ${apiTarget} foi encerrada (reinício ou porta ocupada). Rode de novo \`npm run dev\` ou confira se só um processo usa API_PORT.`
+            : `A API não responde em ${apiTarget}. Verifique se dev:api está ativo, se API_PORT no .env bate com essa URL e libere a porta se outro processo estiver usando-a.`
           : 'Falha ao encaminhar para a API local. Reinicie npm run dev ou confira os logs do servidor.'
         res.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8' })
         res.end(JSON.stringify({ message }))
