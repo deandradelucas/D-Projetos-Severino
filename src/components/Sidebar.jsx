@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
-import { BRAND_ASSETS, BRAND_LOGO_PIXEL_SIZE } from '../lib/brandAssets'
+import { BRAND_ASSETS } from '../lib/brandAssets'
 import { useTheme } from '../context/ThemeContext'
 
 function mergeNavItemClass(isActive, href, pathname, extraClass = '') {
@@ -121,8 +121,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
 
   const svgSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
   const pngSrc = theme === 'light' ? BRAND_ASSETS.sidebarLogoLightPng : BRAND_ASSETS.sidebarLogoDarkPng
-  const logoIntrinsic =
-    theme === 'light' ? BRAND_LOGO_PIXEL_SIZE.severinoTemaClaro : BRAND_LOGO_PIXEL_SIZE.severinoPwaEscuro
   const [logoSrc, setLogoSrc] = useState(pngSrc)
 
   useEffect(() => {
@@ -154,8 +152,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             src={logoSrc}
             alt="Severino"
             className="brand-logo"
-            width={logoIntrinsic.width}
-            height={logoIntrinsic.height}
             decoding="sync"
             onError={() => setLogoSrc(svgSrc)}
           />

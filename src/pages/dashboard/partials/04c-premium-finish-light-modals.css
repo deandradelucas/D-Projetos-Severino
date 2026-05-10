@@ -16,14 +16,14 @@ body[data-theme='light'] {
   --pf-sh-float: 0 28px 56px -34px rgba(15, 23, 42, 0.16);
   --pf-sh-soft: 0 8px 24px -12px rgba(15, 23, 42, 0.1);
   --pf-focus: 0 0 0 3px rgba(59, 130, 246, 0.32);
-  /* Menu shell (tema claro): padding único ativo/inativo — evita salto ao trocar rota */
-  --shell-nav-py: 12px;
-  --shell-nav-pl: 16px;
-  --shell-nav-pr: 28px;
-  /* Menu lateral — proporcional ao viewport (largura + padding fluidos) */
-  --app-sidebar-width: clamp(210px, 15.5vw + 66px, 290px);
-  --app-sidebar-pad: clamp(14px, 1.6vw + 8px, 22px) clamp(12px, 1.2vw + 8px, 18px)
-    clamp(14px, 1.5vw + 8px, 20px);
+  /* Menu shell: padding fluido — mais compacto em telas estreitas */
+  --shell-nav-py: clamp(8px, 0.55vw + 6px, 12px);
+  --shell-nav-pl: clamp(10px, 0.85vw + 8px, 16px);
+  --shell-nav-pr: clamp(14px, 1vw + 10px, 26px);
+  /* Menu lateral — mínimo compatível com PT-BR (Investimentos, Logs de Pagamentos, etc.) */
+  --app-sidebar-width: clamp(272px, 12vw + 126px, 312px);
+  --app-sidebar-pad: clamp(10px, 1.1vw + 6px, 18px) clamp(10px, 1vw + 8px, 16px)
+    clamp(10px, 1vw + 6px, 18px);
   --app-shell-inner-max: 1180px;
   /* +14px = gap entre menu e coluna principal (mesmo ritmo dos cards) */
   --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 66px);
@@ -562,7 +562,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    gap: 8px;
+    gap: clamp(5px, 0.45vw + 4px, 8px);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .logout-btn {
@@ -625,19 +625,19 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     align-items: center;
     justify-content: flex-start;
     width: 100%;
-    margin-bottom: 8px;
+    margin-bottom: clamp(6px, 0.5vw + 4px, 8px);
     padding-bottom: 0;
     /* Evita “salto” logo → 1.º item: cada rota remonta o Sidebar e a PNG pode vir com altura 0 até decodificar */
-    min-height: 72px;
-    gap: 11px;
+    min-height: clamp(56px, 4.5vw + 42px, 72px);
+    gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: 72px;
-    min-height: 72px;
-    max-height: 72px;
+    height: clamp(52px, 5vw + 40px, 72px);
+    min-height: clamp(52px, 5vw + 40px, 72px);
+    max-height: clamp(52px, 5vw + 40px, 72px);
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -650,7 +650,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
     display: inline-flex;
     align-items: center;
-    font-size: 24px;
+    font-size: clamp(17px, 1.1vw + 13px, 24px);
     line-height: 1;
     font-weight: 900;
     letter-spacing: 0.08em;
@@ -666,18 +666,18 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     align-items: center;
     justify-content: flex-start;
     width: 100%;
-    margin-bottom: 8px;
+    margin-bottom: clamp(6px, 0.5vw + 4px, 8px);
     padding-bottom: 0;
-    min-height: 72px;
-    gap: 11px;
+    min-height: clamp(56px, 4.5vw + 42px, 72px);
+    gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: 72px;
-    min-height: 72px;
-    max-height: 72px;
+    height: clamp(52px, 5vw + 40px, 72px);
+    min-height: clamp(52px, 5vw + 40px, 72px);
+    max-height: clamp(52px, 5vw + 40px, 72px);
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -690,7 +690,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
     display: inline-flex;
     align-items: center;
-    font-size: 24px;
+    font-size: clamp(17px, 1.1vw + 13px, 24px);
     line-height: 1;
     font-weight: 900;
     letter-spacing: 0.08em;
@@ -700,7 +700,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .nav-menu {
-    gap: 8px;
+    gap: clamp(5px, 0.45vw + 4px, 8px);
   }
 }
 
@@ -712,7 +712,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-me
 
 /* Mesmo gap que entre Dashboard / Transações / … (evita folga extra só abaixo da logo) */
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu {
-  gap: 8px;
+  gap: clamp(5px, 0.45vw + 4px, 8px);
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:first-child {
@@ -731,11 +731,11 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
   max-width: 100%;
   margin-left: 0;
   margin-right: 0;
-  gap: 12px;
-  min-height: 46px;
+  gap: clamp(9px, 0.65vw + 7px, 12px);
+  min-height: clamp(40px, 1.65vw + 32px, 46px);
   padding: var(--shell-nav-py) var(--shell-nav-pr) var(--shell-nav-py) var(--shell-nav-pl);
   border-radius: 12px;
-  font-size: 14px;
+  font-size: clamp(13px, 0.28vw + 12px, 14px);
   font-weight: 600;
   letter-spacing: -0.015em;
   color: rgba(15, 23, 42, 0.52);
@@ -787,8 +787,8 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
-  width: 36px;
-  height: 36px;
+  width: clamp(32px, 1.2vw + 28px, 36px);
+  height: clamp(32px, 1.2vw + 28px, 36px);
   border-radius: 11px;
   background: rgba(255, 255, 255, 0.45);
   border: 1px solid rgba(226, 232, 240, 0.5);
@@ -810,10 +810,15 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item svg {
+  width: clamp(19px, 0.5vw + 17px, 22px);
+  height: clamp(19px, 0.5vw + 17px, 22px);
+}
+
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
   margin-top: auto;
-  min-height: 46px;
-  padding: 12px 16px;
+  min-height: clamp(40px, 1.65vw + 32px, 46px);
+  padding: clamp(9px, 0.55vw + 7px, 12px) clamp(12px, 0.8vw + 10px, 16px);
   border-radius: 12px;
   border: 1px solid rgba(239, 68, 68, 0.22);
   background: rgba(239, 68, 68, 0.06);
@@ -891,12 +896,13 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
-    background: rgba(22, 28, 38, 0.88);
-    -webkit-backdrop-filter: blur(22px) saturate(1.06);
-    backdrop-filter: blur(22px) saturate(1.06);
-    border-right: 1px solid rgba(255, 255, 255, 0.12);
+    background: #000000 !important;
+    background-image: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 1px 0 rgba(255, 255, 255, 0.05) inset,
       14px 0 56px -24px rgba(0, 0, 0, 0.55);
   }
 
@@ -909,10 +915,10 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
     justify-content: center;
     width: 100%;
     max-width: 100%;
-    margin-bottom: 18px;
+    margin-bottom: clamp(12px, 2.5vw + 8px, 18px);
     /* Direita reserva área do X absoluto; esquerda mais curta = logo PNG usa mais largura */
-    padding: 10px 52px 14px 12px;
-    min-height: 72px;
+    padding: 8px 48px 12px 10px;
+    min-height: clamp(58px, 12vw + 36px, 72px);
     gap: 0;
     box-sizing: border-box;
     flex-shrink: 0;
@@ -927,10 +933,10 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    min-height: 48px;
+    width: clamp(42px, 10vw + 28px, 48px);
+    height: clamp(42px, 10vw + 28px, 48px);
+    min-width: clamp(42px, 10vw + 28px, 48px);
+    min-height: clamp(42px, 10vw + 28px, 48px);
     padding: 0;
     border-radius: 14px;
     border: 1px solid transparent;
@@ -994,7 +1000,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
-    gap: 8px;
+    gap: clamp(5px, 1.2vw + 3px, 8px);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn,
@@ -1006,19 +1012,19 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
     border-radius: 12px;
-    min-height: 46px;
+    min-height: clamp(40px, 2.4vw + 34px, 46px);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
     border-radius: 12px;
-    min-height: 46px;
+    min-height: clamp(40px, 2.4vw + 34px, 46px);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label {
-    margin: 10px 0 2px;
-    padding: 12px 8px 6px 10px;
+    margin: 8px 0 2px;
+    padding: 10px 6px 4px 8px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
@@ -1879,7 +1885,7 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
 
 /* Agenda — shell premium com timeline e WhatsApp */
 .agenda-shell {
-  --agenda-accent: #8b5cf6;
+  --agenda-accent: #059669;
   --agenda-accent-2: #d4a84b;
   --agenda-success: #22c55e;
   --agenda-danger: #ef4444;
@@ -1923,9 +1929,8 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
 
 body[data-theme='dark'] .agenda-page .agenda-hero {
   background:
-    radial-gradient(circle at 12% 0%, rgba(139, 92, 246, 0.18), transparent 36%),
-    radial-gradient(circle at 96% 10%, rgba(212, 168, 75, 0.08), transparent 34%),
-    linear-gradient(180deg, rgba(20, 28, 42, 0.92), rgba(8, 13, 22, 0.82));
+    radial-gradient(circle at 96% 10%, rgba(212, 168, 75, 0.1), transparent 36%),
+    linear-gradient(180deg, rgba(12, 12, 12, 0.98), rgba(0, 0, 0, 0.96));
 }
 
 .agenda-page .dashboard-hub__hero-row {
@@ -1987,10 +1992,10 @@ body[data-theme='dark'] .agenda-page .agenda-hero {
 }
 
 body[data-theme='dark'] .agenda-list-panel {
-  border-color: rgba(148, 163, 184, 0.16);
+  border-color: rgba(255, 255, 255, 0.08);
   background:
-    radial-gradient(circle at 95% 0%, rgba(139, 92, 246, 0.1), transparent 40%),
-    rgba(15, 23, 42, 0.66);
+    radial-gradient(circle at 95% 0%, rgba(212, 168, 75, 0.06), transparent 42%),
+    rgba(0, 0, 0, 0.92);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.05) inset,
     0 20px 48px -34px rgba(0, 0, 0, 0.8);
@@ -2145,7 +2150,7 @@ body[data-theme='dark'] .agenda-modal {
 body[data-theme='dark'] .agenda-field input,
 body[data-theme='dark'] .agenda-field textarea,
 body[data-theme='dark'] .agenda-field select {
-  background: rgba(2, 6, 23, 0.42);
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .agenda-field input:focus-visible,
@@ -2172,7 +2177,7 @@ body[data-theme='dark'] .agenda-field select {
   padding: 0 13px;
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 15px;
-  background: rgba(139, 92, 246, 0.08);
+  background: rgba(5, 150, 105, 0.06);
 }
 
 .agenda-toggle input {
@@ -2302,6 +2307,13 @@ body[data-theme='dark'] .agenda-field select {
 .agenda-page .agenda-shell {
   --agenda-accent: #059669;
   --agenda-accent-2: #d4a84b;
+}
+
+body[data-theme='dark'] .agenda-page .agenda-shell {
+  --agenda-accent: #d4a84b;
+  --agenda-accent-2: #e4bc6a;
+  --agenda-ink: #fafafa;
+  --agenda-muted: rgba(250, 250, 250, 0.62);
 }
 
 .agenda-page .agenda-hero,
@@ -2496,27 +2508,37 @@ body[data-theme='light'] .agenda-page .dashboard-hub__hero-actions .dashboard-hu
   box-shadow: 0 18px 28px -24px rgba(255, 255, 255, 0.7) !important;
 }
 
-.agenda-page .agenda-list-panel,
-body[data-theme='dark'] .agenda-page .agenda-list-panel {
+.agenda-page .agenda-list-panel {
   background: #ffffff !important;
   border: 0.5px solid rgba(15, 23, 42, 0.08) !important;
   box-shadow: 0 18px 44px -34px rgba(15, 23, 42, 0.34) !important;
 }
 
-.agenda-page .agenda-list-panel h2,
-body[data-theme='dark'] .agenda-page .agenda-list-panel h2 {
+body[data-theme='dark'] .agenda-page .agenda-list-panel {
+  background: #000000 !important;
+  border: 0.5px solid #0b0b0b !important;
+  box-shadow: none !important;
+}
+
+.agenda-page .agenda-list-panel h2 {
   color: #111827 !important;
 }
 
+body[data-theme='dark'] .agenda-page .agenda-list-panel h2 {
+  color: #fafafa !important;
+}
+
 .agenda-page .agenda-section-eyebrow,
-.agenda-page .agenda-event__local,
-body[data-theme='dark'] .agenda-page .agenda-section-eyebrow,
-body[data-theme='dark'] .agenda-page .agenda-event__local {
+.agenda-page .agenda-event__local {
   color: #64748b !important;
 }
 
-.agenda-page .agenda-secondary-btn,
-body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
+body[data-theme='dark'] .agenda-page .agenda-section-eyebrow,
+body[data-theme='dark'] .agenda-page .agenda-event__local {
+  color: rgba(250, 250, 250, 0.62) !important;
+}
+
+.agenda-page .agenda-secondary-btn {
   background: #ffffff !important;
   border-color: rgba(15, 23, 42, 0.1) !important;
   color: #111827 !important;

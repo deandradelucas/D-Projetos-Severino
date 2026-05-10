@@ -428,7 +428,7 @@ body[data-theme='dark'] .config-card {
 }
 @media (max-width: 1200px) {
   body[data-theme='dark'] {
-    --app-sidebar-width: clamp(190px, 20vw + 34px, 252px);
+    --app-sidebar-width: clamp(272px, 20vw + 80px, 312px);
     --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 66px);
   }
 }
@@ -610,11 +610,6 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .re
 @media (min-width: 560px) {
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (min-width: 1024px) {
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip.ref-kpi-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 body[data-theme='dark'] .ref-kpi-card {
@@ -1655,14 +1650,14 @@ body[data-theme='dark'] {
   --pf-sh-float: 0 28px 56px -34px rgba(0, 0, 0, 0.4);
   --pf-sh-soft: 0 8px 24px -12px rgba(0, 0, 0, 0.28);
   --pf-focus: 0 0 0 3px rgba(59, 130, 246, 0.32);
-  /* Menu shell (tema claro): padding único ativo/inativo — evita salto ao trocar rota */
-  --shell-nav-py: 12px;
-  --shell-nav-pl: 16px;
-  --shell-nav-pr: 28px;
-  /* Menu lateral — proporcional ao viewport (largura + padding fluidos) */
-  --app-sidebar-width: clamp(210px, 15.5vw + 66px, 290px);
-  --app-sidebar-pad: clamp(14px, 1.6vw + 8px, 22px) clamp(12px, 1.2vw + 8px, 18px)
-    clamp(14px, 1.5vw + 8px, 20px);
+  /* Menu shell: padding fluido — mais compacto em telas estreitas */
+  --shell-nav-py: clamp(8px, 0.55vw + 6px, 12px);
+  --shell-nav-pl: clamp(10px, 0.85vw + 8px, 16px);
+  --shell-nav-pr: clamp(14px, 1vw + 10px, 26px);
+  /* Menu lateral — mínimo compatível com PT-BR (Investimentos, Logs de Pagamentos, etc.) */
+  --app-sidebar-width: clamp(272px, 12vw + 126px, 312px);
+  --app-sidebar-pad: clamp(10px, 1.1vw + 6px, 18px) clamp(10px, 1vw + 8px, 16px)
+    clamp(10px, 1vw + 6px, 18px);
   --app-shell-inner-max: 1180px;
   /* +14px = gap entre menu e coluna principal (mesmo ritmo dos cards) */
   --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 66px);
@@ -1800,7 +1795,8 @@ html:has(body[data-theme='dark'] .app-horizon-shell) {
   scrollbar-gutter: stable;
 }
 body[data-theme='dark'] .dashboard-container.app-horizon-shell {
-  background: #1a222e !important;
+  background: #000000 !important;
+  background-image: none !important;
   border: none !important;
   box-shadow: none !important;
   overflow-x: clip;
@@ -1851,13 +1847,14 @@ body[data-theme='dark'] .page-admin.app-horizon-shell .page-admin-header-sub {
   }
 }
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
-  background: linear-gradient(180deg, #151c26 0%, #121820 100%);
+  background: #000000;
+  background-image: none;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
   border: none;
   border-radius: 0;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 20px 48px -32px rgba(0, 0, 0, 0.35),
     0 8px 20px -14px rgba(0, 0, 0, 0.2);
 }
@@ -2005,8 +2002,8 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     line-height: 1;
     font-weight: 900;
     letter-spacing: 0.08em;
-    color: #111820;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+    color: #f8fafc;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
     white-space: nowrap;
   }
 }
@@ -2015,7 +2012,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-men
   display: none !important;
 }
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu {
-  gap: 8px;
+  gap: clamp(5px, 0.45vw + 4px, 8px);
 }
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:first-child {
   margin-top: 0;
@@ -2027,11 +2024,11 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   max-width: 100%;
   margin-left: 0;
   margin-right: 0;
-  gap: 12px;
-  min-height: 46px;
+  gap: clamp(9px, 0.65vw + 7px, 12px);
+  min-height: clamp(40px, 1.65vw + 32px, 46px);
   padding: var(--shell-nav-py) var(--shell-nav-pr) var(--shell-nav-py) var(--shell-nav-pl);
   border-radius: 0;
-  font-size: 14px;
+  font-size: clamp(13px, 0.28vw + 12px, 14px);
   font-weight: 600;
   letter-spacing: -0.015em;
   color: rgba(15, 23, 42, 0.52);
@@ -2075,8 +2072,8 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   outline-offset: 2px;
 }
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
-  width: 36px;
-  height: 36px;
+  width: clamp(32px, 1.2vw + 28px, 36px);
+  height: clamp(32px, 1.2vw + 28px, 36px);
   border-radius: 0;
   background: rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(226, 232, 240, 0.45);
@@ -2095,10 +2092,16 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   color: var(--accent);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
+
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item svg {
+  width: clamp(19px, 0.5vw + 17px, 22px);
+  height: clamp(19px, 0.5vw + 17px, 22px);
+}
+
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
   margin-top: auto;
-  min-height: 46px;
-  padding: 12px 16px;
+  min-height: clamp(40px, 1.65vw + 32px, 46px);
+  padding: clamp(9px, 0.55vw + 7px, 12px) clamp(12px, 0.8vw + 10px, 16px);
   border-radius: 0;
   border: none;
   background: rgba(239, 68, 68, 0.08);
@@ -2169,61 +2172,16 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   }
 }
 @media (max-width: 768px) {
-
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
     margin-top: auto;
   }
-}
-@media (max-width: 768px) {
 
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
-    border-radius: 0;
-    min-height: 52px;
-  }
-}
-
-/* Mobile shell (escuro): mesma gaveta e lista em linha que dashboard.css — só reforça tipografia do bloco desktop */
-@media (max-width: 768px) {
+  /* Drawer e densidade iguais ao tema claro (02b) — antes este bloco forçava itens maiores só no escuro */
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
-    width: min(86vw, 320px);
-    max-width: 320px;
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    min-height: 52px;
-    padding: 12px 10px;
-    font-size: 16px;
-    font-weight: 600;
-  }
-
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
-    flex: 1 1 auto;
-    min-width: 0;
-    text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 16px;
-    font-weight: 600;
-  }
-
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
-  }
-
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item svg {
-    width: 22px;
-    height: 22px;
+    width: min(84vw, 300px);
+    max-width: 300px;
+    padding-left: max(8px, env(safe-area-inset-left, 0px));
+    padding-right: max(8px, env(safe-area-inset-right, 0px));
   }
 }
 @media (min-width: 769px) {
@@ -2233,7 +2191,8 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
 }
 @media (max-width: 768px) {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell {
-    background: #1a222e !important;
+    background: #000000 !important;
+    background-image: none !important;
   }
 }
 body[data-theme='dark'] .sidebar .nav-menu {
@@ -2375,7 +2334,8 @@ body[data-theme='dark'] .ref-panel__link:focus-visible {
     min-height: 100dvh;
     border: none;
     box-shadow: none;
-    background: linear-gradient(180deg, #111820 0%, #1e293b 100%);
+    background: #000000;
+    background-image: none;
   }
 }
 @media (max-width: 768px) {

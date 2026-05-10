@@ -1,10 +1,9 @@
 /* =============================================================================
-   Shell autenticado: menu lateral sempre cartão branco + cantos arredondados
-   (todas as larguras; tema claro e escuro). Carregado por último para vencer
-   vidros / gradientes dos temas escuros.
+   Shell autenticado: tema claro = cartão branco; tema escuro = #000 alinhado ao
+   dashboard full black + texto claro (este ficheiro carrega por último).
    ============================================================================= */
 
-.dashboard-container.app-horizon-shell .sidebar {
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
   background: #ffffff !important;
   background-image: none !important;
   -webkit-backdrop-filter: none !important;
@@ -13,6 +12,17 @@
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.92) inset,
     0 18px 44px -28px rgba(15, 23, 42, 0.16) !important;
+}
+
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
+  background: #000000 !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 24px 56px -32px rgba(0, 0, 0, 0.75) !important;
 }
 
 .dashboard-container.app-horizon-shell .sidebar::before {
@@ -37,34 +47,88 @@
   }
 }
 
-/* Tema escuro: paleta de texto/ítens igual ao menu claro (sobre fundo branco) */
+/* Tema escuro: fundo #000 + texto claro (ativo = chip escuro + ouro, sem pill branco) */
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-  color: #111827 !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+  color: #fafafa !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Marca no shell: mesma altura útil claro/escuro — escuro usa PNG quadrado (PWA); sem width/height HTML que forçavam “torre” alta */
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+  width: auto !important;
+  object-fit: contain !important;
+  flex: 0 1 auto !important;
+  /* Evita “xadrez” / halo claro em PNG com canal alpha sobre fundos compostos */
+  background-color: #000000 !important;
+}
+
+@media (min-width: 769px) {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+    height: clamp(52px, 5vw + 40px, 72px) !important;
+    max-height: clamp(52px, 5vw + 40px, 72px) !important;
+    object-position: left center !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+    aspect-ratio: 1009 / 382;
+    max-width: min(58%, 260px) !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+    aspect-ratio: 1 / 1;
+    max-width: min(34%, 108px) !important;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+  }
+}
+
+@media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+    height: clamp(48px, 12vw + 32px, 64px) !important;
+    max-height: clamp(48px, 12vw + 32px, 64px) !important;
+    object-position: center center !important;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+    aspect-ratio: 1009 / 382;
+    max-width: min(85%, 280px) !important;
+  }
+
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+    aspect-ratio: 1 / 1;
+    max-width: min(52vw, 132px) !important;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+  }
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
-  color: rgba(15, 23, 42, 0.52) !important;
+  color: rgba(250, 250, 250, 0.88) !important;
   border: 1px solid transparent !important;
   background: transparent !important;
   background-image: none !important;
   box-shadow: inset 0 1px 0 transparent !important;
 }
 
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
+  color: inherit !important;
+}
+
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) {
-  background: rgba(248, 250, 252, 0.95) !important;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset !important;
-  color: #334155 !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: none !important;
+  color: #fafafa !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
   font-weight: 600 !important;
-  color: #020617 !important;
-  background: rgba(255, 255, 255, 0.94) !important;
-  border-color: rgba(148, 163, 184, 0.28) !important;
+  color: #fafafa !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(212, 168, 75, 0.42) !important;
   box-shadow:
-    0 10px 28px -18px rgba(15, 23, 42, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+    0 0 0 1px rgba(212, 168, 75, 0.22) inset,
+    0 12px 28px -18px rgba(0, 0, 0, 0.55) !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg {
@@ -73,45 +137,46 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) .icon-wrap {
-  background: rgba(248, 250, 252, 0.9) !important;
-  border: 1px solid rgba(226, 232, 240, 0.55) !important;
-  color: rgba(15, 23, 42, 0.42) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(250, 250, 250, 0.88) !important;
   box-shadow: none !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap {
-  background: rgba(255, 255, 255, 0.98) !important;
-  border-color: rgba(226, 232, 240, 0.75) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
-  background: rgba(212, 168, 75, 0.14) !important;
-  border-color: rgba(212, 168, 75, 0.35) !important;
+  background: rgba(212, 168, 75, 0.16) !important;
+  border-color: rgba(212, 168, 75, 0.48) !important;
   color: var(--accent) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+  box-shadow: none !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) {
-  color: rgba(15, 23, 42, 0.48) !important;
+  color: rgba(250, 250, 250, 0.55) !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) .icon-wrap {
-  background: rgba(15, 23, 42, 0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label {
-  border-top-color: rgba(226, 232, 240, 0.75) !important;
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
-  color: rgba(15, 23, 42, 0.42) !important;
+  color: rgba(250, 250, 250, 0.42) !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
   color: #ef4444 !important;
-  border: 1px solid rgba(239, 68, 68, 0.22) !important;
-  background: rgba(239, 68, 68, 0.06) !important;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset !important;
+  border: 1px solid rgba(239, 68, 68, 0.28) !important;
+  background: rgba(239, 68, 68, 0.09) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:hover {
@@ -144,4 +209,21 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
   border-radius: 11px !important;
+}
+
+/* Desktop: texto do menu não pode encolher até cortar (flex min-width:0 + sidebar estreita) */
+@media (min-width: 769px) {
+  .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
+    flex: 1 1 auto;
+    min-width: max-content;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+
+  .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+  }
 }

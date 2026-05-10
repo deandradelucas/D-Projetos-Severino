@@ -211,7 +211,7 @@ body[data-theme='light'] .config-card {
 
 @media (max-width: 1200px) {
   body[data-theme='light'] {
-    --app-sidebar-width: clamp(190px, 20vw + 34px, 252px);
+    --app-sidebar-width: clamp(272px, 20vw + 80px, 312px);
     --app-shell-max: calc(var(--app-sidebar-width) + var(--app-shell-inner-max) + 66px);
   }
   body[data-theme='light'] .sidebar {

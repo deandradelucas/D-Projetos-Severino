@@ -143,13 +143,24 @@ export function assertBotSecret(authHeader) {
   return { ok: true }
 }
 
-export async function calcularSaldo(usuarioId) {
+export async function calcularSaldo(usuarioId, { inicio = null, fim = null } = {}) {
   const supabase = getSupabaseAdmin()
+  const now = new Date()
+  const mesInicio =
+    inicio ??
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+  const ultimoDia = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  const mesFim =
+    fim ??
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(ultimoDia).padStart(2, '0')}`
+
   const { data, error } = await supabase
     .from('transacoes')
     .select('tipo, valor')
     .eq('usuario_id', usuarioId)
     .eq('status', 'EFETIVADA')
+    .gte('data_transacao', mesInicio)
+    .lte('data_transacao', mesFim)
   if (error) throw error
 
   let receitas = 0
@@ -159,7 +170,12 @@ export async function calcularSaldo(usuarioId) {
     if (t.tipo === 'RECEITA') receitas += v
     else despesas += v
   }
-  return { saldo: receitas - despesas, receitas, despesas }
+  return { saldo: receitas - despesas, receitas, despesas, periodo: { inicio: mesInicio, fim: mesFim } }
+}
+
+function fmtPeriodo(inicio) {
+  const d = new Date(inicio + 'T00:00:00Z')
+  return d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' })
 }
 
 function fmt(v) {
@@ -276,11 +292,12 @@ export async function processarMensagemBot(phone, rawMessage) {
   // Consulta de saldo
   if (isSaldoQuery(message)) {
     try {
-      const { saldo, receitas, despesas } = await calcularSaldo(dataUsuarioId)
+      const { saldo, receitas, despesas, periodo } = await calcularSaldo(dataUsuarioId)
       const nome = usuario.nome ? ` ${usuario.nome.split(' ')[0]}` : ''
+      const mesLabel = fmtPeriodo(periodo.inicio)
       return {
         ok: true,
-        reply: `📊 *Saldo atual${nome}:*\n\n✅ Receitas: ${fmt(receitas)}\n❌ Despesas: ${fmt(despesas)}\n\n💰 *Saldo: ${fmt(saldo)}*`,
+        reply: `📊 *Resumo de ${mesLabel}${nome}:*\n\n✅ Receitas: ${fmt(receitas)}\n❌ Despesas: ${fmt(despesas)}\n\n💰 *Saldo do mês: ${fmt(saldo)}*`,
       }
     } catch (e) {
       log.error('[whatsapp-bot] calcularSaldo error', e)
@@ -308,7 +325,7 @@ export async function processarMensagemBot(phone, rawMessage) {
   // 4. Conversa — mesmo motor do Severino IA no app (contexto financeiro + agenda)
   if (parsed.tipo === 'CHAT') {
     try {
-      const full = await askHorizon(message, dataUsuarioId, [])
+      const full = await askHorizon(message, dataUsuarioId, [], usuario.nome || null)
       return { ok: true, reply: formatAssistantReplyForWhatsApp(full) }
     } catch (e) {
       log.warn('[whatsapp-bot] askHorizon (WhatsApp CHAT)', e?.message || e)
@@ -347,16 +364,21 @@ export async function processarMensagemBot(phone, rawMessage) {
 
   // 7. Montar resposta de confirmação com saldo atualizado
   let saldoAtual = null
+  let saldoPeriodoLabel = null
   try {
-    const { saldo } = await calcularSaldo(dataUsuarioId)
+    const { saldo, periodo } = await calcularSaldo(dataUsuarioId)
     saldoAtual = saldo
+    saldoPeriodoLabel = fmtPeriodo(periodo.inicio)
   } catch {
     // não crítico
   }
 
   const emoji = parsed.tipo === 'RECEITA' ? '✅' : '💸'
   const acao = parsed.tipo === 'RECEITA' ? 'Receita' : 'Despesa'
-  const saldoLinha = saldoAtual !== null ? `\n\n📊 Saldo atual: *${fmt(saldoAtual)}*` : ''
+  const saldoLinha =
+    saldoAtual !== null
+      ? `\n\n📊 Saldo de ${saldoPeriodoLabel}: *${fmt(saldoAtual)}*`
+      : ''
   const dataLinha = dataExplicita
     ? `\n📅 *Data:* ${formatDataTransacaoReplyPtBr(dataTransacaoIso)}`
     : ''

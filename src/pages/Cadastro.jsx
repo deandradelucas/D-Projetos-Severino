@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthPasswordToggleButton from '../components/AuthPasswordToggleButton'
 import AuthPhoneShell from '../components/AuthPhoneShell'
+import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
 import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
 import { getSupabaseErrorMessage, parseSupabaseResponse, supabaseKey, supabaseUrl } from '../lib/supabase'
 import { showToast } from '../lib/toastStore'
@@ -14,21 +15,10 @@ function formatTelefone(value) {
   return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`
 }
 
-const FAMILIA_CONVITE_SESSION_KEY = 'severino_familia_convite'
-
 export default function Cadastro() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const conviteQuery = useMemo(() => searchParams.get('convite')?.trim() || '', [searchParams])
-
-  useEffect(() => {
-    if (!conviteQuery) return
-    try {
-      window.sessionStorage.setItem(FAMILIA_CONVITE_SESSION_KEY, conviteQuery)
-    } catch {
-      /* ignore */
-    }
-  }, [conviteQuery])
 
   const loginHref = conviteQuery ? `/login?convite=${encodeURIComponent(conviteQuery)}` : '/login'
   const [step, setStep] = useState(1)
@@ -127,6 +117,9 @@ export default function Cadastro() {
         </>
       }
     >
+      <div className="mb-4 sm:mb-5">
+        <FamiliaConviteColarBlock idPrefix="cadastro-familia-convite" />
+      </div>
       <div className="mb-5">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-500">Passo {step} de 2</span>

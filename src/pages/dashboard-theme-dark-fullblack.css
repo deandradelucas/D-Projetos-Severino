@@ -7,15 +7,19 @@
 /* Tokens (sobrescreve polish parcial + espelho) */
 body[data-theme='dark'] {
   --bg-primary: #000000;
-  --bg-secondary: #050505;
-  --bg-card: #0c0c0c;
-  --bg-card-elevated: #121212;
-  --active-bg: #161616;
+  --bg-secondary: #000000;
+  --bg-card: #000000;
+  --bg-card-elevated: #0a0a0a;
+  --active-bg: #141414;
   --border-color: rgba(255, 255, 255, 0.08);
   --text-primary: #fafafa;
   --text-secondary: #a3a3a3;
+  --accent: #d4a84b;
+  --accent-hover: #e4bc6a;
   --accent-muted: rgba(212, 168, 75, 0.12);
-  --sidebar-bg: #030303;
+  --success: #34d399;
+  --danger: #f87171;
+  --sidebar-bg: #000000;
   --sidebar-text: #fafafa;
   --sidebar-text-muted: rgba(250, 250, 250, 0.52);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
@@ -36,15 +40,23 @@ body[data-theme='dark'] .btn-primary:focus-visible {
     0 14px 32px -18px rgba(0, 0, 0, 0.55);
 }
 
-/* Cartões de conteúdo */
+/* Cartões de relatório / config — preto (.ref-kpi-card e .ref-panel ficam no bloco “KPIs e painéis” abaixo) */
 body[data-theme='dark'] .relatorios-chart-card,
-body[data-theme='dark'] .config-card {
-  background: linear-gradient(165deg, #101010 0%, #0a0a0a 100%);
+body[data-theme='dark'] .config-card,
+body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card,
+body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card {
+  background: #000000;
+  background-image: none;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.04) inset,
     0 20px 48px -28px rgba(0, 0, 0, 0.65),
     0 6px 16px -10px rgba(0, 0, 0, 0.45);
+}
+
+/* Relatórios: pseudo-camada roxa do layout base (02c) — remover no escuro */
+body[data-theme='dark'] .page-relatorios .relatorios-chart-card::before {
+  display: none;
 }
 
 body[data-theme='dark'] .config-card:hover {
@@ -104,9 +116,9 @@ body[data-theme='dark'] .logout-btn {
   color: #fca5a5;
 }
 
-/* Shell — sidebar */
+/* Shell — sidebar (preto sólido alinhado ao main #000; detalhes finos em 08-shell + 05-dark) */
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
-  background: linear-gradient(195deg, #0a0a0a 0%, #050505 52%, #000000 100%);
+  background: #000000;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.05) inset,
@@ -128,7 +140,8 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
 /* KPIs e painéis */
 body[data-theme='dark'] .ref-kpi-card {
   border: 1px solid rgba(255, 255, 255, 0.09);
-  background: linear-gradient(165deg, #121212 0%, #0c0c0c 55%, #080808 100%);
+  background: #000000;
+  background-image: none;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.05) inset,
     0 18px 44px -30px rgba(0, 0, 0, 0.72);
@@ -136,7 +149,8 @@ body[data-theme='dark'] .ref-kpi-card {
 
 @media (min-width: 769px) {
   body[data-theme='dark'] .ref-kpi-card {
-    background: linear-gradient(165deg, #141414 0%, #0e0e0e 50%, #090909 100%);
+    background: #000000;
+    background-image: none;
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.06) inset,
       0 22px 50px -32px rgba(0, 0, 0, 0.75);
@@ -172,7 +186,8 @@ body[data-theme='dark'] .ref-kpi-card__label {
 
 body[data-theme='dark'] .ref-panel {
   border: 1px solid rgba(255, 255, 255, 0.09);
-  background: linear-gradient(165deg, #101010 0%, #0a0a0a 52%, #060606 100%);
+  background: #000000;
+  background-image: none;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.05) inset,
     0 22px 52px -32px rgba(0, 0, 0, 0.72);
@@ -180,7 +195,8 @@ body[data-theme='dark'] .ref-panel {
 
 @media (min-width: 769px) {
   body[data-theme='dark'] .ref-panel {
-    background: linear-gradient(165deg, #121212 0%, #0c0c0c 50%, #080808 100%);
+    background: #000000;
+    background-image: none;
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.06) inset,
       0 26px 56px -34px rgba(0, 0, 0, 0.78);
@@ -541,30 +557,6 @@ body[data-theme='dark'] .btn-delete {
   color: #a3a3a3;
 }
 
-/* Neo black — paleta inspirada em mobile finance premium (apenas cores). */
-body[data-theme='dark'] {
-  --bg-primary: #000000;
-  --bg-secondary: #050505;
-  --bg-card: #0d0d10;
-  --bg-card-elevated: #151519;
-  --active-bg: #18151f;
-  --border-color: rgba(255, 255, 255, 0.1);
-  --text-primary: #ffffff;
-  --text-secondary: #a5a5ad;
-  --accent: #8b5cf6;
-  --accent-hover: #a855f7;
-  --accent-muted: rgba(139, 92, 246, 0.18);
-  --success: #10d68f;
-  --danger: #ff4d67;
-  --transacoes-balance-pos: #8b5cf6;
-  --sidebar-bg: #030305;
-  --sidebar-text: #ffffff;
-  --sidebar-text-muted: rgba(255, 255, 255, 0.55);
-  --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
-  --sidebar-border-color: rgba(255, 255, 255, 0.1);
-  --content-border-color: rgba(255, 255, 255, 0.08);
-}
-
 /* PNG de categoria não herda `color`; tintura ~ --danger neo (#ff4d67), como a borda do quadrado. */
 body[data-theme='dark'] .ref-tx-arrow-wrap--down img {
   filter: brightness(0) saturate(100%) invert(52%) sepia(94%) saturate(3844%) hue-rotate(319deg) brightness(103%) contrast(101%);
@@ -579,7 +571,17 @@ body[data-theme='dark'] .app-background-root--plain-dark .app-background-root__p
   background: #000000;
 }
 
-body[data-theme='dark'] .dashboard-container.app-horizon-shell,
+/* Shell: fundo #000 no container + inner (gap entre colunas e faixa lateral; espelho herdava slate). */
+body[data-theme='dark'] .dashboard-container.app-horizon-shell {
+  background: #000000 !important;
+  background-image: none !important;
+}
+
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .app-horizon-inner {
+  background: #000000 !important;
+  background-image: none !important;
+}
+
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
   background: transparent;
 }
@@ -594,9 +596,8 @@ body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .main-conte
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar,
 body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .sidebar,
 body[data-theme='dark'] .sidebar {
-  background:
-    radial-gradient(circle at 24% 0%, rgba(139, 92, 246, 0.12), transparent 34%),
-    linear-gradient(195deg, #0d0d10 0%, #050506 54%, #000000 100%);
+  background: #000000;
+  background-image: none;
   border-color: rgba(255, 255, 255, 0.1);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
@@ -625,14 +626,12 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
 
 body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .nav-item.active,
 body[data-theme='dark'] .nav-item.active {
-  background:
-    radial-gradient(circle at 18% 14%, rgba(0, 183, 255, 0.18), transparent 34%),
-    linear-gradient(135deg, rgba(139, 92, 246, 0.34) 0%, rgba(255, 72, 178, 0.14) 100%);
-  border-color: rgba(139, 92, 246, 0.52);
+  background: rgba(212, 168, 75, 0.12);
+  border-color: rgba(212, 168, 75, 0.42);
   color: #ffffff !important;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.12) inset,
-    0 12px 34px -22px rgba(139, 92, 246, 0.9);
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 8px 24px -18px rgba(0, 0, 0, 0.55);
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
@@ -680,23 +679,8 @@ body[data-theme='dark'] .horizon-send-btn:hover:not(:disabled) {
 body[data-theme='dark'] .btn-primary:focus-visible,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:focus-visible {
   box-shadow:
-    0 0 0 3px rgba(0, 183, 255, 0.36),
-    0 18px 42px -24px rgba(139, 92, 246, 0.88);
-}
-
-body[data-theme='dark'] .ref-kpi-card,
-body[data-theme='dark'] .ref-panel,
-body[data-theme='dark'] .relatorios-chart-card,
-body[data-theme='dark'] .config-card,
-body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card,
-body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card {
-  background:
-    radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.12), transparent 32%),
-    linear-gradient(165deg, #17171c 0%, #0d0d10 54%, #070708 100%);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 24px 58px -36px rgba(0, 0, 0, 0.86);
+    0 0 0 3px rgba(212, 168, 75, 0.4),
+    0 18px 42px -24px rgba(0, 0, 0, 0.55);
 }
 
 body[data-theme='dark'] .ref-panel__head,
@@ -706,16 +690,16 @@ body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section + .nova-tx-sect
 }
 
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub {
-  --hub-accent: #8b5cf6;
-  --hub-accent-hover: #a855f7;
-  --hub-accent-ring: rgba(0, 183, 255, 0.36);
-  --hub-accent-soft: rgba(139, 92, 246, 0.18);
+  --hub-accent: #d4a84b;
+  --hub-accent-hover: #e4bc6a;
+  --hub-accent-ring: rgba(212, 168, 75, 0.42);
+  --hub-accent-soft: rgba(212, 168, 75, 0.14);
   --hub-surface: rgba(255, 255, 255, 0.055);
   --hub-border: rgba(255, 255, 255, 0.11);
   --hub-muted: rgba(255, 255, 255, 0.7);
   --hub-title: rgba(255, 255, 255, 0.98);
   --hub-icon-bg: rgba(255, 255, 255, 0.06);
-  --hub-icon-bg-hover: rgba(139, 92, 246, 0.2);
+  --hub-icon-bg-hover: rgba(212, 168, 75, 0.2);
   --hub-icon-fg: rgba(255, 255, 255, 0.86);
 }
 
@@ -732,15 +716,15 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell mai
 
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__icon,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn--privacy-on {
-  background: rgba(139, 92, 246, 0.22);
-  border-color: rgba(0, 183, 255, 0.28);
-  color: #c4b5fd;
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.28);
+  color: #93c5fd;
 }
 
 body[data-theme='dark'] .ref-kpi-card--balance .ref-kpi-card__value,
 body[data-theme='dark'] .relatorios-kpi-saldo--pos {
-  color: #8b5cf6 !important;
-  text-shadow: 0 0 26px rgba(139, 92, 246, 0.38);
+  color: var(--transacoes-balance-pos, #3b82f6) !important;
+  text-shadow: 0 0 22px rgba(59, 130, 246, 0.22);
 }
 
 body[data-theme='dark'] .ref-kpi-card--income .ref-kpi-card__value,
@@ -769,8 +753,8 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__icon-btn:hover,
 body[data-theme='dark'] .btn-secondary:hover,
 body[data-theme='dark'] .modal-actions .btn-secondary:hover {
-  background: rgba(139, 92, 246, 0.18);
-  border-color: rgba(0, 183, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(212, 168, 75, 0.35);
   color: #ffffff;
 }
 
@@ -795,30 +779,31 @@ body[data-theme='dark'] .modal-form input:not([type='checkbox']):not([type='radi
 body[data-theme='dark'] .modal-form select:focus,
 body[data-theme='dark'] .modal-form textarea:focus,
 body[data-theme='dark'] .horizon-chat-input:focus {
-  background: rgba(255, 255, 255, 0.075);
-  border-color: rgba(0, 183, 255, 0.36);
-  box-shadow: 0 0 0 2px rgba(0, 183, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 168, 75, 0.45);
+  box-shadow: 0 0 0 2px rgba(212, 168, 75, 0.14);
 }
 
 body[data-theme='dark'] .custom-select-dropdown,
 body[data-theme='dark'] .modal-content,
 body[data-theme='dark'] .horizon-chat-window,
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip {
-  background:
-    radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.13), transparent 34%),
-    linear-gradient(180deg, #17171c 0%, #080809 100%);
+  background: #000000;
+  background-image: none;
   border-color: rgba(255, 255, 255, 0.12);
 }
 
 body[data-theme='dark'] .custom-select-option.selected {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.28) 0%, rgba(0, 183, 255, 0.12) 100%) !important;
-  border-color: rgba(139, 92, 246, 0.44);
+  background: rgba(212, 168, 75, 0.16) !important;
+  color: #fafafa !important;
+  border-color: rgba(212, 168, 75, 0.42) !important;
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .custom-select-option:hover,
 body[data-theme='dark'] .data-table tbody tr:hover,
 body[data-theme='dark'] .ref-tx-row:hover {
-  background: rgba(139, 92, 246, 0.1) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
 }
 
 body[data-theme='dark'] .data-table thead th {
@@ -834,9 +819,8 @@ body[data-theme='dark'] .horizon-msg-model .horizon-msg-bubble {
 }
 
 body[data-theme='dark'] .horizon-chat-fab {
-  background:
-    radial-gradient(circle at 82% 0%, rgba(139, 92, 246, 0.2), transparent 32%),
-    linear-gradient(145deg, rgba(20, 20, 24, 0.94) 0%, rgba(5, 5, 6, 0.92) 100%);
+  background: #0a0a0a;
+  background-image: none;
   border-color: rgba(255, 255, 255, 0.12);
   color: #ffffff;
   box-shadow:
