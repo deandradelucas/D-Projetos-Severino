@@ -1,11 +1,17 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 
+// Coluna tipo_indexador: scripts/migrations/28_investimentos_usuario_tipo_indexador.sql
+
 /** Chaves aceites no POST `preset`; `nome` gravado é o valor legível. */
 export const INVESTIMENTO_PRESETS = Object.freeze({
   LCA: 'LCA',
   LCI: 'LCI',
+  CRI: 'CRI',
+  CRA: 'CRA',
   CDB: 'CDB',
   CDI: 'CDI',
+  DEBENTURE: 'Debênture',
+  TESOURO_SELIC: 'Tesouro Selic',
   POUPANCA: 'Poupança',
 })
 
@@ -108,6 +114,39 @@ export function parseDataAquisicao(raw) {
   return m[0]
 }
 
+/**
+ * Tipo de indexador: 'CDI' (pós-fixado, percentual_cdi = % do CDI) ou 'PREFIXADO' (taxa a.a. absoluta).
+ * Registros antigos com null são tratados como 'CDI'.
+ * @param {unknown} raw
+ * @returns {'CDI' | 'PREFIXADO'}
+ */
+export function parseTipoIndexador(raw) {
+  const v = String(raw ?? 'CDI').trim().toUpperCase()
+  if (v === 'PREFIXADO') return 'PREFIXADO'
+  return 'CDI'
+}
+
+/**
+ * Data de vencimento (YYYY-MM-DD). Campo opcional — retorna null se ausente.
+ * @param {unknown} raw
+ * @returns {string | null}
+ */
+export function parseDataVencimento(raw) {
+  if (raw == null || String(raw).trim() === '') return null
+  const s = extrairDataYyyyMmDdInvestimento(raw)
+  if (!s) throw new Error('Data de vencimento inválida.')
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
+  if (!m) throw new Error('Data de vencimento inválida.')
+  const y = Number(m[1])
+  const mo = Number(m[2])
+  const d = Number(m[3])
+  const dt = new Date(Date.UTC(y, mo - 1, d))
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) {
+    throw new Error('Data de vencimento inválida.')
+  }
+  return m[0]
+}
+
 export function parsePercentualCdi(raw) {
   if (raw === undefined || raw === null) {
     throw new Error('Informe o percentual do CDI contratado.')
@@ -136,7 +175,7 @@ export function parsePercentualCdi(raw) {
 /**
  * @param {Record<string, unknown>} body
  * @param {{ defaultDataAquisicaoHoje?: boolean }} [options] — em criação (POST), usar `defaultDataAquisicaoHoje: true` se o cliente omitir a data (evita NOT NULL no banco).
- * @returns {{ tipo_preset: string | null, nome: string, instituicao_nome: string, valor_investido: number, percentual_cdi: number, data_aquisicao: string }}
+ * @returns {{ tipo_preset: string | null, nome: string, instituicao_nome: string, valor_investido: number, percentual_cdi: number, data_aquisicao: string, tipo_indexador: string, data_vencimento: string | null }}
  */
 export function parseInvestimentoCreateBody(body, options = {}) {
   const { defaultDataAquisicaoHoje = false } = options
@@ -147,6 +186,7 @@ export function parseInvestimentoCreateBody(body, options = {}) {
 
   const valor_investido = parseValorInvestido(body?.valor_investido)
   const percentual_cdi = parsePercentualCdi(body?.percentual_cdi)
+  const tipo_indexador = parseTipoIndexador(body?.tipo_indexador)
   const rawDa = body?.data_aquisicao
   const data_aquisicao =
     rawDa === undefined || rawDa === null || String(rawDa).trim() === ''
@@ -154,6 +194,8 @@ export function parseInvestimentoCreateBody(body, options = {}) {
         ? dataAquisicaoPadraoHojeIso()
         : parseDataAquisicao(rawDa)
       : parseDataAquisicao(rawDa)
+
+  const data_vencimento = parseDataVencimento(body?.data_vencimento)
 
   const presetRaw = String(body?.preset ?? '').trim().toUpperCase()
   const custom = cleanNomeCustom(body?.nome_custom)
@@ -166,6 +208,8 @@ export function parseInvestimentoCreateBody(body, options = {}) {
       valor_investido,
       percentual_cdi,
       data_aquisicao,
+      tipo_indexador,
+      data_vencimento,
     }
   }
 
@@ -173,7 +217,7 @@ export function parseInvestimentoCreateBody(body, options = {}) {
     throw new Error('Escolha um tipo na lista ou informe outro investimento (mínimo 2 caracteres).')
   }
 
-  return { tipo_preset: null, nome: custom, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao }
+  return { tipo_preset: null, nome: custom, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, tipo_indexador, data_vencimento }
 }
 
 function rowToApi(row) {
@@ -189,7 +233,9 @@ function rowToApi(row) {
     valor_investido: vi != null ? Number(vi) : null,
     percentual_cdi: pc != null ? Number(pc) : null,
     data_aquisicao: extrairDataYyyyMmDdInvestimento(row.data_aquisicao),
+    data_vencimento: extrairDataYyyyMmDdInvestimento(row.data_vencimento),
     criado_em: row.criado_em,
+    tipo_indexador: row.tipo_indexador ?? 'CDI',
   }
 }
 
@@ -200,7 +246,7 @@ export async function listarInvestimentosUsuario(usuarioId) {
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
     .from('investimentos_usuario')
-    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, criado_em')
+    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, data_vencimento, criado_em, tipo_indexador')
     .eq('usuario_id', usuarioId)
     .order('criado_em', { ascending: false })
 
@@ -213,7 +259,7 @@ export async function listarInvestimentosUsuario(usuarioId) {
  * @param {Record<string, unknown>} body
  */
 export async function criarInvestimentoUsuario(usuarioId, body) {
-  const { tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao } =
+  const { tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, tipo_indexador, data_vencimento } =
     parseInvestimentoCreateBody(body, { defaultDataAquisicaoHoje: true })
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
@@ -226,8 +272,10 @@ export async function criarInvestimentoUsuario(usuarioId, body) {
       valor_investido,
       percentual_cdi,
       data_aquisicao,
+      tipo_indexador,
+      data_vencimento,
     })
-    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, criado_em')
+    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, data_vencimento, criado_em, tipo_indexador')
     .maybeSingle()
 
   if (error) throw new Error(error.message || 'Erro ao criar investimento.')
@@ -257,7 +305,7 @@ export async function removerInvestimentoUsuario(id, usuarioId) {
  * @param {Record<string, unknown>} body
  */
 export async function atualizarInvestimentoUsuario(id, usuarioId, body) {
-  const { tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao } =
+  const { tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, tipo_indexador, data_vencimento } =
     parseInvestimentoCreateBody(body)
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
@@ -269,10 +317,12 @@ export async function atualizarInvestimentoUsuario(id, usuarioId, body) {
       valor_investido,
       percentual_cdi,
       data_aquisicao,
+      tipo_indexador,
+      data_vencimento,
     })
     .eq('id', id)
     .eq('usuario_id', usuarioId)
-    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, criado_em')
+    .select('id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, data_vencimento, criado_em, tipo_indexador')
     .maybeSingle()
 
   if (error) throw new Error(error.message || 'Erro ao atualizar investimento.')

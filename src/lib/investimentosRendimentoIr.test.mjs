@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
+  contarDiasUteisComJurosAteYmd,
   contarDiasUteisComJurosDesdeIso,
   diasCorridosDesdeIso,
+  diasCorridosEntreReferenciasIso,
   ehDiaUtilComPregaoCdi,
+  DIAS_UTEIS_ANO_RENDIMENTO,
   estimativaRendimentoAcumuladoAteHoje,
   estimativaRendimentoDiarioComIr,
   extrairYyyyMmDdReferencia,
+  taxaEfetivaAaContratada,
 } from './investimentosRendimentoIr.js'
 
 describe('extrairYyyyMmDdReferencia', () => {
@@ -24,6 +28,26 @@ describe('diasCorridosDesdeIso', () => {
     const n = diasCorridosDesdeIso('2025-11-10T00:00:00.000Z')
     expect(n).not.toBeNull()
     expect(Number.isFinite(n)).toBe(true)
+  })
+})
+
+describe('contarDiasUteisComJurosAteYmd', () => {
+  it('alinha com contagem até a mesma data em YYYY-MM-DD', () => {
+    const ate = contarDiasUteisComJurosAteYmd('2025-06-09', '2025-06-10')
+    const ref = contarDiasUteisComJurosDesdeIso('2025-06-09', new Date('2025-06-10T12:00:00'))
+    expect(ate).toBe(ref)
+    expect(ate).toBe(2)
+  })
+
+  it('retorna null se data final inválida', () => {
+    expect(contarDiasUteisComJurosAteYmd('2025-06-09', '')).toBe(null)
+  })
+})
+
+describe('diasCorridosEntreReferenciasIso', () => {
+  it('conta dias corridos entre calendários locais', () => {
+    expect(diasCorridosEntreReferenciasIso('2025-06-10T12:00:00', '2025-06-15')).toBe(5)
+    expect(diasCorridosEntreReferenciasIso('2025-06-15', '2025-06-10')).toBe(0)
   })
 })
 
@@ -52,13 +76,15 @@ describe('contarDiasUteisComJurosDesdeIso', () => {
 })
 
 describe('estimativaRendimentoAcumuladoAteHoje', () => {
-  it('acumulado = diário × dias úteis (IR sobre bruto acumulado)', () => {
+  it('acumulado por compostos em 252 d.u.; IR sobre bruto acumulado', () => {
     const du = 10
     const daily = estimativaRendimentoDiarioComIr(10_000, 100, 10, 30, false)
     expect(daily).not.toBeNull()
     const ac = estimativaRendimentoAcumuladoAteHoje(10_000, 100, 10, 30, false, du)
     expect(ac?.diasUteisAcumulacao).toBe(du)
-    expect(ac?.brutoAcumulado).toBeCloseTo(daily.bruto * du, 6)
+    const te = taxaEfetivaAaContratada(100, 10, 'CDI')
+    const brutoEsp = 10_000 * (Math.pow(1 + te / 100, du / DIAS_UTEIS_ANO_RENDIMENTO) - 1)
+    expect(ac?.brutoAcumulado).toBeCloseTo(brutoEsp, 6)
     expect(ac?.impostoAcumulado).toBeCloseTo(ac.brutoAcumulado * daily.aliquota, 6)
     expect(ac?.liquidoAcumulado).toBeCloseTo(ac.brutoAcumulado - ac.impostoAcumulado, 6)
   })

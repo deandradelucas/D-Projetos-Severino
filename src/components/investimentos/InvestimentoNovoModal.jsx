@@ -19,6 +19,25 @@ function localDateInputToday() {
   return `${y}-${m}-${day}`
 }
 
+function minDataVencimento(dataAquisicaoYmd) {
+  if (!dataAquisicaoYmd) return ''
+  const d = new Date(`${dataAquisicaoYmd}T12:00:00`)
+  d.setDate(d.getDate() + 1)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+function dataVencimentoInicialParaInput(edit) {
+  const raw = edit?.data_vencimento
+  if (raw == null || String(raw).trim() === '') return ''
+  const s = String(raw).trim()
+  const head = s.match(/^(\d{4}-\d{2}-\d{2})/)
+  if (head) return head[1]
+  return ''
+}
+
 function dataAquisicaoInicialParaInput(edit) {
   const raw = edit?.data_aquisicao
   if (raw != null && String(raw).trim() !== '') {
@@ -41,9 +60,9 @@ function dataAquisicaoInicialParaInput(edit) {
  * @param {{
  *   open: boolean
  *   onClose: () => void
- *   onSubmit: (payload: { instituicao_nome: string, preset?: string, nome_custom?: string, valor_investido: number, percentual_cdi: number, data_aquisicao: string }) => Promise<void>
+ *   onSubmit: (payload: { instituicao_nome: string, preset?: string, nome_custom?: string, valor_investido: number, percentual_cdi: number, data_aquisicao: string, data_vencimento: string | null }) => Promise<void>
  *   submitting?: boolean
- *   initialEdit?: { id: string, instituicao_nome?: string | null, tipo_preset?: string | null, nome?: string | null, valor_investido?: number | null, percentual_cdi?: number | null, data_aquisicao?: string | null } | null
+ *   initialEdit?: { id: string, instituicao_nome?: string | null, tipo_preset?: string | null, nome?: string | null, valor_investido?: number | null, percentual_cdi?: number | null, data_aquisicao?: string | null, data_vencimento?: string | null } | null
  * }} props
  */
 export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitting = false, initialEdit = null }) {
@@ -56,11 +75,14 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
   const stepPercTitleId = useId()
   const instListId = useId()
   const instInputId = useId()
+  const tipoSelectId = useId()
   const dataInputId = useId()
+  const dataVencimentoInputId = useId()
   const valorInputId = useId()
   const percInputId = useId()
   const blurTimerRef = useRef(null)
   const comboboxWrapRef = useRef(null)
+  const listRef = useRef(null)
 
   const [instQuery, setInstQuery] = useState(() => String(initialEdit?.instituicao_nome ?? '').trim())
   const [instChosen, setInstChosen] = useState(() => {
@@ -68,6 +90,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
     return n.length >= 2 ? n : null
   })
   const [instListOpen, setInstListOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(null)
 
   const [preset, setPreset] = useState(() => {
     if (!initialEdit?.id) return 'LCA'
@@ -88,7 +111,15 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
   )
   const [percInput, setPercInput] = useState(() => percentualGravadoParaInput(initialEdit?.percentual_cdi))
   const [dataAquisicaoInput, setDataAquisicaoInput] = useState(() => dataAquisicaoInicialParaInput(initialEdit))
+  const [dataVencimentoInput, setDataVencimentoInput] = useState(() => dataVencimentoInicialParaInput(initialEdit))
   const [formError, setFormError] = useState('')
+  const [tipoIndexador, setTipoIndexador] = useState(() => {
+    if (!initialEdit?.id) return 'CDI'
+    return initialEdit.tipo_indexador === 'PREFIXADO' ? 'PREFIXADO' : 'CDI'
+  })
+  const [nomePersonalizadoExpandido, setNomePersonalizadoExpandido] = useState(() =>
+    Boolean(initialEdit?.id) && !initialEdit?.tipo_preset && String(initialEdit?.nome ?? '').trim().length > 0,
+  )
 
   const instituicoesFiltradas = useMemo(() => filtrarInstituicoesFinanceiras(instQuery), [instQuery])
 
@@ -97,6 +128,12 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
       if (blurTimerRef.current) window.clearTimeout(blurTimerRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (activeIndex === null || !listRef.current) return
+    const item = listRef.current.querySelector(`#${CSS.escape(`${instListId}-opt-${activeIndex}`)}`)
+    if (item) item.scrollIntoView({ block: 'nearest' })
+  }, [activeIndex, instListId])
 
   useEffect(() => {
     if (!open) return undefined
@@ -120,6 +157,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
     setInstQuery(inst)
     setInstChosen(inst.length >= 2 ? inst : null)
     setInstListOpen(false)
+    setActiveIndex(null)
     if (!initialEdit?.id) {
       setPreset('LCA')
       setCustomNome('')
@@ -140,6 +178,11 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
     )
     setPercInput(percentualGravadoParaInput(initialEdit?.percentual_cdi))
     setDataAquisicaoInput(dataAquisicaoInicialParaInput(initialEdit))
+    setDataVencimentoInput(dataVencimentoInicialParaInput(initialEdit))
+    setTipoIndexador(initialEdit?.tipo_indexador === 'PREFIXADO' ? 'PREFIXADO' : 'CDI')
+    setNomePersonalizadoExpandido(
+      Boolean(initialEdit?.id) && !initialEdit?.tipo_preset && String(initialEdit?.nome ?? '').trim().length > 0,
+    )
     setFormError('')
   }, [
     open,
@@ -150,6 +193,8 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
     initialEdit?.valor_investido,
     initialEdit?.percentual_cdi,
     initialEdit?.data_aquisicao,
+    initialEdit?.data_vencimento,
+    initialEdit?.tipo_indexador,
   ])
 
   if (!open) return null
@@ -159,7 +204,10 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
 
   const scheduleCloseList = () => {
     if (blurTimerRef.current) window.clearTimeout(blurTimerRef.current)
-    blurTimerRef.current = window.setTimeout(() => setInstListOpen(false), 160)
+    blurTimerRef.current = window.setTimeout(() => {
+      setInstListOpen(false)
+      setActiveIndex(null)
+    }, 160)
   }
 
   const handleBackdropDown = (e) => {
@@ -205,6 +253,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
       return
     }
 
+    const vencimentoStr = dataVencimentoInput.trim() || null
     const trimmed = customNome.trim()
     if (trimmed.length >= 2) {
       await onSubmit({
@@ -213,6 +262,8 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         valor_investido: valorRounded,
         percentual_cdi: percRounded,
         data_aquisicao: dataStr,
+        tipo_indexador: tipoIndexador,
+        data_vencimento: vencimentoStr,
       })
       return
     }
@@ -223,6 +274,8 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         valor_investido: valorRounded,
         percentual_cdi: percRounded,
         data_aquisicao: dataStr,
+        tipo_indexador: tipoIndexador,
+        data_vencimento: vencimentoStr,
       })
       return
     }
@@ -256,177 +309,151 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         </div>
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="modal-body page-investimentos-modal__body">
-            <p className="page-investimentos-modal__lead">
-              Instituição, tipo ou nome livre, data de aquisição, valor aplicado e % do CDI contratada.
-            </p>
 
-            <section className="page-investimentos-modal__card" aria-labelledby={stepInstTitleId}>
-              <div className="page-investimentos-modal__card-head">
-                <span className="page-investimentos-modal__step-num" aria-hidden>
-                  1
-                </span>
-                <div className="page-investimentos-modal__card-head-text">
-                  <h4 id={stepInstTitleId} className="page-investimentos-modal__card-title">
-                    Banco ou corretora
-                  </h4>
-                  <p className="page-investimentos-modal__card-desc">Custódia do investimento</p>
-                </div>
-              </div>
-              <fieldset className="page-investimentos-modal__fieldset" aria-labelledby={stepInstTitleId}>
-                <legend className="sr-only">Banco ou corretora</legend>
-                <div ref={comboboxWrapRef} className="page-investimentos-inst-combobox">
-                  <label htmlFor={instInputId} className="page-investimentos-modal__label page-investimentos-modal__label--inline">
-                    Pesquisar instituição
-                  </label>
-                  <input
-                    id={instInputId}
-                    type="text"
-                    className="page-investimentos-modal__input"
-                    placeholder="Ex.: Sicredi, Nubank, XP, Banco do Brasil…"
-                    maxLength={120}
-                    autoComplete="off"
-                    aria-autocomplete="list"
-                    aria-expanded={instListOpen}
-                    aria-controls={instListId}
-                    disabled={submitting}
-                    value={instQuery}
-                    onChange={(e) => {
-                      const v = e.target.value
-                      setInstQuery(v)
-                      if (instChosen != null && v !== instChosen) setInstChosen(null)
-                      const temBusca = String(v).trim().length > 0
-                      setInstListOpen(temBusca)
-                    }}
-                    onBlur={(e) => {
-                      const next = e.relatedTarget
-                      if (next instanceof Node && comboboxWrapRef.current?.contains(next)) return
-                      scheduleCloseList()
-                    }}
-                    onFocus={() => {
-                      if (blurTimerRef.current) window.clearTimeout(blurTimerRef.current)
-                    }}
-                  />
-                  {instListOpen ? (
-                    <ul id={instListId} className="page-investimentos-inst-dropdown" role="listbox">
-                      {instituicoesFiltradas.length === 0 ? (
-                        <li className="page-investimentos-inst-dropdown__empty" role="presentation">
-                          Nenhum resultado na lista. Você pode usar o texto digitado acima como instituição ao adicionar.
-                        </li>
-                      ) : (
-                        instituicoesFiltradas.map((row) => (
-                          <li key={row.nome} role="option" className="page-investimentos-inst-dropdown__item-wrap">
-                            <button
-                              type="button"
-                              className="page-investimentos-inst-option"
-                              onMouseDown={(e) => e.preventDefault()}
-                              onClick={() => selecionarInstituicao(row.nome)}
-                            >
-                              <span className="page-investimentos-inst-option__nome">{row.nome}</span>
-                              <span className="page-investimentos-inst-option__tipo">{labelTipoInstituicao(row.tipo)}</span>
-                            </button>
-                          </li>
-                        ))
-                      )}
-                    </ul>
-                  ) : null}
-                </div>
-                <p className="page-investimentos-modal__hint">
-                  Digite para ver sugestões; escolha uma opção ou use o nome completo se não aparecer na lista.
-                </p>
-              </fieldset>
-            </section>
-
-            <section className="page-investimentos-modal__card" aria-labelledby={stepTipoTitleId}>
-              <div className="page-investimentos-modal__card-head">
-                <span className="page-investimentos-modal__step-num" aria-hidden>
-                  2
-                </span>
-                <div className="page-investimentos-modal__card-head-text">
-                  <h4 id={stepTipoTitleId} className="page-investimentos-modal__card-title">
-                    Tipo de aplicação
-                  </h4>
-                  <p className="page-investimentos-modal__card-desc">Atalhos para os produtos mais comuns</p>
-                </div>
-              </div>
-              <fieldset className="page-investimentos-modal__fieldset" aria-labelledby={stepTipoTitleId}>
-                <legend className="sr-only">Tipo de investimento</legend>
-                <div className="page-investimentos-preset-grid" role="group" aria-label="Tipo de investimento">
-                  {INVESTIMENTOS_PRESETS_LIST.map((p) => {
-                    const active = preset === p.key
-                    return (
-                      <button
-                        key={p.key}
-                        type="button"
-                        className={`page-investimentos-preset-chip${active ? ' page-investimentos-preset-chip--active' : ''}`}
-                        aria-pressed={active}
-                        disabled={submitting}
-                        onClick={() => {
-                          setPreset(p.key)
-                          setCustomNome('')
-                        }}
-                      >
-                        <span className="page-investimentos-preset-chip__label">{p.label}</span>
-                        {p.hint ? <span className="page-investimentos-preset-chip__hint">{p.hint}</span> : null}
-                      </button>
-                    )
-                  })}
-                </div>
-              </fieldset>
-            </section>
-
-            <section
-              className="page-investimentos-modal__card page-investimentos-modal__card--soft"
-              aria-labelledby={stepOutroTitleId}
-            >
-              <div className="page-investimentos-modal__card-head">
-                <span className="page-investimentos-modal__step-num page-investimentos-modal__step-num--optional" aria-hidden>
-                  3
-                </span>
-                <div className="page-investimentos-modal__card-head-text">
-                  <h4 id={stepOutroTitleId} className="page-investimentos-modal__card-title">
-                    Outro nome <span className="page-investimentos-modal__optional-tag">opcional</span>
-                  </h4>
-                  <p className="page-investimentos-modal__card-desc">Substitui o tipo escolhido em cima quando preenchido</p>
-                </div>
-              </div>
-              <div className="page-investimentos-modal__custom">
-                <label htmlFor="investimento-outro-nome" className="page-investimentos-modal__label">
-                  Nome livre
+            {/* Banco ou corretora */}
+            <div className="page-investimentos-modal__section">
+              <div ref={comboboxWrapRef} className="page-investimentos-inst-combobox">
+                <label htmlFor={instInputId} className="page-investimentos-modal__section-label">
+                  Banco ou corretora
                 </label>
                 <input
-                  id="investimento-outro-nome"
+                  id={instInputId}
                   type="text"
                   className="page-investimentos-modal__input"
-                  placeholder="Ex.: Tesouro Selic, debêntures, fundo multimercado…"
+                  placeholder="Sicredi, Nubank, XP, Itaú…"
                   maxLength={120}
-                  value={customNome}
+                  autoComplete="off"
+                  aria-autocomplete="list"
+                  aria-expanded={instListOpen}
+                  aria-controls={instListId}
+                  aria-activedescendant={activeIndex !== null && instListOpen ? `${instListId}-opt-${activeIndex}` : undefined}
                   disabled={submitting}
+                  value={instQuery}
                   onChange={(e) => {
-                    setCustomNome(e.target.value)
-                    setPreset(null)
+                    const v = e.target.value
+                    setInstQuery(v)
+                    setActiveIndex(null)
+                    if (instChosen != null && v !== instChosen) setInstChosen(null)
+                    setInstListOpen(String(v).trim().length > 0)
+                  }}
+                  onKeyDown={(e) => {
+                    if (!instListOpen || instituicoesFiltradas.length === 0) {
+                      if (e.key === 'Escape') { setInstListOpen(false); setActiveIndex(null) }
+                      return
+                    }
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault()
+                      setActiveIndex((prev) => (prev === null ? 0 : Math.min(prev + 1, instituicoesFiltradas.length - 1)))
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault()
+                      setActiveIndex((prev) => (prev === null ? instituicoesFiltradas.length - 1 : Math.max(prev - 1, 0)))
+                    } else if (e.key === 'Enter') {
+                      if (activeIndex !== null && instituicoesFiltradas[activeIndex]) {
+                        e.preventDefault()
+                        selecionarInstituicao(instituicoesFiltradas[activeIndex].nome)
+                        setActiveIndex(null)
+                      }
+                    } else if (e.key === 'Escape') {
+                      e.preventDefault()
+                      setInstListOpen(false)
+                      setActiveIndex(null)
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const next = e.relatedTarget
+                    if (next instanceof Node && comboboxWrapRef.current?.contains(next)) return
+                    scheduleCloseList()
+                  }}
+                  onFocus={() => {
+                    if (blurTimerRef.current) window.clearTimeout(blurTimerRef.current)
                   }}
                 />
-                <p className="page-investimentos-modal__hint">
-                  Útil quando o produto não está na grelha ou quer um rótulo próprio na carteira.
-                </p>
+                {instListOpen ? (
+                  <ul id={instListId} ref={listRef} className="page-investimentos-inst-dropdown" role="listbox">
+                    {instituicoesFiltradas.length === 0 ? (
+                      <li className="page-investimentos-inst-dropdown__empty" role="presentation">
+                        Não encontrado na lista — o texto digitado será usado.
+                      </li>
+                    ) : (
+                      instituicoesFiltradas.map((row, i) => (
+                        <li
+                          key={row.nome}
+                          id={`${instListId}-opt-${i}`}
+                          role="option"
+                          aria-selected={activeIndex === i}
+                          className="page-investimentos-inst-dropdown__item-wrap"
+                        >
+                          <button
+                            type="button"
+                            className={`page-investimentos-inst-option${activeIndex === i ? ' page-investimentos-inst-option--active' : ''}`}
+                            tabIndex={-1}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => { selecionarInstituicao(row.nome); setActiveIndex(null) }}
+                          >
+                            <span className="page-investimentos-inst-option__nome">{row.nome}</span>
+                            <span className="page-investimentos-inst-option__tipo">{labelTipoInstituicao(row.tipo)}</span>
+                          </button>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                ) : null}
               </div>
-            </section>
+            </div>
 
-            <section className="page-investimentos-modal__card" aria-labelledby={stepDataTitleId}>
-              <div className="page-investimentos-modal__card-head">
-                <span className="page-investimentos-modal__step-num" aria-hidden>
-                  4
-                </span>
-                <div className="page-investimentos-modal__card-head-text">
-                  <h4 id={stepDataTitleId} className="page-investimentos-modal__card-title">
-                    Data de aquisição
-                  </h4>
-                  <p className="page-investimentos-modal__card-desc">Quando passou a deter esta posição</p>
-                </div>
-              </div>
-              <div className="page-investimentos-modal__data-field">
-                <label htmlFor={dataInputId} className="page-investimentos-modal__label">
-                  Data
+            {/* Tipo de aplicação */}
+            <div className="page-investimentos-modal__section">
+              <label htmlFor={tipoSelectId} className="page-investimentos-modal__section-label">
+                Tipo de aplicação
+              </label>
+              <select
+                id={tipoSelectId}
+                className="page-investimentos-modal__input page-investimentos-modal__input--select"
+                value={preset ?? '__custom__'}
+                disabled={submitting}
+                onChange={(e) => {
+                  const v = e.target.value
+                  if (v === '__custom__') {
+                    setPreset(null)
+                    setNomePersonalizadoExpandido(true)
+                  } else {
+                    setPreset(v)
+                    setCustomNome('')
+                    setNomePersonalizadoExpandido(false)
+                    if (String(percInput).trim() === '') {
+                      if (v === 'POUPANCA') setPercInput('70')
+                      else if (v === 'TESOURO_SELIC') setPercInput('100')
+                    }
+                  }
+                }}
+              >
+                {INVESTIMENTOS_PRESETS_LIST.map((p) => (
+                  <option key={p.key} value={p.key}>{p.label}</option>
+                ))}
+                <option value="__custom__">Outro (personalizado)</option>
+              </select>
+              {preset === 'POUPANCA' && (
+                <p className="page-investimentos-modal__hint page-investimentos-modal__hint--preset">
+                  Poupança ≈ 70% CDI · isenta IR (PF) · use <strong>70</strong> no campo % CDI
+                </p>
+              )}
+              {preset === 'TESOURO_SELIC' && (
+                <p className="page-investimentos-modal__hint page-investimentos-modal__hint--preset">
+                  Tesouro Selic ≈ 100% CDI · use <strong>100</strong> no campo % CDI
+                </p>
+              )}
+              {(preset === 'CRI' || preset === 'CRA' || preset === 'DEBENTURE') && (
+                <p className="page-investimentos-modal__hint page-investimentos-modal__hint--preset">
+                  Isento de IR para pessoa física
+                </p>
+              )}
+            </div>
+
+            {/* Data de aquisição + Valor investido */}
+            <div className="page-investimentos-modal__section page-investimentos-modal__section--row">
+              <div>
+                <label htmlFor={dataInputId} className="page-investimentos-modal__section-label">
+                  Data de aquisição
                 </label>
                 <input
                   id={dataInputId}
@@ -438,27 +465,10 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                   value={dataAquisicaoInput}
                   onChange={(e) => setDataAquisicaoInput(e.target.value)}
                 />
-                <p className="page-investimentos-modal__hint">
-                  Usada para estimar o IR regressivo sobre o rendimento (prazo desde a aquisição).
-                </p>
               </div>
-            </section>
-
-            <section className="page-investimentos-modal__card" aria-labelledby={stepValorTitleId}>
-              <div className="page-investimentos-modal__card-head">
-                <span className="page-investimentos-modal__step-num" aria-hidden>
-                  5
-                </span>
-                <div className="page-investimentos-modal__card-head-text">
-                  <h4 id={stepValorTitleId} className="page-investimentos-modal__card-title">
-                    Valor investido
-                  </h4>
-                  <p className="page-investimentos-modal__card-desc">Quanto você aplicou nesta posição (referência em reais)</p>
-                </div>
-              </div>
-              <div className="page-investimentos-modal__valor-field">
-                <label htmlFor={valorInputId} className="page-investimentos-modal__label">
-                  Valor (R$)
+              <div>
+                <label htmlFor={valorInputId} className="page-investimentos-modal__section-label">
+                  Valor investido
                 </label>
                 <div className="page-investimentos-modal__valor-input-wrap">
                   <span className="page-investimentos-modal__valor-prefix" aria-hidden>
@@ -476,51 +486,104 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                     onChange={(e) => setValorInput(maskCurrencyBRLInput(e.target.value))}
                   />
                 </div>
-                <p className="page-investimentos-modal__hint">
-                  Igual à transação: só números — formata em real (ex.: digitar 150050 vira 1.500,50). Referência só para o seu acompanhamento.
-                </p>
               </div>
-            </section>
+            </div>
 
-            <section className="page-investimentos-modal__card" aria-labelledby={stepPercTitleId}>
-              <div className="page-investimentos-modal__card-head">
-                <span className="page-investimentos-modal__step-num" aria-hidden>
-                  6
+            {/* Data de vencimento (opcional) */}
+            <div className="page-investimentos-modal__section">
+              <label htmlFor={dataVencimentoInputId} className="page-investimentos-modal__section-label">
+                Data de vencimento{' '}
+                <span className="page-investimentos-modal__label-optional">(opcional)</span>
+              </label>
+              <input
+                id={dataVencimentoInputId}
+                type="date"
+                className="page-investimentos-modal__input page-investimentos-modal__input--date"
+                min={minDataVencimento(dataAquisicaoInput)}
+                disabled={submitting}
+                value={dataVencimentoInput}
+                onChange={(e) => setDataVencimentoInput(e.target.value)}
+              />
+              <p className="page-investimentos-modal__hint">
+                Preencha se souber quando vence — o app mostrará o prazo restante e usará esta data no simulador.
+              </p>
+            </div>
+
+            {/* Taxa */}
+            <div className="page-investimentos-modal__section">
+              <span className="page-investimentos-modal__section-label">
+                {tipoIndexador === 'PREFIXADO' ? 'Taxa pré-fixada a.a.' : '% do CDI contratada'}
+              </span>
+              <div className="page-investimentos-modal__indexador-toggle" role="group" aria-label="Tipo de taxa">
+                <button
+                  type="button"
+                  className={`page-investimentos-modal__indexador-btn${tipoIndexador === 'CDI' ? ' page-investimentos-modal__indexador-btn--active' : ''}`}
+                  aria-pressed={tipoIndexador === 'CDI'}
+                  disabled={submitting}
+                  onClick={() => { setTipoIndexador('CDI'); setPercInput('') }}
+                >
+                  % do CDI
+                </button>
+                <button
+                  type="button"
+                  className={`page-investimentos-modal__indexador-btn${tipoIndexador === 'PREFIXADO' ? ' page-investimentos-modal__indexador-btn--active' : ''}`}
+                  aria-pressed={tipoIndexador === 'PREFIXADO'}
+                  disabled={submitting}
+                  onClick={() => { setTipoIndexador('PREFIXADO'); setPercInput('') }}
+                >
+                  Pré-fixado
+                </button>
+              </div>
+              <label htmlFor={percInputId} className="sr-only">
+                {tipoIndexador === 'PREFIXADO' ? 'Taxa pré-fixada em % a.a.' : '% do CDI contratada'}
+              </label>
+              <div className="page-investimentos-modal__perc-input-wrap">
+                <input
+                  id={percInputId}
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  className="page-investimentos-modal__input page-investimentos-modal__input--perc"
+                  placeholder={tipoIndexador === 'PREFIXADO' ? '12,5' : '100'}
+                  disabled={submitting}
+                  value={percInput}
+                  onChange={(e) => setPercInput(e.target.value)}
+                />
+                <span className="page-investimentos-modal__perc-suffix" aria-hidden>
+                  {tipoIndexador === 'PREFIXADO' ? '% a.a.' : '% do CDI'}
                 </span>
-                <div className="page-investimentos-modal__card-head-text">
-                  <h4 id={stepPercTitleId} className="page-investimentos-modal__card-title">
-                    % do CDI contratada
-                  </h4>
-                  <p className="page-investimentos-modal__card-desc">
-                    Taxa pactuada em relação ao CDI (ex.: 100% do CDI ou 110%)
-                  </p>
-                </div>
               </div>
-              <div className="page-investimentos-modal__perc-field">
-                <label htmlFor={percInputId} className="page-investimentos-modal__label">
-                  Percentual
-                </label>
-                <div className="page-investimentos-modal__perc-input-wrap">
+            </div>
+
+            {/* Nome personalizado (colapsável) */}
+            <div className="page-investimentos-modal__section page-investimentos-modal__section--custom">
+              <button
+                type="button"
+                className="page-investimentos-modal__toggle-link"
+                aria-expanded={nomePersonalizadoExpandido}
+                onClick={() => setNomePersonalizadoExpandido((v) => !v)}
+              >
+                {nomePersonalizadoExpandido ? '− Nome personalizado' : '+ Nome personalizado'}
+              </button>
+              {nomePersonalizadoExpandido ? (
+                <div style={{ marginTop: '0.5rem' }}>
+                  <label htmlFor="investimento-outro-nome" className="sr-only">Nome personalizado</label>
                   <input
-                    id={percInputId}
+                    id="investimento-outro-nome"
                     type="text"
-                    inputMode="decimal"
-                    autoComplete="off"
-                    className="page-investimentos-modal__input page-investimentos-modal__input--perc"
-                    placeholder="100"
+                    className="page-investimentos-modal__input"
+                    placeholder="Ex.: Tesouro Selic 2027, fundo multimercado…"
+                    maxLength={120}
+                    value={customNome}
                     disabled={submitting}
-                    value={percInput}
-                    onChange={(e) => setPercInput(e.target.value)}
+                    onChange={(e) => {
+                      setCustomNome(e.target.value)
+                      setPreset(null)
+                    }}
                   />
-                  <span className="page-investimentos-modal__perc-suffix" aria-hidden>
-                    % do CDI
-                  </span>
                 </div>
-                <p className="page-investimentos-modal__hint">
-                  Use vírgula para decimais (ex.: 105,5). Pode incluir ou não o símbolo %.
-                </p>
-              </div>
-            </section>
+              ) : null}
+            </div>
 
             {formError ? (
               <p className="page-investimentos-modal__error" role="alert">
