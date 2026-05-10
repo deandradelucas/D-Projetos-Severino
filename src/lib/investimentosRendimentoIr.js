@@ -112,11 +112,8 @@ function dataLocalInicioApartirDeIso(iso) {
  * @param {Date} [dataReferencia=new Date()] “Hoje” para o corte (date-only no fuso local).
  * @returns {number | null}
  */
-export function contarDiasUteisComJurosDesdeIso(iso, dataReferencia = new Date()) {
-  const start = dataLocalInicioApartirDeIso(iso)
-  if (!start) return null
-  const end = new Date(dataReferencia.getFullYear(), dataReferencia.getMonth(), dataReferencia.getDate())
-  if (end < start) return 0
+function contarDiasUteisEntreDatasLocais(start, end) {
+  if (!start || !end || end < start) return 0
 
   /** @type {Map<number, Set<string>>} */
   const cache = new Map()
@@ -136,6 +133,49 @@ export function contarDiasUteisComJurosDesdeIso(iso, dataReferencia = new Date()
     walk.setDate(walk.getDate() + 1)
   }
   return n
+}
+
+export function contarDiasUteisComJurosDesdeIso(iso, dataReferencia = new Date()) {
+  const start = dataLocalInicioApartirDeIso(iso)
+  if (!start) return null
+  const end = new Date(dataReferencia.getFullYear(), dataReferencia.getMonth(), dataReferencia.getDate())
+  return contarDiasUteisEntreDatasLocais(start, end)
+}
+
+/**
+ * Dias úteis com pregão CDI no intervalo **[data de início, data final]** (calendário local, inclusivo).
+ * @param {string | undefined | null} isoInicio
+ * @param {string | undefined | null} ymdFim `YYYY-MM-DD`
+ * @returns {number | null}
+ */
+export function contarDiasUteisComJurosAteYmd(isoInicio, ymdFim) {
+  const start = dataLocalInicioApartirDeIso(isoInicio)
+  if (!start) return null
+  const ymd = extrairYyyyMmDdReferencia(ymdFim)
+  if (!ymd) return null
+  const [y, m, d] = ymd.split('-').map(Number)
+  const end = new Date(y, m - 1, d)
+  if (Number.isNaN(end.getTime())) return null
+  return contarDiasUteisEntreDatasLocais(start, end)
+}
+
+/**
+ * Dias corridos entre duas referências (somente calendário local), inclusivo do extremo final − início.
+ * @param {string | undefined | null} isoInicio
+ * @param {string | undefined | null} ymdOuIsoFim data final `YYYY-MM-DD` ou ISO
+ * @returns {number | null}
+ */
+export function diasCorridosEntreReferenciasIso(isoInicio, ymdOuIsoFim) {
+  const ymdA = extrairYyyyMmDdReferencia(isoInicio)
+  const ymdB = extrairYyyyMmDdReferencia(ymdOuIsoFim)
+  if (!ymdA || !ymdB) return null
+  const [ya, ma, da] = ymdA.split('-').map(Number)
+  const [yb, mb, db] = ymdB.split('-').map(Number)
+  const start = new Date(ya, ma - 1, da)
+  const end = new Date(yb, mb - 1, db)
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null
+  const ms = end.getTime() - start.getTime()
+  return Math.max(0, Math.floor(ms / (24 * 60 * 60 * 1000)))
 }
 
 /**
@@ -191,15 +231,24 @@ export function diasCorridosDesdeIso(iso) {
   return Math.max(0, Math.floor(ms / (24 * 60 * 60 * 1000)))
 }
 
-/** % a.a. efetiva contratada (ex.: 100% CDI × 14,4% CDI = 14,4%). */
-export function taxaEfetivaAaContratada(percentualCdi, cdiAa) {
+/**
+ * % a.a. efetiva contratada.
+ * - CDI: percentualCdi = % do CDI (ex.: 110 → 110% × CDI a.a.)
+ * - PREFIXADO: percentualCdi = taxa a.a. absoluta (ex.: 12.5 → 12,5% a.a.)
+ * @param {number} percentualCdi
+ * @param {number} cdiAa
+ * @param {'CDI' | 'PREFIXADO'} [tipoIndexador]
+ * @returns {number}
+ */
+export function taxaEfetivaAaContratada(percentualCdi, cdiAa, tipoIndexador = 'CDI') {
+  if (tipoIndexador === 'PREFIXADO') return Number(percentualCdi)
   return (Number(percentualCdi) / 100) * Number(cdiAa)
 }
 
-export function rendimentoBrutoDiarioEstimado(valor, percentualCdi, cdiAa) {
+export function rendimentoBrutoDiarioEstimado(valor, percentualCdi, cdiAa, tipoIndexador = 'CDI') {
   const v = Number(valor)
-  const te = taxaEfetivaAaContratada(percentualCdi, cdiAa)
-  return (v * (te / 100)) / DIAS_UTEIS_ANO_RENDIMENTO
+  const te = taxaEfetivaAaContratada(percentualCdi, cdiAa, tipoIndexador)
+  return v * (Math.pow(1 + te / 100, 1 / DIAS_UTEIS_ANO_RENDIMENTO) - 1)
 }
 
 export function formatAliquotaIrPtBr(decimal) {
@@ -225,20 +274,24 @@ export function formatMoedaDiariaEstimativa(valor) {
 /**
  * @param {number} valor
  * @param {number} percentualCdi
- * @param {number} cdiAa
+ * @param {number | null} cdiAa — pode ser null para pré-fixado
  * @param {number | null} diasPrazo — se null, usa 0 (faixa mais conservadora)
  * @param {boolean} isentoIrPf
+ * @param {'CDI' | 'PREFIXADO'} [tipoIndexador]
  * @returns {object | null}
  */
-export function estimativaRendimentoDiarioComIr(valor, percentualCdi, cdiAa, diasPrazo, isentoIrPf) {
+export function estimativaRendimentoDiarioComIr(valor, percentualCdi, cdiAa, diasPrazo, isentoIrPf, tipoIndexador = 'CDI') {
   const v = Number(valor)
   if (!Number.isFinite(v) || v <= 0) return null
   const p = Number(percentualCdi)
   if (!Number.isFinite(p) || p <= 0) return null
-  const cdi = Number(cdiAa)
-  if (!Number.isFinite(cdi) || cdi <= 0) return null
 
-  const bruto = rendimentoBrutoDiarioEstimado(v, p, cdi)
+  if (tipoIndexador !== 'PREFIXADO') {
+    const cdi = Number(cdiAa)
+    if (!Number.isFinite(cdi) || cdi <= 0) return null
+  }
+
+  const bruto = rendimentoBrutoDiarioEstimado(v, p, cdiAa, tipoIndexador)
   if (isentoIrPf) {
     return {
       bruto,
@@ -264,10 +317,12 @@ export function estimativaRendimentoDiarioComIr(valor, percentualCdi, cdiAa, dia
 }
 
 /**
- * Rendimento acumulado estimado: (valor diário bruto × dias úteis) com IR sobre o bruto acumulado
- * usando a alíquota regressiva atual pelo prazo em dias corridos (aproximação; CDI e capital constantes).
+ * Rendimento acumulado estimado por juros compostos: valor × ((1 + taxa_aa)^(du/252) − 1).
+ * IR aplicado sobre o bruto acumulado com a alíquota regressiva pelo prazo em dias corridos.
+ * CDI e capital considerados constantes — estimativa de referência.
  *
  * @param {number | null | undefined} diasUteisAcumulacao resultado de {@link contarDiasUteisComJurosDesdeIso}
+ * @param {'CDI' | 'PREFIXADO'} [tipoIndexador]
  */
 export function estimativaRendimentoAcumuladoAteHoje(
   valor,
@@ -276,11 +331,13 @@ export function estimativaRendimentoAcumuladoAteHoje(
   diasPrazoIr,
   isentoIrPf,
   diasUteisAcumulacao,
+  tipoIndexador = 'CDI',
 ) {
   const du = Math.max(0, Math.floor(Number(diasUteisAcumulacao)) || 0)
-  const daily = estimativaRendimentoDiarioComIr(valor, percentualCdi, cdiAa, diasPrazoIr, isentoIrPf)
+  const daily = estimativaRendimentoDiarioComIr(valor, percentualCdi, cdiAa, diasPrazoIr, isentoIrPf, tipoIndexador)
   if (!daily) return null
-  const brutoAcum = daily.bruto * du
+  const te = taxaEfetivaAaContratada(percentualCdi, cdiAa, tipoIndexador)
+  const brutoAcum = Number(valor) * (Math.pow(1 + te / 100, du / DIAS_UTEIS_ANO_RENDIMENTO) - 1)
   if (daily.isento) {
     return {
       brutoAcumulado: brutoAcum,
@@ -306,5 +363,5 @@ export function estimativaRendimentoAcumuladoAteHoje(
 export function investimentoIsentoIrPessoaFisica(tipoPreset) {
   if (tipoPreset == null || String(tipoPreset).trim() === '') return false
   const k = String(tipoPreset).toUpperCase()
-  return k === 'LCA' || k === 'LCI'
+  return k === 'LCA' || k === 'LCI' || k === 'POUPANCA' || k === 'CRI' || k === 'CRA' || k === 'DEBENTURE'
 }

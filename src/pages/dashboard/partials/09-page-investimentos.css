@@ -397,14 +397,25 @@ body[data-theme='light'] .page-investimentos-card {
 
 .page-investimentos-card__metrics {
   display: grid;
-  /* 3 colunas: base + estimativa diária (3) + acumulado (3) + total em linha própria */
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.65rem 1rem;
   margin: 0.5rem 0 0;
   padding: 0.65rem 0.75rem;
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.2);
   background: rgba(148, 163, 184, 0.06);
+}
+
+@media (min-width: 520px) {
+  .page-investimentos-card__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 720px) {
+  .page-investimentos-card__metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 body[data-theme='light'] .page-investimentos-card__metrics {
@@ -438,6 +449,7 @@ body[data-theme='light'] .page-investimentos-card__metrics {
 }
 
 .page-investimentos-card__metric--aquisicao {
+  grid-column: 1 / -1;
   padding-bottom: 0.5rem;
   margin-bottom: 0.15rem;
   border-bottom: 1px solid rgba(148, 163, 184, 0.22);
@@ -454,13 +466,46 @@ body[data-theme='dark'] .page-investimentos-card__metric--aquisicao {
   border-bottom-color: rgba(148, 163, 184, 0.16);
 }
 
-/* Último campo do bloco (total); mantém-se na grelha 3×3 sem buracos */
+/* Separador entre blocos (grupo dt/dd válido em <dl>; uma única célula na grelha) */
+.page-investimentos-card__metrics-rule-wrap {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0;
+}
+
+.page-investimentos-card__metrics-rule-wrap > dd {
+  height: 0;
+  margin: 0.15rem 0 0.35rem;
+  padding: 0;
+  border: none;
+  border-top: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+body[data-theme='dark'] .page-investimentos-card__metrics-rule-wrap > dd {
+  border-top-color: rgba(148, 163, 184, 0.14);
+}
+
+.page-investimentos-card__metric--total {
+  grid-column: 1 / -1;
+  margin-top: 0.15rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+body[data-theme='dark'] .page-investimentos-card__metric--total {
+  border-top-color: rgba(148, 163, 184, 0.14);
+}
+
 .page-investimentos-card__metric--total .page-investimentos-card__metric-value {
   font-size: clamp(0.95rem, 1.2vw + 0.82rem, 1.05rem);
 }
 
 body[data-theme='dark'] .page-investimentos-card__metric--total .page-investimentos-card__metric-value {
   color: rgba(248, 250, 252, 0.98);
+}
+
+.page-investimentos-card--metricas-completas .page-investimentos-card__primary {
+  display: none;
 }
 
 .page-investimentos-card__metric-value--muted {
@@ -987,6 +1032,12 @@ body[data-theme='dark'] .page-investimentos-modal__input {
   line-height: 1.35;
 }
 
+.page-investimentos-modal__label-optional {
+  font-weight: 400;
+  font-size: 0.82em;
+  opacity: 0.65;
+}
+
 .page-investimentos-modal__error {
   margin: 0.75rem 0 0;
   padding: 8px 10px;
@@ -1129,12 +1180,6 @@ body[data-theme='light'] .taxa-cdi-badge--hero {
     box-sizing: border-box;
   }
 
-  .page-investimentos-card__metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem 0.55rem;
-    padding: 0.55rem 0.58rem;
-  }
-
   .page-investimentos-card__metric-value {
     font-size: clamp(0.82rem, 2.4vw, 0.93rem);
     overflow-wrap: anywhere;
@@ -1230,5 +1275,886 @@ body[data-theme='light'] .taxa-cdi-badge--hero {
   .page-investimentos-modal__footer-actions .btn-secondary {
     flex: 1 1 auto;
     text-align: center;
+  }
+}
+
+/* ============================================================
+   Resumo da carteira — painel de totais + gráfico donut
+   ============================================================ */
+
+.page-investimentos-resumo {
+  margin-top: 0;
+}
+
+.page-investimentos-resumo__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.page-investimentos-resumo__badge {
+  font-size: 0.65rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #64748b);
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.1);
+  white-space: nowrap;
+}
+
+.page-investimentos-resumo__head-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.page-investimentos-resumo__badge--sim {
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 42%, rgba(148, 163, 184, 0.35));
+  background: color-mix(in srgb, var(--accent, #d4a84b) 14%, transparent);
+  color: color-mix(in srgb, var(--accent, #d4a84b) 72%, var(--text-primary, #0f172a));
+}
+
+body[data-theme='dark'] .page-investimentos-resumo__badge--sim {
+  color: color-mix(in srgb, var(--accent, #e4bc6a) 88%, rgba(248, 250, 252, 0.92));
+}
+
+.page-investimentos-resumo__projecao {
+  margin-top: 0.5rem;
+  padding: 0.55rem 0 0.1rem;
+  border-top: 1px dashed rgba(148, 163, 184, 0.22);
+}
+
+.page-investimentos-resumo__projecao-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.75rem;
+}
+
+.page-investimentos-resumo__projecao-label {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+  color: var(--text-secondary, #64748b);
+}
+
+.page-investimentos-resumo__projecao-input {
+  min-height: 36px;
+  padding: 0.3rem 0.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #0f172a);
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+body[data-theme='dark'] .page-investimentos-resumo__projecao-input {
+  background: rgba(15, 23, 42, 0.55);
+  border-color: rgba(148, 163, 184, 0.28);
+  color: rgba(248, 250, 252, 0.92);
+  color-scheme: dark;
+}
+
+.page-investimentos-resumo__projecao-erro {
+  margin: 0.3rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 650;
+  color: var(--danger, #b91c1c);
+}
+
+body[data-theme='dark'] .page-investimentos-resumo__projecao-erro {
+  color: #f87171;
+}
+
+/* Body: stats + chart lado a lado no desktop, empilhado no mobile */
+.page-investimentos-resumo__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 0.25rem;
+}
+
+@media (min-width: 680px) {
+  .page-investimentos-resumo__body {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+}
+
+/* Grid de stat cards */
+.page-investimentos-resumo__stats {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+}
+
+.page-investimentos-resumo__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.06);
+  min-width: 0;
+}
+
+body[data-theme='light'] .page-investimentos-resumo__stat {
+  background: rgba(248, 250, 252, 0.92);
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+/* Destaque para Total Estimado */
+.page-investimentos-resumo__stat--accent {
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 42%, transparent);
+  background: color-mix(in srgb, var(--accent, #d4a84b) 9%, transparent);
+}
+
+body[data-theme='light'] .page-investimentos-resumo__stat--accent {
+  background: rgba(212, 168, 75, 0.11);
+  border-color: rgba(212, 168, 75, 0.38);
+}
+
+/* Stat mudo (CDI indisponível / carregando) */
+.page-investimentos-resumo__stat--muted {
+  grid-column: 1 / -1;
+  background: transparent;
+  border-style: dashed;
+}
+
+.page-investimentos-resumo__stat-label {
+  margin: 0;
+  font-size: 0.63rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.3;
+}
+
+body[data-theme='dark'] .page-investimentos-resumo__stat-label {
+  color: rgba(248, 250, 252, 0.52);
+}
+
+.page-investimentos-resumo__stat-value {
+  margin: 0;
+  font-size: clamp(1rem, 1.8vw + 0.72rem, 1.25rem);
+  font-weight: 800;
+  letter-spacing: -0.028em;
+  color: var(--text-primary, #0f172a);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+}
+
+body[data-theme='dark'] .page-investimentos-resumo__stat-value {
+  color: rgba(248, 250, 252, 0.96);
+}
+
+.page-investimentos-resumo__stat-value--pos {
+  color: var(--success, #10b981);
+}
+
+body[data-theme='dark'] .page-investimentos-resumo__stat-value--pos {
+  color: #34d399;
+}
+
+.page-investimentos-resumo__stat--muted .page-investimentos-resumo__stat-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+}
+
+/* Chart */
+.page-investimentos-resumo__chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+}
+
+@media (min-width: 680px) {
+  .page-investimentos-resumo__chart {
+    width: 240px;
+    flex-shrink: 0;
+  }
+}
+
+@media (min-width: 960px) {
+  .page-investimentos-resumo__chart {
+    width: 260px;
+  }
+}
+
+.page-investimentos-resumo__chart-title {
+  margin: 0 0 0.15rem;
+  align-self: flex-start;
+  font-size: 0.63rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-secondary, #64748b);
+}
+
+body[data-theme='dark'] .page-investimentos-resumo__chart-title {
+  color: rgba(248, 250, 252, 0.48);
+}
+
+/* Tooltip customizado do recharts */
+.page-investimentos-resumo__tooltip {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: var(--bg-card, #fff);
+  box-shadow: 0 4px 16px -6px rgba(15, 23, 42, 0.25);
+  pointer-events: none;
+}
+
+body[data-theme='dark'] .page-investimentos-resumo__tooltip {
+  background: var(--bg-card, #0c0c0c);
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+.page-investimentos-resumo__tooltip-name {
+  margin: 0 0 2px;
+  font-size: 0.75rem;
+  font-weight: 650;
+  color: var(--text-secondary, #64748b);
+}
+
+.page-investimentos-resumo__tooltip-value {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #0f172a);
+  font-variant-numeric: tabular-nums;
+}
+
+body[data-theme='dark'] .page-investimentos-resumo__tooltip-value {
+  color: rgba(248, 250, 252, 0.96);
+}
+
+/* Mobile: 420px e abaixo — stats em 1 coluna */
+@media (max-width: 420px) {
+  .page-investimentos-resumo__stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page-investimentos-resumo__stat--muted {
+    grid-column: 1;
+  }
+
+  .page-investimentos-resumo__stat-value {
+    font-size: clamp(1rem, 5vw + 0.6rem, 1.15rem);
+  }
+}
+
+/* Combobox instituição — item ativo via teclado */
+.page-investimentos-inst-option--active {
+  background: color-mix(in srgb, var(--accent, #d4a84b) 14%, transparent);
+}
+
+/* Toggle CDI / Pré-fixado no step 6 do modal */
+.page-investimentos-modal__indexador-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 0.75rem;
+}
+
+.page-investimentos-modal__indexador-btn {
+  flex: 1 1 0;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  font-size: 0.82rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  min-height: 38px;
+}
+
+.page-investimentos-modal__indexador-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 45%, transparent);
+  color: var(--text-primary, #0f172a);
+}
+
+.page-investimentos-modal__indexador-btn--active {
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 55%, transparent);
+  background: color-mix(in srgb, var(--accent, #d4a84b) 12%, transparent);
+  color: var(--text-primary, #0f172a);
+  font-weight: 750;
+}
+
+.page-investimentos-modal__indexador-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   Controles de ordenação e filtro da lista
+   ============================================================ */
+
+.page-investimentos-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.65rem;
+  padding: 0.55rem 0 0.7rem;
+  margin-bottom: 0.1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+body[data-theme='dark'] .page-investimentos-controls {
+  border-bottom-color: rgba(148, 163, 184, 0.12);
+}
+
+.page-investimentos-controls__select {
+  flex-shrink: 0;
+  height: 2rem;
+  padding: 0 2rem 0 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background-color: var(--bg-primary, #fff);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.45rem center;
+  background-size: 14px;
+  -webkit-appearance: none;
+  appearance: none;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s ease;
+}
+
+.page-investimentos-controls__select:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #d4a84b) 75%, transparent);
+  outline-offset: 2px;
+}
+
+body[data-theme='dark'] .page-investimentos-controls__select {
+  background-color: rgba(15, 23, 42, 0.55);
+  border-color: rgba(148, 163, 184, 0.22);
+  color: rgba(248, 250, 252, 0.7);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.page-investimentos-controls__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.page-investimentos-controls__filter-btn {
+  height: 2rem;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+  white-space: nowrap;
+}
+
+.page-investimentos-controls__filter-btn:hover {
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 55%, rgba(148, 163, 184, 0.32));
+  color: var(--text-primary, #0f172a);
+}
+
+.page-investimentos-controls__filter-btn--active {
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 65%, transparent);
+  background: color-mix(in srgb, var(--accent, #d4a84b) 14%, transparent);
+  color: var(--text-primary, #0f172a);
+}
+
+body[data-theme='dark'] .page-investimentos-controls__filter-btn {
+  color: rgba(248, 250, 252, 0.6);
+}
+
+body[data-theme='dark'] .page-investimentos-controls__filter-btn:hover,
+body[data-theme='dark'] .page-investimentos-controls__filter-btn--active {
+  color: rgba(248, 250, 252, 0.92);
+}
+
+.page-investimentos-controls__empty {
+  margin: 2rem auto;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #64748b);
+}
+
+body[data-theme='dark'] .page-investimentos-controls__empty {
+  color: rgba(248, 250, 252, 0.48);
+}
+
+/* ============================================================
+   Modal — layout flat (sections, sem cards)
+   ============================================================ */
+
+.page-investimentos-modal__section {
+  padding: 0.9rem 0 0.35rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.page-investimentos-modal__section:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+body[data-theme='dark'] .page-investimentos-modal__section {
+  border-top-color: rgba(148, 163, 184, 0.11);
+}
+
+.page-investimentos-modal__section-label {
+  display: block;
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #64748b);
+}
+
+body[data-theme='dark'] .page-investimentos-modal__section-label {
+  color: rgba(248, 250, 252, 0.5);
+}
+
+/* Data + Valor lado a lado */
+.page-investimentos-modal__section--row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 380px) {
+  .page-investimentos-modal__section--row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Seção do toggle custom (menos padding-bottom) */
+.page-investimentos-modal__section--custom {
+  padding-bottom: 0.1rem;
+}
+
+/* Hint inline curto (contexto do preset selecionado) */
+.page-investimentos-modal__hint--preset {
+  margin: 0.45rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--text-secondary, #64748b);
+}
+
+body[data-theme='dark'] .page-investimentos-modal__hint--preset {
+  color: rgba(248, 250, 252, 0.55);
+}
+
+/* Preset grid compacto (3 colunas, sem hints) */
+.page-investimentos-preset-grid--compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.page-investimentos-preset-chip--compact {
+  padding: 8px 6px;
+  min-height: 38px;
+}
+
+.page-investimentos-preset-chip--compact .page-investimentos-preset-chip__label {
+  font-size: 0.85rem;
+}
+
+/* Toggle link "nome personalizado" */
+.page-investimentos-modal__toggle-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--text-secondary, #64748b);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(148, 163, 184, 0.5);
+  transition: color 0.12s ease;
+}
+
+.page-investimentos-modal__toggle-link:hover {
+  color: var(--text-primary, #0f172a);
+}
+
+body[data-theme='dark'] .page-investimentos-modal__toggle-link {
+  color: rgba(248, 250, 252, 0.52);
+}
+
+body[data-theme='dark'] .page-investimentos-modal__toggle-link:hover {
+  color: rgba(248, 250, 252, 0.9);
+}
+
+/* Select nativo para tipo de aplicação */
+.page-investimentos-modal__input.page-investimentos-modal__input--select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 14px;
+  padding-right: 2.25rem;
+  cursor: pointer;
+}
+
+body[data-theme='dark'] .page-investimentos-modal__input.page-investimentos-modal__input--select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.page-investimentos-modal__input.page-investimentos-modal__input--select:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #d4a84b) 75%, transparent);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Card v2 — primary display (Total estimado + rendimento)
+   ============================================================ */
+
+.page-investimentos-card__primary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin: 0.55rem 0 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent, #d4a84b) 7%, rgba(248, 250, 252, 0.04));
+  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 22%, rgba(148, 163, 184, 0.2));
+}
+
+body[data-theme='light'] .page-investimentos-card__primary {
+  background: rgba(212, 168, 75, 0.07);
+  border-color: rgba(212, 168, 75, 0.22);
+}
+
+body[data-theme='dark'] .page-investimentos-card__primary {
+  background: color-mix(in srgb, var(--accent, #d4a84b) 8%, rgba(15, 23, 42, 0.55));
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 28%, rgba(148, 163, 184, 0.15));
+}
+
+.page-investimentos-card__primary-block {
+  min-width: 0;
+}
+
+.page-investimentos-card__primary-block--right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.page-investimentos-card__primary-label {
+  margin: 0;
+  font-size: 0.63rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.3;
+}
+
+body[data-theme='dark'] .page-investimentos-card__primary-label {
+  color: rgba(248, 250, 252, 0.5);
+}
+
+.page-investimentos-card__primary-value {
+  margin: 0.12rem 0 0;
+  font-size: clamp(1.1rem, 2.2vw + 0.68rem, 1.38rem);
+  font-weight: 800;
+  letter-spacing: -0.028em;
+  color: var(--text-primary, #0f172a);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+}
+
+body[data-theme='dark'] .page-investimentos-card__primary-value {
+  color: rgba(248, 250, 252, 0.97);
+}
+
+.page-investimentos-card__primary-rendimento {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--success, #10b981);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+body[data-theme='dark'] .page-investimentos-card__primary-rendimento {
+  color: #34d399;
+}
+
+.page-investimentos-card__primary-pct {
+  margin: 0.12rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--success, #10b981);
+  letter-spacing: -0.01em;
+}
+
+body[data-theme='dark'] .page-investimentos-card__primary-pct {
+  color: #34d399;
+}
+
+.page-investimentos-card__primary-sublabel {
+  margin: 0.2rem 0 0;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  white-space: nowrap;
+}
+
+body[data-theme='dark'] .page-investimentos-card__primary-sublabel {
+  color: rgba(248, 250, 252, 0.42);
+}
+
+/* Chips novos: taxa e isento */
+.page-investimentos-chip--taxa {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  border-color: rgba(59, 130, 246, 0.28);
+  background: rgba(59, 130, 246, 0.08);
+  color: color-mix(in srgb, #2563eb 80%, var(--text-secondary, #64748b));
+}
+
+body[data-theme='dark'] .page-investimentos-chip--taxa {
+  border-color: rgba(96, 165, 250, 0.3);
+  background: rgba(96, 165, 250, 0.1);
+  color: #93c5fd;
+}
+
+.page-investimentos-chip--isento {
+  font-size: 0.65rem;
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 45%, transparent);
+  background: color-mix(in srgb, var(--accent, #d4a84b) 12%, transparent);
+  color: color-mix(in srgb, var(--accent, #d4a84b) 70%, var(--text-primary, #0f172a));
+}
+
+body[data-theme='dark'] .page-investimentos-chip--isento {
+  color: color-mix(in srgb, var(--accent, #e4bc6a) 90%, rgba(248, 250, 252, 0.9));
+}
+
+/* Chips de vencimento */
+.page-investimentos-chip--vencimento {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.08);
+  color: color-mix(in srgb, #059669 80%, var(--text-primary, #0f172a));
+}
+
+.page-investimentos-chip--vencimento-proximo {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.1);
+  color: color-mix(in srgb, #d97706 85%, var(--text-primary, #0f172a));
+}
+
+.page-investimentos-chip--vencimento-urgente {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  color: color-mix(in srgb, #dc2626 85%, var(--text-primary, #0f172a));
+}
+
+.page-investimentos-chip--vencido {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+body[data-theme='dark'] .page-investimentos-chip--vencimento {
+  color: #6ee7b7;
+  border-color: rgba(110, 231, 183, 0.3);
+  background: rgba(110, 231, 183, 0.08);
+}
+
+body[data-theme='dark'] .page-investimentos-chip--vencimento-proximo {
+  color: #fcd34d;
+  border-color: rgba(252, 211, 77, 0.3);
+  background: rgba(252, 211, 77, 0.08);
+}
+
+body[data-theme='dark'] .page-investimentos-chip--vencimento-urgente,
+body[data-theme='dark'] .page-investimentos-chip--vencido {
+  color: #fca5a5;
+  border-color: rgba(252, 165, 165, 0.35);
+  background: rgba(252, 165, 165, 0.08);
+}
+
+/* Sufixos de métrica para vencimento */
+.page-investimentos-card__metric-suffix--vencido {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.page-investimentos-card__metric-suffix--urgente {
+  color: #d97706;
+  font-weight: 700;
+}
+
+body[data-theme='dark'] .page-investimentos-card__metric-suffix--vencido {
+  color: #fca5a5;
+}
+
+body[data-theme='dark'] .page-investimentos-card__metric-suffix--urgente {
+  color: #fcd34d;
+}
+
+/* Simulação por data (rendimento acumulado até data escolhida) */
+.page-investimentos-card__projecao {
+  margin-top: 0.65rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed rgba(148, 163, 184, 0.28);
+}
+
+.page-investimentos-card__projecao-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.75rem;
+}
+
+.page-investimentos-card__projecao-label {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+  color: var(--text-secondary, #64748b);
+}
+
+.page-investimentos-card__projecao-input {
+  min-height: 38px;
+  padding: 0.35rem 0.55rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #0f172a);
+  font-family: inherit;
+  font-size: 0.88rem;
+}
+
+body[data-theme='dark'] .page-investimentos-card__projecao-input {
+  background: rgba(15, 23, 42, 0.55);
+  border-color: rgba(148, 163, 184, 0.28);
+  color: rgba(248, 250, 252, 0.92);
+  color-scheme: dark;
+}
+
+.page-investimentos-card__projecao-hint {
+  margin: 0.4rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--text-secondary, #64748b);
+}
+
+.page-investimentos-card__projecao-erro {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--danger, #b91c1c);
+}
+
+.page-investimentos-card__metrics--projecao {
+  margin-top: 0.5rem;
+}
+
+.page-investimentos-card__metric--projecao-total {
+  border-top-style: solid;
+}
+
+body[data-theme='dark'] .page-investimentos-card__projecao-hint {
+  color: rgba(248, 250, 252, 0.48);
+}
+
+body[data-theme='dark'] .page-investimentos-card__projecao-erro {
+  color: #f87171;
+}
+
+/* Disclaimer único no rodapé do card */
+.page-investimentos-card__disclaimer {
+  margin: 0.4rem 0 0;
+  font-size: 0.65rem;
+  font-style: italic;
+  color: var(--text-secondary, #64748b);
+  opacity: 0.8;
+}
+
+body[data-theme='dark'] .page-investimentos-card__disclaimer {
+  color: rgba(248, 250, 252, 0.38);
+  opacity: 1;
+}
+
+/* Responsividade do primary block */
+@media (max-width: 480px) {
+  .page-investimentos-card__primary {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .page-investimentos-card__primary-block--right {
+    text-align: left;
+  }
+
+  .page-investimentos-card__primary-sublabel {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-investimentos-card__primary-value {
+    font-size: clamp(1rem, 5vw + 0.6rem, 1.15rem);
+  }
+
+  .page-investimentos-card__primary-rendimento {
+    font-size: 0.9rem;
   }
 }

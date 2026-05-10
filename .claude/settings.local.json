@@ -45,7 +45,10 @@
       "WebFetch(domain:docs.stripe.com)",
       "Bash(git push *)",
       "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('scripts',{}\\), indent=2\\)\\)\")",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(git stash *)",
+      "Bash(npx vite *)",
+      "Bash(npx eslint *)"
     ]
   }
 }
