@@ -18,7 +18,7 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
 
   useEffect(() => {
     if (!open) return
-    setValorInput('')
+    setValorInput('') // eslint-disable-line react-hooks/set-state-in-effect
     setDataInput(localDateToday())
     setErrors({})
     setTimeout(() => valorInputRef.current?.focus(), 60)
@@ -57,7 +57,7 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
 
   return (
     <div
-      className="modal-overlay page-investimentos-modal-backdrop"
+      className="modal-backdrop page-investimentos-modal-backdrop"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}

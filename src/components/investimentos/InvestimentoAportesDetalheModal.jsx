@@ -1,13 +1,14 @@
 import React, { useEffect, useId } from 'react'
 import {
   aliquotaIrRendaFixaPfPorPrazoDias,
+  contarDiasUteisComJurosDesdeIso,
   diasCorridosDesdeIso,
   estimativaRendimentoAcumuladoAteHoje,
   extrairYyyyMmDdReferencia,
   formatAliquotaIrPtBr,
   investimentoIsentoIrPessoaFisica,
 } from '../../lib/investimentosRendimentoIr'
-import { contarDiasUteisComJurosDesdeIso, isoParaCalculoDias } from '../../lib/investimentosUtils'
+import { isoParaCalculoDias } from '../../lib/investimentosUtils'
 import { formatCurrencyBRL } from '../../lib/formatCurrency'
 
 function formatDataBr(ymd) {
@@ -53,7 +54,7 @@ export default function InvestimentoAportesDetalheModal({
 
   return (
     <div
-      className="modal-overlay page-investimentos-modal-backdrop"
+      className="modal-backdrop page-investimentos-modal-backdrop"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -122,28 +123,34 @@ export default function InvestimentoAportesDetalheModal({
 
                     return (
                       <tr key={aporte.id}>
-                        <td>
+                        <td data-label="Data">
                           <time dateTime={extrairYyyyMmDdReferencia(aporte.data_aquisicao) ?? ''}>
                             {formatDataBr(aporte.data_aquisicao)}
                           </time>
                         </td>
-                        <td className="num">{formatCurrencyBRL(aporte.valor)}</td>
-                        <td className="num">{diasCorridos != null ? diasCorridos : '—'}</td>
-                        <td className="num">{aliqFmt}</td>
-                        <td className="num pos">
+                        <td className="num" data-label="Valor aportado">
+                          {formatCurrencyBRL(aporte.valor)}
+                        </td>
+                        <td className="num" data-label="Dias (corridos)">
+                          {diasCorridos != null ? diasCorridos : '—'}
+                        </td>
+                        <td className="num" data-label="Alíquota IR">
+                          {aliqFmt}
+                        </td>
+                        <td className="num pos" data-label="Bruto acum.">
                           {estAcum ? formatCurrencyBRL(estAcum.brutoAcumulado) : '—'}
                         </td>
-                        <td className="num">
+                        <td className="num" data-label="IR acum.">
                           {estAcum
                             ? estAcum.isento
                               ? 'Isento'
                               : formatCurrencyBRL(estAcum.impostoAcumulado)
                             : '—'}
                         </td>
-                        <td className="num pos">
+                        <td className="num pos" data-label="Líquido acum.">
                           {estAcum ? formatCurrencyBRL(estAcum.liquidoAcumulado) : '—'}
                         </td>
-                        <td>
+                        <td data-label="Ação">
                           <button
                             type="button"
                             className="page-investimentos-aportes-table__remove"

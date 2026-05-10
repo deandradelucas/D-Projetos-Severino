@@ -48,7 +48,8 @@
       "Bash(python3 *)",
       "Bash(git stash *)",
       "Bash(npx vite *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Read(//tmp/**)"
     ]
   }
 }

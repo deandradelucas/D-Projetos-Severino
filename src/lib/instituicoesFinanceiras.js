@@ -126,12 +126,33 @@ function normalizeBusca(s) {
     .trim()
 }
 
+/** Partes do nome para corresponder “começa com…” em cada palavra (ex.: “Bradesco” em “Banco Bradesco”). */
+function segmentosNomeNormalizado(nomeNorm) {
+  return nomeNorm
+    .split(/[\s/,\u2014\-]+/)
+    .map((p) => p.replace(/[()[\]{}]/g, ''))
+    .filter(Boolean)
+}
+
+/**
+ * @param {string} nomeNorm
+ * @param {string} q query já normalizada
+ * @returns {0 | 1 | null} 0 = nome inteiro começa com q; 1 = alguma palavra começa com q; null = sem match
+ */
+function tierPrefixoInstituicao(nomeNorm, q) {
+  if (!q) return 0
+  if (nomeNorm.startsWith(q)) return 0
+  if (segmentosNomeNormalizado(nomeNorm).some((seg) => seg.startsWith(q))) return 1
+  return null
+}
+
 /** Lista ordenada (imutável) para a UI */
 export const INSTITUICOES_FINANCEIRAS = Object.freeze(
   [...RAW].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })),
 )
 
 /**
+ * Lista instituições cujo nome (ou alguma palavra do nome) começa com o texto digitado — ignorando maiúsculas e acentos.
  * @param {string} query
  * @param {number} [limit]
  * @returns {InstituicaoRow[]}
@@ -139,14 +160,21 @@ export const INSTITUICOES_FINANCEIRAS = Object.freeze(
 export function filtrarInstituicoesFinanceiras(query, limit = 48) {
   const q = normalizeBusca(query)
   if (!q) return INSTITUICOES_FINANCEIRAS.slice(0, limit)
-  const out = []
+
+  const scored = []
   for (const row of INSTITUICOES_FINANCEIRAS) {
-    if (normalizeBusca(row.nome).includes(q)) {
-      out.push(row)
-      if (out.length >= limit) break
-    }
+    const nomeNorm = normalizeBusca(row.nome)
+    const tier = tierPrefixoInstituicao(nomeNorm, q)
+    if (tier === null) continue
+    scored.push({ row, tier })
   }
-  return out
+
+  scored.sort((a, b) => {
+    if (a.tier !== b.tier) return a.tier - b.tier
+    return a.row.nome.localeCompare(b.row.nome, 'pt-BR', { sensitivity: 'base' })
+  })
+
+  return scored.slice(0, limit).map((s) => s.row)
 }
 
 export function labelTipoInstituicao(tipo) {
