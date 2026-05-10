@@ -100,7 +100,11 @@ export default function Dashboard() {
   const formatCurrency = formatCurrencyBRL
 
   const saldoValorClass =
-    saldoTotal > 0 ? 'dashboard-hub__balance-value--positive' : saldoTotal < 0 ? 'dashboard-hub__balance-value--negative' : ''
+    saldoTotal > 0
+      ? 'dashboard-hub__balance-value--positive'
+      : saldoTotal < 0
+        ? 'dashboard-hub__balance-value--negative'
+        : 'dashboard-hub__balance-value--zero'
 
   return (
     <>
@@ -181,9 +185,25 @@ export default function Dashboard() {
             <>
               <SkeletonKpi />
               <SkeletonKpi />
+              <SkeletonKpi />
             </>
           ) : (
             <>
+              <article className="ref-kpi-card ref-kpi-card--balance">
+                <div className="ref-kpi-card__icon" aria-hidden>
+                  {/* ícone carteira/saldo */}
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                  </svg>
+                </div>
+                <div className="ref-kpi-card__body">
+                  <p className="ref-kpi-card__label">Saldo</p>
+                  <p className={`ref-kpi-card__value ref-kpi-card__value--balance ${saldoTotal > 0 ? 'ref-kpi-card__value--pos' : saldoTotal < 0 ? 'ref-kpi-card__value--neg' : 'ref-kpi-card__value--zero'} ${privacyMode ? 'privacy-blur' : ''}`}>
+                    {formatCurrency(saldoTotal)}
+                  </p>
+                </div>
+              </article>
               <article className="ref-kpi-card ref-kpi-card--expense">
                 <div className="ref-kpi-card__icon" aria-hidden>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -330,7 +350,7 @@ export default function Dashboard() {
       </div>
     </div>
 
-    {!isModalOpen && (
+    {!isModalOpen && txRecentes.length > 0 && (
       <button
         type="button"
         className="dashboard-mobile-tx-fab"

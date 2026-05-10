@@ -1095,8 +1095,8 @@ body[data-theme='dark'] .page-investimentos-modal__input {
 }
 
 .page-investimentos-modal__error {
-  margin: 0.75rem 0 0;
-  padding: 8px 10px;
+  margin: 0.5rem 0 0;
+  padding: 6px 9px;
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -1818,8 +1818,8 @@ body[data-theme='dark'] .page-investimentos-modal__section-label {
 
 /* Hint inline curto (contexto do preset selecionado) */
 .page-investimentos-modal__hint--preset {
-  margin: 0.45rem 0 0;
-  font-size: 0.78rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.74rem;
   line-height: 1.35;
   color: var(--text-secondary, #64748b);
 }

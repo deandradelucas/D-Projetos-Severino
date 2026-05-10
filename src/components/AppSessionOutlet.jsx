@@ -105,7 +105,7 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
     return () => {
       cancelled = true
     }
-  }, [requireAppAccess, location.state?.freshLogin])
+  }, [requireAppAccess, location.state?.freshLogin, location.pathname])
 
   if (state.loading) {
     return (

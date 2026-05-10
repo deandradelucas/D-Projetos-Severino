@@ -22,6 +22,39 @@ function isMissingColumnError(err, column) {
   return msg.includes(c) && (msg.includes('does not exist') || msg.includes('não existe'))
 }
 
+/** Valor vindo do Postgres/PostgREST — evita falhar por tipos inesperados. */
+function rawIsentoPagamento(v) {
+  return v === true || v === 'true' || v === 't' || v === 1 || v === '1'
+}
+
+/**
+ * Lê `isento_pagamento` direto na base para o utilizador da sessão e o titular de cobrança (conta familiar).
+ * Fonte única para alinhar com GET /api/pagamentos/config (getPerfilUsuario).
+ */
+export async function resolveIsentoPagamentoEscopo(actorUsuarioId, billingUsuarioId) {
+  const supabase = getSupabaseAdmin()
+  const a = String(actorUsuarioId || '').trim()
+  const b = String(billingUsuarioId || '').trim()
+  if (!a) return false
+  const ids = a === b ? [a] : [...new Set([a, b])]
+  try {
+    const { data, error } = await supabase.from('usuarios').select('isento_pagamento').in('id', ids)
+    if (error) {
+      if (isMissingColumnError(error, 'isento_pagamento')) {
+        log.warn('[resolveIsentoPagamentoEscopo] coluna isento_pagamento ausente; rode scripts/migrations/06_isento_pagamento_usuarios.sql')
+      } else {
+        log.warn('[resolveIsentoPagamentoEscopo]', error.message || error)
+      }
+      return false
+    }
+    if (!Array.isArray(data)) return false
+    return data.some((r) => rawIsentoPagamento(r?.isento_pagamento))
+  } catch (e) {
+    log.warn('[resolveIsentoPagamentoEscopo] exceção:', e?.message || e)
+    return false
+  }
+}
+
 /** Assinatura Asaas sem cobrança ativa — INACTIVE (pausada) ou EXPIRED. */
 const ASAAS_STATUS_BLOQUEIA_ACESSO = new Set(['inactive', 'expired'])
 
@@ -108,7 +141,7 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
 
   const out = {
     email: base.data.email,
-    isento_pagamento: base.data.isento_pagamento === true,
+    isento_pagamento: rawIsentoPagamento(base.data.isento_pagamento),
     trial_ends_at: null,
     bem_vindo_pagamento_visto_at: null,
   }
@@ -226,9 +259,8 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   }
 
   let row = await fetchAssinaturaCamposUsuario(billingUid)
-  const emailParaFlags = row.email ?? ''
-  const emailExibicao = partialUser.email ?? emailParaFlags ?? ''
-  const isento = partialUser.isento_pagamento === true || row.isento_pagamento === true
+  const emailParaFlagsEarly = row.email ?? ''
+  const emailExibicao = partialUser.email ?? emailParaFlagsEarly ?? ''
 
   await sincronizarPagamentosPendentesDoUsuario(billingUid).catch((e) => {
     if (isAsaasForbiddenError(e)) {
@@ -249,6 +281,13 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   })
 
   row = await fetchAssinaturaCamposUsuario(billingUid)
+
+  const emailParaFlags = row.email ?? emailParaFlagsEarly ?? ''
+  const isentoDb = await resolveIsentoPagamentoEscopo(uid, billingUid)
+  const isento =
+    isentoDb ||
+    partialUser.isento_pagamento === true ||
+    row.isento_pagamento === true
 
   const hasPay = await usuarioTemPagamentoAprovado(billingUid, emailParaFlags)
   const flags = computeAssinaturaFlags({
@@ -276,6 +315,7 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     return {
       trial_ends_at: trialEnds || row.trial_ends_at || null,
       bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at || null,
+      isento_pagamento: isento,
       assinatura_paga: flagsAdmin.assinatura_paga,
       acesso_app_liberado: flagsAdmin.acesso_app_liberado,
       mostrar_bem_vindo_assinatura: flagsAdmin.mostrar_bem_vindo_assinatura,
@@ -302,6 +342,7 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   const base = {
     trial_ends_at: trialEnds || row.trial_ends_at || null,
     bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at || null,
+    isento_pagamento: isento,
     assinatura_paga: flags.assinatura_paga,
     acesso_app_liberado: flags.acesso_app_liberado,
     mostrar_bem_vindo_assinatura: flags.mostrar_bem_vindo_assinatura,
@@ -453,7 +494,9 @@ export async function assertAcessoAppUsuario(usuarioId) {
   const email = urow.email ?? ''
   const hasPay = await usuarioTemPagamentoAprovado(billingUid, email)
 
-  const isento = 'isento_pagamento' in urow ? urow.isento_pagamento === true : false
+  const isento =
+    (await resolveIsentoPagamentoEscopo(uid, billingUid)) ||
+    ('isento_pagamento' in urow ? rawIsentoPagamento(urow.isento_pagamento) : false)
 
   const flags = computeAssinaturaFlags({
     email,

@@ -16,6 +16,7 @@ export function registerAssinaturaRoutes(app) {
       return c.json({
         trial_ends_at: null,
         bem_vindo_pagamento_visto_at: null,
+        isento_pagamento: false,
         assinatura_paga: false,
         acesso_app_liberado: true,
         mostrar_bem_vindo_assinatura: false,
