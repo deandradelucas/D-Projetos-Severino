@@ -309,6 +309,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         </div>
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="modal-body page-investimentos-modal__body">
+            <div className="page-investimentos-modal__surface">
 
             {/* Banco ou corretora */}
             <div className="page-investimentos-modal__section">
@@ -366,13 +367,14 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                   }}
                   onFocus={() => {
                     if (blurTimerRef.current) window.clearTimeout(blurTimerRef.current)
+                    if (String(instQuery).trim().length > 0) setInstListOpen(true)
                   }}
                 />
                 {instListOpen ? (
                   <ul id={instListId} ref={listRef} className="page-investimentos-inst-dropdown" role="listbox">
                     {instituicoesFiltradas.length === 0 ? (
                       <li className="page-investimentos-inst-dropdown__empty" role="presentation">
-                        Não encontrado na lista — o texto digitado será usado.
+                        Nenhuma instituição na lista começa assim — o texto digitado será usado.
                       </li>
                     ) : (
                       instituicoesFiltradas.map((row, i) => (
@@ -566,7 +568,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                 {nomePersonalizadoExpandido ? '− Nome personalizado' : '+ Nome personalizado'}
               </button>
               {nomePersonalizadoExpandido ? (
-                <div style={{ marginTop: '0.5rem' }}>
+                <div className="page-investimentos-modal__custom-field">
                   <label htmlFor="investimento-outro-nome" className="sr-only">Nome personalizado</label>
                   <input
                     id="investimento-outro-nome"
@@ -583,6 +585,8 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                   />
                 </div>
               ) : null}
+            </div>
+
             </div>
 
             {formError ? (

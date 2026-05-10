@@ -4,6 +4,8 @@ import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import InvestimentoNovoModal from '../components/investimentos/InvestimentoNovoModal.jsx'
+import InvestimentoAporteModal from '../components/investimentos/InvestimentoAporteModal.jsx'
+import InvestimentoAportesDetalheModal from '../components/investimentos/InvestimentoAportesDetalheModal.jsx'
 import InvestimentosResumo from '../components/investimentos/InvestimentosResumo.jsx'
 import InvestimentoCard from '../components/investimentos/InvestimentoCard.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
@@ -37,6 +39,7 @@ function buildOptimisticItem(payload, uid, id) {
     data_vencimento: payload.data_vencimento ?? null,
     criado_em: new Date().toISOString(),
     tipo_indexador: payload.tipo_indexador ?? 'CDI',
+    aportes: [],
   }
 }
 
@@ -54,6 +57,12 @@ export default function Investimentos() {
   const [cdiLoading, setCdiLoading] = useState(true)
   const [sortKey, setSortKey] = useState('data_desc')
   const [filtroPreset, setFiltroPreset] = useState('')
+
+  // Aportes state
+  const [aporteTarget, setAporteTarget] = useState(null)
+  const [aporteSubmitting, setAporteSubmitting] = useState(false)
+  const [aporteDetalheTarget, setAporteDetalheTarget] = useState(null)
+  const [removendoAporteId, setRemovendoAporteId] = useState(null)
 
   const session = readHorizonteUser()
   const uid = session?.id ? String(session.id).trim() : ''
@@ -212,6 +221,50 @@ export default function Investimentos() {
     }
   }
 
+  const handleAportar = async (payload) => {
+    if (!uid || !aporteTarget?.id) return
+    setAporteSubmitting(true)
+    try {
+      const res = await fetch(apiUrl(`/api/investimentos/${aporteTarget.id}/aportes`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': uid },
+        body: JSON.stringify(payload),
+      })
+      if (redirectAssinaturaExpiradaSe403(res)) return
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.message || 'Não foi possível adicionar o aporte.')
+      setLista((prev) => prev.map((x) => (x.id === aporteTarget.id ? data : x)))
+      if (aporteDetalheTarget?.id === aporteTarget.id) setAporteDetalheTarget(data)
+      setAporteTarget(null)
+      showToast('Aporte adicionado.')
+    } catch (e) {
+      showToast(e.message || 'Erro ao adicionar aporte.', 'error')
+    } finally {
+      setAporteSubmitting(false)
+    }
+  }
+
+  const handleRemoverAporte = async (investimentoId, aporteId) => {
+    if (!uid) return
+    setRemovendoAporteId(aporteId)
+    try {
+      const res = await fetch(apiUrl(`/api/investimentos/${investimentoId}/aportes/${aporteId}`), {
+        method: 'DELETE',
+        headers: { 'x-user-id': uid },
+      })
+      if (redirectAssinaturaExpiradaSe403(res)) return
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.message || 'Não foi possível remover o aporte.')
+      setLista((prev) => prev.map((x) => (x.id === investimentoId ? data : x)))
+      if (aporteDetalheTarget?.id === investimentoId) setAporteDetalheTarget(data)
+      showToast('Aporte removido.')
+    } catch (e) {
+      showToast(e.message || 'Erro ao remover aporte.', 'error')
+    } finally {
+      setRemovendoAporteId(null)
+    }
+  }
+
   return (
     <div className="dashboard-container dashboard-page page-investimentos ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
@@ -336,11 +389,10 @@ export default function Investimentos() {
                               cdiLoading={cdiLoading}
                               pregaoCdiHoje={pregaoCdiHoje}
                               uid={uid}
-                              onEdit={(r) => {
-                                setEditTarget(r)
-                                setModalOpen(true)
-                              }}
+                              onEdit={(r) => { setEditTarget(r); setModalOpen(true) }}
                               onRemove={(target) => setRemoveTarget(target)}
+                              onAportar={(r) => setAporteTarget(r)}
+                              onVerAportes={(r) => setAporteDetalheTarget(r)}
                             />
                           </li>
                         ))}
@@ -495,6 +547,23 @@ export default function Investimentos() {
         tone="danger"
         onClose={() => setRemoveTarget(null)}
         onConfirm={confirmarRemover}
+      />
+
+      <InvestimentoAporteModal
+        open={Boolean(aporteTarget)}
+        onClose={() => { if (!aporteSubmitting) setAporteTarget(null) }}
+        onSubmit={handleAportar}
+        submitting={aporteSubmitting}
+        investimentoNome={aporteTarget?.nome ?? ''}
+      />
+
+      <InvestimentoAportesDetalheModal
+        open={Boolean(aporteDetalheTarget)}
+        onClose={() => setAporteDetalheTarget(null)}
+        investimento={aporteDetalheTarget}
+        cdiAa={cdiAa}
+        onRemoverAporte={handleRemoverAporte}
+        removendoAporteId={removendoAporteId}
       />
     </div>
   )

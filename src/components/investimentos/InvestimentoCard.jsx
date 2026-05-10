@@ -15,6 +15,7 @@ import { formatCurrencyBRL } from '../../lib/formatCurrency'
 import { formatPercentualCdiLista } from '../../lib/percentualCdiInput'
 import { INVESTIMENTOS_PRESETS_LIST } from '../../lib/investimentosPresets'
 import { ymdLocalFromDate, ymdMaxProjecaoLocal, formatYmdPtBr, isoParaCalculoDias } from '../../lib/investimentosUtils'
+import { getLogoInstituicao } from '../../lib/bankLogos'
 
 function labelTipoInvestimentoPreset(key) {
   if (key == null || String(key).trim() === '') return null
@@ -86,6 +87,7 @@ function computeAliquotaFmt(brutoTotal, irTotal, allIsento) {
 export default function InvestimentoCard({ row, cdiAa, cdiLoading, pregaoCdiHoje, uid, onEdit, onRemove, onAportar, onVerAportes }) {
   // null = untouched (falls through to default); '' = explicitly cleared
   const [projecaoAteYmd, setProjecaoAteYmd] = useState(null)
+  const [collapsed, setCollapsed] = useState(true)
 
   const tipoLb = labelTipoInvestimentoPreset(row.tipo_preset)
 
@@ -209,9 +211,24 @@ export default function InvestimentoCard({ row, cdiAa, cdiLoading, pregaoCdiHoje
     nomeRow !== '' &&
     nomeRow.toUpperCase() === String(tipoLb).trim().toUpperCase()
 
+  const logoSrc = getLogoInstituicao(row.instituicao_nome)
+  const instIniciais = String(row.instituicao_nome || '?')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+
+  const valorResumido = estAcumulado
+    ? formatCurrencyBRL(Number(row.valor_investido) + estAcumulado.liquidoAcumulado)
+    : temValor
+    ? formatCurrencyBRL(Number(row.valor_investido))
+    : null
+
   return (
     <article
-      className={`page-investimentos-card${mostrarGrelhaCompleta ? ' page-investimentos-card--metricas-completas' : ''}`}
+      className={`page-investimentos-card${mostrarGrelhaCompleta ? ' page-investimentos-card--metricas-completas' : ''}${collapsed ? ' page-investimentos-card--collapsed' : ''}`}
       aria-label={
         tituloRedundanteComChipTipo
           ? `${row.instituicao_nome || 'Investimento'}, ${tipoLb}`
@@ -219,48 +236,102 @@ export default function InvestimentoCard({ row, cdiAa, cdiLoading, pregaoCdiHoje
       }
     >
       <div className="page-investimentos-card__main">
-        <div className="page-investimentos-card__badges" aria-label="Etiquetas">
-          <span className="page-investimentos-chip page-investimentos-chip--inst">
-            {row.instituicao_nome || '—'}
-          </span>
-          {tipoLb ? (
-            <span className="page-investimentos-chip page-investimentos-chip--tipo">{tipoLb}</span>
-          ) : (
-            <span className="page-investimentos-chip page-investimentos-chip--custom">
-              Personalizado
-            </span>
+        <div className="page-investimentos-card__top-row">
+          {collapsed && (
+            <div className="page-investimentos-card__bank-avatar" aria-hidden="true">
+              {logoSrc ? (
+                <img
+                  src={logoSrc}
+                  alt=""
+                  className="page-investimentos-card__bank-logo"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling?.removeAttribute('hidden') }}
+                />
+              ) : null}
+              <span className="page-investimentos-card__bank-initials" hidden={!!logoSrc}>
+                {instIniciais}
+              </span>
+            </div>
           )}
-          {percExibicao ? (
-            <span className="page-investimentos-chip page-investimentos-chip--taxa">{percExibicao}</span>
-          ) : null}
-          {isentoIr ? (
-            <span className="page-investimentos-chip page-investimentos-chip--isento">Isento IR (PF)</span>
-          ) : null}
-          {dataVencimentoYmd ? (() => {
-            const { cls, texto } = chipVencimentoProps(diasAteVencimento)
-            return <span className={`page-investimentos-chip ${cls}`}>{texto}</span>
-          })() : null}
+          <div className="page-investimentos-card__badges" aria-label="Etiquetas">
+            <span className="page-investimentos-chip page-investimentos-chip--inst">
+              {row.instituicao_nome || '—'}
+            </span>
+            {tipoLb ? (
+              <span className="page-investimentos-chip page-investimentos-chip--tipo">{tipoLb}</span>
+            ) : (
+              <span className="page-investimentos-chip page-investimentos-chip--custom">
+                Personalizado
+              </span>
+            )}
+            {percExibicao ? (
+              <span className="page-investimentos-chip page-investimentos-chip--taxa">{percExibicao}</span>
+            ) : null}
+            {isentoIr ? (
+              <span className="page-investimentos-chip page-investimentos-chip--isento">Isento IR (PF)</span>
+            ) : null}
+            {dataVencimentoYmd ? (() => {
+              const { cls, texto } = chipVencimentoProps(diasAteVencimento)
+              return <span className={`page-investimentos-chip ${cls}`}>{texto}</span>
+            })() : null}
+          </div>
+          <div className="page-investimentos-card__collapse-area">
+            {collapsed && valorResumido ? (
+              <span className="page-investimentos-card__collapsed-value">{valorResumido}</span>
+            ) : null}
+            <button
+              type="button"
+              className="page-investimentos-card__collapse-btn"
+              onClick={() => setCollapsed((c) => !c)}
+              aria-expanded={!collapsed}
+              aria-label={collapsed ? 'Expandir card' : 'Minimizar card'}
+            >
+              <svg
+                className={`page-investimentos-card__collapse-chevron${collapsed ? ' page-investimentos-card__collapse-chevron--collapsed' : ''}`}
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m18 15-6-6-6 6" />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        {multiAporte && (
-          <button
-            type="button"
-            className="page-investimentos-card__aportes-link"
-            onClick={() => onVerAportes?.(row)}
-          >
-            {aportes.length} aportes — ver detalhes
-          </button>
+        {collapsed ? (
+          !tituloRedundanteComChipTipo ? (
+            <p className="page-investimentos-card__collapsed-nome">{row.nome}</p>
+          ) : null
+        ) : (
+          <>
+            {multiAporte && (
+              <button
+                type="button"
+                className="page-investimentos-card__aportes-link"
+                onClick={() => onVerAportes?.(row)}
+              >
+                {aportes.length} aportes — ver detalhes
+              </button>
+            )}
+
+            {!tituloRedundanteComChipTipo ? (
+              <h3 className="page-investimentos-card__title">{row.nome}</h3>
+            ) : null}
+          </>
         )}
 
-        {!tituloRedundanteComChipTipo ? (
-          <h3 className="page-investimentos-card__title">{row.nome}</h3>
-        ) : null}
-
-        {mostrarRendimento && cdiDisponivel && !dataAquisicaoYmd ? (
+        {!collapsed && mostrarRendimento && cdiDisponivel && !dataAquisicaoYmd ? (
           <p className="page-investimentos-card__missing-date-banner" role="alert">
             Sem data de aquisição — o acumulado usa o dia em que criou o registo. Abra Editar e confirme a data da compra.
           </p>
         ) : null}
+
+        {!collapsed && (<>
 
         {estAcumulado ? (
           <div className="page-investimentos-card__primary">
@@ -618,9 +689,10 @@ export default function InvestimentoCard({ row, cdiAa, cdiLoading, pregaoCdiHoje
             <time dateTime={row.criado_em || undefined}>{formatDataRegistado(row.criado_em)}</time>
           </p>
         ) : null}
+        </>)}
       </div>
 
-      <div className="page-investimentos-card__actions">
+      {!collapsed && <div className="page-investimentos-card__actions">
         <button
           type="button"
           className="page-investimentos-card__edit"
@@ -644,7 +716,7 @@ export default function InvestimentoCard({ row, cdiAa, cdiLoading, pregaoCdiHoje
         >
           Remover
         </button>
-      </div>
+      </div>}
     </article>
   )
 }
