@@ -49,3 +49,11 @@ export function readConviteTokenSession() {
     return ''
   }
 }
+
+export function clearConviteTokenSession() {
+  try {
+    window.sessionStorage.removeItem(FAMILIA_CONVITE_SESSION_KEY)
+  } catch {
+    /* ignore */
+  }
+}

@@ -5,6 +5,7 @@ import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog'
+import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { webAuthnSupported, registerWebAuthnCredential } from '../lib/webauthnBrowser'
@@ -38,6 +39,7 @@ export default function Configuracoes() {
   const [novoConvitePapel, setNovoConvitePapel] = useState('MEMBER')
   const [ultimoTokenConvite, setUltimoTokenConvite] = useState('')
   const [familiaConfirm, setFamiliaConfirm] = useState(null)
+  const [familiaPainelCarregado, setFamiliaPainelCarregado] = useState(false)
   const usuarioIdHeader = String(perfil?.id ?? '').trim()
 
   const showToast = useCallback((msg) => {
@@ -69,7 +71,10 @@ export default function Configuracoes() {
   }, [usuarioIdHeader])
 
   const loadFamiliaPainel = useCallback(async () => {
-    if (!usuarioIdHeader) return
+    if (!usuarioIdHeader) {
+      setFamiliaPainelCarregado(false)
+      return
+    }
     setFamiliaLoadErr(null)
     try {
       const resM = await fetch(apiUrl('/api/familia/membros'), { headers: { 'x-user-id': usuarioIdHeader } })
@@ -91,6 +96,8 @@ export default function Configuracoes() {
       setFamiliaConvites(Array.isArray(c.convites) ? c.convites : [])
     } catch {
       setFamiliaLoadErr('Não foi possível carregar a conta familiar.')
+    } finally {
+      setFamiliaPainelCarregado(true)
     }
   }, [usuarioIdHeader])
 
@@ -370,6 +377,32 @@ export default function Configuracoes() {
             </div>
           </section>
 
+          {familiaPainelCarregado &&
+          usuarioIdHeader &&
+          familiaTitular !== true &&
+          !perfil.conta_familiar_membro ? (
+            <section className="config-card config-card--full">
+              <div className="config-card-head">
+                <span className="config-card-kicker">Família</span>
+                <h2 className="config-card-title-clean">Aceitar convite familiar</h2>
+                <p className="config-card-subtitle">
+                  Cole o link ou o código enviado pelo titular. Quando o convite for validado, use <strong>Vincular à esta conta</strong> — não precisa repetir na tela de login.
+                </p>
+              </div>
+              <FamiliaConviteColarBlock
+                idPrefix="config-familia-convite"
+                usuarioIdParaAceitar={usuarioIdHeader}
+                ocultarTituloBloco
+                onAceitarSucesso={(data) => {
+                  showToast(data?.message || 'Convite familiar aceito.')
+                  void refreshAssinaturaPerfil()
+                  void loadFamiliaPainel()
+                }}
+                onAceitarErro={(msg) => showToast(msg)}
+              />
+            </section>
+          ) : null}
+
           {familiaTitular === true && (
             <section className="config-card config-card--full">
               <div className="config-card-head">
@@ -414,7 +447,8 @@ export default function Configuracoes() {
               {ultimoTokenConvite ? (
                 <div className="config-security-panel" style={{ marginBottom: '1.25rem' }}>
                   <p className="config-card-subtitle" style={{ marginBottom: '0.5rem' }}>
-                    <strong>Guarde agora:</strong> o código só aparece uma vez. Quem receber deve abrir o link ou colar o código após criar conta / login.
+                    <strong>Guarde agora:</strong> o código só aparece uma vez. Quem receber pode usar o link, colar o código no cadastro ou, já com conta, em{' '}
+                    <strong>Configurações → Aceitar convite familiar</strong>.
                   </p>
                   <div
                     className="config-field"

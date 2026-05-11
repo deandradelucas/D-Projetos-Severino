@@ -5,6 +5,7 @@ import {
   extrairTokenConviteFamilia,
   persistConviteTokenSession,
   readConviteTokenSession,
+  clearConviteTokenSession,
 } from '../lib/familiaConviteColar'
 
 function papelConviteLabel(p) {
@@ -16,6 +17,8 @@ function papelConviteLabel(p) {
 
 /**
  * Campo para colar link ou código de convite da conta familiar (+ preview via API pública).
+ * Em login/cadastro: persiste em session para aplicar ao entrar.
+ * Com `usuarioIdParaAceitar`: permite aceitar já autenticado (ex.: Configurações).
  */
 function readInitialConviteRaw() {
   if (typeof window === 'undefined') return ''
@@ -28,10 +31,17 @@ function readInitialConviteRaw() {
   return readConviteTokenSession()
 }
 
-export default function FamiliaConviteColarBlock({ idPrefix = 'familia-convite' }) {
+export default function FamiliaConviteColarBlock({
+  idPrefix = 'familia-convite',
+  usuarioIdParaAceitar = null,
+  onAceitarSucesso,
+  onAceitarErro,
+  ocultarTituloBloco = false,
+}) {
   const [searchParams] = useSearchParams()
   const [raw, setRaw] = useState(readInitialConviteRaw)
   const [preview, setPreview] = useState(null)
+  const [aceitarBusy, setAceitarBusy] = useState(false)
 
   /* Sincroniza ?convite= da SPA com o campo (ex.: link “Entrar” no cadastro). */
   useEffect(() => {
@@ -78,17 +88,61 @@ export default function FamiliaConviteColarBlock({ idPrefix = 'familia-convite' 
     }
   }, [raw])
 
+  const handleAceitarAgora = async () => {
+    const uid = String(usuarioIdParaAceitar || '').trim()
+    const token = extrairTokenConviteFamilia(raw)
+    if (!uid || !token) return
+    setAceitarBusy(true)
+    try {
+      const res = await fetch(apiUrl('/api/familia/aceitar'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': uid,
+        },
+        body: JSON.stringify({ token }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        onAceitarErro?.(data.message || 'Não foi possível aceitar o convite.')
+        return
+      }
+      clearConviteTokenSession()
+      setRaw('')
+      setPreview(null)
+      onAceitarSucesso?.(data)
+    } catch {
+      onAceitarErro?.('Erro de rede ao aceitar o convite.')
+    } finally {
+      setAceitarBusy(false)
+    }
+  }
+
   const areaId = `${idPrefix}-textarea`
   const hintId = `${idPrefix}-hint`
+  const modoLogado = Boolean(usuarioIdParaAceitar)
 
   return (
     <div className="rounded-[14px] border border-emerald-500/25 bg-emerald-500/[0.06] p-3 sm:p-3.5">
       <label className="block" htmlFor={areaId}>
-        <span className="mb-1.5 block text-[11px] font-semibold text-emerald-900 sm:text-[12px]">
-          Conta familiar — convite (opcional)
-        </span>
+        {ocultarTituloBloco ? (
+          <span className="sr-only">Convite conta familiar</span>
+        ) : (
+          <span className="mb-1.5 block text-[11px] font-semibold text-emerald-900 sm:text-[12px]">
+            Conta familiar — convite (opcional)
+          </span>
+        )}
         <span id={hintId} className="mb-2 block text-[10px] leading-snug text-neutral-600 sm:text-[11px]">
-          Cole o <strong>link</strong> ou só o <strong>código</strong> que o titular enviou. Depois faça login ou crie a conta; o vínculo é feito ao entrar.
+          {modoLogado ? (
+            <>
+              Cole o <strong>link</strong> ou só o <strong>código</strong> que o titular enviou. Quando aparecer “Convite válido”, confirme em{' '}
+              <strong>Vincular à esta conta</strong>.
+            </>
+          ) : (
+            <>
+              Cole o <strong>link</strong> ou só o <strong>código</strong> que o titular enviou. Depois faça login ou crie a conta; o vínculo é feito ao entrar.
+            </>
+          )}
         </span>
         <textarea
           id={areaId}
@@ -135,6 +189,19 @@ export default function FamiliaConviteColarBlock({ idPrefix = 'familia-convite' 
       ) : null}
       {preview?.erro ? (
         <p className="mt-2 text-[10px] text-red-700 sm:text-[11px]">{preview.erro}</p>
+      ) : null}
+
+      {modoLogado && preview?.ok ? (
+        <div className="mt-3">
+          <button
+            type="button"
+            disabled={aceitarBusy}
+            onClick={() => void handleAceitarAgora()}
+            className="w-full rounded-[12px] bg-emerald-600 px-3 py-2.5 text-[12px] font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2"
+          >
+            {aceitarBusy ? 'A vincular…' : 'Vincular à esta conta'}
+          </button>
+        </div>
       ) : null}
     </div>
   )

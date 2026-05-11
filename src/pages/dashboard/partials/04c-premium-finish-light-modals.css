@@ -628,16 +628,16 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     margin-bottom: clamp(6px, 0.5vw + 4px, 8px);
     padding-bottom: 0;
     /* Evita “salto” logo → 1.º item: cada rota remonta o Sidebar e a PNG pode vir com altura 0 até decodificar */
-    min-height: clamp(56px, 4.5vw + 42px, 72px);
+    min-height: clamp(120px, 11vw + 92px, 180px);
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: clamp(52px, 5vw + 40px, 72px);
-    min-height: clamp(52px, 5vw + 40px, 72px);
-    max-height: clamp(52px, 5vw + 40px, 72px);
+    height: clamp(112px, 12vw + 80px, 168px);
+    min-height: clamp(112px, 12vw + 80px, 168px);
+    max-height: clamp(112px, 12vw + 80px, 168px);
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -668,16 +668,16 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     width: 100%;
     margin-bottom: clamp(6px, 0.5vw + 4px, 8px);
     padding-bottom: 0;
-    min-height: clamp(56px, 4.5vw + 42px, 72px);
+    min-height: clamp(120px, 11vw + 92px, 180px);
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: clamp(52px, 5vw + 40px, 72px);
-    min-height: clamp(52px, 5vw + 40px, 72px);
-    max-height: clamp(52px, 5vw + 40px, 72px);
+    height: clamp(112px, 12vw + 80px, 168px);
+    min-height: clamp(112px, 12vw + 80px, 168px);
+    max-height: clamp(112px, 12vw + 80px, 168px);
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -918,7 +918,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
     margin-bottom: clamp(12px, 2.5vw + 8px, 18px);
     /* Direita reserva área do X absoluto; esquerda mais curta = logo PNG usa mais largura */
     padding: 8px 48px 12px 10px;
-    min-height: clamp(58px, 12vw + 36px, 72px);
+    min-height: clamp(96px, 24vw + 60px, 140px);
     gap: 0;
     box-sizing: border-box;
     flex-shrink: 0;

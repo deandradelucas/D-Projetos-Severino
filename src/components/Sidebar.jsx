@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
@@ -31,6 +31,7 @@ function getFocusableElements(container) {
 export default function Sidebar({ menuAberto, setMenuAberto }) {
   const { theme } = useTheme()
   const { pathname } = useLocation()
+  const sidebarLogoSrc = theme === 'dark' ? BRAND_ASSETS.sidebarLogoDark : BRAND_ASSETS.sidebarLogo
   const showAdminNav = canAccessAdminPanelSession()
   const sidebarRef = useRef(null)
   const closeButtonRef = useRef(null)
@@ -119,14 +120,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     }
   }, [menuAberto])
 
-  const svgSrc = theme === 'light' ? BRAND_ASSETS.logoOnLight : BRAND_ASSETS.logoOnDark
-  const pngSrc = theme === 'light' ? BRAND_ASSETS.sidebarLogoLightPng : BRAND_ASSETS.sidebarLogoDarkPng
-  const [logoSrc, setLogoSrc] = useState(pngSrc)
-
-  useEffect(() => {
-    setLogoSrc(pngSrc)
-  }, [pngSrc])
-
   return (
     <>
       {/* Mobile Backdrop */}
@@ -148,16 +141,12 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
       >
         <div className="brand-wrapper">
           <img
-            key={logoSrc}
-            src={logoSrc}
+            key={sidebarLogoSrc}
+            src={sidebarLogoSrc}
             alt="Severino"
             className="brand-logo"
             decoding="sync"
-            onError={() => setLogoSrc(svgSrc)}
           />
-          <span className="brand-wordmark" aria-hidden>
-            SEVERINO
-          </span>
           <button
             ref={closeButtonRef}
             type="button"

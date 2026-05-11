@@ -29,6 +29,10 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   display: none !important;
 }
 
+.dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+  background: transparent !important;
+}
+
 /* Desktop: cartão com raio em todos os cantos (coluna com gap no shell) */
 @media (min-width: 769px) {
   .dashboard-container.app-horizon-shell .sidebar,
@@ -53,32 +57,30 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-w
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35) !important;
 }
 
-/* Marca no shell: mesma altura útil claro/escuro — escuro usa PNG quadrado (PWA); sem width/height HTML que forçavam “torre” alta */
+/* Marca no shell: fundo transparente — sem retângulo atrás da arte; usa o próprio cartão da sidebar (claro/escuro). */
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
   width: auto !important;
   object-fit: contain !important;
   flex: 0 1 auto !important;
-  /* Evita “xadrez” / halo claro em PNG com canal alpha sobre fundos compostos */
-  background-color: #000000 !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
 }
 
 @media (min-width: 769px) {
+  /* Mesma caixa claro/escuro — PNG claro é horizontal; limite de largura evita “tomar” a sidebar inteira. */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    height: clamp(52px, 5vw + 40px, 72px) !important;
-    max-height: clamp(52px, 5vw + 40px, 72px) !important;
+    height: clamp(112px, 12vw + 80px, 168px) !important;
+    max-height: clamp(112px, 12vw + 80px, 168px) !important;
+    max-width: min(100%, 184px) !important;
+    width: auto !important;
+    object-fit: contain !important;
     object-position: left center !important;
-  }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    aspect-ratio: 1009 / 382;
-    max-width: min(58%, 260px) !important;
+    transform: none !important;
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    aspect-ratio: 1 / 1;
-    max-width: min(34%, 108px) !important;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
   }
 }
@@ -86,19 +88,16 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-l
 @media (max-width: 768px) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    height: clamp(48px, 12vw + 32px, 64px) !important;
-    max-height: clamp(48px, 12vw + 32px, 64px) !important;
+    height: clamp(88px, 22vw + 56px, 132px) !important;
+    max-height: clamp(88px, 22vw + 56px, 132px) !important;
+    max-width: min(100%, 168px) !important;
+    width: auto !important;
+    object-fit: contain !important;
     object-position: center center !important;
-  }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    aspect-ratio: 1009 / 382;
-    max-width: min(85%, 280px) !important;
+    transform: none !important;
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    aspect-ratio: 1 / 1;
-    max-width: min(52vw, 132px) !important;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
   }
 }
