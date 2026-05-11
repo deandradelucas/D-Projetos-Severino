@@ -1,8 +1,11 @@
 import { createHash, randomBytes } from 'node:crypto'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 
-export const FAMILIA_MAX_MEMBROS_TOTAL =
-  Number.parseInt(process.env.FAMILIA_MAX_MEMBROS || '5', 10) || 5
+/** Total máximo na conta familiar: 1 titular + membros vinculados (fixo no produto). */
+export const FAMILIA_MAX_MEMBROS_TOTAL = 5
+
+/** Quantos utilizadores podem estar vinculados ao titular (ex.: 4 se o total da família é 5). */
+export const FAMILIA_MAX_VINCULADOS = Math.max(1, FAMILIA_MAX_MEMBROS_TOTAL - 1)
 
 const INVITE_VALID_DAYS = Number.parseInt(process.env.FAMILIA_CONVITE_DIAS || '7', 10) || 7
 
@@ -77,6 +80,37 @@ export async function resolveEscopoUsuario(actorUsuarioId) {
 }
 
 /**
+ * ID do titular para gestão da conta familiar (convites, listar/remover membros).
+ * Só o titular — utilizadores convidados (qualquer papel) não gerem a família na API.
+ * @param {{ actorId?: string, dataUsuarioId?: string, familiaPapel?: string | null, isMembroConta?: boolean } | null} escopo
+ * @returns {string | null}
+ */
+export function titularUsuarioIdParaGestaoFamilia(escopo) {
+  if (!escopo?.actorId) return null
+  const actor = String(escopo.actorId).trim()
+  if (!actor) return null
+  if (!escopo.isMembroConta) return actor
+  return null
+}
+
+/**
+ * Quantidade de utilizadores vinculados ao titular (não inclui o titular).
+ * @param {string} titularUsuarioId
+ * @returns {Promise<number>}
+ */
+export async function countVinculosFamiliaTitular(titularUsuarioId) {
+  const tid = String(titularUsuarioId || '').trim()
+  if (!tid) return 0
+  const supabase = getSupabaseAdmin()
+  const { count, error } = await supabase
+    .from('usuarios')
+    .select('id', { count: 'exact', head: true })
+    .eq('vinculo_conta_principal_id', tid)
+  if (error) return 0
+  return typeof count === 'number' && Number.isFinite(count) ? count : 0
+}
+
+/**
  * VIEWER não altera dados (transações, agenda, recorrências).
  * @returns {null | { status: number, message: string }}
  */
@@ -103,16 +137,33 @@ async function countMembrosDoTitular(titularId) {
   return Number(count || 0)
 }
 
+async function countConvitesPendentesValidos(titularId) {
+  const tid = String(titularId || '').trim()
+  const supabase = getSupabaseAdmin()
+  const now = new Date().toISOString()
+  const { count, error } = await supabase
+    .from('familia_convites')
+    .select('id', { count: 'exact', head: true })
+    .eq('titular_usuario_id', tid)
+    .is('revoked_at', null)
+    .is('consumed_at', null)
+    .gt('expires_at', now)
+
+  if (error) throw error
+  return Number(count || 0)
+}
+
 async function assertTitularPodeConvidar(actorId) {
   const escopo = await resolveEscopoUsuario(actorId)
   if (escopo.isMembroConta) {
     throw new Error('Apenas o titular da conta pode criar convites.')
   }
-  const n = await countMembrosDoTitular(actorId)
-  const maxMembers = Math.max(1, FAMILIA_MAX_MEMBROS_TOTAL) - 1
-  if (n >= maxMembers) {
+  const nMembros = await countMembrosDoTitular(actorId)
+  const nConvites = await countConvitesPendentesValidos(actorId)
+  const ocupados = nMembros + nConvites
+  if (ocupados >= FAMILIA_MAX_VINCULADOS) {
     throw new Error(
-      `Limite de ${FAMILIA_MAX_MEMBROS_TOTAL} pessoas nesta conta foi atingido. Remova um membro ou convite para continuar.`,
+      `Limite de ${FAMILIA_MAX_MEMBROS_TOTAL} pessoas nesta conta familiar (titular + até ${FAMILIA_MAX_VINCULADOS} convidados). Remova um membro ou um convite pendente para criar outro convite.`,
     )
   }
 }
@@ -281,9 +332,10 @@ export async function aceitarConviteFamilia(actorUsuarioId, plainToken) {
   }
 
   const n = await countMembrosDoTitular(titularId)
-  const maxMembers = Math.max(1, FAMILIA_MAX_MEMBROS_TOTAL) - 1
-  if (n >= maxMembers) {
-    throw new Error('Esta família já atingiu o número máximo de membros.')
+  if (n >= FAMILIA_MAX_VINCULADOS) {
+    throw new Error(
+      `Esta conta familiar já tem o máximo de ${FAMILIA_MAX_VINCULADOS} pessoa(s) vinculada(s) (${FAMILIA_MAX_MEMBROS_TOTAL} no total com o titular).`,
+    )
   }
 
   const papel = String(conv.papel_convite || 'MEMBER').toUpperCase()

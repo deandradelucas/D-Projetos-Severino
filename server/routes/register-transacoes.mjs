@@ -99,9 +99,9 @@ export function registerTransacoesRoutes(app) {
         return c.json({ message: val.message }, 400)
       }
 
-      const lancadoPor = parsed.escopo.isMembroConta ? parsed.actorId : null
+      /* Sempre quem está logado (titular ou familiar): assim na lista aparece quem lançou cada despesa/receita. */
       const data = await TransactionService.createTransaction(parsed.dataUsuarioId, body, {
-        lancadoPorUsuarioId: lancadoPor,
+        lancadoPorUsuarioId: parsed.actorId,
       })
 
       return c.json({ message: 'Transação inserida com sucesso.', data }, 201)

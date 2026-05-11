@@ -628,16 +628,16 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     margin-bottom: clamp(6px, 0.5vw + 4px, 8px);
     padding-bottom: 0;
     /* Evita “salto” logo → 1.º item: cada rota remonta o Sidebar e a PNG pode vir com altura 0 até decodificar */
-    min-height: clamp(120px, 11vw + 92px, 180px);
+    min-height: clamp(156px, 13vw + 120px, 232px);
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: clamp(112px, 12vw + 80px, 168px);
-    min-height: clamp(112px, 12vw + 80px, 168px);
-    max-height: clamp(112px, 12vw + 80px, 168px);
+    height: clamp(148px, 14vw + 108px, 220px);
+    min-height: clamp(148px, 14vw + 108px, 220px);
+    max-height: clamp(148px, 14vw + 108px, 220px);
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -668,16 +668,16 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     width: 100%;
     margin-bottom: clamp(6px, 0.5vw + 4px, 8px);
     padding-bottom: 0;
-    min-height: clamp(120px, 11vw + 92px, 180px);
+    min-height: clamp(156px, 13vw + 120px, 232px);
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: clamp(112px, 12vw + 80px, 168px);
-    min-height: clamp(112px, 12vw + 80px, 168px);
-    max-height: clamp(112px, 12vw + 80px, 168px);
+    height: clamp(148px, 14vw + 108px, 220px);
+    min-height: clamp(148px, 14vw + 108px, 220px);
+    max-height: clamp(148px, 14vw + 108px, 220px);
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -917,8 +917,8 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
     max-width: 100%;
     margin-bottom: clamp(12px, 2.5vw + 8px, 18px);
     /* Direita reserva área do X absoluto; esquerda mais curta = logo PNG usa mais largura */
-    padding: 8px 48px 12px 10px;
-    min-height: clamp(96px, 24vw + 60px, 140px);
+    padding: 8px 40px 12px 10px;
+    min-height: clamp(126px, 32vw + 76px, 178px);
     gap: 0;
     box-sizing: border-box;
     flex-shrink: 0;
@@ -933,12 +933,12 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: clamp(42px, 10vw + 28px, 48px);
-    height: clamp(42px, 10vw + 28px, 48px);
-    min-width: clamp(42px, 10vw + 28px, 48px);
-    min-height: clamp(42px, 10vw + 28px, 48px);
+    width: clamp(34px, 7vw + 22px, 40px);
+    height: clamp(34px, 7vw + 22px, 40px);
+    min-width: clamp(34px, 7vw + 22px, 40px);
+    min-height: clamp(34px, 7vw + 22px, 40px);
     padding: 0;
-    border-radius: 14px;
+    border-radius: 11px;
     border: 1px solid transparent;
     background: rgba(255, 255, 255, 0.08);
     color: rgba(248, 250, 252, 0.92);
@@ -973,8 +973,8 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn svg,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn svg {
-    width: 26px;
-    height: 26px;
+    width: 17px;
+    height: 17px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
@@ -2767,7 +2767,7 @@ body[data-theme='dark'] .agenda-page .agenda-event__local {
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
     min-height: 0;
-    align-items: center;
+    align-items: flex-start;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero > * {
@@ -2927,6 +2927,17 @@ body[data-theme='dark'] .agenda-page .agenda-event__local {
     background: rgba(22, 28, 38, 0.68) !important;
     -webkit-backdrop-filter: blur(14px) saturate(1.05) !important;
     backdrop-filter: blur(14px) saturate(1.05) !important;
+  }
+
+  /* Ajustes — hero chapado #000 como hubs desktop / Pagamento (sem vidro azulado) */
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    border: 0.5px solid rgba(255, 255, 255, 0.08) !important;
+    background: #000000 !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
 
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero::after,

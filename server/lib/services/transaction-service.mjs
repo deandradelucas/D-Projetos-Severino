@@ -11,7 +11,7 @@ export const TransactionService = {
    * Cria uma nova transação e processa efeitos colaterais (recorrência, etc).
    * @param {string} userId titular de dados (conta familiar)
    * @param {object} payload corpo validado
-   * @param {{ lancadoPorUsuarioId?: string | null }} [opts] membro que lançou (conta familiar); omitir se titular
+   * @param {{ lancadoPorUsuarioId?: string | null }} [opts] utilizador que registrou o lançamento (titular ou membro familiar)
    */
   async createTransaction(userId, payload, opts = {}) {
     if (!userId) throw new Error('ID do usuário é obrigatório.')

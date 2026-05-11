@@ -44,3 +44,29 @@ export function readHorizonteUserPainelState() {
     id: u.id != null ? String(u.id).trim() : '',
   }
 }
+
+/**
+ * Exibir "Lançado por …" nas listas quando há conta familiar partilhada (titular com ≥1 vinculado ou utilizador membro).
+ * Definido em `buildAssinaturaUsuarioPayload` → `familia_mostrar_quem_lancou` (login / GET /api/assinatura/status).
+ */
+export function familiaMostrarQuemLancouNaUi(usuario) {
+  if (!usuario || typeof usuario !== 'object') return false
+  if (usuario.familia_mostrar_quem_lancou === true) return true
+  // Sessões antigas sem o campo: membro já partilha dados com o titular.
+  if (usuario.conta_familiar_membro === true) return true
+  return false
+}
+
+/** Atualiza estado quando `AppSessionOutlet` ou outra parte grava sessão e dispara o evento. */
+export function subscribeHorizonteSessionRefresh(callback) {
+  if (typeof window === 'undefined') return () => {}
+  const handler = () => {
+    try {
+      callback(readHorizonteUser())
+    } catch {
+      callback(null)
+    }
+  }
+  window.addEventListener('horizonte-session-refresh', handler)
+  return () => window.removeEventListener('horizonte-session-refresh', handler)
+}

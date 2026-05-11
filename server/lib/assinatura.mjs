@@ -1,7 +1,7 @@
 import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { isSuperAdminEmail } from './super-admin.mjs'
-import { resolveEscopoUsuario } from './conta-familiar.mjs'
+import { resolveEscopoUsuario, countVinculosFamiliaTitular } from './conta-familiar.mjs'
 import { isAsaasForbiddenError, urlPortalAssinaturaAsaasPadrao } from './asaas.mjs'
 import {
   sincronizarPagamentosPendentesDoUsuario,
@@ -96,6 +96,20 @@ function addDaysIso(days) {
   const d = new Date()
   d.setUTCDate(d.getUTCDate() + days)
   return d.toISOString()
+}
+
+/** Nome (ou identificador) do titular para quem é membro da conta familiar — sessão/UI. */
+function pickTitularNomeExibicao(row) {
+  if (!row || typeof row !== 'object') return null
+  const nome = typeof row.nome === 'string' ? row.nome.trim() : ''
+  if (nome) return nome
+  const usuario = typeof row.usuario === 'string' ? row.usuario.trim() : ''
+  if (usuario) return usuario
+  const email = typeof row.email === 'string' ? row.email.trim().toLowerCase() : ''
+  if (!email) return null
+  const at = email.indexOf('@')
+  if (at > 0) return email.slice(0, at)
+  return email
 }
 
 /**
@@ -251,6 +265,19 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
 
   const membroConta = Boolean(escopoMembro?.isMembroConta && billingUid !== uid)
 
+  let familiaMostrarQuemLancou = false
+  try {
+    if (membroConta) familiaMostrarQuemLancou = true
+    else {
+      const n = await countVinculosFamiliaTitular(billingUid)
+      familiaMostrarQuemLancou = n > 0
+    }
+  } catch (e) {
+    log.warn('[buildAssinaturaUsuarioPayload] familia_mostrar_quem_lancou:', e?.message || e)
+  }
+
+  const familiaQuemLancouPayload = { familia_mostrar_quem_lancou: familiaMostrarQuemLancou }
+
   let trialEnds = null
   try {
     trialEnds = await ensureTrialIniciado(billingUid)
@@ -281,6 +308,30 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   })
 
   row = await fetchAssinaturaCamposUsuario(billingUid)
+
+  let contaFamiliarTitularNome = null
+  if (membroConta && billingUid) {
+    try {
+      const supabase = getSupabaseAdmin()
+      const tid = String(billingUid).trim()
+      const { data: titRow, error: titErr } = await supabase
+        .from('usuarios')
+        .select('nome, usuario, email')
+        .eq('id', tid)
+        .maybeSingle()
+      if (titErr) {
+        log.warn('[buildAssinaturaUsuarioPayload] titular row:', titErr.message || titErr)
+      } else if (titRow) {
+        contaFamiliarTitularNome = pickTitularNomeExibicao(titRow)
+      }
+    } catch (e) {
+      log.warn('[buildAssinaturaUsuarioPayload] conta_familiar_titular_nome:', e?.message || e)
+    }
+  }
+
+  const familiaTitularNomePayload = membroConta
+    ? { conta_familiar_titular_nome: contaFamiliarTitularNome }
+    : { conta_familiar_titular_nome: null }
 
   const emailParaFlags = row.email ?? emailParaFlagsEarly ?? ''
   const isentoDb = await resolveIsentoPagamentoEscopo(uid, billingUid)
@@ -330,6 +381,8 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
       conta_familiar_membro: membroConta || undefined,
       familia_papel: escopoMembro?.familiaPapel ?? undefined,
       conta_familiar_titular_id: membroConta ? billingUid : undefined,
+      ...familiaQuemLancouPayload,
+      ...familiaTitularNomePayload,
     }
   }
 
@@ -359,6 +412,8 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   if (membroConta) {
     return {
       ...base,
+      ...familiaQuemLancouPayload,
+      ...familiaTitularNomePayload,
       mostrar_bem_vindo_assinatura: false,
       conta_familiar_membro: true,
       familia_papel: escopoMembro?.familiaPapel ?? null,
@@ -366,7 +421,7 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     }
   }
 
-  return base
+  return { ...base, ...familiaQuemLancouPayload, ...familiaTitularNomePayload }
 }
 
 export async function marcarBemVindoPagamentoVisto(usuarioId) {

@@ -11,7 +11,15 @@ import {
   removerMembroFamilia,
   resolveEscopoUsuario,
   revogarConviteFamilia,
+  titularUsuarioIdParaGestaoFamilia,
 } from '../lib/conta-familiar.mjs'
+
+const MSG_GESTAO_FAMILIA = 'Apenas o titular da conta pode gerir convites e membros da família.'
+
+function titularGestaoOu403(escopo) {
+  const tid = titularUsuarioIdParaGestaoFamilia(escopo)
+  return tid ? { ok: true, titularId: tid } : { ok: false }
+}
 import { isUuidString } from '../lib/transacao-validate.mjs'
 
 export function registerFamiliaRoutes(app) {
@@ -37,7 +45,8 @@ export function registerFamiliaRoutes(app) {
       const usuarioId = c.req.header('x-user-id')
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
-      if (parsed.escopo.isMembroConta) {
+      const gestao = titularGestaoOu403(parsed.escopo)
+      if (!gestao.ok) {
         return c.json({ message: 'Apenas o titular da conta pode criar convites.' }, 403)
       }
 
@@ -52,7 +61,7 @@ export function registerFamiliaRoutes(app) {
         body = {}
       }
       const papel = String(body?.papel || 'MEMBER').toUpperCase()
-      const criado = await criarConviteFamilia(parsed.actorId, papel)
+      const criado = await criarConviteFamilia(gestao.titularId, papel)
       return c.json({
         message: 'Convite criado. Envie o link ou o código ao familiar — ele só aparece uma vez.',
         convite: criado.convite,
@@ -70,10 +79,9 @@ export function registerFamiliaRoutes(app) {
       const usuarioId = c.req.header('x-user-id')
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
-      if (parsed.escopo.isMembroConta) {
-        return c.json({ message: 'Apenas o titular lista convites.' }, 403)
-      }
-      const lista = await listarConvitesPendentes(parsed.actorId)
+      const gestao = titularGestaoOu403(parsed.escopo)
+      if (!gestao.ok) return c.json({ message: MSG_GESTAO_FAMILIA }, 403)
+      const lista = await listarConvitesPendentes(gestao.titularId)
       return c.json({ convites: lista })
     } catch (error) {
       log.error('familia listar convites', error)
@@ -88,14 +96,13 @@ export function registerFamiliaRoutes(app) {
       const usuarioId = c.req.header('x-user-id')
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
-      if (parsed.escopo.isMembroConta) {
-        return c.json({ message: 'Apenas o titular revoga convites.' }, 403)
-      }
-      await revogarConviteFamilia(parsed.actorId, id)
-      return c.json({ message: 'Convite revogado.' })
+      const gestao = titularGestaoOu403(parsed.escopo)
+      if (!gestao.ok) return c.json({ message: MSG_GESTAO_FAMILIA }, 403)
+      await revogarConviteFamilia(gestao.titularId, id)
+      return c.json({ message: 'Convite removido.' })
     } catch (error) {
       log.error('familia revogar convite', error)
-      return c.json({ message: error.message || 'Erro ao revogar.' }, 400)
+      return c.json({ message: error.message || 'Erro ao remover convite.' }, 400)
     }
   })
 
@@ -104,10 +111,9 @@ export function registerFamiliaRoutes(app) {
       const usuarioId = c.req.header('x-user-id')
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
-      if (parsed.escopo.isMembroConta) {
-        return c.json({ message: 'Apenas o titular gerencia membros.' }, 403)
-      }
-      const membros = await listarMembrosFamilia(parsed.actorId)
+      const gestao = titularGestaoOu403(parsed.escopo)
+      if (!gestao.ok) return c.json({ message: MSG_GESTAO_FAMILIA }, 403)
+      const membros = await listarMembrosFamilia(gestao.titularId)
       return c.json({ membros })
     } catch (error) {
       log.error('familia listar membros', error)
@@ -122,10 +128,9 @@ export function registerFamiliaRoutes(app) {
       const usuarioId = c.req.header('x-user-id')
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
-      if (parsed.escopo.isMembroConta) {
-        return c.json({ message: 'Apenas o titular remove membros.' }, 403)
-      }
-      await removerMembroFamilia(parsed.actorId, membroId)
+      const gestao = titularGestaoOu403(parsed.escopo)
+      if (!gestao.ok) return c.json({ message: MSG_GESTAO_FAMILIA }, 403)
+      await removerMembroFamilia(gestao.titularId, membroId)
       return c.json({ message: 'Membro removido da conta familiar.' })
     } catch (error) {
       log.error('familia remover membro', error)

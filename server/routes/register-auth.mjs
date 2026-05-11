@@ -86,6 +86,8 @@ export function registerAuthRoutes(app) {
           assinatura_asaas_bloqueada: false,
           motivo_bloqueio_acesso: null,
           asaas_portal_url: null,
+          familia_mostrar_quem_lancou: false,
+          conta_familiar_titular_nome: null,
         }
       }
 

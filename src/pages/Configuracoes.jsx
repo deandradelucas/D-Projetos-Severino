@@ -1,14 +1,23 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog'
+import ConfigSelectCustom from '../components/ConfigSelectCustom.jsx'
 import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
+import { montarTextoConviteFamiliaComPwa } from '../lib/familiaConviteMensagemCompartilhavel'
+import { getPublicAppOriginForConvites } from '../lib/publicAppOrigin'
 import { webAuthnSupported, registerWebAuthnCredential } from '../lib/webauthnBrowser'
+
+const PAPEL_CONVITE_OPCOES = [
+  { value: 'MEMBER', label: 'Membro — pode lançar e editar (exceto pagamento do titular)' },
+  { value: 'VIEWER', label: 'Só leitura — não altera transações nem agenda' },
+  { value: 'ADMIN', label: 'Administrador familiar — mesmo nível de escrita que membro' },
+]
 
 export default function Configuracoes() {
   const { theme, setTheme, privacyMode, togglePrivacy } = useTheme()
@@ -75,6 +84,15 @@ export default function Configuracoes() {
       setFamiliaPainelCarregado(false)
       return
     }
+    /* Convidadas/os (qualquer papel) não gerem família na UI — não pedir painel ao servidor */
+    if (perfil?.conta_familiar_membro === true) {
+      setFamiliaTitular(false)
+      setFamiliaMembros([])
+      setFamiliaConvites([])
+      setFamiliaLoadErr(null)
+      setFamiliaPainelCarregado(true)
+      return
+    }
     setFamiliaLoadErr(null)
     try {
       const resM = await fetch(apiUrl('/api/familia/membros'), { headers: { 'x-user-id': usuarioIdHeader } })
@@ -99,7 +117,7 @@ export default function Configuracoes() {
     } finally {
       setFamiliaPainelCarregado(true)
     }
-  }, [usuarioIdHeader])
+  }, [usuarioIdHeader, perfil?.conta_familiar_membro])
 
   useEffect(() => {
     void refreshAssinaturaPerfil()
@@ -111,7 +129,7 @@ export default function Configuracoes() {
 
   useEffect(() => {
     if (!usuarioIdHeader) return
-    fetch('/api/usuarios/perfil', { headers: { 'x-user-id': usuarioIdHeader } })
+    fetch(apiUrl('/api/usuarios/perfil'), { headers: { 'x-user-id': usuarioIdHeader } })
       .then((res) => res.json())
       .then((data) => {
         if (data.perfil) {
@@ -126,10 +144,12 @@ export default function Configuracoes() {
           const u = { ...JSON.parse(localStorage.getItem('horizonte_user') || '{}'), ...data.perfil }
           localStorage.setItem('horizonte_user', JSON.stringify(u))
           window.dispatchEvent(new Event('horizonte-session-refresh'))
+          /* Perfil pode chegar antes da assinatura — repete status para preencher conta_familiar_titular_nome */
+          void refreshAssinaturaPerfil()
         }
       })
       .catch(() => {})
-  }, [usuarioIdHeader])
+  }, [usuarioIdHeader, refreshAssinaturaPerfil])
 
   const loadWebAuthn = useCallback(async () => {
     if (!usuarioIdHeader) return
@@ -205,11 +225,10 @@ export default function Configuracoes() {
     navigator.clipboard.writeText(perfil.email).then(() => showToast('E-mail copiado.')).catch(() => {})
   }
 
-  const podeColarConviteFamilia =
-    Boolean(usuarioIdHeader) &&
-    familiaPainelCarregado &&
-    familiaTitular !== true &&
-    !perfil.conta_familiar_membro
+  const mostrarCampoConviteFamilia =
+    Boolean(usuarioIdHeader) && familiaPainelCarregado && !perfil.conta_familiar_membro
+
+  const podeColarConviteFamilia = mostrarCampoConviteFamilia
 
   const irParaCodigoConviteFamilia = () => {
     document.getElementById('config-secao-convite-familia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -230,10 +249,26 @@ export default function Configuracoes() {
     return 'Membro'
   }
 
+  /** Alinhado ao servidor: 5 pessoas no total = titular + até 4 (membros + convites pendentes válidos). */
+  const FAMILIA_MAX_VINCULADOS_UI = 4
+  const familiaVagasOcupadas = familiaMembros.length + familiaConvites.length
+  const familiaLimiteConvitesAtingido = familiaVagasOcupadas >= FAMILIA_MAX_VINCULADOS_UI
+
+  const convitePublicOrigin = useMemo(() => getPublicAppOriginForConvites(), [])
+
   const loginConviteHref =
     typeof window !== 'undefined' && ultimoTokenConvite
-      ? `${window.location.origin}/login?convite=${encodeURIComponent(ultimoTokenConvite)}`
+      ? `${convitePublicOrigin}/login?convite=${encodeURIComponent(ultimoTokenConvite)}`
       : ''
+
+  const textoConviteCompletoComPwa = useMemo(() => {
+    if (!ultimoTokenConvite || typeof window === 'undefined') return ''
+    return montarTextoConviteFamiliaComPwa({
+      baseUrl: convitePublicOrigin,
+      token: ultimoTokenConvite,
+      titularNome: perfil?.nome,
+    })
+  }, [ultimoTokenConvite, perfil?.nome, convitePublicOrigin])
 
   const criarConviteFamilia = async () => {
     if (!usuarioIdHeader || familiaBusy) return
@@ -270,10 +305,32 @@ export default function Configuracoes() {
         })
         const data = await res.json().catch(() => ({}))
         if (!res.ok) {
-          showToast(data.message || 'Não foi possível revogar.')
+          showToast(data.message || 'Não foi possível remover o convite.')
           return
         }
-        showToast(data.message || 'Convite revogado.')
+        showToast(data.message || 'Convite removido.')
+        await loadFamiliaPainel()
+      } else if (familiaConfirm.type === 'revoke_all') {
+        const ids = familiaConvites.map((c) => c.id).filter(Boolean)
+        let ok = 0
+        let fail = 0
+        for (const id of ids) {
+          const res = await fetch(apiUrl(`/api/familia/convites/${id}`), {
+            method: 'DELETE',
+            headers: { 'x-user-id': usuarioIdHeader },
+          })
+          if (res.ok) ok += 1
+          else fail += 1
+        }
+        if (fail === 0) {
+          showToast(ok === 1 ? 'Convite pendente removido.' : `${ok} convites pendentes removidos.`)
+        } else {
+          showToast(
+            ok > 0
+              ? `Removidos ${ok} convite(s); ${fail} falharam. Atualize a lista e tente de novo.`
+              : 'Não foi possível remover os convites. Tente de novo.',
+          )
+        }
         await loadFamiliaPainel()
       } else if (familiaConfirm.type === 'remove') {
         const res = await fetch(apiUrl(`/api/familia/membros/${familiaConfirm.usuarioId}`), {
@@ -344,9 +401,6 @@ export default function Configuracoes() {
             <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} aria-label="Abrir menu" />
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">Ajustes</h1>
-              <p className="page-configuracoes__hero-lead">
-                Conta, tema, segurança e <strong>código de convite</strong> da conta familiar.
-              </p>
             </div>
           </div>
         </section>
@@ -377,6 +431,25 @@ export default function Configuracoes() {
               </div>
             </div>
 
+            {perfil.conta_familiar_membro ? (
+              <div className="config-membro-familia-row">
+                <p className="config-membro-familia-text">
+                  Membro Familiar de:{' '}
+                  <strong className="config-membro-familia-nome">
+                    {String(perfil.conta_familiar_titular_nome || '').trim() || 'Titular'}
+                  </strong>
+                </p>
+                <button
+                  type="button"
+                  className="config-action-btn config-membro-familia-sair"
+                  disabled={familiaBusy}
+                  onClick={() => setFamiliaConfirm({ type: 'sair' })}
+                >
+                  Sair
+                </button>
+              </div>
+            ) : null}
+
             <div className="config-quick-actions">
               <button type="button" className="config-action-btn" onClick={copiarEmail} disabled={!perfil.email}>
                 Copiar e-mail
@@ -401,34 +474,35 @@ export default function Configuracoes() {
                 </button>
               ) : null}
             </div>
-          </section>
 
-          {familiaPainelCarregado &&
-          usuarioIdHeader &&
-          familiaTitular !== true &&
-          !perfil.conta_familiar_membro ? (
-            <section id="config-secao-convite-familia" className="config-card config-card--full">
-              <div className="config-card-head">
-                <span className="config-card-kicker">Família</span>
-                <h2 className="config-card-title-clean">Código de convite familiar</h2>
-                <p className="config-card-subtitle">
-                  Insira abaixo o <strong>código</strong> ou o <strong>link</strong> enviado pelo titular. Quando aparecer “Convite válido”, use{' '}
-                  <strong>Vincular à esta conta</strong> — não precisa repetir na tela de login.
-                </p>
+            {mostrarCampoConviteFamilia ? (
+              <div id="config-secao-convite-familia" className="config-familia-no-perfil">
+                <div className="config-card-head">
+                  <span className="config-card-kicker">Família</span>
+                  <h3 className="config-subsection__title">Código de convite familiar</h3>
+                  <p className="config-card-subtitle">
+                    Use o campo abaixo para colar o <strong>código</strong> ou o <strong>link</strong> enviado pelo titular. Não precisa ir à tela de login.
+                  </p>
+                </div>
+                {familiaTitular === true ? (
+                  <p className="config-empty-note" style={{ marginBottom: '12px' }}>
+                    Você já é <strong>titular</strong> de uma conta familiar. Aceitar outro convite pode exigir transferir a titularidade ou sair dos vínculos atuais — se o sistema recusar, contacte o suporte.
+                  </p>
+                ) : null}
+                <FamiliaConviteColarBlock
+                  idPrefix="config-familia-convite"
+                  usuarioIdParaAceitar={usuarioIdHeader}
+                  visualVariant="shell"
+                  onAceitarSucesso={(data) => {
+                    showToast(data?.message || 'Convite familiar aceito.')
+                    void refreshAssinaturaPerfil()
+                    void loadFamiliaPainel()
+                  }}
+                  onAceitarErro={(msg) => showToast(msg)}
+                />
               </div>
-              <FamiliaConviteColarBlock
-                idPrefix="config-familia-convite"
-                usuarioIdParaAceitar={usuarioIdHeader}
-                ocultarTituloBloco
-                onAceitarSucesso={(data) => {
-                  showToast(data?.message || 'Convite familiar aceito.')
-                  void refreshAssinaturaPerfil()
-                  void loadFamiliaPainel()
-                }}
-                onAceitarErro={(msg) => showToast(msg)}
-              />
-            </section>
-          ) : null}
+            ) : null}
+          </section>
 
           {familiaTitular === true && (
             <section className="config-card config-card--full">
@@ -436,61 +510,53 @@ export default function Configuracoes() {
                 <span className="config-card-kicker">Família</span>
                 <h2 className="config-card-title-clean">Conta familiar</h2>
                 <p className="config-card-subtitle">
-                  Convites com link ou código curto, validade e revogação. Cada familiar usa login próprio; você define o papel (leitura ou lançamentos).
+                  Convites com link ou código curto, validade e revogação. Cada familiar usa login próprio para ver e lançar dados; só o <strong>titular</strong> gere convites e membros aqui — quem foi convidado não altera estas definições.{' '}
+                  <strong>Limite:</strong> 5 pessoas no total (titular + até 4 vinculados). Convites pendentes ocupam vaga até aceitos, expirarem ou serem removidos.
                 </p>
               </div>
 
               {familiaLoadErr ? <p className="config-empty-note">{familiaLoadErr}</p> : null}
 
-              <div className="config-field-grid" style={{ marginBottom: '1rem' }}>
-                <label className="config-field" htmlFor="familia-papel-convite">
+              <div className="config-familia-generate-row">
+                <label className="config-field config-field--stretch" htmlFor="familia-papel-convite">
                   <span>Papel do próximo convite</span>
-                  <select
+                  <ConfigSelectCustom
                     id="familia-papel-convite"
-                    className="config-action-btn"
-                    style={{ width: '100%', cursor: 'pointer' }}
                     value={novoConvitePapel}
-                    onChange={(e) => setNovoConvitePapel(e.target.value)}
+                    onChange={setNovoConvitePapel}
+                    options={PAPEL_CONVITE_OPCOES}
                     disabled={familiaBusy}
-                  >
-                    <option value="MEMBER">Membro — pode lançar e editar (exceto pagamento do titular)</option>
-                    <option value="VIEWER">Só leitura — não altera transações nem agenda</option>
-                    <option value="ADMIN">Administrador familiar — mesmo nível de escrita que membro</option>
-                  </select>
+                  />
                 </label>
+                <div className="config-familia-generate-row__cta">
+                  <button
+                    type="button"
+                    className="config-action-btn config-action-btn--primary"
+                    disabled={familiaBusy || !usuarioIdHeader || familiaLimiteConvitesAtingido}
+                    onClick={() => void criarConviteFamilia()}
+                  >
+                    {familiaBusy ? 'Gerando…' : 'Gerar convite'}
+                  </button>
+                </div>
               </div>
 
-              <div className="config-quick-actions" style={{ marginBottom: '1.25rem' }}>
-                <button
-                  type="button"
-                  className="config-action-btn config-action-btn--primary"
-                  disabled={familiaBusy || !usuarioIdHeader}
-                  onClick={() => void criarConviteFamilia()}
-                >
-                  {familiaBusy ? 'Gerando…' : 'Gerar convite'}
-                </button>
-              </div>
+              {familiaLimiteConvitesAtingido ? (
+                <p className="config-empty-note" style={{ marginTop: '0.65rem' }}>
+                  Limite de <strong>5 pessoas</strong> atingido ({familiaVagasOcupadas} vaga(s) em uso entre membros e convites pendentes). Remova um convite
+                  pendente ou um membro para poder gerar outro convite.
+                </p>
+              ) : null}
 
               {ultimoTokenConvite ? (
-                <div className="config-security-panel" style={{ marginBottom: '1.25rem' }}>
-                  <p className="config-card-subtitle" style={{ marginBottom: '0.5rem' }}>
+                <div className="config-invite-panel">
+                  <p className="config-card-subtitle config-invite-panel__lead">
                     <strong>Guarde agora:</strong> o código só aparece uma vez. Quem receber pode usar o link, colar o código no cadastro ou, já com conta, em{' '}
-                    <strong>Ajustes → Código de convite familiar</strong>.
+                    <strong>Ajustes → Código de convite familiar</strong>. Envie a mensagem abaixo por WhatsApp ou e-mail — inclui o link, o código e como instalar o app na tela inicial.
                   </p>
-                  <div
-                    className="config-field"
-                    style={{
-                      wordBreak: 'break-all',
-                      fontFamily: 'ui-monospace, monospace',
-                      fontSize: '0.85rem',
-                      padding: '0.75rem',
-                      borderRadius: '12px',
-                      background: 'color-mix(in srgb, var(--color-neutral-500, #737373) 8%, transparent)',
-                    }}
-                  >
+                  <div className="config-invite-token" aria-label="Código do convite">
                     {ultimoTokenConvite}
                   </div>
-                  <div className="config-quick-actions" style={{ marginTop: '0.75rem' }}>
+                  <div className="config-invite-actions">
                     <button type="button" className="config-action-btn" onClick={() => copiarTexto(ultimoTokenConvite, 'Código copiado.')}>
                       Copiar código
                     </button>
@@ -499,15 +565,46 @@ export default function Configuracoes() {
                         Copiar link
                       </button>
                     ) : null}
+                    {textoConviteCompletoComPwa ? (
+                      <button
+                        type="button"
+                        className="config-action-btn"
+                        onClick={() => copiarTexto(textoConviteCompletoComPwa, 'Mensagem copiada — cole no WhatsApp ou no e-mail.')}
+                      >
+                        Copiar mensagem completa
+                      </button>
+                    ) : null}
                   </div>
+                  {textoConviteCompletoComPwa ? (
+                    <div className="config-invite-preview-field">
+                      <span id="config-familia-convite-mensagem-pwa-label">Pré-visualização da mensagem</span>
+                      <textarea
+                        id="config-familia-convite-mensagem-pwa"
+                        readOnly
+                        rows={14}
+                        value={textoConviteCompletoComPwa}
+                        className="config-invite-message-preview"
+                        aria-labelledby="config-familia-convite-mensagem-pwa-label"
+                      />
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
 
-              <div className="config-card-head" style={{ marginTop: '0.5rem' }}>
-                <h3 className="config-card-title-clean" style={{ fontSize: '1rem' }}>
-                  Convites pendentes
-                </h3>
-              </div>
+              <div className="config-subsection config-subsection--flush-top">
+                <div className="config-subsection__head">
+                  <h3 className="config-subsection__title">Convites pendentes</h3>
+                  {familiaConvites.length > 0 ? (
+                    <button
+                      type="button"
+                      className="config-action-btn"
+                      disabled={familiaBusy}
+                      onClick={() => setFamiliaConfirm({ type: 'revoke_all' })}
+                    >
+                      Remover todos
+                    </button>
+                  ) : null}
+                </div>
               {familiaConvites.length === 0 ? (
                 <p className="config-empty-note">Nenhum convite ativo.</p>
               ) : (
@@ -524,18 +621,16 @@ export default function Configuracoes() {
                         </small>
                       </span>
                       <button type="button" className="config-action-btn" onClick={() => setFamiliaConfirm({ type: 'revoke', id: c.id })}>
-                        Revogar
+                        Remover
                       </button>
                     </li>
                   ))}
                 </ul>
               )}
-
-              <div className="config-card-head" style={{ marginTop: '1rem' }}>
-                <h3 className="config-card-title-clean" style={{ fontSize: '1rem' }}>
-                  Membros
-                </h3>
               </div>
+
+              <div className="config-subsection">
+                <h3 className="config-subsection__title">Membros</h3>
               {familiaMembros.length === 0 ? (
                 <p className="config-empty-note">Nenhum familiar vinculado ainda.</p>
               ) : (
@@ -556,32 +651,9 @@ export default function Configuracoes() {
                   ))}
                 </ul>
               )}
+              </div>
             </section>
           )}
-
-          {familiaTitular === false && perfil.conta_familiar_membro ? (
-            <section className="config-card config-card--full">
-              <div className="config-card-head">
-                <span className="config-card-kicker">Família</span>
-                <h2 className="config-card-title-clean">Conta vinculada</h2>
-                <p className="config-card-subtitle">
-                  Você acessa os dados da conta do titular com seu próprio login. Papel:{' '}
-                  <strong>{papelFamiliaLabel(perfil.familia_papel)}</strong>.
-                  {String(perfil.familia_papel || '').toUpperCase() === 'VIEWER'
-                    ? ' Alterações em transações e agenda não são permitidas.'
-                    : null}
-                </p>
-              </div>
-              <button
-                type="button"
-                className="config-action-btn"
-                disabled={familiaBusy}
-                onClick={() => setFamiliaConfirm({ type: 'sair' })}
-              >
-                Sair da conta familiar
-              </button>
-            </section>
-          ) : null}
 
           <section className="config-card">
             <div className="config-card-head">
@@ -722,19 +794,25 @@ export default function Configuracoes() {
         open={Boolean(familiaConfirm)}
         title={
           familiaConfirm?.type === 'revoke'
-            ? 'Revogar convite?'
-            : familiaConfirm?.type === 'remove'
-              ? 'Remover familiar?'
-              : 'Sair da conta familiar?'
+            ? 'Remover convite pendente?'
+            : familiaConfirm?.type === 'revoke_all'
+              ? 'Remover todos os convites pendentes?'
+              : familiaConfirm?.type === 'remove'
+                ? 'Remover familiar?'
+                : 'Sair da conta familiar?'
         }
         message={
           familiaConfirm?.type === 'revoke'
             ? 'O link e o código deste convite deixarão de funcionar.'
-            : familiaConfirm?.type === 'remove'
-              ? 'O familiar voltará a ver apenas os dados da própria conta.'
-              : 'Você deixa de acessar os dados do titular; sua conta e seus próprios dados permanecem.'
+            : familiaConfirm?.type === 'revoke_all'
+              ? 'Todos os links e códigos destes convites deixarão de funcionar. Membros já vinculados não são afetados.'
+              : familiaConfirm?.type === 'remove'
+                ? 'O familiar voltará a ver apenas os dados da própria conta.'
+                : 'Você deixa de acessar os dados do titular; sua conta e seus próprios dados permanecem.'
         }
-        confirmLabel={familiaConfirm?.type === 'sair' ? 'Sair' : 'Confirmar'}
+        confirmLabel={
+          familiaConfirm?.type === 'sair' ? 'Sair' : familiaConfirm?.type === 'revoke_all' ? 'Remover todos' : 'Remover'
+        }
         onConfirm={() => void executarFamiliaConfirm()}
         onClose={() => setFamiliaConfirm(null)}
       />
