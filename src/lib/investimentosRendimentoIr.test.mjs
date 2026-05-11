@@ -32,11 +32,11 @@ describe('diasCorridosDesdeIso', () => {
 })
 
 describe('contarDiasUteisComJurosAteYmd', () => {
-  it('alinha com contagem até a mesma data em YYYY-MM-DD', () => {
+  it('alinha com contagem até a mesma data em YYYY-MM-DD (rendimento só após 1.º dia útil pós-aquisição)', () => {
     const ate = contarDiasUteisComJurosAteYmd('2025-06-09', '2025-06-10')
     const ref = contarDiasUteisComJurosDesdeIso('2025-06-09', new Date('2025-06-10T12:00:00'))
     expect(ate).toBe(ref)
-    expect(ate).toBe(2)
+    expect(ate).toBe(1)
   })
 
   it('retorna null se data final inválida', () => {
@@ -52,21 +52,21 @@ describe('diasCorridosEntreReferenciasIso', () => {
 })
 
 describe('contarDiasUteisComJurosDesdeIso', () => {
-  it('no mesmo dia útil conta 1', () => {
-    // Ter 10 jun 2025
-    expect(contarDiasUteisComJurosDesdeIso('2025-06-10', new Date('2025-06-10T15:00:00'))).toBe(1)
+  it('no dia da aquisição não rende — mesmo dia útil conta 0', () => {
+    // Ter 10 jun 2025 — próximo pregão = qua 11
+    expect(contarDiasUteisComJurosDesdeIso('2025-06-10', new Date('2025-06-10T15:00:00'))).toBe(0)
   })
 
-  it('intervalo inclusivo: segunda e terça = 2 dias úteis', () => {
-    expect(contarDiasUteisComJurosDesdeIso('2025-06-09', new Date('2025-06-10T12:00:00'))).toBe(2)
+  it('do 2.º dia útil após aquisição: segunda → terça = 1 dia útil', () => {
+    expect(contarDiasUteisComJurosDesdeIso('2025-06-09', new Date('2025-06-10T12:00:00'))).toBe(1)
   })
 
-  it('ignora fim de semana entre as datas (sexta + segunda)', () => {
-    expect(contarDiasUteisComJurosDesdeIso('2025-06-06', new Date('2025-06-09T23:59:59'))).toBe(2)
+  it('sexta aplica; só segunda seguinte rende → 1 dia útil', () => {
+    expect(contarDiasUteisComJurosDesdeIso('2025-06-06', new Date('2025-06-09T23:59:59'))).toBe(1)
   })
 
-  it('Sexta-feira Santa não conta; quinta anterior conta', () => {
-    expect(contarDiasUteisComJurosDesdeIso('2025-04-17', new Date('2025-04-18T12:00:00'))).toBe(1)
+  it('sexta Santa + Sexta-feira Santa: primeiro pregão após quinta é segunda seguinte', () => {
+    expect(contarDiasUteisComJurosDesdeIso('2025-04-17', new Date('2025-04-18T12:00:00'))).toBe(0)
   })
 
   it('retorna null para ISO inválido', () => {

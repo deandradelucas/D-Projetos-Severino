@@ -4,13 +4,6 @@ import DatePickerBrPopover from './DatePickerBrPopover'
 import { maskDateBrInput, parseDdMmYyyyStrict, ymdToDdMmYyyy } from '../../lib/dateInputBr'
 import { parsePercentualCdiInput } from '../../lib/percentualCdiInput'
 import { INVESTIMENTOS_PRESETS_LIST } from '../../lib/investimentosPresets'
-import { formatCurrencyBRL } from '../../lib/formatCurrency'
-import {
-  clampMultiplicadorMeta,
-  deltaPatrimonialMedioDiarioLinear,
-  diasCorridosEntreYmd,
-  taxaAnualEquivalenteParaMultiplo,
-} from '../../lib/investimentosMetaRapida'
 import { filtrarInstituicoesFinanceiras, labelTipoInstituicao } from '../../lib/instituicoesFinanceiras'
 
 function percentualGravadoParaInput(raw) {
@@ -81,17 +74,9 @@ function brVencimentoInicial(edit) {
  *   onSubmit: (payload: { instituicao_nome: string, preset?: string, nome_custom?: string, valor_investido: number, percentual_cdi: number, data_aquisicao: string, data_vencimento: string | null }) => Promise<void>
  *   submitting?: boolean
  *   initialEdit?: { id: string, instituicao_nome?: string | null, tipo_preset?: string | null, nome?: string | null, valor_investido?: number | null, percentual_cdi?: number | null, data_aquisicao?: string | null, data_vencimento?: string | null } | null
- *   carteiraTotalInvestido?: number
  * }} props
  */
-export default function InvestimentoNovoModal({
-  open,
-  onClose,
-  onSubmit,
-  submitting = false,
-  initialEdit = null,
-  carteiraTotalInvestido = 0,
-}) {
+export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitting = false, initialEdit = null }) {
   const titleId = useId()
   const instListId = useId()
   const instInputId = useId()
@@ -144,35 +129,11 @@ export default function InvestimentoNovoModal({
   )
   const [pickerAquisicaoOpen, setPickerAquisicaoOpen] = useState(false)
   const [pickerVencimentoOpen, setPickerVencimentoOpen] = useState(false)
-  const [metaMultiplicador, setMetaMultiplicador] = useState(3)
-  const [metaRapidaEditando, setMetaRapidaEditando] = useState(false)
 
   const instituicoesFiltradas = useMemo(() => filtrarInstituicoesFinanceiras(instQuery), [instQuery])
 
   const dataAquisicaoYmd = useMemo(() => parseDdMmYyyyStrict(dataAquisicaoBr), [dataAquisicaoBr])
   const dataVencimentoYmd = useMemo(() => parseDdMmYyyyStrict(dataVencimentoBr), [dataVencimentoBr])
-
-  const carteiraOk = Number.isFinite(carteiraTotalInvestido) && carteiraTotalInvestido > 0
-
-  const diasMetaRapida = useMemo(() => {
-    if (!dataAquisicaoYmd || !dataVencimentoYmd) return null
-    return diasCorridosEntreYmd(dataAquisicaoYmd, dataVencimentoYmd)
-  }, [dataAquisicaoYmd, dataVencimentoYmd])
-
-  const pctAaEquivMeta = useMemo(() => {
-    if (diasMetaRapida == null) return null
-    return taxaAnualEquivalenteParaMultiplo(metaMultiplicador, diasMetaRapida)
-  }, [diasMetaRapida, metaMultiplicador])
-
-  const deltaMedioDiaMeta = useMemo(() => {
-    if (!carteiraOk || diasMetaRapida == null) return null
-    return deltaPatrimonialMedioDiarioLinear(carteiraTotalInvestido, metaMultiplicador, diasMetaRapida)
-  }, [carteiraOk, carteiraTotalInvestido, diasMetaRapida, metaMultiplicador])
-
-  const valorSugeridoMeta = useMemo(() => {
-    if (!carteiraOk) return null
-    return Math.round(carteiraTotalInvestido * metaMultiplicador * 100) / 100
-  }, [carteiraOk, carteiraTotalInvestido, metaMultiplicador])
 
   useEffect(() => {
     return () => {
@@ -235,8 +196,6 @@ export default function InvestimentoNovoModal({
       setNomePersonalizadoExpandido(
         Boolean(initialEdit?.id) && !initialEdit?.tipo_preset && String(initialEdit?.nome ?? '').trim().length > 0,
       )
-      setMetaMultiplicador(3)
-      setMetaRapidaEditando(false)
       setFormError('')
     })
     return () => window.cancelAnimationFrame(id)
@@ -643,78 +602,6 @@ export default function InvestimentoNovoModal({
                 Preencha se souber quando vence — o app mostrará o prazo restante e usará esta data no simulador.
               </p>
             </div>
-
-            {!editando && carteiraOk ? (
-              <div className="page-investimentos-modal__meta-rapida" aria-labelledby={`${valorInputId}-meta-title`}>
-                <div className="page-investimentos-modal__meta-rapida-head">
-                  <span id={`${valorInputId}-meta-title`} className="page-investimentos-modal__meta-rapida-title">
-                    Meta rápida pela carteira
-                  </span>
-                  <button
-                    type="button"
-                    className="page-investimentos-modal__meta-rapida-edit"
-                    disabled={submitting}
-                    onClick={() => setMetaRapidaEditando((v) => !v)}
-                  >
-                    {metaRapidaEditando ? 'Fechar' : 'Editar'}
-                  </button>
-                </div>
-                <p className="page-investimentos-modal__meta-rapida-lead">
-                  Somando o que já está cadastrado: <strong>{formatCurrencyBRL(carteiraTotalInvestido)}</strong>
-                  {' · '}
-                  meta ilustrativa <strong>{metaMultiplicador}×</strong> →{' '}
-                  <strong>{valorSugeridoMeta != null ? formatCurrencyBRL(valorSugeridoMeta) : '—'}</strong>
-                </p>
-                {metaRapidaEditando ? (
-                  <div className="page-investimentos-modal__meta-rapida-edit-row">
-                    <label htmlFor={`${valorInputId}-meta-mult`} className="page-investimentos-modal__meta-rapida-edit-label">
-                      Multiplicador (1 a 50)
-                    </label>
-                    <input
-                      id={`${valorInputId}-meta-mult`}
-                      type="number"
-                      min={1}
-                      max={50}
-                      step={0.5}
-                      className="page-investimentos-modal__input page-investimentos-modal__meta-rapida-mult-input"
-                      disabled={submitting}
-                      value={metaMultiplicador}
-                      onChange={(e) => setMetaMultiplicador(clampMultiplicadorMeta(e.target.value))}
-                    />
-                  </div>
-                ) : null}
-                <dl className="page-investimentos-modal__meta-rapida-stats">
-                  <div className="page-investimentos-modal__meta-rapida-stat">
-                    <dt>% a.a. equivalente</dt>
-                    <dd>
-                      {pctAaEquivMeta != null
-                        ? `${pctAaEquivMeta.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
-                        : 'Preencha vencimento'}
-                    </dd>
-                  </div>
-                  <div className="page-investimentos-modal__meta-rapida-stat">
-                    <dt>Média/dia (linear)</dt>
-                    <dd>
-                      {deltaMedioDiaMeta != null ? formatCurrencyBRL(deltaMedioDiaMeta) : 'Preencha vencimento'}
-                    </dd>
-                  </div>
-                </dl>
-                <p className="page-investimentos-modal__meta-rapida-hint">
-                  Usa o prazo entre <strong>aquisição</strong> e <strong>vencimento</strong> deste investimento (dias corridos).
-                  Não considera IR nem CDI real — só para visualizar ordem de grandeza.
-                </p>
-                <button
-                  type="button"
-                  className="page-investimentos-modal__meta-rapida-apply btn-secondary"
-                  disabled={submitting || valorSugeridoMeta == null}
-                  onClick={() => {
-                    if (valorSugeridoMeta != null) setValorInput(valorToMaskedBRL(valorSugeridoMeta))
-                  }}
-                >
-                  Usar valor sugerido no campo
-                </button>
-              </div>
-            ) : null}
 
             {/* Taxa */}
             <div className="page-investimentos-modal__section">
