@@ -55,18 +55,12 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     handleSubmit,
   } = useTransactionForm({ usuarioId, editingTransaction, isOpen, categorias, onSave, onClose })
 
-  // Inicializa o formulário e busca categorias ao abrir
+  // Inicializa o formulário e busca categorias ao abrir (sem focus no valor — no Android o focus abria o teclado só de abrir o modal)
   useEffect(() => {
     if (!isOpen || !usuarioId) return
     fetchCategorias()
     initForm()
-    setTimeout(() => {
-      const el = valorInputRef.current
-      if (!el) return
-      el.focus()
-      scrollValorIntoView()
-    }, 120)
-  }, [isOpen, usuarioId, editingTransaction?.id, fetchCategorias, initForm, scrollValorIntoView])
+  }, [isOpen, usuarioId, editingTransaction?.id, fetchCategorias, initForm])
 
   // Trava scroll do body enquanto modal está aberto
   useEffect(() => {

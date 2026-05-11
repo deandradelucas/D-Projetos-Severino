@@ -912,13 +912,14 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* flex-start: sem faixa vazia entre logo e Dashboard (antes center + min-height alto empurravam o menu) */
+    justify-content: flex-start;
     width: 100%;
     max-width: 100%;
-    margin-bottom: clamp(12px, 2.5vw + 8px, 18px);
+    margin-bottom: clamp(6px, 1vw + 3px, 10px);
     /* Direita reserva área do X absoluto; esquerda mais curta = logo PNG usa mais largura */
-    padding: 8px 40px 12px 10px;
-    min-height: clamp(126px, 32vw + 76px, 178px);
+    padding: max(6px, env(safe-area-inset-top, 0px)) 40px 6px 10px;
+    min-height: 0;
     gap: 0;
     box-sizing: border-box;
     flex-shrink: 0;
