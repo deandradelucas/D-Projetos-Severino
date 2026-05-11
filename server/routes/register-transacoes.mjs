@@ -99,7 +99,10 @@ export function registerTransacoesRoutes(app) {
         return c.json({ message: val.message }, 400)
       }
 
-      const data = await TransactionService.createTransaction(parsed.dataUsuarioId, body)
+      const lancadoPor = parsed.escopo.isMembroConta ? parsed.actorId : null
+      const data = await TransactionService.createTransaction(parsed.dataUsuarioId, body, {
+        lancadoPorUsuarioId: lancadoPor,
+      })
 
       return c.json({ message: 'Transação inserida com sucesso.', data }, 201)
     } catch (error) {

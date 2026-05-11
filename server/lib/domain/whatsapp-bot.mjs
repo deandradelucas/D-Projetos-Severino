@@ -347,6 +347,9 @@ export async function processarMensagemBot(phone, rawMessage) {
 
   const { iso: dataTransacaoIso, explicit: dataExplicita } = resolveDataTransacaoParaBot(parsed)
   try {
+    const actorUid = usuario?.id ? String(usuario.id).trim() : ''
+    const lancadoPor =
+      actorUid && actorUid !== String(dataUsuarioId || '').trim() ? actorUid : undefined
     await inserirTransacao({
       usuario_id: dataUsuarioId,
       tipo: parsed.tipo,
@@ -356,6 +359,7 @@ export async function processarMensagemBot(phone, rawMessage) {
       status: 'EFETIVADA',
       categoria_id: parsed.categoria_id || undefined,
       subcategoria_id: parsed.subcategoria_id || undefined,
+      ...(lancadoPor ? { lancado_por_usuario_id: lancadoPor } : {}),
     })
   } catch (e) {
     log.error('[whatsapp-bot] inserirTransacao error', e)

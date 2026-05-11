@@ -9,12 +9,17 @@ import { criarRegraRecorrenciaDia1 } from '../recorrencias-mensais.mjs'
 export const TransactionService = {
   /**
    * Cria uma nova transação e processa efeitos colaterais (recorrência, etc).
+   * @param {string} userId titular de dados (conta familiar)
+   * @param {object} payload corpo validado
+   * @param {{ lancadoPorUsuarioId?: string | null }} [opts] membro que lançou (conta familiar); omitir se titular
    */
-  async createTransaction(userId, payload) {
+  async createTransaction(userId, payload, opts = {}) {
     if (!userId) throw new Error('ID do usuário é obrigatório.')
 
     // 1. Garantir o ID do usuário no payload
+    const lp = opts.lancadoPorUsuarioId ? String(opts.lancadoPorUsuarioId).trim() : ''
     const dataToInsert = { ...payload, usuario_id: userId }
+    if (lp) dataToInsert.lancado_por_usuario_id = lp
 
     // 2. Persistência básica
     let transaction = await inserirTransacao(dataToInsert)

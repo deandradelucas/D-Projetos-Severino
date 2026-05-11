@@ -289,6 +289,11 @@ export default function Dashboard() {
                           <time className="ref-tx-date" dateTime={dateTimeAttr}>
                             {dateLine}
                           </time>
+                          {t.lancado_por_nome ? (
+                            <span className={`ref-tx-lancador ${privacyMode ? 'privacy-blur' : ''}`}>
+                              Por {t.lancado_por_nome}
+                            </span>
+                          ) : null}
                         </div>
                         <div className="ref-tx-cat-cell">
                           <span className="ref-tx-field-label">Categoria</span>
