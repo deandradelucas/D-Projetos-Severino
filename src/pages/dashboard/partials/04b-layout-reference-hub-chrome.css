@@ -251,6 +251,21 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   font-size: clamp(0.8125rem, 0.3vw + 0.68rem, 0.9375rem);
 }
 
+body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-lancador,
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-lancador {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: clamp(0.625rem, 0.22vw + 0.55rem, 0.72rem);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  color: color-mix(in srgb, var(--color-neutral-600, #525252) 88%, transparent);
+}
+
+body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-lancador {
+  color: rgba(255, 255, 255, 0.42);
+}
+
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text,
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text,

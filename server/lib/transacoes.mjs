@@ -179,7 +179,19 @@ async function _syncMissingDefaultCategories(usuario_id, supabaseAdmin, categori
   }
 }
 
-export async function inserirTransacao({ usuario_id, conta_id, categoria_id, subcategoria_id, tipo, valor, descricao, data_transacao, status, recorrencia }) {
+export async function inserirTransacao({
+  usuario_id,
+  conta_id,
+  categoria_id,
+  subcategoria_id,
+  tipo,
+  valor,
+  descricao,
+  data_transacao,
+  status,
+  recorrencia,
+  lancado_por_usuario_id,
+}) {
   const supabaseAdmin = getSupabaseAdmin()
   const valNum = parseFloat(valor)
   
@@ -198,6 +210,8 @@ export async function inserirTransacao({ usuario_id, conta_id, categoria_id, sub
   if (conta_id) basePayload.conta_id = conta_id
   if (categoria_id) basePayload.categoria_id = categoria_id
   if (subcategoria_id) basePayload.subcategoria_id = subcategoria_id
+  const lp = lancado_por_usuario_id ? String(lancado_por_usuario_id).trim() : ''
+  if (lp) basePayload.lancado_por_usuario_id = lp
 
   const payloads = []
   
@@ -242,6 +256,30 @@ export async function inserirTransacao({ usuario_id, conta_id, categoria_id, sub
   return data[0]
 }
 
+async function enrichTransacoesLancadorNome(supabaseAdmin, rows) {
+  if (!rows?.length) return rows
+  const ids = [...new Set(rows.map((r) => r.lancado_por_usuario_id).filter(Boolean).map(String))]
+  if (!ids.length) {
+    return rows.map((r) => ({ ...r, lancado_por_nome: r.lancado_por_nome ?? null }))
+  }
+  const { data: users, error } = await supabaseAdmin.from('usuarios').select('id, nome').in('id', ids)
+  if (error) {
+    log.warn('[enrichTransacoesLancadorNome]', error.message || error)
+    return rows.map((r) => ({ ...r, lancado_por_nome: r.lancado_por_nome ?? null }))
+  }
+  const nomePorId = new Map()
+  for (const u of users || []) {
+    const id = u?.id ? String(u.id) : ''
+    if (!id) continue
+    nomePorId.set(id, u.nome ? String(u.nome).trim() || null : null)
+  }
+  return rows.map((r) => {
+    const lid = r.lancado_por_usuario_id ? String(r.lancado_por_usuario_id) : ''
+    const nome = lid ? nomePorId.get(lid) ?? null : null
+    return { ...r, lancado_por_nome: nome }
+  })
+}
+
 async function enrichTransacoesComCategorias(supabaseAdmin, rows) {
   if (!rows?.length) return []
   const catIds = [...new Set(rows.map((r) => r.categoria_id).filter(Boolean))]
@@ -256,7 +294,7 @@ async function enrichTransacoesComCategorias(supabaseAdmin, rows) {
     const { data: subs } = await supabaseAdmin.from('subcategorias').select('id, nome').in('id', subIds)
     for (const s of subs || []) subMap.set(s.id, { nome: s.nome })
   }
-  return rows.map((r) => ({
+  const mapped = rows.map((r) => ({
     id: r.id,
     tipo: r.tipo,
     valor: r.valor,
@@ -265,6 +303,7 @@ async function enrichTransacoesComCategorias(supabaseAdmin, rows) {
     status: r.status,
     categoria_id: r.categoria_id,
     subcategoria_id: r.subcategoria_id,
+    lancado_por_usuario_id: r.lancado_por_usuario_id ?? null,
     recorrente_grupo_id: r.recorrente_grupo_id ?? null,
     recorrente_index: r.recorrente_index ?? null,
     recorrente_total: r.recorrente_total ?? null,
@@ -272,6 +311,7 @@ async function enrichTransacoesComCategorias(supabaseAdmin, rows) {
     categorias: r.categoria_id ? catMap.get(r.categoria_id) ?? null : null,
     subcategorias: r.subcategoria_id ? subMap.get(r.subcategoria_id) ?? null : null,
   }))
+  return await enrichTransacoesLancadorNome(supabaseAdmin, mapped)
 }
 
 function parseTransacoesListPagination(filters) {
@@ -318,6 +358,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
   const selectComEmbed = `
       id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id,
       recorrente_grupo_id, recorrente_index, recorrente_total, recorrencia_mensal_id,
+      lancado_por_usuario_id,
       categorias(nome, cor),
       subcategorias(nome)
     `
@@ -329,7 +370,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
   if (error) {
     log.warn('[getTransacoes] embed falhou, fallback sem join:', error.message || error)
     const baseCols =
-      'id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id, recorrente_grupo_id, recorrente_index, recorrente_total'
+      'id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id, recorrente_grupo_id, recorrente_index, recorrente_total, lancado_por_usuario_id'
 
     let qFlat = applyFilters(
       supabaseAdmin.from('transacoes').select(`${baseCols}, recorrencia_mensal_id`)
@@ -345,12 +386,13 @@ export async function getTransacoes(usuarioId, filters = {}) {
       r2 = await qFlat.order('data_transacao', { ascending: false }).range(off, rangeEnd)
       if (r2.error) throw r2.error
       const rows = (r2.data || []).map((r) => ({ ...r, recorrencia_mensal_id: null }))
-      return enrichTransacoesComCategorias(supabaseAdmin, rows)
+      return await enrichTransacoesComCategorias(supabaseAdmin, rows)
     }
-    return enrichTransacoesComCategorias(supabaseAdmin, r2.data || [])
+    return await enrichTransacoesComCategorias(supabaseAdmin, r2.data || [])
   }
 
-  return Array.isArray(data) ? data : []
+  const rows = Array.isArray(data) ? data : []
+  return await enrichTransacoesLancadorNome(supabaseAdmin, rows)
 }
 
 export async function atualizarTransacao(id, usuarioId, body) {
