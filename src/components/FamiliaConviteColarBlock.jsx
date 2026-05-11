@@ -37,6 +37,8 @@ export default function FamiliaConviteColarBlock({
   onAceitarSucesso,
   onAceitarErro,
   ocultarTituloBloco = false,
+  /** `shell`: mesmo vocabulário visual dos Ajustes (borda/campo da página de config). */
+  visualVariant = 'card',
 }) {
   const [searchParams] = useSearchParams()
   const [raw, setRaw] = useState(readInitialConviteRaw)
@@ -121,47 +123,90 @@ export default function FamiliaConviteColarBlock({
   const areaId = `${idPrefix}-textarea`
   const hintId = `${idPrefix}-hint`
   const modoLogado = Boolean(usuarioIdParaAceitar)
+  const shell = visualVariant === 'shell'
 
-  return (
-    <div className="rounded-[14px] border border-emerald-500/25 bg-emerald-500/[0.06] p-3 sm:p-3.5">
-      <label className="block" htmlFor={areaId}>
-        {ocultarTituloBloco ? (
-          <span className="sr-only">Convite conta familiar</span>
-        ) : (
-          <span className="mb-1.5 block text-[11px] font-semibold text-emerald-900 sm:text-[12px]">
-            Conta familiar — convite (opcional)
-          </span>
-        )}
-        <span id={hintId} className="mb-2 block text-[10px] leading-snug text-neutral-600 sm:text-[11px]">
-          {modoLogado ? (
-            <>
-              Cole o <strong>link</strong> ou só o <strong>código</strong> que o titular enviou. Quando aparecer “Convite válido”, confirme em{' '}
-              <strong>Vincular à esta conta</strong>.
-            </>
-          ) : (
-            <>
-              Cole o <strong>link</strong> ou só o <strong>código</strong> que o titular enviou. Depois faça login ou crie a conta; o vínculo é feito ao entrar.
-            </>
-          )}
-        </span>
+  const fieldShell = (
+    <>
+      <label className="config-familia-convite-shell__field" htmlFor={areaId}>
+        <span>Código de convite</span>
         <textarea
           id={areaId}
           value={raw}
           onChange={(e) => setRaw(e.target.value)}
-          placeholder="https://…/login?convite=… ou cole o código aqui"
-          rows={2}
+          placeholder="Cole o código ou o link (https://…?convite=…)"
+          rows={3}
           aria-describedby={hintId}
-          className="w-full resize-y rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/40 min-h-[52px]"
+          className="config-familia-convite-shell__textarea"
           spellCheck={false}
           autoComplete="off"
         />
       </label>
+      <p id={hintId} className="config-familia-convite-shell__hint">
+        {modoLogado ? (
+          <>
+            Quando aparecer <strong>Convite válido</strong>, confirme em <strong>Vincular à esta conta</strong>.
+          </>
+        ) : (
+          <>
+            Cole o <strong>código</strong> ou o <strong>link</strong>. Depois faça login ou cadastro; o vínculo é aplicado ao entrar.
+          </>
+        )}
+      </p>
+    </>
+  )
+
+  const fieldCard = (
+    <label className="block" htmlFor={areaId}>
+      {ocultarTituloBloco ? (
+        <span className="sr-only">Convite conta familiar</span>
+      ) : (
+        <span className="mb-1.5 block text-[11px] font-semibold text-emerald-900 sm:text-[12px]">
+          Conta familiar — convite (opcional)
+        </span>
+      )}
+      <span id={hintId} className="mb-2 block text-[10px] leading-snug text-neutral-600 sm:text-[11px]">
+        {modoLogado ? (
+          <>
+            Cole o <strong>link</strong> ou só o <strong>código</strong> que o titular enviou. Quando aparecer “Convite válido”, confirme em{' '}
+            <strong>Vincular à esta conta</strong>.
+          </>
+        ) : (
+          <>
+            Cole o <strong>link</strong> ou só o <strong>código</strong> que o titular enviou. Depois faça login ou crie a conta; o vínculo é feito ao entrar.
+          </>
+        )}
+      </span>
+      <textarea
+        id={areaId}
+        value={raw}
+        onChange={(e) => setRaw(e.target.value)}
+        placeholder="https://…/login?convite=… ou cole o código aqui"
+        rows={2}
+        aria-describedby={hintId}
+        className="w-full resize-y rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/40 min-h-[52px]"
+        spellCheck={false}
+        autoComplete="off"
+      />
+    </label>
+  )
+
+  return (
+    <div className={shell ? 'config-familia-convite-shell' : 'rounded-[14px] border border-emerald-500/25 bg-emerald-500/[0.06] p-3 sm:p-3.5'}>
+      {shell ? fieldShell : fieldCard}
 
       {preview?.loading ? (
-        <p className="mt-2 text-[10px] text-neutral-500 sm:text-[11px]">A validar convite…</p>
+        <p className={shell ? 'config-familia-convite-shell__status' : 'mt-2 text-[10px] text-neutral-500 sm:text-[11px]'}>
+          A validar convite…
+        </p>
       ) : null}
       {preview?.ok ? (
-        <div className="mt-2 rounded-[10px] border border-emerald-500/30 bg-white/80 px-2.5 py-2 text-[10px] leading-snug text-emerald-950 sm:text-[11px]">
+        <div
+          className={
+            shell
+              ? 'config-familia-convite-shell__preview-ok'
+              : 'mt-2 rounded-[10px] border border-emerald-500/30 bg-white/80 px-2.5 py-2 text-[10px] leading-snug text-emerald-950 sm:text-[11px]'
+          }
+        >
           <strong className="font-semibold">Convite válido.</strong>{' '}
           {preview.ok.titular_preview?.nome ? (
             <>
@@ -188,16 +233,20 @@ export default function FamiliaConviteColarBlock({
         </div>
       ) : null}
       {preview?.erro ? (
-        <p className="mt-2 text-[10px] text-red-700 sm:text-[11px]">{preview.erro}</p>
+        <p className={shell ? 'config-familia-convite-shell__preview-erro' : 'mt-2 text-[10px] text-red-700 sm:text-[11px]'}>{preview.erro}</p>
       ) : null}
 
       {modoLogado && preview?.ok ? (
-        <div className="mt-3">
+        <div className={shell ? 'config-familia-convite-shell__actions' : 'mt-3'}>
           <button
             type="button"
             disabled={aceitarBusy}
             onClick={() => void handleAceitarAgora()}
-            className="w-full rounded-[12px] bg-emerald-600 px-3 py-2.5 text-[12px] font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2"
+            className={
+              shell
+                ? 'config-action-btn config-action-btn--primary config-familia-convite-shell__btn-full'
+                : 'w-full rounded-[12px] bg-emerald-600 px-3 py-2.5 text-[12px] font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2'
+            }
           >
             {aceitarBusy ? 'A vincular…' : 'Vincular à esta conta'}
           </button>

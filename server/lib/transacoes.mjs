@@ -256,31 +256,42 @@ export async function inserirTransacao({
   return data[0]
 }
 
-async function enrichTransacoesLancadorNome(supabaseAdmin, rows) {
+async function fetchNomeUsuarioResumo(supabaseAdmin, usuarioId) {
+  const uid = String(usuarioId || '').trim()
+  if (!uid) return null
+  const { data, error } = await supabaseAdmin.from('usuarios').select('nome').eq('id', uid).maybeSingle()
+  if (error || !data) return null
+  const n = data.nome != null ? String(data.nome).trim() : ''
+  return n || null
+}
+
+/** Resolve `lancado_por_nome`; sem ID usa nome do titular da conta (lançamentos legados). */
+async function enrichTransacoesLancadorNome(supabaseAdmin, rows, titularFallbackNome = null) {
   if (!rows?.length) return rows
   const ids = [...new Set(rows.map((r) => r.lancado_por_usuario_id).filter(Boolean).map(String))]
-  if (!ids.length) {
-    return rows.map((r) => ({ ...r, lancado_por_nome: r.lancado_por_nome ?? null }))
-  }
-  const { data: users, error } = await supabaseAdmin.from('usuarios').select('id, nome').in('id', ids)
-  if (error) {
-    log.warn('[enrichTransacoesLancadorNome]', error.message || error)
-    return rows.map((r) => ({ ...r, lancado_por_nome: r.lancado_por_nome ?? null }))
-  }
   const nomePorId = new Map()
-  for (const u of users || []) {
-    const id = u?.id ? String(u.id) : ''
-    if (!id) continue
-    nomePorId.set(id, u.nome ? String(u.nome).trim() || null : null)
+  if (ids.length) {
+    const { data: users, error } = await supabaseAdmin.from('usuarios').select('id, nome').in('id', ids)
+    if (error) {
+      log.warn('[enrichTransacoesLancadorNome]', error.message || error)
+    } else {
+      for (const u of users || []) {
+        const id = u?.id ? String(u.id) : ''
+        if (!id) continue
+        nomePorId.set(id, u.nome ? String(u.nome).trim() || null : null)
+      }
+    }
   }
   return rows.map((r) => {
     const lid = r.lancado_por_usuario_id ? String(r.lancado_por_usuario_id) : ''
-    const nome = lid ? nomePorId.get(lid) ?? null : null
-    return { ...r, lancado_por_nome: nome }
+    const nomeFromId = lid ? nomePorId.get(lid) ?? null : null
+    const resolved =
+      nomeFromId ?? (!lid && titularFallbackNome ? titularFallbackNome : null)
+    return { ...r, lancado_por_nome: resolved }
   })
 }
 
-async function enrichTransacoesComCategorias(supabaseAdmin, rows) {
+async function enrichTransacoesComCategorias(supabaseAdmin, rows, titularFallbackNome = null) {
   if (!rows?.length) return []
   const catIds = [...new Set(rows.map((r) => r.categoria_id).filter(Boolean))]
   const subIds = [...new Set(rows.map((r) => r.subcategoria_id).filter(Boolean))]
@@ -311,7 +322,7 @@ async function enrichTransacoesComCategorias(supabaseAdmin, rows) {
     categorias: r.categoria_id ? catMap.get(r.categoria_id) ?? null : null,
     subcategorias: r.subcategoria_id ? subMap.get(r.subcategoria_id) ?? null : null,
   }))
-  return await enrichTransacoesLancadorNome(supabaseAdmin, mapped)
+  return await enrichTransacoesLancadorNome(supabaseAdmin, mapped, titularFallbackNome)
 }
 
 function parseTransacoesListPagination(filters) {
@@ -339,6 +350,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
 
   const { dataInicio, dataFim, tipo, categoria_id, status, busca, somenteRecorrentes } = filters
   const { off, rangeEnd } = parseTransacoesListPagination(filters)
+  const titularNomeLista = await fetchNomeUsuarioResumo(supabaseAdmin, uid)
 
   const applyFilters = (q) => {
     let query = q.eq('usuario_id', uid)
@@ -386,13 +398,13 @@ export async function getTransacoes(usuarioId, filters = {}) {
       r2 = await qFlat.order('data_transacao', { ascending: false }).range(off, rangeEnd)
       if (r2.error) throw r2.error
       const rows = (r2.data || []).map((r) => ({ ...r, recorrencia_mensal_id: null }))
-      return await enrichTransacoesComCategorias(supabaseAdmin, rows)
+      return await enrichTransacoesComCategorias(supabaseAdmin, rows, titularNomeLista)
     }
-    return await enrichTransacoesComCategorias(supabaseAdmin, r2.data || [])
+    return await enrichTransacoesComCategorias(supabaseAdmin, r2.data || [], titularNomeLista)
   }
 
   const rows = Array.isArray(data) ? data : []
-  return await enrichTransacoesLancadorNome(supabaseAdmin, rows)
+  return await enrichTransacoesLancadorNome(supabaseAdmin, rows, titularNomeLista)
 }
 
 export async function atualizarTransacao(id, usuarioId, body) {

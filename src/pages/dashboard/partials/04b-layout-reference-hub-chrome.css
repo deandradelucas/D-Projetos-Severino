@@ -333,13 +333,32 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   flex-shrink: 0;
 }
 
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-main {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-top {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 10px;
+  width: 100%;
+  min-width: 0;
+}
+
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
   flex: 1 1 0%;
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 6px;
+  gap: 0;
 }
 
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
@@ -861,7 +880,12 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
     width: 100%;
     flex-wrap: nowrap;
-    align-items: center;
+    align-items: flex-start;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
+    align-self: flex-start;
+    margin-top: 2px;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
@@ -875,15 +899,17 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
     line-height: 1.12;
   }
 
-  /* Saldo no hero: coluna em mobile — valor completo visível (sem …) */
+  /* Saldo no hero: uma linha em mobile — rótulo + valor lado a lado */
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
     font-size: clamp(0.8125rem, 3.15vw, 0.97rem);
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+    flex: 0 1 auto;
     font-size: clamp(0.97rem, 3.65vw, 1.125rem);
     line-height: 1.15;
   }
@@ -930,28 +956,16 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
   }
 }
 
-/* Dashboard: telemóveis muito estreitos — toolbar do hero em linha própria (saudação com espaço total) */
+/* Dashboard: telemóveis estreitos — saudação + ícones na mesma linha; saldo logo abaixo (sem barra vazia) */
 @media (max-width: 420px) {
-  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    row-gap: 10px;
-  }
-
-  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
-    align-self: center;
-  }
-
-  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
-    flex: 1 1 0;
-    min-width: 0;
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-top {
+    gap: 6px 8px;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions {
-    flex: 1 1 100%;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex: 0 0 auto;
+    flex-shrink: 0;
+    gap: 6px;
   }
 }
 

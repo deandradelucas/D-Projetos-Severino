@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
@@ -10,10 +10,12 @@ import { apiUrl } from '../lib/apiUrl'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import {
+  familiaMostrarQuemLancouNaUi,
   readHorizonteUser,
   readHorizonteUserPainelState,
   readHorizonteUserProfile,
   horizonteUserProfileTemId,
+  subscribeHorizonteSessionRefresh,
 } from '../lib/horizonteSession'
 import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
@@ -34,6 +36,14 @@ export default function Transacoes() {
     const u = readHorizonteUser()
     if (u) setUsuario((prev) => ({ ...prev, ...u }))
   }, [])
+
+  useEffect(() => {
+    return subscribeHorizonteSessionRefresh((u) => {
+      if (u) setUsuario((prev) => ({ ...prev, ...u }))
+    })
+  }, [])
+
+  const mostrarQuemLancou = useMemo(() => familiaMostrarQuemLancouNaUi(usuario), [usuario])
 
   // States
   const { transacoes: cachedTx, fetchTransacoes: syncGlobalCache } = useTransactionCache()
@@ -536,7 +546,7 @@ export default function Transacoes() {
               <div className="ref-tx-table-subgrid ref-tx-table-subgrid--actions">
                 <div className="ref-tx-list-head">
                   <span className="ref-tx-list-head__icon" aria-hidden />
-                  <span className="ref-tx-list-head__meta">Data</span>
+                  <span className="ref-tx-list-head__meta">{mostrarQuemLancou ? 'Data · quem lançou' : 'Data'}</span>
                   <span className="ref-tx-list-head__cat">Categoria</span>
                   <span className="ref-tx-list-head__sub">Subcategoria</span>
                   <span className="ref-tx-list-head__rec" aria-hidden="true" />
@@ -570,9 +580,9 @@ export default function Transacoes() {
                         <time className="ref-tx-date" dateTime={dateTimeAttr}>
                           {dateLine}
                         </time>
-                        {t.lancado_por_nome ? (
-                          <span className={`ref-tx-lancador ${privacyMode ? 'privacy-blur' : ''}`}>
-                            Por {t.lancado_por_nome}
+                        {mostrarQuemLancou && t.lancado_por_nome ? (
+                          <span className={`ref-tx-lancador ${privacyMode ? 'privacy-blur' : ''}`} title="Quem registrou este lançamento">
+                            Lançado por {t.lancado_por_nome}
                           </span>
                         ) : null}
                       </div>

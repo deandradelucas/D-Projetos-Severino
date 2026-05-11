@@ -132,6 +132,8 @@ describe('investimentos.mjs — parseInvestimentoCreateBody', () => {
       valor_investido: 100,
       percentual_cdi: 100,
       data_aquisicao: DATA_PASS,
+      data_vencimento: null,
+      tipo_indexador: 'CDI',
     })
   })
 
@@ -150,6 +152,8 @@ describe('investimentos.mjs — parseInvestimentoCreateBody', () => {
       valor_investido: 50.25,
       percentual_cdi: 105,
       data_aquisicao: DATA_PASS,
+      data_vencimento: null,
+      tipo_indexador: 'CDI',
     })
   })
 

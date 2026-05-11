@@ -4,6 +4,7 @@ import Sidebar from '@components/Sidebar'
 import MobileMenuButton from '@components/MobileMenuButton'
 import RefDashboardScroll from '@components/RefDashboardScroll'
 import PagamentoPainelLateral from '../components/pagamento/PagamentoPainelLateral.jsx'
+import PagamentoOrientacaoCard from '../components/pagamento/PagamentoOrientacaoCard.jsx'
 import PagamentoDetalhesCard from '../components/pagamento/PagamentoDetalhesCard.jsx'
 import PagamentoHistorico from '../components/pagamento/PagamentoHistorico.jsx'
 import PagamentoPixQrModal from '../components/pagamento/PagamentoPixQrModal.jsx'
@@ -380,6 +381,10 @@ export default function Pagamento() {
     historicoLen: historico.length,
   })
 
+  /** Card “Conta isenta” na coluna direita vira bloco abaixo do histórico (exceto conta admin). */
+  const isentaOrientacaoAbaixoHistorico =
+    config.isento_pagamento && painelAssinatura.situacao !== 'admin'
+
   const valorCicloSelecionado = planoCheckout === 'anual' ? precosCatalogo.anual : precosCatalogo.mensal
   const unidadeCiclo = planoCheckout === 'anual' ? 'ano' : 'mês'
 
@@ -415,7 +420,9 @@ export default function Pagamento() {
               </div>
             </section>
 
-            <div className="page-pagamento-layout">
+            <div
+              className={`page-pagamento-layout${isentaOrientacaoAbaixoHistorico ? ' page-pagamento-layout--sem-lateral' : ''}`}
+            >
               <div className="page-pagamento-layout__primary">
                 {dadosErro ? (
                   <div className="pagamento-banner pagamento-banner--danger" role="alert">
@@ -495,12 +502,6 @@ export default function Pagamento() {
                   <p className="pagamento-config-alert">
                     Checkout indisponível: configure <code>ASAAS_API_KEY</code> no servidor.
                   </p>
-                ) : null}
-
-                {config.isento_pagamento && !loading ? (
-                  <div className="pagamento-banner pagamento-banner--success">
-                    <p className="pagamento-banner__title">Conta isenta — sem cobrança.</p>
-                  </div>
                 ) : null}
 
                 {loading && !config.isento_pagamento ? (
@@ -635,6 +636,12 @@ export default function Pagamento() {
                   </div>
                 ) : null}
 
+                {config.isento_pagamento && !loading ? (
+                  <div className="pagamento-banner pagamento-banner--success">
+                    <p className="pagamento-banner__title">Conta isenta — sem cobrança.</p>
+                  </div>
+                ) : null}
+
                 <PagamentoDetalhesCard
                   tituloPlano={titulo}
                   valorCicloSelecionado={valorCicloSelecionado}
@@ -670,9 +677,17 @@ export default function Pagamento() {
                 ) : null}
 
                 <PagamentoHistorico historicoRef={historicoRef} historico={historico} loading={loading} formatCurrency={formatCurrency} />
+
+                {isentaOrientacaoAbaixoHistorico ? (
+                  <PagamentoOrientacaoCard
+                    variant={orientacao.variant}
+                    title={orientacao.title}
+                    body={orientacao.body}
+                  />
+                ) : null}
               </div>
 
-              <PagamentoPainelLateral orientacao={orientacao} />
+              {!isentaOrientacaoAbaixoHistorico ? <PagamentoPainelLateral orientacao={orientacao} /> : null}
             </div>
 
             <PagamentoPixQrModal

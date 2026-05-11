@@ -1345,8 +1345,8 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
     gap: 10px;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
   }
 
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .mobile-menu-btn,
@@ -1396,15 +1396,17 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
-    gap: 2px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
     font-size: clamp(0.8125rem, 3.15vw, 0.97rem);
     font-weight: 650;
     letter-spacing: -0.01em;
-    flex-direction: column;
-    align-items: flex-start;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+    flex: 0 1 auto;
     font-size: clamp(0.97rem, 3.65vw, 1.125rem);
     font-weight: 850;
   }
@@ -2392,7 +2394,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
 @media (min-width: 769px) {
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper {
-    min-height: clamp(120px, 11vw + 92px, 180px);
+    min-height: clamp(156px, 13vw + 120px, 232px);
     margin-bottom: clamp(6px, 0.6vw + 4px, 12px);
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
@@ -2400,9 +2402,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo {
     width: auto;
-    height: clamp(112px, 12vw + 80px, 168px);
-    min-height: clamp(112px, 12vw + 80px, 168px);
-    max-height: clamp(112px, 12vw + 80px, 168px);
+    height: clamp(148px, 14vw + 108px, 220px);
+    min-height: clamp(148px, 14vw + 108px, 220px);
+    max-height: clamp(148px, 14vw + 108px, 220px);
     max-width: 100%;
     object-fit: contain;
   }
@@ -2432,7 +2434,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn {
-    border-radius: 14px !important;
+    border-radius: 11px !important;
   }
 
 }

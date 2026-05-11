@@ -234,21 +234,16 @@ body[data-theme='dark'] .horizon-chat-fab.horizon-chat-fab--shell-dock {
 body[data-theme='dark'] .horizon-chat-window.horizon-chat-window--shell-dock.chat-window-open {
   z-index: 9590;
 }
+/* Ajustes — superfícies finais em 03-horizon-chat + fullblack; evitar slate aqui */
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card {
-  background: #1a222e;
-  border-color: #334155;
-  box-shadow:
-    0 1px 2px rgba(255, 255, 255, 0.04),
-    0 6px 20px rgba(255, 255, 255, 0.05);
+  background: #000000;
+  border-color: rgba(255, 255, 255, 0.08);
 }
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card:hover {
-  border-color: rgba(148, 163, 184, 0.35);
-  box-shadow:
-    0 2px 4px rgba(255, 255, 255, 0.05),
-    0 10px 28px rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card {
-  background: #1a222e;
+  background: #000000;
 }
 body[data-theme='dark'] .dashboard-container {
   background: #f4f6fc;
@@ -1972,7 +1967,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     margin-bottom: 8px;
     padding-bottom: 0;
     /* Evita “salto” logo → 1.º item: cada rota remonta o Sidebar e a PNG pode vir com altura 0 até decodificar */
-    min-height: clamp(120px, 11vw + 92px, 180px);
+    min-height: clamp(156px, 13vw + 120px, 232px);
     gap: 11px;
   }
 }
@@ -1981,9 +1976,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
     width: auto;
     max-width: 100%;
-    height: clamp(112px, 12vw + 80px, 168px);
-    min-height: clamp(112px, 12vw + 80px, 168px);
-    max-height: clamp(112px, 12vw + 80px, 168px);
+    height: clamp(148px, 14vw + 108px, 220px);
+    min-height: clamp(148px, 14vw + 108px, 220px);
+    max-height: clamp(148px, 14vw + 108px, 220px);
     object-fit: contain;
     object-position: left center;
     transform: none;

@@ -440,7 +440,7 @@ body:has(.sidebar.open) .horizon-chat-window {
     flex: 1 1 auto;
     min-width: 0;
     width: auto;
-    max-width: calc(100% - 52px);
+    max-width: calc(100% - 46px);
     height: auto;
     max-height: 44px;
     object-fit: contain;
