@@ -744,6 +744,19 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   gap: 22px;
 }
 
+.page-configuracoes__hero-lead {
+  margin: 0.35rem 0 0;
+  max-width: 36rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-weight: 500;
+  color: var(--text-secondary, #64748b);
+}
+
+body[data-theme='dark'] .page-configuracoes__hero-lead {
+  color: rgba(248, 250, 252, 0.55);
+}
+
 @media (min-width: 1024px) {
   .config-layout {
     grid-template-columns: 1fr 1fr;

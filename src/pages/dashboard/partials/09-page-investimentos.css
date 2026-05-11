@@ -1042,11 +1042,104 @@ body[data-theme='dark'] .page-investimentos-date-popover {
 
 .page-investimentos-date-popover__title {
   flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0 2px;
   text-align: center;
   font-weight: 750;
   font-size: 0.92rem;
   letter-spacing: -0.02em;
   color: inherit;
+}
+
+.page-investimentos-date-popover__title-month {
+  white-space: nowrap;
+}
+
+.page-investimentos-date-popover__title-year-btn {
+  margin: 0;
+  padding: 2px 6px;
+  border: none;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent, #d4a84b) 14%, transparent);
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.page-investimentos-date-popover__title-year-btn:hover {
+  background: color-mix(in srgb, var(--accent, #d4a84b) 22%, transparent);
+}
+
+.page-investimentos-date-popover__title-year-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #d4a84b) 22%, transparent);
+}
+
+body[data-theme='dark'] .page-investimentos-date-popover__title-year-btn {
+  background: color-mix(in srgb, var(--accent, #d4a84b) 18%, rgba(15, 23, 42, 0.5));
+}
+
+body[data-theme='dark'] .page-investimentos-date-popover__title-year-btn:hover {
+  background: color-mix(in srgb, var(--accent, #d4a84b) 28%, rgba(15, 23, 42, 0.45));
+}
+
+.page-investimentos-date-popover__year-panel {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  max-height: 228px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+  padding: 4px 2px;
+  scrollbar-gutter: stable;
+}
+
+.page-investimentos-date-popover__year-cell {
+  min-height: 38px;
+  padding: 0 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease;
+}
+
+.page-investimentos-date-popover__year-cell:hover {
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 45%, rgba(148, 163, 184, 0.35));
+  background: color-mix(in srgb, var(--accent, #d4a84b) 8%, transparent);
+}
+
+.page-investimentos-date-popover__year-cell:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 55%, rgba(148, 163, 184, 0.35));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #d4a84b) 16%, transparent);
+}
+
+.page-investimentos-date-popover__year-cell--selected {
+  border-color: color-mix(in srgb, var(--accent, #d4a84b) 72%, rgba(148, 163, 184, 0.25));
+  background: color-mix(in srgb, var(--accent, #d4a84b) 22%, rgba(15, 23, 42, 0.06));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #d4a84b) 22%, transparent);
+}
+
+body[data-theme='dark'] .page-investimentos-date-popover__year-cell {
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+body[data-theme='dark'] .page-investimentos-date-popover__year-cell--selected {
+  background: color-mix(in srgb, var(--accent, #d4a84b) 22%, rgba(15, 23, 42, 0.5));
 }
 
 .page-investimentos-date-popover__nav {
