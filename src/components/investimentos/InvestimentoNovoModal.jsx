@@ -1,7 +1,16 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../../lib/currencyMaskBr'
+import DatePickerBrPopover from './DatePickerBrPopover'
+import { maskDateBrInput, parseDdMmYyyyStrict, ymdToDdMmYyyy } from '../../lib/dateInputBr'
 import { parsePercentualCdiInput } from '../../lib/percentualCdiInput'
 import { INVESTIMENTOS_PRESETS_LIST } from '../../lib/investimentosPresets'
+import { formatCurrencyBRL } from '../../lib/formatCurrency'
+import {
+  clampMultiplicadorMeta,
+  deltaPatrimonialMedioDiarioLinear,
+  diasCorridosEntreYmd,
+  taxaAnualEquivalenteParaMultiplo,
+} from '../../lib/investimentosMetaRapida'
 import { filtrarInstituicoesFinanceiras, labelTipoInstituicao } from '../../lib/instituicoesFinanceiras'
 
 function percentualGravadoParaInput(raw) {
@@ -56,6 +65,15 @@ function dataAquisicaoInicialParaInput(edit) {
   return localDateInputToday()
 }
 
+function brAquisicaoInicial(edit) {
+  return ymdToDdMmYyyy(dataAquisicaoInicialParaInput(edit))
+}
+
+function brVencimentoInicial(edit) {
+  const ymd = dataVencimentoInicialParaInput(edit)
+  return ymd ? ymdToDdMmYyyy(ymd) : ''
+}
+
 /**
  * @param {{
  *   open: boolean
@@ -63,16 +81,18 @@ function dataAquisicaoInicialParaInput(edit) {
  *   onSubmit: (payload: { instituicao_nome: string, preset?: string, nome_custom?: string, valor_investido: number, percentual_cdi: number, data_aquisicao: string, data_vencimento: string | null }) => Promise<void>
  *   submitting?: boolean
  *   initialEdit?: { id: string, instituicao_nome?: string | null, tipo_preset?: string | null, nome?: string | null, valor_investido?: number | null, percentual_cdi?: number | null, data_aquisicao?: string | null, data_vencimento?: string | null } | null
+ *   carteiraTotalInvestido?: number
  * }} props
  */
-export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitting = false, initialEdit = null }) {
+export default function InvestimentoNovoModal({
+  open,
+  onClose,
+  onSubmit,
+  submitting = false,
+  initialEdit = null,
+  carteiraTotalInvestido = 0,
+}) {
   const titleId = useId()
-  const stepInstTitleId = useId()
-  const stepTipoTitleId = useId()
-  const stepOutroTitleId = useId()
-  const stepDataTitleId = useId()
-  const stepValorTitleId = useId()
-  const stepPercTitleId = useId()
   const instListId = useId()
   const instInputId = useId()
   const tipoSelectId = useId()
@@ -83,6 +103,8 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
   const blurTimerRef = useRef(null)
   const comboboxWrapRef = useRef(null)
   const listRef = useRef(null)
+  const btnCalAquisicaoRef = useRef(null)
+  const btnCalVencimentoRef = useRef(null)
 
   const [instQuery, setInstQuery] = useState(() => String(initialEdit?.instituicao_nome ?? '').trim())
   const [instChosen, setInstChosen] = useState(() => {
@@ -110,8 +132,8 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
       : '',
   )
   const [percInput, setPercInput] = useState(() => percentualGravadoParaInput(initialEdit?.percentual_cdi))
-  const [dataAquisicaoInput, setDataAquisicaoInput] = useState(() => dataAquisicaoInicialParaInput(initialEdit))
-  const [dataVencimentoInput, setDataVencimentoInput] = useState(() => dataVencimentoInicialParaInput(initialEdit))
+  const [dataAquisicaoBr, setDataAquisicaoBr] = useState(() => brAquisicaoInicial(initialEdit))
+  const [dataVencimentoBr, setDataVencimentoBr] = useState(() => brVencimentoInicial(initialEdit))
   const [formError, setFormError] = useState('')
   const [tipoIndexador, setTipoIndexador] = useState(() => {
     if (!initialEdit?.id) return 'CDI'
@@ -120,8 +142,37 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
   const [nomePersonalizadoExpandido, setNomePersonalizadoExpandido] = useState(() =>
     Boolean(initialEdit?.id) && !initialEdit?.tipo_preset && String(initialEdit?.nome ?? '').trim().length > 0,
   )
+  const [pickerAquisicaoOpen, setPickerAquisicaoOpen] = useState(false)
+  const [pickerVencimentoOpen, setPickerVencimentoOpen] = useState(false)
+  const [metaMultiplicador, setMetaMultiplicador] = useState(3)
+  const [metaRapidaEditando, setMetaRapidaEditando] = useState(false)
 
   const instituicoesFiltradas = useMemo(() => filtrarInstituicoesFinanceiras(instQuery), [instQuery])
+
+  const dataAquisicaoYmd = useMemo(() => parseDdMmYyyyStrict(dataAquisicaoBr), [dataAquisicaoBr])
+  const dataVencimentoYmd = useMemo(() => parseDdMmYyyyStrict(dataVencimentoBr), [dataVencimentoBr])
+
+  const carteiraOk = Number.isFinite(carteiraTotalInvestido) && carteiraTotalInvestido > 0
+
+  const diasMetaRapida = useMemo(() => {
+    if (!dataAquisicaoYmd || !dataVencimentoYmd) return null
+    return diasCorridosEntreYmd(dataAquisicaoYmd, dataVencimentoYmd)
+  }, [dataAquisicaoYmd, dataVencimentoYmd])
+
+  const pctAaEquivMeta = useMemo(() => {
+    if (diasMetaRapida == null) return null
+    return taxaAnualEquivalenteParaMultiplo(metaMultiplicador, diasMetaRapida)
+  }, [diasMetaRapida, metaMultiplicador])
+
+  const deltaMedioDiaMeta = useMemo(() => {
+    if (!carteiraOk || diasMetaRapida == null) return null
+    return deltaPatrimonialMedioDiarioLinear(carteiraTotalInvestido, metaMultiplicador, diasMetaRapida)
+  }, [carteiraOk, carteiraTotalInvestido, diasMetaRapida, metaMultiplicador])
+
+  const valorSugeridoMeta = useMemo(() => {
+    if (!carteiraOk) return null
+    return Math.round(carteiraTotalInvestido * metaMultiplicador * 100) / 100
+  }, [carteiraOk, carteiraTotalInvestido, metaMultiplicador])
 
   useEffect(() => {
     return () => {
@@ -152,38 +203,44 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
   }, [open, onClose, submitting])
 
   useEffect(() => {
-    if (!open) return
-    const inst = String(initialEdit?.instituicao_nome ?? '').trim()
-    setInstQuery(inst)
-    setInstChosen(inst.length >= 2 ? inst : null)
-    setInstListOpen(false)
-    setActiveIndex(null)
-    if (!initialEdit?.id) {
-      setPreset('LCA')
-      setCustomNome('')
-    } else {
-      const tp = initialEdit.tipo_preset
-      if (tp != null && String(tp).trim() !== '') {
-        setPreset(String(tp).trim().toUpperCase())
+    if (!open) return undefined
+    const id = window.requestAnimationFrame(() => {
+      const inst = String(initialEdit?.instituicao_nome ?? '').trim()
+      setInstQuery(inst)
+      setInstChosen(inst.length >= 2 ? inst : null)
+      setInstListOpen(false)
+      setActiveIndex(null)
+      if (!initialEdit?.id) {
+        setPreset('LCA')
         setCustomNome('')
       } else {
-        setPreset(null)
-        setCustomNome(String(initialEdit.nome ?? '').trim())
+        const tp = initialEdit.tipo_preset
+        if (tp != null && String(tp).trim() !== '') {
+          setPreset(String(tp).trim().toUpperCase())
+          setCustomNome('')
+        } else {
+          setPreset(null)
+          setCustomNome(String(initialEdit.nome ?? '').trim())
+        }
       }
-    }
-    setValorInput(
-      initialEdit?.valor_investido != null && Number.isFinite(Number(initialEdit.valor_investido))
-        ? valorToMaskedBRL(Number(initialEdit.valor_investido))
-        : '',
-    )
-    setPercInput(percentualGravadoParaInput(initialEdit?.percentual_cdi))
-    setDataAquisicaoInput(dataAquisicaoInicialParaInput(initialEdit))
-    setDataVencimentoInput(dataVencimentoInicialParaInput(initialEdit))
-    setTipoIndexador(initialEdit?.tipo_indexador === 'PREFIXADO' ? 'PREFIXADO' : 'CDI')
-    setNomePersonalizadoExpandido(
-      Boolean(initialEdit?.id) && !initialEdit?.tipo_preset && String(initialEdit?.nome ?? '').trim().length > 0,
-    )
-    setFormError('')
+      setValorInput(
+        initialEdit?.valor_investido != null && Number.isFinite(Number(initialEdit.valor_investido))
+          ? valorToMaskedBRL(Number(initialEdit.valor_investido))
+          : '',
+      )
+      setPercInput(percentualGravadoParaInput(initialEdit?.percentual_cdi))
+      setDataAquisicaoBr(brAquisicaoInicial(initialEdit))
+      setDataVencimentoBr(brVencimentoInicial(initialEdit))
+      setTipoIndexador(initialEdit?.tipo_indexador === 'PREFIXADO' ? 'PREFIXADO' : 'CDI')
+      setNomePersonalizadoExpandido(
+        Boolean(initialEdit?.id) && !initialEdit?.tipo_preset && String(initialEdit?.nome ?? '').trim().length > 0,
+      )
+      setMetaMultiplicador(3)
+      setMetaRapidaEditando(false)
+      setFormError('')
+    })
+    return () => window.cancelAnimationFrame(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- campos primitivos de initialEdit; evita loop quando o pai passa objeto novo a cada render
   }, [
     open,
     initialEdit?.id,
@@ -247,13 +304,32 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
       return
     }
 
-    const dataStr = String(dataAquisicaoInput ?? '').trim().slice(0, 10)
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) {
-      setFormError('Informe a data de aquisição.')
+    const dataStr = parseDdMmYyyyStrict(dataAquisicaoBr)
+    if (!dataStr) {
+      setFormError('Informe a data de aquisição no formato dd/mm/aaaa.')
+      return
+    }
+    const hoje = localDateInputToday()
+    if (dataStr > hoje) {
+      setFormError('A data de aquisição não pode ser futura.')
       return
     }
 
-    const vencimentoStr = dataVencimentoInput.trim() || null
+    let vencimentoStr = null
+    const vTrim = String(dataVencimentoBr ?? '').trim()
+    if (vTrim) {
+      const vy = parseDdMmYyyyStrict(dataVencimentoBr)
+      if (!vy) {
+        setFormError('Data de vencimento inválida — use dd/mm/aaaa.')
+        return
+      }
+      const minV = minDataVencimento(dataStr)
+      if (minV && vy < minV) {
+        setFormError('A data de vencimento deve ser pelo menos um dia após a aquisição.')
+        return
+      }
+      vencimentoStr = vy
+    }
     const trimmed = customNome.trim()
     if (trimmed.length >= 2) {
       await onSubmit({
@@ -293,6 +369,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
   }
 
   return (
+    <>
     <div className="modal-backdrop page-investimentos-modal-backdrop" role="presentation" onMouseDown={handleBackdropDown}>
       <div
         className="modal-content page-investimentos-modal"
@@ -457,16 +534,44 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                 <label htmlFor={dataInputId} className="page-investimentos-modal__section-label">
                   Data de aquisição
                 </label>
-                <input
-                  id={dataInputId}
-                  type="date"
-                  className="page-investimentos-modal__input page-investimentos-modal__input--date"
-                  required
-                  max={localDateInputToday()}
-                  disabled={submitting}
-                  value={dataAquisicaoInput}
-                  onChange={(e) => setDataAquisicaoInput(e.target.value)}
-                />
+                <div className="page-investimentos-modal__date-field-wrap">
+                  <input
+                    id={dataInputId}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    placeholder="dd/mm/aaaa"
+                    lang="pt-BR"
+                    required
+                    aria-describedby={`${dataInputId}-fmt`}
+                    className="page-investimentos-modal__input page-investimentos-modal__input--date-br"
+                    disabled={submitting}
+                    value={dataAquisicaoBr}
+                    onChange={(e) => setDataAquisicaoBr(maskDateBrInput(e.target.value))}
+                  />
+                  <button
+                    ref={btnCalAquisicaoRef}
+                    type="button"
+                    className="page-investimentos-modal__date-cal-btn"
+                    disabled={submitting}
+                    aria-label="Abrir calendário — data de aquisição"
+                    aria-expanded={pickerAquisicaoOpen}
+                    onClick={() => {
+                      setPickerVencimentoOpen(false)
+                      setPickerAquisicaoOpen((v) => !v)
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                  </button>
+                </div>
+                <p id={`${dataInputId}-fmt`} className="page-investimentos-modal__hint page-investimentos-modal__hint--date-fmt">
+                  Formato brasileiro <strong>dd/mm/aaaa</strong> ou ícone do calendário.
+                </p>
               </div>
               <div>
                 <label htmlFor={valorInputId} className="page-investimentos-modal__section-label">
@@ -497,19 +602,119 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                 Data de vencimento{' '}
                 <span className="page-investimentos-modal__label-optional">(opcional)</span>
               </label>
-              <input
-                id={dataVencimentoInputId}
-                type="date"
-                className="page-investimentos-modal__input page-investimentos-modal__input--date"
-                min={minDataVencimento(dataAquisicaoInput)}
-                disabled={submitting}
-                value={dataVencimentoInput}
-                onChange={(e) => setDataVencimentoInput(e.target.value)}
-              />
+              <div className="page-investimentos-modal__date-field-wrap">
+                <input
+                  id={dataVencimentoInputId}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  placeholder="dd/mm/aaaa"
+                  lang="pt-BR"
+                  aria-describedby={`${dataVencimentoInputId}-fmt`}
+                  className="page-investimentos-modal__input page-investimentos-modal__input--date-br"
+                  disabled={submitting}
+                  value={dataVencimentoBr}
+                  onChange={(e) => setDataVencimentoBr(maskDateBrInput(e.target.value))}
+                />
+                <button
+                  ref={btnCalVencimentoRef}
+                  type="button"
+                  className="page-investimentos-modal__date-cal-btn"
+                  disabled={submitting}
+                  aria-label="Abrir calendário — data de vencimento"
+                  aria-expanded={pickerVencimentoOpen}
+                  onClick={() => {
+                    setPickerAquisicaoOpen(false)
+                    setPickerVencimentoOpen((v) => !v)
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </button>
+              </div>
+              <p id={`${dataVencimentoInputId}-fmt`} className="page-investimentos-modal__hint page-investimentos-modal__hint--date-fmt">
+                Opcional · mesmo formato <strong>dd/mm/aaaa</strong>.
+              </p>
               <p className="page-investimentos-modal__hint">
                 Preencha se souber quando vence — o app mostrará o prazo restante e usará esta data no simulador.
               </p>
             </div>
+
+            {!editando && carteiraOk ? (
+              <div className="page-investimentos-modal__meta-rapida" aria-labelledby={`${valorInputId}-meta-title`}>
+                <div className="page-investimentos-modal__meta-rapida-head">
+                  <span id={`${valorInputId}-meta-title`} className="page-investimentos-modal__meta-rapida-title">
+                    Meta rápida pela carteira
+                  </span>
+                  <button
+                    type="button"
+                    className="page-investimentos-modal__meta-rapida-edit"
+                    disabled={submitting}
+                    onClick={() => setMetaRapidaEditando((v) => !v)}
+                  >
+                    {metaRapidaEditando ? 'Fechar' : 'Editar'}
+                  </button>
+                </div>
+                <p className="page-investimentos-modal__meta-rapida-lead">
+                  Somando o que já está cadastrado: <strong>{formatCurrencyBRL(carteiraTotalInvestido)}</strong>
+                  {' · '}
+                  meta ilustrativa <strong>{metaMultiplicador}×</strong> →{' '}
+                  <strong>{valorSugeridoMeta != null ? formatCurrencyBRL(valorSugeridoMeta) : '—'}</strong>
+                </p>
+                {metaRapidaEditando ? (
+                  <div className="page-investimentos-modal__meta-rapida-edit-row">
+                    <label htmlFor={`${valorInputId}-meta-mult`} className="page-investimentos-modal__meta-rapida-edit-label">
+                      Multiplicador (1 a 50)
+                    </label>
+                    <input
+                      id={`${valorInputId}-meta-mult`}
+                      type="number"
+                      min={1}
+                      max={50}
+                      step={0.5}
+                      className="page-investimentos-modal__input page-investimentos-modal__meta-rapida-mult-input"
+                      disabled={submitting}
+                      value={metaMultiplicador}
+                      onChange={(e) => setMetaMultiplicador(clampMultiplicadorMeta(e.target.value))}
+                    />
+                  </div>
+                ) : null}
+                <dl className="page-investimentos-modal__meta-rapida-stats">
+                  <div className="page-investimentos-modal__meta-rapida-stat">
+                    <dt>% a.a. equivalente</dt>
+                    <dd>
+                      {pctAaEquivMeta != null
+                        ? `${pctAaEquivMeta.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
+                        : 'Preencha vencimento'}
+                    </dd>
+                  </div>
+                  <div className="page-investimentos-modal__meta-rapida-stat">
+                    <dt>Média/dia (linear)</dt>
+                    <dd>
+                      {deltaMedioDiaMeta != null ? formatCurrencyBRL(deltaMedioDiaMeta) : 'Preencha vencimento'}
+                    </dd>
+                  </div>
+                </dl>
+                <p className="page-investimentos-modal__meta-rapida-hint">
+                  Usa o prazo entre <strong>aquisição</strong> e <strong>vencimento</strong> deste investimento (dias corridos).
+                  Não considera IR nem CDI real — só para visualizar ordem de grandeza.
+                </p>
+                <button
+                  type="button"
+                  className="page-investimentos-modal__meta-rapida-apply btn-secondary"
+                  disabled={submitting || valorSugeridoMeta == null}
+                  onClick={() => {
+                    if (valorSugeridoMeta != null) setValorInput(valorToMaskedBRL(valorSugeridoMeta))
+                  }}
+                >
+                  Usar valor sugerido no campo
+                </button>
+              </div>
+            ) : null}
 
             {/* Taxa */}
             <div className="page-investimentos-modal__section">
@@ -609,5 +814,25 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         </form>
       </div>
     </div>
+
+    <DatePickerBrPopover
+      open={pickerAquisicaoOpen}
+      onClose={() => setPickerAquisicaoOpen(false)}
+      anchorRef={btnCalAquisicaoRef}
+      valueYmd={dataAquisicaoYmd}
+      onSelectYmd={(ymd) => setDataAquisicaoBr(ymdToDdMmYyyy(ymd))}
+      maxYmd={localDateInputToday()}
+    />
+    <DatePickerBrPopover
+      open={pickerVencimentoOpen}
+      onClose={() => setPickerVencimentoOpen(false)}
+      anchorRef={btnCalVencimentoRef}
+      valueYmd={dataVencimentoYmd}
+      onSelectYmd={(ymd) => setDataVencimentoBr(ymdToDdMmYyyy(ymd))}
+      minYmd={dataAquisicaoYmd ? minDataVencimento(dataAquisicaoYmd) : undefined}
+      showClear
+      onClear={() => setDataVencimentoBr('')}
+    />
+    </>
   )
 }

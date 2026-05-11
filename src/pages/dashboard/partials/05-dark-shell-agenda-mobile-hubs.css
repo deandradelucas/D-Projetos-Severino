@@ -2392,7 +2392,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
 @media (min-width: 769px) {
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper {
-    min-height: clamp(56px, 4.5vw + 42px, 76px);
+    min-height: clamp(120px, 11vw + 92px, 180px);
     margin-bottom: clamp(6px, 0.6vw + 4px, 12px);
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
@@ -2400,9 +2400,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo {
     width: auto;
-    height: clamp(52px, 5vw + 40px, 72px);
-    min-height: clamp(52px, 5vw + 40px, 72px);
-    max-height: clamp(52px, 5vw + 40px, 72px);
+    height: clamp(112px, 12vw + 80px, 168px);
+    min-height: clamp(112px, 12vw + 80px, 168px);
+    max-height: clamp(112px, 12vw + 80px, 168px);
     max-width: 100%;
     object-fit: contain;
   }

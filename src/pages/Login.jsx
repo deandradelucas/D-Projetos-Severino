@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthPasswordToggleButton from '../components/AuthPasswordToggleButton'
 import AuthPhoneShell from '../components/AuthPhoneShell'
-import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
 import { apiUrl, severinoProdApiMisconfigured } from '../lib/apiUrl'
-import { FAMILIA_CONVITE_SESSION_KEY } from '../lib/familiaConviteColar'
+import {
+  clearConviteTokenSession,
+  extrairTokenConviteFamilia,
+  FAMILIA_CONVITE_SESSION_KEY,
+  persistConviteTokenSession,
+} from '../lib/familiaConviteColar'
 import { BRAND_ASSETS, BRAND_LOGO_PIXEL_SIZE } from '../lib/brandAssets'
 import { prefetchRoute } from '../lazyRoutes'
 import { showToast } from '../lib/toastStore'
@@ -34,11 +38,7 @@ async function aplicarConviteFamiliaAposLogin(user) {
     })
     const data = await res.json().catch(() => ({}))
     if (res.ok) {
-      try {
-        window.sessionStorage.removeItem(FAMILIA_CONVITE_SESSION_KEY)
-      } catch {
-        /* ignore */
-      }
+      clearConviteTokenSession()
       const assinRes = await fetch(apiUrl('/api/assinatura/status'), {
         headers: { 'x-user-id': String(user.id).trim() },
         cache: 'no-store',
@@ -56,6 +56,7 @@ async function aplicarConviteFamiliaAposLogin(user) {
 
 export default function Login() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [email, setEmail] = useState(() => {
     try {
       return window.localStorage.getItem(REMEMBER_EMAIL_KEY) || ''
@@ -91,6 +92,14 @@ export default function Login() {
     prefetchRoute('/pagamento')
     prefetchRoute('/bem-vindo-assinatura')
   }, [])
+
+  /* Mantém ?convite= na URL na session (bloco de colar está em Configurações). */
+  useEffect(() => {
+    const q = searchParams.get('convite')?.trim()
+    if (!q) return
+    const token = extrairTokenConviteFamilia(q)
+    if (token) persistConviteTokenSession(token)
+  }, [searchParams])
 
   useEffect(() => {
     let cancelled = false
@@ -386,9 +395,6 @@ export default function Login() {
           <span className="font-mono">/api</span>) onde <span className="font-mono">/api/health</span> devolve JSON.
         </div>
       ) : null}
-      <div className="mb-4 sm:mb-5">
-        <FamiliaConviteColarBlock idPrefix="login-familia-convite" />
-      </div>
       <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" noValidate>
         <label className="block" htmlFor="email">
           <span className="mb-2 block text-[11px] font-medium text-neutral-700 sm:text-[12px]">E-mail</span>

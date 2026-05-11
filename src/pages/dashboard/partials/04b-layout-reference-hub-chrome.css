@@ -1,7 +1,7 @@
 /* --------------------------------------------------------------------------
    Layout referência (screenshot — sidebar clara, banner IA, 4 KPIs, 3 colunas)
    -------------------------------------------------------------------------- */
-body[data-theme='light'] .sidebar .brand-logo {
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .sidebar .brand-logo {
   display: block;
   grid-area: 1 / 1;
   /* ~85% × scale(1.18) ≈ 100% da coluna: evita corte com overflow-x do menu */
@@ -20,7 +20,7 @@ body[data-theme='light'] .sidebar .brand-logo {
   pointer-events: auto;
 }
 
-body[data-theme='light'] .sidebar .brand-wrapper {
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .sidebar .brand-wrapper {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto;
@@ -35,7 +35,7 @@ body[data-theme='light'] .sidebar .brand-wrapper {
   flex-shrink: 0;
 }
 
-body[data-theme='light'] .sidebar .brand-wrapper .mobile-close-btn {
+body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .sidebar .brand-wrapper .mobile-close-btn {
   grid-area: 1 / 1;
   justify-self: end;
   align-self: center;
@@ -45,7 +45,7 @@ body[data-theme='light'] .sidebar .brand-wrapper .mobile-close-btn {
 }
 
 @media (max-width: 768px) {
-  body[data-theme='light'] .sidebar .brand-wrapper {
+  body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .sidebar .brand-wrapper {
     margin-bottom: 12px;
   }
 }
