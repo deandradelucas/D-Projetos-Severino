@@ -115,15 +115,6 @@ export default function Investimentos() {
     }
   }, [])
 
-  const carteiraTotalInvestido = useMemo(() => {
-    let t = 0
-    for (const row of lista) {
-      const v = Number(row.valor_investido)
-      if (Number.isFinite(v) && v > 0) t += v
-    }
-    return t
-  }, [lista])
-
   const tiposNaLista = useMemo(() => {
     const seen = new Set()
     const result = []
@@ -533,7 +524,6 @@ export default function Investimentos() {
         key={editTarget?.id ?? `novo-${modalResetKey}`}
         open={modalOpen}
         initialEdit={editTarget}
-        carteiraTotalInvestido={carteiraTotalInvestido}
         onClose={() => {
           if (!submitting) {
             setModalOpen(false)

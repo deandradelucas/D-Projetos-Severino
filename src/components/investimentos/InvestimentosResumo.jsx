@@ -7,7 +7,6 @@ import {
   diasCorridosDesdeIso,
   diasCorridosEntreReferenciasIso,
   investimentoIsentoIrPessoaFisica,
-  extrairYyyyMmDdReferencia,
 } from '../../lib/investimentosRendimentoIr'
 import { formatCurrencyBRL } from '../../lib/formatCurrency'
 import { INVESTIMENTOS_PRESETS_LIST } from '../../lib/investimentosPresets'
@@ -159,6 +158,7 @@ export default function InvestimentosResumo({ lista, cdiAa, cdiLoading }) {
             <input
               id="inv-resumo-proj-data"
               type="date"
+              lang="pt-BR"
               className="page-investimentos-resumo__projecao-input"
               min={hojeYmdInput}
               max={maxYmdInput}

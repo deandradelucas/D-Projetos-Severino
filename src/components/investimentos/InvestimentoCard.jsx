@@ -465,7 +465,7 @@ export default function InvestimentoCard({ row, cdiAa, cdiLoading, pregaoCdiHoje
                   </dt>
                   <dd
                     className="page-investimentos-card__metric-value"
-                    title={`~${estAcumulado.diasUteisAcumulacao} dias úteis com pregão desde a data de referência`}
+                    title={`~${estAcumulado.diasUteisAcumulacao} dias úteis com pregão desde o 1.º dia útil após a aquisição`}
                   >
                     {formatCurrencyBRL(estAcumulado.brutoAcumulado)}
                   </dd>
@@ -601,6 +601,7 @@ export default function InvestimentoCard({ row, cdiAa, cdiLoading, pregaoCdiHoje
               <input
                 id={`inv-proj-${row.id}`}
                 type="date"
+                lang="pt-BR"
                 className="page-investimentos-card__projecao-input"
                 min={hojeYmd}
                 max={maxYmdProj}

@@ -2,6 +2,7 @@
  * Estimativas de rendimento diário ligadas ao CDI e IR regressivo sobre o rendimento (PF).
  * Convenção: pro rata linear em 252 dias úteis sobre taxa efetiva (% CDI contratada × CDI a.a.).
  * CDI incide em dias úteis (não há rendimento em fins de semana — feriados nacionais vedam pregão).
+ * O rendimento **acumulado** conta apenas a partir do **primeiro pregão depois** da data de aquisição (D+1 útil).
  */
 
 export const DIAS_UTEIS_ANO_RENDIMENTO = 252
@@ -104,9 +105,29 @@ function dataLocalInicioApartirDeIso(iso) {
 }
 
 /**
+ * Primeiro dia em que o rendimento passa a contar (CDI / convenção pregão):
+ * o **próximo** dia útil com pregão **depois** da data de aquisição (o dia da aplicação não rende).
+ *
+ * @param {string | undefined | null} iso Data de aquisição (`YYYY-MM-DD` ou ISO).
+ * @returns {Date | null} Meia-noite local do primeiro dia de incidência; null se inválido.
+ */
+export function dataLocalInicioRendimentoCdiApartirDeIso(iso) {
+  const ref = dataLocalInicioApartirDeIso(iso)
+  if (!ref) return null
+  const cursor = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate())
+  cursor.setDate(cursor.getDate() + 1)
+  let guard = 0
+  while (!ehDiaUtilComPregaoCdi(cursor)) {
+    cursor.setDate(cursor.getDate() + 1)
+    guard += 1
+    if (guard > 366 * 5) return null
+  }
+  return cursor
+}
+
+/**
  * Conta dias úteis (seg–sex, exceto feriados nacionais) com pregão CDI no intervalo
  * **[data de início, data de referência]** (ambos inclusivos no calendário local).
- * Usado para acumular rendimento estimado desde a data de aquisição até “hoje”.
  *
  * @param {string | undefined | null} iso Data inicial (YYYY-MM-DD ou ISO com prefixo data).
  * @param {Date} [dataReferencia=new Date()] “Hoje” para o corte (date-only no fuso local).
@@ -136,9 +157,10 @@ function contarDiasUteisEntreDatasLocais(start, end) {
 }
 
 export function contarDiasUteisComJurosDesdeIso(iso, dataReferencia = new Date()) {
-  const start = dataLocalInicioApartirDeIso(iso)
+  const start = dataLocalInicioRendimentoCdiApartirDeIso(iso)
   if (!start) return null
   const end = new Date(dataReferencia.getFullYear(), dataReferencia.getMonth(), dataReferencia.getDate())
+  if (end < start) return 0
   return contarDiasUteisEntreDatasLocais(start, end)
 }
 
@@ -149,13 +171,14 @@ export function contarDiasUteisComJurosDesdeIso(iso, dataReferencia = new Date()
  * @returns {number | null}
  */
 export function contarDiasUteisComJurosAteYmd(isoInicio, ymdFim) {
-  const start = dataLocalInicioApartirDeIso(isoInicio)
+  const start = dataLocalInicioRendimentoCdiApartirDeIso(isoInicio)
   if (!start) return null
   const ymd = extrairYyyyMmDdReferencia(ymdFim)
   if (!ymd) return null
   const [y, m, d] = ymd.split('-').map(Number)
   const end = new Date(y, m - 1, d)
   if (Number.isNaN(end.getTime())) return null
+  if (end < start) return 0
   return contarDiasUteisEntreDatasLocais(start, end)
 }
 
