@@ -205,6 +205,19 @@ export default function Configuracoes() {
     navigator.clipboard.writeText(perfil.email).then(() => showToast('E-mail copiado.')).catch(() => {})
   }
 
+  const podeColarConviteFamilia =
+    Boolean(usuarioIdHeader) &&
+    familiaPainelCarregado &&
+    familiaTitular !== true &&
+    !perfil.conta_familiar_membro
+
+  const irParaCodigoConviteFamilia = () => {
+    document.getElementById('config-secao-convite-familia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.setTimeout(() => {
+      document.getElementById('config-familia-convite-textarea')?.focus()
+    }, 380)
+  }
+
   const copiarTexto = (t, okMsg = 'Copiado.') => {
     if (!t) return
     navigator.clipboard.writeText(t).then(() => showToast(okMsg)).catch(() => {})
@@ -326,11 +339,14 @@ export default function Configuracoes() {
       <main className="main-content relative z-10 ref-dashboard-main config-page">
         <div className="ref-dashboard-inner dashboard-hub">
         <RefDashboardScroll>
-        <section className="dashboard-hub__hero page-configuracoes__hero" aria-label="Configurações">
+        <section className="dashboard-hub__hero page-configuracoes__hero" aria-label="Ajustes">
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} aria-label="Abrir menu" />
             <div className="dashboard-hub__hero-text">
-              <h1 className="dashboard-hub__title">Configurações</h1>
+              <h1 className="dashboard-hub__title">Ajustes</h1>
+              <p className="page-configuracoes__hero-lead">
+                Conta, tema, segurança e <strong>código de convite</strong> da conta familiar.
+              </p>
             </div>
           </div>
         </section>
@@ -374,6 +390,16 @@ export default function Configuracoes() {
               >
                 {resetSending ? 'Enviando…' : 'Código no WhatsApp'}
               </button>
+              {podeColarConviteFamilia ? (
+                <button
+                  type="button"
+                  className="config-action-btn"
+                  onClick={irParaCodigoConviteFamilia}
+                  title="Abre o campo para colar o código ou o link do convite"
+                >
+                  Código de convite familiar
+                </button>
+              ) : null}
             </div>
           </section>
 
@@ -381,12 +407,13 @@ export default function Configuracoes() {
           usuarioIdHeader &&
           familiaTitular !== true &&
           !perfil.conta_familiar_membro ? (
-            <section className="config-card config-card--full">
+            <section id="config-secao-convite-familia" className="config-card config-card--full">
               <div className="config-card-head">
                 <span className="config-card-kicker">Família</span>
-                <h2 className="config-card-title-clean">Aceitar convite familiar</h2>
+                <h2 className="config-card-title-clean">Código de convite familiar</h2>
                 <p className="config-card-subtitle">
-                  Cole o link ou o código enviado pelo titular. Quando o convite for validado, use <strong>Vincular à esta conta</strong> — não precisa repetir na tela de login.
+                  Insira abaixo o <strong>código</strong> ou o <strong>link</strong> enviado pelo titular. Quando aparecer “Convite válido”, use{' '}
+                  <strong>Vincular à esta conta</strong> — não precisa repetir na tela de login.
                 </p>
               </div>
               <FamiliaConviteColarBlock
@@ -448,7 +475,7 @@ export default function Configuracoes() {
                 <div className="config-security-panel" style={{ marginBottom: '1.25rem' }}>
                   <p className="config-card-subtitle" style={{ marginBottom: '0.5rem' }}>
                     <strong>Guarde agora:</strong> o código só aparece uma vez. Quem receber pode usar o link, colar o código no cadastro ou, já com conta, em{' '}
-                    <strong>Configurações → Aceitar convite familiar</strong>.
+                    <strong>Ajustes → Código de convite familiar</strong>.
                   </p>
                   <div
                     className="config-field"
