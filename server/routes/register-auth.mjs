@@ -359,6 +359,9 @@ export function registerAuthRoutes(app) {
       const email = String(body?.email || '').trim().toLowerCase()
       const code = body?.code ?? body?.otp
       const password = String(body?.password || '')
+      if (email && !rateLimitTake(`otp-confirm-email:${email}`, 5, 15 * 60_000)) {
+        return c.json({ message: 'Muitas tentativas para este e-mail. Solicite um novo código.' }, 429)
+      }
       await confirmPasswordOtpWhatsApp(email, code, password)
       return c.json({ message: 'Senha redefinida com sucesso. Faça login.' })
     } catch (error) {

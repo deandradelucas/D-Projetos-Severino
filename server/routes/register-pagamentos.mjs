@@ -342,12 +342,14 @@ export function registerPagamentosRoutes(app) {
 
   app.post('/api/pagamentos/webhook', async (c) => {
     const secret = String(process.env.ASAAS_WEBHOOK_TOKEN || '').trim()
-    if (secret) {
-      const url = new URL(c.req.url)
-      const tok = url.searchParams.get('token') || ''
-      if (tok !== secret) {
-        return c.json({ message: 'Forbidden.' }, 403)
-      }
+    if (!secret) {
+      log.warn('[asaas webhook] ASAAS_WEBHOOK_TOKEN não configurado — requisição rejeitada')
+      return c.json({ message: 'Webhook não configurado.' }, 503)
+    }
+    const url = new URL(c.req.url)
+    const tok = url.searchParams.get('token') || ''
+    if (tok !== secret) {
+      return c.json({ message: 'Forbidden.' }, 403)
     }
 
     let body = {}
