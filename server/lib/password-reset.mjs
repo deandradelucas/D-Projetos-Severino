@@ -2,6 +2,7 @@
  * Validação de e-mail, origem pública do app (checkout MP, etc.) e login por senha.
  * Redefinição de senha por e-mail/link foi removida do produto.
  */
+import bcrypt from 'bcryptjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { normalizeUsuarioRow, stripSenha } from './usuario-schema.mjs'
 
@@ -100,13 +101,12 @@ export async function authenticateUser(email, password) {
   const normalizedEmail = String(email || '').trim().toLowerCase()
   const normalizedPassword = String(password || '')
 
-  /* .maybeSingle() quebra com erro se existir mais de um registro (e-mail duplicado).
+  /* Busca apenas pelo e-mail — a verificação da senha é feita em memória com bcrypt.
      .limit(1) evita PGRST116 e usa a primeira linha. */
   const { data: rows, error } = await supabaseAdmin
     .from('usuarios')
     .select('*')
     .eq('email', normalizedEmail)
-    .eq('senha', normalizedPassword)
     .limit(1)
 
   if (error) {
@@ -118,6 +118,16 @@ export async function authenticateUser(email, password) {
   if (raw.is_active === false) {
     return null
   }
+
+  const senhaHash = String(raw.senha || '')
+  // Suporta senhas ainda em plaintext (período de transição pós-migração)
+  let match = false
+  if (senhaHash.startsWith('$2b$') || senhaHash.startsWith('$2a$')) {
+    match = await bcrypt.compare(normalizedPassword, senhaHash)
+  } else {
+    match = normalizedPassword === senhaHash
+  }
+  if (!match) return null
 
   const nowIso = new Date().toISOString()
   try {

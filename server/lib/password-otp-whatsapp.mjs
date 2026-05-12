@@ -1,4 +1,5 @@
 import crypto from 'node:crypto'
+import bcrypt from 'bcryptjs'
 import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { sendEvolutionText, evolutionEnvConfigured } from './evolution-send.mjs'
@@ -171,10 +172,11 @@ export async function confirmPasswordOtpWhatsApp(email, otpRaw, newPassword) {
     throw e
   }
 
+  const senhaHash = await bcrypt.hash(password, 10)
   const { error: upErr } = await supabase
     .from('usuarios')
     .update({
-      senha: password,
+      senha: senhaHash,
       reset_token_hash: null,
       reset_token_expires_at: null,
       reset_token_created_at: null,
