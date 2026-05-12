@@ -4,8 +4,10 @@ import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 import {
   aceitarConviteFamilia,
+  alterarPapelMembro,
   buscarInfoConvitePorToken,
   criarConviteFamilia,
+  hashFamiliaToken,
   listarConvitesPendentes,
   listarMembrosFamilia,
   removerMembroFamilia,
@@ -31,6 +33,9 @@ export function registerFamiliaRoutes(app) {
       const ip = clientKeyFromHono(c)
       if (!rateLimitTake(`familia-convite-info:${ip}`, 40, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
+      }
+      if (!rateLimitTake(`familia-convite-token:${hashFamiliaToken(token)}`, 5, 300_000)) {
+        return c.json({ message: 'Convite bloqueado temporariamente. Tente em alguns minutos.' }, 429)
       }
       const info = await buscarInfoConvitePorToken(token)
       return c.json(info)
@@ -61,7 +66,8 @@ export function registerFamiliaRoutes(app) {
         body = {}
       }
       const papel = String(body?.papel || 'MEMBER').toUpperCase()
-      const criado = await criarConviteFamilia(gestao.titularId, papel)
+      const label = body?.label ? String(body.label).slice(0, 60).trim() || null : null
+      const criado = await criarConviteFamilia(gestao.titularId, papel, label)
       return c.json({
         message: 'Convite criado. Envie o link ou o código ao familiar — ele só aparece uma vez.',
         convite: criado.convite,
@@ -121,6 +127,27 @@ export function registerFamiliaRoutes(app) {
     }
   })
 
+  app.patch('/api/familia/membros/:usuarioId', async (c) => {
+    try {
+      const membroId = c.req.param('usuarioId')
+      if (!isUuidString(membroId)) return c.json({ message: 'ID inválido.' }, 400)
+      const usuarioId = c.req.header('x-user-id')
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+      const gestao = titularGestaoOu403(parsed.escopo)
+      if (!gestao.ok) return c.json({ message: MSG_GESTAO_FAMILIA }, 403)
+      let body = {}
+      try { body = await c.req.json() } catch { return c.json({ message: 'JSON inválido.' }, 400) }
+      const papel = String(body?.papel || '').toUpperCase()
+      if (!papel) return c.json({ message: 'Informe o campo "papel" (ADMIN, MEMBER ou VIEWER).' }, 400)
+      await alterarPapelMembro(gestao.titularId, membroId, papel)
+      return c.json({ message: `Papel do membro atualizado para ${papel}.` })
+    } catch (error) {
+      log.error('familia alterar papel membro', error)
+      return c.json({ message: error.message || 'Erro ao alterar papel.' }, 400)
+    }
+  })
+
   app.delete('/api/familia/membros/:usuarioId', async (c) => {
     try {
       const membroId = c.req.param('usuarioId')
@@ -156,6 +183,15 @@ export function registerFamiliaRoutes(app) {
         .eq('id', escopo.actorId)
 
       if (error) throw error
+
+      const supabaseAudit = getSupabaseAdmin()
+      await supabaseAudit.from('familia_audit_log').insert({
+        titular_id: escopo.dataUsuarioId,
+        actor_id: escopo.actorId,
+        membro_id: escopo.actorId,
+        acao: 'SAIU',
+      }).catch(() => {})
+
       return c.json({ message: 'Você saiu da conta familiar. Seus dados próprios permanecem na sua conta.' })
     } catch (error) {
       log.error('familia sair', error)
@@ -182,12 +218,11 @@ export function registerFamiliaRoutes(app) {
       }
 
       const resultado = await aceitarConviteFamilia(usuarioId, token)
-      const escopo = await resolveEscopoUsuario(usuarioId)
       return c.json({
         message: 'Você entrou na conta familiar. Os dados financeiros e a agenda passam a ser os do titular.',
         titular_usuario_id: resultado.titular_usuario_id,
         familia_papel: resultado.familia_papel,
-        conta_familiar_membro: escopo.isMembroConta,
+        conta_familiar_membro: true,
       })
     } catch (error) {
       log.error('familia aceitar', error)

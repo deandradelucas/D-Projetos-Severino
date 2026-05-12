@@ -37,7 +37,7 @@ export async function resolveEscopoUsuario(actorUsuarioId) {
   const supabase = getSupabaseAdmin()
   const { data: row, error } = await supabase
     .from('usuarios')
-    .select('id, vinculo_conta_principal_id, familia_papel')
+    .select('id, vinculo_conta_principal_id, familia_papel, principal:usuarios!vinculo_conta_principal_id(id)')
     .eq('id', actorId)
     .maybeSingle()
 
@@ -57,14 +57,7 @@ export async function resolveEscopoUsuario(actorUsuarioId) {
     }
   }
 
-  const { data: titular, error: terr } = await supabase
-    .from('usuarios')
-    .select('id')
-    .eq('id', principal)
-    .maybeSingle()
-
-  if (terr) throw terr
-  if (!titular) {
+  if (!row.principal?.id) {
     throw new Error('Conta principal não encontrada. Contacte o suporte.')
   }
 
@@ -125,16 +118,20 @@ export function assertFamiliaPodeEscrever(escopo) {
   return null
 }
 
-async function countMembrosDoTitular(titularId) {
-  const tid = String(titularId || '').trim()
-  const supabase = getSupabaseAdmin()
-  const { count, error } = await supabase
-    .from('usuarios')
-    .select('id', { count: 'exact', head: true })
-    .eq('vinculo_conta_principal_id', tid)
-
-  if (error) throw error
-  return Number(count || 0)
+async function registrarAuditFamilia({ titularId, actorId, membroId = null, acao, papelAntes = null, papelDepois = null }) {
+  try {
+    const supabase = getSupabaseAdmin()
+    await supabase.from('familia_audit_log').insert({
+      titular_id: titularId,
+      actor_id: actorId,
+      membro_id: membroId || null,
+      acao,
+      papel_antes: papelAntes,
+      papel_depois: papelDepois,
+    })
+  } catch {
+    // audit não bloqueia operação principal
+  }
 }
 
 async function countConvitesPendentesValidos(titularId) {
@@ -158,7 +155,7 @@ async function assertTitularPodeConvidar(actorId) {
   if (escopo.isMembroConta) {
     throw new Error('Apenas o titular da conta pode criar convites.')
   }
-  const nMembros = await countMembrosDoTitular(actorId)
+  const nMembros = await countVinculosFamiliaTitular(actorId)
   const nConvites = await countConvitesPendentesValidos(actorId)
   const ocupados = nMembros + nConvites
   if (ocupados >= FAMILIA_MAX_VINCULADOS) {
@@ -171,8 +168,9 @@ async function assertTitularPodeConvidar(actorId) {
 /**
  * @param {string} titularUsuarioId
  * @param {'ADMIN'|'MEMBER'|'VIEWER'} papel
+ * @param {string | null} label
  */
-export async function criarConviteFamilia(titularUsuarioId, papel = 'MEMBER') {
+export async function criarConviteFamilia(titularUsuarioId, papel = 'MEMBER', label = null) {
   await assertTitularPodeConvidar(titularUsuarioId)
 
   const p = String(papel || 'MEMBER').toUpperCase()
@@ -190,8 +188,9 @@ export async function criarConviteFamilia(titularUsuarioId, papel = 'MEMBER') {
       token_hash,
       papel_convite: papelConvite,
       expires_at,
+      label: label ? String(label).slice(0, 60).trim() || null : null,
     })
-    .select('id, papel_convite, expires_at, created_at')
+    .select('id, papel_convite, expires_at, created_at, label')
     .single()
 
   if (error) throw error
@@ -208,7 +207,7 @@ export async function listarConvitesPendentes(titularUsuarioId) {
   const now = new Date().toISOString()
   const { data, error } = await supabase
     .from('familia_convites')
-    .select('id, papel_convite, expires_at, created_at')
+    .select('id, papel_convite, expires_at, created_at, label')
     .eq('titular_usuario_id', titularUsuarioId)
     .is('revoked_at', null)
     .is('consumed_at', null)
@@ -289,79 +288,22 @@ export async function aceitarConviteFamilia(actorUsuarioId, plainToken) {
   const token_hash = hashFamiliaToken(plainToken)
 
   const supabase = getSupabaseAdmin()
+  const { data, error } = await supabase.rpc('aceitar_convite_familia', {
+    p_actor_id: actorId,
+    p_token_hash: token_hash,
+  })
 
-  const { data: self, error: sErr } = await supabase
-    .from('usuarios')
-    .select('id, vinculo_conta_principal_id')
-    .eq('id', actorId)
-    .maybeSingle()
-
-  if (sErr) throw sErr
-  if (!self) throw new Error('Usuário não encontrado.')
-
-  if (self.vinculo_conta_principal_id) {
-    throw new Error('Esta conta já está vinculada a uma família. Saia da conta compartilhada antes de aceitar outro convite.')
+  if (error) {
+    // Extrai a mensagem legível do RAISE EXCEPTION (formato "codigo: mensagem")
+    const msg = error.message || ''
+    const match = msg.match(/:\s*(.+)$/)
+    throw new Error(match ? match[1].trim() : 'Não foi possível aceitar o convite.')
   }
 
-  const now = new Date().toISOString()
-  const { data: conv, error: cErr } = await supabase
-    .from('familia_convites')
-    .select('*')
-    .eq('token_hash', token_hash)
-    .maybeSingle()
-
-  if (cErr) throw cErr
-  if (!conv) throw new Error('Convite inválido.')
-  if (conv.revoked_at) throw new Error('Convite revogado.')
-  if (conv.consumed_at) throw new Error('Convite já utilizado.')
-  if (conv.expires_at <= now) throw new Error('Convite expirado.')
-
-  const titularId = String(conv.titular_usuario_id).trim()
-  if (titularId === actorId) {
-    throw new Error('Você não pode aceitar um convite da própria conta.')
+  return {
+    titular_usuario_id: String(data.titular_usuario_id),
+    familia_papel: String(data.familia_papel),
   }
-
-  const { data: titularRow } = await supabase
-    .from('usuarios')
-    .select('vinculo_conta_principal_id')
-    .eq('id', titularId)
-    .maybeSingle()
-
-  if (titularRow?.vinculo_conta_principal_id) {
-    throw new Error('O titular deste convite não pode ser conta vinculada.')
-  }
-
-  const n = await countMembrosDoTitular(titularId)
-  if (n >= FAMILIA_MAX_VINCULADOS) {
-    throw new Error(
-      `Esta conta familiar já tem o máximo de ${FAMILIA_MAX_VINCULADOS} pessoa(s) vinculada(s) (${FAMILIA_MAX_MEMBROS_TOTAL} no total com o titular).`,
-    )
-  }
-
-  const papel = String(conv.papel_convite || 'MEMBER').toUpperCase()
-  const familiaPapel = ['ADMIN', 'MEMBER', 'VIEWER'].includes(papel) ? papel : 'MEMBER'
-
-  const { error: upUserErr } = await supabase
-    .from('usuarios')
-    .update({
-      vinculo_conta_principal_id: titularId,
-      familia_papel: familiaPapel,
-    })
-    .eq('id', actorId)
-
-  if (upUserErr) throw upUserErr
-
-  const { error: upConvErr } = await supabase
-    .from('familia_convites')
-    .update({
-      consumed_at: now,
-      consumed_by_usuario_id: actorId,
-    })
-    .eq('id', conv.id)
-
-  if (upConvErr) throw upConvErr
-
-  return { titular_usuario_id: titularId, familia_papel: familiaPapel }
 }
 
 export async function listarMembrosFamilia(titularUsuarioId) {
@@ -384,7 +326,7 @@ export async function removerMembroFamilia(titularUsuarioId, membroUsuarioId) {
   const supabase = getSupabaseAdmin()
   const { data: row, error } = await supabase
     .from('usuarios')
-    .select('id')
+    .select('id, familia_papel')
     .eq('id', mid)
     .eq('vinculo_conta_principal_id', tid)
     .maybeSingle()
@@ -398,4 +340,38 @@ export async function removerMembroFamilia(titularUsuarioId, membroUsuarioId) {
     .eq('id', mid)
 
   if (upErr) throw upErr
+
+  await registrarAuditFamilia({ titularId: tid, actorId: tid, membroId: mid, acao: 'REMOVEU', papelAntes: row.familia_papel })
+}
+
+export async function alterarPapelMembro(titularUsuarioId, membroUsuarioId, novoPapel) {
+  const tid = String(titularUsuarioId || '').trim()
+  const mid = String(membroUsuarioId || '').trim()
+  if (tid === mid) throw new Error('Operação inválida.')
+
+  const papel = String(novoPapel || '').toUpperCase()
+  if (!['ADMIN', 'MEMBER', 'VIEWER'].includes(papel)) {
+    throw new Error('Papel inválido. Use ADMIN, MEMBER ou VIEWER.')
+  }
+
+  const supabase = getSupabaseAdmin()
+  const { data: row, error } = await supabase
+    .from('usuarios')
+    .select('id, familia_papel')
+    .eq('id', mid)
+    .eq('vinculo_conta_principal_id', tid)
+    .maybeSingle()
+
+  if (error) throw error
+  if (!row) throw new Error('Membro não encontrado nesta conta.')
+  if (row.familia_papel === papel) throw new Error(`Membro já possui o papel ${papel}.`)
+
+  const { error: upErr } = await supabase
+    .from('usuarios')
+    .update({ familia_papel: papel })
+    .eq('id', mid)
+
+  if (upErr) throw upErr
+
+  await registrarAuditFamilia({ titularId: tid, actorId: tid, membroId: mid, acao: 'PAPEL_ALTERADO', papelAntes: row.familia_papel, papelDepois: papel })
 }
