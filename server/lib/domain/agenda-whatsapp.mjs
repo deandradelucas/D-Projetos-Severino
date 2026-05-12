@@ -298,7 +298,7 @@ export function isAgendaMessage(message) {
   const trimmed = raw.trim()
   if (/^[1-5]$/.test(trimmed)) return true
   if (/^aviso[1-5]$/i.test(trimmed)) return true
-  if (/^aviso(0|5|10|30|60)$/i.test(trimmed)) return true
+  if (/^aviso(0|5|10|15|30|60)$/i.test(trimmed)) return true
   if (AGENDA_KEYWORD_RE.test(raw)) return true
   return hasCreateIntent(raw) && Boolean(parseAgendaDateTime(raw))
 }
@@ -321,7 +321,7 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
   try {
     const trimmedMsg = message.trim()
     const lower = trimmedMsg.toLowerCase()
-    const ROW_TO_MINUTES = { aviso0: 0, aviso5: 5, aviso10: 10, aviso30: 30, aviso60: 60 }
+    const ROW_TO_MINUTES = { aviso0: 0, aviso5: 5, aviso10: 10, aviso15: 15, aviso30: 30, aviso60: 60 }
     const DIGIT_TO_MINUTES = { '1': 0, '2': 5, '3': 10, '4': 30, '5': 60 }
     const menuMinutes =
       lower in ROW_TO_MINUTES
@@ -445,21 +445,15 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
       return {
         ok: true,
         reply: `✅ ${label}\n*${data.titulo}*\n${quando}\n\nToque no botão abaixo para escolher quando ser avisado.`,
-        listMessage: {
+        buttonMessage: {
           title: `✅ ${label}`,
-          description: `${data.titulo}\n${quando}`,
-          buttonText: 'Escolher aviso',
-          footerText: 'Horizonte Financeiro',
-          sections: [{
-            title: 'Quando avisar?',
-            rows: [
-              { title: 'Na hora', description: 'Aviso no momento exato', rowId: 'aviso0' },
-              { title: '5 minutos antes', description: 'Aviso 5 min antes do evento', rowId: 'aviso5' },
-              { title: '10 minutos antes', description: 'Aviso 10 min antes do evento', rowId: 'aviso10' },
-              { title: '30 minutos antes', description: 'Aviso 30 min antes do evento', rowId: 'aviso30' },
-              { title: '1 hora antes', description: 'Aviso 1 hora antes do evento', rowId: 'aviso60' },
-            ],
-          }],
+          description: `${data.titulo}\n${quando}\nQuando quer ser avisado?`,
+          footer: 'Horizonte Financeiro',
+          buttons: [
+            { buttonId: 'aviso0',  buttonText: { displayText: 'Na hora' } },
+            { buttonId: 'aviso15', buttonText: { displayText: '15 min antes' } },
+            { buttonId: 'aviso60', buttonText: { displayText: '1 hora antes' } },
+          ],
         },
       }
     }

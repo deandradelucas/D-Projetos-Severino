@@ -1,6 +1,6 @@
 import { log } from '../logger.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
-import { sendEvolutionText, sendEvolutionList } from '../evolution-send.mjs'
+import { sendEvolutionText, sendEvolutionButtons } from '../evolution-send.mjs'
 import { transcribeWhatsAppAudioWithGemini } from '../ai.mjs'
 import { processarMensagemBot } from '../domain/whatsapp-bot.mjs'
 import { atualizarWhatsappId, buscarUsuarioPorTelefone } from '../usuarios.mjs'
@@ -288,14 +288,14 @@ async function deliverWhatsappBotOutbound(body, phone, response, options = {}) {
   const textToSend = String(response.reply || '').trim()
 
   try {
-    if (response.listMessage) {
-      const listOk = await sendEvolutionList({
+    if (response.buttonMessage) {
+      const btnOk = await sendEvolutionButtons({
         instance,
         number: phone,
         remoteJid: body?.remoteJid,
-        ...response.listMessage,
+        ...response.buttonMessage,
       })
-      return Boolean(listOk)
+      return Boolean(btnOk)
     }
     if (!textToSend) return false
     const textOk = await sendEvolutionText({
