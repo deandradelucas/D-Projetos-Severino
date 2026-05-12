@@ -228,7 +228,7 @@ export default function Configuracoes() {
   }
 
   const mostrarCampoConviteFamilia =
-    Boolean(usuarioIdHeader) && familiaPainelCarregado && !perfil.conta_familiar_membro
+    Boolean(usuarioIdHeader) && familiaPainelCarregado && !perfil.conta_familiar_membro && familiaTitular !== true
 
   const podeColarConviteFamilia = mostrarCampoConviteFamilia
 
@@ -315,16 +315,16 @@ export default function Configuracoes() {
         await loadFamiliaPainel()
       } else if (familiaConfirm.type === 'revoke_all') {
         const ids = familiaConvites.map((c) => c.id).filter(Boolean)
-        let ok = 0
-        let fail = 0
-        for (const id of ids) {
-          const res = await fetch(apiUrl(`/api/familia/convites/${id}`), {
-            method: 'DELETE',
-            headers: { 'x-user-id': usuarioIdHeader },
-          })
-          if (res.ok) ok += 1
-          else fail += 1
-        }
+        const results = await Promise.all(
+          ids.map((id) =>
+            fetch(apiUrl(`/api/familia/convites/${id}`), {
+              method: 'DELETE',
+              headers: { 'x-user-id': usuarioIdHeader },
+            }).then((r) => r.ok)
+          )
+        )
+        const ok = results.filter(Boolean).length
+        const fail = results.length - ok
         if (fail === 0) {
           showToast(ok === 1 ? 'Convite pendente removido.' : `${ok} convites pendentes removidos.`)
         } else {
@@ -533,6 +533,12 @@ export default function Configuracoes() {
 
               {familiaLoadErr ? <p className="config-empty-note">{familiaLoadErr}</p> : null}
 
+              <p className="config-card-subtitle" style={{ marginBottom: '0.75rem' }}>
+                {familiaVagasOcupadas === 0
+                  ? 'Nenhum familiar vinculado ainda.'
+                  : `${familiaVagasOcupadas} de ${FAMILIA_MAX_VINCULADOS_UI} vaga${familiaVagasOcupadas !== 1 ? 's' : ''} usada${familiaVagasOcupadas !== 1 ? 's' : ''} (membros + convites pendentes).`}
+              </p>
+
               <div className="config-familia-generate-row">
                 <label className="config-field config-field--stretch" htmlFor="familia-papel-convite">
                   <span>Papel do próximo convite</span>
@@ -644,7 +650,7 @@ export default function Configuracoes() {
                     <li key={c.id} className="config-bio-item">
                       <span>
                         <strong>{papelFamiliaLabel(c.papel_convite)}</strong>
-                        {c.label ? <em style={{ fontSize: '0.82em', opacity: 0.75 }}>{c.label}</em> : null}
+                        {c.label ? <em style={{ fontSize: '0.82em', opacity: 0.75 }}> · {c.label}</em> : null}
                         <small>
                           Expira em{' '}
                           {c.expires_at
@@ -681,9 +687,9 @@ export default function Configuracoes() {
                           <>
                             <select
                               className="config-input config-input--compact"
-                              defaultValue={mem.familia_papel}
+                              value={alterarPapelMembro.novoPapel}
                               disabled={familiaBusy}
-                              onChange={(e) => setAlterarPapelMembro({ usuarioId: mem.id, novoPapel: e.target.value })}
+                              onChange={(e) => setAlterarPapelMembro((prev) => ({ ...prev, novoPapel: e.target.value }))}
                             >
                               {PAPEL_CONVITE_OPCOES.map((o) => (
                                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -692,10 +698,10 @@ export default function Configuracoes() {
                             <button
                               type="button"
                               className="config-action-btn config-action-btn--primary"
-                              disabled={familiaBusy}
-                              onClick={() => void executarAlterarPapel(mem.id, alterarPapelMembro.novoPapel || mem.familia_papel)}
+                              disabled={familiaBusy || alterarPapelMembro.novoPapel === mem.familia_papel}
+                              onClick={() => void executarAlterarPapel(mem.id, alterarPapelMembro.novoPapel)}
                             >
-                              Salvar
+                              {familiaBusy ? 'Salvando…' : 'Salvar'}
                             </button>
                             <button
                               type="button"
