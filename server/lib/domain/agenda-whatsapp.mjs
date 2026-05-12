@@ -298,6 +298,7 @@ export function isAgendaMessage(message) {
   const trimmed = raw.trim()
   if (/^[1-5]$/.test(trimmed)) return true
   if (/^aviso[1-5]$/i.test(trimmed)) return true
+  if (/^aviso(0|5|10|30|60)$/i.test(trimmed)) return true
   if (AGENDA_KEYWORD_RE.test(raw)) return true
   return hasCreateIntent(raw) && Boolean(parseAgendaDateTime(raw))
 }
@@ -319,14 +320,21 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
 
   try {
     const trimmedMsg = message.trim()
-    const menuDigit =
-      trimmedMsg.match(/^([1-5])$/)?.[1] ?? trimmedMsg.match(/^aviso([1-5])$/i)?.[1]
-    if (menuDigit) {
+    const lower = trimmedMsg.toLowerCase()
+    const ROW_TO_MINUTES = { aviso0: 0, aviso5: 5, aviso10: 10, aviso30: 30, aviso60: 60 }
+    const DIGIT_TO_MINUTES = { '1': 0, '2': 5, '3': 10, '4': 30, '5': 60 }
+    const menuMinutes =
+      lower in ROW_TO_MINUTES
+        ? ROW_TO_MINUTES[lower]
+        : (() => {
+            const d = trimmedMsg.match(/^([1-5])$/)?.[1] ?? trimmedMsg.match(/^aviso([1-5])$/i)?.[1]
+            return d !== undefined ? DIGIT_TO_MINUTES[d] : undefined
+          })()
+    if (menuMinutes !== undefined) {
       const bloq = bloqueioEscritaViewer()
       if (bloq) return { ok: false, reply: bloq }
       intent = 'agenda_reminder_menu'
-      const minutesMap = { '1': 0, '2': 5, '3': 10, '4': 30, '5': 60 }
-      const minutes = minutesMap[menuDigit]
+      const minutes = menuMinutes
       const recent = await ultimoEventoAgendaCriadoRecentemente(uid, 30)
       if (!recent) {
         reply =
@@ -433,8 +441,27 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
       }
 
       const quando = formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)
-      reply = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n*${data.titulo}*\n${quando}\n\nPara o aviso, responda só com *um* número:\n*1* — na hora\n*2* — 5 min antes\n*3* — 10 min antes\n*4* — 30 min antes\n*5* — 1 hora antes`
-      return { ok: true, reply }
+      const label = reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'
+      return {
+        ok: true,
+        reply: `✅ ${label}\n*${data.titulo}*\n${quando}\n\nToque no botão abaixo para escolher quando ser avisado.`,
+        listMessage: {
+          title: `✅ ${label}`,
+          description: `${data.titulo}\n${quando}`,
+          buttonText: 'Escolher aviso',
+          footerText: 'Horizonte Financeiro',
+          sections: [{
+            title: 'Quando avisar?',
+            rows: [
+              { title: 'Na hora', description: 'Aviso no momento exato', rowId: 'aviso0' },
+              { title: '5 minutos antes', description: '', rowId: 'aviso5' },
+              { title: '10 minutos antes', description: '', rowId: 'aviso10' },
+              { title: '30 minutos antes', description: '', rowId: 'aviso30' },
+              { title: '1 hora antes', description: '', rowId: 'aviso60' },
+            ],
+          }],
+        },
+      }
     }
 
     const reminderMinutes = parseReminderMinutes(message)
