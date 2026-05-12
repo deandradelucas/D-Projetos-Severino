@@ -222,13 +222,14 @@ export async function revogarConviteFamilia(titularUsuarioId, conviteId) {
   const supabase = getSupabaseAdmin()
   const { data: row, error: selErr } = await supabase
     .from('familia_convites')
-    .select('id')
+    .select('id, revoked_at')
     .eq('id', conviteId)
     .eq('titular_usuario_id', titularUsuarioId)
     .maybeSingle()
 
   if (selErr) throw selErr
   if (!row) throw new Error('Convite não encontrado.')
+  if (row.revoked_at) return
 
   const { error } = await supabase
     .from('familia_convites')

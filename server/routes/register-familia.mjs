@@ -171,6 +171,10 @@ export function registerFamiliaRoutes(app) {
       const usuarioId = c.req.header('x-user-id')
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
 
+      if (!rateLimitTake(`familia-sair:${usuarioId}`, 5, 60_000)) {
+        return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
+      }
+
       const escopo = await resolveEscopoUsuario(usuarioId)
       if (!escopo.isMembroConta) {
         return c.json({ message: 'Esta conta não está vinculada a uma família.' }, 400)

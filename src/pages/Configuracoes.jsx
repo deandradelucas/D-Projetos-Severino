@@ -46,8 +46,10 @@ export default function Configuracoes() {
   const [familiaLoadErr, setFamiliaLoadErr] = useState(null)
   const [familiaBusy, setFamiliaBusy] = useState(false)
   const [novoConvitePapel, setNovoConvitePapel] = useState('MEMBER')
+  const [novoConviteLabel, setNovoConviteLabel] = useState('')
   const [ultimoTokenConvite, setUltimoTokenConvite] = useState('')
   const [familiaConfirm, setFamiliaConfirm] = useState(null)
+  const [alterarPapelMembro, setAlterarPapelMembro] = useState(null)
   const [familiaPainelCarregado, setFamiliaPainelCarregado] = useState(false)
   const usuarioIdHeader = String(perfil?.id ?? '').trim()
 
@@ -277,7 +279,7 @@ export default function Configuracoes() {
       const res = await fetch(apiUrl('/api/familia/convites'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioIdHeader },
-        body: JSON.stringify({ papel: novoConvitePapel }),
+        body: JSON.stringify({ papel: novoConvitePapel, label: novoConviteLabel.trim() || null }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -285,6 +287,7 @@ export default function Configuracoes() {
         return
       }
       setUltimoTokenConvite(String(data.token || '').trim())
+      setNovoConviteLabel('')
       showToast(data.message || 'Convite criado.')
       await loadFamiliaPainel()
     } catch {
@@ -364,6 +367,24 @@ export default function Configuracoes() {
       setFamiliaBusy(false)
       setFamiliaConfirm(null)
     }
+  }
+
+  const executarAlterarPapel = async (membroId, novoPapel) => {
+    if (!usuarioIdHeader || familiaBusy) return
+    setFamiliaBusy(true)
+    try {
+      const res = await fetch(apiUrl(`/api/familia/membros/${membroId}`), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioIdHeader },
+        body: JSON.stringify({ papel: novoPapel }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) { showToast(data.message || 'Não foi possível alterar o papel.'); return }
+      showToast(data.message || 'Papel atualizado.')
+      setAlterarPapelMembro(null)
+      await loadFamiliaPainel()
+    } catch { showToast('Erro de rede.') }
+    finally { setFamiliaBusy(false) }
   }
 
   const solicitarCodigoSenhaWhatsapp = async () => {
@@ -481,14 +502,9 @@ export default function Configuracoes() {
                   <span className="config-card-kicker">Família</span>
                   <h3 className="config-subsection__title">Código de convite familiar</h3>
                   <p className="config-card-subtitle">
-                    Use o campo abaixo para colar o <strong>código</strong> ou o <strong>link</strong> enviado pelo titular. Não precisa ir à tela de login.
+                    Use o campo abaixo para colar o <strong>código</strong> ou o <strong>link</strong> enviado pelo titular.
                   </p>
                 </div>
-                {familiaTitular === true ? (
-                  <p className="config-empty-note" style={{ marginBottom: '12px' }}>
-                    Você já é <strong>titular</strong> de uma conta familiar. Aceitar outro convite pode exigir transferir a titularidade ou sair dos vínculos atuais — se o sistema recusar, contacte o suporte.
-                  </p>
-                ) : null}
                 <FamiliaConviteColarBlock
                   idPrefix="config-familia-convite"
                   usuarioIdParaAceitar={usuarioIdHeader}
@@ -528,6 +544,21 @@ export default function Configuracoes() {
                     disabled={familiaBusy}
                   />
                 </label>
+                <div className="config-field config-field--stretch">
+                  <label htmlFor="familia-convite-label" className="config-field-label">
+                    <span>Identificação (opcional)</span>
+                  </label>
+                  <input
+                    id="familia-convite-label"
+                    type="text"
+                    className="config-input"
+                    placeholder='Ex: "Para João" — aparece na lista de pendentes'
+                    maxLength={60}
+                    value={novoConviteLabel}
+                    onChange={(e) => setNovoConviteLabel(e.target.value)}
+                    disabled={familiaBusy || familiaLimiteConvitesAtingido}
+                  />
+                </div>
                 <div className="config-familia-generate-row__cta">
                   <button
                     type="button"
@@ -613,6 +644,7 @@ export default function Configuracoes() {
                     <li key={c.id} className="config-bio-item">
                       <span>
                         <strong>{papelFamiliaLabel(c.papel_convite)}</strong>
+                        {c.label ? <em style={{ fontSize: '0.82em', opacity: 0.75 }}>{c.label}</em> : null}
                         <small>
                           Expira em{' '}
                           {c.expires_at
@@ -644,9 +676,55 @@ export default function Configuracoes() {
                           {papelFamiliaLabel(mem.familia_papel)}
                         </small>
                       </span>
-                      <button type="button" className="config-action-btn" onClick={() => setFamiliaConfirm({ type: 'remove', usuarioId: mem.id })}>
-                        Remover
-                      </button>
+                      <div className="config-bio-item__actions">
+                        {alterarPapelMembro?.usuarioId === mem.id ? (
+                          <>
+                            <select
+                              className="config-input config-input--compact"
+                              defaultValue={mem.familia_papel}
+                              disabled={familiaBusy}
+                              onChange={(e) => setAlterarPapelMembro({ usuarioId: mem.id, novoPapel: e.target.value })}
+                            >
+                              {PAPEL_CONVITE_OPCOES.map((o) => (
+                                <option key={o.value} value={o.value}>{o.label}</option>
+                              ))}
+                            </select>
+                            <button
+                              type="button"
+                              className="config-action-btn config-action-btn--primary"
+                              disabled={familiaBusy}
+                              onClick={() => void executarAlterarPapel(mem.id, alterarPapelMembro.novoPapel || mem.familia_papel)}
+                            >
+                              Salvar
+                            </button>
+                            <button
+                              type="button"
+                              className="config-action-btn"
+                              onClick={() => setAlterarPapelMembro(null)}
+                            >
+                              Cancelar
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              className="config-action-btn"
+                              disabled={familiaBusy}
+                              onClick={() => setAlterarPapelMembro({ usuarioId: mem.id, novoPapel: mem.familia_papel })}
+                            >
+                              Alterar papel
+                            </button>
+                            <button
+                              type="button"
+                              className="config-action-btn"
+                              onClick={() => setFamiliaConfirm({ type: 'remove', usuarioId: mem.id })}
+                            >
+                              Remover
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>
