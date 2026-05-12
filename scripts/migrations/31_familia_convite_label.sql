@@ -1,0 +1,1 @@
+ALTER TABLE familia_convites ADD COLUMN IF NOT EXISTS label TEXT;
