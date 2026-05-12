@@ -444,17 +444,7 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
       const label = reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'
       return {
         ok: true,
-        reply: `✅ ${label}\n*${data.titulo}*\n${quando}\n\nToque no botão abaixo para escolher quando ser avisado.`,
-        buttonMessage: {
-          title: `✅ ${label}`,
-          description: `${data.titulo}\n${quando}\nQuando quer ser avisado?`,
-          footer: 'Horizonte Financeiro',
-          buttons: [
-            { buttonId: 'aviso0',  buttonText: { displayText: 'Na hora' } },
-            { buttonId: 'aviso15', buttonText: { displayText: '15 min antes' } },
-            { buttonId: 'aviso60', buttonText: { displayText: '1 hora antes' } },
-          ],
-        },
+        reply: `✅ ${label}\n*${data.titulo}*\n${quando}\n\nQuando quer ser avisado? Responda com:\n*1* – Na hora\n*2* – 5 min antes\n*3* – 10 min antes\n*4* – 30 min antes\n*5* – 1 hora antes`,
       }
     }
 
