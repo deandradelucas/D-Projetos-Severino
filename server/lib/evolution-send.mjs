@@ -43,27 +43,32 @@ export async function sendEvolutionText({ instance, number, text, remoteJid }) {
 }
 
 /**
- * Envia mensagem de lista interativa via Evolution API (`/message/sendList/:instance`).
- * O usuário vê um botão que abre uma lista de opções clicáveis (sem precisar digitar).
- * `sections`: [{ title, rows: [{ title, description, rowId }] }]
+ * Envia mensagem com botões de resposta rápida via Evolution API (`/message/sendButtons/:instance`).
+ * Máximo 3 botões. Resposta vem como `buttonsResponseMessage.selectedButtonId`.
+ * `buttons`: [{ buttonId, buttonText: { displayText } }]
  */
-export async function sendEvolutionList({ instance, number, remoteJid, title, description, buttonText, footerText, sections }) {
+export async function sendEvolutionButtons({ instance, number, remoteJid, title, description, footer, buttons }) {
   const baseUrl = firstString(process.env.EVOLUTION_API_URL, process.env.EVOLUTION_SERVER_URL)
   const apiKey = firstString(process.env.EVOLUTION_API_KEY)
   const dest = firstString(remoteJid, number)
-  if (!baseUrl || !apiKey || !instance || !dest || !sections?.length) return false
+  if (!baseUrl || !apiKey || !instance || !dest || !buttons?.length) return false
 
-  const response = await fetch(`${baseUrl.replace(/\/+$/, '')}/message/sendList/${encodeURIComponent(instance)}`, {
+  const payload = {
+    number: dest,
+    title,
+    description,
+    footer,
+    buttons: buttons.map((b) => ({ ...b, type: 'reply' })),
+  }
+
+  const response = await fetch(`${baseUrl.replace(/\/+$/, '')}/message/sendButtons/${encodeURIComponent(instance)}`, {
     method: 'POST',
-    headers: {
-      apikey: apiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ number: dest, title, description, buttonText, footerText, sections }),
+    headers: { apikey: apiKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
   })
   if (!response.ok) {
     const detail = await response.text().catch(() => '')
-    log.warn('[evolution] sendList failed', { status: response.status, detail: detail.slice(0, 280) })
+    log.warn('[evolution] sendButtons failed', { status: response.status, detail: detail.slice(0, 280) })
     return false
   }
   return true
