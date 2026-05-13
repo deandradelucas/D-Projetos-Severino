@@ -62,7 +62,10 @@
       "Bash(pip install *)",
       "Bash(yt-dlp *)",
       "Bash(claude mcp *)",
-      "Skill(update-config)"
+      "Skill(update-config)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Projetos\\\\Severino\" -Directory)",
+      "Bash(Select-Object Name)",
+      "mcp__filesystem__directory_tree"
     ]
   }
 }

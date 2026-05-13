@@ -52,6 +52,7 @@ export default function Cadastro() {
   const [emailOtpError, setEmailOtpError] = useState('')
   const [emailOtpLoading, setEmailOtpLoading] = useState(false)
   const [emailResendCooldown, setEmailResendCooldown] = useState(0)
+  const [totalSteps, setTotalSteps] = useState(null)
 
   const forca = senhaForca(senha)
 
@@ -121,6 +122,8 @@ export default function Cadastro() {
       }
 
       if (data.needsPhoneVerification || data.needsEmailVerification) {
+        const total = 2 + (data.needsPhoneVerification ? 1 : 0) + (data.needsEmailVerification ? 1 : 0)
+        setTotalSteps(total)
         setPendingUserId(data.userId)
         setNeedsEmailVerification(Boolean(data.needsEmailVerification))
         if (data.needsPhoneVerification) {
@@ -286,7 +289,7 @@ export default function Cadastro() {
       <div className="mb-5">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-500">
-            {step <= 2 ? `Passo ${step} de 2` : step === 3 ? `Passo 3 de ${needsEmailVerification ? 4 : 3}` : 'Passo 4 de 4'}
+            Passo {step} de {totalSteps ?? (step > 2 ? step : 2)}
           </span>
           <span className="text-[10px] text-neutral-400">
             {step === 1 ? 'Dados pessoais' : step === 2 ? 'Segurança' : step === 3 ? 'WhatsApp' : 'E-mail'}
@@ -295,7 +298,7 @@ export default function Cadastro() {
         <div className="h-1 overflow-hidden rounded-full bg-neutral-200/90">
           <div
             className="h-full rounded-full bg-[var(--accent)] transition-all duration-500"
-            style={{ width: step === 4 ? '100%' : step === 3 ? (needsEmailVerification ? '75%' : '100%') : `${(step / 2) * 100}%` }}
+            style={{ width: `${(step / (totalSteps ?? (step > 2 ? step : 2))) * 100}%` }}
           />
         </div>
       </div>
