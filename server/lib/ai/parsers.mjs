@@ -15,6 +15,27 @@ export function normalizeAudioMimeForGemini(mimetype) {
 }
 
 /**
+ * Infere MIME pelo magic number (WhatsApp PTT costuma ser OGG/Opus).
+ * Devolve string vazia se não reconhecer.
+ */
+export function sniffAudioMimeFromBuffer(buf) {
+  if (!buf || buf.length < 12) return ''
+  const b0 = buf[0]
+  const b1 = buf[1]
+  const b2 = buf[2]
+  const b3 = buf[3]
+  if (b0 === 0x4f && b1 === 0x67 && b2 === 0x67 && b3 === 0x53) return 'audio/ogg' // OggS
+  if (b0 === 0x52 && b1 === 0x49 && b2 === 0x46 && b3 === 0x46 && buf.toString('ascii', 8, 12) === 'WAVE') {
+    return 'audio/wav'
+  }
+  if (b0 === 0x1a && b1 === 0x45 && b2 === 0xdf && b3 === 0xa3) return 'audio/webm' // EBML (WebM/Matroska)
+  if (b0 === 0x49 && b1 === 0x44 && b2 === 0x33) return 'audio/mpeg' // ID3
+  if (b0 === 0xff && (b1 & 0xe0) === 0xe0) return 'audio/mpeg' // frame sync MPEG
+  if (buf.toString('ascii', 4, 8) === 'ftyp') return 'audio/mp4'
+  return ''
+}
+
+/**
  * Extrai texto da resposta generateContent e detecta bloqueios.
  */
 export function extractTextFromGeminiResponse(json) {

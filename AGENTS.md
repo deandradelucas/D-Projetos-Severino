@@ -55,6 +55,7 @@ Skills em `.agents/skills/` quando existirem no clone; regras em `.cursor/rules/
 | `npm run lint` | ESLint (browser: `src/`; Node: `api/`, `server/`, `scripts/`) |
 | `npm run test` | `build` + `lint` (smoke de integridade) |
 | `npm run audit:dashboard-css` | Lista classes em `dashboard.css` sem uso aparente em `src/` (há safelist para Recharts e previews de tema) |
+| `npm run n8n:push` | Atualiza o workflow WhatsApp no n8n via API (`scripts/push-n8n-whatsapp-bot-workflow.mjs` — mescla `.env` → `.env.local` → `.env.production` → `.env.production.local`) |
 
 ## Rotas da API (Hono)
 

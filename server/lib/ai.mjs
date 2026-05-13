@@ -9,6 +9,7 @@ import {
 } from './ai/gemini-client.mjs'
 import {
   normalizeAudioMimeForGemini,
+  sniffAudioMimeFromBuffer,
   extractTextFromGeminiResponse,
   buildGeminiContents,
   contentsWithSystemPrepended,
@@ -20,6 +21,36 @@ import {
 } from './domain/transaction-heuristics.mjs'
 
 const MAX_WHATSAPP_AUDIO_BYTES = 12 * 1024 * 1024
+
+function looksLikeNonBinaryAudioPayload(buf) {
+  if (!buf?.length) return false
+  const head = buf.subarray(0, Math.min(buf.length, 120)).toString('utf8').trimStart()
+  if (head.startsWith('<')) return true
+  if (head.startsWith('{')) {
+    try {
+      const slice = buf.subarray(0, Math.min(buf.length, 8000)).toString('utf8')
+      const j = JSON.parse(slice)
+      if (j && (j.error || j.message === 'Unauthorized' || j.statusCode)) return true
+    } catch {
+      /* binário que começa por "{" é raro em áudio; ignorar */
+    }
+  }
+  return false
+}
+
+function uniqueMimeCandidates(buf, mimeHint) {
+  const sniffed = sniffAudioMimeFromBuffer(buf)
+  const norm = normalizeAudioMimeForGemini(mimeHint)
+  const raw = [sniffed, norm, 'audio/ogg', 'audio/webm', 'audio/mpeg', 'audio/mp4'].filter(Boolean)
+  const seen = new Set()
+  const out = []
+  for (const m of raw) {
+    if (seen.has(m)) continue
+    seen.add(m)
+    out.push(m)
+  }
+  return out
+}
 
 /**
  * ASR para notas de voz do WhatsApp.
@@ -34,7 +65,10 @@ export async function transcribeWhatsAppAudioWithGemini(audioBytes, mimeHint = '
     throw new Error(`Áudio demasiado grande (máx. ${Math.floor(MAX_WHATSAPP_AUDIO_BYTES / 1024 / 1024)} MB).`)
   }
 
-  const mime = normalizeAudioMimeForGemini(mimeHint)
+  if (looksLikeNonBinaryAudioPayload(buf)) {
+    throw new Error('Áudio inválido (payload não é ficheiro de som).')
+  }
+
   const b64 = buf.toString('base64')
 
   const instruction =
@@ -42,54 +76,58 @@ export async function transcribeWhatsAppAudioWithGemini(audioBytes, mimeHint = '
     'Devolve apenas o texto ditado pelo utilizador, sem comentários, sem rótulos como "Transcrição:" ou "O utilizador disse". ' +
     'Se não houver fala inteligível, devolve exatamente: (silêncio)'
 
+  const mimes = uniqueMimeCandidates(buf, mimeHint)
   const models = resolveGeminiModelCandidates()
   let lastErr = null
 
-  for (const mid of models) {
-    const body = {
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            { inline_data: { mime_type: mime, data: b64 } },
-            { text: instruction },
-          ],
-        },
-      ],
-      generationConfig: {
-        maxOutputTokens: 1024,
-        temperature: 0.1,
-      },
-    }
+  modelLoop: for (const mid of models) {
+    for (const mime of mimes) {
+      const partVariants = [
+        [{ text: instruction }, { inline_data: { mime_type: mime, data: b64 } }],
+        [{ inline_data: { mime_type: mime, data: b64 } }, { text: instruction }],
+      ]
+      for (const parts of partVariants) {
+        const body = {
+          contents: [{ role: 'user', parts }],
+          generationConfig: {
+            maxOutputTokens: 1024,
+            temperature: 0.1,
+          },
+        }
 
-    try {
-      const response = await geminiPostGenerateContent(mid, apiKey, body)
-      if (!response.ok) {
-        const t = await response.text()
-        const apiMsg = t?.slice(0, 500)
-        lastErr = new Error(`Gemini ${response.status}: ${apiMsg}`)
-        if (response.status === 404 || /not found/i.test(apiMsg)) continue
-        throw lastErr
-      }
+        try {
+          const response = await geminiPostGenerateContent(mid, apiKey, body)
+          if (!response.ok) {
+            const t = await response.text()
+            const apiMsg = t?.slice(0, 500)
+            lastErr = new Error(`Gemini ${response.status}: ${apiMsg}`)
+            if (response.status === 401) throw lastErr
+            if (response.status === 404 || /not found/i.test(apiMsg)) continue modelLoop
+            continue
+          }
 
-      const json = await response.json()
-      const extracted = extractTextFromGeminiResponse(json)
-      if (!extracted.ok) {
-        lastErr = new Error(extracted.detail || 'Falha na transcrição')
-        continue
-      }
+          const json = await response.json()
+          const extracted = extractTextFromGeminiResponse(json)
+          if (!extracted.ok) {
+            lastErr = new Error(extracted.detail || 'Falha na transcrição')
+            continue
+          }
 
-      let text = extracted.text.trim()
-      if (text.toLowerCase() === '(silêncio)' || text.toLowerCase() === '(silencio)') {
-        text = ''
+          let text = extracted.text.trim()
+          if (text.toLowerCase() === '(silêncio)' || text.toLowerCase() === '(silencio)') {
+            text = ''
+          }
+          return text
+        } catch (e) {
+          if (e?.message?.includes?.('401')) throw e
+          lastErr = e
+          continue
+        }
       }
-      return text
-    } catch (e) {
-      lastErr = e
-      continue
     }
   }
 
+  log.warn({ msg: 'whatsapp_audio_transcribe_failed', detail: String(lastErr?.message || lastErr) })
   if (lastErr) throw lastErr
   throw new Error('Não foi possível transcrever o áudio.')
 }

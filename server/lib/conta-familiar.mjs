@@ -37,7 +37,7 @@ export async function resolveEscopoUsuario(actorUsuarioId) {
   const supabase = getSupabaseAdmin()
   const { data: row, error } = await supabase
     .from('usuarios')
-    .select('id, vinculo_conta_principal_id, familia_papel, principal:usuarios!vinculo_conta_principal_id(id)')
+    .select('id, vinculo_conta_principal_id, familia_papel')
     .eq('id', actorId)
     .maybeSingle()
 
@@ -57,7 +57,14 @@ export async function resolveEscopoUsuario(actorUsuarioId) {
     }
   }
 
-  if (!row.principal?.id) {
+  const { data: principalRow, error: principalErr } = await supabase
+    .from('usuarios')
+    .select('id')
+    .eq('id', principal)
+    .maybeSingle()
+
+  if (principalErr) throw principalErr
+  if (!principalRow?.id) {
     throw new Error('Conta principal não encontrada. Contacte o suporte.')
   }
 

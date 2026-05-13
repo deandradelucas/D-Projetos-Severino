@@ -17,6 +17,7 @@ import { primeiroNomeExibicao } from '../lib/primeiroNomeExibicao'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { formatTransacaoListDateTime } from '../lib/transacaoDateDisplay'
 import { getSaudacao } from '../lib/getSaudacao'
+import { getWhatsappContactUrl } from '../lib/whatsappContactUrl.js'
 import { SkeletonKpi, SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon'
@@ -84,7 +85,6 @@ export default function Dashboard() {
     }
   }, [fetchTransacoes, fetchError])
 
-
   const { totalReceitas, totalDespesas, saldoTotal } = useMemo(() => {
     return transacoes.reduce(
       (acc, t) => {
@@ -108,7 +108,7 @@ export default function Dashboard() {
 
   const mostrarQuemLancou = useMemo(() => familiaMostrarQuemLancouNaUi(usuario), [usuario])
 
-  const whatsappContactUrl = 'https://wa.me/5554992605447'
+  const whatsappContactUrl = useMemo(() => getWhatsappContactUrl(), [])
 
   const formatCurrency = formatCurrencyBRL
 

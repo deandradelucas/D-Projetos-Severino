@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Sidebar from '@components/Sidebar'
 import MobileMenuButton from '@components/MobileMenuButton'
@@ -38,7 +38,6 @@ const POLL_ASSINATURA_MAX_MS = 4 * 60_000
 export default function Pagamento() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
-  const historicoRef = useRef(null)
 
   const [config, setConfig] = useState({
     ready: false,
@@ -371,6 +370,20 @@ export default function Pagamento() {
     setSearchParams(searchParams, { replace: true })
   }
 
+  const fecharParamCheckout = useCallback(
+    (paramKey) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev)
+          next.delete(paramKey)
+          return next
+        },
+        { replace: true },
+      )
+    },
+    [setSearchParams],
+  )
+
   const onAtualizar = async () => {
     await fetchDados({ silent: true })
   }
@@ -445,16 +458,7 @@ export default function Pagamento() {
                     <button
                       type="button"
                       className="btn-secondary btn-secondary--compact"
-                      onClick={() => {
-                        setSearchParams(
-                          (prev) => {
-                            const next = new URLSearchParams(prev)
-                            next.delete('stripe')
-                            return next
-                          },
-                          { replace: true },
-                        )
-                      }}
+                      onClick={() => fecharParamCheckout('stripe')}
                     >
                       Fechar aviso
                     </button>
@@ -467,16 +471,7 @@ export default function Pagamento() {
                     <button
                       type="button"
                       className="btn-secondary btn-secondary--compact"
-                      onClick={() => {
-                        setSearchParams(
-                          (prev) => {
-                            const next = new URLSearchParams(prev)
-                            next.delete('asaas')
-                            return next
-                          },
-                          { replace: true },
-                        )
-                      }}
+                      onClick={() => fecharParamCheckout('asaas')}
                     >
                       Fechar aviso
                     </button>
@@ -558,51 +553,37 @@ export default function Pagamento() {
                 ) : null}
 
                 {!config.isento_pagamento && config.ready && !loading ? (
-                  <div className="ref-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem' }}>
-                    <div>
-                      <p style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '0.25rem' }}>
-                        Finalizar assinatura
-                      </p>
-                      <p style={{ fontSize: '0.85rem', opacity: 0.65 }}>
+                  <div className="ref-panel pagamento-checkout-panel">
+                    <div className="pagamento-checkout-panel__lead">
+                      <p className="pagamento-checkout-panel__lead-title">Finalizar assinatura</p>
+                      <p className="pagamento-checkout-panel__lead-text">
                         Você será redirecionado para o checkout seguro da Asaas para inserir os dados do cartão.
                       </p>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                      <label htmlFor="cpf-checkout" style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                        CPF ou CNPJ <span style={{ color: '#ef4444' }}>*</span>
+                    <div className="pagamento-checkout-panel__field">
+                      <label htmlFor="cpf-checkout" className="pagamento-checkout-panel__label">
+                        CPF ou CNPJ <span className="pagamento-checkout-panel__label-req">*</span>
                       </label>
                       <input
                         id="cpf-checkout"
                         type="text"
+                        className="pagamento-checkout-panel__input"
                         value={cpfCnpj}
                         onChange={handleCpfChange}
                         placeholder="000.000.000-00"
                         maxLength={18}
                         disabled={paying}
-                        style={{
-                          width: '100%',
-                          padding: '0.625rem 0.875rem',
-                          border: '1.5px solid #d1d5db',
-                          borderRadius: '8px',
-                          fontSize: '1rem',
-                          outline: 'none',
-                          boxSizing: 'border-box',
-                        }}
+                        autoComplete="off"
                       />
-                      <p style={{ fontSize: '0.8rem', opacity: 0.55 }}>
-                        Exigido pela Asaas para identificar o pagador.
-                      </p>
+                      <p className="pagamento-checkout-panel__hint">Exigido pela Asaas para identificar o pagador.</p>
                     </div>
 
-                    {error ? (
-                      <p style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.9rem' }}>{error}</p>
-                    ) : null}
+                    {error ? <p className="pagamento-checkout-panel__error">{error}</p> : null}
 
                     <button
                       type="button"
-                      className="btn-primary"
-                      style={{ width: '100%', fontSize: '1rem', padding: '0.75rem' }}
+                      className="btn-primary pagamento-checkout-panel__btn-full"
                       disabled={disabledCheckout || paying}
                       onClick={handlePagarAsaas}
                     >
@@ -611,8 +592,7 @@ export default function Pagamento() {
 
                     <button
                       type="button"
-                      className="btn-secondary"
-                      style={{ width: '100%' }}
+                      className="btn-secondary pagamento-checkout-panel__btn-full"
                       disabled={loading || paying}
                       onClick={onAtualizar}
                     >
@@ -622,8 +602,7 @@ export default function Pagamento() {
                     {planoCheckout === 'anual' ? (
                       <button
                         type="button"
-                        className="btn-secondary"
-                        style={{ width: '100%' }}
+                        className="btn-secondary pagamento-checkout-panel__btn-full"
                         disabled={paying || loading}
                         onClick={() => {
                           setPixCpfCnpj(cpfCnpj.replace(/\D/g, ''))
@@ -676,7 +655,7 @@ export default function Pagamento() {
                   </div>
                 ) : null}
 
-                <PagamentoHistorico historicoRef={historicoRef} historico={historico} loading={loading} formatCurrency={formatCurrency} />
+                <PagamentoHistorico historico={historico} loading={loading} formatCurrency={formatCurrency} />
 
                 {isentaOrientacaoAbaixoHistorico ? (
                   <PagamentoOrientacaoCard

@@ -1,6 +1,7 @@
 import '../load-env.mjs'
 
-const GEMINI_MODEL_FALLBACKS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash']
+/** Ordem: modelos mais recentes primeiro (áudio inline costuma variar por modelo). */
+const GEMINI_MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash']
 const DEFAULT_MODEL = 'gemini-2.0-flash'
 
 /**

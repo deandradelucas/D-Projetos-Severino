@@ -35,6 +35,15 @@ export function registerWhatsappRoutes(app) {
       log.error('[whatsapp-bot] processarMensagemBot failed', error)
       const raw = String(error?.message || '')
       if (/transcrev|Gemini|getBase64|baixar áudio|Áudio/i.test(raw)) {
+        if (
+          /API key not valid|API_KEY_INVALID|API key expired|invalid\s*API\s*key|PERMISSION_DENIED|401|403/i.test(
+            raw,
+          )
+        ) {
+          log.warn('[whatsapp-bot] transcrição: Gemini recusou a chave (401/403, inválida ou expirada).')
+        } else if (/quota|RESOURCE_EXHAUSTED|exceeded your current quota|429/i.test(raw)) {
+          log.warn('[whatsapp-bot] transcrição: quota/rate limit Gemini (429).')
+        }
         return c.json({ ok: false, reply: '🎙️ Não consegui transcrever o áudio. Tente novamente ou envie por texto.' }, 200)
       }
       return c.json({ ok: false, reply: '❌ Erro interno. Tente novamente.' }, 500)

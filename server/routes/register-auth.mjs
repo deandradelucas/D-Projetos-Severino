@@ -1,13 +1,19 @@
+import bcrypt from 'bcryptjs'
 import { log } from '../lib/logger.mjs'
 import { clientIpFromHono } from '../lib/http/client-ip.mjs'
 import { authenticateUser, isValidEmail } from '../lib/password-reset.mjs'
+import { getSupabaseAdmin } from '../lib/supabase-admin.mjs'
 import { requestPasswordOtpWhatsApp, confirmPasswordOtpWhatsApp } from '../lib/password-otp-whatsapp.mjs'
+import { sendRegistrationOtp, verifyRegistrationOtp } from '../lib/registration-otp.mjs'
+import { evolutionEnvConfigured } from '../lib/evolution-send.mjs'
+import { sendEmailOtp, verifyEmailOtp, emailOtpEnabled } from '../lib/email-otp.mjs'
 import { getPerfilUsuario } from '../lib/usuarios.mjs'
 import { insertAdminAuditLog } from '../lib/admin-audit.mjs'
 import { buildAssinaturaUsuarioPayload } from '../lib/assinatura.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { mapSupabaseOrNetworkError } from '../lib/http/hono-error-map.mjs'
 import { isUuidString } from '../lib/transacao-validate.mjs'
+import { normalizeUsuarioRow, stripSenha } from '../lib/usuario-schema.mjs'
 import {
   beginRegistration,
   finishRegistration,
@@ -112,6 +118,387 @@ export function registerAuthRoutes(app) {
         { message: 'Não foi possível fazer login agora. Tente novamente em alguns instantes.' },
         500
       )
+    }
+  })
+
+  app.post('/api/auth/register', async (c) => {
+    try {
+      const ip = clientKeyFromHono(c)
+      if (!rateLimitTake(`register:${ip}`, 10, 60_000)) {
+        return c.json({ message: 'Muitas tentativas. Aguarde cerca de um minuto e tente de novo.' }, 429)
+      }
+      let body
+      try {
+        body = await c.req.json()
+      } catch {
+        return c.json({ message: 'Corpo da requisição inválido. Envie JSON.' }, 400)
+      }
+      const nome = String(body?.nome || '').trim()
+      const telefone = String(body?.telefone || '').trim()
+      const email = String(body?.email || '').trim().toLowerCase()
+      const senha = String(body?.senha || '')
+
+      if (nome.length < 2) {
+        return c.json({ message: 'Informe seu nome completo (mínimo 2 caracteres).' }, 400)
+      }
+      if (!isValidEmail(email)) {
+        return c.json({ message: 'Informe um e-mail válido.' }, 400)
+      }
+      if (senha.length < 6) {
+        return c.json({ message: 'A senha deve ter pelo menos 6 caracteres.' }, 400)
+      }
+
+      let telefoneLimpo = null
+      if (telefone) {
+        const digits = telefone.replace(/\D/g, '')
+        if (digits.length < 10 || digits.length > 13) {
+          return c.json({ message: 'Telefone inválido. Informe DDD + número (10 a 13 dígitos).' }, 400)
+        }
+        telefoneLimpo = digits
+      }
+
+      const supabaseAdmin = getSupabaseAdmin()
+
+      const { data: existing } = await supabaseAdmin
+        .from('usuarios')
+        .select('id')
+        .eq('email', email)
+        .limit(1)
+
+      if (existing && existing.length > 0) {
+        return c.json({ message: 'Este e-mail já está cadastrado.' }, 409)
+      }
+
+      const senhaHash = await bcrypt.hash(senha, 10)
+
+      const { data: newUser, error: insertError } = await supabaseAdmin
+        .from('usuarios')
+        .insert({ nome, email, telefone: telefoneLimpo, senha: senhaHash })
+        .select('*')
+        .single()
+
+      if (insertError) {
+        if (insertError.code === '23505') {
+          return c.json({ message: 'Este e-mail já está cadastrado.' }, 409)
+        }
+        log.error('register insert error', insertError)
+        const mapped = mapSupabaseOrNetworkError(insertError)
+        if (mapped) return c.json({ message: mapped.message }, mapped.status)
+        return c.json({ message: 'Não foi possível criar a conta. Tente novamente.' }, 500)
+      }
+
+      const safeUser = normalizeUsuarioRow(stripSenha(newUser))
+      let payloadUser = { ...safeUser }
+      try {
+        const assinatura = await buildAssinaturaUsuarioPayload(newUser.id, safeUser)
+        payloadUser = { ...newUser, ...assinatura }
+      } catch (err) {
+        log.error('assinatura no cadastro (confira migration 07_trial_bem_vindo_assinatura)', err)
+        payloadUser = {
+          ...safeUser,
+          trial_ends_at: null,
+          bem_vindo_pagamento_visto_at: null,
+          assinatura_paga: false,
+          acesso_app_liberado: true,
+          mostrar_bem_vindo_assinatura: false,
+          trial_dias_gratis: 7,
+          assinatura_proxima_cobranca: null,
+          assinatura_asaas_status: null,
+          plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
+          assinatura_situacao: 'inativa',
+          assinatura_asaas_bloqueada: false,
+          motivo_bloqueio_acesso: null,
+          asaas_portal_url: null,
+          familia_mostrar_quem_lancou: false,
+          conta_familiar_titular_nome: null,
+        }
+      }
+
+      await insertAdminAuditLog({
+        actorUserId: newUser.id,
+        targetUserId: newUser.id,
+        targetEmail: newUser.email,
+        action: 'cadastro_sucesso',
+        clientIp: clientIpFromHono(c),
+        detail: { email: newUser.email },
+      })
+
+      const hasPhone = evolutionEnvConfigured() && Boolean(telefoneLimpo)
+      const hasEmail = emailOtpEnabled()
+
+      let telefoneMascarado = null
+      let emailMascarado = null
+
+      if (hasPhone) {
+        try {
+          const { number } = await sendRegistrationOtp(newUser.id, telefoneLimpo)
+          telefoneMascarado = number.slice(0, 4) + '…' + number.slice(-2)
+        } catch (otpErr) {
+          log.warn('[register] falha ao enviar OTP WhatsApp, seguindo sem verificação de telefone', otpErr.message)
+        }
+      }
+
+      if (hasEmail) {
+        try {
+          const { masked } = await sendEmailOtp(newUser.id, newUser.email)
+          emailMascarado = masked
+        } catch (otpErr) {
+          log.warn('[register] falha ao enviar OTP e-mail, seguindo sem verificação de e-mail', otpErr.message)
+        }
+      }
+
+      if (telefoneMascarado || emailMascarado) {
+        return c.json({
+          needsPhoneVerification: Boolean(telefoneMascarado),
+          needsEmailVerification: Boolean(emailMascarado),
+          userId: newUser.id,
+          telefoneMascarado,
+          emailMascarado,
+          message: 'Conta criada. Confirme seus dados para continuar.',
+        })
+      }
+
+      return c.json({ message: 'Conta criada com sucesso.', user: payloadUser })
+    } catch (error) {
+      log.error('register failed', error)
+      const mapped = mapSupabaseOrNetworkError(error)
+      if (mapped) return c.json({ message: mapped.message }, mapped.status)
+      return c.json({ message: 'Não foi possível criar a conta agora. Tente novamente em alguns instantes.' }, 500)
+    }
+  })
+
+  app.post('/api/auth/verify-registration', async (c) => {
+    try {
+      const ip = clientKeyFromHono(c)
+      if (!rateLimitTake(`verify-reg:${ip}`, 15, 60_000)) {
+        return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
+      }
+      let body
+      try {
+        body = await c.req.json()
+      } catch {
+        return c.json({ message: 'JSON inválido.' }, 400)
+      }
+      const userId = String(body?.userId || '').trim()
+      const otp = String(body?.otp || '').replace(/\D/g, '')
+      if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
+
+      if (!rateLimitTake(`verify-reg-user:${userId}`, 5, 15 * 60_000)) {
+        return c.json({ message: 'Muitas tentativas para este usuário. Solicite um novo código.' }, 429)
+      }
+
+      await verifyRegistrationOtp(userId, otp)
+
+      const supabaseAdmin = getSupabaseAdmin()
+      const { data: userRow, error: fetchErr } = await supabaseAdmin
+        .from('usuarios')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      if (fetchErr || !userRow) {
+        return c.json({ message: 'Usuário não encontrado.' }, 404)
+      }
+
+      const safeUser = normalizeUsuarioRow(stripSenha(userRow))
+      let payloadUser = { ...safeUser }
+      try {
+        const assinatura = await buildAssinaturaUsuarioPayload(userRow.id, safeUser)
+        payloadUser = { ...safeUser, ...assinatura }
+      } catch (err) {
+        log.error('assinatura no verify-registration', err)
+        payloadUser = {
+          ...safeUser,
+          trial_ends_at: null,
+          bem_vindo_pagamento_visto_at: null,
+          assinatura_paga: false,
+          acesso_app_liberado: true,
+          mostrar_bem_vindo_assinatura: false,
+          trial_dias_gratis: 7,
+          assinatura_proxima_cobranca: null,
+          assinatura_asaas_status: null,
+          plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
+          assinatura_situacao: 'inativa',
+          assinatura_asaas_bloqueada: false,
+          motivo_bloqueio_acesso: null,
+          asaas_portal_url: null,
+          familia_mostrar_quem_lancou: false,
+          conta_familiar_titular_nome: null,
+        }
+      }
+
+      if (emailOtpEnabled()) {
+        const { data: freshRow } = await getSupabaseAdmin()
+          .from('usuarios')
+          .select('email_verificado')
+          .eq('id', userId)
+          .single()
+        if (!freshRow?.email_verificado) {
+          return c.json({ needsEmailVerification: true, userId })
+        }
+      }
+
+      return c.json({ message: 'Telefone confirmado com sucesso.', user: payloadUser })
+    } catch (error) {
+      log.error('verify-registration failed', error)
+      const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
+      if (status !== 500) return c.json({ message: error.message || 'Código inválido.' }, status)
+      const mapped = mapSupabaseOrNetworkError(error)
+      if (mapped) return c.json({ message: mapped.message }, mapped.status)
+      return c.json({ message: 'Não foi possível confirmar o telefone. Tente novamente.' }, 500)
+    }
+  })
+
+  app.post('/api/auth/resend-registration-otp', async (c) => {
+    try {
+      const ip = clientKeyFromHono(c)
+      if (!rateLimitTake(`resend-reg-otp:${ip}`, 5, 15 * 60_000)) {
+        return c.json({ message: 'Muitas solicitações. Aguarde alguns minutos.' }, 429)
+      }
+      let body
+      try {
+        body = await c.req.json()
+      } catch {
+        return c.json({ message: 'JSON inválido.' }, 400)
+      }
+      const userId = String(body?.userId || '').trim()
+      if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
+
+      if (!rateLimitTake(`resend-reg-otp-user:${userId}`, 3, 15 * 60_000)) {
+        return c.json({ message: 'Limite de reenvios atingido para este número. Aguarde 15 minutos.' }, 429)
+      }
+
+      const supabaseAdmin = getSupabaseAdmin()
+      const { data: userRow, error: fetchErr } = await supabaseAdmin
+        .from('usuarios')
+        .select('id, telefone, whatsapp_id, telefone_verificado')
+        .eq('id', userId)
+        .single()
+      if (fetchErr || !userRow) return c.json({ message: 'Usuário não encontrado.' }, 404)
+      if (userRow.telefone_verificado) return c.json({ message: 'Telefone já confirmado.' }, 400)
+
+      const telefone = userRow.telefone || userRow.whatsapp_id
+      if (!telefone) return c.json({ message: 'Nenhum telefone cadastrado para reenvio.' }, 400)
+
+      const { number } = await sendRegistrationOtp(userId, telefone)
+      const masked = number.slice(0, 4) + '…' + number.slice(-2)
+      return c.json({ message: `Novo código enviado para ${masked}.` })
+    } catch (error) {
+      log.error('resend-registration-otp failed', error)
+      const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
+      if (status !== 500) return c.json({ message: error.message || 'Erro ao reenviar.' }, status)
+      const mapped = mapSupabaseOrNetworkError(error)
+      if (mapped) return c.json({ message: mapped.message }, mapped.status)
+      return c.json({ message: 'Não foi possível reenviar o código. Tente novamente.' }, 500)
+    }
+  })
+
+  app.post('/api/auth/verify-email-otp', async (c) => {
+    try {
+      const ip = clientKeyFromHono(c)
+      if (!rateLimitTake(`verify-email-otp:${ip}`, 15, 60_000)) {
+        return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
+      }
+      let body
+      try {
+        body = await c.req.json()
+      } catch {
+        return c.json({ message: 'JSON inválido.' }, 400)
+      }
+      const userId = String(body?.userId || '').trim()
+      const otp = String(body?.otp || '').replace(/\D/g, '')
+      if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
+
+      if (!rateLimitTake(`verify-email-otp-user:${userId}`, 5, 15 * 60_000)) {
+        return c.json({ message: 'Muitas tentativas para este e-mail. Solicite um novo código.' }, 429)
+      }
+
+      await verifyEmailOtp(userId, otp)
+
+      const supabaseAdmin = getSupabaseAdmin()
+      const { data: userRow, error: fetchErr } = await supabaseAdmin
+        .from('usuarios')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      if (fetchErr || !userRow) {
+        return c.json({ message: 'Usuário não encontrado.' }, 404)
+      }
+
+      const safeUser = normalizeUsuarioRow(stripSenha(userRow))
+      let payloadUser = { ...safeUser }
+      try {
+        const assinatura = await buildAssinaturaUsuarioPayload(userRow.id, safeUser)
+        payloadUser = { ...safeUser, ...assinatura }
+      } catch (err) {
+        log.error('assinatura no verify-email-otp', err)
+        payloadUser = {
+          ...safeUser,
+          trial_ends_at: null,
+          bem_vindo_pagamento_visto_at: null,
+          assinatura_paga: false,
+          acesso_app_liberado: true,
+          mostrar_bem_vindo_assinatura: false,
+          trial_dias_gratis: 7,
+          assinatura_proxima_cobranca: null,
+          assinatura_asaas_status: null,
+          plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
+          assinatura_situacao: 'inativa',
+          assinatura_asaas_bloqueada: false,
+          motivo_bloqueio_acesso: null,
+          asaas_portal_url: null,
+          familia_mostrar_quem_lancou: false,
+          conta_familiar_titular_nome: null,
+        }
+      }
+
+      return c.json({ message: 'E-mail confirmado com sucesso.', user: payloadUser })
+    } catch (error) {
+      log.error('verify-email-otp failed', error)
+      const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
+      if (status !== 500) return c.json({ message: error.message || 'Código inválido.' }, status)
+      const mapped = mapSupabaseOrNetworkError(error)
+      if (mapped) return c.json({ message: mapped.message }, mapped.status)
+      return c.json({ message: 'Não foi possível confirmar o e-mail. Tente novamente.' }, 500)
+    }
+  })
+
+  app.post('/api/auth/resend-email-otp', async (c) => {
+    try {
+      const ip = clientKeyFromHono(c)
+      if (!rateLimitTake(`resend-email-otp:${ip}`, 5, 15 * 60_000)) {
+        return c.json({ message: 'Muitas solicitações. Aguarde alguns minutos.' }, 429)
+      }
+      let body
+      try {
+        body = await c.req.json()
+      } catch {
+        return c.json({ message: 'JSON inválido.' }, 400)
+      }
+      const userId = String(body?.userId || '').trim()
+      if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
+
+      if (!rateLimitTake(`resend-email-otp-user:${userId}`, 3, 15 * 60_000)) {
+        return c.json({ message: 'Limite de reenvios atingido para este e-mail. Aguarde 15 minutos.' }, 429)
+      }
+
+      const supabaseAdmin = getSupabaseAdmin()
+      const { data: userRow, error: fetchErr } = await supabaseAdmin
+        .from('usuarios')
+        .select('id, email, email_verificado')
+        .eq('id', userId)
+        .single()
+      if (fetchErr || !userRow) return c.json({ message: 'Usuário não encontrado.' }, 404)
+      if (userRow.email_verificado) return c.json({ message: 'E-mail já confirmado.' }, 400)
+
+      const { masked } = await sendEmailOtp(userId, userRow.email)
+      return c.json({ message: `Novo código enviado para ${masked}.` })
+    } catch (error) {
+      log.error('resend-email-otp failed', error)
+      const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
+      if (status !== 500) return c.json({ message: error.message || 'Erro ao reenviar.' }, status)
+      const mapped = mapSupabaseOrNetworkError(error)
+      if (mapped) return c.json({ message: mapped.message }, mapped.status)
+      return c.json({ message: 'Não foi possível reenviar o código. Tente novamente.' }, 500)
     }
   })
 

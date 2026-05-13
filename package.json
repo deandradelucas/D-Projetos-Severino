@@ -24,17 +24,21 @@
     "whatsapp:docker:down": "docker compose down",
     "supabase:check": "node scripts/supabase-admin-check.mjs",
     "backup:rclone": "node scripts/run-rclone-backup.mjs",
-    "backup:rclone:task": "powershell -ExecutionPolicy Bypass -File scripts/install-rclone-backup-task.ps1"
+    "backup:rclone:task": "powershell -ExecutionPolicy Bypass -File scripts/install-rclone-backup-task.ps1",
+    "n8n:push": "node scripts/push-n8n-whatsapp-bot-workflow.mjs",
+    "check:gemini": "node scripts/check-gemini-api.mjs"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.12",
     "@simplewebauthn/browser": "^13.3.0",
     "@simplewebauthn/server": "^13.3.0",
     "@supabase/supabase-js": "^2.101.1",
+    "bcryptjs": "^3.0.3",
     "hono": "^4.12.10",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "line-awesome": "^1.3.0",
+    "nodemailer": "^8.0.7",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.14.0",

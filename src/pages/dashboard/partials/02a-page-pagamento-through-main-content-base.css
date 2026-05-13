@@ -378,6 +378,89 @@ body[data-theme='light'] .pagamento-banner {
   color: var(--danger);
 }
 
+/* Painel “Finalizar assinatura” (antes estilos inline no JSX) */
+.pagamento-checkout-panel.ref-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.pagamento-checkout-panel__lead-title {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.pagamento-checkout-panel__lead-text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.pagamento-checkout-panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.pagamento-checkout-panel__label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.pagamento-checkout-panel__label-req {
+  color: var(--danger);
+}
+
+.pagamento-checkout-panel__input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 1.5px solid var(--border-default);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.pagamento-checkout-panel__input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.pagamento-checkout-panel__input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.pagamento-checkout-panel__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.pagamento-checkout-panel__error {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.pagamento-checkout-panel__btn-full {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full {
+  font-size: 1rem;
+  padding: 0.75rem;
+}
+
 .page-pagamento .page-pagamento-cta {
   width: 100%;
   max-width: 100%;
