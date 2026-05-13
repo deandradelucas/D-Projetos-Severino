@@ -1,62 +1,176 @@
-/* Default Reset & Variables (tema claro) */
+/* ============================================================
+   HORIZONTE FINANCEIRO — Tokens Canônicos v2.0 (light mode)
+   ============================================================ */
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #ffffff;
-  --bg-card: #ffffff;
-  --bg-card-elevated: #f8fafc;
-  --active-bg: #ffffff; /* Volta ao branco sólido */
-  --border-color: rgba(0, 0, 0, 0.05);
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --accent: #d4a84b;
-  --accent-hover: #b8923f;
-  --success: #10b981;
-  --danger: #ef4444;
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  --sidebar-bg: rgba(0, 0, 0, 0.85);
-  --sidebar-text: #ffffff;
-  --sidebar-text-muted: rgba(255, 255, 255, 0.5);
+  color-scheme: light;
+
+  /* Backgrounds */
+  --bg-base:           #f0f2f5;
+  --bg-primary:        #f5f7fa;
+  --bg-secondary:      #eef0f4;
+  --bg-card:           #ffffff;
+  --bg-card-elevated:  #ffffff;
+  --active-bg:         #ffffff; /* compat */
+
+  /* Textos */
+  --text-primary:   #0d1117;
+  --text-secondary: #4a5568;
+  --text-muted:     #8896a5;
+
+  /* Acento gold — família completa */
+  --accent:             #d4a84b;
+  --accent-hover:       #c49535;
+  --accent-active:      #b8832a;
+  --accent-subtle:      #e8c878;
+  --accent-muted:       rgba(212, 168, 75, 0.12);
+  --accent-muted-hover: rgba(212, 168, 75, 0.20);
+  --accent-border:      rgba(212, 168, 75, 0.30);
+  --accent-foreground:  #1a1200;
+
+  /* Semânticas — base + muted + text */
+  --success:       #16a34a;
+  --success-muted: rgba(22, 163, 74, 0.10);
+  --success-text:  #15803d;
+  --error:         #dc2626;
+  --error-muted:   rgba(220, 38, 38, 0.10);
+  --error-text:    #b91c1c;
+  --warning:       #d97706;
+  --warning-muted: rgba(217, 119, 6, 0.10);
+  --warning-text:  #b45309;
+  --info:          #2563eb;
+  --info-muted:    rgba(37, 99, 235, 0.10);
+  --info-text:     #1d4ed8;
+  --danger:        #dc2626; /* compat alias → error */
+
+  /* Bordas */
+  --border-subtle:  rgba(0, 0, 0, 0.05);
+  --border-default: #d1d9e0;
+  --border-strong:  #94a3b8;
+  --border-accent:  rgba(212, 168, 75, 0.30);
+  --border-color:   rgba(0, 0, 0, 0.05); /* compat */
+  --content-border-color: rgba(0, 0, 0, 0.05); /* compat */
+
+  /* Sidebar (sempre dark — não muda com o tema) */
+  --sidebar-bg:               #0d1117;
+  --sidebar-border:           rgba(255, 255, 255, 0.06);
+  --sidebar-text:             #c8d3e0;
+  --sidebar-text-muted:       #5a6a7a;
+  --sidebar-item-hover:       rgba(255, 255, 255, 0.06);
+  --sidebar-item-active:      rgba(212, 168, 75, 0.15);
+  --sidebar-item-active-text: #d4a84b;
+  --sidebar-item-active-bar:  #d4a84b;
+  /* compat aliases */
+  --sidebar-border-color:  rgba(255, 255, 255, 0.06);
+  --sidebar-hover-bg:      rgba(255, 255, 255, 0.06);
   --sidebar-backdrop-blur: 2px;
-  --sidebar-hover-bg: rgba(255, 255, 255, 0.1);
-  --sidebar-border-color: #111111;
-  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --content-border-color: rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Sombras */
+  --shadow-sm:     0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md:     0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg:     0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl:     0 16px 40px rgba(0, 0, 0, 0.15);
+  --shadow-accent: 0 0 20px rgba(212, 168, 75, 0.15);
+  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* compat */
+
+  /* Séries de gráficos */
+  --chart-1: #d4a84b;
+  --chart-2: #6b8ede;
+  --chart-3: #7dd3aa;
+  --chart-4: #c47bc4;
+  --chart-5: #e8926b;
+  --chart-6: #5ec8d4;
+
+  /* Transações — balanço positivo */
+  --transacoes-balance-pos: #2563eb;
+
+  /* Tipografia */
+  --font-family:         'Inter', system-ui, -apple-system, sans-serif;
+  --font-numeric-features: "tnum" 1, "ss01" 1;
+
+  /* Transições */
   --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --transacoes-balance-pos: #6366f1;
+
   /* Áreas seguras (notch, home indicator, PWA) */
-  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-top:    env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
 }
 
-/* Paleta escura — mesmas chaves que :root; layout idêntico ao claro */
+/* ============================================================
+   DARK MODE — body[data-theme='dark']
+   ============================================================ */
 body[data-theme='dark'] {
-  --bg-primary: #000000;
-  --bg-secondary: #050505;
-  --bg-card: #0c0c0c;
-  --bg-card-elevated: #121212;
-  --active-bg: #161616;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --text-primary: #fafafa;
-  --text-secondary: #a3a3a3;
-  --accent: #e4bc6a;
-  --accent-hover: #d4a84b;
-  --success: #34d399;
-  --danger: #f87171;
-  --sidebar-bg: #030303;
-  --sidebar-text: #fafafa;
-  --sidebar-text-muted: rgba(250, 250, 250, 0.52);
-  --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
-  --sidebar-border-color: rgba(255, 255, 255, 0.09);
-  --content-border-color: rgba(255, 255, 255, 0.07);
-  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.35);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.35);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.32);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.38);
+  color-scheme: dark;
+
+  /* Backgrounds */
+  --bg-base:           #030405;
+  --bg-primary:        #080a0c;
+  --bg-secondary:      #0e1014;
+  --bg-card:           #141618;
+  --bg-card-elevated:  #1c1e22;
+  --active-bg:         #1c1e22; /* compat */
+
+  /* Textos */
+  --text-primary:   #f0f2f5;
+  --text-secondary: #8a9bb0;
+  --text-muted:     #4a5568;
+
+  /* Acento gold — igual em ambos os temas (identidade de marca) */
+  --accent:             #d4a84b;
+  --accent-hover:       #c49535;
+  --accent-active:      #b8832a;
+  --accent-subtle:      #e8c878;
+  --accent-muted:       rgba(212, 168, 75, 0.12);
+  --accent-muted-hover: rgba(212, 168, 75, 0.20);
+  --accent-border:      rgba(212, 168, 75, 0.35);
+  --accent-foreground:  #1a1200;
+
+  /* Semânticas dark */
+  --success:       #22c55e;
+  --success-muted: rgba(34, 197, 94, 0.12);
+  --success-text:  #4ade80;
+  --error:         #ef4444;
+  --error-muted:   rgba(239, 68, 68, 0.12);
+  --error-text:    #f87171;
+  --warning:       #f59e0b;
+  --warning-muted: rgba(245, 158, 11, 0.12);
+  --warning-text:  #fbbf24;
+  --info:          #3b82f6;
+  --info-muted:    rgba(59, 130, 246, 0.12);
+  --info-text:     #60a5fa;
+  --danger:        #ef4444; /* compat alias → error */
+
+  /* Bordas dark */
+  --border-subtle:  rgba(255, 255, 255, 0.04);
+  --border-default: #232830;
+  --border-strong:  #3a4250;
+  --border-accent:  rgba(212, 168, 75, 0.35);
+  --border-color:   rgba(255, 255, 255, 0.04); /* compat */
+  --content-border-color: rgba(255, 255, 255, 0.07); /* compat */
+
+  /* Sidebar dark */
+  --sidebar-bg:               #070910;
+  --sidebar-border:           rgba(255, 255, 255, 0.05);
+  --sidebar-text:             #b8c5d0;
+  --sidebar-text-muted:       #485868;
+  --sidebar-item-hover:       rgba(255, 255, 255, 0.05);
+  --sidebar-item-active:      rgba(212, 168, 75, 0.12);
+  --sidebar-item-active-text: #d4a84b;
+  --sidebar-item-active-bar:  #d4a84b;
+  /* compat aliases */
+  --sidebar-border-color: rgba(255, 255, 255, 0.05);
+  --sidebar-hover-bg:     rgba(255, 255, 255, 0.05);
+
+  /* Sombras dark (mais opacas para visibilidade) */
+  --shadow-sm:     0 1px 3px rgba(0, 0, 0, 0.40);
+  --shadow-md:     0 4px 12px rgba(0, 0, 0, 0.50);
+  --shadow-lg:     0 8px 24px rgba(0, 0, 0, 0.60);
+  --shadow-xl:     0 16px 40px rgba(0, 0, 0, 0.70);
+  --shadow-accent: 0 0 24px rgba(212, 168, 75, 0.20);
+  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.35); /* compat */
+
+  /* Transações — balanço positivo */
   --transacoes-balance-pos: #3b82f6;
 }
 

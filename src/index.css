@@ -1,90 +1,135 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Cores base ─────────────────────────────────────────── */
-  --color-bg-base: #050607;
-  --color-bg-primary: #0a0a0a;
-  --color-bg-secondary: #141414;
-  --color-bg-card: #1a1a1a;
-
-  /* ── Texto ──────────────────────────────────────────────── */
-  --color-text-primary: #f5f5f5;
-  --color-text-secondary: #a3a3a3;
-  --color-text-muted: #737373;
-
-  /* ── Acento gold ────────────────────────────────────────── */
-  --color-accent-gold: #d4a84b;
-  --color-accent-gold-hover: #b8923f;
-  --color-accent-gold-muted: rgba(212, 168, 75, 0.15);
-
-  /* ── Borda ──────────────────────────────────────────────── */
-  --color-border: #2a2a2a;
-
-  /* ── Semânticas ─────────────────────────────────────────── */
-  --color-success: #22c55e;
-  --color-error: #ef4444;
-  --color-warning: #f59e0b;
-  --color-info: #3b82f6;
-
   /* ── Tipografia — família ────────────────────────────────── */
-  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif; /* compat */
 
   /* ── Tipografia — tamanhos ───────────────────────────────── */
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.25rem;
+  --font-size-xs:   0.6875rem;
+  --font-size-sm:   0.8125rem;
+  --font-size-base: 0.9375rem;
+  --font-size-lg:   1.0625rem;
+  --font-size-xl:   1.25rem;
+  --font-size-2xl:  1.5rem;
+  --font-size-3xl:  1.875rem;
+  --font-size-4xl:  2.25rem;
+  --font-size-5xl:  3rem;
 
   /* ── Tipografia — pesos ──────────────────────────────────── */
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  --font-weight-normal:    400;
+  --font-weight-medium:    500;
+  --font-weight-semibold:  600;
+  --font-weight-bold:      700;
   --font-weight-extrabold: 800;
-  --font-weight-black: 900;
+  --font-weight-black:     900;
 
   /* ── Tipografia — entrelinhamento ────────────────────────── */
-  --leading-tight: 1.1;
-  --leading-snug: 1.25;
-  --leading-normal: 1.5;
+  --leading-tight:   1.1;
+  --leading-snug:    1.25;
+  --leading-normal:  1.5;
   --leading-relaxed: 1.625;
 
   /* ── Border radius ───────────────────────────────────────── */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-2xl: 28px;
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-2xl:  20px;
   --radius-full: 9999px;
 
-  /* ── Sombras (prefixo --shadow-*) ────────────────────────── */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  --shadow-gold: 0 0 30px rgba(212, 168, 75, 0.2);
+  /* ── Backgrounds (light mode — default) ─────────────────── */
+  --color-bg-base:          #f0f2f5;
+  --color-bg-primary:       #f5f7fa;
+  --color-bg-secondary:     #eef0f4;
+  --color-bg-card:          #ffffff;
+  --color-bg-card-elevated: #ffffff;
+
+  /* ── Texto (light mode) ──────────────────────────────────── */
+  --color-text-primary:   #0d1117;
+  --color-text-secondary: #4a5568;
+  --color-text-muted:     #8896a5;
+
+  /* ── Acento gold — família completa ─────────────────────── */
+  --color-accent:             #d4a84b;
+  --color-accent-hover:       #c49535;
+  --color-accent-active:      #b8832a;
+  --color-accent-subtle:      #e8c878;
+  --color-accent-muted:       rgba(212, 168, 75, 0.12);
+  --color-accent-muted-hover: rgba(212, 168, 75, 0.20);
+  --color-accent-border:      rgba(212, 168, 75, 0.30);
+  --color-accent-foreground:  #1a1200;
+  /* compat aliases */
+  --color-accent-gold:        #d4a84b;
+  --color-accent-gold-hover:  #c49535;
+  --color-accent-gold-muted:  rgba(212, 168, 75, 0.12);
+
+  /* ── Semânticas (light mode) ─────────────────────────────── */
+  --color-success:       #16a34a;
+  --color-success-muted: rgba(22, 163, 74, 0.10);
+  --color-success-text:  #15803d;
+  --color-error:         #dc2626;
+  --color-error-muted:   rgba(220, 38, 38, 0.10);
+  --color-error-text:    #b91c1c;
+  --color-warning:       #d97706;
+  --color-warning-muted: rgba(217, 119, 6, 0.10);
+  --color-warning-text:  #b45309;
+  --color-info:          #2563eb;
+  --color-info-muted:    rgba(37, 99, 235, 0.10);
+  --color-info-text:     #1d4ed8;
+
+  /* ── Bordas (light mode) ─────────────────────────────────── */
+  --color-border-subtle:  rgba(0, 0, 0, 0.05);
+  --color-border-default: #d1d9e0;
+  --color-border-strong:  #94a3b8;
+  --color-border-accent:  rgba(212, 168, 75, 0.30);
+  --color-border:         #d1d9e0; /* compat */
+
+  /* ── Sidebar (sempre dark) ───────────────────────────────── */
+  --color-sidebar-bg:               #0d1117;
+  --color-sidebar-border:           rgba(255, 255, 255, 0.06);
+  --color-sidebar-text:             #c8d3e0;
+  --color-sidebar-text-muted:       #5a6a7a;
+  --color-sidebar-item-hover:       rgba(255, 255, 255, 0.06);
+  --color-sidebar-item-active:      rgba(212, 168, 75, 0.15);
+  --color-sidebar-item-active-text: #d4a84b;
+  --color-sidebar-item-active-bar:  #d4a84b;
+
+  /* ── Séries de gráficos ──────────────────────────────────── */
+  --color-chart-1: #d4a84b;
+  --color-chart-2: #6b8ede;
+  --color-chart-3: #7dd3aa;
+  --color-chart-4: #c47bc4;
+  --color-chart-5: #e8926b;
+  --color-chart-6: #5ec8d4;
+
+  /* ── Sombras (light mode) ────────────────────────────────── */
+  --shadow-sm:     0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md:     0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg:     0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl:     0 16px 40px rgba(0, 0, 0, 0.15);
+  --shadow-accent: 0 0 20px rgba(212, 168, 75, 0.15);
+  /* compat aliases */
+  --shadow-gold:        0 0 20px rgba(212, 168, 75, 0.15);
   --shadow-gold-strong: 0 8px 32px rgba(212, 168, 75, 0.35);
 
   /* ── Motion — durações ───────────────────────────────────── */
-  --duration-fast: 150ms;
-  --duration-base: 200ms;
-  --duration-slow: 300ms;
+  --duration-fast:   150ms;
+  --duration-base:   200ms;
+  --duration-slow:   300ms;
   --duration-slower: 500ms;
-  --duration-count: 1000ms;
+  --duration-count:  1000ms;
 
   /* ── Motion — easings ────────────────────────────────────── */
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:        cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out:     cubic-bezier(0.4, 0, 0.2, 1);
   --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
 }
 
 html {
   min-height: 100%;
   height: 100%;
-  background-color: #050607;
+  background-color: #080a0c;
   -webkit-text-size-adjust: 100%;
   overflow-x: clip;
 }
@@ -102,8 +147,8 @@ body,
 
 body {
   font-family: var(--font-family-sans);
-  background: #050607;
-  background-color: #050607;
+  background: #080a0c;
+  background-color: #080a0c;
   margin: 0;
   overflow-x: clip;
   -webkit-tap-highlight-color: rgba(212, 168, 75, 0.12);
@@ -1027,3 +1072,49 @@ body:has(.pwa-install-sheet) .horizon-chat-window {
     }
   }
 }
+
+/* ── Utilitários de tipografia numérica ──────────────────────── */
+.tabular-nums,
+.font-numeric {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  letter-spacing: -0.01em;
+}
+
+.value-positive {
+  color: var(--success-text, #15803d);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+.value-negative {
+  color: var(--error-text, #b91c1c);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+/* ── Cards base reutilizáveis ────────────────────────────────── */
+.card-base {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-base:hover {
+  background: var(--bg-card-elevated);
+  border-color: var(--border-strong);
+}
+
+.card-accent {
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md), var(--shadow-accent);
+}
+
+.card-alert-error   { border-left: 3px solid var(--error);   }
+.card-alert-warning { border-left: 3px solid var(--warning); }
+.card-alert-success { border-left: 3px solid var(--success); }
+.card-alert-info    { border-left: 3px solid var(--info);    }

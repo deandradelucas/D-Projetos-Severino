@@ -361,6 +361,7 @@ export default function Login() {
       bodyLogoSrc={BRAND_ASSETS.loginSeverinoLight}
       bodyLogoIntrinsicSize={BRAND_LOGO_PIXEL_SIZE.severinoTemaClaro}
       bodyLogoAlt="Severino"
+      subtitle="Seu financeiro pessoal, organizado"
       heroImageSrc="/images/Login/01.avif"
       compact={!showRecovery && !(webAuthnSupported() && hasWebAuthn)}
       footer={
@@ -368,7 +369,7 @@ export default function Login() {
           Não tem conta?{' '}
           <Link
             to="/cadastro"
-            className="cursor-pointer font-semibold text-emerald-600 underline-offset-4 transition hover:text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            className="cursor-pointer font-semibold text-[var(--accent)] underline-offset-4 transition hover:text-[var(--accent-hover)] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-border)] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             Criar conta
           </Link>
@@ -411,7 +412,12 @@ export default function Login() {
         </label>
 
         <label className="block" htmlFor="senha">
-          <span className="mb-2 block text-[11px] font-medium text-neutral-700 sm:text-[12px]">Senha</span>
+          <span className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-neutral-700 sm:text-[12px]">
+            Senha
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3 text-neutral-400 sm:hidden" aria-hidden="true">
+              <path fillRule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5V4.5a2 2 0 1 0-4 0V6h4Z" clipRule="evenodd" />
+            </svg>
+          </span>
           <div className="relative">
             <input
               id="senha"
@@ -429,19 +435,19 @@ export default function Login() {
         </label>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium text-emerald-800 sm:text-[12px]">
+          <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium text-[var(--text-secondary)] sm:text-[12px]">
             <input
               type="checkbox"
               checked={rememberEmail}
               onChange={(e) => setRememberEmail(e.target.checked)}
-              className="h-4 w-4 cursor-pointer rounded border-emerald-400/80 bg-white text-emerald-600 accent-emerald-600 focus:ring-emerald-500/35 focus:ring-offset-0"
+              className="h-4 w-4 cursor-pointer rounded border-[var(--accent-border)] bg-white accent-[var(--accent)] focus:ring-[var(--accent-border)] focus:ring-offset-0"
             />
             <span>Lembrar e-mail</span>
           </label>
           <button
             type="button"
             onClick={openRecovery}
-            className="cursor-pointer text-[11px] font-medium text-neutral-800 underline-offset-4 hover:text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40 sm:text-[12px]"
+            className="cursor-pointer text-[11px] font-medium text-[var(--text-secondary)] underline-offset-4 hover:text-[var(--accent)] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-border)] sm:text-[12px]"
           >
             {showRecovery ? 'Fechar recuperação' : 'Esqueceu a senha?'}
           </button>
@@ -459,14 +465,14 @@ export default function Login() {
                   value={recoveryEmail}
                   onChange={(e) => setRecoveryEmail(e.target.value)}
                   placeholder="E-mail da conta"
-                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/35"
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
                   autoComplete="email"
                 />
                 <button
                   type="button"
                   onClick={() => void handleRequestOtp()}
                   disabled={recoveryLoading}
-                  className="w-full cursor-pointer rounded-[12px] border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-[11px] font-semibold text-emerald-900 transition hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full cursor-pointer rounded-[12px] border border-[var(--accent-border)] bg-[var(--accent-muted)] px-3 py-2 text-[11px] font-semibold text-[var(--text-primary)] transition hover:bg-[var(--accent-muted-hover)] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {recoveryLoading ? 'Enviando…' : 'Enviar código no WhatsApp'}
                 </button>
@@ -479,7 +485,7 @@ export default function Login() {
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="Código (6 dígitos)"
-                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] tracking-widest text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/35"
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] tracking-widest text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
                   autoComplete="one-time-code"
                 />
                 <input
@@ -488,7 +494,7 @@ export default function Login() {
                   onChange={(e) => setNovaSenha(e.target.value)}
                   placeholder="Nova senha (mín. 6 caracteres)"
                   minLength={6}
-                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/35"
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
                   autoComplete="new-password"
                 />
                 <input
@@ -497,7 +503,7 @@ export default function Login() {
                   onChange={(e) => setConfirmarNovaSenha(e.target.value)}
                   placeholder="Confirmar nova senha"
                   minLength={6}
-                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/35"
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
                   autoComplete="new-password"
                 />
                 <button
@@ -524,8 +530,8 @@ export default function Login() {
               <div
                 className={`mt-2 rounded-[10px] border p-2 text-[11px] ${
                   recoveryMsg.type === 'success'
-                    ? 'border-success/35 bg-success/10 text-emerald-800'
-                    : 'border-error/35 bg-error/10 text-red-700'
+                    ? 'border-[var(--success)] bg-[var(--success-muted)] text-[var(--success-text)]'
+                    : 'border-[var(--error)] bg-[var(--error-muted)] text-[var(--error-text)]'
                 }`}
               >
                 {recoveryMsg.text}
@@ -537,7 +543,7 @@ export default function Login() {
         <button
           type="submit"
           disabled={loading || bioLoading}
-          className="min-h-[46px] w-full cursor-pointer rounded-[14px] bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 px-4 py-3 text-[13px] font-semibold text-white shadow-[0_12px_36px_-12px_rgba(16,185,129,0.42)] transition hover:brightness-[1.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/55 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[48px] sm:text-[14px]"
+          className="min-h-[46px] w-full cursor-pointer rounded-[14px] bg-[var(--accent)] px-4 py-3 text-[13px] font-semibold text-[var(--accent-foreground)] shadow-[var(--shadow-accent)] transition hover:bg-[var(--accent-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-border)] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[48px] sm:text-[14px]"
         >
           {loading ? 'Entrando...' : 'Entrar'}
         </button>
@@ -554,8 +560,15 @@ export default function Login() {
         )}
       </form>
 
+      <p className="mt-4 flex items-center justify-center gap-1.5 text-[10px] text-neutral-400">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3 shrink-0" aria-hidden="true">
+          <path fillRule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5V4.5a2 2 0 1 0-4 0V6h4Z" clipRule="evenodd" />
+        </svg>
+        Dados criptografados e seguros
+      </p>
+
       {formError ? (
-        <div className="mt-4 rounded-[12px] border border-error/35 bg-error/10 p-3 text-center text-[11px] text-red-700 sm:text-[12px]">
+        <div className="mt-3 rounded-[12px] border border-error/35 bg-error/10 p-3 text-center text-[11px] text-red-700 sm:text-[12px]">
           {formError}
         </div>
       ) : null}
