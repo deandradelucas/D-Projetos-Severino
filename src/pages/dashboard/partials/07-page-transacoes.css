@@ -143,14 +143,14 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .page-transacoes-filter-grid .filter-input:focus {
-  border-color: rgba(52, 211, 153, 0.45);
-  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.12);
+  border-color: rgba(212, 168, 75, 0.45);
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.12);
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters button.ref-panel__link--button {
-  color: #059669;
+  color: var(--accent);
   background: rgba(255, 255, 255, 0.42);
-  border-color: rgba(16, 185, 129, 0.32);
+  border-color: rgba(212, 168, 75, 0.32);
   border-radius: 999px;
   padding: 5px 11px;
   font-size: 12px;
@@ -165,9 +165,9 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters button.ref-panel__link--button {
-  color: #6ee7b7;
+  color: var(--accent);
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(52, 211, 153, 0.28);
+  border-color: rgba(212, 168, 75, 0.28);
   border-radius: 999px;
   padding: 5px 11px;
   font-size: 12px;

@@ -616,8 +616,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   }
 }
 
-/* Desktop shell: logo um pouco acima da régua do item do menu (~46px).
-   Espaço logo → Dashboard = mesmo ritmo que entre itens (.nav-menu gap), sem “degrau” extra. */
+/* Desktop shell: wordmark horizontal — largura máxima + altura intrínseca (evita faixa vazia em cima/em baixo). */
 @media (min-width: 769px) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
     display: flex;
@@ -627,17 +626,16 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     width: 100%;
     margin-bottom: clamp(6px, 0.5vw + 4px, 8px);
     padding-bottom: 0;
-    /* Evita “salto” logo → 1.º item: cada rota remonta o Sidebar e a PNG pode vir com altura 0 até decodificar */
-    min-height: clamp(156px, 13vw + 120px, 232px);
+    min-height: 0;
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    width: auto;
+    width: min(100%, 244px);
     max-width: 100%;
-    height: clamp(148px, 14vw + 108px, 220px);
-    min-height: clamp(148px, 14vw + 108px, 220px);
-    max-height: clamp(148px, 14vw + 108px, 220px);
+    height: auto;
+    min-height: 0;
+    max-height: none;
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -668,16 +666,16 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     width: 100%;
     margin-bottom: clamp(6px, 0.5vw + 4px, 8px);
     padding-bottom: 0;
-    min-height: clamp(156px, 13vw + 120px, 232px);
+    min-height: 0;
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    width: auto;
+    width: min(100%, 244px);
     max-width: 100%;
-    height: clamp(148px, 14vw + 108px, 220px);
-    min-height: clamp(148px, 14vw + 108px, 220px);
-    max-height: clamp(148px, 14vw + 108px, 220px);
+    height: auto;
+    min-height: 0;
+    max-height: none;
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -1136,19 +1134,6 @@ body[data-theme='light'] .btn-primary:active {
 body[data-theme='light'] .btn-primary:focus-visible {
   outline: none;
   box-shadow: var(--pf-focus), 0 16px 30px -20px rgba(15, 23, 42, 0.55);
-}
-
-/* Cartões de app (transações, relatórios, config) — mesma família de sombra */
-body[data-theme='light'] .relatorios-chart-card,
-body[data-theme='light'] .config-card {
-  border-color: var(--pf-line-soft) !important;
-  box-shadow: var(--pf-sh-inset), var(--pf-sh-soft) !important;
-  transition: box-shadow 0.25s var(--pf-ease-out), border-color 0.2s var(--pf-ease);
-}
-
-body[data-theme='light'] .config-card:hover {
-  border-color: rgba(148, 163, 184, 0.28) !important;
-  box-shadow: var(--pf-sh-inset), 0 16px 40px -24px rgba(15, 23, 42, 0.14) !important;
 }
 
 /* Tabelas — ritmo e leitura */
@@ -1886,7 +1871,7 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
 
 /* Agenda — shell premium com timeline e WhatsApp */
 .agenda-shell {
-  --agenda-accent: #059669;
+  --agenda-accent: var(--accent);
   --agenda-accent-2: #d4a84b;
   --agenda-success: #22c55e;
   --agenda-danger: #ef4444;
@@ -2306,7 +2291,7 @@ body[data-theme='dark'] .agenda-field select {
 }
 
 .agenda-page .agenda-shell {
-  --agenda-accent: #059669;
+  --agenda-accent: var(--accent);
   --agenda-accent-2: #d4a84b;
 }
 

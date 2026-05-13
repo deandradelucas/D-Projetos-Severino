@@ -1390,11 +1390,11 @@ body[data-theme='light'] .ref-panel__link:hover .ref-panel__link-chevron {
 }
 
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link {
-  color: #059669;
+  color: var(--accent);
 }
 
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__link:hover {
-  color: #047857;
+  color: var(--accent-hover);
 }
 
 body[data-theme='light'] .ref-tx-list {
@@ -2222,11 +2222,11 @@ body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-h
 
 /* KPI card Saldo — cor do valor conforme positivo/negativo/zero */
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--pos {
-  color: #059669;
+  color: var(--success-text);
 }
 
 body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--pos {
-  color: #34d399;
+  color: var(--success);
 }
 
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--neg {

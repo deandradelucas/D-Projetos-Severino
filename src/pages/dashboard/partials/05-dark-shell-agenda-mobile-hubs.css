@@ -2390,22 +2390,22 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 }
 
-/* Home / ref-dashboard: altura da marca alinhada ao shell; gap como 04c (ícone + wordmark) */
+/* Home / ref-dashboard: mesma marca que 04c — sem caixa vertical extra. */
 @media (min-width: 769px) {
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-wrapper {
-    min-height: clamp(156px, 13vw + 120px, 232px);
+    min-height: 0;
     margin-bottom: clamp(6px, 0.6vw + 4px, 12px);
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo {
-    width: auto;
-    height: clamp(148px, 14vw + 108px, 220px);
-    min-height: clamp(148px, 14vw + 108px, 220px);
-    max-height: clamp(148px, 14vw + 108px, 220px);
+    width: min(100%, 244px);
     max-width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
     object-fit: contain;
   }
 
