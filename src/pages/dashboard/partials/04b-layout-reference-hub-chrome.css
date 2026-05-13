@@ -112,12 +112,12 @@ body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relat
   --hub-r-inner: 8px;
 }
 
-/* Dashboard inicial (claro): acento esmeralda + coluna rolável branca — demais páginas hub mantêm o roxo */
+/* Dashboard inicial (claro): acento gold — unificado com o design system */
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub {
-  --hub-accent: #10b981;
-  --hub-accent-hover: #059669;
-  --hub-accent-ring: rgba(16, 185, 129, 0.42);
-  --hub-accent-soft: rgba(16, 185, 129, 0.14);
+  --hub-accent: var(--accent);
+  --hub-accent-hover: var(--accent-hover);
+  --hub-accent-ring: var(--accent-border);
+  --hub-accent-soft: var(--accent-muted);
 }
 
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
@@ -407,7 +407,7 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   min-width: 0;
   max-width: 100%;
   color: var(--hub-title);
-  font-size: clamp(1.05rem, 0.52vw + 0.86rem, 1.22rem);
+  font-size: clamp(1.35rem, 1.2vw + 0.95rem, 1.75rem);
   font-weight: 900;
   letter-spacing: -0.025em;
   white-space: normal;
@@ -417,15 +417,15 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
 }
 
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line-label {
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
-  color: #0b0b0b;
+  color: var(--text-primary);
 }
 
 /* Saldo no hero: positivo verde, negativo vermelho (sobrepõe `--hub-title` / preto do tema claro e mobile `!important`) */
@@ -803,10 +803,10 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
 }
 
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__icon {
-  background: linear-gradient(165deg, rgba(209, 250, 229, 0.98) 0%, rgba(167, 243, 208, 0.52) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.28);
-  color: #059669;
-  box-shadow: 0 2px 10px -4px rgba(16, 185, 129, 0.35);
+  background: linear-gradient(165deg, var(--accent-muted) 0%, rgba(212, 168, 75, 0.10) 100%);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  box-shadow: 0 2px 10px -4px rgba(212, 168, 75, 0.35);
 }
 
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
@@ -910,7 +910,7 @@ body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .d
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
     flex: 0 1 auto;
-    font-size: clamp(0.97rem, 3.65vw, 1.125rem);
+    font-size: clamp(1.25rem, 5.5vw, 1.65rem);
     line-height: 1.15;
   }
 

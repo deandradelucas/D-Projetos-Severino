@@ -356,7 +356,7 @@ export default function Dashboard() {
       </div>
     </div>
 
-    {!isModalOpen && txRecentes.length > 0 && (
+    {!isModalOpen && (
       <button
         type="button"
         className="dashboard-mobile-tx-fab"
