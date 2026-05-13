@@ -2101,43 +2101,6 @@ body[data-theme='light'] .relatorios-kpi-saldo--neg {
   transition: filter 0.3s ease;
 }
 
-/* UI Elements */
-.switch-apple {
-  appearance: none;
-  width: 44px;
-  height: 24px;
-  background: #e2e8f0;
-  border-radius: 20px;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.switch-apple:checked {
-  background: var(--success);
-}
-
-.switch-apple::before {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  top: 2px;
-  left: 2px;
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.switch-apple:checked::before {
-  left: 22px;
-}
-
-.switch-apple:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 20%, transparent);
-}
+/* switch-apple — ver 10-page-configuracoes.css */
 
 

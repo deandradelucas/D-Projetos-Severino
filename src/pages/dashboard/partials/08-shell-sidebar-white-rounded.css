@@ -68,13 +68,14 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-l
 }
 
 @media (min-width: 769px) {
-  /* Mesma caixa claro/escuro — PNG claro é horizontal; limite de largura evita “tomar” a sidebar inteira. */
+  /* Mesma caixa claro/escuro — PNG horizontal: escala pela largura, sem letterboxing vertical. */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    height: clamp(148px, 14vw + 108px, 220px) !important;
-    max-height: clamp(148px, 14vw + 108px, 220px) !important;
-    max-width: min(100%, 244px) !important;
-    width: auto !important;
+    width: min(100%, 244px) !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     object-fit: contain !important;
     object-position: left center !important;
     transform: none !important;
@@ -88,10 +89,11 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-l
 @media (max-width: 768px) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    height: clamp(118px, 30vw + 72px, 174px) !important;
-    max-height: clamp(118px, 30vw + 72px, 174px) !important;
-    max-width: min(100%, 222px) !important;
-    width: auto !important;
+    width: min(100%, 222px) !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     object-fit: contain !important;
     object-position: center center !important;
     transform: none !important;

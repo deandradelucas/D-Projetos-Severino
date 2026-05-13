@@ -161,12 +161,35 @@ function buscarUsuarioPorSufixoUnico(digitos, allUsers) {
   return null
 }
 
+/** Dígitos que parecem telefone BR (evita tratar LID 15+ dígitos como DDD+número). */
+function isProbablyBrazilPhoneDigits(d) {
+  const x = String(d || '').replace(/\D/g, '')
+  if (!x || x.length > 13) return false
+  if (/^55\d{10,11}$/.test(x)) return true
+  if (/^\d{10,11}$/.test(x)) return true
+  if (/^\d{2}9\d{8}$/.test(x)) return true
+  return false
+}
+
 /**
  * @param {string} telefoneLimpo
  * @param {{ usarGemini?: boolean }} [options] — default usarGemini true se GEMINI_API_KEY existir
  */
 export async function buscarUsuarioPorTelefone(telefoneLimpo, options = {}) {
   const supabaseAdmin = getSupabaseAdmin()
+  const d = String(telefoneLimpo || '').replace(/\D/g, '')
+
+  /* LID WhatsApp (identificador interno) — não passar por variantes BR (risco de falso positivo). */
+  if (d.length >= 15 && !isProbablyBrazilPhoneDigits(d)) {
+    const { data: byLid, error: errLid } = await supabaseAdmin
+      .from('usuarios')
+      .select('id, nome, email, telefone, whatsapp_id')
+      .eq('whatsapp_id', d)
+      .maybeSingle()
+    if (!errLid && byLid) return byLid
+    return null
+  }
+
   const variants = variantesTelefoneBrasil(telefoneLimpo)
 
   for (const v of variants) {

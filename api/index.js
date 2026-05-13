@@ -1,3 +1,4 @@
+import '../server/lib/load-env.mjs'
 import { buffer as bufferStream } from 'node:stream/consumers'
 import app from '../server/app.mjs'
 

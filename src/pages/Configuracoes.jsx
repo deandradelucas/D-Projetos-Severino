@@ -228,7 +228,7 @@ export default function Configuracoes() {
   }
 
   const mostrarCampoConviteFamilia =
-    Boolean(usuarioIdHeader) && familiaPainelCarregado && !perfil.conta_familiar_membro && familiaTitular !== true
+    Boolean(usuarioIdHeader) && familiaPainelCarregado && !perfil.conta_familiar_membro
 
   const podeColarConviteFamilia = mostrarCampoConviteFamilia
 
@@ -426,7 +426,11 @@ export default function Configuracoes() {
           </div>
         </section>
 
-        {toast && <div className="config-toast">{toast}</div>}
+        {toast ? (
+          <div className="config-toast" role="status" aria-live="polite">
+            {toast}
+          </div>
+        ) : null}
 
         <div className="config-layout config-layout--clean">
           <section className="config-card config-profile-card">
@@ -520,6 +524,53 @@ export default function Configuracoes() {
             ) : null}
           </section>
 
+          <section className="config-card config-card--preferences" aria-labelledby="config-preferencias-heading">
+            <div className="config-card-head">
+              <span className="config-card-kicker">Preferências</span>
+              <h2 id="config-preferencias-heading" className="config-card-title-clean">
+                Aparência
+              </h2>
+              <p className="config-card-subtitle">Escolha o tema e o nível de privacidade da interface.</p>
+            </div>
+
+            <div className="config-themes config-themes--compact" role="group" aria-label="Tema da interface">
+              <button
+                type="button"
+                className={`config-theme-card ${theme === 'light' ? 'is-active' : ''}`}
+                onClick={() => setTheme('light')}
+                aria-pressed={theme === 'light'}
+              >
+                <div className="config-theme-preview config-theme-preview--light" aria-hidden />
+                <div className="config-theme-body">
+                  <h4>Claro</h4>
+                  <p>Visual leve para o dia.</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                className={`config-theme-card ${theme === 'dark' ? 'is-active' : ''}`}
+                onClick={() => setTheme('dark')}
+                aria-pressed={theme === 'dark'}
+              >
+                <div className="config-theme-preview config-theme-preview--dark" aria-hidden />
+                <div className="config-theme-body">
+                  <h4>Escuro</h4>
+                  <p>Menos brilho à noite.</p>
+                </div>
+              </button>
+            </div>
+
+            <div className="config-preference-list">
+              <label className="config-pref-row config-pref-row--clean">
+                <span className="config-pref-label">
+                  <strong>Modo privacidade</strong>
+                  <span>Oculta valores sensíveis nas telas principais.</span>
+                </span>
+                <input type="checkbox" className="switch-apple" checked={privacyMode} onChange={togglePrivacy} aria-label="Modo privacidade" />
+              </label>
+            </div>
+          </section>
+
           {familiaTitular === true && (
             <section className="config-card config-card--full">
               <div className="config-card-head">
@@ -533,7 +584,7 @@ export default function Configuracoes() {
 
               {familiaLoadErr ? <p className="config-empty-note">{familiaLoadErr}</p> : null}
 
-              <p className="config-card-subtitle" style={{ marginBottom: '0.75rem' }}>
+              <p className="config-card-subtitle config-familia-vagas-line">
                 {familiaVagasOcupadas === 0
                   ? 'Nenhum familiar vinculado ainda.'
                   : `${familiaVagasOcupadas} de ${FAMILIA_MAX_VINCULADOS_UI} vaga${familiaVagasOcupadas !== 1 ? 's' : ''} usada${familiaVagasOcupadas !== 1 ? 's' : ''} (membros + convites pendentes).`}
@@ -578,7 +629,7 @@ export default function Configuracoes() {
               </div>
 
               {familiaLimiteConvitesAtingido ? (
-                <p className="config-empty-note" style={{ marginTop: '0.65rem' }}>
+                <p className="config-empty-note config-familia-limite-note">
                   Limite de <strong>5 pessoas</strong> atingido ({familiaVagasOcupadas} vaga(s) em uso entre membros e convites pendentes). Remova um convite
                   pendente ou um membro para poder gerar outro convite.
                 </p>
@@ -650,7 +701,7 @@ export default function Configuracoes() {
                     <li key={c.id} className="config-bio-item">
                       <span>
                         <strong>{papelFamiliaLabel(c.papel_convite)}</strong>
-                        {c.label ? <em style={{ fontSize: '0.82em', opacity: 0.75 }}> · {c.label}</em> : null}
+                        {c.label ? <em className="config-bio-item__tag"> · {c.label}</em> : null}
                         <small>
                           Expira em{' '}
                           {c.expires_at
@@ -738,51 +789,6 @@ export default function Configuracoes() {
               </div>
             </section>
           )}
-
-          <section className="config-card">
-            <div className="config-card-head">
-              <span className="config-card-kicker">Preferências</span>
-              <h2 className="config-card-title-clean">Aparência</h2>
-              <p className="config-card-subtitle">Escolha o tema e o nível de privacidade da interface.</p>
-            </div>
-
-            <div className="config-themes config-themes--compact" role="group" aria-label="Tema da interface">
-              <button
-                type="button"
-                className={`config-theme-card ${theme === 'light' ? 'is-active' : ''}`}
-                onClick={() => setTheme('light')}
-                aria-pressed={theme === 'light'}
-              >
-                <div className="config-theme-preview config-theme-preview--light" aria-hidden />
-                <div className="config-theme-body">
-                  <h4>Claro</h4>
-                  <p>Visual leve para o dia.</p>
-                </div>
-              </button>
-              <button
-                type="button"
-                className={`config-theme-card ${theme === 'dark' ? 'is-active' : ''}`}
-                onClick={() => setTheme('dark')}
-                aria-pressed={theme === 'dark'}
-              >
-                <div className="config-theme-preview config-theme-preview--dark" aria-hidden />
-                <div className="config-theme-body">
-                  <h4>Escuro</h4>
-                  <p>Menos brilho à noite.</p>
-                </div>
-              </button>
-            </div>
-
-            <div className="config-preference-list">
-              <label className="config-pref-row config-pref-row--clean">
-                <span className="config-pref-label">
-                  <strong>Modo privacidade</strong>
-                  <span>Oculta valores sensíveis nas telas principais.</span>
-                </span>
-                <input type="checkbox" className="switch-apple" checked={privacyMode} onChange={togglePrivacy} aria-label="Modo privacidade" />
-              </label>
-            </div>
-          </section>
 
           <section className="config-card config-card--full config-security-card">
             <div className="config-card-head config-card-head--row">

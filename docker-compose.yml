@@ -37,6 +37,7 @@ services:
       - CACHE_LOCAL_ENABLED=true
       - WEBHOOK_GLOBAL_ENABLED=true
       - WEBHOOK_GLOBAL_URL=${WHATSAPP_WEBHOOK_BASE_URL:-http://host.docker.internal:3001}/api/whatsapp/webhook/${WHATSAPP_WEBHOOK_TOKEN:-ece58f64012d51028d28a04264d07131}
+      # true: Evolution chama …/webhook/TOKEN/messages-upsert (Severino aceita :event). Para n8n com URL fixo, use false.
       - WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS=true
       - WEBHOOK_EVENTS_MESSAGES_UPSERT=true
       - WEBHOOK_EVENTS_MESSAGES_UPDATE=true

@@ -273,13 +273,8 @@ export default function Login() {
       try {
         data = raw ? JSON.parse(raw) : {}
       } catch {
-        const endpoint = apiUrl('/api/auth/login')
-        const looksHtml = /^\s*</.test(raw)
-        setFormError(
-          looksHtml
-            ? `A API devolveu HTML em vez de JSON. Pedido: ${endpoint}. Em https://severino.mestredamente.com a API deve ser a mesma origem (/api) ou use VITE_SEVERINO_API_ORIGIN com o host onde /api/health responde JSON. Veja o separador Rede.`
-            : `Resposta inválida do servidor (não é JSON). Pedido: ${endpoint}. Confirme se a API está no ar e o URL correto.`,
-        )
+        console.error('[Login] resposta não-JSON:', apiUrl('/api/auth/login'), raw?.slice(0, 200))
+        setFormError('Não foi possível conectar ao servidor. Tente novamente.')
         setLoading(false)
         return
       }
@@ -298,22 +293,8 @@ export default function Login() {
 
       navigateAfterLogin(u)
     } catch (err) {
-      const endpoint = apiUrl('/api/auth/login')
-      const detail = err instanceof Error ? err.message : String(err)
-      const fetchLike =
-        err instanceof TypeError &&
-        String(detail || '')
-          .toLowerCase()
-          .match(/fetch|network|failed|load/i)
-      const sslHint =
-        typeof window !== 'undefined' && window.location.protocol === 'http:'
-          ? ' Force HTTPS no domínio do Severino (SSL na Hostinger); em HTTP o navegador pode bloquear o pedido à API.'
-          : ''
-      setFormError(
-        fetchLike
-          ? `Não foi possível contactar a API (${endpoint}). Verifique CORS no servidor da API, se o URL está certo e a ligação.${sslHint} Detalhe: ${detail}`
-          : `Erro ao ligar ao servidor (${endpoint}): ${detail}`,
-      )
+      console.error('[Login] erro de rede:', apiUrl('/api/auth/login'), err)
+      setFormError('Não foi possível conectar ao servidor. Tente novamente.')
       setLoading(false)
     }
   }
@@ -376,7 +357,7 @@ export default function Login() {
         </>
       }
     >
-      {severinoProdApiMisconfigured() ? (
+      {import.meta.env.DEV && severinoProdApiMisconfigured() ? (
         <div
           className="mb-4 rounded-lg border border-amber-400/80 bg-amber-50 px-3 py-2.5 text-[11px] leading-snug text-amber-950 sm:text-[12px]"
           role="alert"
@@ -442,7 +423,7 @@ export default function Login() {
               onChange={(e) => setRememberEmail(e.target.checked)}
               className="h-4 w-4 cursor-pointer rounded border-[var(--accent-border)] bg-white accent-[var(--accent)] focus:ring-[var(--accent-border)] focus:ring-offset-0"
             />
-            <span>Lembrar e-mail</span>
+            <span>Lembrar meu e-mail</span>
           </label>
           <button
             type="button"
@@ -540,6 +521,16 @@ export default function Login() {
           </div>
         )}
 
+        {formError ? (
+          <div
+            role="alert"
+            aria-live="polite"
+            className="rounded-[12px] border border-error/35 bg-error/10 p-3 text-center text-[11px] text-red-700 sm:text-[12px]"
+          >
+            {formError}
+          </div>
+        ) : null}
+
         <button
           type="submit"
           disabled={loading || bioLoading}
@@ -567,11 +558,6 @@ export default function Login() {
         Dados criptografados e seguros
       </p>
 
-      {formError ? (
-        <div className="mt-3 rounded-[12px] border border-error/35 bg-error/10 p-3 text-center text-[11px] text-red-700 sm:text-[12px]">
-          {formError}
-        </div>
-      ) : null}
     </AuthPhoneShell>
   )
 }

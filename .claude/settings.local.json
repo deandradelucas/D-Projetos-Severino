@@ -51,7 +51,18 @@
       "Bash(npx eslint *)",
       "Read(//tmp/**)",
       "Bash(node --check server/lib/domain/whatsapp-bot.mjs)",
-      "Bash(node --check server/lib/ai.mjs)"
+      "Bash(node --check server/lib/ai.mjs)",
+      "Bash(git reset *)",
+      "Bash(npm install *)",
+      "Bash(wsl --list -v)",
+      "Bash(yt-dlp --version)",
+      "Bash(node -e \"const fs=require\\('fs'\\); const p=JSON.parse\\(fs.readFileSync\\('/dev/stdin','utf8'\\)\\); const deps={...p.dependencies,...p.devDependencies}; console.log\\('anthropic:', deps['@anthropic-ai/sdk']||'NAO'\\); console.log\\('gemini:', deps['@google/generative-ai']||'NAO'\\); console.log\\('env ANTHROPIC_API_KEY exists:', !!process.env.ANTHROPIC_API_KEY\\)\")",
+      "Bash(node *)",
+      "Bash(pip3 install *)",
+      "Bash(pip install *)",
+      "Bash(yt-dlp *)",
+      "Bash(claude mcp *)",
+      "Skill(update-config)"
     ]
   }
 }

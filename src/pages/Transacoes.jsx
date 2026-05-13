@@ -23,6 +23,7 @@ import { SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon'
 import { formatTransacaoListDateTime } from '../lib/transacaoDateDisplay'
+import { getWhatsappContactUrl } from '../lib/whatsappContactUrl.js'
 import './dashboard.css'
 
 /** Itens por requisição — menos DOM inicial; “Carregar mais” busca o restante. */
@@ -286,7 +287,7 @@ export default function Transacoes() {
 
   const filtroRecorrentesAtivo = filters.lancamentos === 'recorrentes'
 
-  const whatsappContactUrl = 'https://wa.me/5554992605447'
+  const whatsappContactUrl = useMemo(() => getWhatsappContactUrl(), [])
 
   return (
     <>

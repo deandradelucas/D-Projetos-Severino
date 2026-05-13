@@ -31,6 +31,10 @@ npm run whatsapp:docker:down
 
 Se a API local nao estiver na porta `3001`, ajuste `WHATSAPP_WEBHOOK_BASE_URL` para `http://host.docker.internal:<porta>` antes de subir o compose. Em Linux, se o container nao alcancar o host, rode a API com `API_HOST=0.0.0.0`.
 
+### Evolution + n8n (produção)
+
+Se a Evolution envia primeiro para o **n8n** e o n8n chama o Severino, o erro mais frequente é **`webhook_by_events: true`**: a Evolution passa a chamar `…/webhook-do-n8n/messages-upsert`, e o trigger do n8n **não recebe** (só escuta o URL sem sufixo). Use **`webhook_by_events: false`** na webhook da instância e filtre o evento no workflow. Passo a passo: [`docs/whatsapp-evolution-n8n.md`](docs/whatsapp-evolution-n8n.md).
+
 ## Backup com rclone
 
 Para executar o backup manual para o Google Drive via `rclone`, rode:
