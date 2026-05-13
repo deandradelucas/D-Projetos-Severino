@@ -33,7 +33,7 @@ export default function AuthPasswordToggleButton({
       type="button"
       onClick={onToggle}
       aria-label={passwordVisible ? ariaLabelHide : ariaLabelShow}
-      className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/45 sm:right-3"
+      className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-border)] sm:right-3"
     >
       <EyeIcons hidden={passwordVisible} />
     </button>
