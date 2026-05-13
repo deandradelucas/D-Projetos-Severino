@@ -234,17 +234,6 @@ body[data-theme='dark'] .horizon-chat-fab.horizon-chat-fab--shell-dock {
 body[data-theme='dark'] .horizon-chat-window.horizon-chat-window--shell-dock.chat-window-open {
   z-index: 9590;
 }
-/* Ajustes — superfícies finais em 03-horizon-chat + fullblack; evitar slate aqui */
-body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card {
-  background: #000000;
-  border-color: rgba(255, 255, 255, 0.08);
-}
-body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
-}
-body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card {
-  background: #000000;
-}
 body[data-theme='dark'] .dashboard-container {
   background: #f4f6fc;
   border-radius: 34px;
@@ -312,8 +301,7 @@ body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .main-conte
   box-shadow: none;
   padding: 20px 28px 24px;
 }
-body[data-theme='dark'] .relatorios-chart-card,
-body[data-theme='dark'] .config-card {
+body[data-theme='dark'] .relatorios-chart-card {
   border-radius: 22px;
   border: 1px solid rgba(148, 163, 184, 0.18);
   background: #eef2fa;
@@ -413,13 +401,6 @@ body[data-theme='dark'] .relatorios-filter-grid {
 body[data-theme='dark'] .filter-input {
   min-height: 40px;
   border-radius: 12px;
-}
-body[data-theme='dark'] .config-layout {
-  gap: 14px;
-}
-body[data-theme='dark'] .config-card {
-  padding: 16px;
-  border-radius: 18px !important;
 }
 @media (max-width: 1200px) {
   body[data-theme='dark'] {
@@ -1978,19 +1959,18 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     width: 100%;
     margin-bottom: 8px;
     padding-bottom: 0;
-    /* Evita “salto” logo → 1.º item: cada rota remonta o Sidebar e a PNG pode vir com altura 0 até decodificar */
-    min-height: clamp(156px, 13vw + 120px, 232px);
+    min-height: 0;
     gap: 11px;
   }
 }
 @media (min-width: 769px) {
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    width: auto;
+    width: min(100%, 244px);
     max-width: 100%;
-    height: clamp(148px, 14vw + 108px, 220px);
-    min-height: clamp(148px, 14vw + 108px, 220px);
-    max-height: clamp(148px, 14vw + 108px, 220px);
+    height: auto;
+    min-height: 0;
+    max-height: none;
     object-fit: contain;
     object-position: left center;
     transform: none;
@@ -2274,15 +2254,10 @@ body[data-theme='dark'] .btn-primary:focus-visible {
   outline: none;
   box-shadow: var(--pf-focus), 0 16px 30px -20px rgba(0, 0, 0, 0.55);
 }
-body[data-theme='dark'] .relatorios-chart-card,
-body[data-theme='dark'] .config-card {
+body[data-theme='dark'] .relatorios-chart-card {
   border-color: var(--pf-line-soft) !important;
   box-shadow: var(--pf-sh-inset), var(--pf-sh-soft) !important;
   transition: box-shadow 0.25s var(--pf-ease-out), border-color 0.2s var(--pf-ease);
-}
-body[data-theme='dark'] .config-card:hover {
-  border-color: rgba(148, 163, 184, 0.25) !important;
-  box-shadow: var(--pf-sh-inset), 0 16px 40px -24px rgba(0, 0, 0, 0.35) !important;
 }
 body[data-theme='dark'] .data-table tbody tr {
   transition: background-color 0.15s var(--pf-ease);

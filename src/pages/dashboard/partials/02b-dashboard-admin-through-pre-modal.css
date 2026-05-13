@@ -809,7 +809,7 @@ body:has(.sidebar.open) .horizon-chat-window {
     letter-spacing: -0.035em;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    background: linear-gradient(185deg, #10b981 0%, #047857 42%, #065f46 100%);
+    background: linear-gradient(185deg, #d4a84b 0%, #c49535 42%, #a07520 100%);
     -webkit-background-clip: text;
     background-clip: text;
   }

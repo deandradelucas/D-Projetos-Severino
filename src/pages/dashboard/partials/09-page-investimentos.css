@@ -1917,11 +1917,11 @@ body[data-theme='dark'] .page-investimentos-resumo__stat-value {
 }
 
 .page-investimentos-resumo__stat-value--pos {
-  color: var(--success, #10b981);
+  color: var(--success);
 }
 
 body[data-theme='dark'] .page-investimentos-resumo__stat-value--pos {
-  color: #34d399;
+  color: var(--success);
 }
 
 .page-investimentos-resumo__stat--muted .page-investimentos-resumo__stat-value {
@@ -2360,25 +2360,25 @@ body[data-theme='dark'] .page-investimentos-card__primary-value {
   font-size: 0.98rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--success, #10b981);
+  color: var(--success);
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
 }
 
 body[data-theme='dark'] .page-investimentos-card__primary-rendimento {
-  color: #34d399;
+  color: var(--success);
 }
 
 .page-investimentos-card__primary-pct {
   margin: 0.12rem 0 0;
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--success, #10b981);
+  color: var(--success);
   letter-spacing: -0.01em;
 }
 
 body[data-theme='dark'] .page-investimentos-card__primary-pct {
-  color: #34d399;
+  color: var(--success);
 }
 
 .page-investimentos-card__primary-sublabel {
@@ -2429,7 +2429,7 @@ body[data-theme='dark'] .page-investimentos-chip--isento {
   font-weight: 700;
   border-color: rgba(16, 185, 129, 0.3);
   background: rgba(16, 185, 129, 0.08);
-  color: color-mix(in srgb, #059669 80%, var(--text-primary, #0f172a));
+  color: var(--success-text);
 }
 
 .page-investimentos-chip--vencimento-proximo {
@@ -2463,9 +2463,9 @@ body[data-theme='dark'] .page-investimentos-chip--isento {
 }
 
 body[data-theme='dark'] .page-investimentos-chip--vencimento {
-  color: #6ee7b7;
-  border-color: rgba(110, 231, 183, 0.3);
-  background: rgba(110, 231, 183, 0.08);
+  color: var(--accent);
+  border-color: rgba(212, 168, 75, 0.3);
+  background: rgba(212, 168, 75, 0.08);
 }
 
 body[data-theme='dark'] .page-investimentos-chip--vencimento-proximo {
