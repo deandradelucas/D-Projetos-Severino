@@ -1,4 +1,3 @@
-import React from 'react'
 import { paymentStatusLabel } from '../../lib/usersAdmin'
 
 const base = {

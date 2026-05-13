@@ -1,4 +1,3 @@
-import React from 'react'
 
 /** Ícone de recorrência: setas superiores em verde, inferiores em vermelho (compra/venda recorrente). */
 export default function RecorrenciaArrowIcon({ size = 18, className = '' }) {

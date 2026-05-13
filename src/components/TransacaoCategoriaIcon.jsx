@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   getTransacaoCategoriaIconKey,
   LINE_AWESOME_CLASS_BY_ICON_ID,
