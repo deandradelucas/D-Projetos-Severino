@@ -1,4 +1,3 @@
-import React from 'react'
 import PagamentoStatusBadge from '../PagamentoStatusBadge'
 import { paymentLogStatusLabel } from '../../lib/paymentLogsAdmin'
 

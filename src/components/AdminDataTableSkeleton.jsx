@@ -1,4 +1,3 @@
-import React from 'react'
 
 /**
  * Cabeçalhos reais + linhas placeholder — evita só o texto "Carregando…" solto.
