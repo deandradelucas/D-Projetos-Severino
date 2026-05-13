@@ -160,7 +160,7 @@ export default function FamiliaConviteColarBlock({
       {ocultarTituloBloco ? (
         <span className="sr-only">Convite conta familiar</span>
       ) : (
-        <span className="mb-1.5 block text-[11px] font-semibold text-emerald-900 sm:text-[12px]">
+        <span className="mb-1.5 block text-[11px] font-semibold text-neutral-700 sm:text-[12px]">
           Conta familiar — convite (opcional)
         </span>
       )}
@@ -183,7 +183,7 @@ export default function FamiliaConviteColarBlock({
         placeholder="https://…/login?convite=… ou cole o código aqui"
         rows={2}
         aria-describedby={hintId}
-        className="w-full resize-y rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-emerald-400/40 min-h-[52px]"
+        className="w-full resize-y rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)] min-h-[52px]"
         spellCheck={false}
         autoComplete="off"
       />
@@ -191,7 +191,7 @@ export default function FamiliaConviteColarBlock({
   )
 
   return (
-    <div className={shell ? 'config-familia-convite-shell' : 'rounded-[14px] border border-emerald-500/25 bg-emerald-500/[0.06] p-3 sm:p-3.5'}>
+    <div className={shell ? 'config-familia-convite-shell' : 'rounded-[14px] border border-[var(--accent-border)] bg-[rgba(212,168,75,0.06)] p-3 sm:p-3.5'}>
       {shell ? fieldShell : fieldCard}
 
       {preview?.loading ? (
@@ -204,7 +204,7 @@ export default function FamiliaConviteColarBlock({
           className={
             shell
               ? 'config-familia-convite-shell__preview-ok'
-              : 'mt-2 rounded-[10px] border border-emerald-500/30 bg-white/80 px-2.5 py-2 text-[10px] leading-snug text-emerald-950 sm:text-[11px]'
+              : 'mt-2 rounded-[10px] border border-[var(--accent-border)] bg-white/80 px-2.5 py-2 text-[10px] leading-snug text-neutral-900 sm:text-[11px]'
           }
         >
           <strong className="font-semibold">Convite válido.</strong>{' '}
@@ -245,7 +245,7 @@ export default function FamiliaConviteColarBlock({
             className={
               shell
                 ? 'config-action-btn config-action-btn--primary config-familia-convite-shell__btn-full'
-                : 'w-full rounded-[12px] bg-emerald-600 px-3 py-2.5 text-[12px] font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2'
+                : 'w-full rounded-[12px] bg-[var(--accent)] px-3 py-2.5 text-[12px] font-semibold text-[var(--accent-foreground)] shadow-[var(--shadow-accent)] transition hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-border)] focus-visible:ring-offset-2'
             }
           >
             {aceitarBusy ? 'A vincular…' : 'Vincular à esta conta'}
