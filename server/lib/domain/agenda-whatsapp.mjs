@@ -62,6 +62,59 @@ function stripAccents(value) {
   return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
+/**
+ * Normaliza horas/minutos por extenso em portugu\u00eas para formato num\u00e9rico.
+ * "dezesseis e meia" \u2192 "16:30" | "\u00e0s quatorze horas" \u2192 "\u00e0s 14 horas"
+ * Seguro: compostos resolvidos antes dos simples; amb\u00edguos s\u00f3 com preposi\u00e7\u00e3o ou "horas".
+ */
+function normalizeWordTime(text) {
+  let t = String(text || '')
+  const r = (re, val) => { t = t.replace(re, val) }
+
+  // Compostos PRIMEIRO (evita match parcial em "vinte e dois" \u2192 "20 e dois")
+  r(/\bvinte\s+e\s+tr[e\u00ea]s\b/gi, '23')
+  r(/\bvinte\s+e\s+dois\b|\bvinte\s+e\s+duas\b/gi, '22')
+  r(/\bvinte\s+e\s+um\b|\bvinte\s+e\s+uma\b/gi, '21')
+
+  // Un\u00edvocos (11-20) \u2014 substitui\u00e7\u00e3o direta, raramente amb\u00edguos em contexto de agenda
+  r(/\bdezenove\b|\bdezanove\b/gi, '19')
+  r(/\bdezoito\b/gi, '18')
+  r(/\bdezessete\b|\bdezassete\b/gi, '17')
+  r(/\bdezesseis\b|\bdezasseis\b/gi, '16')
+  r(/\bquinze\b/gi, '15')
+  r(/\bquatorze\b|\bcatorze\b/gi, '14')
+  r(/\btreze\b/gi, '13')
+  r(/\bdoze\b/gi, '12')
+  r(/\bonze\b/gi, '11')
+  r(/\bvinte\b/gi, '20')
+
+  // Amb\u00edguos (1-10): somente com preposi\u00e7\u00e3o (\u00e0s/as/pelas) OU seguidos de "horas"
+  for (const [pat, val] of [
+    ['dez', 10], ['nove', 9], ['oito', 8], ['sete', 7],
+    ['seis', 6], ['cinco', 5], ['quatro', 4], ['tr[e\u00ea]s', 3],
+    ['dois|duas', 2],
+  ]) {
+    r(new RegExp(`(\\b(?:\u00e0s|as|pelas?)\\s+)(?:${pat})\\b`, 'gi'), `$1${val}`)
+    r(new RegExp(`\\b(?:${pat})(?=\\s+horas?\\b)`, 'gi'), String(val))
+  }
+  r(/((?:\u00e0s|as|pelas?)\s+)uma\b/gi, '$11')
+  r(/\buma\s+hora\b/gi, '1h')
+
+  // Minutos por extenso ap\u00f3s d\u00edgito (maiores combina\u00e7\u00f5es primeiro)
+  r(/\b(\d{1,2})\s+e\s+quarenta\s+e\s+cinco\b/gi, '$1:45')
+  r(/\b(\d{1,2})\s+e\s+trinta\s+e\s+cinco\b/gi, '$1:35')
+  r(/\b(\d{1,2})\s+e\s+vinte\s+e\s+cinco\b/gi, '$1:25')
+  r(/\b(\d{1,2})\s+e\s+quarenta\b/gi, '$1:40')
+  r(/\b(\d{1,2})\s+e\s+trinta\b/gi, '$1:30')
+  r(/\b(\d{1,2})\s+e\s+vinte\b/gi, '$1:20')
+  r(/\b(\d{1,2})\s+e\s+quinze\b/gi, '$1:15')
+  r(/\b(\d{1,2})\s+e\s+dez\b/gi, '$1:10')
+  r(/\b(\d{1,2})\s+e\s+cinco\b/gi, '$1:05')
+  r(/\b(\d{1,2})\s+e\s+meia\b/gi, '$1:30')
+
+  return t
+}
+
 function startOfToday() {
   const parts = saoPauloParts()
   return saoPauloDateFromParts(parts)
@@ -90,20 +143,42 @@ function nextWeekday(targetDay) {
 
 function parseTime(message) {
   const text = String(message || '').toLowerCase()
+
+  // Palavras-chave sem número explícito
+  if (/\bmeio[\s-]dia\b/.test(text)) return { hour: 12, minute: 0 }
+  if (/\bmeia[\s-]noite\b/.test(text)) return { hour: 0, minute: 0 }
+
+  // "14 e meia" / "14 horas e meia" → :30
+  const eMeia = text.match(/\b(?:(?:às|as|pelas?)\s*)?(\d{1,2})(?:\s+horas?)?\s+e\s+meia\b/i)
+  if (eMeia) {
+    let h = Number.parseInt(eMeia[1], 10)
+    if (Number.isFinite(h) && h >= 0 && h <= 23) {
+      if (h >= 1 && h <= 11 && /\b(da|de)?\s*(tarde|noite)\b/.test(text)) h += 12
+      return { hour: h, minute: 30 }
+    }
+  }
+
   const match = text.match(
-    /\b(?:as|às|a|para|pelas?)\s*(\d{1,2})(?:[:h](\d{2}))?\b|\b(\d{1,2})[:h](\d{2})\b|\b(\d{1,2})h\b/i
+    /\b(?:às|as|pelas?)\s*(\d{1,2})(?:[:h](\d{2}))?\b|\bpara\s+as\s+(\d{1,2})(?:[:h](\d{2}))?\b|\b(?:a|para)\s+(\d{1,2})(?:[:h](\d{2}))?\b|\b(\d{1,2})[:h](\d{2})\b|\b(\d{1,2})h\b|\b(\d{1,2})\s+horas?\b/i
   )
   if (!match) return null
-  let hour = Number.parseInt(match[1] || match[3] || match[5], 10)
-  const minute = Number.parseInt(match[2] || match[4] || '0', 10)
+
+  // índices: às/as/pelas → 1,2 | para as → 3,4 | a/para → 5,6 | HH:mm → 7,8 | HHh → 9 | N horas → 10
+  let hour = Number.parseInt(match[1] || match[3] || match[5] || match[7] || match[9] || match[10], 10)
+  const minute = Number.parseInt(match[2] || match[4] || match[6] || match[8] || '0', 10)
+
+  if (!Number.isFinite(hour)) return null
   if (hour >= 1 && hour <= 11 && /\b(da|de)?\s*(tarde|noite)\b/.test(text)) hour += 12
+  if (hour >= 1 && hour <= 6 && /\b(da|de|pela)?\s*manh[aã]\b/.test(text)) {
+    // "6 da manhã" — já está correto, nenhum ajuste necessário (hora < 12)
+  }
   if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null
   return { hour, minute }
 }
 
 export function parseAgendaDateTime(message, base = new Date()) {
   const raw = String(message || '')
-  const text = stripAccents(raw.toLowerCase())
+  const text = normalizeWordTime(stripAccents(raw.toLowerCase()))
   const time = parseTime(text)
 
   const relative = text.match(/\b(?:daqui\s+a|em)\s+(\d{1,3})\s*(min|minuto|minutos|hora|horas|h|dia|dias|semana|semanas)\b/)
@@ -139,6 +214,10 @@ export function parseAgendaDateTime(message, base = new Date()) {
   } else if (text.includes('amanha')) {
     bumpDayIfPast = false
     parts = saoPauloParts(addDays(startOfToday(), 1))
+  } else if (text.includes('hoje')) {
+    // "hoje" é explícito — nunca empurra para amanhã mesmo se horário passou
+    bumpDayIfPast = false
+    parts = saoPauloParts(startOfToday())
   } else {
     let weekdayMatched = false
     for (const [name, weekday] of WEEKDAY_MAP.entries()) {
@@ -186,17 +265,60 @@ export function parseReminderMinutes(message) {
 }
 
 function extractTitle(message) {
-  let text = String(message || '').trim()
-  text = text.replace(/^(me\s+)?(marcar|agendar|criar|adicionar|anotar|anota|colocar|inclui|incluir|avise|avisar|alerte|alerta|alertar|lembra|lembrar|lembre|tenho|terei)\s+(de|para|um|uma|o|a)?\s*/i, '')
-  text = text.replace(/^(um|uma|o|a)\s+(compromisso|lembrete|evento)\s+(de|para)?\s*/i, '')
-  text = text.replace(/\b(me\s+)?(avise|avisar|alerte|alerta|alertar|lembre|lembrar|lembra)\b.*$/i, '')
-  text = text.replace(/\b(hoje|amanh[aã]|depois de amanh[aã]|segunda|ter[cç]a|quarta|quinta|sexta|s[aá]bado|domingo)\b.*$/i, '')
-  text = text.replace(/\b(?:daqui\s+a|em)\s+\d{1,3}\s*(min|minuto|minutos|hora|horas|h|dia|dias|semana|semanas)\b.*$/i, '')
-  text = text.replace(/\b(dia\s+)?\d{1,2}[/-]\d{1,2}([/-]\d{2,4})?.*$/i, '')
-  text = text.replace(/\b(?:as|às|a|para|pelas?)\s*\d{1,2}([:h]\d{2})?\b.*$/i, '')
-  text = text.replace(/\b\d{1,2}[:h]\d{2}\b.*$/i, '')
-  const title = text.trim().replace(/\s+/g, ' ')
-  return title.length >= 2 ? title.slice(0, 160) : 'Compromisso'
+  // 1. Normaliza horas por extenso
+  let text = normalizeWordTime(String(message || '').trim())
+
+  // 2. Remove "Severino" (vocativo em qualquer posição dentro dos primeiros 60 chars)
+  //    "Fala Severino, ..." → "..." | "Severino, lembra..." → "lembra..."
+  if (/^.{0,60}severino\b/i.test(text)) {
+    text = text.replace(/^.*?\bseverino\b[,!\s]*/i, '')
+  }
+
+  // 3. Localiza verbo de agendamento em QUALQUER posição (não só no início).
+  //    Se existe preamble conversacional ("como você tá? Marque..."), salta para o verbo.
+  const schedVerb =
+    /\b(?:me\s+)?(?:marqu[ae]|agende?|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
+  const schedMatch = text.match(schedVerb)
+  if (schedMatch && schedMatch.index > 0) {
+    text = text.slice(schedMatch.index)
+  }
+
+  // 4. Remove verbos de ação no início (infinitivo + imperativo)
+  text = text.replace(
+    /^(?:me\s+)?(?:marcar|marque|agendar|agende|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|lembrete)\s+(?:de|para|um|uma|o|a)?\s*/i,
+    ''
+  )
+  text = text.replace(/^(?:um|uma|o|a)\s+(?:compromisso|lembrete|evento)\s+(?:de|para)?\s*/i, '')
+
+  // 5. Remove verbo auxiliar de movimento "ir" ("ir buscar" → "buscar")
+  text = text.replace(/^ir\s+/i, '')
+
+  // 6. Remove frases de lembrete ao final
+  text = text.replace(/[\s,]+\b(?:me\s+)?(?:avise|avisar|alerte|alerta|alertar|lembre|lembrar|lembra)\b.*$/i, '')
+
+  // 7. Remove marcadores de data/hora em QUALQUER posição
+  text = text.replace(/\bmeio[\s-]dia\b/gi, '')
+  text = text.replace(/\bmeia[\s-]noite\b/gi, '')
+  text = text.replace(/\b(?:depois\s+de\s+amanh[aã]|amanh[aã]|hoje)\b/gi, '')
+  text = text.replace(/\b(?:segunda(?:-feira)?|ter[cç]a(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|s[aá]bado|domingo)\b/gi, '')
+  text = text.replace(/\b(?:daqui\s+a|em)\s+\d{1,3}\s*(?:min|minuto|minutos|hora|horas|h|dia|dias|semana|semanas)\b/gi, '')
+  text = text.replace(/\b(?:dia\s+)?\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b/gi, '')
+  text = text.replace(/\b(?:às|as|pelas?)\s*\d{1,2}(?:[:h]\d{2}|\s+horas?\s+e\s+meia|\s+horas?)?\b/gi, '')
+  text = text.replace(/\bpara\s+(?:as|às)\s+\d{1,2}(?:[:h]\d{2}|\s+horas?\s+e\s+meia|\s+horas?)?\b/gi, '')
+  text = text.replace(/\b\d{1,2}[:h]\d{2}\b/gi, '')
+  text = text.replace(/\b\d{1,2}\s+horas?\s+e\s+meia\b/gi, '')
+  text = text.replace(/\b\d{1,2}\s+e\s+meia\b/gi, '')
+  text = text.replace(/\b\d{1,2}\s+horas?\b/gi, '')
+  text = text.replace(/\b\d{1,2}h\b/gi, '')
+  text = text.replace(/\b(?:da|de|pela)\s+(?:manh[aã]|tarde|noite)\b/gi, '')
+  text = text.replace(/\b(?:pr[oó]xim[ao]s?)\b/gi, '')
+
+  // 8. Remove artigo "a/o/as/os" entre verbo de ação e pessoa/coisa (padrão da fala)
+  text = text.replace(/\b(buscar|pegar|pagar|levar|trazer|chamar|ligar|falar|ver|comprar)\s+(a|o|as|os)\s+/gi, '$1 ')
+
+  const cleaned = text.replace(/\s+/g, ' ').replace(/^[\s,;:?!]+|[\s,;:?!]+$/g, '').trim()
+  if (cleaned.length < 2) return 'Compromisso'
+  return (cleaned.charAt(0).toUpperCase() + cleaned.slice(1)).slice(0, 160)
 }
 
 function isReminderCreateMessage(message) {
