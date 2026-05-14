@@ -63,6 +63,8 @@ export const DESPESA_RULES = [
   { re: /netflix|spotify|prime video|disney\+|hbo|globoplay|assinatura/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Assinaturas (Netflix, Spotify, etc)'] },
   { re: /cinema|show\b|teatro|ingresso.*show/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Cinema, Shows e Teatro'] },
   { re: /bar\b|balada|cervejaria/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Bares e Baladas'] },
+  { re: /poker|apostas?|bingo|cassino|loteria\b|\bbet\b|betano|pixbet|blaze\b|roleta|sportingbet|esport.*aposta|aposta.*esport/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Jogos e Hobbies'] },
+  { re: /hobby|passeio\b|parque\b|praia\b|museu\b|exposicao|exposição|festival\b|trilha\b|surf\b|skate\b|paintball|kart\b|boliche|sinuca/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Praias e Parques', 'Museus e Exposições', 'Jogos e Hobbies', 'Clubes e Associações'] },
   { re: /salao|salão|barbearia|cabelo|manicure/i, categoriaNome: 'Cuidados Pessoais', subLabels: ['Salão de Beleza / Barbearia'] },
   { re: /roupa|camisa|calca|calça|tenis|tênis|vestuario/i, categoriaNome: 'Cuidados Pessoais', subLabels: ['Vestuário (Roupas do Dia a Dia)', 'Sapatos e Tênis'] },
   { re: /amazon|mercado\s*livre|shopee|shein|aliexpress|magalu|americanas|shopping|loja de departamento/i, categoriaNome: 'Compras e Varejo', subLabels: ['Marketplace (Amazon, Mercado Livre)', 'Compras Online', 'Shopping', 'Loja de Departamento'] },

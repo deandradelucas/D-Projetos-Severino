@@ -515,6 +515,7 @@ REGRAS OBRIGATÓRIAS:
      * Verbais compostos: "dois mil" → 2000, "três mil e quinhentos" → 3500, "dois mil e duzentos reais" → 2200.
    - Identifique a DESCRIÇÃO: curta e clara (do que se trata o lançamento).
    - Mapeie para as CATEGORIAS fornecidas usando os IDs exatos. Prefira SUBCATEGORIA quando o texto for específico (ex.: Uber → transporte por app; iFood → alimentação delivery).
+   - OBRIGATÓRIO: SEMPRE informe categoria_id e subcategoria_id quando for DESPESA ou RECEITA — mesmo que o contexto seja incomum (poker, apostas, hobby, presente, etc.). Escolha a categoria e subcategoria MAIS PRÓXIMAS do contexto. NUNCA retorne categoria_id como null para transações.
    - Opcional: "data_transacao" em ISO 8601 completo se o usuário mencionar QUANDO ocorreu ("hoje às 14h", "ontem", "dia 15/03 às 9h", "amanhã de manhã"). Use o fuso America/Sao_Paulo. Se não houver menção de data/hora, use null.
 2. Se NÃO for transação (ex: comentários, perguntas, saudações, filosofia):
    - Identifique o TIPO como "CHAT".
