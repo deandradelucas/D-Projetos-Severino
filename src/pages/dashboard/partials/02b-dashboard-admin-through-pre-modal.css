@@ -565,12 +565,20 @@ body:has(.sidebar.open) .horizon-chat-window {
   }
 
   .mobile-bottom-nav {
+    display: block;
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     z-index: 70;
+    /* Container absorve safe area — preenche a zona do home indicator com o mesmo fundo do bar */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: rgba(6, 6, 8, 0.99);
     pointer-events: none;
+  }
+
+  body[data-theme='light'] .mobile-bottom-nav {
+    background: rgba(255, 255, 255, 1);
   }
 
   .mobile-bottom-nav__bar {
@@ -579,8 +587,7 @@ body:has(.sidebar.open) .horizon-chat-window {
     gap: 2px;
     width: 100%;
     margin: 0;
-    /* padding-bottom inclui safe-area — ícones ficam acima do home indicator */
-    padding: 8px max(8px, var(--safe-right)) calc(10px + var(--safe-bottom)) max(8px, var(--safe-left));
+    padding: 8px max(8px, var(--safe-right)) 10px max(8px, var(--safe-left));
     border: none;
     border-radius: 20px 20px 0 0;
     background:

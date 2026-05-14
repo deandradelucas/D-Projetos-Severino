@@ -829,6 +829,10 @@ body[data-theme='dark'] .horizon-chat-fab {
 }
 
 /* Menu inferior mobile: inativos brancos; só o ativo em --accent */
+body[data-theme='dark'] .mobile-bottom-nav {
+  background: rgba(4, 4, 6, 1);
+}
+
 body[data-theme='dark'] .mobile-bottom-nav__bar {
   background:
     linear-gradient(180deg, rgba(14, 14, 18, 0.98) 0%, rgba(4, 4, 6, 1) 100%);
