@@ -594,7 +594,7 @@ export default function Transacoes() {
                       </div>
                       <div className="ref-tx-cat-cell">
                         <span className="ref-tx-field-label">Categoria</span>
-                        <p className="ref-tx-cat-text break-words">
+                        <p className="ref-tx-cat-text">
                           {catNome}
                           {t.recorrente_index ? (
                             <span className="ref-tx-rec-badge">
@@ -605,7 +605,7 @@ export default function Transacoes() {
                       </div>
                       <div className="ref-tx-sub-cell">
                         <span className="ref-tx-field-label">Subcategoria</span>
-                        <p className="ref-tx-sub-text break-words">{subNome}</p>
+                        <p className="ref-tx-sub-text">{subNome}</p>
                       </div>
                       <div className="ref-tx-rec-cell">
                         {mostraIconeRecorrente ? (
