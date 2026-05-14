@@ -84,6 +84,7 @@ export const DESPESA_RULES = [
   { re: /coworking|trafego pago|tráfego pago|anuncio|anúncio|marketing|branding|frete.*venda|taxa.*plataforma|equipamento profissional/i, categoriaNome: 'Trabalho e Negócios', subLabels: ['Coworking', 'Tráfego Pago', 'Marketing e Anúncios', 'Design e Branding', 'Fretes de Venda', 'Taxas de Plataforma', 'Equipamentos Profissionais'] },
   { re: /aluguel(?!.*receb)/i, categoriaNome: 'Moradia', subLabels: ['Aluguel'] },
   { re: /condominio|condomínio/i, categoriaNome: 'Moradia', subLabels: ['Condomínio'] },
+  { re: /energia solar|placa[s]?\s*solar|painel\s*solar|instalac[aã]o\s*solar|sistema\s*solar|fotovoltai/i, categoriaNome: 'Moradia', subLabels: ['Energia Solar'] },
   { re: /luz\b|energia eletrica|energia elétrica|celesc|copel|enel/i, categoriaNome: 'Moradia', subLabels: ['Conta de Luz'] },
   { re: /agua\b|água\b|sanepar|cedae/i, categoriaNome: 'Moradia', subLabels: ['Conta de Água'] },
   { re: /internet\b|fibra|wifi|vivo fibra|net\b claro|oi fibra/i, categoriaNome: 'Moradia', subLabels: ['Internet e TV'] },
