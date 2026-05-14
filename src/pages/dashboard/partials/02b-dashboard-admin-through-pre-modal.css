@@ -564,6 +564,10 @@ body:has(.sidebar.open) .horizon-chat-window {
     padding-bottom: calc(130px + var(--safe-bottom));
   }
 
+  body:has(.dashboard-mobile-fabs) .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    padding-bottom: calc(138px + var(--safe-bottom));
+  }
+
   .mobile-bottom-nav {
     display: block;
     position: fixed;
