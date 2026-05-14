@@ -72,7 +72,7 @@ const MOBILE_NAV_ITEMS = [
   },
   {
     to: '/configuracoes',
-    label: 'Configurações',
+    label: 'Ajustes',
     end: true,
     className: 'mobile-bottom-nav__item--settings',
     icon: (
