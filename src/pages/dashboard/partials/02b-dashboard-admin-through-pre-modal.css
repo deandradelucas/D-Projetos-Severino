@@ -569,9 +569,10 @@ body:has(.sidebar.open) .horizon-chat-window {
     position: fixed;
     left: 0;
     right: 0;
-    bottom: 0;
+    /* html/body/root travados em 100svh (= altura_física - safe-area no iOS).
+       Negativo empurra o container até o fundo físico sem alterar os layouts. */
+    bottom: calc(-1.5 * env(safe-area-inset-bottom, 0px));
     z-index: 70;
-    /* Container absorve safe area — preenche a zona do home indicator com o mesmo fundo do bar */
     padding-bottom: env(safe-area-inset-bottom, 0px);
     background: rgba(6, 6, 8, 0.99);
     pointer-events: none;
@@ -587,7 +588,7 @@ body:has(.sidebar.open) .horizon-chat-window {
     gap: 2px;
     width: 100%;
     margin: 0;
-    padding: 8px max(8px, var(--safe-right)) 10px max(8px, var(--safe-left));
+    padding: 8px max(8px, var(--safe-right)) max(8px, env(safe-area-inset-bottom, 0px)) max(8px, var(--safe-left));
     border: none;
     border-radius: 20px 20px 0 0;
     background:
