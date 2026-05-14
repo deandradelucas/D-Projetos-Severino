@@ -394,6 +394,31 @@ export default function Pagamento() {
     historicoLen: historico.length,
   })
 
+  const diasRestantesTrial = useMemo(() => {
+    if (painelAssinatura.situacao !== 'trial' || !painelAssinatura.trialEndsAt) return null
+    const end = new Date(painelAssinatura.trialEndsAt)
+    if (Number.isNaN(end.getTime())) return null
+    return Math.max(0, Math.ceil((end - new Date()) / 86_400_000))
+  }, [painelAssinatura.situacao, painelAssinatura.trialEndsAt])
+
+  const trialUrgenciaVariant =
+    diasRestantesTrial === null
+      ? null
+      : diasRestantesTrial <= 1
+        ? 'critico'
+        : diasRestantesTrial <= 3
+          ? 'aviso'
+          : 'normal'
+
+  const trialUrgenciaMsg =
+    diasRestantesTrial === 0
+      ? 'Seu período gratuito termina hoje. Assine agora para não perder o acesso.'
+      : diasRestantesTrial === 1
+        ? 'Último dia de teste! Depois disso, você perde acesso ao app.'
+        : diasRestantesTrial <= 3
+          ? 'Restam poucos dias. Assine para manter o controle financeiro que você construiu.'
+          : 'Aproveite o período gratuito e assine antes de terminar para não perder o acesso.'
+
   /** Card “Conta isenta” na coluna direita vira bloco abaixo do histórico (exceto conta admin). */
   const isentaOrientacaoAbaixoHistorico =
     config.isento_pagamento && painelAssinatura.situacao !== 'admin'
@@ -434,9 +459,46 @@ export default function Pagamento() {
             </section>
 
             <div
-              className={`page-pagamento-layout${isentaOrientacaoAbaixoHistorico ? ' page-pagamento-layout--sem-lateral' : ''}`}
+              className={`page-pagamento-layout${isentaOrientacaoAbaixoHistorico || painelAssinatura.situacao === 'trial' ? ' page-pagamento-layout--sem-lateral' : ''}`}
             >
               <div className="page-pagamento-layout__primary">
+                {diasRestantesTrial !== null && trialUrgenciaVariant && (
+                  <div className={`pagamento-trial-urgencia pagamento-trial-urgencia--${trialUrgenciaVariant}`} role="alert">
+                    <div className="pagamento-trial-urgencia__dias-box">
+                      <span className="pagamento-trial-urgencia__num">
+                        {diasRestantesTrial === 0 ? '0' : diasRestantesTrial}
+                      </span>
+                      <span className="pagamento-trial-urgencia__label">
+                        {diasRestantesTrial === 1 ? 'dia' : 'dias'}
+                      </span>
+                    </div>
+                    <div className="pagamento-trial-urgencia__body">
+                      <p className="pagamento-trial-urgencia__title">
+                        {diasRestantesTrial === 0
+                          ? 'Período gratuito termina hoje'
+                          : diasRestantesTrial === 1
+                            ? '1 dia restante de período gratuito'
+                            : `${diasRestantesTrial} dias restantes de período gratuito`}
+                      </p>
+                      <p className="pagamento-trial-urgencia__text">{trialUrgenciaMsg}</p>
+                    </div>
+                    <a href="#pagamento-checkout" className="pagamento-trial-urgencia__cta">
+                      Assinar agora
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden>
+                        <path d="M2.5 6.5h8M6.5 3l3.5 3.5L6.5 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </a>
+                  </div>
+                )}
+
+                {painelAssinatura.situacao === 'trial' && (
+                  <PagamentoOrientacaoCard
+                    variant={orientacao.variant}
+                    title={orientacao.title}
+                    body={orientacao.body}
+                  />
+                )}
+
                 {dadosErro ? (
                   <div className="pagamento-banner pagamento-banner--danger" role="alert">
                     <p className="pagamento-banner__title">{dadosErro}</p>
@@ -553,7 +615,7 @@ export default function Pagamento() {
                 ) : null}
 
                 {!config.isento_pagamento && config.ready && !loading ? (
-                  <div className="ref-panel pagamento-checkout-panel">
+                  <div id="pagamento-checkout" className="ref-panel pagamento-checkout-panel">
                     <div className="pagamento-checkout-panel__lead">
                       <p className="pagamento-checkout-panel__lead-title">Finalizar assinatura</p>
                       <p className="pagamento-checkout-panel__lead-text">
@@ -666,7 +728,7 @@ export default function Pagamento() {
                 ) : null}
               </div>
 
-              {!isentaOrientacaoAbaixoHistorico ? <PagamentoPainelLateral orientacao={orientacao} /> : null}
+              {!isentaOrientacaoAbaixoHistorico && painelAssinatura.situacao !== 'trial' ? <PagamentoPainelLateral orientacao={orientacao} /> : null}
             </div>
 
             <PagamentoPixQrModal

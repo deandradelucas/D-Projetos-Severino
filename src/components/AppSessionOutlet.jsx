@@ -132,7 +132,7 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
   }
 
   if (requireAppAccess && state.user.acesso_app_liberado === false) {
-    return <Navigate to="/pagamento?expirado=1" replace />
+    return <Navigate to="/trial-expirado" replace />
   }
 
   return (
