@@ -596,9 +596,8 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     object-fit: contain;
   }
 
-  /* Botões do hero migram para FABs inferiores no mobile */
-  .page-transacoes.app-horizon-shell .dashboard-hub__btn--primary,
-  .page-transacoes.app-horizon-shell .dashboard-hub__icon-btn--wa {
+  /* Botão de nova transação migra para FAB inferior no mobile */
+  .page-transacoes.app-horizon-shell .dashboard-hub__btn--primary {
     display: none !important;
   }
 }
@@ -642,68 +641,6 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
     margin-inline: 0 !important;
   }
 
-  /* WA FAB — mesmo estilo vidro que o tx-fab */
-  .dashboard-mobile-wa-fab {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    min-height: 42px;
-    padding: 0 14px 0 10px;
-    border: 1px solid rgba(255, 255, 255, 0.52);
-    border-radius: 999px;
-    background: linear-gradient(
-      175deg,
-      rgba(255, 255, 255, 0.72) 0%,
-      rgba(255, 255, 255, 0.28) 42%,
-      rgba(255, 255, 255, 0.52) 52%,
-      rgba(255, 255, 255, 0.36) 100%
-    );
-    -webkit-backdrop-filter: blur(22px) saturate(1.35);
-    backdrop-filter: blur(22px) saturate(1.35);
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 850;
-    letter-spacing: -0.01em;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    box-shadow:
-      0 14px 34px -18px rgba(15, 23, 42, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.85),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.22);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    cursor: pointer;
-  }
-
-  .dashboard-mobile-wa-fab:active {
-    transform: scale(0.97);
-  }
-
-  .dashboard-mobile-wa-fab svg {
-    flex-shrink: 0;
-    color: #25a244;
-  }
-
-  .dashboard-mobile-wa-fab__label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 920;
-    letter-spacing: -0.035em;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    background: linear-gradient(185deg, #22c55e 0%, #16a34a 50%, #166534 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
-
-  @supports not (-webkit-background-clip: text) {
-    .dashboard-mobile-wa-fab__label {
-      color: #16a34a;
-      -webkit-text-fill-color: #16a34a;
-      background: none;
-    }
-  }
 }
 
 
