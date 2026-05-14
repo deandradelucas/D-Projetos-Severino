@@ -12,8 +12,8 @@ export const BRAND_ASSETS = {
   /** Menu lateral — escuro (`public/images/Nova Logo/Tema Escuro.png`) */
   sidebarLogoDark: '/images/Nova Logo/Tema Escuro.png',
   /** Alias usado em telas como BemVindoAssinatura */
-  logo: '/images/horizonte_fiel_original_logo_dark.svg',
-  logoOnDark: '/images/horizonte_fiel_original_logo_dark.svg',
+  logo: '/images/Nova Logo/Tema Escuro.png',
+  logoOnDark: '/images/Nova Logo/Tema Escuro.png',
   /** SVG no repo — fallback quando PNG não carregar */
   logoOnLight: '/images/horizonte_fiel_original_logo_light.svg',
   /** Raster para menu (mobile: largura 100% sem depender de SVG inline) */
