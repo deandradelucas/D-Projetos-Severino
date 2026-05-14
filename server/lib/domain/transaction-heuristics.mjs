@@ -142,8 +142,6 @@ export function enriquecerCategoriaPorTexto(message, extractedData, categoriasUs
     }
   }
 
-  if (extractedData.categoria_id && extractedData.subcategoria_id) return extractedData
-
   for (const rule of rulesForTipo(tipo)) {
     if (!rule.categoriaNome || !rule.subLabels?.length) continue
     if (!SEED_CAT_NOMES.has(rule.categoriaNome)) continue
