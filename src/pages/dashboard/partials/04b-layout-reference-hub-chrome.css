@@ -260,6 +260,9 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .re
   letter-spacing: 0.02em;
   line-height: 1.25;
   color: color-mix(in srgb, var(--color-neutral-600, #525252) 88%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-lancador {

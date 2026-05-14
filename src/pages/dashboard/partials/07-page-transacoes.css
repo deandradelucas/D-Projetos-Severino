@@ -327,7 +327,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   grid-row: 1 / 3;
   display: flex !important;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
   gap: 4px;
@@ -374,6 +374,9 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
   font-size: 13px !important;
   line-height: 1.12 !important;
   margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-cat-text {
@@ -382,6 +385,9 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   font-size: 13px !important;
   line-height: 1.12 !important;
   margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-sub-text {
@@ -390,6 +396,9 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
   font-size: 12px !important;
   line-height: 1.12 !important;
   margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-sub-text {
@@ -398,6 +407,9 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   font-size: 12px !important;
   line-height: 1.12 !important;
   margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date {
