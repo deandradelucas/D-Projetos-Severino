@@ -501,10 +501,6 @@ button {
 
 
 @media (max-width: 768px) {
-  /*
-   * 100svh ≈ viewport visível estável; 100dvh em PWA/mobile costuma ser maior que a área útil
-   * e deixa faixa escura/clara em baixo ou “desloca” o layout.
-   */
   html {
     overflow: hidden;
     overflow-x: clip;
@@ -537,10 +533,6 @@ button {
   }
 
   body {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100svh;
     overscroll-behavior-y: none;
   }
 
