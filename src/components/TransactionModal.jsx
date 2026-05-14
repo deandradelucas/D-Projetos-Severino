@@ -271,6 +271,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   value={formData.descricao}
                   onChange={handleChange}
                   placeholder="Ex.: mercado, aluguel, salário…"
+                  maxLength={25}
                   className="input-premium"
                 />
               </div>
