@@ -570,11 +570,6 @@ body:has(.sidebar.open) .horizon-chat-window {
     right: 0;
     bottom: 0;
     z-index: 70;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    padding: 0 max(12px, var(--safe-left)) var(--safe-bottom) max(12px, var(--safe-right));
-    box-sizing: border-box;
     pointer-events: none;
   }
 
@@ -582,19 +577,19 @@ body:has(.sidebar.open) .horizon-chat-window {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 2px;
-    width: min(580px, 100%);
+    width: 100%;
     margin: 0;
-    padding: 8px;
+    /* padding-bottom inclui safe-area — ícones ficam acima do home indicator */
+    padding: 8px max(8px, var(--safe-right)) calc(10px + var(--safe-bottom)) max(8px, var(--safe-left));
     border: none;
-    border-radius: 26px;
+    border-radius: 20px 20px 0 0;
     background:
-      linear-gradient(175deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 42%, rgba(12, 12, 14, 0.82) 100%),
-      rgba(6, 6, 8, 0.76);
-    -webkit-backdrop-filter: blur(16px) saturate(1.12);
-    backdrop-filter: blur(16px) saturate(1.12);
+      linear-gradient(180deg, rgba(16, 16, 20, 0.97) 0%, rgba(6, 6, 8, 0.99) 100%);
+    -webkit-backdrop-filter: blur(20px) saturate(1.15);
+    backdrop-filter: blur(20px) saturate(1.15);
     box-shadow:
-      0 20px 50px -22px rgba(0, 0, 0, 0.72),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      0 -1px 0 rgba(255, 255, 255, 0.07),
+      0 -12px 40px -12px rgba(0, 0, 0, 0.55);
     pointer-events: auto;
   }
 
@@ -684,14 +679,12 @@ body:has(.sidebar.open) .horizon-chat-window {
 
   body[data-theme='light'] .mobile-bottom-nav__bar {
     border: none;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(248, 250, 252, 0.72)),
-      rgba(255, 255, 255, 0.58);
-    -webkit-backdrop-filter: blur(16px) saturate(1.1);
-    backdrop-filter: blur(16px) saturate(1.1);
+    background: rgba(255, 255, 255, 0.97);
+    -webkit-backdrop-filter: blur(20px) saturate(1.1);
+    backdrop-filter: blur(20px) saturate(1.1);
     box-shadow:
-      0 20px 48px -24px rgba(15, 23, 42, 0.38),
-      inset 0 1px 0 rgba(255, 255, 255, 0.88);
+      0 -1px 0 rgba(15, 23, 42, 0.07),
+      0 -8px 28px -8px rgba(15, 23, 42, 0.12);
   }
 
   body[data-theme='light'] .mobile-bottom-nav__item {

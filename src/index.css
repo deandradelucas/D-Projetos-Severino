@@ -139,6 +139,30 @@ html:has(body[data-theme='light']) {
   background-color: #ffffff;
 }
 
+/* BemVindoAssinatura — pinta TODO o viewport de preto (Background.jsx, html, body, #root)
+   para evitar que o safe-area bottom do iPhone mostre fundo branco do tema claro */
+html:has(.bem-vindo-page),
+html:has(.bem-vindo-page) body,
+html:has(.bem-vindo-page) #root {
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+html:has(.bem-vindo-page) .app-background-root__plain-fill {
+  background: #000000 !important;
+}
+
+html:has(.bem-vindo-page) .app-layout-shell,
+html:has(.bem-vindo-page) .app-routes-grow {
+  background-color: #000000 !important;
+}
+
+/* BemVindoAssinatura — esconde o chat FAB nessa rota */
+html:has(.bem-vindo-page) .horizon-chat-fab,
+html:has(.bem-vindo-page) .horizon-chat-window {
+  display: none !important;
+}
+
 body,
 #root {
   min-height: 100%;
@@ -546,6 +570,20 @@ button {
   /* Shell autenticado: safe-area já nos painéis internos / FAB — não somar padding aqui */
   .app-routes-grow:has(.dashboard-container.app-horizon-shell) {
     padding-bottom: 0;
+  }
+
+  /* BemVindoAssinatura: componente cobre toda a tela — remove padding e força fundo preto */
+  .app-routes-grow:has(.bem-vindo-page) {
+    padding-bottom: 0;
+    background-color: #000000;
+    overflow: visible;
+  }
+
+  html:has(.bem-vindo-page),
+  html:has(.bem-vindo-page) body,
+  html:has(.bem-vindo-page) #root {
+    background-color: #000000 !important;
+    background-image: none !important;
   }
 
   body::after {

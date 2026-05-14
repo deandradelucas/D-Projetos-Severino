@@ -280,7 +280,7 @@ export default function Login() {
       }
 
       if (!response.ok) {
-        showToast(data.message || 'Dados de acesso incorretos.', 'error')
+        setFormError(data.message || 'Dados de acesso incorretos.')
         setLoading(false)
         return
       }
