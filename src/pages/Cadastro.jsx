@@ -90,7 +90,7 @@ export default function Cadastro() {
     if (u.mostrar_bem_vindo_assinatura) {
       navigate('/bem-vindo-assinatura', navOpts)
     } else if (u.acesso_app_liberado === false) {
-      navigate('/pagamento?expirado=1', navOpts)
+      navigate('/trial-expirado', navOpts)
     } else {
       navigate('/dashboard', navOpts)
     }

@@ -25,6 +25,7 @@ import {
   AdminMarketing,
   Pagamento,
   BemVindoAssinatura,
+  TrialExpirado,
 } from './lazyRoutes'
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
                 <Route element={<AppSessionOutlet requireAppAccess={false} />}>
                   <Route path="/bem-vindo-assinatura" element={<BemVindoAssinatura />} />
                   <Route path="/pagamento" element={<Pagamento />} />
+                  <Route path="/trial-expirado" element={<TrialExpirado />} />
                 </Route>
                 <Route element={<AppSessionOutlet requireAppAccess />}>
                   <Route path="/dashboard" element={<Dashboard />} />

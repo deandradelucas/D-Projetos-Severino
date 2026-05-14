@@ -42,6 +42,9 @@ export const Pagamento = lazy(loadPagamento)
 const loadBemVindoAssinatura = () => import('./pages/BemVindoAssinatura.jsx')
 export const BemVindoAssinatura = lazy(loadBemVindoAssinatura)
 
+const loadTrialExpirado = () => import('./pages/TrialExpirado.jsx')
+export const TrialExpirado = lazy(loadTrialExpirado)
+
 const ROUTE_PREFETCH = {
   '/': loadLogin,
   '/login': loadLogin,
@@ -58,6 +61,7 @@ const ROUTE_PREFETCH = {
   '/admin/marketing': loadAdminMarketing,
   '/pagamento': loadPagamento,
   '/bem-vindo-assinatura': loadBemVindoAssinatura,
+  '/trial-expirado': loadTrialExpirado,
 }
 
 const prefetched = new Set()
