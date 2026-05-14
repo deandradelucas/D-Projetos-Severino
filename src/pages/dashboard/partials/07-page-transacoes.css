@@ -234,7 +234,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) {
   display: grid !important;
   grid-template-columns: 34px minmax(0, 1fr) auto !important;
-  grid-template-rows: auto auto auto !important;
+  grid-template-rows: auto auto auto auto !important;
   grid-template-areas: none !important;
   column-gap: 10px !important;
   row-gap: 8px !important;
@@ -254,7 +254,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) {
   display: grid !important;
   grid-template-columns: 34px minmax(0, 1fr) auto !important;
-  grid-template-rows: auto auto auto !important;
+  grid-template-rows: auto auto auto auto !important;
   grid-template-areas: none !important;
   column-gap: 10px !important;
   row-gap: 8px !important;
@@ -282,7 +282,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-icon-cell {
   grid-column: 1;
-  grid-row: 1 / -1;
+  grid-row: 1 / 4;
   align-self: start;
   padding: 0 !important;
   margin: 0 !important;
@@ -323,18 +323,19 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-val-act-wrap {
-  grid-column: 3;
-  grid-row: 1 / 3;
+  grid-column: 1 / -1;
+  grid-row: 4;
   display: flex !important;
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
+  justify-content: space-between;
+  gap: 8px;
   align-self: center;
   min-width: 0;
-  padding: 0 !important;
+  padding: 8px 0 0 !important;
   margin: 0 !important;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
 }
 
 /* Ícone seta: mesmas medidas do hub “recentes” (mobile) */
@@ -372,44 +373,44 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
   font-weight: 800 !important;
   color: #0b0b0b !important;
   font-size: 13px !important;
-  line-height: 1.12 !important;
+  line-height: 1.3 !important;
   margin: 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  word-break: break-word !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-cat-text {
   font-weight: 800 !important;
   color: #f1f5f9 !important;
   font-size: 13px !important;
-  line-height: 1.12 !important;
+  line-height: 1.3 !important;
   margin: 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  word-break: break-word !important;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-sub-text {
   font-weight: 600 !important;
   color: #64748b !important;
   font-size: 12px !important;
-  line-height: 1.12 !important;
+  line-height: 1.3 !important;
   margin: 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  word-break: break-word !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-sub-text {
   font-weight: 600 !important;
   color: rgba(148, 163, 184, 0.95) !important;
   font-size: 12px !important;
-  line-height: 1.12 !important;
+  line-height: 1.3 !important;
   margin: 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  word-break: break-word !important;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date {
@@ -481,10 +482,9 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   letter-spacing: 0.01em;
   line-height: 1.3;
   color: color-mix(in srgb, var(--color-neutral-600, #525252) 75%, transparent);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 120px;
+  white-space: normal;
+  overflow: visible;
+  word-break: break-word;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-desc {

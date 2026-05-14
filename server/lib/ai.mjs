@@ -332,13 +332,27 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
     'Você interpreta pedidos em português brasileiro para preencher um formulário de agenda (compromisso ou lembrete).\n\n' +
     `REFERÊNCIA DE DATA/HORA no fuso America/Sao_Paulo: ${baseReadable}\n\n` +
     'Retorne APENAS um JSON válido (sem markdown), formato exato:\n' +
-    '{"titulo":"string com ao menos 2 caracteres","data_local":"YYYY-MM-DD","hora_local":"HH:mm","local":"","descricao":"","lembrar_minutos_antes":15,"whatsapp_notificar":true}\n\n' +
-    'Regras:\n' +
+    '{"titulo":"string","data_local":"YYYY-MM-DD","hora_local":"HH:mm","local":"","descricao":"","lembrar_minutos_antes":15,"whatsapp_notificar":true}\n\n' +
+    'Regras gerais:\n' +
     '- data_local e hora_local são no horário de Brasília (não use UTC no JSON).\n' +
-    '- lembrar_minutos_antes deve ser um destes valores: 0, 5, 10, 15, 30, 60 (0 = aviso na hora do evento).\n' +
-    '- Se o texto pedir lembrete ou aviso mas não disser quanto antes, use 15.\n' +
-    '- whatsapp_notificar: true salvo pedido explícito para não notificar.\n' +
-    '- local e descricao: string (podem ser vazias).\n\n' +
+    '- lembrar_minutos_antes deve ser exatamente um destes valores: 0, 5, 10, 15, 30, 60.\n' +
+    '- Se o texto pedir lembrete/aviso sem especificar quantos minutos antes, use 15.\n' +
+    '- whatsapp_notificar: true, salvo pedido explícito para não notificar.\n' +
+    '- local e descricao: strings, podem ser vazias.\n\n' +
+    'Regras para o TÍTULO:\n' +
+    '- Extraia o que é o compromisso/lembrete em si, sem incluir data, hora, dia da semana nem verbos de ação (marcar, agendar, lembrar, avise, etc.).\n' +
+    '- NUNCA inclua no título: data, hora, dia da semana, "horas", "h", "às", "e meia", verbos de ação (marcar, lembrar, ir, avise), artigos soltos (a, o, as, os).\n' +
+    '- Capitalize a primeira letra. Use 2 a 8 palavras. Extraia SOMENTE o nome do compromisso.\n' +
+    '- O texto pode vir de transcrição de áudio e PODE ter preamble conversacional antes do comando de agendamento — ignore tudo antes do verbo de ação e extraia só o evento.\n' +
+    '- Se o usuário só informar horário sem descrever o evento, use "Compromisso" como título.\n' +
+    '- Exemplos de entrada → título correto:\n' +
+    '  "marcar dentista segunda 10h" → "Dentista"\n' +
+    '  "Fala Severino, como você tá? Marque uma reunião importante para as 16:30" → "Reunião importante"\n' +
+    '  "lembrar de ir buscar a Fabiana às dezesseis e meia" → "Buscar Fabiana"\n' +
+    '  "Oi, tudo bem? Agenda uma consulta médica pra amanhã às 9h" → "Consulta médica"\n' +
+    '  "me lembra de pagar a luz sexta 9h" → "Pagar a luz"\n' +
+    '  "amanhã às quinze e meia buscar filha na escola" → "Buscar filha na escola"\n' +
+    '  "call com cliente às dezesseis horas" → "Call com cliente"\n\n' +
     `Texto do usuário:\n"""${safeUserText}"""`
 
   const models = resolveGeminiModelCandidates()
