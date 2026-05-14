@@ -460,6 +460,25 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   justify-content: flex-end !important;
 }
 
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-desc,
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-desc {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--color-neutral-600, #525252) 75%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-desc {
+  color: rgba(255, 255, 255, 0.38);
+}
+
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-actions-cell svg {
   width: 15px !important;
   height: 15px !important;

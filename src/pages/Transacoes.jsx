@@ -581,6 +581,11 @@ export default function Transacoes() {
                         <time className="ref-tx-date" dateTime={dateTimeAttr}>
                           {dateLine}
                         </time>
+                        {t.descricao && String(t.descricao).trim() ? (
+                          <span className="ref-tx-desc" title={String(t.descricao).trim()}>
+                            {String(t.descricao).trim()}
+                          </span>
+                        ) : null}
                         {mostrarQuemLancou && t.lancado_por_nome ? (
                           <span className={`ref-tx-lancador ${privacyMode ? 'privacy-blur' : ''}`} title="Quem registrou este lançamento">
                             Lançado por {t.lancado_por_nome}
