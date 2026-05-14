@@ -175,15 +175,80 @@ export function inferTipoBasicoFromTexto(message) {
   return null
 }
 
-export function extrairValorBasicoFromTexto(message) {
-  const m = message.match(/(\d+(?:[.,]\d+)?)/)
-  if (!m) return null
-  let raw = m[1].trim()
-  if (raw.includes(',') && !raw.includes('.')) {
-    raw = raw.replace(',', '.')
-  } else if (raw.includes('.') && raw.includes(',')) {
-    raw = raw.replace(/\./g, '').replace(',', '.')
+const _BR_NUM_MAP = {
+  um: 1, uma: 1, dois: 2, duas: 2, tres: 3, quatro: 4, cinco: 5,
+  seis: 6, sete: 7, oito: 8, nove: 9,
+  dez: 10, onze: 11, doze: 12, treze: 13, quatorze: 14, catorze: 14, quinze: 15,
+  dezesseis: 16, dezessete: 17, dezoito: 18, dezenove: 19,
+  vinte: 20, trinta: 30, quarenta: 40, cinquenta: 50, sessenta: 60,
+  setenta: 70, oitenta: 80, noventa: 90,
+  cem: 100, cento: 100,
+  duzentos: 200, duzentas: 200, trezentos: 300, trezentas: 300,
+  quatrocentos: 400, quatrocentas: 400, quinhentos: 500, quinhentas: 500,
+  seiscentos: 600, seiscentas: 600, setecentos: 700, setecentas: 700,
+  oitocentos: 800, oitocentas: 800, novecentos: 900, novecentas: 900,
+}
+
+// Requer dezena, centena ou "mil" — evita falso positivo em "um café", "dois pratos"
+const _VERBAL_INDICATOR = /\b(?:mil|cem|cento|duzentos|duzentas|trezentos|trezentas|quatrocentos|quatrocentas|quinhentos|quinhentas|seiscentos|seiscentas|setecentos|setecentas|oitocentos|oitocentas|novecentos|novecentas|dez|onze|doze|treze|quatorze|catorze|quinze|dezesseis|dezessete|dezoito|dezenove|vinte|trinta|quarenta|cinquenta|sessenta|setenta|oitenta|noventa)\b/
+
+function _somarChunk(s) {
+  let soma = 0
+  for (const tok of s.split(/\s+/)) {
+    const v = _BR_NUM_MAP[tok]
+    if (v !== undefined) soma += v
   }
+  return soma
+}
+
+/**
+ * Converte valor verbal BR em número.
+ * "dois mil e quinhentos" → 2500 | "cento e cinquenta" → 150 | "cinquenta reais" → 50
+ * Retorna null se nenhum padrão verbal reconhecido.
+ */
+export function parseBRVerbalValor(texto) {
+  let s = normTxt(texto)
+    .replace(/\b(reais|real|uns|umas)\b/g, ' ')
+    .replace(/\b(de|e)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (!_VERBAL_INDICATOR.test(s)) return null
+
+  const milIdx = s.indexOf('mil')
+  let total = 0
+
+  if (milIdx !== -1) {
+    const anteMil = s.slice(0, milIdx).trim()
+    const aposMil = s.slice(milIdx + 3).trim()
+    const mult = anteMil ? _somarChunk(anteMil) : 1
+    const resto = aposMil ? _somarChunk(aposMil) : 0
+    total = mult * 1000 + resto
+  } else {
+    total = _somarChunk(s)
+  }
+
+  return total > 0 ? total : null
+}
+
+export function extrairValorBasicoFromTexto(message) {
+  const verbal = parseBRVerbalValor(message)
+  if (verbal !== null) return verbal
+
+  // Captura "2.000,50" | "2.000" | "89,90" | "50" (separadores BR)
+  const m = message.match(/(\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|\d+(?:,\d{1,2})?)/)
+  if (!m) return null
+
+  let raw = m[1].trim()
+  if (raw.includes('.') && raw.includes(',')) {
+    raw = raw.replace(/\./g, '').replace(',', '.')
+  } else if (raw.includes('.') && /\.\d{3}$/.test(raw)) {
+    // "2.000" — ponto seguido de 3 dígitos = separador de milhar BR
+    raw = raw.replace(/\./g, '')
+  } else if (raw.includes(',')) {
+    raw = raw.replace(',', '.')
+  }
+
   const val = parseFloat(raw)
   if (!isFinite(val) || val <= 0) return null
   return val

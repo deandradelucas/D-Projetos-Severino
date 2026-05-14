@@ -73,6 +73,8 @@ export async function transcribeWhatsAppAudioWithGemini(audioBytes, mimeHint = '
 
   const instruction =
     'Transcreve integralmente o áudio em português brasileiro. ' +
+    'Contexto: assistente financeiro pessoal — o usuário provavelmente menciona valores monetários ("dois mil reais", "R$ 500", "trezentos e vinte"), compras ou despesas. ' +
+    'Transcreva valores monetários com precisão, mantendo exatamente as palavras ditas (ex.: "dois mil reais", não "2000 reais"). ' +
     'Devolve apenas o texto ditado pelo utilizador, sem comentários, sem rótulos como "Transcrição:" ou "O utilizador disse". ' +
     'Se não houver fala inteligível, devolve exatamente: (silêncio)'
 
@@ -507,7 +509,10 @@ Sua tarefa é analisar mensagens (texto ou áudio) e decidir se são uma TRANSA�
 REGRAS OBRIGATÓRIAS:
 1. Se for TRANSAÇÃO (gasto ou receita):
    - Identifique o TIPO: "DESPESA" ou "RECEITA".
-   - Identifique o VALOR: número decimal (ex.: 90.50). Aceite formatos brasileiros na mensagem: "R$ 50", "50 reais", "89,90", "trinta reais" → converta para número.
+   - Identifique o VALOR: número decimal puro, sem separadores (ex.: 2000, 1500.50). Formatos aceitos:
+     * Separador de milhar BR: "R$ 2.000" → 2000 (NÃO 2.0), "R$ 1.500,50" → 1500.50. O ponto em "2.000" é milhar, NÃO decimal.
+     * Verbais simples: "cinquenta reais" → 50, "trinta" → 30.
+     * Verbais compostos: "dois mil" → 2000, "três mil e quinhentos" → 3500, "dois mil e duzentos reais" → 2200.
    - Identifique a DESCRIÇÃO: curta e clara (do que se trata o lançamento).
    - Mapeie para as CATEGORIAS fornecidas usando os IDs exatos. Prefira SUBCATEGORIA quando o texto for específico (ex.: Uber → transporte por app; iFood → alimentação delivery).
    - Opcional: "data_transacao" em ISO 8601 completo se o usuário mencionar QUANDO ocorreu ("hoje às 14h", "ontem", "dia 15/03 às 9h", "amanhã de manhã"). Use o fuso America/Sao_Paulo. Se não houver menção de data/hora, use null.
