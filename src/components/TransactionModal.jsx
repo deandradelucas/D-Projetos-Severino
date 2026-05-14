@@ -12,9 +12,12 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   const [categorias, setCategorias] = useState([])
   const [loadingCats, setLoadingCats] = useState(false)
   const [activeSelect, setActiveSelect] = useState(null)
+  const [aiSuggesting, setAiSuggesting] = useState(false)
+  const [aiSuggestedCat, setAiSuggestedCat] = useState(false)
 
   const valorInputRef = useRef(null)
   const modalSheetRef = useRef(null)
+  const suggestTimeoutRef = useRef(null)
 
   const scrollValorIntoView = useCallback(() => {
     const el = valorInputRef.current
@@ -55,11 +58,12 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     handleSubmit,
   } = useTransactionForm({ usuarioId, editingTransaction, isOpen, categorias, onSave, onClose })
 
-  // Inicializa o formulário e busca categorias ao abrir (sem focus no valor — no Android o focus abria o teclado só de abrir o modal)
+  // Inicializa o formulário e busca categorias ao abrir
   useEffect(() => {
     if (!isOpen || !usuarioId) return
     fetchCategorias()
     initForm()
+    setAiSuggestedCat(false)
   }, [isOpen, usuarioId, editingTransaction?.id, fetchCategorias, initForm])
 
   // Trava scroll do body enquanto modal está aberto
@@ -68,6 +72,13 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = prev }
+  }, [isOpen])
+
+  // Limpa timeout ao fechar modal
+  useEffect(() => {
+    if (!isOpen && suggestTimeoutRef.current) {
+      clearTimeout(suggestTimeoutRef.current)
+    }
   }, [isOpen])
 
   // Ajuste dinâmico para teclado virtual (mobile)
@@ -90,6 +101,60 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       sheet?.style.removeProperty('--keyboard-overlap')
     }
   }, [isOpen])
+
+  // Sugestão de categoria por IA — debounce 600ms na descrição
+  useEffect(() => {
+    if (!isOpen || !usuarioId || isEditMode) return
+
+    if (suggestTimeoutRef.current) clearTimeout(suggestTimeoutRef.current)
+
+    const desc = formData.descricao.trim()
+
+    // Não sugere se descrição curta ou categoria já definida manualmente
+    if (desc.length < 3 || formData.categoria_id) return
+
+    suggestTimeoutRef.current = setTimeout(async () => {
+      setAiSuggesting(true)
+      try {
+        const res = await fetch(apiUrl('/api/ai/suggest-category'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioId },
+          body: JSON.stringify({ descricao: desc, tipo: formData.tipo }),
+        })
+        if (!res.ok) return
+        const { categoria_id, subcategoria_id } = await res.json()
+        if (!categoria_id) return
+
+        setFormData((prev) => {
+          // Dupla verificação: não sobrescreve se usuário selecionou no intervalo
+          if (prev.categoria_id) return prev
+          return { ...prev, categoria_id, subcategoria_id: subcategoria_id || '' }
+        })
+        setAiSuggestedCat(true)
+      } catch {
+        // Falha silenciosa — sugestão é best-effort
+      } finally {
+        setAiSuggesting(false)
+      }
+    }, 600)
+
+    return () => {
+      if (suggestTimeoutRef.current) clearTimeout(suggestTimeoutRef.current)
+    }
+  }, [formData.descricao, formData.tipo, formData.categoria_id, isOpen, isEditMode, usuarioId, setFormData])
+
+  // Reseta badge ao trocar tipo
+  const handleTypeChangeWithReset = useCallback((newType) => {
+    setAiSuggestedCat(false)
+    if (suggestTimeoutRef.current) clearTimeout(suggestTimeoutRef.current)
+    handleTypeChange(newType)
+  }, [handleTypeChange])
+
+  // Reseta badge quando usuário altera categoria manualmente
+  const handleChangeWithAIReset = useCallback((e) => {
+    if (e.target.name === 'categoria_id') setAiSuggestedCat(false)
+    handleChange(e)
+  }, [handleChange])
 
   const categoriasFiltradas = useMemo(
     () =>
@@ -129,14 +194,14 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   <button
                     type="button"
                     className={`type-btn despesa ${formData.tipo === 'DESPESA' ? 'active' : ''}`}
-                    onClick={() => handleTypeChange('DESPESA')}
+                    onClick={() => handleTypeChangeWithReset('DESPESA')}
                   >
                     Despesa
                   </button>
                   <button
                     type="button"
                     className={`type-btn receita ${formData.tipo === 'RECEITA' ? 'active' : ''}`}
-                    onClick={() => handleTypeChange('RECEITA')}
+                    onClick={() => handleTypeChangeWithReset('RECEITA')}
                   >
                     Receita
                   </button>
@@ -144,17 +209,39 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               </div>
 
               <div className="form-group" style={{ opacity: loadingCats ? 0.5 : 1 }}>
-                <label>Categoria</label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  Categoria
+                  {aiSuggesting && (
+                    <svg
+                      className="spinner"
+                      viewBox="0 0 24 24"
+                      style={{ width: '13px', height: '13px', opacity: 0.5 }}
+                      aria-label="IA analisando..."
+                    >
+                      <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="3" />
+                    </svg>
+                  )}
+                </label>
                 <CategorySelector
                   name="categoria_id"
                   value={formData.categoria_id}
-                  onChange={handleChange}
+                  onChange={handleChangeWithAIReset}
                   options={categoriasFiltradas}
                   placeholder="Escolha uma categoria…"
                   isOpen={activeSelect === 'categoria_id'}
                   onToggle={setActiveSelect}
                   zIndex={10}
                 />
+                {aiSuggestedCat && (
+                  <p style={{
+                    margin: '4px 0 0',
+                    fontSize: '11px',
+                    opacity: 0.6,
+                    letterSpacing: '0.01em',
+                  }}>
+                    ✨ Categoria sugerida pela IA
+                  </p>
+                )}
               </div>
 
               {subcategorias.length > 0 && (
@@ -163,7 +250,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   <CategorySelector
                     name="subcategoria_id"
                     value={formData.subcategoria_id}
-                    onChange={handleChange}
+                    onChange={handleChangeWithAIReset}
                     options={subcategorias}
                     placeholder="Opcional…"
                     isOpen={activeSelect === 'subcategoria_id'}
