@@ -45,8 +45,23 @@ function useHorizonShellDock() {
       const lift = mobile ? 14 : 40
       const gap = 8
 
-      const fabBottom = Math.max(insetH, window.innerHeight - r.bottom + lift)
       const fabRight = Math.max(insetH, window.innerWidth - r.right + insetH)
+
+      /* fabBottom mobile: ancora acima do mobile-bottom-nav via getBoundingClientRect.
+         getBCR usa o viewport físico; bottom CSS no iOS usa 100svh (innerHeight - safeArea).
+         A fórmula (innerHeight - navTop + 8) cancela essa diferença automaticamente. */
+      let fabBottom
+      if (mobile) {
+        const navEl = document.querySelector('.mobile-bottom-nav')
+        if (navEl) {
+          const navRect = navEl.getBoundingClientRect()
+          fabBottom = Math.max(insetH, window.innerHeight - navRect.top + 8)
+        } else {
+          fabBottom = Math.max(insetH, window.innerHeight - r.bottom + lift)
+        }
+      } else {
+        fabBottom = Math.max(insetH, window.innerHeight - r.bottom + lift)
+      }
 
       if (mobile) {
         /* Cartão compacto, centralizado no painel — não ocupa a largura inteira */

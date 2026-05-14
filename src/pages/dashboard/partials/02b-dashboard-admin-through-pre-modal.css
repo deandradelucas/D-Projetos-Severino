@@ -729,7 +729,7 @@ body:has(.sidebar.open) .horizon-chat-window {
   }
 
   body:has(.dashboard-mobile-tx-fab) .pwa-install-sheet {
-    bottom: calc(148px + var(--safe-bottom));
+    bottom: calc(128px + var(--safe-bottom));
   }
 
   .dashboard-mobile-tx-fab {
@@ -737,7 +737,7 @@ body:has(.sidebar.open) .horizon-chat-window {
     left: 0;
     right: 0;
     margin-inline: auto;
-    bottom: calc(100px + var(--safe-bottom));
+    bottom: max(78px, calc(70px + var(--safe-bottom)));
     z-index: 76;
     display: inline-flex;
     align-items: center;

@@ -608,7 +608,7 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
 /* Mobile adjustments — janela compacta (shell-dock refinado via JS); fallback centrado */
 @media (max-width: 768px) {
   .horizon-chat-fab {
-    bottom: 20px;
+    bottom: calc(78px + var(--safe-bottom, env(safe-area-inset-bottom, 0px)));
     right: 16px;
     width: 50px;
     height: 50px;
