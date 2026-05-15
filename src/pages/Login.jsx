@@ -16,7 +16,7 @@ import { webAuthnSupported, fetchWebAuthnStatus, loginWithWebAuthn } from '../li
 import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
 import { validateEmail } from '../lib/validateEmail'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
-import { writeHorizonteAccessToken } from '../lib/horizonteAccessToken'
+import { writeHorizonteAccessToken, writeHorizonteRefreshToken } from '../lib/horizonteAccessToken'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
 
@@ -288,6 +288,7 @@ export default function Login() {
 
       let u = data.user || {}
       if (data.accessToken) writeHorizonteAccessToken(data.accessToken)
+      if (data.refreshToken) writeHorizonteRefreshToken(data.refreshToken)
       u = await aplicarConviteFamiliaAposLogin(u)
       if (u?.id) {
         window.localStorage.setItem('horizonte_user', JSON.stringify(u))
@@ -327,6 +328,7 @@ export default function Login() {
       const data = await loginWithWebAuthn(email)
       let u = data.user || {}
       if (data.accessToken) writeHorizonteAccessToken(data.accessToken)
+      if (data.refreshToken) writeHorizonteRefreshToken(data.refreshToken)
       u = await aplicarConviteFamiliaAposLogin(u)
       if (u?.id) {
         window.localStorage.setItem('horizonte_user', JSON.stringify(u))

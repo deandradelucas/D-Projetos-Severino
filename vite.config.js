@@ -84,6 +84,17 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    test: {
+      environment: 'node',
+      include: ['src/**/*.test.{js,mjs,jsx,ts,tsx}'],
+      coverage: {
+        provider: 'v8',
+        include: ['src/hooks/**', 'src/lib/**'],
+        exclude: ['src/**/*.test.*', 'src/**/__tests__/**'],
+        thresholds: { lines: 60, functions: 60, branches: 50, statements: 60 },
+        reporter: ['text', 'lcov'],
+      },
+    },
     server: {
       host: true,
       port: Number(process.env.VITE_PORT) || 3010,

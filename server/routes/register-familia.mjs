@@ -32,10 +32,10 @@ export function registerFamiliaRoutes(app) {
       const token = String(c.req.query('token') || '').trim()
       if (!token) return c.json({ message: 'Informe o token do convite.' }, 400)
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`familia-convite-info:${ip}`, 40, 60_000)) {
+      if (!await rateLimitTake(`familia-convite-info:${ip}`, 40, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
-      if (!rateLimitTake(`familia-convite-token:${hashFamiliaToken(token)}`, 5, 300_000)) {
+      if (!await rateLimitTake(`familia-convite-token:${hashFamiliaToken(token)}`, 5, 300_000)) {
         return c.json({ message: 'Convite bloqueado temporariamente. Tente em alguns minutos.' }, 429)
       }
       const info = await buscarInfoConvitePorToken(token)
@@ -56,7 +56,7 @@ export function registerFamiliaRoutes(app) {
         return c.json({ message: 'Apenas o titular da conta pode criar convites.' }, 403)
       }
 
-      if (!rateLimitTake(`familia-convite:${parsed.actorId}:${clientKeyFromHono(c)}`, 12, 86_400_000)) {
+      if (!await rateLimitTake(`familia-convite:${parsed.actorId}:${clientKeyFromHono(c)}`, 12, 86_400_000)) {
         return c.json({ message: 'Limite diário de convites atingido. Tente amanhã.' }, 429)
       }
 
@@ -172,7 +172,7 @@ export function registerFamiliaRoutes(app) {
       const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
 
-      if (!rateLimitTake(`familia-sair:${usuarioId}`, 5, 60_000)) {
+      if (!await rateLimitTake(`familia-sair:${usuarioId}`, 5, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
 
@@ -195,7 +195,7 @@ export function registerFamiliaRoutes(app) {
         actor_id: escopo.actorId,
         membro_id: escopo.actorId,
         acao: 'SAIU',
-      }).catch(() => {})
+      }).catch((e) => log.warn('[familia_audit_log] insert SAIU falhou', e?.message || e))
 
       return c.json({ message: 'Você saiu da conta familiar. Seus dados próprios permanecem na sua conta.' })
     } catch (error) {
@@ -218,7 +218,7 @@ export function registerFamiliaRoutes(app) {
       const token = String(body?.token || '').trim()
       if (!token) return c.json({ message: 'Informe o token do convite.' }, 400)
 
-      if (!rateLimitTake(`familia-aceitar:${usuarioId}:${clientKeyFromHono(c)}`, 20, 60_000)) {
+      if (!await rateLimitTake(`familia-aceitar:${usuarioId}:${clientKeyFromHono(c)}`, 20, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
 

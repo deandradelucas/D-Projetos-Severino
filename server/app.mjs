@@ -13,14 +13,17 @@ import { registerApiDomainRoutes } from './routes/register-all.mjs'
 const app = createApp()
 
 function corsAllowedOrigin(origin) {
-  if (!origin) return '*'
+  if (!origin) return null
   if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return origin
-  if (
-    /^https?:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin) ||
-    /^https?:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin) ||
-    /^https?:\/\/172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin)
-  ) {
-    return origin
+  /* IPs privados: somente em desenvolvimento local */
+  if (process.env.NODE_ENV !== 'production') {
+    if (
+      /^https?:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin) ||
+      /^https?:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin) ||
+      /^https?:\/\/172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin)
+    ) {
+      return origin
+    }
   }
   /* http + https: evita preflight bloqueado se o front abrir sem TLS (Hostinger em HTTP). */
   if (/^https?:\/\/([a-z0-9-]+\.)*mestredamente\.com$/i.test(origin)) return origin
@@ -40,6 +43,32 @@ app.use(
     allowHeaders: ['Content-Type', 'x-user-id', 'Authorization'],
   }),
 )
+
+app.use('*', async (c, next) => {
+  await next()
+  c.header('X-Content-Type-Options', 'nosniff')
+  c.header('X-Frame-Options', 'DENY')
+  c.header('Referrer-Policy', 'strict-origin-when-cross-origin')
+  c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  if (process.env.NODE_ENV === 'production') {
+    c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+  }
+  c.header(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      "script-src 'self'",
+      "style-src 'self' 'unsafe-inline'",
+      "connect-src 'self' https://*.supabase.co https://api.stripe.com https://checkout.stripe.com",
+      "img-src 'self' data: blob:",
+      "font-src 'self' data:",
+      "frame-src https://checkout.stripe.com",
+      "frame-ancestors 'none'",
+      "object-src 'none'",
+      "base-uri 'self'",
+    ].join('; ')
+  )
+})
 
 app.use('*', httpRequestLogger)
 app.use('/api/pagamentos/*', pagamentosRequestLogger)

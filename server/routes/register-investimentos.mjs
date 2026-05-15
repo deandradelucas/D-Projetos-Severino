@@ -33,7 +33,7 @@ export function registerInvestimentosRoutes(app) {
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      if (!rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
+      if (!await rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -72,7 +72,7 @@ export function registerInvestimentosRoutes(app) {
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
 
-      if (!rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
+      if (!await rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -113,7 +113,7 @@ export function registerInvestimentosRoutes(app) {
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
 
-      if (!rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
+      if (!await rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -136,7 +136,7 @@ export function registerInvestimentosRoutes(app) {
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
 
-      if (!rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
+      if (!await rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -171,7 +171,7 @@ export function registerInvestimentosRoutes(app) {
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id) || !isUuidString(aporteId)) return c.json({ message: 'ID inválido.' }, 400)
 
-      if (!rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
+      if (!await rateLimitTake(`investimentos-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 

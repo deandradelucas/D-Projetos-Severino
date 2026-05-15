@@ -216,7 +216,7 @@ export function registerAdminRoutes(app) {
       if (!perfil?.email) return c.json({ message: 'Usuário não encontrado.' }, 404)
 
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`admin-pw-otp:${usuarioId}:${ip}`, 25, 60 * 60_000)) {
+      if (!await rateLimitTake(`admin-pw-otp:${usuarioId}:${ip}`, 25, 60 * 60_000)) {
         return c.json({ message: 'Limite de solicitações. Tente mais tarde.' }, 429)
       }
 

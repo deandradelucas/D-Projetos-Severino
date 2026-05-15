@@ -39,7 +39,7 @@ export function registerAgendaRoutes(app) {
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      if (!rateLimitTake(`agenda-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      if (!await rateLimitTake(`agenda-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -66,7 +66,7 @@ export function registerAgendaRoutes(app) {
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
 
-      if (!rateLimitTake(`agenda-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      if (!await rateLimitTake(`agenda-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
