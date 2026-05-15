@@ -490,7 +490,14 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   border-radius: 12px;
   box-shadow: none;
   background: var(--tx-dir-icon-bg, #f1f3f6) !important;
-  border: 1px solid color-mix(in srgb, var(--tx-dir-card-border, #e8eaed) 80%, transparent) !important;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap--up {
+  border: 1px solid var(--tx-dir-title-rec, #107c52) !important;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap--down {
+  border: 1px solid var(--danger, #ef4444) !important;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap svg,
@@ -828,6 +835,14 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     width: 44px !important;
     height: 44px !important;
     border-radius: 12px !important;
+  }
+
+  .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap--up {
+    border: 1px solid var(--tx-dir-title-rec, #107c52) !important;
+  }
+
+  .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap--down {
+    border: 1px solid var(--danger, #ef4444) !important;
   }
 
   .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap svg,
