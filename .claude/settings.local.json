@@ -65,7 +65,8 @@
       "Skill(update-config)",
       "Bash(Get-ChildItem -Path \"d:\\\\Projetos\\\\Severino\" -Directory)",
       "Bash(Select-Object Name)",
-      "mcp__filesystem__directory_tree"
+      "mcp__filesystem__directory_tree",
+      "Bash(vercel *)"
     ]
   }
 }

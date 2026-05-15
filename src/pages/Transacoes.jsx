@@ -544,7 +544,7 @@ export default function Transacoes() {
               </div>
             ) : (
               <>
-              <div className="ref-tx-table-subgrid ref-tx-table-subgrid--actions">
+              <div className="ref-tx-table-subgrid ref-tx-table-subgrid--actions tx-cal-grid">
                 <div className="ref-tx-list-head">
                   <span className="ref-tx-list-head__icon" aria-hidden />
                   <span className="ref-tx-list-head__meta">{mostrarQuemLancou ? 'Data · quem lançou' : 'Data'}</span>
