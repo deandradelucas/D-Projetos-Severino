@@ -1,33 +1,20 @@
-const STORAGE_KEY = 'horizonte_access_token'
+/* Access token: mantido apenas em memória (não persiste entre reloads — XSS não pode roubá-lo via localStorage).
+ * Refresh token: persiste em localStorage; usado para reobter o access token silenciosamente na inicialização. */
+
 const REFRESH_STORAGE_KEY = 'horizonte_refresh_token'
 
+let _accessToken = ''
+
 export function readHorizonteAccessToken() {
-  if (typeof window === 'undefined') return ''
-  try {
-    return String(window.localStorage.getItem(STORAGE_KEY) || '').trim()
-  } catch {
-    return ''
-  }
+  return _accessToken
 }
 
 export function writeHorizonteAccessToken(token) {
-  if (typeof window === 'undefined') return
-  try {
-    const t = String(token || '').trim()
-    if (t) window.localStorage.setItem(STORAGE_KEY, t)
-    else window.localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    /* ignore */
-  }
+  _accessToken = String(token || '').trim()
 }
 
 export function clearHorizonteAccessToken() {
-  if (typeof window === 'undefined') return
-  try {
-    window.localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    /* ignore */
-  }
+  _accessToken = ''
 }
 
 export function readHorizonteRefreshToken() {
