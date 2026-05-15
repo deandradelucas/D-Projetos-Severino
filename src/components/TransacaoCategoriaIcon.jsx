@@ -17,16 +17,16 @@ export function TransacaoCategoriaIcon({ categoriaNome, subcategoriaNome, isRece
       <img
         src={rasterSrc}
         alt=""
-        width={size}
-        height={size}
         draggable={false}
         loading="lazy"
         decoding="async"
+        className="transacao-categoria-icon__img"
         style={{
-          width: size,
-          height: size,
+          width: '100%',
+          height: '100%',
           objectFit: 'contain',
           display: 'block',
+          filter: 'none',
         }}
         aria-hidden
       />

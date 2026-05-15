@@ -17,6 +17,13 @@
   --tx-dir-panel-bg: #eceef2;
   --tx-dir-footer-line: #e4e7ec;
   --tx-dir-icon-bg: #f1f3f6;
+  /* "+ Nova transação" — referência: dourado, texto escuro, pill */
+  --tx-nova-btn-bg: #e4c14d;
+  --tx-nova-btn-bg-hover: #ecc965;
+  --tx-nova-btn-fg: #111111;
+  --tx-nova-btn-border: rgba(0, 0, 0, 0.1);
+  --tx-nova-btn-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+  --tx-nova-btn-ring: rgba(196, 154, 42, 0.45);
 
   font-family: var(--tx-dir-font);
   -webkit-font-smoothing: antialiased;
@@ -34,6 +41,47 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.app-horizon-shell {
   --tx-dir-panel-bg: #0c0e12;
   --tx-dir-footer-line: rgba(255, 255, 255, 0.1);
   --tx-dir-icon-bg: rgba(255, 255, 255, 0.07);
+  --tx-nova-btn-bg: #d4af37;
+  --tx-nova-btn-bg-hover: #e0bc4a;
+  --tx-nova-btn-fg: #111111;
+  --tx-nova-btn-border: rgba(0, 0, 0, 0.18);
+  --tx-nova-btn-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --tx-nova-btn-ring: rgba(228, 201, 90, 0.5);
+}
+
+/* "+ Nova transação": mesmo visual em qualquer largura (dourado, texto escuro, pill, Poppins) */
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  font-family: var(--tx-dir-font) !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.2 !important;
+  min-height: 42px !important;
+  padding: 0 22px !important;
+  border-radius: 9999px !important;
+  border: 1px solid var(--tx-nova-btn-border) !important;
+  background: var(--tx-nova-btn-bg) !important;
+  color: var(--tx-nova-btn-fg) !important;
+  box-shadow: var(--tx-nova-btn-shadow) !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:hover {
+  background: var(--tx-nova-btn-bg-hover) !important;
+  color: var(--tx-nova-btn-fg) !important;
+  border-color: var(--tx-nova-btn-border) !important;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:focus-visible {
+  outline: none !important;
+  box-shadow:
+    var(--tx-nova-btn-shadow),
+    0 0 0 3px var(--tx-nova-btn-ring) !important;
 }
 
 .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
@@ -324,6 +372,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) {
   display: grid !important;
+  /* Linha 1: ícone + título (categoria) + recorrência; linhas 2–4: restante à largura do cartão */
   grid-template-columns: 48px minmax(0, 1fr) auto !important;
   grid-template-rows: auto auto auto auto !important;
   grid-template-areas: none !important;
@@ -373,7 +422,8 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-icon-cell {
   grid-column: 1;
-  grid-row: 1 / 4;
+  grid-row: 1;
+  justify-self: start;
   align-self: start;
   padding: 0 !important;
   margin: 0 !important;
@@ -385,30 +435,34 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   min-width: 0;
   padding: 0 !important;
   margin: 0 !important;
+  text-align: left;
+  align-self: start;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-sub-cell {
-  grid-column: 2;
+  grid-column: 1 / -1;
   grid-row: 2;
   min-width: 0;
   padding: 0 !important;
   margin: 0 !important;
+  text-align: left;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-meta-cell {
-  grid-column: 2;
+  grid-column: 1 / -1;
   grid-row: 3;
   align-self: start;
   min-width: 0;
   padding: 0 !important;
   margin: 0 !important;
+  text-align: left;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-rec-cell {
   grid-column: 3;
-  grid-row: 3;
+  grid-row: 1;
   justify-self: end;
-  align-self: center;
+  align-self: start;
   padding: 0 !important;
   margin: 0 !important;
 }
@@ -441,11 +495,26 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap svg,
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap i,
-.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap img {
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap img:not(.transacao-categoria-icon__img) {
   width: 14px;
   height: 14px;
   font-size: 14px;
   object-fit: contain;
+}
+
+/* PNG de categoria (ex.: Alimentação 3D): sem tintura; preenche o quadrado */
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap:has(img.transacao-categoria-icon__img),
+.page-transacoes.app-horizon-shell .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap:has(img.transacao-categoria-icon__img) {
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img.transacao-categoria-icon__img,
+.page-transacoes.app-horizon-shell .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap img.transacao-categoria-icon__img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  filter: none !important;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-val-act-wrap > .ref-tx-val-cell,
@@ -456,10 +525,6 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   width: auto !important;
   padding: 0 !important;
   margin: 0 !important;
-}
-
-.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:has(> .ref-tx-rec-cell:empty) > .ref-tx-sub-cell {
-  grid-column: 2;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-cat-text {
@@ -562,7 +627,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap svg,
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap i,
-.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img {
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img:not(.transacao-categoria-icon__img) {
   width: 14px !important;
   height: 14px !important;
   font-size: 14px !important;
@@ -767,7 +832,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
   .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap svg,
   .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap i,
-  .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap img {
+  .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap img:not(.transacao-categoria-icon__img) {
     width: 14px !important;
     height: 14px !important;
     font-size: 14px !important;
@@ -855,6 +920,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     column-gap: 12px !important;
     row-gap: 10px !important;
     grid-template-columns: 48px minmax(0, 1fr) auto !important;
+    grid-template-rows: auto auto auto auto !important;
   }
 
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap {
@@ -865,16 +931,11 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap svg,
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap i,
-  .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img {
+  .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img:not(.transacao-categoria-icon__img) {
     width: 14px !important;
     height: 14px !important;
     font-size: 14px !important;
     object-fit: contain;
-  }
-
-  /* Botão de nova transação migra para FAB inferior no mobile */
-  .page-transacoes.app-horizon-shell .dashboard-hub__btn--primary {
-    display: none !important;
   }
 }
 
@@ -917,6 +978,9 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
     margin-inline: 0 !important;
   }
 
+  body:has(.dashboard-container.page-transacoes) .dashboard-mobile-fabs {
+    display: none !important;
+  }
 }
 
 

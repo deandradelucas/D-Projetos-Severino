@@ -1541,11 +1541,18 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap svg,
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap i,
-  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap img {
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap img:not(.transacao-categoria-icon__img) {
     width: 14px !important;
     height: 14px !important;
     font-size: 14px !important;
     object-fit: contain;
+  }
+
+  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-arrow-wrap img.transacao-categoria-icon__img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    filter: none !important;
   }
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-recorrencia-ico-wrap {
