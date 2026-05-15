@@ -7,8 +7,7 @@ function bearerTokenFromAuthorization(value) {
 }
 
 /**
- * Identidade da API: Bearer JWT (sub) primeiro; opcionalmente `x-user-id` se
- * `HORIZONTE_ALLOW_LEGACY_X_USER_ID=true` (rollback / migração).
+ * Identidade da API: Bearer JWT (sub).
  * @param {import('hono').Context} c
  * @returns {string}
  */
@@ -17,9 +16,6 @@ export function resolveRequestUserId(c) {
   if (bearer) {
     const v = verifyAccessToken(bearer)
     if (v?.sub) return v.sub
-  }
-  if (String(process.env.HORIZONTE_ALLOW_LEGACY_X_USER_ID || '').trim().toLowerCase() === 'true') {
-    return String(c.req.header('x-user-id') || '').trim()
   }
   return ''
 }

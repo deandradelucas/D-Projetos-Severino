@@ -40,7 +40,7 @@ app.use(
   cors({
     origin: (origin) => corsAllowedOrigin(origin),
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'x-user-id', 'Authorization'],
+    allowHeaders: ['Content-Type', 'Authorization'],
   }),
 )
 

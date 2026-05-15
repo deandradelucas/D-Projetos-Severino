@@ -331,7 +331,7 @@ export default function HorizonChat() {
         id="horizon-chat-window"
         role="dialog"
         aria-label="Chat com Severino IA"
-        aria-modal={aberto}
+        aria-modal="true"
         className={`horizon-chat-window ${aberto ? 'chat-window-open' : ''} ${shellDock ? 'horizon-chat-window--shell-dock' : ''}`}
         style={shellDock?.winStyle}
         aria-hidden={!aberto}

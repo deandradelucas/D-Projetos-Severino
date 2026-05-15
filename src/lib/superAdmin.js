@@ -1,3 +1,7 @@
+/* UI-ONLY gating: estas funções controlam apenas o que é exibido no frontend.
+ * Manipular o localStorage não concede acesso real — todas as rotas /api/admin/*
+ * validam o JWT no servidor e rejeitam requisições não autorizadas com 401/403. */
+
 /** Deve coincidir com server/lib/super-admin.mjs (env SUPER_ADMIN_EMAIL no servidor). */
 const SUPER_ADMIN_EMAIL = 'mestredamente@mestredamente.com'
 
