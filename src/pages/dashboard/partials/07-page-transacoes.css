@@ -1071,7 +1071,10 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
     position: fixed;
     left: 16px;
     right: 16px;
-    bottom: calc(70px + var(--safe-bottom, 0px));
+    /* Reserva à direita para o FAB Severino (~50px + folga), como o max-width do pill na Visão Geral */
+    padding-inline-end: max(56px, calc(48px + env(safe-area-inset-right, 0px)));
+    /* Mesmo baseline que .dashboard-mobile-tx-fab na Visão Geral (02b): max(78px, 70px + safe) */
+    bottom: max(78px, calc(70px + var(--safe-bottom, 0px)));
     z-index: 76;
     display: flex;
     align-items: center;

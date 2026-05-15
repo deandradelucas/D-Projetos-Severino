@@ -1102,32 +1102,18 @@ body[data-theme='light'] .ref-kpi-row {
   margin: 0;
 }
 
-/* Relatórios: KPIs — 1 → 2 colunas (Receitas + Despesas; saldo no hero) */
+/* Relatórios: KPIs — duas colunas lado a lado (como Saída/Entrada na Visão Geral) */
 body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-kpi-row,
 body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row {
   width: 100%;
   min-width: 0;
   gap: 12px;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-kpi-row .ref-kpi-card,
 body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row .ref-kpi-card {
   min-width: 0;
-}
-
-@media (min-width: 520px) {
-  body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-kpi-row,
-  body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 960px) {
-  body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-kpi-row,
-  body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 /* Dashboard: KPIs — 1 → 2 colunas (Saída + Entrada) */

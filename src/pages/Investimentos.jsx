@@ -283,20 +283,6 @@ export default function Investimentos() {
                       <TaxaCdiBadge variant="hero" />
                     </div>
                   </div>
-                  <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações">
-                    <button
-                      type="button"
-                      className="dashboard-hub__btn dashboard-hub__btn--primary"
-                      onClick={() => {
-                        setEditTarget(null)
-                        setModalResetKey((k) => k + 1)
-                        setModalOpen(true)
-                      }}
-                      disabled={!uid}
-                    >
-                      + Novo investimento
-                    </button>
-                  </div>
                 </div>
               </section>
 

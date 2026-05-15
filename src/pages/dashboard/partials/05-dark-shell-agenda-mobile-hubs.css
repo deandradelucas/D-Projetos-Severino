@@ -1623,26 +1623,36 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     display: none;
   }
 
-  .dashboard-container.dashboard-page:not(.page-transacoes).ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text,
   .dashboard-container.dashboard-page:not(.page-transacoes).ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text {
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: calc(100% - 74px);
+    font-size: 0.72rem;
+    font-weight: 620;
+    line-height: 1.15;
   }
 
+  /* .ref-tx-cat-text: sem overflow:hidden — cortava a bolinha (.ref-tx-tipo-pulse) e o anel do box-shadow */
   .dashboard-container.dashboard-page:not(.page-transacoes).ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text {
+    margin: 0;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
     font-size: 0.86rem;
     font-weight: 800;
     letter-spacing: -0.025em;
     line-height: 1.15;
   }
 
-  .dashboard-container.dashboard-page:not(.page-transacoes).ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text {
-    max-width: calc(100% - 74px);
-    font-size: 0.72rem;
-    font-weight: 620;
-    line-height: 1.15;
+  .dashboard-container.dashboard-page:not(.page-transacoes).ref-dashboard.app-horizon-shell
+    .dashboard-hub__tx-panel
+    .ref-tx-cat-text__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .dashboard-container.dashboard-page:not(.page-transacoes).ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-date {
