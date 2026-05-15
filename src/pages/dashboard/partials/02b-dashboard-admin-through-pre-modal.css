@@ -20,6 +20,34 @@
   }
 }
 
+/* Admin — utilizadores, auditoria, pagamentos, marketing: tipografia alinhada a Transações / Configurações (Poppins + fallbacks) */
+.dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell,
+.dashboard-container.page-admin-auditoria.ref-dashboard.app-horizon-shell,
+.dashboard-container.page-admin-pagamentos.ref-dashboard.app-horizon-shell,
+.dashboard-container.page-admin-marketing.ref-dashboard.app-horizon-shell {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Coluna hub + scroll: largura fluida (evita “faixa” de fundo ao lado do painel em mobile / zoom) */
+.dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
+.dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+.dashboard-container.page-admin-auditoria.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
+.dashboard-container.page-admin-auditoria.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+.dashboard-container.page-admin-pagamentos.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
+.dashboard-container.page-admin-pagamentos.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+.dashboard-container.page-admin-marketing.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
+.dashboard-container.page-admin-marketing.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 /* Mobile structural elements hidden on desktop */
 .mobile-backdrop {
   display: none;
@@ -1135,18 +1163,24 @@ body:has(.sidebar.open) .horizon-chat-window {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 @media (min-width: 720px) {
   .page-admin-usuarios-cards {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    width: 100%;
+    /* auto-fit: última linha expande cartões e evita “faixa” vazia típica de auto-fill */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 13px;
   }
 }
 
 @media (min-width: 1200px) {
   .page-admin-usuarios-cards {
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   }
 }
 
@@ -1812,6 +1846,8 @@ body[data-theme='dark']
   .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
   .page-admin-usuarios-kpis.ref-dashboard-kpi-strip.ref-kpi-row {
   grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  /* Menos “ar” entre células que o gap global dos KPIs (14–16px) */
+  gap: 8px;
 }
 
 @media (min-width: 1100px) {
@@ -1822,7 +1858,74 @@ body[data-theme='dark']
     .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
     .page-admin-usuarios-kpis.ref-dashboard-kpi-strip.ref-kpi-row {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
   }
+}
+
+/* Cartões KPI desta página: mais baixos e menos padding (evita faixa branca larga à direita do texto) */
+body[data-theme='light']
+  .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
+  .page-admin-usuarios-kpis
+  .ref-kpi-card,
+body[data-theme='dark']
+  .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
+  .page-admin-usuarios-kpis
+  .ref-kpi-card {
+  min-height: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+@media (min-width: 769px) {
+  body[data-theme='light']
+    .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
+    .page-admin-usuarios-kpis
+    .ref-kpi-card,
+  body[data-theme='dark']
+    .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
+    .page-admin-usuarios-kpis
+    .ref-kpi-card {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+}
+
+body[data-theme='light']
+  .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
+  .page-admin-usuarios-kpis
+  .ref-kpi-card__icon,
+body[data-theme='dark']
+  .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
+  .page-admin-usuarios-kpis
+  .ref-kpi-card__icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 10px;
+}
+
+body[data-theme='light']
+  .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
+  .page-admin-usuarios-kpis
+  .ref-kpi-card__icon svg,
+body[data-theme='dark']
+  .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
+  .page-admin-usuarios-kpis
+  .ref-kpi-card__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+body[data-theme='light']
+  .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
+  .page-admin-usuarios-kpis
+  .ref-kpi-card__value,
+body[data-theme='dark']
+  .dashboard-container.page-admin-usuarios.dashboard-page.ref-dashboard.app-horizon-shell
+  .page-admin-usuarios-kpis
+  .ref-kpi-card__value {
+  margin-top: 2px;
 }
 
 .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .page-admin-audit-card.ref-panel,
@@ -1988,9 +2091,34 @@ body[data-theme='dark'] .dashboard-container.page-admin-auditoria.ref-dashboard.
 }
 
 .page-admin-usuarios-panel .page-admin-usuarios-cards-wrap {
-  margin: 0 -4px;
-  padding: 4px 2px 8px;
+  /* Sem margem negativa: alinha ao padding do .ref-panel e respeita o border-radius */
+  margin: 0;
+  padding: 4px 0 10px;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Painel «Cadastros e acessos»: ocupa a coluna toda + fundo opaco estável (sobreposição a scroll/main) */
+body[data-theme='light'] .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .page-admin-usuarios-panel.ref-panel,
+body[data-theme='dark'] .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .page-admin-usuarios-panel.ref-panel {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  align-self: stretch;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: visible;
+  background-clip: padding-box;
+}
+
+body[data-theme='light'] .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .page-admin-usuarios-panel.ref-panel {
+  background-color: #ffffff;
+}
+
+body[data-theme='dark'] .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell .page-admin-usuarios-panel.ref-panel {
+  background-color: #1a222e;
 }
 
 .page-admin-empty {
@@ -2063,6 +2191,13 @@ body[data-theme='dark'] .dashboard-container.page-admin-auditoria.ref-dashboard.
   gap: 12px;
 }
 
+.page-admin-payment-logs__title-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
 .page-admin-payment-logs__head-actions {
   display: flex;
   flex-wrap: wrap;
@@ -2077,16 +2212,337 @@ body[data-theme='dark'] .dashboard-container.page-admin-auditoria.ref-dashboard.
   color: var(--text-secondary);
 }
 
-.page-admin-payment-logs__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 16px;
+/* Logs de pagamentos — Poppins já no .page-admin-pagamentos; layout e tabela mais legíveis */
+.dashboard-container.page-admin-pagamentos.ref-dashboard.app-horizon-shell .page-admin-payment-logs.ref-panel {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
-@media (min-width: 1100px) {
-  .page-admin-payment-logs__layout {
-    grid-template-columns: minmax(0, 1fr) 280px;
-    align-items: start;
+.dashboard-container.page-admin-pagamentos.ref-dashboard.app-horizon-shell .page-admin-payment-logs__layout {
+  gap: 20px;
+}
+
+.dashboard-container.page-admin-pagamentos.ref-dashboard.app-horizon-shell .page-admin-payment-logs__main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.page-admin-kpi-compact-strip--payment-logs {
+  margin-bottom: 16px;
+}
+
+.dashboard-container.page-admin-pagamentos.ref-dashboard.app-horizon-shell .page-admin-payment-logs__toolbar {
+  margin-bottom: 0;
+  padding: 14px 14px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(148, 163, 184, 0.06);
+  gap: 12px;
+}
+
+.dashboard-container.page-admin-pagamentos.ref-dashboard.app-horizon-shell .page-admin-kpi-compact-strip {
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.dashboard-container.page-admin-pagamentos.ref-dashboard.app-horizon-shell .page-admin-payment-logs__cards-wrap {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.page-admin-payment-logs-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 720px) {
+  .page-admin-payment-logs-cards {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 13px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page-admin-payment-logs-cards {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  }
+}
+
+.page-admin-payment-log-card {
+  --payment-log-card-bg-top: var(--bg-card);
+  --payment-log-card-bg-bottom: color-mix(in srgb, var(--bg-card-elevated) 82%, var(--text-primary) 7%);
+
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: linear-gradient(165deg, var(--payment-log-card-bg-top) 0%, var(--payment-log-card-bg-bottom) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 2px 12px rgba(15, 23, 42, 0.07);
+  min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.page-admin-payment-log-card:hover {
+  border-color: rgba(148, 163, 184, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 8px 26px rgba(15, 23, 42, 0.1);
+}
+
+.page-admin-payment-log-card--alert {
+  border-left: 4px solid rgba(234, 88, 12, 0.95);
+  padding-left: 14px;
+}
+
+body[data-theme='dark'] .page-admin-payment-log-card {
+  --payment-log-card-bg-top: color-mix(in srgb, var(--bg-card) 55%, var(--bg-card-elevated) 45%);
+  --payment-log-card-bg-bottom: color-mix(in srgb, var(--bg-card-elevated) 78%, var(--text-primary) 8%);
+
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 2px 16px rgba(0, 0, 0, 0.38);
+}
+
+body[data-theme='dark'] .page-admin-payment-log-card:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+body[data-theme='dark'] .page-admin-payment-log-card--alert {
+  border-left-color: rgba(251, 146, 60, 0.95);
+}
+
+.page-admin-payment-log-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.page-admin-payment-log-card__head-text {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.page-admin-payment-log-card__user {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.page-admin-payment-log-card__email {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.page-admin-payment-log-card__head-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.page-admin-payment-log-card__amount {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.page-admin-payment-log-card__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .page-admin-payment-log-card__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.page-admin-payment-log-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.page-admin-payment-log-card__field--wide {
+  grid-column: 1 / -1;
+}
+
+.page-admin-payment-log-card__label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.page-admin-payment-log-card__value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.35;
+  min-width: 0;
+}
+
+.page-admin-payment-log-card__value--cap {
+  text-transform: capitalize;
+}
+
+.page-admin-payment-log-card__value--mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  word-break: break-all;
+}
+
+.page-admin-payment-log-card__value--detail {
+  font-size: 12px;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.page-admin-payment-log-card__sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.page-admin-payment-log-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.page-admin-payment-log-card__actions .page-admin-payment-logs__action-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.page-admin-payment-log-card.page-admin-payment-log-card--skeleton {
+  pointer-events: none;
+}
+
+.page-admin-payment-log-card.page-admin-payment-log-card--skeleton:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 2px 12px rgba(15, 23, 42, 0.07);
+}
+
+.page-admin-payment-log-card__sk-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.page-admin-payment-log-card__sk-bar {
+  display: block;
+  height: 14px;
+  border-radius: 6px;
+  width: 100%;
+}
+
+.page-admin-payment-log-card__sk-bar--lg {
+  width: 58%;
+  height: 18px;
+}
+
+.page-admin-payment-log-card__sk-bar--md {
+  width: 72%;
+}
+
+.page-admin-payment-log-card__sk-bar--xs {
+  width: 38%;
+  height: 10px;
+}
+
+.page-admin-payment-log-card__sk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.page-admin-payment-log-card__sk-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.page-admin-payment-log-card__sk-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.page-admin-payment-log-card__sk-pill {
+  flex: 1;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.page-admin-payment-logs__layout {
+  display: block;
+  min-width: 0;
+}
+
+/* Operação + Gestão — abaixo de «Refinar no lote carregado», antes da tabela */
+.page-admin-payment-logs__insights {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 720px) {
+  .page-admin-payment-logs__insights {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 14px;
+    align-items: stretch;
+  }
+
+  .page-admin-payment-logs__insights-docs {
+    grid-column: 1 / -1;
   }
 }
 
@@ -2094,11 +2550,21 @@ body[data-theme='dark'] .dashboard-container.page-admin-auditoria.ref-dashboard.
   margin-bottom: 10px;
 }
 
-.page-admin-payment-logs__quick-filters {
+.page-admin-payment-logs__filter-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
+  grid-column: 1 / -1;
   width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.page-admin-payment-logs__filter-actions .page-admin-toolbar-btn {
+  flex: 1 1 0;
+  min-width: max-content;
+  white-space: nowrap;
 }
 
 .page-admin-toolbar-btn--active {
@@ -2108,26 +2574,105 @@ body[data-theme='dark'] .dashboard-container.page-admin-auditoria.ref-dashboard.
 }
 
 .page-admin-payment-logs__client-filters {
-  margin-bottom: 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  margin-bottom: 0;
+  padding: 14px 14px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
   background: rgba(148, 163, 184, 0.06);
+  min-width: 0;
 }
 
 .page-admin-payment-logs__client-filters-title {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
+/* Grupos De/Até — evita auto-fit + min-width:200px nos inputs (campos colados / quebra estranha) */
 .page-admin-payment-logs__client-filters-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+}
+
+.page-admin-payment-logs__filter-group {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  align-items: end;
+  min-width: 0;
+}
+
+.page-admin-payment-logs__filter-group-label {
+  grid-column: 1 / -1;
+  margin: 0 0 2px;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.page-admin-payment-logs__filter-group-fields {
+  display: contents;
+}
+
+.page-admin-payment-logs__filter-group-fields .page-admin-filter-label {
+  width: 100%;
+  min-width: 0;
+  gap: 5px;
+}
+
+.page-admin-payment-logs__filter-group-fields .page-admin-filter-label > span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.page-admin-payment-logs__toolbar .page-admin-filter-label > span {
+  white-space: nowrap;
+}
+
+.page-admin-payment-logs__client-filters .page-admin-filter-input {
+  flex: none;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+@media (max-width: 520px) {
+  .page-admin-payment-logs__filter-group {
+    grid-template-columns: 1fr;
+  }
+
+  .page-admin-payment-logs__filter-group-fields .page-admin-filter-label {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 900px) {
+  .page-admin-payment-logs__client-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px 16px;
+    align-items: start;
+  }
 }
 
 .page-admin-payment-logs__table-wrap {
@@ -2197,13 +2742,6 @@ body[data-theme='dark'] .dashboard-container.page-admin-auditoria.ref-dashboard.
   color: #64748b !important;
 }
 
-.page-admin-payment-logs__actions-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: stretch;
-}
-
 .page-admin-payment-logs__action-btn {
   padding: 4px 10px !important;
   font-size: 11px !important;
@@ -2227,85 +2765,6 @@ body[data-theme='dark'] .dashboard-container.page-admin-auditoria.ref-dashboard.
   border-radius: 4px;
   background: rgba(220, 38, 38, 0.14);
   color: #b91c1c;
-}
-
-.page-admin-payment-logs__table-desktop tbody tr {
-  cursor: pointer;
-}
-
-.page-admin-payment-logs__table-desktop tbody tr:hover {
-  background: rgba(148, 163, 184, 0.08);
-}
-
-.page-admin-payment-logs__mobile-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.page-admin-payment-logs__mobile-card {
-  width: 100%;
-  text-align: left;
-  padding: 14px 16px;
-  border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.page-admin-payment-logs__mobile-card:hover {
-  border-color: rgba(99, 102, 241, 0.35);
-  background: rgba(99, 102, 241, 0.06);
-}
-
-.page-admin-payment-logs__mobile-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.page-admin-payment-logs__mobile-amount {
-  font-weight: 800;
-  font-size: 1.05rem;
-}
-
-.page-admin-payment-logs__mobile-user {
-  margin: 0 0 4px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.page-admin-payment-logs__mobile-meta {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-@media (max-width: 900px) {
-  .page-admin-payment-logs__table-desktop {
-    display: none !important;
-  }
-
-  .page-admin-payment-logs__mobile-list {
-    display: flex !important;
-  }
-
-  .page-admin-payment-logs__aside {
-    order: -1;
-  }
-}
-
-.page-admin-payment-logs__aside {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 .page-admin-payment-logs__aside-card {
@@ -2365,6 +2824,7 @@ body[data-theme='dark'] .dashboard-container.page-admin-auditoria.ref-dashboard.
 }
 
 .page-admin-payment-logs-modal {
+  font-family: var(--tx-dir-font, 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif)));
   max-width: 560px !important;
   max-height: min(90vh, 720px);
   overflow: hidden;

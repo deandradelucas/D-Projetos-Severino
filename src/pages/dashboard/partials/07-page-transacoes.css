@@ -35,12 +35,13 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.app-horizon-shell {
   --tx-dir-title: #f4f4f5;
   --tx-dir-title-rec: #3ecf8e;
   --tx-dir-muted: #9ca3af;
-  --tx-dir-card-bg: #141820;
+  --tx-dir-card-bg: #000000;
   --tx-dir-card-border: rgba(255, 255, 255, 0.09);
   --tx-dir-card-shadow: 0 2px 18px rgba(0, 0, 0, 0.4);
   --tx-dir-panel-bg: #0c0e12;
   --tx-dir-footer-line: rgba(255, 255, 255, 0.1);
-  --tx-dir-icon-bg: rgba(255, 255, 255, 0.07);
+  --tx-dir-icon-bg: #ffffff;
+  --tx-dir-icon-border: rgba(15, 23, 42, 0.1);
   --tx-nova-btn-bg: #c4a052;
   --tx-nova-btn-bg-hover: #d1ae62;
   --tx-nova-btn-fg: #111111;
@@ -371,7 +372,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions {
     display: flex !important;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
     padding: 0 !important;
     min-width: 0;
   }
@@ -412,14 +413,14 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   border-radius: 16px !important;
   box-sizing: border-box !important;
   border: 1px solid var(--tx-dir-card-border, rgba(255, 255, 255, 0.09)) !important;
-  background: var(--tx-dir-card-bg, #141820) !important;
+  background: var(--tx-dir-card-bg, #000000) !important;
   box-shadow: var(--tx-dir-card-shadow, 0 2px 18px rgba(0, 0, 0, 0.4)) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton):hover {
-  background: color-mix(in srgb, var(--tx-dir-card-bg, #141820) 92%, #ffffff 8%) !important;
+  background: color-mix(in srgb, var(--tx-dir-card-bg, #000000) 92%, #ffffff 8%) !important;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton)::after,
@@ -510,9 +511,9 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap--up,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap--down {
-  color: rgba(148, 163, 184, 0.92) !important;
-  background: var(--tx-dir-icon-bg, rgba(255, 255, 255, 0.07)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: var(--tx-dir-muted, #64748b) !important;
+  background: var(--tx-dir-icon-bg, #ffffff) !important;
+  border: 1px solid var(--tx-dir-icon-border, rgba(15, 23, 42, 0.1)) !important;
   box-shadow: none !important;
 }
 
@@ -791,11 +792,11 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-skeleton-stack {
-  gap: 12px !important;
+  gap: 10px !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-skeleton-stack {
-  gap: 12px !important;
+  gap: 10px !important;
 }
 
 /* ─── Desktop: layout estilo calendário (grid multi-coluna) ────────────
@@ -812,7 +813,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)) !important;
     grid-auto-flow: row;
     align-content: start;
-    gap: 22px !important;
+    gap: 14px !important;
     padding: 0 !important;
     min-width: 0;
     width: 100%;
@@ -880,9 +881,9 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     .ref-tx-table-subgrid--actions.tx-cal-grid
     > .ref-tx-row:not(.ref-tx-row--skeleton)
     .ref-tx-arrow-wrap--down {
-    color: rgba(148, 163, 184, 0.92) !important;
-    background: var(--tx-dir-icon-bg, rgba(255, 255, 255, 0.07)) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: var(--tx-dir-muted, #64748b) !important;
+    background: var(--tx-dir-icon-bg, #ffffff) !important;
+    border: 1px solid var(--tx-dir-icon-border, rgba(15, 23, 42, 0.1)) !important;
     box-shadow: none !important;
   }
 
@@ -1019,13 +1020,13 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
   /* Sobrepõe 04c no escuro — alinha ao token do cartão “directório” */
   body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) {
-    background: var(--tx-dir-card-bg, #141820) !important;
+    background: var(--tx-dir-card-bg, #000000) !important;
     border-color: var(--tx-dir-card-border, rgba(255, 255, 255, 0.09)) !important;
     box-shadow: var(--tx-dir-card-shadow, 0 2px 18px rgba(0, 0, 0, 0.4)) !important;
   }
 
   body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton):hover {
-    background: color-mix(in srgb, var(--tx-dir-card-bg, #141820) 92%, #ffffff 8%) !important;
+    background: color-mix(in srgb, var(--tx-dir-card-bg, #000000) 92%, #ffffff 8%) !important;
   }
 
   /* Não zerar row-gap aqui — anula respiro cat/sub/data definido no bloco vidro acima */

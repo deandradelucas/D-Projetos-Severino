@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import AdminDataTableSkeleton from '../AdminDataTableSkeleton'
+import MobileMenuButton from '../MobileMenuButton'
 import PaymentLogStatusBadge from './PaymentLogStatusBadge'
 import {
   computeOperationalInsights,
@@ -13,22 +13,127 @@ import {
 } from '../../lib/paymentLogsAdmin'
 import { formatCurrencyBRL } from '../../lib/formatCurrency'
 
-const TABLE_HEADERS = [
-  'Registro',
-  'Usuário',
-  'E-mail',
-  'ID usuário',
-  'Valor',
-  'Status',
-  'Isenção',
-  'Venc. / próx. cobrança',
-  'Último pag.',
-  'Provedor',
-  'ID pagamento',
-  'Referência',
-  'Detalhe',
-  'Ações',
-]
+function PaymentLogCard({ row, togglingUserId, onToggleExempt, onOpenDetail }) {
+  return (
+    <article
+      className={`page-admin-payment-log-card${row.isOverdue ? ' page-admin-payment-log-card--alert' : ''}`}
+    >
+      <header className="page-admin-payment-log-card__head">
+        <div className="page-admin-payment-log-card__head-text">
+          <p className="page-admin-payment-log-card__user">{row.userName || '—'}</p>
+          <p className="page-admin-payment-log-card__email">{row.userEmail || '—'}</p>
+        </div>
+        <div className="page-admin-payment-log-card__head-meta">
+          <p className="page-admin-payment-log-card__amount">{formatCurrencyBRL(row.amount)}</p>
+          <PaymentLogStatusBadge status={row.status} isOverdue={row.isOverdue} />
+        </div>
+      </header>
+
+      <div className="page-admin-payment-log-card__grid">
+        <div className="page-admin-payment-log-card__field">
+          <span className="page-admin-payment-log-card__label">Registro</span>
+          <span className="page-admin-payment-log-card__value">{formatDateTimePt(row.created_at)}</span>
+        </div>
+        <div className="page-admin-payment-log-card__field">
+          <span className="page-admin-payment-log-card__label">Provedor</span>
+          <span className="page-admin-payment-log-card__value page-admin-payment-log-card__value--cap">
+            {row.provider || '—'}
+          </span>
+        </div>
+        <div className="page-admin-payment-log-card__field">
+          <span className="page-admin-payment-log-card__label">Isenção</span>
+          <span className="page-admin-payment-log-card__value">
+            {row.usuario_id ? (
+              <span className={row.isExempt ? 'admin-pill' : 'admin-pill page-admin-payment-logs__pill--muted'}>
+                {row.isExempt ? 'Isento' : 'Não'}
+              </span>
+            ) : (
+              '—'
+            )}
+          </span>
+        </div>
+        <div className="page-admin-payment-log-card__field">
+          <span className="page-admin-payment-log-card__label">Venc. / próx. cobrança</span>
+          <span className="page-admin-payment-log-card__value">
+            <span title={row.dueDate || row.nextPaymentDate || ''}>
+              {formatDatePt(row.dueDate || row.nextPaymentDate)}
+            </span>
+            {(row.nextPaymentDate || row.dueDate) && (
+              <span className="page-admin-payment-log-card__sub">{daysUntilLabel(row.nextPaymentDate || row.dueDate)}</span>
+            )}
+          </span>
+        </div>
+        <div className="page-admin-payment-log-card__field">
+          <span className="page-admin-payment-log-card__label">Último pag.</span>
+          <span className="page-admin-payment-log-card__value">{formatDateTimePt(row.lastPaymentDate)}</span>
+        </div>
+        <div className="page-admin-payment-log-card__field">
+          <span className="page-admin-payment-log-card__label">ID usuário</span>
+          <span className="page-admin-payment-log-card__value page-admin-payment-log-card__value--mono">
+            {row.usuario_id || '—'}
+          </span>
+        </div>
+        <div className="page-admin-payment-log-card__field page-admin-payment-log-card__field--wide">
+          <span className="page-admin-payment-log-card__label">ID pagamento</span>
+          <span className="page-admin-payment-log-card__value page-admin-payment-log-card__value--mono">
+            {row.payment_id || '—'}
+          </span>
+        </div>
+        <div className="page-admin-payment-log-card__field page-admin-payment-log-card__field--wide">
+          <span className="page-admin-payment-log-card__label">Referência</span>
+          <span className="page-admin-payment-log-card__value page-admin-payment-log-card__value--mono">
+            {row.external_reference || '—'}
+          </span>
+        </div>
+        <div className="page-admin-payment-log-card__field page-admin-payment-log-card__field--wide">
+          <span className="page-admin-payment-log-card__label">Detalhe</span>
+          <span className="page-admin-payment-log-card__value page-admin-payment-log-card__value--detail">
+            {row.status_detail || row.description || '—'}
+          </span>
+        </div>
+      </div>
+
+      <footer className="page-admin-payment-log-card__actions">
+        <button type="button" className="btn-secondary page-admin-payment-logs__action-btn" onClick={() => onOpenDetail(row)}>
+          Detalhes
+        </button>
+        {row.usuario_id ? (
+          <button
+            type="button"
+            className="btn-secondary page-admin-payment-logs__action-btn"
+            disabled={togglingUserId === row.usuario_id}
+            onClick={() => onToggleExempt(row.usuario_id, !row.isExempt)}
+          >
+            {togglingUserId === row.usuario_id ? '…' : row.isExempt ? 'Remover isenção' : 'Isentar'}
+          </button>
+        ) : null}
+      </footer>
+    </article>
+  )
+}
+
+function PaymentLogCardSkeleton() {
+  return (
+    <div className="page-admin-payment-log-card page-admin-payment-log-card--skeleton" aria-hidden>
+      <div className="page-admin-payment-log-card__sk-head">
+        <span className="skeleton skeleton-pulse page-admin-payment-log-card__sk-bar page-admin-payment-log-card__sk-bar--lg" />
+        <span className="skeleton skeleton-pulse page-admin-payment-log-card__sk-bar page-admin-payment-log-card__sk-bar--md" />
+      </div>
+      <div className="page-admin-payment-log-card__sk-grid">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="page-admin-payment-log-card__sk-field">
+            <span className="skeleton skeleton-pulse page-admin-payment-log-card__sk-bar page-admin-payment-log-card__sk-bar--xs" />
+            <span className="skeleton skeleton-pulse page-admin-payment-log-card__sk-bar" />
+          </div>
+        ))}
+      </div>
+      <div className="page-admin-payment-log-card__sk-actions">
+        <span className="skeleton skeleton-pulse page-admin-payment-log-card__sk-pill" />
+        <span className="skeleton skeleton-pulse page-admin-payment-log-card__sk-pill" />
+      </div>
+    </div>
+  )
+}
 
 /**
  * @param {{
@@ -61,6 +166,8 @@ export default function AdminPaymentLogsPanel({
   togglingUserId,
   onToggleExempt,
   adminDocsUrl = '',
+  menuAberto = false,
+  onToggleMobileMenu,
 }) {
   const [detail, setDetail] = useState(null)
   const [exporting, setExporting] = useState(false)
@@ -121,13 +228,18 @@ export default function AdminPaymentLogsPanel({
         aria-labelledby="admin-pag-heading"
       >
         <div className="ref-panel__head page-admin-pagamentos-panel-head page-admin-payment-logs__head">
-          <div>
-            <h2 id="admin-pag-heading" className="ref-panel__title">
-              Registros e indicadores
-            </h2>
-            <p className="ref-panel__subtitle">
-              Checkouts e cobranças Asaas, isenções e receita aprovada — filtros combinam com o período do registro.
-            </p>
+          <div className="page-admin-payment-logs__title-block">
+            {onToggleMobileMenu ? (
+              <MobileMenuButton onClick={onToggleMobileMenu} isOpen={menuAberto} />
+            ) : null}
+            <div>
+              <h2 id="admin-pag-heading" className="ref-panel__title">
+                Registros e indicadores
+              </h2>
+              <p className="ref-panel__subtitle">
+                Checkouts e cobranças Asaas, isenções e receita aprovada — filtros combinam com o período do registro.
+              </p>
+            </div>
           </div>
           <div className="page-admin-payment-logs__head-actions">
             <button type="button" className="btn-secondary page-admin-toolbar-btn" disabled={loading} onClick={() => onRefresh()}>
@@ -151,7 +263,7 @@ export default function AdminPaymentLogsPanel({
         {actionMsg ? <div className="page-admin-toast-msg">{actionMsg}</div> : null}
 
         {summary && !loading && (
-          <div className="page-admin-kpi-compact-strip" style={{ marginBottom: '16px' }}>
+          <div className="page-admin-kpi-compact-strip page-admin-kpi-compact-strip--payment-logs">
             <div className="kpi-mini"><span>Aprovado:</span> <strong>{formatCurrencyBRL(summary.accumulatedRevenue)}</strong></div>
             <div className="kpi-mini"><span>Qtde:</span> <strong>{summary.approvedCount}</strong></div>
             <div className="kpi-mini"><span>Pendente:</span> <strong>{formatCurrencyBRL(summary.pendingAmount)}</strong></div>
@@ -230,7 +342,7 @@ export default function AdminPaymentLogsPanel({
                 <span>Até</span>
                 <input type="date" className="page-admin-filter-input" value={loadParams.dateTo || ''} onChange={(e) => setParam('dateTo', e.target.value)} />
               </label>
-              <div className="page-admin-payment-logs__quick-filters">
+              <div className="page-admin-payment-logs__filter-actions">
                 <button
                   type="button"
                   className={`btn-secondary page-admin-toolbar-btn${loadParams.statusGroup === 'pending' ? ' page-admin-toolbar-btn--active' : ''}`}
@@ -245,8 +357,6 @@ export default function AdminPaymentLogsPanel({
                 >
                   Só atrasados
                 </button>
-              </div>
-              <div className="page-admin-toolbar-btns">
                 <button type="button" className="btn-secondary page-admin-toolbar-btn" disabled={loading} onClick={() => onRefresh()}>
                   Aplicar filtros
                 </button>
@@ -259,222 +369,169 @@ export default function AdminPaymentLogsPanel({
             <div className="page-admin-payment-logs__client-filters">
               <p className="page-admin-payment-logs__client-filters-title">Refinar no lote carregado</p>
               <div className="page-admin-payment-logs__client-filters-grid">
-                <label className="page-admin-filter-label">
-                  <span>Valor mín. (R$)</span>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    className="page-admin-filter-input"
-                    value={clientFilters.amountMin}
-                    onChange={(e) => setClientFilters((p) => ({ ...p, amountMin: e.target.value }))}
-                  />
-                </label>
-                <label className="page-admin-filter-label">
-                  <span>Valor máx. (R$)</span>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    className="page-admin-filter-input"
-                    value={clientFilters.amountMax}
-                    onChange={(e) => setClientFilters((p) => ({ ...p, amountMax: e.target.value }))}
-                  />
-                </label>
-                <label className="page-admin-filter-label">
-                  <span>Venc. / próx. cobrança de</span>
-                  <input
-                    type="date"
-                    className="page-admin-filter-input"
-                    value={clientFilters.dueFrom}
-                    onChange={(e) => setClientFilters((p) => ({ ...p, dueFrom: e.target.value }))}
-                  />
-                </label>
-                <label className="page-admin-filter-label">
-                  <span>até</span>
-                  <input
-                    type="date"
-                    className="page-admin-filter-input"
-                    value={clientFilters.dueTo}
-                    onChange={(e) => setClientFilters((p) => ({ ...p, dueTo: e.target.value }))}
-                  />
-                </label>
-                <label className="page-admin-filter-label">
-                  <span>Último pag. de</span>
-                  <input
-                    type="date"
-                    className="page-admin-filter-input"
-                    value={clientFilters.payFrom}
-                    onChange={(e) => setClientFilters((p) => ({ ...p, payFrom: e.target.value }))}
-                  />
-                </label>
-                <label className="page-admin-filter-label">
-                  <span>até</span>
-                  <input
-                    type="date"
-                    className="page-admin-filter-input"
-                    value={clientFilters.payTo}
-                    onChange={(e) => setClientFilters((p) => ({ ...p, payTo: e.target.value }))}
-                  />
-                </label>
+                <div className="page-admin-payment-logs__filter-group">
+                  <p className="page-admin-payment-logs__filter-group-label">Valor (R$)</p>
+                  <div className="page-admin-payment-logs__filter-group-fields">
+                    <label className="page-admin-filter-label">
+                      <span>Mínimo</span>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        className="page-admin-filter-input"
+                        value={clientFilters.amountMin}
+                        onChange={(e) => setClientFilters((p) => ({ ...p, amountMin: e.target.value }))}
+                      />
+                    </label>
+                    <label className="page-admin-filter-label">
+                      <span>Máximo</span>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        className="page-admin-filter-input"
+                        value={clientFilters.amountMax}
+                        onChange={(e) => setClientFilters((p) => ({ ...p, amountMax: e.target.value }))}
+                      />
+                    </label>
+                  </div>
+                </div>
+                <div className="page-admin-payment-logs__filter-group">
+                  <p className="page-admin-payment-logs__filter-group-label">Venc. / próx. cobrança</p>
+                  <div className="page-admin-payment-logs__filter-group-fields">
+                    <label className="page-admin-filter-label">
+                      <span>De</span>
+                      <input
+                        type="date"
+                        className="page-admin-filter-input"
+                        value={clientFilters.dueFrom}
+                        onChange={(e) => setClientFilters((p) => ({ ...p, dueFrom: e.target.value }))}
+                      />
+                    </label>
+                    <label className="page-admin-filter-label">
+                      <span>Até</span>
+                      <input
+                        type="date"
+                        className="page-admin-filter-input"
+                        value={clientFilters.dueTo}
+                        onChange={(e) => setClientFilters((p) => ({ ...p, dueTo: e.target.value }))}
+                      />
+                    </label>
+                  </div>
+                </div>
+                <div className="page-admin-payment-logs__filter-group">
+                  <p className="page-admin-payment-logs__filter-group-label">Último pagamento</p>
+                  <div className="page-admin-payment-logs__filter-group-fields">
+                    <label className="page-admin-filter-label">
+                      <span>De</span>
+                      <input
+                        type="date"
+                        className="page-admin-filter-input"
+                        value={clientFilters.payFrom}
+                        onChange={(e) => setClientFilters((p) => ({ ...p, payFrom: e.target.value }))}
+                      />
+                    </label>
+                    <label className="page-admin-filter-label">
+                      <span>Até</span>
+                      <input
+                        type="date"
+                        className="page-admin-filter-input"
+                        value={clientFilters.payTo}
+                        onChange={(e) => setClientFilters((p) => ({ ...p, payTo: e.target.value }))}
+                      />
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="page-admin-table-scroll page-admin-payment-logs__table-wrap">
+            <div className="page-admin-payment-logs__insights" aria-label="Insights operacionais">
+              <div className="page-admin-payment-logs__aside-card">
+                <h3 className="page-admin-payment-logs__aside-title">Operação</h3>
+                <ul className="page-admin-payment-logs__aside-list">
+                  <li>
+                    <span className="page-admin-payment-logs__aside-k">Vencendo hoje (próx. cobrança)</span>
+                    <span className="page-admin-payment-logs__aside-v">{insights.dueToday}</span>
+                  </li>
+                  <li>
+                    <span className="page-admin-payment-logs__aside-k">Próximos 7 dias</span>
+                    <span className="page-admin-payment-logs__aside-v">{insights.due7}</span>
+                  </li>
+                  <li>
+                    <span className="page-admin-payment-logs__aside-k">Pendências que exigem atenção</span>
+                    <span className="page-admin-payment-logs__aside-v">{insights.pendingAction}</span>
+                  </li>
+                  <li>
+                    <span className="page-admin-payment-logs__aside-k">Atrasados (&gt;7d pendente)</span>
+                    <span className="page-admin-payment-logs__aside-v">{summary?.overdueCount ?? '—'}</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="page-admin-payment-logs__aside-card">
+                <h3 className="page-admin-payment-logs__aside-title">Gestão</h3>
+                <ul className="page-admin-payment-logs__aside-list">
+                  <li>
+                    <span className="page-admin-payment-logs__aside-k">Receita no mês (aprovados)</span>
+                    <span className="page-admin-payment-logs__aside-v">{formatCurrencyBRL(summary?.monthlyRevenue ?? 0)}</span>
+                  </li>
+                  <li>
+                    <span className="page-admin-payment-logs__aside-k">Ticket médio (aprov.)</span>
+                    <span className="page-admin-payment-logs__aside-v">{formatCurrencyBRL(summary?.ticketMedio ?? 0)}</span>
+                  </li>
+                  <li>
+                    <span className="page-admin-payment-logs__aside-k">Taxa de aprovação</span>
+                    <span className="page-admin-payment-logs__aside-v">
+                      {insights.approvalRate != null ? `${insights.approvalRate}%` : '—'}
+                    </span>
+                  </li>
+                  <li>
+                    <span className="page-admin-payment-logs__aside-k">Isentos (usuários no lote)</span>
+                    <span className="page-admin-payment-logs__aside-v">{insights.exemptCount}</span>
+                  </li>
+                  <li>
+                    <span className="page-admin-payment-logs__aside-k">Recusados / cancelados</span>
+                    <span className="page-admin-payment-logs__aside-v">{summary?.rejectedCount ?? '—'}</span>
+                  </li>
+                  <li>
+                    <span className="page-admin-payment-logs__aside-k">Estornos</span>
+                    <span className="page-admin-payment-logs__aside-v">{summary?.refundedCount ?? '—'}</span>
+                  </li>
+                </ul>
+              </div>
+              {adminDocsUrl ? (
+                <div className="page-admin-payment-logs__aside-card page-admin-payment-logs__aside-card--muted page-admin-payment-logs__insights-docs">
+                  <a className="page-admin-doc-link" href={adminDocsUrl} target="_blank" rel="noreferrer">
+                    Documentação / runbook
+                  </a>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="page-admin-payment-logs__cards-wrap">
               {loading ? (
-                <AdminDataTableSkeleton headers={TABLE_HEADERS} rows={8} />
+                <ul className="page-admin-payment-logs-cards" aria-busy="true" aria-label="Carregando pagamentos">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <li key={`payment-log-skel-${i}`}>
+                      <PaymentLogCardSkeleton />
+                    </li>
+                  ))}
+                </ul>
               ) : sortedRows.length === 0 ? (
                 <p className="page-admin-empty">Nenhum pagamento encontrado com estes filtros.</p>
               ) : (
-                <>
-                  <table className="data-table page-admin-data-table page-admin-payment-logs__table-desktop">
-                    <thead>
-                      <tr>
-                        {TABLE_HEADERS.map((h) => (
-                          <th key={h}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sortedRows.map((row) => (
-                        <tr
-                          key={row.id}
-                          className={row.isOverdue ? 'page-admin-payment-logs__row--alert' : undefined}
-                          onClick={() => setDetail(row)}
-                        >
-                          <td className="page-admin-payment-logs__cell-muted">{formatDateTimePt(row.created_at)}</td>
-                          <td className="page-admin-cell-strong">{row.userName || '—'}</td>
-                          <td className="page-admin-payment-logs__cell-email">{row.userEmail || '—'}</td>
-                          <td className="page-admin-payment-logs__cell-mono">{row.usuario_id ? String(row.usuario_id).slice(0, 10) : '—'}</td>
-                          <td>{formatCurrencyBRL(row.amount)}</td>
-                          <td>
-                            <PaymentLogStatusBadge status={row.status} isOverdue={row.isOverdue} />
-                          </td>
-                          <td>
-                            {row.usuario_id ? (
-                              <span className={row.isExempt ? 'admin-pill' : 'admin-pill page-admin-payment-logs__pill--muted'}>
-                                {row.isExempt ? 'Isento' : 'Não'}
-                              </span>
-                            ) : (
-                              '—'
-                            )}
-                          </td>
-                          <td className="page-admin-payment-logs__cell-muted">
-                            <span title={row.dueDate || row.nextPaymentDate || ''}>{formatDatePt(row.dueDate || row.nextPaymentDate)}</span>
-                            <span className="page-admin-payment-logs__sub">{daysUntilLabel(row.nextPaymentDate || row.dueDate)}</span>
-                          </td>
-                          <td className="page-admin-payment-logs__cell-muted">{formatDateTimePt(row.lastPaymentDate)}</td>
-                          <td>
-                            <span className="page-admin-payment-logs__provider">{row.provider || '—'}</span>
-                          </td>
-                          <td className="page-admin-payment-logs__cell-mono">{row.payment_id || '—'}</td>
-                          <td className="page-admin-payment-logs__cell-mono">{row.external_reference || '—'}</td>
-                          <td className="page-admin-payment-logs__cell-detail">{row.status_detail || row.description || '—'}</td>
-                          <td className="page-admin-payment-logs__actions" onClick={(e) => e.stopPropagation()}>
-                            <div className="page-admin-payment-logs__actions-inner">
-                              <button
-                                type="button"
-                                className="btn-secondary page-admin-payment-logs__action-btn"
-                                onClick={() => setDetail(row)}
-                              >
-                                Detalhes
-                              </button>
-                              {row.usuario_id ? (
-                                <button
-                                  type="button"
-                                  className="btn-secondary page-admin-payment-logs__action-btn"
-                                  disabled={togglingUserId === row.usuario_id}
-                                  onClick={() => onToggleExempt(row.usuario_id, !row.isExempt)}
-                                >
-                                  {togglingUserId === row.usuario_id ? '…' : row.isExempt ? 'Remover isenção' : 'Isentar'}
-                                </button>
-                              ) : null}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-
-                  <ul className="page-admin-payment-logs__mobile-list">
-                    {sortedRows.map((row) => (
-                      <li key={row.id}>
-                        <button type="button" className="page-admin-payment-logs__mobile-card" onClick={() => setDetail(row)}>
-                          <div className="page-admin-payment-logs__mobile-top">
-                            <span className="page-admin-payment-logs__mobile-amount">{formatCurrencyBRL(row.amount)}</span>
-                            <PaymentLogStatusBadge status={row.status} isOverdue={row.isOverdue} />
-                          </div>
-                          <p className="page-admin-payment-logs__mobile-user">{row.userName || row.userEmail || row.usuario_id || '—'}</p>
-                          <p className="page-admin-payment-logs__mobile-meta">{formatDateTimePt(row.created_at)}</p>
-                          {row.isExempt ? <span className="admin-pill">Isento</span> : null}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </>
+                <ul className="page-admin-payment-logs-cards" aria-label="Lista de pagamentos">
+                  {sortedRows.map((row) => (
+                    <li key={row.id}>
+                      <PaymentLogCard
+                        row={row}
+                        togglingUserId={togglingUserId}
+                        onToggleExempt={onToggleExempt}
+                        onOpenDetail={setDetail}
+                      />
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
           </div>
-
-          <aside className="page-admin-payment-logs__aside" aria-label="Insights operacionais">
-            <div className="page-admin-payment-logs__aside-card">
-              <h3 className="page-admin-payment-logs__aside-title">Operação</h3>
-              <ul className="page-admin-payment-logs__aside-list">
-                <li>
-                  <span className="page-admin-payment-logs__aside-k">Vencendo hoje (próx. cobrança)</span>
-                  <span className="page-admin-payment-logs__aside-v">{insights.dueToday}</span>
-                </li>
-                <li>
-                  <span className="page-admin-payment-logs__aside-k">Próximos 7 dias</span>
-                  <span className="page-admin-payment-logs__aside-v">{insights.due7}</span>
-                </li>
-                <li>
-                  <span className="page-admin-payment-logs__aside-k">Pendências que exigem atenção</span>
-                  <span className="page-admin-payment-logs__aside-v">{insights.pendingAction}</span>
-                </li>
-                <li>
-                  <span className="page-admin-payment-logs__aside-k">Atrasados (&gt;7d pendente)</span>
-                  <span className="page-admin-payment-logs__aside-v">{summary?.overdueCount ?? '—'}</span>
-                </li>
-              </ul>
-            </div>
-            <div className="page-admin-payment-logs__aside-card">
-              <h3 className="page-admin-payment-logs__aside-title">Gestão</h3>
-              <ul className="page-admin-payment-logs__aside-list">
-                <li>
-                  <span className="page-admin-payment-logs__aside-k">Receita no mês (aprovados)</span>
-                  <span className="page-admin-payment-logs__aside-v">{formatCurrencyBRL(summary?.monthlyRevenue ?? 0)}</span>
-                </li>
-                <li>
-                  <span className="page-admin-payment-logs__aside-k">Ticket médio (aprov.)</span>
-                  <span className="page-admin-payment-logs__aside-v">{formatCurrencyBRL(summary?.ticketMedio ?? 0)}</span>
-                </li>
-                <li>
-                  <span className="page-admin-payment-logs__aside-k">Taxa de aprovação</span>
-                  <span className="page-admin-payment-logs__aside-v">
-                    {insights.approvalRate != null ? `${insights.approvalRate}%` : '—'}
-                  </span>
-                </li>
-                <li>
-                  <span className="page-admin-payment-logs__aside-k">Isentos (usuários no lote)</span>
-                  <span className="page-admin-payment-logs__aside-v">{insights.exemptCount}</span>
-                </li>
-                <li>
-                  <span className="page-admin-payment-logs__aside-k">Recusados / cancelados</span>
-                  <span className="page-admin-payment-logs__aside-v">{summary?.rejectedCount ?? '—'}</span>
-                </li>
-                <li>
-                  <span className="page-admin-payment-logs__aside-k">Estornos</span>
-                  <span className="page-admin-payment-logs__aside-v">{summary?.refundedCount ?? '—'}</span>
-                </li>
-              </ul>
-            </div>
-            {adminDocsUrl ? (
-              <div className="page-admin-payment-logs__aside-card page-admin-payment-logs__aside-card--muted">
-                <a className="page-admin-doc-link" href={adminDocsUrl} target="_blank" rel="noreferrer">
-                  Documentação / runbook
-                </a>
-              </div>
-            ) : null}
-          </aside>
         </div>
       </article>
 

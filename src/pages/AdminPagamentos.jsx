@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
-import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import AdminPaymentLogsPanel from '../components/admin/AdminPaymentLogsPanel'
 import ConfirmDialog from '../components/ConfirmDialog'
@@ -122,26 +121,16 @@ export default function AdminPagamentos() {
   }
 
   return (
-    <div className="dashboard-container page-admin ref-dashboard app-horizon-shell">
+    <div className="dashboard-container page-admin page-admin-pagamentos ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
         <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
             <RefDashboardScroll>
-            <section className="dashboard-hub__hero page-admin__hero" aria-label="Logs de pagamentos">
-              <div className="dashboard-hub__hero-row">
-                <MobileMenuButton onClick={() => setMenuAberto(true)} />
-                <div className="dashboard-hub__hero-text">
-                  <h1 className="dashboard-hub__title">PAYMENTS CORE v4</h1>
-                  <p className="ref-panel__subtitle page-admin-header-sub">
-                    Gestão financeira e conciliação Asaas
-                  </p>
-                </div>
-              </div>
-            </section>
-
             <AdminPaymentLogsPanel
+              menuAberto={menuAberto}
+              onToggleMobileMenu={() => setMenuAberto((v) => !v)}
               rows={rows}
               summary={summary}
               loading={loading}
