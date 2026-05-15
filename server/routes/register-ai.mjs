@@ -77,9 +77,6 @@ export function registerAiRoutes(app) {
           502,
         )
       }
-      if (raw && raw.length < 280) {
-        return c.json({ message: raw }, 500)
-      }
       return c.json(
         { message: 'Não foi possível processar sua pergunta agora. Tente novamente.' },
         500,
@@ -145,7 +142,6 @@ export function registerAiRoutes(app) {
           503,
         )
       }
-      if (raw && raw.length < 320) return c.json({ message: raw }, 400)
       return c.json({ message: 'Não foi possível interpretar o texto. Reformule com data e horário.' }, 400)
     }
   })

@@ -20,8 +20,8 @@ function generateOtp() {
 }
 
 /**
- * Gera OTP, salva hash em reset_token_* e envia pelo WhatsApp.
- * Lança erro com .statusCode se falhar.
+ * Gera OTP, salva hash em registration_token_* e envia pelo WhatsApp.
+ * Usa colunas separadas de reset_token_* para evitar colisão de tokens.
  * @returns {{ sent: boolean, number: string }}
  */
 export async function sendRegistrationOtp(userId, telefone) {
@@ -41,9 +41,9 @@ export async function sendRegistrationOtp(userId, telefone) {
   const { error: upErr } = await supabase
     .from('usuarios')
     .update({
-      reset_token_hash: tokenHash,
-      reset_token_expires_at: expiresAt,
-      reset_token_created_at: now.toISOString(),
+      registration_token_hash: tokenHash,
+      registration_token_expires_at: expiresAt,
+      registration_token_created_at: now.toISOString(),
     })
     .eq('id', userId)
   if (upErr) throw upErr
@@ -55,7 +55,7 @@ export async function sendRegistrationOtp(userId, telefone) {
   if (!ok) {
     await supabase
       .from('usuarios')
-      .update({ reset_token_hash: null, reset_token_expires_at: null, reset_token_created_at: null })
+      .update({ registration_token_hash: null, registration_token_expires_at: null, registration_token_created_at: null })
       .eq('id', userId)
     const e = new Error('Não foi possível enviar o código pelo WhatsApp. Tente de novo em instantes.')
     e.statusCode = 502
@@ -81,24 +81,24 @@ export async function verifyRegistrationOtp(userId, otpRaw) {
   const supabase = getSupabaseAdmin()
   const { data: user, error } = await supabase
     .from('usuarios')
-    .select('id, reset_token_hash, reset_token_expires_at')
+    .select('id, registration_token_hash, registration_token_expires_at')
     .eq('id', userId)
     .maybeSingle()
 
   if (error) throw error
-  if (!user?.reset_token_hash) {
+  if (!user?.registration_token_hash) {
     const e = new Error('Código inválido ou expirado. Solicite um novo código.')
     e.statusCode = 400
     throw e
   }
-  if (!user.reset_token_expires_at || new Date(user.reset_token_expires_at) <= new Date()) {
+  if (!user.registration_token_expires_at || new Date(user.registration_token_expires_at) <= new Date()) {
     const e = new Error('Código expirado. Clique em "Reenviar código".')
     e.statusCode = 400
     throw e
   }
 
   const expectedHash = hashOtp(userId, otp)
-  if (expectedHash !== user.reset_token_hash) {
+  if (expectedHash !== user.registration_token_hash) {
     const e = new Error('Código incorreto. Verifique e tente novamente.')
     e.statusCode = 400
     throw e
@@ -108,9 +108,9 @@ export async function verifyRegistrationOtp(userId, otpRaw) {
     .from('usuarios')
     .update({
       telefone_verificado: true,
-      reset_token_hash: null,
-      reset_token_expires_at: null,
-      reset_token_created_at: null,
+      registration_token_hash: null,
+      registration_token_expires_at: null,
+      registration_token_created_at: null,
     })
     .eq('id', userId)
   if (upErr) throw upErr

@@ -43,9 +43,13 @@ export async function rateLimitTake(key, max = 30, windowMs = 60_000) {
 
   if (redis) {
     try {
-      const count = await redis.incr(k)
-      if (count === 1) await redis.pexpire(k, windowMs)
-      return count <= max
+      /* Lua garante atomicidade: INCR + PEXPIRE em um único round-trip */
+      const lua = `
+        local c = redis.call('INCR', KEYS[1])
+        if c == 1 then redis.call('PEXPIRE', KEYS[1], ARGV[1]) end
+        return c`
+      const count = await redis.eval(lua, 1, k, String(windowMs))
+      return Number(count) <= max
     } catch {
       /* Redis indisponível — cai para in-memory */
     }
