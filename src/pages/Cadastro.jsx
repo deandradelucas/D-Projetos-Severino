@@ -37,7 +37,6 @@ export default function Cadastro() {
   const [pendingUserId, setPendingUserId] = useState(null)
   const [telefoneMascarado, setTelefoneMascarado] = useState('')
   const [emailMascarado, setEmailMascarado] = useState('')
-  const [needsEmailVerification, setNeedsEmailVerification] = useState(false)
   const [otp, setOtp] = useState('')
   const [otpError, setOtpError] = useState('')
   const [otpLoading, setOtpLoading] = useState(false)
@@ -119,7 +118,6 @@ export default function Cadastro() {
         const total = 2 + (data.needsPhoneVerification ? 1 : 0) + (data.needsEmailVerification ? 1 : 0)
         setTotalSteps(total)
         setPendingUserId(data.userId)
-        setNeedsEmailVerification(Boolean(data.needsEmailVerification))
         if (data.needsPhoneVerification) {
           setTelefoneMascarado(data.telefoneMascarado || '')
           setEmailMascarado(data.emailMascarado || '')

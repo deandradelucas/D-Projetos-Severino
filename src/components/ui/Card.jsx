@@ -44,13 +44,14 @@ export default function Card({
   alert = null,
   padding = '16px',
   hoverable = false,
-  as: Tag = 'div',
+  as,
   children,
   className = '',
   style = {},
   ...props
 }) {
   const v = VARIANTS[variant] ?? VARIANTS.base
+  const Root = as || 'div'
 
   const base = {
     position: 'relative',
@@ -76,14 +77,14 @@ export default function Card({
     : {}
 
   return (
-    <Tag
+    <Root
       className={`hz-card hz-card--${variant}${alert ? ` hz-card--alert-${alert}` : ''}${hoverable ? ' hz-card--hoverable' : ''}${className ? ` ${className}` : ''}`}
       style={base}
       {...hoverHandlers}
       {...props}
     >
       {children}
-    </Tag>
+    </Root>
   )
 }
 

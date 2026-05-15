@@ -10,9 +10,9 @@
  *   2. ANTHROPIC_API_KEY no .env
  */
 
-import { execSync, spawnSync } from 'node:child_process'
+import { spawnSync } from 'node:child_process'
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { join } from 'node:path'
 import { tmpdir, homedir } from 'node:os'
 
 // ─── Config ────────────────────────────────────────────────────────────────
@@ -56,7 +56,7 @@ function downloadTranscript(url, outDir) {
   console.log('Baixando transcrição...')
 
   // 1. Legendas manuais
-  let result = spawnSync('yt-dlp', [
+  spawnSync('yt-dlp', [
     '--skip-download',
     '--write-subs',
     '--sub-langs', langs,
@@ -70,7 +70,7 @@ function downloadTranscript(url, outDir) {
   const foundVtt = readdirSync(outDir).filter(f => f.endsWith('.vtt'))
   if (foundVtt.length === 0) {
     console.log('Sem legendas manuais — tentando auto-geradas...')
-    result = spawnSync('yt-dlp', [
+    spawnSync('yt-dlp', [
       '--skip-download',
       '--write-auto-subs',
       '--sub-langs', langs,

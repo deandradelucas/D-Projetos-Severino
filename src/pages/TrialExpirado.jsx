@@ -1,15 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 
-function readUser() {
-  try {
-    const raw = localStorage.getItem('horizonte_user')
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
-}
-
 function handleLogout(navigate) {
   localStorage.removeItem('horizonte_user')
   navigate('/login', { replace: true })
