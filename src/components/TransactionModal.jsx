@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import CategorySelector from './transaction/CategorySelector'
 import RecurrenceOptions from './transaction/RecurrenceOptions'
 import { useTransactionForm } from '../hooks/useTransactionForm'
@@ -30,7 +31,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     setLoadingCats(true)
     try {
       const res = await fetch(apiUrl('/api/categorias'), {
-        headers: { 'x-user-id': usuarioId },
+        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (res.ok) {
@@ -42,7 +43,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     } finally {
       setLoadingCats(false)
     }
-  }, [usuarioId])
+  }, [])
 
   const {
     formData,
@@ -118,7 +119,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       try {
         const res = await fetch(apiUrl('/api/ai/suggest-category'), {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioId },
+          headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify({ descricao: desc, tipo: formData.tipo }),
         })
         if (!res.ok) return

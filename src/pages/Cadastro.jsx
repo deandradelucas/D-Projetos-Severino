@@ -5,6 +5,7 @@ import AuthPhoneShell from '../components/AuthPhoneShell'
 import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
 import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
 import { apiUrl } from '../lib/apiUrl'
+import { writeHorizonteAccessToken } from '../lib/horizonteAccessToken'
 import { showToast } from '../lib/toastStore'
 import { validateEmail } from '../lib/validateEmail'
 import { maskPhoneBRMobile } from '../lib/formatPhoneBR'
@@ -132,6 +133,7 @@ export default function Cadastro() {
         return
       }
 
+      if (data.accessToken) writeHorizonteAccessToken(data.accessToken)
       window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
       navigateAfterLogin(data.user)
     } catch {
@@ -167,6 +169,7 @@ export default function Cadastro() {
         setOtpLoading(false)
         return
       }
+      if (data.accessToken) writeHorizonteAccessToken(data.accessToken)
       window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
       navigateAfterLogin(data.user)
     } catch {
@@ -222,6 +225,7 @@ export default function Cadastro() {
         setEmailOtpLoading(false)
         return
       }
+      if (data.accessToken) writeHorizonteAccessToken(data.accessToken)
       window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
       navigateAfterLogin(data.user)
     } catch {

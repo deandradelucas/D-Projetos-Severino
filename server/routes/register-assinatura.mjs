@@ -1,11 +1,12 @@
 import { log } from '../lib/logger.mjs'
 import { getPerfilUsuario } from '../lib/usuarios.mjs'
 import { buildAssinaturaUsuarioPayload, marcarBemVindoPagamentoVisto } from '../lib/assinatura.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 export function registerAssinaturaRoutes(app) {
   app.get('/api/assinatura/status', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
       const perfil = await getPerfilUsuario(usuarioId)
       if (!perfil) return c.json({ message: 'Perfil não encontrado.' }, 404)
@@ -36,7 +37,7 @@ export function registerAssinaturaRoutes(app) {
 
   app.post('/api/assinatura/bem-vindo-visto', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
       await marcarBemVindoPagamentoVisto(usuarioId)
       const perfil = await getPerfilUsuario(usuarioId)

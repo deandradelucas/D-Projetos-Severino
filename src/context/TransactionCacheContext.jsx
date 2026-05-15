@@ -13,6 +13,7 @@ import React, {
   useState,
 } from 'react'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
@@ -60,7 +61,7 @@ export function TransactionCacheProvider({ children }) {
       await syncRecorrenciasMensais(session.id)
 
       const res = await fetchWithRetry(apiUrl('/api/transacoes'), {
-        headers: { 'x-user-id': String(session.id).trim() },
+        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
 
@@ -89,7 +90,7 @@ export function TransactionCacheProvider({ children }) {
   }, [])
 
   /**
-   * Lançamentos pelo WhatsApp não chegam por push ao browser (API custom + x-user-id).
+   * Lançamentos pelo WhatsApp não chegam por push ao browser (API custom + Bearer).
    * Revalidamos ao voltar ao separador e em intervalo curto com o app visível.
    */
   useEffect(() => {

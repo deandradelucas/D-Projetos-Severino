@@ -7,6 +7,7 @@ import { SkeletonKpi } from '../components/dashboard/DashboardSkeletons'
 import UserAdminStatusBadge from '../components/admin/UserAdminStatusBadge'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { formatPhoneBRDisplay } from '../lib/formatPhoneBR'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import {
@@ -470,7 +471,7 @@ export default function AdminUsuarios() {
         setLoadError('Faça login para carregar os usuários.')
         return
       }
-      const u = JSON.parse(userSaved)
+      JSON.parse(userSaved)
       const qs = buildUsuariosAdminQuery({
         page,
         pageSize: PAGE_SIZE,
@@ -489,7 +490,7 @@ export default function AdminUsuarios() {
         trialEndsFrom: filterTrialEndsFrom,
         trialEndsTo: filterTrialEndsTo,
       })
-      const res = await fetch(apiUrl(`/api/admin/usuarios?${qs}`), { headers: { 'x-user-id': u.id } })
+      const res = await fetch(apiUrl(`/api/admin/usuarios?${qs}`), { headers: horizonteApiAuthHeaders() })
       const data = await res.json().catch(() => ({}))
       if (res.ok && data && Array.isArray(data.items)) {
         setListaUsuarios(data.items)
@@ -559,7 +560,7 @@ export default function AdminUsuarios() {
     try {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
-      const u = JSON.parse(userSaved)
+      JSON.parse(userSaved)
       const qs = buildUsuariosAdminQuery({
         page: 1,
         pageSize: 5000,
@@ -578,7 +579,7 @@ export default function AdminUsuarios() {
         trialEndsFrom: filterTrialEndsFrom,
         trialEndsTo: filterTrialEndsTo,
       })
-      const res = await fetch(apiUrl(`/api/admin/usuarios?${qs}`), { headers: { 'x-user-id': u.id } })
+      const res = await fetch(apiUrl(`/api/admin/usuarios?${qs}`), { headers: horizonteApiAuthHeaders() })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.message || 'Falha ao exportar.')
       const items = Array.isArray(data.items) ? data.items : []
@@ -620,16 +621,13 @@ export default function AdminUsuarios() {
     try {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
-      const u = JSON.parse(userSaved)
+      JSON.parse(userSaved)
 
       const antes = listaUsuarios.find((row) => row.id === editingUserId)
 
       const res = await fetch(apiUrl(`/api/admin/usuarios/${editingUserId}`), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': u.id,
-        },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(editForm),
       })
       const data = await res.json()
@@ -672,11 +670,11 @@ export default function AdminUsuarios() {
     try {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
-      const u = JSON.parse(userSaved)
+      JSON.parse(userSaved)
 
       const res = await fetch(apiUrl(`/api/admin/usuarios/${user.id}`), {
         method: 'DELETE',
-        headers: { 'x-user-id': u.id },
+        headers: horizonteApiAuthHeaders(),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Falha ao excluir usuário.')
@@ -701,10 +699,10 @@ export default function AdminUsuarios() {
     try {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
-      const u = JSON.parse(userSaved)
+      JSON.parse(userSaved)
       const res = await fetch(apiUrl(`/api/admin/usuarios/${user.id}/solicitar-otp-senha-whatsapp`), {
         method: 'POST',
-        headers: { 'x-user-id': u.id },
+        headers: horizonteApiAuthHeaders(),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Falha ao solicitar código pelo WhatsApp.')
@@ -719,10 +717,10 @@ export default function AdminUsuarios() {
     try {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
-      const u = JSON.parse(userSaved)
+      JSON.parse(userSaved)
       const res = await fetch(apiUrl(`/api/admin/usuarios/${detailUser.id}`), {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': u.id },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ is_active: nextActive }),
       })
       const data = await res.json()

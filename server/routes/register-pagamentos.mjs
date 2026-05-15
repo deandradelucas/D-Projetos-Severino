@@ -23,11 +23,12 @@ import { subscriptionIdFromAsaasWebhookBody } from '../lib/asaas-webhook-subscri
 import { AsaasPixPrecisaCpfError, criarPixAnualComQrCode } from '../lib/asaas-pix-qr.mjs'
 import { assertAgendaCronSecret } from '../lib/http/agenda-route-auth.mjs'
 import { processExtratoRenovacaoCron } from '../lib/extrato-renovacao.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 export function registerPagamentosRoutes(app) {
   app.get('/api/pagamentos/config', async (c) => {
     let isento_pagamento = false
-    const uid = c.req.header('x-user-id')
+    const uid = resolveRequestUserId(c)
     if (uid) {
       try {
         const perfil = await getPerfilUsuario(uid)
@@ -51,7 +52,7 @@ export function registerPagamentosRoutes(app) {
 
   app.get('/api/pagamentos/minhas', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
       const gate = await assertSessaoRotasPagamento(usuarioId)
       if (gate) return c.json({ message: gate.message }, gate.status)
@@ -75,7 +76,7 @@ export function registerPagamentosRoutes(app) {
 
   app.post('/api/pagamentos/preferencia', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
       const gate = await assertSessaoRotasPagamento(usuarioId)
       if (gate) return c.json({ message: gate.message }, gate.status)
@@ -175,7 +176,7 @@ export function registerPagamentosRoutes(app) {
 
   app.post('/api/pagamentos/asaas/pix-anual-qrcode', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
       const gate = await assertSessaoRotasPagamento(usuarioId)
       if (gate) return c.json({ message: gate.message }, gate.status)
@@ -249,7 +250,7 @@ export function registerPagamentosRoutes(app) {
 
   app.post('/api/pagamentos/stripe/checkout', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
       const gate = await assertSessaoRotasPagamento(usuarioId)
       if (gate) return c.json({ message: gate.message }, gate.status)

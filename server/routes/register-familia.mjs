@@ -15,6 +15,7 @@ import {
   revogarConviteFamilia,
   titularUsuarioIdParaGestaoFamilia,
 } from '../lib/conta-familiar.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 const MSG_GESTAO_FAMILIA = 'Apenas o titular da conta pode gerir convites e membros da família.'
 
@@ -47,7 +48,7 @@ export function registerFamiliaRoutes(app) {
 
   app.post('/api/familia/convites', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       const gestao = titularGestaoOu403(parsed.escopo)
@@ -82,7 +83,7 @@ export function registerFamiliaRoutes(app) {
 
   app.get('/api/familia/convites', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       const gestao = titularGestaoOu403(parsed.escopo)
@@ -99,7 +100,7 @@ export function registerFamiliaRoutes(app) {
     try {
       const id = c.req.param('id')
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       const gestao = titularGestaoOu403(parsed.escopo)
@@ -114,7 +115,7 @@ export function registerFamiliaRoutes(app) {
 
   app.get('/api/familia/membros', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       const gestao = titularGestaoOu403(parsed.escopo)
@@ -131,7 +132,7 @@ export function registerFamiliaRoutes(app) {
     try {
       const membroId = c.req.param('usuarioId')
       if (!isUuidString(membroId)) return c.json({ message: 'ID inválido.' }, 400)
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       const gestao = titularGestaoOu403(parsed.escopo)
@@ -152,7 +153,7 @@ export function registerFamiliaRoutes(app) {
     try {
       const membroId = c.req.param('usuarioId')
       if (!isUuidString(membroId)) return c.json({ message: 'ID inválido.' }, 400)
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       const gestao = titularGestaoOu403(parsed.escopo)
@@ -168,7 +169,7 @@ export function registerFamiliaRoutes(app) {
   /** Membro remove o próprio vínculo (volta à conta só com seus dados). */
   app.post('/api/familia/sair', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
 
       if (!rateLimitTake(`familia-sair:${usuarioId}`, 5, 60_000)) {
@@ -205,7 +206,7 @@ export function registerFamiliaRoutes(app) {
 
   app.post('/api/familia/aceitar', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
 
       let body = {}

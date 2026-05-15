@@ -9,6 +9,7 @@ import ConfigSelectCustom from '../components/ConfigSelectCustom.jsx'
 import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { montarTextoConviteFamiliaComPwa } from '../lib/familiaConviteMensagemCompartilhavel'
 import { getPublicAppOriginForConvites } from '../lib/publicAppOrigin'
 import { webAuthnSupported, registerWebAuthnCredential } from '../lib/webauthnBrowser'
@@ -66,7 +67,7 @@ export default function Configuracoes() {
     if (!usuarioIdHeader) return
     try {
       const res = await fetch(apiUrl('/api/assinatura/status'), {
-        headers: { 'x-user-id': usuarioIdHeader },
+        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (!res.ok) return
@@ -101,7 +102,7 @@ export default function Configuracoes() {
     }
     setFamiliaLoadErr(null)
     try {
-      const resM = await fetch(apiUrl('/api/familia/membros'), { headers: { 'x-user-id': usuarioIdHeader } })
+      const resM = await fetch(apiUrl('/api/familia/membros'), { headers: horizonteApiAuthHeaders() })
       if (resM.status === 403) {
         setFamiliaTitular(false)
         setFamiliaMembros([])
@@ -115,7 +116,7 @@ export default function Configuracoes() {
       setFamiliaTitular(true)
       const m = await resM.json().catch(() => ({}))
       setFamiliaMembros(Array.isArray(m.membros) ? m.membros : [])
-      const resC = await fetch(apiUrl('/api/familia/convites'), { headers: { 'x-user-id': usuarioIdHeader } })
+      const resC = await fetch(apiUrl('/api/familia/convites'), { headers: horizonteApiAuthHeaders() })
       const c = resC.ok ? await resC.json().catch(() => ({})) : {}
       setFamiliaConvites(Array.isArray(c.convites) ? c.convites : [])
     } catch {
@@ -135,7 +136,7 @@ export default function Configuracoes() {
 
   useEffect(() => {
     if (!usuarioIdHeader) return
-    fetch(apiUrl('/api/usuarios/perfil'), { headers: { 'x-user-id': usuarioIdHeader } })
+    fetch(apiUrl('/api/usuarios/perfil'), { headers: horizonteApiAuthHeaders() })
       .then((res) => res.json())
       .then((data) => {
         if (data.perfil) {
@@ -163,7 +164,7 @@ export default function Configuracoes() {
     setWebauthnError(null)
     try {
       const res = await fetch(apiUrl('/api/auth/webauthn/credentials'), {
-        headers: { 'x-user-id': usuarioIdHeader },
+        headers: horizonteApiAuthHeaders(),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -192,7 +193,7 @@ export default function Configuracoes() {
     }
     setBioRegistering(true)
     try {
-      await registerWebAuthnCredential(() => ({ 'x-user-id': usuarioIdHeader }))
+      await registerWebAuthnCredential(() => horizonteApiAuthHeaders())
       showToast('Biometria ativada neste aparelho.')
       await loadWebAuthn()
     } catch (e) {
@@ -207,7 +208,7 @@ export default function Configuracoes() {
     try {
       const res = await fetch(apiUrl(`/api/auth/webauthn/credentials/${credentialRowId}`), {
         method: 'DELETE',
-        headers: { 'x-user-id': usuarioIdHeader },
+        headers: horizonteApiAuthHeaders(),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
@@ -247,7 +248,7 @@ export default function Configuracoes() {
     try {
       const res = await fetch(apiUrl('/api/usuarios/perfil/telefone'), {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioIdHeader },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ telefone: check.digits }),
       })
       const data = await res.json().catch(() => ({}))
@@ -331,7 +332,7 @@ export default function Configuracoes() {
     try {
       const res = await fetch(apiUrl('/api/familia/convites'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioIdHeader },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ papel: novoConvitePapel, label: novoConviteLabel.trim() || null }),
       })
       const data = await res.json().catch(() => ({}))
@@ -357,7 +358,7 @@ export default function Configuracoes() {
       if (familiaConfirm.type === 'revoke') {
         const res = await fetch(apiUrl(`/api/familia/convites/${familiaConfirm.id}`), {
           method: 'DELETE',
-          headers: { 'x-user-id': usuarioIdHeader },
+          headers: horizonteApiAuthHeaders(),
         })
         const data = await res.json().catch(() => ({}))
         if (!res.ok) {
@@ -372,7 +373,7 @@ export default function Configuracoes() {
           ids.map((id) =>
             fetch(apiUrl(`/api/familia/convites/${id}`), {
               method: 'DELETE',
-              headers: { 'x-user-id': usuarioIdHeader },
+              headers: horizonteApiAuthHeaders(),
             }).then((r) => r.ok)
           )
         )
@@ -391,7 +392,7 @@ export default function Configuracoes() {
       } else if (familiaConfirm.type === 'remove') {
         const res = await fetch(apiUrl(`/api/familia/membros/${familiaConfirm.usuarioId}`), {
           method: 'DELETE',
-          headers: { 'x-user-id': usuarioIdHeader },
+          headers: horizonteApiAuthHeaders(),
         })
         const data = await res.json().catch(() => ({}))
         if (!res.ok) {
@@ -403,7 +404,7 @@ export default function Configuracoes() {
       } else if (familiaConfirm.type === 'sair') {
         const res = await fetch(apiUrl('/api/familia/sair'), {
           method: 'POST',
-          headers: { 'x-user-id': usuarioIdHeader },
+          headers: horizonteApiAuthHeaders(),
         })
         const data = await res.json().catch(() => ({}))
         if (!res.ok) {
@@ -428,7 +429,7 @@ export default function Configuracoes() {
     try {
       const res = await fetch(apiUrl(`/api/familia/membros/${membroId}`), {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioIdHeader },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ papel: novoPapel }),
       })
       const data = await res.json().catch(() => ({}))

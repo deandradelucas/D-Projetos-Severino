@@ -15,6 +15,8 @@ import { showToast } from '../lib/toastStore'
 import { webAuthnSupported, fetchWebAuthnStatus, loginWithWebAuthn } from '../lib/webauthnBrowser'
 import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
 import { validateEmail } from '../lib/validateEmail'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { writeHorizonteAccessToken } from '../lib/horizonteAccessToken'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
 
@@ -30,17 +32,16 @@ async function aplicarConviteFamiliaAposLogin(user) {
   try {
     const res = await fetch(apiUrl('/api/familia/aceitar'), {
       method: 'POST',
-      headers: {
+      headers: horizonteApiAuthHeaders({
         'Content-Type': 'application/json',
-        'x-user-id': String(user.id).trim(),
-      },
+      }),
       body: JSON.stringify({ token: token.trim() }),
     })
     const data = await res.json().catch(() => ({}))
     if (res.ok) {
       clearConviteTokenSession()
       const assinRes = await fetch(apiUrl('/api/assinatura/status'), {
-        headers: { 'x-user-id': String(user.id).trim() },
+        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       const assin = assinRes.ok ? await assinRes.json().catch(() => ({})) : {}
@@ -286,6 +287,7 @@ export default function Login() {
       }
 
       let u = data.user || {}
+      if (data.accessToken) writeHorizonteAccessToken(data.accessToken)
       u = await aplicarConviteFamiliaAposLogin(u)
       if (u?.id) {
         window.localStorage.setItem('horizonte_user', JSON.stringify(u))
@@ -324,6 +326,7 @@ export default function Login() {
     try {
       const data = await loginWithWebAuthn(email)
       let u = data.user || {}
+      if (data.accessToken) writeHorizonteAccessToken(data.accessToken)
       u = await aplicarConviteFamiliaAposLogin(u)
       if (u?.id) {
         window.localStorage.setItem('horizonte_user', JSON.stringify(u))

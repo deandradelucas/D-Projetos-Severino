@@ -9,6 +9,7 @@ import PagamentoDetalhesCard from '../components/pagamento/PagamentoDetalhesCard
 import PagamentoHistorico from '../components/pagamento/PagamentoHistorico.jsx'
 import PagamentoPixQrModal from '../components/pagamento/PagamentoPixQrModal.jsx'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { maskCpfCnpj, validateCpfCnpj } from '../lib/cpfCnpjUtils.js'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import {
@@ -96,14 +97,12 @@ export default function Pagamento() {
       } catch {
         uid = ''
       }
-      const cfgHeaders = uid ? { 'x-user-id': uid } : {}
-
       if (uid && u) {
         setPainelAssinatura(painelAssinaturaFromUser(u))
         if (u.assinatura_proxima_cobranca) setProximaCobranca(u.assinatura_proxima_cobranca)
         try {
           const stRes = await fetch(apiUrl('/api/assinatura/status'), {
-            headers: { 'x-user-id': uid },
+            headers: horizonteApiAuthHeaders(),
             cache: silent ? 'no-store' : undefined,
           })
           if (stRes.ok) {
@@ -132,11 +131,11 @@ export default function Pagamento() {
       }
 
       const [cfgRes, histRes] = await Promise.all([
-        fetch(apiUrl('/api/pagamentos/config'), { headers: cfgHeaders }),
+        fetch(apiUrl('/api/pagamentos/config'), { headers: horizonteApiAuthHeaders() }),
         (async () => {
           if (!uidHistorico) return { ok: false, status: 0 }
           return fetch(apiUrl('/api/pagamentos/minhas'), {
-            headers: { 'x-user-id': uidHistorico },
+            headers: horizonteApiAuthHeaders(),
             cache: silent ? 'no-store' : undefined,
           })
         })(),
@@ -302,14 +301,13 @@ export default function Pagamento() {
         window.location.href = '/login'
         return
       }
-      const u = JSON.parse(userSaved)
+      JSON.parse(userSaved)
 
       const res = await fetch(apiUrl('/api/pagamentos/preferencia'), {
         method: 'POST',
-        headers: {
+        headers: horizonteApiAuthHeaders({
           'Content-Type': 'application/json',
-          'x-user-id': u.id,
-        },
+        }),
         body: JSON.stringify({
           plano: planoCheckout === 'anual' ? 'anual' : 'mensal',
           titulo: titulo.trim() || PLANO_PADRAO_TITULO,
@@ -339,13 +337,12 @@ export default function Pagamento() {
         window.location.href = '/login'
         return
       }
-      const u = JSON.parse(userSaved)
+      JSON.parse(userSaved)
       const res = await fetch(apiUrl('/api/pagamentos/asaas/pix-anual-qrcode'), {
         method: 'POST',
-        headers: {
+        headers: horizonteApiAuthHeaders({
           'Content-Type': 'application/json',
-          'x-user-id': u.id,
-        },
+        }),
         body: JSON.stringify({ cpf_cnpj: pixCpfCnpj }),
       })
       const data = await res.json().catch(() => ({}))

@@ -1,7 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
+import { clearHorizonteAccessToken } from '../lib/horizonteAccessToken'
 
 function handleLogout(navigate) {
+  clearHorizonteAccessToken()
   localStorage.removeItem('horizonte_user')
   navigate('/login', { replace: true })
 }

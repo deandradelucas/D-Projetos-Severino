@@ -12,6 +12,7 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import TaxaSelicBadge from '../components/TaxaSelicBadge.jsx'
 import TaxaCdiBadge from '../components/TaxaCdiBadge.jsx'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
@@ -73,7 +74,7 @@ export default function Investimentos() {
     setLoading(true)
     try {
       const res = await fetch(apiUrl('/api/investimentos'), {
-        headers: { 'x-user-id': uid },
+        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
@@ -174,7 +175,7 @@ export default function Investimentos() {
     try {
       const res = await fetch(apiUrl(editingId ? `/api/investimentos/${editingId}` : '/api/investimentos'), {
         method: editingId ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': uid },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
@@ -209,7 +210,7 @@ export default function Investimentos() {
     try {
       const res = await fetch(apiUrl(`/api/investimentos/${targetId}`), {
         method: 'DELETE',
-        headers: { 'x-user-id': uid },
+        headers: horizonteApiAuthHeaders(),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       const errBody = await res.json().catch(() => ({}))
@@ -227,7 +228,7 @@ export default function Investimentos() {
     try {
       const res = await fetch(apiUrl(`/api/investimentos/${aporteTarget.id}/aportes`), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': uid },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
@@ -250,7 +251,7 @@ export default function Investimentos() {
     try {
       const res = await fetch(apiUrl(`/api/investimentos/${investimentoId}/aportes/${aporteId}`), {
         method: 'DELETE',
-        headers: { 'x-user-id': uid },
+        headers: horizonteApiAuthHeaders(),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       const data = await res.json().catch(() => ({}))

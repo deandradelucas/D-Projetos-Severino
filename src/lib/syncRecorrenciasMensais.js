@@ -1,4 +1,5 @@
 import { apiUrl } from './apiUrl'
+import { horizonteApiAuthHeaders } from './apiAuthHeaders'
 
 const SYNC_TIMEOUT_MS = 10_000
 
@@ -10,7 +11,7 @@ export async function syncRecorrenciasMensais(userId) {
   try {
     await fetch(apiUrl('/api/recorrencias-mensais/sincronizar'), {
       method: 'POST',
-      headers: { 'x-user-id': String(userId).trim() },
+      headers: horizonteApiAuthHeaders(),
       cache: 'no-store',
       signal: controller.signal,
     })

@@ -21,11 +21,12 @@ import {
 } from '../lib/transacao-validate.mjs'
 import { TransactionService } from '../lib/services/transaction-service.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 export function registerTransacoesRoutes(app) {
   app.get('/api/categorias', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -39,7 +40,7 @@ export function registerTransacoesRoutes(app) {
 
   app.get('/api/transacoes', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -79,7 +80,7 @@ export function registerTransacoesRoutes(app) {
 
   app.post('/api/transacoes', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -113,7 +114,7 @@ export function registerTransacoesRoutes(app) {
 
   app.post('/api/recorrencias-mensais/sincronizar', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -127,7 +128,7 @@ export function registerTransacoesRoutes(app) {
 
   app.get('/api/recorrencias-mensais', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -142,7 +143,7 @@ export function registerTransacoesRoutes(app) {
   app.delete('/api/recorrencias-mensais/:id', async (c) => {
     try {
       const id = c.req.param('id')
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -171,7 +172,7 @@ export function registerTransacoesRoutes(app) {
   app.put('/api/transacoes/:id', async (c) => {
     try {
       const id = c.req.param('id')
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -206,7 +207,7 @@ export function registerTransacoesRoutes(app) {
   app.delete('/api/transacoes/:id', async (c) => {
     try {
       const id = c.req.param('id')
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 

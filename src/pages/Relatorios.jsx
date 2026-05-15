@@ -4,6 +4,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { useRelatorioAggregates } from '../hooks/useRelatorioAggregates'
@@ -189,14 +190,14 @@ export default function Relatorios() {
   const fetchCategorias = useCallback(async () => {
     try {
       const res = await fetch(apiUrl('/api/categorias'), {
-        headers: { 'x-user-id': usuario.id }
+        headers: horizonteApiAuthHeaders(),
       })
       if (res.ok) {
         const data = await res.json()
         setCategorias(data || [])
       }
     } catch (err) { console.error(err) }
-  }, [usuario.id])
+  }, [])
 
   // Fetch Transacoes
   const fetchTransacoes = useCallback(async () => {
@@ -212,7 +213,7 @@ export default function Relatorios() {
       params.append('status', 'EFETIVADA') // Para relatórios, focamos nas efetivadas normalmente
 
       const res = await fetchWithRetry(apiUrl(`/api/transacoes?${params.toString()}`), {
-        headers: { 'x-user-id': String(usuario.id).trim() },
+        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (res.ok) {
@@ -226,7 +227,7 @@ export default function Relatorios() {
       setRefreshing(false)
       firstFetchDoneRef.current = true
     }
-  }, [usuario.id, filters])
+  }, [filters])
 
   useEffect(() => {
     firstFetchDoneRef.current = false

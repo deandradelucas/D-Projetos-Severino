@@ -7,11 +7,12 @@ import {
 import { getCategorias } from '../lib/transacoes.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 export function registerAiRoutes(app) {
   app.post('/api/ai/chat', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -88,7 +89,7 @@ export function registerAiRoutes(app) {
 
   app.post('/api/ai/suggest-category', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -118,7 +119,7 @@ export function registerAiRoutes(app) {
 
   app.post('/api/ai/agenda-parse', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 

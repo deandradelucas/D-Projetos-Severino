@@ -7,6 +7,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import { useTheme } from '../context/ThemeContext'
 import { useTransactionCache, TRANSACOES_REVALIDATED_EVENT } from '../context/transactionCacheStore'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import {
@@ -85,7 +86,7 @@ export default function Transacoes() {
     if (!session?.id) return
     try {
       const res = await fetch(apiUrl('/api/categorias'), {
-        headers: { 'x-user-id': session.id },
+        headers: horizonteApiAuthHeaders(),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
@@ -102,7 +103,7 @@ export default function Transacoes() {
     if (!session?.id) return
     try {
       const res = await fetch(apiUrl('/api/recorrencias-mensais'), {
-        headers: { 'x-user-id': session.id },
+        headers: horizonteApiAuthHeaders(),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
@@ -144,7 +145,7 @@ export default function Transacoes() {
     try {
       await syncRecorrenciasMensais(session.id)
       const res = await fetchWithRetry(apiUrl(`/api/transacoes?${buildTxQuery(0).toString()}`), {
-        headers: { 'x-user-id': String(session.id).trim() },
+        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
@@ -171,7 +172,7 @@ export default function Transacoes() {
     try {
       const offset = transacoes.length
       const res = await fetchWithRetry(apiUrl(`/api/transacoes?${buildTxQuery(offset).toString()}`), {
-        headers: { 'x-user-id': String(session.id).trim() },
+        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
@@ -218,7 +219,7 @@ export default function Transacoes() {
     try {
       const res = await fetch(apiUrl(`/api/recorrencias-mensais/${id}`), {
         method: 'DELETE',
-        headers: { 'x-user-id': session.id },
+        headers: horizonteApiAuthHeaders(),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) fetchRecorrencias()
@@ -251,7 +252,7 @@ export default function Transacoes() {
     try {
       const res = await fetch(apiUrl(`/api/transacoes/${id}`), {
         method: 'DELETE',
-        headers: { 'x-user-id': session.id },
+        headers: horizonteApiAuthHeaders(),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {

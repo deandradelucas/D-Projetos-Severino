@@ -1,5 +1,6 @@
 import { log } from '../lib/logger.mjs'
 import { clientIpFromHono } from '../lib/http/client-ip.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 export async function httpRequestLogger(c, next) {
   const start = Date.now()
@@ -11,7 +12,7 @@ export async function httpRequestLogger(c, next) {
     path: c.req.path,
     status,
     duration_ms: duration,
-    user_id: c.req.header('x-user-id') || null,
+    user_id: resolveRequestUserId(c) || null,
     client_ip: clientIpFromHono(c),
   })
 }
@@ -25,6 +26,6 @@ export async function pagamentosRequestLogger(c, next) {
     method: c.req.method,
     status: c.res?.status || 200,
     duration_ms: duration,
-    user_id: c.req.header('x-user-id') || null,
+    user_id: resolveRequestUserId(c) || null,
   })
 }

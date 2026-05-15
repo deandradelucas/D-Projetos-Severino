@@ -10,11 +10,12 @@ import {
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { isUuidString } from '../lib/transacao-validate.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 export function registerInvestimentosRoutes(app) {
   app.get('/api/investimentos', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -28,7 +29,7 @@ export function registerInvestimentosRoutes(app) {
 
   app.post('/api/investimentos', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -66,7 +67,7 @@ export function registerInvestimentosRoutes(app) {
   app.patch('/api/investimentos/:id', async (c) => {
     try {
       const id = c.req.param('id')
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
@@ -107,7 +108,7 @@ export function registerInvestimentosRoutes(app) {
   app.delete('/api/investimentos/:id', async (c) => {
     try {
       const id = c.req.param('id')
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
@@ -130,7 +131,7 @@ export function registerInvestimentosRoutes(app) {
   app.post('/api/investimentos/:id/aportes', async (c) => {
     try {
       const id = c.req.param('id')
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
@@ -165,7 +166,7 @@ export function registerInvestimentosRoutes(app) {
     try {
       const id = c.req.param('id')
       const aporteId = c.req.param('aporteId')
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id) || !isUuidString(aporteId)) return c.json({ message: 'ID inválido.' }, 400)

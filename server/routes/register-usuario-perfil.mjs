@@ -1,6 +1,7 @@
 import { log } from '../lib/logger.mjs'
 import { assertAcessoAppUsuario } from '../lib/assinatura.mjs'
 import { atualizarTelefoneUsuario, getPerfilUsuario } from '../lib/usuarios.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 function validarCelularBr(raw) {
   const digits = String(raw || '').replace(/\D/g, '')
@@ -16,7 +17,7 @@ function validarCelularBr(raw) {
 export function registerUsuarioPerfilRoutes(app) {
   app.get('/api/usuarios/perfil', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
 
       const gate = await assertAcessoAppUsuario(usuarioId)
@@ -32,7 +33,7 @@ export function registerUsuarioPerfilRoutes(app) {
 
   app.patch('/api/usuarios/perfil/telefone', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
 
       const gate = await assertAcessoAppUsuario(usuarioId)
