@@ -38,7 +38,7 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell button.ref-panel__lin
   border: 1px solid rgba(226, 232, 240, 0.98);
 }
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-panels {
-  gap: 14px;
+  gap: 18px;
   align-content: start;
 }
 body[data-theme='dark'] .page-transacoes-rec-head__flag {

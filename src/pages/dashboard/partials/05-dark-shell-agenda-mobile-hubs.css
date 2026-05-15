@@ -2277,7 +2277,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-panels {
     position: relative !important;
     z-index: 3 !important;
-    gap: 14px !important;
+    gap: 18px !important;
     margin: -8px 0 0 !important;
   }
 

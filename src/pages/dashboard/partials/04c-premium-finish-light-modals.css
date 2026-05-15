@@ -1387,7 +1387,7 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 18px;
     padding: 0;
     min-width: 0;
   }
