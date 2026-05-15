@@ -100,7 +100,7 @@ export const COMPRAS_E_VAREJO_CATEGORIA_ICON_SRC =
 
 /** Ícone raster para a categoria «Alimentação». */
 export const ALIMENTACAO_CATEGORIA_ICON_SRC =
-  '/images/icons/' + encodeURIComponent('Alimentação.png')
+  '/images/icons/' + encodeURIComponent('Alimentação-3D.png')
 
 /** Ícone raster para a categoria «Cuidados Pessoais». */
 export const CUIDADOS_PESSOAIS_CATEGORIA_ICON_SRC =

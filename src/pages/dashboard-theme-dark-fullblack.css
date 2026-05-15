@@ -558,7 +558,7 @@ body[data-theme='dark'] .btn-delete {
 }
 
 /* PNG de categoria não herda `color`; tintura ~ --danger neo (#ff4d67), como a borda do quadrado. */
-body[data-theme='dark'] .ref-tx-arrow-wrap--down img {
+body[data-theme='dark'] .ref-tx-arrow-wrap--down img:not(.transacao-categoria-icon__img) {
   filter: brightness(0) saturate(100%) invert(52%) sepia(94%) saturate(3844%) hue-rotate(319deg) brightness(103%) contrast(101%);
 }
 

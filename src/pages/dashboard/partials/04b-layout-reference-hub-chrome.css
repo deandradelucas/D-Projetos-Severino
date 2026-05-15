@@ -1891,8 +1891,17 @@ body[data-theme='light'] .ref-tx-arrow-wrap--down {
 }
 
 /* Ícones raster (PNG): não herdam `color` — tintura ~ --danger (#ef4444 claro). */
-body[data-theme='light'] .ref-tx-arrow-wrap--down img {
+body[data-theme='light'] .ref-tx-arrow-wrap--down img:not(.transacao-categoria-icon__img) {
   filter: brightness(0) saturate(100%) invert(35%) sepia(93%) saturate(7456%) hue-rotate(342deg) brightness(97%) contrast(96%);
+}
+
+/* PNG de categoria (assets): mantém cores originais e preenche o quadrado do ícone */
+body[data-theme='light'] .ref-tx-arrow-wrap img.transacao-categoria-icon__img,
+body[data-theme='dark'] .ref-tx-arrow-wrap img.transacao-categoria-icon__img {
+  filter: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
 }
 
 body[data-theme='light'] .ref-tx-date {
