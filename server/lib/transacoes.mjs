@@ -55,13 +55,24 @@ export async function getCategorias(usuarioId) {
 
   if (subError) throw subError
 
-  return categorias.map((c) => {
-    return {
-      ...c,
-      tipo: normalizeTipoCategoria(c.tipo),
-      subcategorias: (subcategorias || []).filter((sub) => sub.categoria_id === c.id),
-    }
-  })
+  const comSubs = categorias.map((c) => ({
+    ...c,
+    tipo: normalizeTipoCategoria(c.tipo),
+    subcategorias: (subcategorias || []).filter((sub) => sub.categoria_id === c.id),
+  }))
+
+  /* Uma linha por (nome, tipo): evita duplicados no UI quando o banco tem categorias repetidas (ex.: RECEITA). */
+  const visto = new Set()
+  const dedup = []
+  for (const c of comSubs) {
+    const k = _categoriaChaveUnica(c.nome, c.tipo)
+    if (visto.has(k)) continue
+    visto.add(k)
+    dedup.push(c)
+  }
+  return dedup.sort((a, b) =>
+    String(a.nome ?? '').localeCompare(String(b.nome ?? ''), 'pt', { sensitivity: 'base' }),
+  )
 }
 /** Fonte única para seed + fallback de IA (WhatsApp). Manter nomes alinhados. */
 export const DEFAULT_CATEGORIES = [

@@ -595,12 +595,19 @@ export default function Transacoes() {
                       <div className="ref-tx-cat-cell">
                         <span className="ref-tx-field-label">Categoria</span>
                         <p className="ref-tx-cat-text">
-                          {catNome}
-                          {t.recorrente_index ? (
-                            <span className="ref-tx-rec-badge">
-                              {t.recorrente_index}/{t.recorrente_total}
-                            </span>
-                          ) : null}
+                          <span
+                            className={`ref-tx-tipo-pulse ${isRec ? 'ref-tx-tipo-pulse--receita' : 'ref-tx-tipo-pulse--despesa'}`}
+                            role="img"
+                            aria-label={isRec ? 'Receita' : 'Despesa'}
+                          />
+                          <span className="ref-tx-cat-text__label">
+                            {catNome}
+                            {t.recorrente_index ? (
+                              <span className="ref-tx-rec-badge">
+                                {t.recorrente_index}/{t.recorrente_total}
+                              </span>
+                            ) : null}
+                          </span>
                         </p>
                       </div>
                       <div className="ref-tx-sub-cell">

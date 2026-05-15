@@ -146,6 +146,60 @@ describe('getTransacaoCategoriaIconKey', () => {
     expect(getTransacaoCategoriaIconKey('Trabalho e Negócios', 'Salário')).toBe('trabalhoNegociosPng')
   })
 
+  it('Trabalho e Negócios + Renda principal → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Trabalho e Negócios', 'Renda principal')).toBe('rendaPrincipalPng')
+  })
+
+  it('categoria Renda principal → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Renda principal', '—')).toBe('rendaPrincipalPng')
+  })
+
+  it('Receitas + Renda principal → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Receitas', 'Renda principal')).toBe('rendaPrincipalPng')
+  })
+
+  it('Trabalho e Negócios + Renda extra → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Trabalho e Negócios', 'Renda extra')).toBe('rendaExtraPng')
+  })
+
+  it('categoria Renda extra → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Renda extra', '—')).toBe('rendaExtraPng')
+  })
+
+  it('Receitas + Renda Extra → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Receitas', 'Renda Extra')).toBe('rendaExtraPng')
+  })
+
+  it('Trabalho e Negócios + Rendimentos e Benefícios → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Trabalho e Negócios', 'Rendimentos e Benefícios')).toBe(
+      'rendimentosBeneficiosPng',
+    )
+  })
+
+  it('categoria Rendimentos e Benefícios → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Rendimentos e Benefícios', '—')).toBe('rendimentosBeneficiosPng')
+  })
+
+  it('Trabalho e Negócios + Receitas eventuais → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Trabalho e Negócios', 'Receitas eventuais')).toBe('receitasEventuaisPng')
+  })
+
+  it('categoria Receitas eventuais → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Receitas eventuais', '—')).toBe('receitasEventuaisPng')
+  })
+
+  it('Trabalho e Negócios + Rendas PJ → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Trabalho e Negócios', 'Rendas PJ')).toBe('rendasPjPng')
+  })
+
+  it('subcategoria Empresa → PNG Rendas PJ', () => {
+    expect(getTransacaoCategoriaIconKey('Trabalho e Negócios', 'Empresa')).toBe('rendasPjPng')
+  })
+
+  it('texto Rendas PJ / Empresa → PNG dedicado', () => {
+    expect(getTransacaoCategoriaIconKey('Trabalho e Negócios', 'Rendas PJ / Empresa')).toBe('rendasPjPng')
+  })
+
   it('Viagens → PNG da categoria', () => {
     expect(getTransacaoCategoriaIconKey('Viagens', '—')).toBe('viagensPng')
   })
