@@ -1341,6 +1341,17 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
+  /* Mesma linha que «Nova transação»: strip 07 usa o mesmo bottom que 02b (78 / 70+safe); chat 50px vs pill 42px ⇒ base −4px. */
+  body:has(.mobile-bottom-nav):has(.dashboard-mobile-fabs) .horizon-chat-fab {
+    bottom: calc(max(78px, calc(70px + var(--safe-bottom, env(safe-area-inset-bottom, 0px)))) - 4px) !important;
+    right: max(22px, calc(20px + env(safe-area-inset-right, 0px))) !important;
+  }
+
+  body:has(.mobile-bottom-nav):has(.dashboard-mobile-tx-fab):not(:has(.dashboard-mobile-fabs)) .horizon-chat-fab {
+    bottom: calc(max(78px, calc(70px + var(--safe-bottom, env(safe-area-inset-bottom, 0px)))) - 4px) !important;
+    right: max(22px, calc(20px + env(safe-area-inset-right, 0px))) !important;
+  }
+
   body:has(.mobile-bottom-nav) .horizon-chat-window {
     bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important;
   }
@@ -1352,13 +1363,14 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
  */
 @media (max-width: 768px) {
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table {
-    overflow: hidden;
+    /* hidden cortava o anel da bolinha nas linhas; cantos vêm do cartão .ref-tx-row */
+    overflow: visible;
   }
 
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-list {
     max-height: min(62dvh, 560px);
     overflow-y: auto;
-    overflow-x: clip;
+    overflow-x: visible;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     scrollbar-color: rgba(148, 163, 184, 0.6) transparent;
@@ -1380,8 +1392,8 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
   }
 
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-list {
-    padding-left: 4px;
-    padding-right: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions {
@@ -1796,7 +1808,8 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     margin: 0;
     padding: 13px;
     border-radius: 18px;
-    overflow: hidden;
+    /* visible: overflow:hidden cortava a bolinha (.ref-tx-tipo-pulse) e o pulso (box-shadow) */
+    overflow: visible;
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row {

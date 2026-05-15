@@ -459,10 +459,14 @@ export default function Relatorios() {
             <>
               <article className="ref-kpi-card ref-kpi-card--income">
                 <div className="ref-kpi-card__icon" aria-hidden>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 19V5" />
-                    <path d="m5 12 7-7 7 7" />
-                  </svg>
+                  <img
+                    className="ref-kpi-card__icon-img"
+                    src="/images/icons/setacima.png"
+                    alt=""
+                    width={22}
+                    height={22}
+                    decoding="async"
+                  />
                 </div>
                 <div className="ref-kpi-card__body">
                   <p className="ref-kpi-card__label">Receitas</p>
@@ -471,10 +475,14 @@ export default function Relatorios() {
               </article>
               <article className="ref-kpi-card ref-kpi-card--expense">
                 <div className="ref-kpi-card__icon" aria-hidden>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 5v14" />
-                    <path d="m19 12-7 7-7-7" />
-                  </svg>
+                  <img
+                    className="ref-kpi-card__icon-img"
+                    src="/images/icons/setabaixo.png"
+                    alt=""
+                    width={22}
+                    height={22}
+                    decoding="async"
+                  />
                 </div>
                 <div className="ref-kpi-card__body">
                   <p className="ref-kpi-card__label">Despesas</p>

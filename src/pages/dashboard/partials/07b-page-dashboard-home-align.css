@@ -240,20 +240,26 @@ body[data-theme='dark']
   }
 }
 
-/* FAB fixo no Visão Geral: mesmo dourado sólido que o «+ Nova transação» em Transações */
+/* FAB fixo — Visão Geral: vitrificado + borda fina dourada (accent), sem fundo sólido */
 body:not([data-theme='dark']):has(
     .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(
         .page-investimentos
       )
   )
   .dashboard-mobile-tx-fab {
-  border: 1px solid rgba(0, 0, 0, 0.14) !important;
-  background: #b58d3d !important;
-  background-image: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14) !important;
-  color: #111111 !important;
+  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 72%, transparent) !important;
+  background: linear-gradient(
+    172deg,
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(255, 255, 255, 0.22) 48%,
+    rgba(255, 255, 255, 0.38) 100%
+  ) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.28) !important;
+  backdrop-filter: blur(20px) saturate(1.28) !important;
+  box-shadow:
+    0 10px 28px -14px rgba(15, 23, 42, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.05) !important;
 }
 
 body[data-theme='dark']:has(
@@ -262,13 +268,21 @@ body[data-theme='dark']:has(
       )
   )
   .dashboard-mobile-tx-fab {
-  border: 1px solid rgba(0, 0, 0, 0.22) !important;
-  background: #c4a052 !important;
-  background-image: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
-  color: #111111 !important;
+  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 52%, rgba(255, 255, 255, 0.12)) !important;
+  background:
+    linear-gradient(
+      158deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.04) 38%,
+      transparent 62%
+    ),
+    rgba(15, 23, 42, 0.38) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.22) !important;
+  backdrop-filter: blur(22px) saturate(1.22) !important;
+  box-shadow:
+    0 14px 36px -20px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
 }
 
 body:not([data-theme='dark']):has(
@@ -277,11 +291,11 @@ body:not([data-theme='dark']):has(
       )
   )
   .dashboard-mobile-tx-fab__icon {
-  background: rgba(0, 0, 0, 0.1) !important;
-  color: #111111 !important;
+  background: rgba(15, 23, 42, 0.07) !important;
+  color: rgba(15, 23, 42, 0.72) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.06) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.06) !important;
 }
 
 body[data-theme='dark']:has(
@@ -290,11 +304,11 @@ body[data-theme='dark']:has(
       )
   )
   .dashboard-mobile-tx-fab__icon {
-  background: rgba(0, 0, 0, 0.12) !important;
-  color: #111111 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28) !important;
 }
 
 body:not([data-theme='dark']):has(
@@ -303,13 +317,12 @@ body:not([data-theme='dark']):has(
       )
   )
   .dashboard-mobile-tx-fab__label {
-  color: #111111 !important;
-  -webkit-text-fill-color: #111111 !important;
-  background: none !important;
-  background-image: none !important;
-  -webkit-background-clip: border-box !important;
-  background-clip: border-box !important;
-  font-weight: 700 !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  background: linear-gradient(185deg, #c9a227 0%, #b58d3d 42%, #7a5a18 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  font-weight: 800 !important;
 }
 
 body[data-theme='dark']:has(
@@ -318,13 +331,12 @@ body[data-theme='dark']:has(
       )
   )
   .dashboard-mobile-tx-fab__label {
-  color: #111111 !important;
-  -webkit-text-fill-color: #111111 !important;
-  background: none !important;
-  background-image: none !important;
-  -webkit-background-clip: border-box !important;
-  background-clip: border-box !important;
-  font-weight: 700 !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  background: linear-gradient(185deg, #f0deaa 0%, #d4a84b 45%, #b58d3d 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  font-weight: 800 !important;
 }
 
 body:not([data-theme='dark']):has(

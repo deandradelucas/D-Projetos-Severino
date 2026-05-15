@@ -8,7 +8,6 @@ export default function TaxaSelicBadge({ variant = 'hero' }) {
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState('')
   const [valorFmt, setValorFmt] = useState('')
-  const [dataRef, setDataRef] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -17,7 +16,6 @@ export default function TaxaSelicBadge({ variant = 'hero' }) {
         if (cancelled) return
         setErr('')
         setValorFmt(formatSelicPercentPtBr(data.valor_aa))
-        setDataRef(data.data_referencia ? `Ref. ${data.data_referencia}` : '')
       })
       .catch((e) => {
         if (cancelled) return
@@ -61,14 +59,7 @@ export default function TaxaSelicBadge({ variant = 'hero' }) {
           Indisponível
         </span>
       ) : (
-        <>
-          <span className="taxa-selic-badge__pill">{valorFmt}</span>
-          {dataRef ? (
-            <span className="taxa-selic-badge__ref" title="Data da última observação na série do BCB">
-              {dataRef}
-            </span>
-          ) : null}
-        </>
+        <span className="taxa-selic-badge__pill">{valorFmt}</span>
       )}
     </div>
   )

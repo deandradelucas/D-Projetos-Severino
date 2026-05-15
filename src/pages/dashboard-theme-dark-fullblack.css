@@ -858,7 +858,7 @@ body[data-theme='dark'] .mobile-bottom-nav__item--active {
 }
 
 body[data-theme='dark'] .dashboard-mobile-tx-fab {
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 48%, rgba(255, 255, 255, 0.12)) !important;
   background:
     linear-gradient(
       148deg,
