@@ -314,7 +314,14 @@ export default function Dashboard() {
                         </div>
                         <div className="ref-tx-cat-cell">
                           <span className="ref-tx-field-label">Categoria</span>
-                          <p className="ref-tx-cat-text break-words">{catNome}</p>
+                          <p className="ref-tx-cat-text break-words">
+                            <span
+                              className={`ref-tx-tipo-pulse ${isRec ? 'ref-tx-tipo-pulse--receita' : 'ref-tx-tipo-pulse--despesa'}`}
+                              role="img"
+                              aria-label={isRec ? 'Receita' : 'Despesa'}
+                            />
+                            <span className="ref-tx-cat-text__label">{catNome}</span>
+                          </p>
                         </div>
                         <div className="ref-tx-sub-cell">
                           <span className="ref-tx-field-label">Subcategoria</span>

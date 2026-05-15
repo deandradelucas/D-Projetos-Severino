@@ -18,6 +18,40 @@ export function getTransacaoCategoriaIconKey(categoriaNome, subcategoriaNome) {
   const s = norm(subcategoriaNome)
   const hay = `${c} ${s}`
 
+  /* Antes de PNG genérico «Trabalho e Negócios» e heurísticas de carteira. */
+  if (/\brenda principal\b/.test(hay) || c === 'renda principal' || s === 'renda principal') {
+    return 'rendaPrincipalPng'
+  }
+  if (/\brenda extra\b/.test(hay) || c === 'renda extra' || s === 'renda extra') {
+    return 'rendaExtraPng'
+  }
+  if (
+    /\brendimentos e beneficios\b/.test(hay) ||
+    c === 'rendimentos e beneficios' ||
+    s === 'rendimentos e beneficios'
+  ) {
+    return 'rendimentosBeneficiosPng'
+  }
+  if (
+    /\breceitas eventuais\b/.test(hay) ||
+    c === 'receitas eventuais' ||
+    s === 'receitas eventuais'
+  ) {
+    return 'receitasEventuaisPng'
+  }
+  if (
+    /\brendas pj\b|\brenda pj\b/.test(hay) ||
+    /\brendas pj\s*\/\s*empresa\b/.test(hay) ||
+    c === 'rendas pj' ||
+    s === 'rendas pj' ||
+    c === 'renda pj' ||
+    s === 'renda pj' ||
+    c === 'empresa' ||
+    s === 'empresa'
+  ) {
+    return 'rendasPjPng'
+  }
+
   const test = (patterns, key) => {
     for (const p of patterns) {
       if (p.test(hay) || p.test(s) || p.test(c)) return key
@@ -158,6 +192,25 @@ export const TRABALHO_E_NEGOCIOS_CATEGORIA_ICON_SRC =
 export const VIAGENS_CATEGORIA_ICON_SRC =
   '/images/icons/' + encodeURIComponent('Viagens.png')
 
+/** Ícone raster — «Renda principal» (receitas). */
+export const RENDA_PRINCIPAL_CATEGORIA_ICON_SRC = '/images/icons/RendaPrincipal.png'
+
+/** Ícone raster — «Renda extra» (receitas). */
+export const RENDA_EXTRA_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Renda Extra.png')
+
+/** Ícone raster — «Rendimentos e Benefícios» (receitas). */
+export const RENDIMENTOS_E_BENEFICIOS_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Rendimentos e Benefícios.png')
+
+/** Ícone raster — «Receitas eventuais» (receitas). */
+export const RECEITAS_EVENTUAIS_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Receitas Eventuais.png')
+
+/** Ícone raster — «Rendas PJ» / Empresa (receitas). */
+export const RENDAS_PJ_CATEGORIA_ICON_SRC =
+  '/images/icons/' + encodeURIComponent('Rendas PJ.png')
+
 /** Chaves que renderizam `<img>` em `TransacaoCategoriaIcon`. */
 export const RASTER_CATEGORIA_ICON_SRC_BY_KEY = {
   transportePng: TRANSPORTE_CATEGORIA_ICON_SRC,
@@ -172,6 +225,11 @@ export const RASTER_CATEGORIA_ICON_SRC_BY_KEY = {
   lazerEntreterimentoPng: LAZER_E_ENTRETERIMENTO_CATEGORIA_ICON_SRC,
   moradiaPng: MORADIA_CATEGORIA_ICON_SRC,
   petsDependentesPng: PETS_E_DEPENDENTES_CATEGORIA_ICON_SRC,
+  rendaPrincipalPng: RENDA_PRINCIPAL_CATEGORIA_ICON_SRC,
+  rendaExtraPng: RENDA_EXTRA_CATEGORIA_ICON_SRC,
+  rendimentosBeneficiosPng: RENDIMENTOS_E_BENEFICIOS_CATEGORIA_ICON_SRC,
+  receitasEventuaisPng: RECEITAS_EVENTUAIS_CATEGORIA_ICON_SRC,
+  rendasPjPng: RENDAS_PJ_CATEGORIA_ICON_SRC,
   saudePng: SAUDE_CATEGORIA_ICON_SRC,
   servicosAssinaturasPng: SERVICOS_E_ASSINATURAS_CATEGORIA_ICON_SRC,
   tecnologiaGadgetsPng: TECNOLOGIA_E_GADGETS_CATEGORIA_ICON_SRC,
@@ -221,6 +279,11 @@ export const LISTA_ICONES_CATEGORIA_TRANSACOES = [
   { id: 'documentacaoImpostosPng', assetSrc: DOCUMENTACAO_E_IMPOSTOS_CATEGORIA_ICON_SRC, nomeIcone: 'Documentação e Impostos', categorias: 'Documentação e Impostos', palavras: 'todas as subcategorias' },
   { id: 'educacaoPng', assetSrc: EDUCACAO_CATEGORIA_ICON_SRC, nomeIcone: 'Educação', categorias: 'Educação', palavras: 'todas as subcategorias' },
   { id: 'investimentosPatrimonioPng', assetSrc: INVESTIMENTOS_E_PATRIMONIO_CATEGORIA_ICON_SRC, nomeIcone: 'Investimentos e Patrimônio', categorias: 'Investimentos e Patrimônio', palavras: 'todas as subcategorias' },
+  { id: 'rendaPrincipalPng', assetSrc: RENDA_PRINCIPAL_CATEGORIA_ICON_SRC, nomeIcone: 'Renda principal', categorias: 'Receitas; Trabalho e Negócios', palavras: 'categoria ou subcategoria «Renda principal»' },
+  { id: 'rendaExtraPng', assetSrc: RENDA_EXTRA_CATEGORIA_ICON_SRC, nomeIcone: 'Renda extra', categorias: 'Receitas; Trabalho e Negócios', palavras: 'categoria ou subcategoria «Renda extra»' },
+  { id: 'rendimentosBeneficiosPng', assetSrc: RENDIMENTOS_E_BENEFICIOS_CATEGORIA_ICON_SRC, nomeIcone: 'Rendimentos e Benefícios', categorias: 'Receitas; Trabalho e Negócios', palavras: 'categoria ou subcategoria «Rendimentos e Benefícios»' },
+  { id: 'receitasEventuaisPng', assetSrc: RECEITAS_EVENTUAIS_CATEGORIA_ICON_SRC, nomeIcone: 'Receitas eventuais', categorias: 'Receitas; Trabalho e Negócios', palavras: 'categoria ou subcategoria «Receitas eventuais»' },
+  { id: 'rendasPjPng', assetSrc: RENDAS_PJ_CATEGORIA_ICON_SRC, nomeIcone: 'Rendas PJ / Empresa', categorias: 'Receitas; Trabalho e Negócios', palavras: '«Rendas PJ», «Renda PJ», «Rendas PJ / Empresa» ou «Empresa»' },
   { id: 'lazerEntreterimentoPng', assetSrc: LAZER_E_ENTRETERIMENTO_CATEGORIA_ICON_SRC, nomeIcone: 'Lazer e Entreterimento', categorias: 'Lazer e Entreterimento; Lazer e Entretenimento', palavras: 'todas as subcategorias' },
   { id: 'moradiaPng', assetSrc: MORADIA_CATEGORIA_ICON_SRC, nomeIcone: 'Moradia', categorias: 'Moradia', palavras: 'todas as subcategorias' },
   { id: 'petsDependentesPng', assetSrc: PETS_E_DEPENDENTES_CATEGORIA_ICON_SRC, nomeIcone: 'Pets e Dependentes', categorias: 'Pets e Dependentes', palavras: 'todas as subcategorias' },
