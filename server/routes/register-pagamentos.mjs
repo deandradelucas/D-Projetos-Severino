@@ -133,7 +133,6 @@ export function registerPagamentosRoutes(app) {
       const externalRef = `hf-${usuarioId}-${randomUUID()}`
 
       const labelCiclo = plano === 'anual' ? 'anual' : 'mensal'
-      const billingTypes = ['CREDIT_CARD']
 
       const resultado = await criarAssinaturaComLink({
         baseUrlApp: baseUrl,

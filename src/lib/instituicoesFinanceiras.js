@@ -129,7 +129,7 @@ function normalizeBusca(s) {
 /** Partes do nome para corresponder “começa com…” em cada palavra (ex.: “Bradesco” em “Banco Bradesco”). */
 function segmentosNomeNormalizado(nomeNorm) {
   return nomeNorm
-    .split(/[\s/,\u2014\-]+/)
+    .split(/[\s/,\u2014-]+/)
     .map((p) => p.replace(/[()[\]{}]/g, ''))
     .filter(Boolean)
 }

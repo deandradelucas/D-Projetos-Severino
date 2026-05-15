@@ -75,12 +75,6 @@ function formatYmd(d) {
   return `${y}-${m}-${day}`
 }
 
-function addYears(d, n) {
-  const x = new Date(d.getTime())
-  x.setUTCFullYear(x.getUTCFullYear() + n)
-  return x
-}
-
 /**
  * @param {string} path - relativo à base (ex.: `/payments/xyz`)
  * @param {RequestInit} options
@@ -116,18 +110,6 @@ export async function buscarAssinaturaAsaas(subscriptionId) {
   const id = String(subscriptionId || '').trim()
   if (!id) throw new Error('ID de assinatura inválido.')
   return asaasFetch(`/subscriptions/${encodeURIComponent(id)}`, { method: 'GET' })
-}
-
-/** @param {unknown} v */
-function normalizeBillingTypes(v) {
-  const allowed = new Set(['CREDIT_CARD', 'PIX'])
-  if (!Array.isArray(v) || v.length === 0) return ['CREDIT_CARD', 'PIX']
-  const out = []
-  for (const x of v) {
-    const s = String(x || '').trim().toUpperCase()
-    if (allowed.has(s) && !out.includes(s)) out.push(s)
-  }
-  return out.length > 0 ? out : ['CREDIT_CARD', 'PIX']
 }
 
 /**
