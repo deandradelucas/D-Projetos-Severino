@@ -51,14 +51,24 @@ function applyThemeToDocument(theme) {
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => readStoredTheme())
-  const [privacyMode, setPrivacyMode] = useState(() => localStorage.getItem('horizonte_privacy') === 'true')
+  const [privacyMode, setPrivacyMode] = useState(() => {
+    try {
+      return localStorage.getItem('horizonte_privacy') === 'true'
+    } catch {
+      return false
+    }
+  })
 
   useLayoutEffect(() => {
     applyThemeToDocument(theme)
   }, [theme])
 
   useEffect(() => {
-    localStorage.setItem('horizonte_privacy', privacyMode ? 'true' : 'false')
+    try {
+      localStorage.setItem('horizonte_privacy', privacyMode ? 'true' : 'false')
+    } catch {
+      /* quota / private mode */
+    }
   }, [privacyMode])
 
   const setTheme = (t) => {

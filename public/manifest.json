@@ -14,25 +14,25 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "/icons/pwa-app-icon.png",
+      "src": "/icons/pwa-192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any"
     },
     {
-      "src": "/icons/pwa-app-icon.png",
+      "src": "/icons/pwa-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
     },
     {
-      "src": "/icons/pwa-app-icon.png",
+      "src": "/icons/pwa-192-maskable.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "maskable"
     },
     {
-      "src": "/icons/pwa-app-icon.png",
+      "src": "/icons/pwa-512-maskable.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
@@ -46,8 +46,8 @@
       "url": "/dashboard?acao=nova-transacao",
       "icons": [
         {
-          "src": "/icons/pwa-app-icon.png",
-          "sizes": "192x192",
+          "src": "/icons/pwa-512.png",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]
@@ -59,8 +59,8 @@
       "url": "/transacoes",
       "icons": [
         {
-          "src": "/icons/pwa-app-icon.png",
-          "sizes": "192x192",
+          "src": "/icons/pwa-512.png",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]
@@ -72,8 +72,8 @@
       "url": "/relatorios",
       "icons": [
         {
-          "src": "/icons/pwa-app-icon.png",
-          "sizes": "192x192",
+          "src": "/icons/pwa-512.png",
+          "sizes": "512x512",
           "type": "image/png"
         }
       ]

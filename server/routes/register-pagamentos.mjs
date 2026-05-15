@@ -95,7 +95,7 @@ export function registerPagamentosRoutes(app) {
         return c.json({ message: 'Não autorizado.' }, 401)
       }
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`asaas-checkout:${usuarioId}:${ip}`, 15, 60 * 60_000)) {
+      if (!await rateLimitTake(`asaas-checkout:${usuarioId}:${ip}`, 15, 60 * 60_000)) {
         return c.json({ message: 'Limite de solicitações de pagamento. Tente de novo em até uma hora.' }, 429)
       }
       if (!isAsaasConfigured()) {
@@ -195,7 +195,7 @@ export function registerPagamentosRoutes(app) {
         return c.json({ message: 'Não autorizado.' }, 401)
       }
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`asaas-pix-qr:${usuarioId}:${ip}`, 10, 60 * 60_000)) {
+      if (!await rateLimitTake(`asaas-pix-qr:${usuarioId}:${ip}`, 10, 60 * 60_000)) {
         return c.json({ message: 'Limite de pedidos de QR Pix. Tente de novo em até uma hora.' }, 429)
       }
       if (!isAsaasConfigured()) {
@@ -269,7 +269,7 @@ export function registerPagamentosRoutes(app) {
         return c.json({ message: 'Não autorizado.' }, 401)
       }
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`stripe-checkout:${usuarioId}:${ip}`, 15, 60 * 60_000)) {
+      if (!await rateLimitTake(`stripe-checkout:${usuarioId}:${ip}`, 15, 60 * 60_000)) {
         return c.json({ message: 'Limite de solicitações de pagamento. Tente de novo em até uma hora.' }, 429)
       }
       if (!isStripeConfigured()) {
@@ -346,8 +346,14 @@ export function registerPagamentosRoutes(app) {
       log.warn('[asaas webhook] ASAAS_WEBHOOK_TOKEN não configurado — requisição rejeitada')
       return c.json({ message: 'Webhook não configurado.' }, 503)
     }
+    /* Asaas envia o token no header asaas-access-token; fallback para ?token= (legado). */
+    const headerTok = String(c.req.header('asaas-access-token') || '').trim()
     const url = new URL(c.req.url)
-    const tok = url.searchParams.get('token') || ''
+    const queryTok = String(url.searchParams.get('token') || '').trim()
+    const tok = headerTok || queryTok
+    if (!headerTok && queryTok) {
+      log.warn('[asaas webhook] token via query string (deprecado) — mover para header asaas-access-token')
+    }
     if (tok !== secret) {
       return c.json({ message: 'Forbidden.' }, 403)
     }

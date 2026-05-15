@@ -424,6 +424,31 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
   return { ...base, ...familiaQuemLancouPayload, ...familiaTitularNomePayload }
 }
 
+/**
+ * Payload de fallback de assinatura usado quando buildAssinaturaUsuarioPayload falha.
+ * Garante acesso temporário (acesso_app_liberado: true) para não bloquear o usuário por falha de infra.
+ */
+export function buildAssinaturaFallbackPayload(baseUser) {
+  return {
+    ...baseUser,
+    trial_ends_at: null,
+    bem_vindo_pagamento_visto_at: null,
+    assinatura_paga: false,
+    acesso_app_liberado: true,
+    mostrar_bem_vindo_assinatura: false,
+    trial_dias_gratis: 7,
+    assinatura_proxima_cobranca: null,
+    assinatura_asaas_status: null,
+    plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
+    assinatura_situacao: 'inativa',
+    assinatura_asaas_bloqueada: false,
+    motivo_bloqueio_acesso: null,
+    asaas_portal_url: null,
+    familia_mostrar_quem_lancou: false,
+    conta_familiar_titular_nome: null,
+  }
+}
+
 export async function marcarBemVindoPagamentoVisto(usuarioId) {
   const uid = String(usuarioId || '').trim()
   let targetId = uid

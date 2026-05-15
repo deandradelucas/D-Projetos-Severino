@@ -53,7 +53,7 @@ export function registerTransacoesRoutes(app) {
       }
 
       const ip = clientIpFromHono(c)
-      if (!rateLimitTake(`tx-list:${parsed.actorId}:${ip}`, 240, 60_000)) {
+      if (!await rateLimitTake(`tx-list:${parsed.actorId}:${ip}`, 240, 60_000)) {
         return c.json({ message: 'Muitas consultas. Aguarde um momento.' }, 429)
       }
 
@@ -84,7 +84,7 @@ export function registerTransacoesRoutes(app) {
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      if (!rateLimitTake(`tx-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      if (!await rateLimitTake(`tx-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -180,7 +180,7 @@ export function registerTransacoesRoutes(app) {
         return c.json({ message: 'ID inválido.' }, 400)
       }
 
-      if (!rateLimitTake(`tx-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      if (!await rateLimitTake(`tx-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
@@ -215,7 +215,7 @@ export function registerTransacoesRoutes(app) {
         return c.json({ message: 'ID inválido.' }, 400)
       }
 
-      if (!rateLimitTake(`tx-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+      if (!await rateLimitTake(`tx-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 

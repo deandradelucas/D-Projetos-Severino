@@ -24,7 +24,7 @@ export function registerAiRoutes(app) {
         return c.json({ message: 'Mensagem não pode estar vazia.' }, 400)
       }
 
-      if (!rateLimitTake(`ai-chat:${parsed.actorId}:${clientKeyFromHono(c)}`, 40, 60_000)) {
+      if (!await rateLimitTake(`ai-chat:${parsed.actorId}:${clientKeyFromHono(c)}`, 40, 60_000)) {
         return c.json({ message: 'Muitas mensagens seguidas. Aguarde cerca de um minuto e tente de novo.' }, 429)
       }
 
@@ -93,7 +93,7 @@ export function registerAiRoutes(app) {
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      if (!rateLimitTake(`ai-suggest-cat:${parsed.actorId}`, 60, 60_000)) {
+      if (!await rateLimitTake(`ai-suggest-cat:${parsed.actorId}`, 60, 60_000)) {
         return c.json({ categoria_id: null, subcategoria_id: null })
       }
 
@@ -123,7 +123,7 @@ export function registerAiRoutes(app) {
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      if (!rateLimitTake(`ai-parse:${parsed.actorId}:${clientKeyFromHono(c)}`, 24, 60_000)) {
+      if (!await rateLimitTake(`ai-parse:${parsed.actorId}:${clientKeyFromHono(c)}`, 24, 60_000)) {
         return c.json({ message: 'Muitas interpretações seguidas. Aguarde um minuto.' }, 429)
       }
 

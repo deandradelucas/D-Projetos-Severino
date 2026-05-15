@@ -1,7 +1,31 @@
-/** Limite simples em memória (reinicia a cada deploy). Produção com várias instâncias: usar Redis/Upstash. */
+import Redis from 'ioredis'
+
+/**
+ * Rate limit com Redis (quando REDIS_URL está definida) ou in-memory como fallback.
+ * Usa fixed-window com INCR + PEXPIRE — atômico e correto por design.
+ */
+
+let _redis = null
+
+function getRedis() {
+  if (_redis) return _redis
+  const url = process.env.REDIS_URL
+  if (!url) return null
+  _redis = new Redis(url, {
+    lazyConnect: true,
+    enableReadyCheck: false,
+    maxRetriesPerRequest: 1,
+    connectTimeout: 3000,
+    commandTimeout: 2000,
+  })
+  _redis.on('error', () => { /* suprime stack trace — reconecta automaticamente */ })
+  return _redis
+}
+
+/* Fallback: in-memory (reinicia a cada deploy; adequado para worker único PM2) */
 const buckets = new Map()
 
-export function rateLimitTake(key, max = 30, windowMs = 60_000) {
+function rateLimitInMemory(key, max, windowMs) {
   const k = String(key || 'unknown').slice(0, 200)
   const now = Date.now()
   let b = buckets.get(k)
@@ -10,8 +34,24 @@ export function rateLimitTake(key, max = 30, windowMs = 60_000) {
     buckets.set(k, b)
   }
   b.n += 1
-  if (b.n > max) return false
-  return true
+  return b.n <= max
+}
+
+export async function rateLimitTake(key, max = 30, windowMs = 60_000) {
+  const k = `rl:${String(key || 'unknown').slice(0, 190)}`
+  const redis = getRedis()
+
+  if (redis) {
+    try {
+      const count = await redis.incr(k)
+      if (count === 1) await redis.pexpire(k, windowMs)
+      return count <= max
+    } catch {
+      /* Redis indisponível — cai para in-memory */
+    }
+  }
+
+  return rateLimitInMemory(key, max, windowMs)
 }
 
 export function clientKeyFromHono(c) {

@@ -9,7 +9,7 @@ import { evolutionEnvConfigured } from '../lib/evolution-send.mjs'
 import { sendEmailOtp, verifyEmailOtp, emailOtpEnabled } from '../lib/email-otp.mjs'
 import { getPerfilUsuario } from '../lib/usuarios.mjs'
 import { insertAdminAuditLog } from '../lib/admin-audit.mjs'
-import { buildAssinaturaUsuarioPayload } from '../lib/assinatura.mjs'
+import { buildAssinaturaUsuarioPayload, buildAssinaturaFallbackPayload } from '../lib/assinatura.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { mapSupabaseOrNetworkError } from '../lib/http/hono-error-map.mjs'
 import { isUuidString } from '../lib/transacao-validate.mjs'
@@ -25,13 +25,14 @@ import {
   listCredentialSummariesForUser,
 } from '../lib/webauthn.mjs'
 import { signAccessToken } from '../lib/auth-access-token.mjs'
+import { createRefreshToken, rotateRefreshToken, revokeRefreshToken } from '../lib/refresh-token.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 export function registerAuthRoutes(app) {
   app.post('/api/auth/login', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`login:${ip}`, 25, 60_000)) {
+      if (!await rateLimitTake(`login:${ip}`, 25, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde cerca de um minuto e tente de novo.' }, 429)
       }
       let body
@@ -79,24 +80,7 @@ export function registerAuthRoutes(app) {
         payloadUser = { ...user, ...assinatura }
       } catch (err) {
         log.error('assinatura no login (confira migration 07_trial_bem_vindo_assinatura)', err)
-        payloadUser = {
-          ...user,
-          trial_ends_at: null,
-          bem_vindo_pagamento_visto_at: null,
-          assinatura_paga: false,
-          acesso_app_liberado: true,
-          mostrar_bem_vindo_assinatura: false,
-          trial_dias_gratis: 7,
-          assinatura_proxima_cobranca: null,
-          assinatura_asaas_status: null,
-          plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
-          assinatura_situacao: 'inativa',
-          assinatura_asaas_bloqueada: false,
-          motivo_bloqueio_acesso: null,
-          asaas_portal_url: null,
-          familia_mostrar_quem_lancou: false,
-          conta_familiar_titular_nome: null,
-        }
+        payloadUser = buildAssinaturaFallbackPayload(user)
       }
 
       await insertAdminAuditLog({
@@ -108,10 +92,15 @@ export function registerAuthRoutes(app) {
         detail: { email: user.email, method: 'senha' },
       })
 
+      const [accessToken, refreshToken] = await Promise.all([
+        signAccessToken(user.id),
+        createRefreshToken(user.id),
+      ])
       return c.json({
         message: 'Login realizado com sucesso.',
         user: payloadUser,
-        accessToken: signAccessToken(user.id),
+        accessToken,
+        refreshToken,
       })
     } catch (error) {
       log.error('login failed', error)
@@ -127,7 +116,7 @@ export function registerAuthRoutes(app) {
   app.post('/api/auth/register', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`register:${ip}`, 10, 60_000)) {
+      if (!await rateLimitTake(`register:${ip}`, 10, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde cerca de um minuto e tente de novo.' }, 429)
       }
       let body
@@ -197,24 +186,7 @@ export function registerAuthRoutes(app) {
         payloadUser = { ...newUser, ...assinatura }
       } catch (err) {
         log.error('assinatura no cadastro (confira migration 07_trial_bem_vindo_assinatura)', err)
-        payloadUser = {
-          ...safeUser,
-          trial_ends_at: null,
-          bem_vindo_pagamento_visto_at: null,
-          assinatura_paga: false,
-          acesso_app_liberado: true,
-          mostrar_bem_vindo_assinatura: false,
-          trial_dias_gratis: 7,
-          assinatura_proxima_cobranca: null,
-          assinatura_asaas_status: null,
-          plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
-          assinatura_situacao: 'inativa',
-          assinatura_asaas_bloqueada: false,
-          motivo_bloqueio_acesso: null,
-          asaas_portal_url: null,
-          familia_mostrar_quem_lancou: false,
-          conta_familiar_titular_nome: null,
-        }
+        payloadUser = buildAssinaturaFallbackPayload(safeUser)
       }
 
       await insertAdminAuditLog({
@@ -261,7 +233,11 @@ export function registerAuthRoutes(app) {
         })
       }
 
-      return c.json({ message: 'Conta criada com sucesso.', user: payloadUser, accessToken: signAccessToken(newUser.id) })
+      const [accessToken, refreshToken] = await Promise.all([
+        signAccessToken(newUser.id),
+        createRefreshToken(newUser.id),
+      ])
+      return c.json({ message: 'Conta criada com sucesso.', user: payloadUser, accessToken, refreshToken })
     } catch (error) {
       log.error('register failed', error)
       const mapped = mapSupabaseOrNetworkError(error)
@@ -273,7 +249,7 @@ export function registerAuthRoutes(app) {
   app.post('/api/auth/verify-registration', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`verify-reg:${ip}`, 15, 60_000)) {
+      if (!await rateLimitTake(`verify-reg:${ip}`, 15, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
       let body
@@ -286,7 +262,7 @@ export function registerAuthRoutes(app) {
       const otp = String(body?.otp || '').replace(/\D/g, '')
       if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
 
-      if (!rateLimitTake(`verify-reg-user:${userId}`, 5, 15 * 60_000)) {
+      if (!await rateLimitTake(`verify-reg-user:${userId}`, 5, 15 * 60_000)) {
         return c.json({ message: 'Muitas tentativas para este usuário. Solicite um novo código.' }, 429)
       }
 
@@ -309,24 +285,7 @@ export function registerAuthRoutes(app) {
         payloadUser = { ...safeUser, ...assinatura }
       } catch (err) {
         log.error('assinatura no verify-registration', err)
-        payloadUser = {
-          ...safeUser,
-          trial_ends_at: null,
-          bem_vindo_pagamento_visto_at: null,
-          assinatura_paga: false,
-          acesso_app_liberado: true,
-          mostrar_bem_vindo_assinatura: false,
-          trial_dias_gratis: 7,
-          assinatura_proxima_cobranca: null,
-          assinatura_asaas_status: null,
-          plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
-          assinatura_situacao: 'inativa',
-          assinatura_asaas_bloqueada: false,
-          motivo_bloqueio_acesso: null,
-          asaas_portal_url: null,
-          familia_mostrar_quem_lancou: false,
-          conta_familiar_titular_nome: null,
-        }
+        payloadUser = buildAssinaturaFallbackPayload(safeUser)
       }
 
       if (emailOtpEnabled()) {
@@ -340,10 +299,15 @@ export function registerAuthRoutes(app) {
         }
       }
 
+      const [accessToken, refreshToken] = await Promise.all([
+        signAccessToken(payloadUser.id),
+        createRefreshToken(payloadUser.id),
+      ])
       return c.json({
         message: 'Telefone confirmado com sucesso.',
         user: payloadUser,
-        accessToken: signAccessToken(payloadUser.id),
+        accessToken,
+        refreshToken,
       })
     } catch (error) {
       log.error('verify-registration failed', error)
@@ -358,7 +322,7 @@ export function registerAuthRoutes(app) {
   app.post('/api/auth/resend-registration-otp', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`resend-reg-otp:${ip}`, 5, 15 * 60_000)) {
+      if (!await rateLimitTake(`resend-reg-otp:${ip}`, 5, 15 * 60_000)) {
         return c.json({ message: 'Muitas solicitações. Aguarde alguns minutos.' }, 429)
       }
       let body
@@ -370,7 +334,7 @@ export function registerAuthRoutes(app) {
       const userId = String(body?.userId || '').trim()
       if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
 
-      if (!rateLimitTake(`resend-reg-otp-user:${userId}`, 3, 15 * 60_000)) {
+      if (!await rateLimitTake(`resend-reg-otp-user:${userId}`, 3, 15 * 60_000)) {
         return c.json({ message: 'Limite de reenvios atingido para este número. Aguarde 15 minutos.' }, 429)
       }
 
@@ -402,7 +366,7 @@ export function registerAuthRoutes(app) {
   app.post('/api/auth/verify-email-otp', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`verify-email-otp:${ip}`, 15, 60_000)) {
+      if (!await rateLimitTake(`verify-email-otp:${ip}`, 15, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
       let body
@@ -415,7 +379,7 @@ export function registerAuthRoutes(app) {
       const otp = String(body?.otp || '').replace(/\D/g, '')
       if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
 
-      if (!rateLimitTake(`verify-email-otp-user:${userId}`, 5, 15 * 60_000)) {
+      if (!await rateLimitTake(`verify-email-otp-user:${userId}`, 5, 15 * 60_000)) {
         return c.json({ message: 'Muitas tentativas para este e-mail. Solicite um novo código.' }, 429)
       }
 
@@ -438,30 +402,18 @@ export function registerAuthRoutes(app) {
         payloadUser = { ...safeUser, ...assinatura }
       } catch (err) {
         log.error('assinatura no verify-email-otp', err)
-        payloadUser = {
-          ...safeUser,
-          trial_ends_at: null,
-          bem_vindo_pagamento_visto_at: null,
-          assinatura_paga: false,
-          acesso_app_liberado: true,
-          mostrar_bem_vindo_assinatura: false,
-          trial_dias_gratis: 7,
-          assinatura_proxima_cobranca: null,
-          assinatura_asaas_status: null,
-          plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
-          assinatura_situacao: 'inativa',
-          assinatura_asaas_bloqueada: false,
-          motivo_bloqueio_acesso: null,
-          asaas_portal_url: null,
-          familia_mostrar_quem_lancou: false,
-          conta_familiar_titular_nome: null,
-        }
+        payloadUser = buildAssinaturaFallbackPayload(safeUser)
       }
 
+      const [accessToken, refreshToken] = await Promise.all([
+        signAccessToken(payloadUser.id),
+        createRefreshToken(payloadUser.id),
+      ])
       return c.json({
         message: 'E-mail confirmado com sucesso.',
         user: payloadUser,
-        accessToken: signAccessToken(payloadUser.id),
+        accessToken,
+        refreshToken,
       })
     } catch (error) {
       log.error('verify-email-otp failed', error)
@@ -476,7 +428,7 @@ export function registerAuthRoutes(app) {
   app.post('/api/auth/resend-email-otp', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`resend-email-otp:${ip}`, 5, 15 * 60_000)) {
+      if (!await rateLimitTake(`resend-email-otp:${ip}`, 5, 15 * 60_000)) {
         return c.json({ message: 'Muitas solicitações. Aguarde alguns minutos.' }, 429)
       }
       let body
@@ -488,7 +440,7 @@ export function registerAuthRoutes(app) {
       const userId = String(body?.userId || '').trim()
       if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
 
-      if (!rateLimitTake(`resend-email-otp-user:${userId}`, 3, 15 * 60_000)) {
+      if (!await rateLimitTake(`resend-email-otp-user:${userId}`, 3, 15 * 60_000)) {
         return c.json({ message: 'Limite de reenvios atingido para este e-mail. Aguarde 15 minutos.' }, 429)
       }
 
@@ -517,7 +469,7 @@ export function registerAuthRoutes(app) {
   app.post('/api/auth/webauthn/register/options', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`webauthn-reg-opt:${ip}`, 20, 60_000)) {
+      if (!await rateLimitTake(`webauthn-reg-opt:${ip}`, 20, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
       const usuarioId = resolveRequestUserId(c)
@@ -544,7 +496,7 @@ export function registerAuthRoutes(app) {
   app.post('/api/auth/webauthn/register/verify', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`webauthn-reg-verify:${ip}`, 20, 60_000)) {
+      if (!await rateLimitTake(`webauthn-reg-verify:${ip}`, 20, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
       const usuarioId = resolveRequestUserId(c)
@@ -598,7 +550,7 @@ export function registerAuthRoutes(app) {
   app.post('/api/auth/webauthn/login/options', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`webauthn-auth-opt:${ip}`, 25, 60_000)) {
+      if (!await rateLimitTake(`webauthn-auth-opt:${ip}`, 25, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
       let body
@@ -631,7 +583,7 @@ export function registerAuthRoutes(app) {
   app.post('/api/auth/webauthn/login/verify', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`webauthn-auth-verify:${ip}`, 25, 60_000)) {
+      if (!await rateLimitTake(`webauthn-auth-verify:${ip}`, 25, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
       let body
@@ -661,10 +613,11 @@ export function registerAuthRoutes(app) {
           detail: { email: u.email, method: 'webauthn' },
         })
       }
-      return c.json({
-        ...out,
-        accessToken: signAccessToken(out.user.id),
-      })
+      const [accessToken, refreshToken] = await Promise.all([
+        signAccessToken(out.user.id),
+        createRefreshToken(out.user.id),
+      ])
+      return c.json({ ...out, accessToken, refreshToken })
     } catch (error) {
       log.error('webauthn login verify', error)
       const mapped = mapSupabaseOrNetworkError(error)
@@ -715,7 +668,7 @@ export function registerAuthRoutes(app) {
   app.post('/api/auth/request-password-otp-whatsapp', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`pw-otp-wa:${ip}`, 10, 15 * 60_000)) {
+      if (!await rateLimitTake(`pw-otp-wa:${ip}`, 10, 15 * 60_000)) {
         return c.json({ message: 'Muitas solicitações. Tente de novo em alguns minutos.' }, 429)
       }
       let body
@@ -728,7 +681,7 @@ export function registerAuthRoutes(app) {
       if (!isValidEmail(email)) {
         return c.json({ message: 'Informe um e-mail válido.' }, 400)
       }
-      if (!rateLimitTake(`pw-otp-wa-email:${email}`, 5, 60 * 60_000)) {
+      if (!await rateLimitTake(`pw-otp-wa-email:${email}`, 5, 60 * 60_000)) {
         return c.json({ message: 'Limite de códigos para este e-mail. Tente mais tarde.' }, 429)
       }
       const result = await requestPasswordOtpWhatsApp(email)
@@ -745,10 +698,55 @@ export function registerAuthRoutes(app) {
     }
   })
 
+  /** Troca o refresh token por um novo par access + refresh (rotação). */
+  app.post('/api/auth/refresh', async (c) => {
+    try {
+      const ip = clientKeyFromHono(c)
+      if (!await rateLimitTake(`refresh:${ip}`, 30, 60_000)) {
+        return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
+      }
+      let body
+      try {
+        body = await c.req.json()
+      } catch {
+        return c.json({ message: 'JSON inválido.' }, 400)
+      }
+      const plainToken = String(body?.refreshToken || '').trim()
+      if (!plainToken) return c.json({ message: 'refreshToken é obrigatório.' }, 400)
+
+      const result = await rotateRefreshToken(plainToken)
+      if (!result) return c.json({ message: 'Sessão expirada. Faça login novamente.' }, 401)
+
+      const accessToken = signAccessToken(result.usuarioId)
+      return c.json({ accessToken, refreshToken: result.newRefreshToken })
+    } catch (error) {
+      log.error('auth refresh failed', error)
+      return c.json({ message: 'Não foi possível renovar a sessão.' }, 500)
+    }
+  })
+
+  /** Revoga o refresh token (logout real — access token expira sozinho em 15min). */
+  app.post('/api/auth/logout', async (c) => {
+    try {
+      let body
+      try {
+        body = await c.req.json()
+      } catch {
+        body = {}
+      }
+      const plainToken = String(body?.refreshToken || '').trim()
+      if (plainToken) await revokeRefreshToken(plainToken)
+      return c.json({ ok: true })
+    } catch (error) {
+      log.error('auth logout failed', error)
+      return c.json({ ok: true }) // logout nunca falha para o cliente
+    }
+  })
+
   app.post('/api/auth/reset-password-whatsapp', async (c) => {
     try {
       const ip = clientKeyFromHono(c)
-      if (!rateLimitTake(`pw-reset-wa:${ip}`, 20, 15 * 60_000)) {
+      if (!await rateLimitTake(`pw-reset-wa:${ip}`, 20, 15 * 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde alguns minutos.' }, 429)
       }
       let body

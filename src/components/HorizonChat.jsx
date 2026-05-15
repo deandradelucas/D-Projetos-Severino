@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import DOMPurify from 'dompurify'
 import { useLocation } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
@@ -148,14 +149,14 @@ function useHorizonShellDock() {
 }
 
 function MarkdownText({ text }) {
-  // Render simple markdown: **bold**, *italic*, bullet lists, line breaks
-  const html = text
+  const raw = text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/^- (.+)$/gm, '<li>$1</li>')
     .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
     .replace(/\n/g, '<br/>')
 
+  const html = DOMPurify.sanitize(raw, { ALLOWED_TAGS: ['strong', 'em', 'ul', 'li', 'br'] })
   return <span dangerouslySetInnerHTML={{ __html: html }} />
 }
 
@@ -177,6 +178,8 @@ export default function HorizonChat() {
   const [erro, setErro] = useState(null)
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
+  const fabRef = useRef(null)
+  const windowRef = useRef(null)
 
   useEffect(() => {
     if (aberto) {
@@ -184,6 +187,36 @@ export default function HorizonChat() {
       setTimeout(() => inputRef.current?.focus(), 100)
     }
   }, [aberto, mensagens.length])
+
+  /* Focus trap + Escape dentro da janela de chat */
+  useEffect(() => {
+    if (!aberto) return
+    const win = windowRef.current
+    if (!win) return
+
+    const FOCUSABLE = 'button:not([disabled]), textarea:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') {
+        setAberto(false)
+        fabRef.current?.focus()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const focusable = Array.from(win.querySelectorAll(FOCUSABLE))
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus() }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus() }
+      }
+    }
+
+    win.addEventListener('keydown', handleKeyDown)
+    return () => win.removeEventListener('keydown', handleKeyDown)
+  }, [aberto])
 
   const enviarMensagem = async () => {
     const msg = input.trim()
@@ -261,13 +294,16 @@ export default function HorizonChat() {
     <>
       {/* Botão Flutuante */}
       <button
+        ref={fabRef}
         id="horizon-chat-btn"
         type="button"
         className={`horizon-chat-fab ${aberto ? 'chat-fab-active' : ''} ${shellDock ? 'horizon-chat-fab--shell-dock' : ''}`}
         style={shellDock?.fabStyle}
         onClick={() => setAberto(v => !v)}
         title="Severino IA"
-        aria-label="Abrir Severino IA"
+        aria-label={aberto ? 'Fechar Severino IA' : 'Abrir Severino IA'}
+        aria-expanded={aberto}
+        aria-controls="horizon-chat-window"
       >
         {aberto ? (
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -291,7 +327,11 @@ export default function HorizonChat() {
 
       {/* Janela de Chat */}
       <div
+        ref={windowRef}
         id="horizon-chat-window"
+        role="dialog"
+        aria-label="Chat com Severino IA"
+        aria-modal={aberto}
         className={`horizon-chat-window ${aberto ? 'chat-window-open' : ''} ${shellDock ? 'horizon-chat-window--shell-dock' : ''}`}
         style={shellDock?.winStyle}
         aria-hidden={!aberto}

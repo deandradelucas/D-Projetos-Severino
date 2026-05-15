@@ -23,8 +23,9 @@ function getSecretForVerifying() {
 }
 
 function accessTokenTtlSeconds() {
-  const raw = Number.parseInt(String(process.env.HORIZONTE_ACCESS_TOKEN_TTL_SECONDS || '1209600').trim(), 10)
-  if (!Number.isFinite(raw)) return 14 * 24 * 3600
+  // Padrão: 15 minutos. Refresh token (30 dias) renova automaticamente via /api/auth/refresh.
+  const raw = Number.parseInt(String(process.env.HORIZONTE_ACCESS_TOKEN_TTL_SECONDS || '900').trim(), 10)
+  if (!Number.isFinite(raw)) return 900
   return Math.min(Math.max(raw, 60), 365 * 24 * 3600)
 }
 

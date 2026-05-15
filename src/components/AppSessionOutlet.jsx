@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import AuthenticatedNavPrefetch from './AuthenticatedNavPrefetch'
 import MobileBottomNav from './MobileBottomNav'
 
@@ -49,8 +49,7 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
       const tid = window.setTimeout(() => controller.abort(), timeoutMs)
       ;(async () => {
         try {
-          const res = await fetch(apiUrl('/api/assinatura/status'), {
-            headers: horizonteApiAuthHeaders(),
+          const res = await apiFetch(apiUrl('/api/assinatura/status'), {
             cache: 'no-store',
             signal: controller.signal,
           })
@@ -80,8 +79,7 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
     const tid = window.setTimeout(() => controller.abort(), timeoutMs)
     ;(async () => {
       try {
-        const res = await fetch(apiUrl('/api/assinatura/status'), {
-          headers: horizonteApiAuthHeaders(),
+        const res = await apiFetch(apiUrl('/api/assinatura/status'), {
           cache: 'no-store',
           signal: controller.signal,
         })
