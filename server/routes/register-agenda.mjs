@@ -11,11 +11,12 @@ import { isUuidString } from '../lib/transacao-validate.mjs'
 import { assertAgendaCronSecret } from '../lib/http/agenda-route-auth.mjs'
 import { processAgendaReminderCron } from '../lib/domain/agenda-reminder-cron.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 export function registerAgendaRoutes(app) {
   app.get('/api/agenda', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -34,7 +35,7 @@ export function registerAgendaRoutes(app) {
 
   app.post('/api/agenda', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
@@ -60,7 +61,7 @@ export function registerAgendaRoutes(app) {
   app.put('/api/agenda/:id', async (c) => {
     try {
       const id = c.req.param('id')
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
@@ -87,7 +88,7 @@ export function registerAgendaRoutes(app) {
   app.patch('/api/agenda/:id/status', async (c) => {
     try {
       const id = c.req.param('id')
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
@@ -110,7 +111,7 @@ export function registerAgendaRoutes(app) {
   app.delete('/api/agenda/:id', async (c) => {
     try {
       const id = c.req.param('id')
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)

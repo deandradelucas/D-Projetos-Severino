@@ -3,7 +3,7 @@ import { assertFamiliaPodeEscrever, resolveEscopoUsuario } from '../conta-famili
 
 /**
  * Resolve titular de dados (conta familiar) após gate de assinatura.
- * @param {string} actorId header x-user-id
+ * @param {string} actorId id do utilizador (Bearer JWT `sub` ou legado `x-user-id` via `resolveRequestUserId`)
  * @param {{ write?: boolean }} opts write=true exige papel diferente de VIEWER
  * @returns {Promise<{ ok: true, actorId: string, dataUsuarioId: string, escopo: Awaited<ReturnType<typeof resolveEscopoUsuario>> } | { ok: false, status: number, message: string }>}
  */

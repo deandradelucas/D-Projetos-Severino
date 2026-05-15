@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { parseApiJsonResponse } from '../lib/apiErrors'
 import { readHorizonteUserProfile } from '../lib/horizonteSession'
 import { BRAND_ASSETS } from '../lib/brandAssets'
@@ -214,7 +215,7 @@ export default function HorizonChat() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(usuarioId ? { 'x-user-id': String(usuarioId) } : {})
+          ...horizonteApiAuthHeaders(),
         },
         body: JSON.stringify({ message: msg, historico })
       })

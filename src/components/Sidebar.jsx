@@ -4,6 +4,7 @@ import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { useTheme } from '../context/ThemeContext'
+import { clearHorizonteAccessToken } from '../lib/horizonteAccessToken'
 
 function mergeNavItemClass(isActive, href, pathname, extraClass = '') {
   const on = Boolean(isActive) || pathname === href
@@ -378,6 +379,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
         <button
           className="logout-btn"
           onClick={() => {
+            clearHorizonteAccessToken()
             localStorage.removeItem('horizonte_user')
             window.location.href = '/'
           }}

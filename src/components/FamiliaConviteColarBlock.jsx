@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import {
   extrairTokenConviteFamilia,
   persistConviteTokenSession,
@@ -98,10 +99,9 @@ export default function FamiliaConviteColarBlock({
     try {
       const res = await fetch(apiUrl('/api/familia/aceitar'), {
         method: 'POST',
-        headers: {
+        headers: horizonteApiAuthHeaders({
           'Content-Type': 'application/json',
-          'x-user-id': uid,
-        },
+        }),
         body: JSON.stringify({ token }),
       })
       const data = await res.json().catch(() => ({}))

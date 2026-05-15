@@ -17,11 +17,12 @@ import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { mapSupabaseOrNetworkError } from '../lib/http/hono-error-map.mjs'
 import { assertPrincipalAdmin } from '../lib/admin/assert-principal-admin.mjs'
 import { getMarketingStatsAdmin } from '../lib/marketing-stats.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 export function registerAdminRoutes(app) {
   app.get('/api/admin/marketing/stats', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const block = await assertPrincipalAdmin(usuarioId)
       if (block) return c.json({ message: block.message }, block.status)
       const stats = await getMarketingStatsAdmin()
@@ -35,7 +36,7 @@ export function registerAdminRoutes(app) {
   /** Asaas + webhook (sem segredos). */
   app.get('/api/admin/pagamentos-saude', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const block = await assertPrincipalAdmin(usuarioId)
       if (block) return c.json({ message: block.message }, block.status)
       return c.json({
@@ -68,7 +69,7 @@ export function registerAdminRoutes(app) {
 
   app.get('/api/admin/usuarios', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const block = await assertPrincipalAdmin(usuarioId)
       if (block) return c.json({ message: block.message }, block.status)
 
@@ -101,7 +102,7 @@ export function registerAdminRoutes(app) {
 
   app.get('/api/admin/audit-log', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const block = await assertPrincipalAdmin(usuarioId)
       if (block) return c.json({ message: block.message }, block.status)
 
@@ -116,7 +117,7 @@ export function registerAdminRoutes(app) {
 
   app.put('/api/admin/usuarios/:id', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const block = await assertPrincipalAdmin(usuarioId)
       if (block) return c.json({ message: block.message }, block.status)
 
@@ -139,7 +140,7 @@ export function registerAdminRoutes(app) {
 
   app.get('/api/admin/pagamentos', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const block = await assertPrincipalAdmin(usuarioId)
       if (block) return c.json({ message: block.message }, block.status)
 
@@ -171,7 +172,7 @@ export function registerAdminRoutes(app) {
 
   app.delete('/api/admin/pagamentos/pendentes', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const block = await assertPrincipalAdmin(usuarioId)
       if (block) return c.json({ message: block.message }, block.status)
 
@@ -188,7 +189,7 @@ export function registerAdminRoutes(app) {
 
   app.delete('/api/admin/usuarios/:id', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const block = await assertPrincipalAdmin(usuarioId)
       if (block) return c.json({ message: block.message }, block.status)
 
@@ -206,7 +207,7 @@ export function registerAdminRoutes(app) {
 
   app.post('/api/admin/usuarios/:id/solicitar-otp-senha-whatsapp', async (c) => {
     try {
-      const usuarioId = c.req.header('x-user-id')
+      const usuarioId = resolveRequestUserId(c)
       const block = await assertPrincipalAdmin(usuarioId)
       if (block) return c.json({ message: block.message }, block.status)
 

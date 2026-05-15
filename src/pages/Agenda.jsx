@@ -5,6 +5,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { showToast } from '../lib/toastStore'
 
@@ -296,7 +297,7 @@ export default function Agenda() {
         to: to.toISOString(),
       })
       const res = await fetch(apiUrl(`/api/agenda?${params.toString()}`), {
-        headers: { 'x-user-id': usuarioId },
+        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       const data = await res.json().catch(() => [])
@@ -435,7 +436,7 @@ export default function Agenda() {
     try {
       const res = await fetch(apiUrl('/api/ai/agenda-parse'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioId },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ texto: t }),
       })
       const data = await res.json().catch(() => ({}))
@@ -481,10 +482,7 @@ export default function Agenda() {
       }
       const res = await fetch(apiUrl(editing ? `/api/agenda/${editing.id}` : '/api/agenda'), {
         method: editing ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': usuarioId,
-        },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       })
       const data = await res.json().catch(() => ({}))
@@ -503,7 +501,7 @@ export default function Agenda() {
     if (!usuarioId || !id) throw new Error('Sessão inválida.')
     const res = await fetch(apiUrl(`/api/agenda/${id}`), {
       method: 'DELETE',
-      headers: { 'x-user-id': usuarioId },
+      headers: horizonteApiAuthHeaders(),
     })
     const data = await res.json().catch(() => ({}))
     if (!res.ok) throw new Error(data.message || 'Falha ao remover item da agenda.')
@@ -540,10 +538,7 @@ export default function Agenda() {
     try {
       const res = await fetch(apiUrl(`/api/agenda/${evento.id}/status`), {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': usuarioId,
-        },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ status }),
       })
       const data = await res.json().catch(() => ({}))

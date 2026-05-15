@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { showToast } from '../lib/toastStore'
 
 /**
@@ -152,7 +153,7 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, cate
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioId },
+        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       })
 
@@ -169,7 +170,7 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, cate
     } finally {
       setSaving(false)
     }
-  }, [formData, categorias, isEditMode, editingTransaction, usuarioId, onSave, onClose])
+  }, [formData, categorias, isEditMode, editingTransaction, onSave, onClose])
 
   return {
     formData,

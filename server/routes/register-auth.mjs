@@ -24,6 +24,8 @@ import {
   deleteCredentialForUser,
   listCredentialSummariesForUser,
 } from '../lib/webauthn.mjs'
+import { signAccessToken } from '../lib/auth-access-token.mjs'
+import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
 export function registerAuthRoutes(app) {
   app.post('/api/auth/login', async (c) => {
@@ -109,6 +111,7 @@ export function registerAuthRoutes(app) {
       return c.json({
         message: 'Login realizado com sucesso.',
         user: payloadUser,
+        accessToken: signAccessToken(user.id),
       })
     } catch (error) {
       log.error('login failed', error)
@@ -258,7 +261,7 @@ export function registerAuthRoutes(app) {
         })
       }
 
-      return c.json({ message: 'Conta criada com sucesso.', user: payloadUser })
+      return c.json({ message: 'Conta criada com sucesso.', user: payloadUser, accessToken: signAccessToken(newUser.id) })
     } catch (error) {
       log.error('register failed', error)
       const mapped = mapSupabaseOrNetworkError(error)
@@ -337,7 +340,11 @@ export function registerAuthRoutes(app) {
         }
       }
 
-      return c.json({ message: 'Telefone confirmado com sucesso.', user: payloadUser })
+      return c.json({
+        message: 'Telefone confirmado com sucesso.',
+        user: payloadUser,
+        accessToken: signAccessToken(payloadUser.id),
+      })
     } catch (error) {
       log.error('verify-registration failed', error)
       const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
@@ -451,7 +458,11 @@ export function registerAuthRoutes(app) {
         }
       }
 
-      return c.json({ message: 'E-mail confirmado com sucesso.', user: payloadUser })
+      return c.json({
+        message: 'E-mail confirmado com sucesso.',
+        user: payloadUser,
+        accessToken: signAccessToken(payloadUser.id),
+      })
     } catch (error) {
       log.error('verify-email-otp failed', error)
       const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
@@ -509,7 +520,7 @@ export function registerAuthRoutes(app) {
       if (!rateLimitTake(`webauthn-reg-opt:${ip}`, 20, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
-      const usuarioId = String(c.req.header('x-user-id') || '').trim()
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
 
       const perfil = await getPerfilUsuario(usuarioId)
@@ -536,7 +547,7 @@ export function registerAuthRoutes(app) {
       if (!rateLimitTake(`webauthn-reg-verify:${ip}`, 20, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
-      const usuarioId = String(c.req.header('x-user-id') || '').trim()
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
 
       let body
@@ -650,7 +661,10 @@ export function registerAuthRoutes(app) {
           detail: { email: u.email, method: 'webauthn' },
         })
       }
-      return c.json(out)
+      return c.json({
+        ...out,
+        accessToken: signAccessToken(out.user.id),
+      })
     } catch (error) {
       log.error('webauthn login verify', error)
       const mapped = mapSupabaseOrNetworkError(error)
@@ -661,7 +675,7 @@ export function registerAuthRoutes(app) {
 
   app.get('/api/auth/webauthn/credentials', async (c) => {
     try {
-      const usuarioId = String(c.req.header('x-user-id') || '').trim()
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
       const rows = await listCredentialSummariesForUser(usuarioId)
       return c.json({ credentials: rows })
@@ -678,7 +692,7 @@ export function registerAuthRoutes(app) {
 
   app.delete('/api/auth/webauthn/credentials/:id', async (c) => {
     try {
-      const usuarioId = String(c.req.header('x-user-id') || '').trim()
+      const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
       const id = c.req.param('id')
       if (!isUuidString(id)) {

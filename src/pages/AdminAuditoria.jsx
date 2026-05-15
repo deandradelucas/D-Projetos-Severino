@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { apiUrl } from '../lib/apiUrl'
+import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import './dashboard.css'
 
 function formatAuditWhen(iso) {
@@ -41,8 +42,8 @@ export default function AdminAuditoria() {
         setRows([])
         return
       }
-      const u = JSON.parse(userSaved)
-      const res = await fetch(apiUrl('/api/admin/audit-log?limit=80'), { headers: { 'x-user-id': u.id } })
+      JSON.parse(userSaved)
+      const res = await fetch(apiUrl('/api/admin/audit-log?limit=80'), { headers: horizonteApiAuthHeaders() })
       const data = await res.json().catch(() => null)
       if (!res.ok) {
         const msg = data && typeof data.message === 'string' ? data.message : 'Não foi possível carregar a auditoria.'
