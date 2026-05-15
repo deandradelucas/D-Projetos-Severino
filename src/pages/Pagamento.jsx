@@ -451,9 +451,6 @@ export default function Pagamento() {
                 <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                 <div className="dashboard-hub__hero-text">
                   <h1 className="dashboard-hub__title">Pagamento</h1>
-                  <p className="ref-panel__subtitle page-pagamento-header-sub">
-                    Plano, assinatura e histórico de cobranças
-                  </p>
                 </div>
               </div>
             </section>

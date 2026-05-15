@@ -163,6 +163,26 @@ html:has(.bem-vindo-page) .horizon-chat-window {
   display: none !important;
 }
 
+/* Bem-vindo assinatura — mesma tipografia que Transações (Poppins + fallbacks) */
+.bem-vindo-page {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Trial expirado — mesma tipografia que Transações (Poppins + fallbacks) */
+.trial-expirado-page {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 body,
 #root {
   min-height: 100%;
@@ -182,6 +202,16 @@ body {
   position: relative;
   z-index: 0;
   isolation: isolate;
+}
+
+/* Login/Cadastro — mesma tipografia que Transações (Poppins + fallbacks) */
+.auth-shell-glass {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Login/Cadastro — fallback atrás da foto (evita flash/branco nas bordas em alguns viewports) */

@@ -20,7 +20,7 @@ export default function TrialExpirado() {
 
   return (
     <div
-      className="relative flex min-h-[100dvh] min-h-[100svh] w-full items-center justify-center overflow-hidden p-4 sm:p-6"
+      className="trial-expirado-page relative flex min-h-[100dvh] min-h-[100svh] w-full items-center justify-center overflow-hidden p-4 sm:p-6"
       style={{ backgroundColor: '#000000' }}
     >
       {/* ── Fundo escuro base ── */}

@@ -7,6 +7,16 @@
    Responsividade mobile aprimorada (touch targets ≥44px, stack vertical).
    ============================================================ */
 
+/* Mesma tipografia da página Transações (Poppins + fallbacks) */
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 /* ——— Layout geral ——— */
 .config-layout {
   display: grid;

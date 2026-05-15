@@ -93,10 +93,19 @@ function formatTime(iso) {
   }).format(new Date(iso))
 }
 
-function formatReminder(minutes) {
+function formatReminderOffset(minutes) {
   const n = Number.parseInt(String(minutes ?? 0), 10)
   if (!Number.isFinite(n) || n <= 0) return 'Na hora'
   return `${n} min`
+}
+
+function formatAgendaListReminderMeta(evento, kind) {
+  if (evento.whatsapp_notificar === false) return null
+  if (kind === 'reminder') {
+    return `Aviso de notificação às ${formatTime(evento.inicio)}`
+  }
+  const offset = formatReminderOffset(evento.lembrar_minutos_antes)
+  return offset === 'Na hora' ? 'Lembrete na hora' : `Lembrete ${offset} antes`
 }
 
 function plural(count, singular, pluralText) {
@@ -213,16 +222,6 @@ const AGENDA_KIND_META = {
   reminder: { label: 'Notificação', icon: 'bell', tone: 'reminder' },
   milestone: { label: 'Marco', icon: 'flag', tone: 'milestone' },
   done: { label: 'Concluído', icon: 'check', tone: 'done' },
-}
-
-function formatAgendaItemTime(evento, kind) {
-  if (kind === 'reminder') return `Aviso de notificação às ${formatTime(evento.inicio)}`
-  return [
-    formatTime(evento.inicio),
-    evento.fim ? ` - ${formatTime(evento.fim)}` : '',
-    ' · lembrete ',
-    formatReminder(evento.lembrar_minutos_antes),
-  ].join('')
 }
 
 function AgendaKindIcon({ type }) {
@@ -678,6 +677,7 @@ export default function Agenda() {
                     {selectedEvents.map((evento) => {
                       const kind = agendaItemKind(evento)
                       const meta = AGENDA_KIND_META[kind]
+                      const reminderMeta = formatAgendaListReminderMeta(evento, kind)
                       return (
                         <article className={`agenda-day-item agenda-day-item--${meta.tone} agenda-event--${eventTone(evento.status)}`} key={evento.id}>
                           <div className="agenda-day-item__icon" aria-hidden="true">
@@ -686,7 +686,7 @@ export default function Agenda() {
                           <div className="agenda-day-item__main">
                             <span className="agenda-day-item__type">{meta.label}</span>
                             <h3>{evento.titulo}</h3>
-                            <p>{formatAgendaItemTime(evento, kind)}</p>
+                            {reminderMeta ? <p className="agenda-day-item__reminder">{reminderMeta}</p> : null}
                             {evento.local ? <p className="agenda-event__local">{evento.local}</p> : null}
                           </div>
                           <div className="agenda-day-item__actions">
