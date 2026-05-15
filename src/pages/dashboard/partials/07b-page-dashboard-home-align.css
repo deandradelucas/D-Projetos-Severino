@@ -176,9 +176,9 @@ body[data-theme='dark']
 body[data-theme='dark']
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(.page-investimentos)
   .ref-tx-arrow-wrap--down {
-  color: rgba(148, 163, 184, 0.92) !important;
-  background: rgba(255, 255, 255, 0.07) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #64748b !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
   box-shadow: none !important;
 }
 
@@ -191,7 +191,8 @@ body[data-theme='dark']
 body[data-theme='dark']
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(.page-investimentos)
   .ref-tx-arrow-wrap {
-  background: rgba(255, 255, 255, 0.07) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
 }
 
 body[data-theme='light']

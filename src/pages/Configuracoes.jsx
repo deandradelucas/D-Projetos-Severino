@@ -12,6 +12,7 @@ import { apiUrl } from '../lib/apiUrl'
 import { montarTextoConviteFamiliaComPwa } from '../lib/familiaConviteMensagemCompartilhavel'
 import { getPublicAppOriginForConvites } from '../lib/publicAppOrigin'
 import { webAuthnSupported, registerWebAuthnCredential } from '../lib/webauthnBrowser'
+import { formatPhoneBRDisplay, maskPhoneBRMobile, validatePhoneBRMobile } from '../lib/formatPhoneBR'
 
 const PAPEL_CONVITE_OPCOES = [
   { value: 'MEMBER', label: 'Membro — pode lançar e editar (exceto pagamento do titular)' },
@@ -51,6 +52,9 @@ export default function Configuracoes() {
   const [familiaConfirm, setFamiliaConfirm] = useState(null)
   const [alterarPapelMembro, setAlterarPapelMembro] = useState(null)
   const [familiaPainelCarregado, setFamiliaPainelCarregado] = useState(false)
+  const [telefoneEditando, setTelefoneEditando] = useState(false)
+  const [telefoneInput, setTelefoneInput] = useState('')
+  const [telefoneSaving, setTelefoneSaving] = useState(false)
   const usuarioIdHeader = String(perfil?.id ?? '').trim()
 
   const showToast = useCallback((msg) => {
@@ -220,7 +224,56 @@ export default function Configuracoes() {
   const biometricSupported = webAuthnSupported()
   const profileInitial = (perfil.nome || perfil.email || '?').charAt(0).toUpperCase()
   const roleLabel = isAdmin ? 'Administrador' : 'Usuário'
-  const telefoneLabel = perfil.telefone || 'Não informado'
+  const telefoneLabel = perfil.telefone ? formatPhoneBRDisplay(perfil.telefone) : 'Não informado'
+
+  const abrirEditarTelefone = () => {
+    setTelefoneInput(maskPhoneBRMobile(perfil.telefone || ''))
+    setTelefoneEditando(true)
+  }
+
+  const cancelarEditarTelefone = () => {
+    setTelefoneEditando(false)
+    setTelefoneInput('')
+  }
+
+  const salvarTelefone = async () => {
+    if (!usuarioIdHeader || telefoneSaving) return
+    const check = validatePhoneBRMobile(telefoneInput)
+    if (!check.ok) {
+      showToast(check.message)
+      return
+    }
+    setTelefoneSaving(true)
+    try {
+      const res = await fetch(apiUrl('/api/usuarios/perfil/telefone'), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': usuarioIdHeader },
+        body: JSON.stringify({ telefone: check.digits }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        showToast(data.message || 'Não foi possível atualizar o telefone.')
+        return
+      }
+      const nextTelefone = data.perfil?.telefone ?? check.digits
+      setPerfil((p) => ({ ...p, telefone: nextTelefone }))
+      try {
+        const raw = localStorage.getItem('horizonte_user')
+        const u = { ...(raw ? JSON.parse(raw) : {}), telefone: nextTelefone }
+        localStorage.setItem('horizonte_user', JSON.stringify(u))
+        window.dispatchEvent(new Event('horizonte-session-refresh'))
+      } catch {
+        /* ignore */
+      }
+      setTelefoneEditando(false)
+      setTelefoneInput('')
+      showToast(data.message || 'Telefone atualizado.')
+    } catch {
+      showToast('Erro de rede ao salvar telefone.')
+    } finally {
+      setTelefoneSaving(false)
+    }
+  }
 
   const copiarEmail = () => {
     if (!perfil.email) return
@@ -475,9 +528,53 @@ export default function Configuracoes() {
               </div>
             ) : null}
 
+            {telefoneEditando ? (
+              <div className="config-telefone-form" aria-label="Alterar telefone">
+                <label className="config-field config-field--stretch" htmlFor="config-telefone-input">
+                  <span>Celular (WhatsApp)</span>
+                  <input
+                    id="config-telefone-input"
+                    type="tel"
+                    className="config-input"
+                    value={telefoneInput}
+                    onChange={(e) => setTelefoneInput(maskPhoneBRMobile(e.target.value))}
+                    placeholder="(00) 00000-0000"
+                    maxLength={15}
+                    autoComplete="tel"
+                    inputMode="numeric"
+                    disabled={telefoneSaving}
+                  />
+                </label>
+                <p className="config-telefone-form__hint">
+                  Usado para recuperar senha via WhatsApp e para o assistente no celular.
+                </p>
+                <div className="config-telefone-form__actions">
+                  <button
+                    type="button"
+                    className="config-action-btn config-action-btn--primary"
+                    disabled={telefoneSaving}
+                    onClick={() => void salvarTelefone()}
+                  >
+                    {telefoneSaving ? 'Salvando…' : 'Salvar telefone'}
+                  </button>
+                  <button
+                    type="button"
+                    className="config-action-btn"
+                    disabled={telefoneSaving}
+                    onClick={cancelarEditarTelefone}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
             <div className="config-quick-actions">
               <button type="button" className="config-action-btn" onClick={copiarEmail} disabled={!perfil.email}>
                 Copiar e-mail
+              </button>
+              <button type="button" className="config-action-btn" onClick={abrirEditarTelefone} disabled={!usuarioIdHeader}>
+                {perfil.telefone ? 'Alterar telefone' : 'Cadastrar telefone'}
               </button>
               <button
                 type="button"

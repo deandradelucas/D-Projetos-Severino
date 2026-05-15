@@ -47,6 +47,14 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   --shell-nav-nova-gold-inset: rgba(181, 141, 61, 0.22);
 }
 
+/* Reforço nos alvos do menu (links, rótulos, secções, sair): mesma Poppins que Dashboard / Transações — evita fallback visual diferente. */
+.dashboard-container.app-horizon-shell .sidebar .nav-item,
+.dashboard-container.app-horizon-shell .sidebar .nav-item__label,
+.dashboard-container.app-horizon-shell .sidebar .nav-section-label__text,
+.dashboard-container.app-horizon-shell .sidebar .logout-btn {
+  font-family: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+}
+
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   --shell-nav-nova-gold: #c4a052;
   --shell-nav-nova-gold-soft: rgba(196, 160, 82, 0.14);

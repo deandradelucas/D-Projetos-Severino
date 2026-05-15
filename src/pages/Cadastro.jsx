@@ -7,13 +7,7 @@ import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
 import { apiUrl } from '../lib/apiUrl'
 import { showToast } from '../lib/toastStore'
 import { validateEmail } from '../lib/validateEmail'
-
-function formatTelefone(value) {
-  const numbers = value.replace(/\D/g, '')
-  if (numbers.length <= 2) return `(${numbers}`
-  if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`
-  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`
-}
+import { maskPhoneBRMobile } from '../lib/formatPhoneBR'
 
 // 1 = fraca, 2 = média, 3 = forte
 function senhaForca(s) {
@@ -441,7 +435,7 @@ export default function Cadastro() {
                 id="telefone"
                 type="tel"
                 value={telefone}
-                onChange={(e) => setTelefone(formatTelefone(e.target.value))}
+                onChange={(e) => setTelefone(maskPhoneBRMobile(e.target.value))}
                 placeholder="(00) 00000-0000"
                 required
                 maxLength={15}

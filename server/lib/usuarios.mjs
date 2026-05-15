@@ -19,7 +19,7 @@ export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
 
   const { data, error } = await supabaseAdmin
     .from('usuarios')
-    .update({ telefone: clean })
+    .update({ telefone: clean, telefone_verificado: false })
     .eq('id', usuarioId)
     .select('id, telefone')
     .single()
