@@ -1,5 +1,67 @@
 /* Página Investimentos — lista + modal novo (shell alinhado ao dashboard-page) */
 
+/* Mesma tipografia e CTAs dourados que Transações (07-page-transacoes.css) */
+.dashboard-container.dashboard-page.page-investimentos.ref-dashboard.app-horizon-shell {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+  --tx-nova-btn-bg: #b58d3d;
+  --tx-nova-btn-bg-hover: #c69d4d;
+  --tx-nova-btn-fg: #111111;
+  --tx-nova-btn-border: rgba(0, 0, 0, 0.14);
+  --tx-nova-btn-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+  --tx-nova-btn-ring: rgba(181, 141, 61, 0.42);
+
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body[data-theme='dark'] .dashboard-container.dashboard-page.page-investimentos.ref-dashboard.app-horizon-shell {
+  --tx-nova-btn-bg: #c4a052;
+  --tx-nova-btn-bg-hover: #d1ae62;
+  --tx-nova-btn-fg: #111111;
+  --tx-nova-btn-border: rgba(0, 0, 0, 0.22);
+  --tx-nova-btn-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --tx-nova-btn-ring: rgba(212, 177, 98, 0.48);
+}
+
+/* "+ Novo investimento": mesmo visual que "+ Nova transação" */
+.dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  font-family: var(--tx-dir-font) !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.2 !important;
+  min-height: 42px !important;
+  padding: 0 22px !important;
+  border-radius: 9999px !important;
+  border: 1px solid var(--tx-nova-btn-border) !important;
+  background: var(--tx-nova-btn-bg) !important;
+  background-image: none !important;
+  color: var(--tx-nova-btn-fg) !important;
+  box-shadow: var(--tx-nova-btn-shadow) !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:hover {
+  background: var(--tx-nova-btn-bg-hover) !important;
+  background-image: none !important;
+  color: var(--tx-nova-btn-fg) !important;
+  border-color: var(--tx-nova-btn-border) !important;
+}
+
+.dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:focus-visible {
+  outline: none !important;
+  box-shadow:
+    var(--tx-nova-btn-shadow),
+    0 0 0 3px var(--tx-nova-btn-ring) !important;
+}
+
 .page-investimentos-hero__rates-row {
   display: flex;
   flex-wrap: wrap;

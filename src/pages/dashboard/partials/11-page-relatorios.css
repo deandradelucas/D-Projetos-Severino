@@ -1,0 +1,149 @@
+/* =============================================================================
+   Página Relatórios — tipografia alinhada à Transações (Poppins + fallbacks).
+   ============================================================================= */
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Hero com «Saldo disponível:» — mesmo bloco estrutural da Visão Geral (dashboard-page) */
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+  align-items: flex-start;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row > .mobile-menu-btn {
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-main {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-top {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-top .dashboard-hub__hero-text {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-top .dashboard-hub__hero-actions {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  min-width: 0;
+  justify-content: flex-end;
+  flex-shrink: 1;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  color: var(--hub-muted);
+  font-size: clamp(0.88rem, 0.38vw + 0.72rem, 1.02rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line-label {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--hub-title);
+  font-size: clamp(1.35rem, 1.2vw + 0.95rem, 1.75rem);
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+  color: var(--text-secondary);
+}
+
+body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line-label {
+  color: var(--text-secondary) !important;
+}
+
+body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive {
+  color: #15803d !important;
+}
+
+body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative {
+  color: #dc2626 !important;
+}
+
+body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
+  color: var(--text-secondary, #64748b) !important;
+}
+
+body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+  color: var(--text-secondary, #a3a3a3);
+}
+
+body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive {
+  color: #4ade80 !important;
+}
+
+body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative {
+  color: #f87171 !important;
+}
+
+body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
+  color: var(--text-secondary, #a3a3a3) !important;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
+    font-size: clamp(0.8125rem, 3.15vw, 0.97rem);
+  }
+
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
+    flex: 0 1 auto;
+    font-size: clamp(1.25rem, 5.5vw, 1.65rem);
+    line-height: 1.15;
+  }
+}
+
+/* Respiro entre a linha Receitas/Despesas e o card Filtros */
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-panel.page-relatorios-ref-filters {
+  margin-top: clamp(16px, 2.5vw, 24px);
+}

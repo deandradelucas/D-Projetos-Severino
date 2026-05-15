@@ -1,3 +1,13 @@
+/* --- Página Pagamento: tipografia alinhada à Transações (Poppins + fallbacks) --- */
+.dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 /* --- Página Pagamento: grid, resumo, lateral, histórico --- */
 .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
   padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
@@ -55,7 +65,9 @@
 
 /* Mensal vs anual — checkout Asaas */
 .page-pagamento-planos.ref-panel {
-  padding: 18px 20px;
+  padding: 16px 20px 14px;
+  min-height: 0 !important;
+  flex: 0 0 auto;
 }
 
 .page-pagamento-planos__legend {

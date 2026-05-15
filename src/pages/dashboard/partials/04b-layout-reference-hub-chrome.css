@@ -1102,7 +1102,7 @@ body[data-theme='light'] .ref-kpi-row {
   margin: 0;
 }
 
-/* Relatórios: KPIs — 1 → 2 → 3 colunas conforme largura (evita rolagem horizontal) */
+/* Relatórios: KPIs — 1 → 2 colunas (Receitas + Despesas; saldo no hero) */
 body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-kpi-row,
 body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row {
   width: 100%;
@@ -1126,7 +1126,7 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row .ref-kpi
 @media (min-width: 960px) {
   body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-kpi-row,
   body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-kpi-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

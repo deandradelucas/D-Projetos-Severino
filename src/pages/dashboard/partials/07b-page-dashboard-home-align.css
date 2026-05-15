@@ -1,7 +1,8 @@
 /* =============================================================================
    Painel inicial (Dashboard.jsx): mesma fonte que Transações + ícones da lista
    «recentes» com fundo neutro (como .page-transacoes), sem faixa verde/vermelha.
-   CTAs «+ Nova transação»: mesmos tokens dourados que 07-page-transacoes.css.
+   CTAs «+ Nova transação» (hero): mesmos tokens dourados que 07-page-transacoes.css;
+   em ≤768px o hero esconde o primário — o FAB inferior substitui (04b + 02b).
    Escopo: não aplica em .page-transacoes / .page-admin / .page-investimentos.
    ============================================================================= */
 
@@ -133,6 +134,26 @@ body[data-theme='dark']
     .ref-tx-tipo-pulse {
     animation: none;
     box-shadow: none !important;
+  }
+}
+
+/* KPIs Saída/Entrada: ícones PNG (mesmas setas que em Transações) */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(.page-investimentos)
+  .ref-dashboard-kpi-strip
+  .ref-kpi-card__icon-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+  filter: none;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(.page-investimentos)
+    .ref-dashboard-kpi-strip
+    .ref-kpi-card__icon-img {
+    width: 16px;
+    height: 16px;
   }
 }
 
@@ -330,4 +351,12 @@ body[data-theme='dark']:has(
   box-shadow:
     0 0 0 5px rgba(212, 177, 98, 0.22),
     0 4px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Mobile: FAB substitui o «+ Nova transação» no hero (07b usa inline-flex !important acima — vence 04b sem !important) */
+@media (max-width: 768px) {
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(.page-investimentos)
+    .dashboard-hub__btn--primary {
+    display: none !important;
+  }
 }

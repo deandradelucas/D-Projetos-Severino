@@ -20,6 +20,16 @@
 @media (min-width: 769px) {
 }
 
+/* Agenda: mesma tipografia da página Transações (Poppins + fallbacks) — calendário, lista, modal */
+.dashboard-container.agenda-page.ref-dashboard.app-horizon-shell {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 /* Agenda 2.0 — calendário + itens do dia (referência mobile enviada). */
 .agenda-page .agenda-hero__title {
   display: grid;
@@ -40,7 +50,8 @@
   font-size: clamp(1.44rem, 4.6vw, 2.06rem);
   font-weight: 820;
   letter-spacing: -0.06em;
-  line-height: 1;
+  line-height: 1.15;
+  overflow: visible;
 }
 
 .agenda-page .agenda-hero__summary {
@@ -609,8 +620,12 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions button {
   .agenda-page .agenda-hero .dashboard-hub__hero-row {
     display: grid !important;
     grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center !important;
+    align-items: flex-start !important;
     gap: 10px !important;
+  }
+
+  .agenda-page .agenda-hero .dashboard-hub__hero-row > .mobile-menu-btn {
+    margin-top: 2px;
   }
 
   .agenda-page .agenda-hero .dashboard-hub__hero-actions {
@@ -627,14 +642,20 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions button {
   }
 
   .agenda-page .agenda-hero__title {
-    overflow: hidden;
+    overflow: visible;
+    min-width: 0;
   }
 
-  .agenda-page .agenda-hero__title span,
-  .agenda-page .agenda-hero__title strong {
+  .agenda-page .agenda-hero__title span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .agenda-page .agenda-hero__title strong {
+    overflow: visible;
+    white-space: nowrap;
+    line-height: 1.15;
   }
 
   .agenda-page .agenda-hero__summary {

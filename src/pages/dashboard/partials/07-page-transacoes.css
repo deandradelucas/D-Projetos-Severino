@@ -84,6 +84,13 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.app-horizon-shell {
     0 0 0 3px var(--tx-nova-btn-ring) !important;
 }
 
+/* Mobile: FAB fixo substitui o «+ Nova transação» no hero (evita duplicar; 07 usa inline-flex !important acima) */
+@media (max-width: 768px) {
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+    display: none !important;
+  }
+}
+
 .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
   font-size: clamp(1.15rem, 2.4vw, 1.45rem);
   font-weight: 700;
@@ -1084,10 +1091,6 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
     left: auto !important;
     right: auto !important;
     margin-inline: 0 !important;
-  }
-
-  body:has(.dashboard-container.page-transacoes) .dashboard-mobile-fabs {
-    display: none !important;
   }
 }
 
