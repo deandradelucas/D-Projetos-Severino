@@ -1114,7 +1114,7 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell button.ref-panel__li
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-panels {
-  gap: 14px;
+  gap: 18px;
   align-content: start;
 }
 

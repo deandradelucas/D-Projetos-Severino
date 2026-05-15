@@ -5,6 +5,70 @@
    Sobrescreve grids .ref-tx-table-subgrid--actions mais acima no ficheiro.
    ============================================================================= */
 
+/* ─── Tipografia + tokens visuais (referência: cartões claros, Poppins) ─── */
+.dashboard-container.page-transacoes.app-horizon-shell {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+  --tx-dir-title: #1a1a1b;
+  --tx-dir-title-rec: #107c52;
+  --tx-dir-muted: #8e959c;
+  --tx-dir-card-bg: #ffffff;
+  --tx-dir-card-border: #e8eaed;
+  --tx-dir-card-shadow: 0 2px 14px rgba(15, 23, 42, 0.07);
+  --tx-dir-panel-bg: #eceef2;
+  --tx-dir-footer-line: #e4e7ec;
+  --tx-dir-icon-bg: #f1f3f6;
+
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body[data-theme='dark'] .dashboard-container.page-transacoes.app-horizon-shell {
+  --tx-dir-title: #f4f4f5;
+  --tx-dir-title-rec: #3ecf8e;
+  --tx-dir-muted: #9ca3af;
+  --tx-dir-card-bg: #141820;
+  --tx-dir-card-border: rgba(255, 255, 255, 0.09);
+  --tx-dir-card-shadow: 0 2px 18px rgba(0, 0, 0, 0.4);
+  --tx-dir-panel-bg: #0c0e12;
+  --tx-dir-footer-line: rgba(255, 255, 255, 0.1);
+  --tx-dir-icon-bg: rgba(255, 255, 255, 0.07);
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.45;
+  color: var(--text-secondary, #64748b);
+}
+
+body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-tx-meta {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-ref-filters .transacoes-filter-grid .filter-input,
+.page-transacoes.app-horizon-shell .page-transacoes-ref-filters .page-transacoes-filter-grid .filter-input {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-field-label {
   display: none !important;
 }
@@ -28,22 +92,20 @@
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table.ref-panel {
   min-height: 0 !important;
-  padding: 10px 12px 10px !important;
-  border: 1px solid rgba(163, 163, 163, 0.28) !important;
-  background: rgba(255, 255, 255, 0.22) !important;
+  padding: 14px 14px 14px !important;
+  border: 1px solid var(--tx-dir-card-border, #e8eaed) !important;
+  background: var(--tx-dir-panel-bg, #eceef2) !important;
   background-image: none !important;
-  -webkit-backdrop-filter: blur(22px) saturate(1.12) !important;
-  backdrop-filter: blur(22px) saturate(1.12) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.42) inset,
-    0 18px 48px -28px rgba(15, 23, 42, 0.22) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table.ref-panel {
   min-height: 0 !important;
-  padding: 10px 12px 10px !important;
+  padding: 14px 14px 14px !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  background: #000000 !important;
+  background: #0c0e12 !important;
   background-image: none !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
@@ -104,18 +166,18 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .ref-panel__title {
   color: #0f172a;
-  font-size: 15px;
-  font-weight: 780;
+  font-size: 0.9375rem;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 1.35;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .ref-panel__title {
   color: #f8fafc;
-  font-size: 15px;
-  font-weight: 780;
+  font-size: 0.9375rem;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 1.35;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .page-transacoes-filters-toggle__chevron {
@@ -153,8 +215,9 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
   border-color: rgba(212, 168, 75, 0.32);
   border-radius: 999px;
   padding: 5px 11px;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   min-height: 36px;
 }
 
@@ -170,8 +233,9 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   border-color: rgba(212, 168, 75, 0.28);
   border-radius: 999px;
   padding: 5px 11px;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   min-height: 36px;
 }
 
@@ -183,12 +247,20 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .filter-group label {
   color: #475569;
-  font-weight: 650;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.3;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .filter-group label {
   color: rgba(148, 163, 184, 0.95);
-  font-weight: 650;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.3;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-panel__head.page-transacoes-tx-panel-head {
@@ -207,72 +279,91 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-panel-head__titles .ref-panel__title {
   color: #0f172a;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-panel-head__titles .ref-panel__title {
   color: #f8fafc;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-filter-hint {
   color: #64748b;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-filter-hint {
   color: rgba(148, 163, 184, 0.92);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
 }
 
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions,
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions {
-  display: flex !important;
-  flex-direction: column;
-  /* Respiro entre cartões (valor / linhas) */
-  gap: 14px;
-  padding: 0 !important;
-  min-width: 0;
+/* Mobile: coluna de cartões. Desktop: grelha no @media (min-width: 769px) com o mesmo seletor + .tx-cal-grid
+   para ganhar a `display:flex !important` antiga e aos subgrids globais (.ref-tx-table-subgrid--actions). */
+@media (max-width: 768px) {
+  body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions,
+  body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions {
+    display: flex !important;
+    flex-direction: column;
+    gap: 18px;
+    padding: 0 !important;
+    min-width: 0;
+  }
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) {
   display: grid !important;
-  grid-template-columns: 34px minmax(0, 1fr) auto !important;
+  grid-template-columns: 48px minmax(0, 1fr) auto !important;
   grid-template-rows: auto auto auto auto !important;
   grid-template-areas: none !important;
-  column-gap: 10px !important;
-  row-gap: 8px !important;
+  column-gap: 12px !important;
+  row-gap: 10px !important;
   align-items: start;
   min-height: 62px;
-  padding: 10px !important;
+  padding: 18px 18px 16px !important;
   margin: 0 !important;
-  border-radius: 18px !important;
+  border-radius: 16px !important;
   box-sizing: border-box !important;
-  border: 1px solid rgba(148, 163, 184, 0.12) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(1.08) !important;
-  backdrop-filter: blur(14px) saturate(1.08) !important;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.28) inset !important;
-  background: rgba(255, 255, 255, 0.34) !important;
+  border: 1px solid var(--tx-dir-card-border, #e8eaed) !important;
+  background: var(--tx-dir-card-bg, #ffffff) !important;
+  box-shadow: var(--tx-dir-card-shadow, 0 2px 14px rgba(15, 23, 42, 0.07)) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) {
   display: grid !important;
-  grid-template-columns: 34px minmax(0, 1fr) auto !important;
+  grid-template-columns: 48px minmax(0, 1fr) auto !important;
   grid-template-rows: auto auto auto auto !important;
   grid-template-areas: none !important;
-  column-gap: 10px !important;
-  row-gap: 8px !important;
+  column-gap: 12px !important;
+  row-gap: 10px !important;
   align-items: start;
   min-height: 62px;
-  padding: 10px !important;
+  padding: 18px 18px 16px !important;
   margin: 0 !important;
-  border-radius: 18px !important;
+  border-radius: 16px !important;
   box-sizing: border-box !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid var(--tx-dir-card-border, rgba(255, 255, 255, 0.09)) !important;
+  background: var(--tx-dir-card-bg, #141820) !important;
+  box-shadow: var(--tx-dir-card-shadow, 0 2px 18px rgba(0, 0, 0, 0.4)) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
-  box-shadow: none !important;
-  background: #000000 !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton):hover {
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: color-mix(in srgb, var(--tx-dir-card-bg, #141820) 92%, #ffffff 8%) !important;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton)::after,
@@ -330,20 +421,22 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   align-self: center;
   min-width: 0;
-  padding: 8px 0 0 !important;
-  margin: 0 !important;
-  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 14px 0 0 !important;
+  margin: 2px 0 0 !important;
+  border-top: 1px solid var(--tx-dir-footer-line, #e4e7ec);
 }
 
 /* Ícone seta: mesmas medidas do hub “recentes” (mobile) */
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap {
-  width: 30px;
-  height: 30px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   box-shadow: none;
+  background: var(--tx-dir-icon-bg, #f1f3f6) !important;
+  border: 1px solid color-mix(in srgb, var(--tx-dir-card-border, #e8eaed) 80%, transparent) !important;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap svg,
@@ -370,10 +463,11 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-cat-text {
-  font-weight: 800 !important;
-  color: #0b0b0b !important;
-  font-size: 13px !important;
-  line-height: 1.3 !important;
+  font-weight: 600 !important;
+  color: var(--tx-dir-title, #1a1a1b) !important;
+  font-size: 0.9375rem !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.02em !important;
   margin: 0 !important;
   white-space: normal !important;
   overflow: visible !important;
@@ -381,21 +475,31 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-cat-text {
-  font-weight: 800 !important;
-  color: #f1f5f9 !important;
-  font-size: 13px !important;
-  line-height: 1.3 !important;
+  font-weight: 600 !important;
+  color: var(--tx-dir-title, #f4f4f5) !important;
+  font-size: 0.9375rem !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.02em !important;
   margin: 0 !important;
   white-space: normal !important;
   overflow: visible !important;
   word-break: break-word !important;
 }
 
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-row:has(.ref-tx-arrow-wrap--up) .ref-tx-cat-text {
+  color: var(--tx-dir-title-rec, #107c52) !important;
+}
+
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-row:has(.ref-tx-arrow-wrap--up) .ref-tx-cat-text {
+  color: var(--tx-dir-title-rec, #3ecf8e) !important;
+}
+
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-sub-text {
-  font-weight: 600 !important;
-  color: #64748b !important;
-  font-size: 12px !important;
-  line-height: 1.3 !important;
+  font-weight: 400 !important;
+  color: var(--tx-dir-muted, #8e959c) !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
   margin: 0 !important;
   white-space: normal !important;
   overflow: visible !important;
@@ -403,10 +507,11 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-sub-text {
-  font-weight: 600 !important;
-  color: rgba(148, 163, 184, 0.95) !important;
-  font-size: 12px !important;
-  line-height: 1.3 !important;
+  font-weight: 400 !important;
+  color: var(--tx-dir-muted, #9ca3af) !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
   margin: 0 !important;
   white-space: normal !important;
   overflow: visible !important;
@@ -414,35 +519,45 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date {
-  display: inline-block !important;
+  display: block !important;
   margin: 0 !important;
-  padding: 2px 8px !important;
-  border-radius: 999px !important;
-  font-size: 10px !important;
-  font-weight: 650 !important;
-  letter-spacing: -0.01em !important;
-  line-height: 1.15 !important;
-  color: #475569 !important;
-  background: rgba(15, 23, 42, 0.06) !important;
-  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1.45 !important;
+  font-variant-numeric: tabular-nums !important;
+  color: var(--tx-dir-muted, #8e959c) !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date {
-  display: inline-block !important;
+  display: block !important;
   margin: 0 !important;
-  padding: 2px 8px !important;
-  border-radius: 999px !important;
-  font-size: 10px !important;
-  font-weight: 650 !important;
-  color: rgba(226, 232, 240, 0.88) !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1.45 !important;
+  font-variant-numeric: tabular-nums !important;
+  color: var(--tx-dir-muted, #9ca3af) !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-meta-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap {
-  width: 32px !important;
-  height: 32px !important;
-  border-radius: 11px !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 12px !important;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap svg,
@@ -455,17 +570,45 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val {
-  padding: 4px 9px !important;
-  border-radius: 999px !important;
-  font-size: 12px !important;
-  font-weight: 800 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.25 !important;
+  font-variant-numeric: tabular-nums !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--tx-dir-title, #1a1a1b) !important;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val {
-  padding: 4px 9px !important;
-  border-radius: 999px !important;
-  font-size: 12px !important;
-  font-weight: 800 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.25 !important;
+  font-variant-numeric: tabular-nums !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--tx-dir-title, #f4f4f5) !important;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--pos {
+  color: var(--tx-dir-title-rec, #107c52) !important;
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--neg {
+  color: var(--danger, #dc2626) !important;
+}
+
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--pos {
+  color: var(--tx-dir-title-rec, #3ecf8e) !important;
+}
+
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--neg {
+  color: var(--danger, #f87171) !important;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .transacoes-actions {
@@ -476,19 +619,34 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-desc,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-desc {
   display: block;
-  margin-top: 0.2rem;
-  font-size: 10px;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.01em;
-  line-height: 1.3;
-  color: color-mix(in srgb, var(--color-neutral-600, #525252) 75%, transparent);
+  line-height: 1.45;
+  color: var(--tx-dir-muted, #8e959c);
   white-space: normal;
   overflow: visible;
   word-break: break-word;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-desc {
-  color: rgba(255, 255, 255, 0.38);
+  color: var(--tx-dir-muted, #9ca3af);
+}
+
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-lancador,
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-lancador {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: var(--tx-dir-muted, #8e959c);
+}
+
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-lancador {
+  color: var(--tx-dir-muted, #9ca3af);
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-actions-cell svg {
@@ -558,72 +716,108 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 /* ─── Desktop: layout estilo calendário (grid multi-coluna) ────────────
    Usa classe exclusiva .tx-cal-grid para evitar conflitos de cascata
    com outros arquivos que definem display:flex/grid no mesmo elemento.
-   Acima de 769 px → grid lado a lado. Abaixo → flex-column (mobile).
+   Acima de 769 px → grelha fluida (quebra para a linha de baixo quando
+   não cabe mais uma coluna de ~220px). Abaixo → flex-column (mobile).
    ───────────────────────────────────────────────────────────────────── */
 @media (min-width: 769px) {
-  /* 1. Container — 4 colunas fixas, ocupa toda a largura */
-  .tx-cal-grid {
+  /* 1. Container — mesma especificidade que o flex mobile + .tx-cal-grid para aplicar grelha mesmo com !important noutros ficheiros */
+  body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions.tx-cal-grid,
+  body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions.tx-cal-grid {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 16px !important;
-    flex-direction: unset !important;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)) !important;
+    grid-auto-flow: row;
+    align-content: start;
+    gap: 22px !important;
+    padding: 0 !important;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-list {
+    overflow-x: hidden;
+    min-width: 0;
+  }
+
+  /* Evita herdar `grid-column: 1 / -1` dos layouts subgrid globais (.ref-tx-table-subgrid--actions). */
+  body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions.tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton),
+  body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions.tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) {
+    grid-column: auto !important;
+    min-width: 0;
   }
 
   /* 2. Card — espaçoso, quadrado com cantos arredondados */
   .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) {
     display: grid !important;
-    grid-template-columns: 40px minmax(0, 1fr) auto !important;
+    grid-template-columns: 48px minmax(0, 1fr) auto !important;
     grid-template-rows: auto auto auto auto !important;
-    padding: 18px 16px 14px !important;
-    column-gap: 12px !important;
-    row-gap: 10px !important;
+    padding: 18px 18px 16px !important;
+    column-gap: 14px !important;
+    row-gap: 12px !important;
     border-radius: 18px !important;
     min-height: 0 !important;
   }
 
   /* 3. Ícone maior no desktop */
   .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap {
-    width: 40px !important;
-    height: 40px !important;
+    width: 44px !important;
+    height: 44px !important;
     border-radius: 12px !important;
   }
 
   .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap svg,
   .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap i,
   .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap img {
-    width: 18px !important;
-    height: 18px !important;
-    font-size: 18px !important;
+    width: 14px !important;
+    height: 14px !important;
+    font-size: 14px !important;
   }
 
   /* 4. Categoria como título */
   body[data-theme='light'] .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-cat-text {
-    font-size: 15px !important;
-    font-weight: 800 !important;
-    color: #0f172a !important;
-    line-height: 1.35 !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    color: var(--tx-dir-title, #1a1a1b) !important;
+    line-height: 1.38 !important;
+    letter-spacing: -0.02em !important;
   }
 
   body[data-theme='dark'] .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-cat-text {
-    font-size: 15px !important;
-    font-weight: 800 !important;
-    color: #f1f5f9 !important;
-    line-height: 1.35 !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    color: var(--tx-dir-title, #f4f4f5) !important;
+    line-height: 1.38 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  body[data-theme='light'] .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton):has(.ref-tx-arrow-wrap--up) .ref-tx-cat-text {
+    color: var(--tx-dir-title-rec, #107c52) !important;
+  }
+
+  body[data-theme='dark'] .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton):has(.ref-tx-arrow-wrap--up) .ref-tx-cat-text {
+    color: var(--tx-dir-title-rec, #3ecf8e) !important;
   }
 
   /* 5. Subcategoria */
   .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-sub-text {
-    font-size: 13px !important;
+    font-size: 0.8125rem !important;
+    line-height: 1.45 !important;
+    font-weight: 400 !important;
+    color: var(--tx-dir-muted, #8e959c) !important;
+  }
+
+  body[data-theme='dark'] .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-sub-text {
+    color: var(--tx-dir-muted, #9ca3af) !important;
   }
 
   /* 6. Separador inferior — visível como na referência */
   body[data-theme='light'] .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-val-act-wrap {
-    border-top: 1px solid rgba(148, 163, 184, 0.35) !important;
+    border-top: 1px solid var(--tx-dir-footer-line, #e4e7ec) !important;
     padding-top: 10px !important;
   }
 
   body[data-theme='dark'] .tx-cal-grid > .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-val-act-wrap {
-    border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-top: 1px solid var(--tx-dir-footer-line, rgba(255, 255, 255, 0.1)) !important;
     padding-top: 10px !important;
   }
 
@@ -643,38 +837,38 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     padding: 8px 10px 8px !important;
   }
 
-  /* Sobrepõe 04c (color-mix / --bg-card) no escuro — cartões pretos como no desktop */
+  /* Sobrepõe 04c no escuro — alinha ao token do cartão “directório” */
   body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) {
-    background: #000000 !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-    box-shadow: none !important;
+    background: var(--tx-dir-card-bg, #141820) !important;
+    border-color: var(--tx-dir-card-border, rgba(255, 255, 255, 0.09)) !important;
+    box-shadow: var(--tx-dir-card-shadow, 0 2px 18px rgba(0, 0, 0, 0.4)) !important;
   }
 
   body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton):hover {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: color-mix(in srgb, var(--tx-dir-card-bg, #141820) 92%, #ffffff 8%) !important;
   }
 
   /* Não zerar row-gap aqui — anula respiro cat/sub/data definido no bloco vidro acima */
   body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton),
   body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row:not(.ref-tx-row--skeleton) {
-    padding: 10px !important;
-    column-gap: 10px !important;
-    row-gap: 8px !important;
-    grid-template-columns: 34px minmax(0, 1fr) auto !important;
+    padding: 16px 16px 14px !important;
+    column-gap: 12px !important;
+    row-gap: 10px !important;
+    grid-template-columns: 48px minmax(0, 1fr) auto !important;
   }
 
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap {
-    width: 30px !important;
-    height: 30px !important;
-    border-radius: 10px !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
   }
 
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap svg,
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap i,
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img {
-    width: 13px !important;
-    height: 13px !important;
-    font-size: 13px !important;
+    width: 14px !important;
+    height: 14px !important;
+    font-size: 14px !important;
     object-fit: contain;
   }
 
