@@ -2135,7 +2135,7 @@ body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row {
       row-gap: 10px;
       grid-template-columns:
         40px
-        minmax(100px, 1.25fr)
+        minmax(100px, min(240px, 1.25fr))
         minmax(0, min(28ch, 1.2fr))
         minmax(0, min(34ch, 1.2fr))
         minmax(24px, 28px)
