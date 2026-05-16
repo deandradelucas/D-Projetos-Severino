@@ -75,7 +75,28 @@
       "Bash(ssh-add -l)",
       "Bash(sshpass *)",
       "Bash(py --version)",
-      "Bash(python3.11 --version)"
+      "Bash(python3.11 --version)",
+      "Bash(ls vercel.json vercel.ts .vercel)",
+      "Bash(cat vercel.json)",
+      "Bash(cat vite.config.js)",
+      "Bash(cat vite.config.ts)",
+      "mcp__plugin_vercel_vercel__get_project",
+      "mcp__plugin_vercel_vercel__list_deployments",
+      "PowerShell(python3 -c \"import paramiko; print\\('ok'\\)\" 2>&1)",
+      "mcp__hostinger-mcp__DNS_getDNSRecordsV1",
+      "mcp__hostinger-mcp__DNS_updateDNSRecordsV1",
+      "PowerShell(Resolve-DnsName *)",
+      "PowerShell(curl.exe -sk -H \"Host: severino.mestredamente.com\" https://187.77.32.207/api/health --max-time 10 2>&1)",
+      "PowerShell(curl.exe -sk -H \"Host: severino.mestredamente.com\" https://187.77.32.207/ --max-time 10 2>&1)",
+      "PowerShell(python \"D:\\\\Projetos\\\\Severino\\\\fix_iptables.py\")",
+      "WebFetch(domain:severino.mestredamente.com)",
+      "Bash(python3.exe -c \"import sys; print\\(sys.version\\)\")",
+      "Bash(where python *)",
+      "WebFetch(domain:github.com)",
+      "Bash(git clone *)",
+      "PowerShell(python3 --version)",
+      "PowerShell(python --version)",
+      "PowerShell(python \"C:\\\\Users\\\\lucas\\\\deploy_severino.py\")"
     ]
   }
 }
