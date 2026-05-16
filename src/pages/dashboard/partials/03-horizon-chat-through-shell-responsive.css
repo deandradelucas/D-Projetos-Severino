@@ -701,10 +701,11 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
       max(10px, env(safe-area-inset-left, 0px));
   }
 
+  /* ≥16px evita zoom automático do Safari/iOS ao focar o textarea */
   .horizon-chat-input {
     min-height: 38px;
     padding: 8px 12px;
-    font-size: 13px;
+    font-size: 16px !important;
   }
 
   .horizon-send-btn {
