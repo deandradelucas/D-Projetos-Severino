@@ -218,6 +218,12 @@ body.horizon-modal-open .pwa-install-sheet {
   display: none !important;
 }
 
+body.horizon-chat-open .mobile-bottom-nav,
+body.horizon-chat-open .dashboard-mobile-tx-fab,
+body.horizon-chat-open .dashboard-mobile-fabs {
+  display: none !important;
+}
+
 body.horizon-sidebar-open .mobile-bottom-nav,
 body:has(.sidebar.open) .mobile-bottom-nav {
   display: none !important;

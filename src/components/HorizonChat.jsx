@@ -10,8 +10,14 @@ import { BRAND_ASSETS } from '../lib/brandAssets'
    AppSessionOutlet pode bloquear a rota e o import em Dashboard.jsx não roda — chat ficava sem CSS. */
 import '../pages/dashboard.css'
 
+function keyboardOverlapPx() {
+  const vv = window.visualViewport
+  if (!vv) return 0
+  return Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+}
+
 /** Ancora FAB + janela ao `main.main-content` do app shell (canto inferior direito “dentro” do painel). */
-function useHorizonShellDock() {
+function useHorizonShellDock(chatOpen) {
   const location = useLocation()
   const [dock, setDock] = useState(null)
 
@@ -74,6 +80,31 @@ function useHorizonShellDock() {
         const maxCardW = 384
         const w = Math.min(maxCardW, Math.max(260, mainW - sideInset * 2))
         const left = mainL + (mainW - w) / 2
+
+        if (chatOpen) {
+          const vv = window.visualViewport
+          const gap = 10
+          const kb = keyboardOverlapPx()
+          const bottomPx = kb > 0 ? kb + gap : gap
+          const availH = vv ? vv.height : window.innerHeight
+          const winH = Math.min(500, Math.max(220, Math.round(availH * 0.58)))
+
+          setDock({
+            fabStyle: { position: 'fixed', bottom: fabBottom, right: fabRight },
+            winStyle: {
+              position: 'fixed',
+              left: `${left}px`,
+              width: `${w}px`,
+              right: 'auto',
+              bottom: `${bottomPx}px`,
+              maxWidth: `${w}px`,
+              height: `${winH}px`,
+              maxHeight: `${Math.min(winH, Math.max(200, availH - gap * 2))}px`,
+            },
+          })
+          return
+        }
+
         setDock({
           fabStyle: { position: 'fixed', bottom: fabBottom, right: fabRight },
           winStyle: {
@@ -132,18 +163,39 @@ function useHorizonShellDock() {
       connectRo()
     }, 160)
 
-    window.addEventListener('resize', schedule)
-    window.addEventListener('scroll', schedule, true)
+    const mobileMq = window.matchMedia('(max-width: 768px)')
+
+    const onWindowResize = () => {
+      if (mobileMq.matches && chatOpen) return
+      schedule()
+    }
+
+    const onWindowScroll = () => {
+      if (mobileMq.matches && chatOpen) return
+      schedule()
+    }
+
+    const vv = window.visualViewport
+    const onVvChange = () => {
+      if (mobileMq.matches && chatOpen) schedule()
+    }
+
+    window.addEventListener('resize', onWindowResize)
+    window.addEventListener('scroll', onWindowScroll, true)
+    vv?.addEventListener('resize', onVvChange)
+    vv?.addEventListener('scroll', onVvChange)
 
     return () => {
       window.clearTimeout(fallback)
       window.clearTimeout(retryTimer)
       cancelAnimationFrame(raf)
       ro?.disconnect()
-      window.removeEventListener('resize', schedule)
-      window.removeEventListener('scroll', schedule, true)
+      window.removeEventListener('resize', onWindowResize)
+      window.removeEventListener('scroll', onWindowScroll, true)
+      vv?.removeEventListener('resize', onVvChange)
+      vv?.removeEventListener('scroll', onVvChange)
     }
-  }, [location.pathname])
+  }, [location.pathname, chatOpen])
 
   return dock
 }
@@ -162,8 +214,8 @@ function MarkdownText({ text }) {
 
 export default function HorizonChat() {
   const location = useLocation()
-  const shellDock = useHorizonShellDock()
   const [aberto, setAberto] = useState(false)
+  const shellDock = useHorizonShellDock(aberto)
 
   const [mensagens, setMensagens] = useState([
     {
@@ -180,6 +232,23 @@ export default function HorizonChat() {
   const inputRef = useRef(null)
   const fabRef = useRef(null)
   const windowRef = useRef(null)
+
+  /* Mobile: esconde nav inferior e trava scroll da página enquanto o chat está aberto */
+  useLayoutEffect(() => {
+    if (!aberto) return undefined
+    const mobile = window.matchMedia('(max-width: 768px)').matches
+    if (!mobile) return undefined
+
+    document.body.classList.add('horizon-chat-open')
+    const scrollEl = document.querySelector('.ref-dashboard-scroll')
+    const prevOverflow = scrollEl?.style.overflow ?? ''
+    if (scrollEl) scrollEl.style.overflow = 'hidden'
+
+    return () => {
+      document.body.classList.remove('horizon-chat-open')
+      if (scrollEl) scrollEl.style.overflow = prevOverflow
+    }
+  }, [aberto])
 
   useEffect(() => {
     if (!aberto) return
