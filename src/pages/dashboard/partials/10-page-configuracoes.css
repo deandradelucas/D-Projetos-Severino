@@ -1159,6 +1159,34 @@ textarea.config-invite-message-preview:focus-visible {
   outline-offset: 2px;
 }
 
+.config-invite-copiado {
+  margin: 14px 0 0;
+  padding: 0;
+  text-align: center;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--success, #16a34a);
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    max-height 0.25s ease,
+    margin 0.25s ease;
+}
+
+.config-invite-copiado--visible {
+  opacity: 1;
+  max-height: 2rem;
+  margin-top: 14px;
+}
+
+body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-invite-copiado {
+  color: var(--success, #22c55e);
+}
+
 /* ——— Subsecções ——— */
 .config-subsection {
   margin-top: 1.35rem;
