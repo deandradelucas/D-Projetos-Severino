@@ -2559,8 +2559,10 @@ body[data-theme='dark'] .agenda-page .agenda-event__local {
     padding: 0 !important;
   }
 
-  .agenda-page .ref-dashboard-scroll {
-    min-height: 100dvh;
+  .agenda-page.dashboard-page .ref-dashboard-scroll {
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
     border-radius: 0;
     padding: 0 16px calc(110px + var(--safe-bottom)) !important;
     box-shadow: none;
@@ -2611,12 +2613,16 @@ body[data-theme='dark'] .agenda-page .agenda-event__local {
     padding: 0 !important;
   }
 
-  .agenda-page .ref-dashboard-scroll {
+  .agenda-page.dashboard-page .ref-dashboard-scroll {
     width: 100% !important;
     max-width: none !important;
     min-height: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
     margin: 0 !important;
     padding: 0 14px calc(120px + var(--safe-bottom)) !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
   }
@@ -2631,7 +2637,7 @@ body[data-theme='dark'] .agenda-page .agenda-event__local {
 }
 
 @media (max-width: 900px) {
-  /* Dashboard inicial / Transações (.dashboard-page): fundo branco / hero vidro, sem tarja preta. */
+  /* Dashboard inicial / Transações / Agenda (.dashboard-page): viewport fixo; rolagem só em .ref-dashboard-scroll */
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell,
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell {
     position: fixed !important;
@@ -2835,9 +2841,9 @@ body[data-theme='dark'] .agenda-page .agenda-event__local {
     max-width: none !important;
     height: 100% !important;
     max-height: 100% !important;
-    min-height: 100dvh !important;
+    min-height: 0 !important;
     margin: 0 !important;
-    padding: 0 14px calc(144px + var(--safe-bottom)) !important;
+    padding: 0 14px calc(120px + var(--safe-bottom)) !important;
     overflow-y: auto !important;
     overscroll-behavior-y: none !important;
     -webkit-overflow-scrolling: touch !important;
@@ -2853,9 +2859,9 @@ body[data-theme='dark'] .agenda-page .agenda-event__local {
     max-width: none !important;
     height: 100% !important;
     max-height: 100% !important;
-    min-height: 100dvh !important;
+    min-height: 0 !important;
     margin: 0 !important;
-    padding: 0 14px calc(144px + var(--safe-bottom)) !important;
+    padding: 0 14px calc(120px + var(--safe-bottom)) !important;
     overflow-y: auto !important;
     overscroll-behavior-y: none !important;
     -webkit-overflow-scrolling: touch !important;

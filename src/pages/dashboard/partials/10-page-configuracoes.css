@@ -600,14 +600,22 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-avatar--cl
 /* ——— Security card ——— */
 .config-security-card {
   display: grid;
-  gap: 2px;
+  gap: 0;
+}
+
+.config-security-card .config-card-head {
+  margin-bottom: 10px;
 }
 
 .config-security-panel {
-  padding: 12px;
+  padding: 10px 12px;
   border: 1px solid color-mix(in srgb, var(--border-default) 76%, transparent);
   border-radius: 18px;
   background: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
+}
+
+.config-security-panel .config-empty-note {
+  padding: 2px 0;
 }
 
 /* ——— Bio list ——— */
@@ -1437,6 +1445,18 @@ body[data-theme='dark'] .switch-apple:checked {
 
 /* ——— Responsividade mobile (≤640px) ——— */
 @media (max-width: 640px) {
+  .page-configuracoes.app-horizon-shell .config-layout--clean {
+    padding-bottom: 0;
+  }
+
+  .page-configuracoes.app-horizon-shell .config-layout--clean > .config-security-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .page-configuracoes.app-horizon-shell .config-security-card {
+    padding-bottom: 1rem;
+  }
+
   /* Padding e raio dos cards */
   .page-configuracoes.app-horizon-shell .config-card,
   .config-card {

@@ -31,7 +31,6 @@ import { AgendaDayList } from '../components/agenda/AgendaDayList'
 
 const EMPTY_FORM = {
   titulo: '',
-  local: '',
   inicio: '',
   fim: '',
   lembrar_minutos_antes: 15,
@@ -203,7 +202,6 @@ export default function Agenda() {
     setEditing(evento)
     setForm({
       titulo: evento.titulo || '',
-      local: evento.local || '',
       inicio: toDatetimeLocal(evento.inicio),
       fim: toDatetimeLocal(evento.fim),
       lembrar_minutos_antes: evento.lembrar_minutos_antes ?? 15,
@@ -298,7 +296,7 @@ export default function Agenda() {
   }
 
   return (
-    <div className="dashboard-container agenda-page ref-dashboard app-horizon-shell">
+    <div className="dashboard-container dashboard-page agenda-page ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
         <Sidebar menuAberto={menuAberto} setMenuAberto={setMenuAberto} />
 
@@ -397,10 +395,6 @@ export default function Agenda() {
             <label className="agenda-field">
               <span>Data e hora</span>
               <input type="datetime-local" value={form.inicio} onChange={(e) => setForm((f) => ({ ...f, inicio: e.target.value }))} required />
-            </label>
-            <label className="agenda-field">
-              <span>Local</span>
-              <input value={form.local} onChange={(e) => setForm((f) => ({ ...f, local: e.target.value }))} maxLength={180} placeholder="Ex.: Zoom, escritório, clínica" />
             </label>
             <div className="agenda-modal__grid">
               <label className="agenda-field">
