@@ -45,7 +45,6 @@ export default function Configuracoes() {
   const [familiaLoadErr, setFamiliaLoadErr] = useState(null)
   const [familiaBusy, setFamiliaBusy] = useState(false)
   const [novoConvitePapel, setNovoConvitePapel] = useState('MEMBER')
-  const [novoConviteLabel, setNovoConviteLabel] = useState('')
   const [ultimoTokenConvite, setUltimoTokenConvite] = useState('')
   const [familiaConfirm, setFamiliaConfirm] = useState(null)
   const [alterarPapelMembro, setAlterarPapelMembro] = useState(null)
@@ -266,7 +265,7 @@ export default function Configuracoes() {
       const res = await fetch(apiUrl('/api/familia/convites'), {
         method: 'POST',
         headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({ papel: novoConvitePapel, label: novoConviteLabel.trim() || null }),
+        body: JSON.stringify({ papel: novoConvitePapel }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -274,7 +273,6 @@ export default function Configuracoes() {
         return
       }
       setUltimoTokenConvite(String(data.token || '').trim())
-      setNovoConviteLabel('')
       showToast(data.message || 'Convite criado.')
       await loadFamiliaPainel()
     } catch {
@@ -582,21 +580,6 @@ export default function Configuracoes() {
                     disabled={familiaBusy}
                   />
                 </label>
-                <div className="config-field config-field--stretch">
-                  <label htmlFor="familia-convite-label" className="config-field-label">
-                    <span>Identificação (opcional)</span>
-                  </label>
-                  <input
-                    id="familia-convite-label"
-                    type="text"
-                    className="config-input"
-                    placeholder='Ex: "Para João" — aparece na lista de pendentes'
-                    maxLength={60}
-                    value={novoConviteLabel}
-                    onChange={(e) => setNovoConviteLabel(e.target.value)}
-                    disabled={familiaBusy || familiaLimiteConvitesAtingido}
-                  />
-                </div>
                 <div className="config-familia-generate-row__cta">
                   <button
                     type="button"
@@ -682,7 +665,6 @@ export default function Configuracoes() {
                     <li key={c.id} className="config-bio-item">
                       <span>
                         <strong>{papelFamiliaLabel(c.papel_convite)}</strong>
-                        {c.label ? <em className="config-bio-item__tag"> · {c.label}</em> : null}
                         <small>
                           Expira em{' '}
                           {c.expires_at
