@@ -30,6 +30,60 @@
   text-rendering: optimizeLegibility;
 }
 
+/* Modal nova/editar agenda — overlay fixo no viewport, card centralizado, Poppins em todo o formulário */
+.agenda-modal-backdrop.modal-backdrop {
+  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top, 0px)) 12px max(12px, env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: manipulation;
+  font-family: var(--tx-dir-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.agenda-modal-backdrop .agenda-modal,
+.agenda-modal-backdrop .agenda-modal h2,
+.agenda-modal-backdrop .agenda-modal .agenda-section-eyebrow,
+.agenda-modal-backdrop .agenda-modal .agenda-field span,
+.agenda-modal-backdrop .agenda-modal .agenda-toggle span,
+.agenda-modal-backdrop .agenda-modal input,
+.agenda-modal-backdrop .agenda-modal textarea,
+.agenda-modal-backdrop .agenda-modal select,
+.agenda-modal-backdrop .agenda-modal button {
+  font-family: var(--tx-dir-font);
+}
+
+.agenda-modal-backdrop .agenda-modal {
+  width: min(560px, calc(100vw - 24px));
+  max-height: min(
+    88dvh,
+    100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 28px
+  );
+  margin: auto;
+  flex-shrink: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+body:has(.agenda-modal-backdrop) .mobile-bottom-nav,
+body:has(.agenda-modal-backdrop) .dashboard-mobile-tx-fab,
+body:has(.agenda-modal-backdrop) .horizon-chat-fab,
+body:has(.agenda-modal-backdrop) .horizon-chat-window,
+body:has(.agenda-modal-backdrop) .pwa-install-sheet {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 /* Agenda 2.0 — calendário + itens do dia (referência mobile enviada). */
 .agenda-page .agenda-hero__title {
   display: grid;

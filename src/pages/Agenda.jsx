@@ -1,4 +1,5 @@
 ﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
@@ -30,7 +31,6 @@ import { AgendaDayList } from '../components/agenda/AgendaDayList'
 
 const EMPTY_FORM = {
   titulo: '',
-  descricao: '',
   local: '',
   inicio: '',
   fim: '',
@@ -203,7 +203,6 @@ export default function Agenda() {
     setEditing(evento)
     setForm({
       titulo: evento.titulo || '',
-      descricao: evento.descricao || '',
       local: evento.local || '',
       inicio: toDatetimeLocal(evento.inicio),
       fim: toDatetimeLocal(evento.fim),
@@ -368,9 +367,21 @@ export default function Agenda() {
         </main>
       </div>
 
-      {modalOpen && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label={editing ? 'Editar item da agenda' : 'Novo item da agenda'}>
-          <form className="agenda-modal" onSubmit={saveEvent}>
+      {modalOpen && createPortal(
+        <div
+          className="modal-backdrop agenda-modal-backdrop"
+          role="presentation"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget && !saving) setModalOpen(false)
+          }}
+        >
+          <form
+            className="agenda-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={editing ? 'Editar item da agenda' : 'Novo item da agenda'}
+            onSubmit={saveEvent}
+          >
             <div className="agenda-modal__header">
               <div>
                 <span className="agenda-section-eyebrow">{editing ? 'Editar item' : 'Novo item'}</span>
@@ -391,11 +402,6 @@ export default function Agenda() {
               <span>Local</span>
               <input value={form.local} onChange={(e) => setForm((f) => ({ ...f, local: e.target.value }))} maxLength={180} placeholder="Ex.: Zoom, escritório, clínica" />
             </label>
-            <label className="agenda-field">
-              <span>Descrição</span>
-              <textarea value={form.descricao} onChange={(e) => setForm((f) => ({ ...f, descricao: e.target.value }))} rows={3} placeholder="Notas rápidas para lembrar antes do compromisso" />
-            </label>
-
             <div className="agenda-modal__grid">
               <label className="agenda-field">
                 <span>Aviso de notificação</span>
@@ -430,7 +436,8 @@ export default function Agenda() {
               </div>
             </div>
           </form>
-        </div>
+        </div>,
+        document.body,
       )}
       <ConfirmDialog
         open={confirmDeleteOpen}
