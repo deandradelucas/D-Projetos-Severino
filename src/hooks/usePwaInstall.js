@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react'
 
-function isIosBrowser() {
+function isIosSafari() {
   const ua = navigator.userAgent
-  return /iphone|ipad|ipod/i.test(ua) && !window.MSStream
+  const isIos = /iphone|ipad|ipod/i.test(ua) && !window.MSStream
+  // iPadOS 13+ reporta como macOS — detectar via touch
+  const isIpadOs = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1
+  const isSafari = /safari/i.test(ua) && !/crios|fxios|opios|mercury/i.test(ua)
+  return (isIos || isIpadOs) && isSafari
 }
 
 function isStandalone() {
@@ -15,13 +19,12 @@ function isStandalone() {
 export function usePwaInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [canInstall, setCanInstall] = useState(false)
-  const [ios, setIos] = useState(false)
-  const [installed, setInstalled] = useState(false)
+  // inicializa ios de forma síncrona para evitar flash de "não mostrar"
+  const [ios] = useState(() => !isStandalone() && isIosSafari())
+  const [installed, setInstalled] = useState(() => isStandalone())
 
   useEffect(() => {
-    if (isStandalone()) { setInstalled(true); return }
-
-    setIos(isIosBrowser())
+    if (installed) return
 
     const handler = (e) => {
       e.preventDefault()
@@ -33,7 +36,7 @@ export function usePwaInstall() {
     window.addEventListener('appinstalled', () => setInstalled(true))
 
     return () => window.removeEventListener('beforeinstallprompt', handler)
-  }, [])
+  }, [installed])
 
   async function install() {
     if (!deferredPrompt) return
