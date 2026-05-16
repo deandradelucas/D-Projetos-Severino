@@ -304,7 +304,7 @@ function stripDateTime(text) {
   t = t.replace(/\bmeio[\s-]dia\b/gi, '')
   t = t.replace(/\bmeia[\s-]noite\b/gi, '')
   t = t.replace(/\b(?:depois\s+de\s+amanh[aã]|amanh[aã]|hoje)(?!\w)/gi, '')
-  t = t.replace(/\b(?:segunda(?:-feira)?|ter[cç]a(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|s[aá]bado|domingo|seg|ter|qua|qui|sex|sab|dom)\.?\b/gi, '')
+  t = t.replace(/\b(?:segunda(?:-feira)?|ter[cç]a(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|s[aá]bado|domingo|seg|ter|qua|qui|sex|sab|dom)\.?(?!\w)/gi, '')
   t = t.replace(/\b(?:daqui\s+a|em)\s+\d{1,3}\s*(?:min|minuto|minutos|hora|horas|h|dia|dias|semana|semanas)\b/gi, '')
   t = t.replace(/\b(?:dia\s+)?\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b/gi, '')
   t = t.replace(/(?<!\w)(?:às|as|pelas?)\s*\d{1,2}(?:h\d{2}|:\d{2}|\s+horas?\s+e\s+meia|\s+horas?|h)?(?=\s|$|[^\w])/gi, '')
