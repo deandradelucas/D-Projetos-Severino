@@ -21,11 +21,14 @@ import { getWhatsappContactUrl } from '../lib/whatsappContactUrl.js'
 import { SkeletonKpi, SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon'
+import PwaInstallBanner from '../components/PwaInstallBanner'
+import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
 
 export default function Dashboard() {
   const location = useLocation()
   const navigate = useNavigate()
   const { privacyMode, togglePrivacy } = useTheme()
+  const isMobile = useMatchMaxWidth(768)
   const [usuario, setUsuario] = useState(() => readHorizonteUserPainelState())
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -192,6 +195,8 @@ export default function Dashboard() {
             </div>
           </div>
         </section>
+
+        {isMobile && <PwaInstallBanner />}
 
         <section
           className={`ref-kpi-row ref-dashboard-kpi-strip dashboard-hub__kpis${refreshing ? ' page-panel--refreshing' : ''}`}
