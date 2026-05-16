@@ -6,6 +6,7 @@ import { BRAND_ASSETS } from '../lib/brandAssets'
 import { useTheme } from '../context/ThemeContext'
 import { logoutHorizonte } from '../lib/logout'
 import { MAIN_NAV_ITEMS } from '../lib/navItems'
+import { version } from '../../package.json'
 
 const SIDEBAR_ICON_PROPS = { strokeWidth: '1.5', width: '22', height: '22' }
 
@@ -292,6 +293,10 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             </>
           )}
         </ul>
+
+        <span style={{ display: 'block', textAlign: 'center', fontSize: '0.65rem', opacity: 0.35, marginBottom: '6px', letterSpacing: '0.05em' }}>
+          v{version}
+        </span>
 
         <button
           className="logout-btn"
