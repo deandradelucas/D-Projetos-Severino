@@ -7,12 +7,14 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog'
 import ConfigSelectCustom from '../components/ConfigSelectCustom.jsx'
 import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
+import ConfigAparenciaCard from '../components/configuracoes/ConfigAparenciaCard'
+import ConfigBiometriaCard from '../components/configuracoes/ConfigBiometriaCard'
 import { useTheme } from '../context/ThemeContext'
+import { useConfigWebAuthn } from '../hooks/useConfigWebAuthn'
 import { apiUrl } from '../lib/apiUrl'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { montarTextoConviteFamiliaComPwa } from '../lib/familiaConviteMensagemCompartilhavel'
 import { getPublicAppOriginForConvites } from '../lib/publicAppOrigin'
-import { webAuthnSupported, registerWebAuthnCredential } from '../lib/webauthnBrowser'
 import { formatPhoneBRDisplay, maskPhoneBRMobile, validatePhoneBRMobile } from '../lib/formatPhoneBR'
 
 const PAPEL_CONVITE_OPCOES = [
@@ -37,11 +39,6 @@ export default function Configuracoes() {
 
   const [toast, setToast] = useState('')
   const [resetSending, setResetSending] = useState(false)
-  const [webauthnList, setWebauthnList] = useState([])
-  const [webauthnLoading, setWebauthnLoading] = useState(false)
-  const [webauthnError, setWebauthnError] = useState(null)
-  const [bioRegistering, setBioRegistering] = useState(false)
-  const [confirmBiometricRemoval, setConfirmBiometricRemoval] = useState(null)
   const [familiaTitular, setFamiliaTitular] = useState(null)
   const [familiaMembros, setFamiliaMembros] = useState([])
   const [familiaConvites, setFamiliaConvites] = useState([])
@@ -62,6 +59,18 @@ export default function Configuracoes() {
     setToast(msg)
     setTimeout(() => setToast(''), 4200)
   }, [])
+
+  const {
+    webauthnList,
+    webauthnLoading,
+    webauthnError,
+    bioRegistering,
+    confirmBiometricRemoval,
+    setConfirmBiometricRemoval,
+    handleRegisterBiometric,
+    handleRemoveBiometric,
+    loadWebAuthn,
+  } = useConfigWebAuthn({ usuarioIdHeader, showToast })
 
   const refreshAssinaturaPerfil = useCallback(async () => {
     if (!usuarioIdHeader) return
@@ -158,71 +167,7 @@ export default function Configuracoes() {
       .catch(() => {})
   }, [usuarioIdHeader, refreshAssinaturaPerfil])
 
-  const loadWebAuthn = useCallback(async () => {
-    if (!usuarioIdHeader) return
-    setWebauthnLoading(true)
-    setWebauthnError(null)
-    try {
-      const res = await fetch(apiUrl('/api/auth/webauthn/credentials'), {
-        headers: horizonteApiAuthHeaders(),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        setWebauthnList([])
-        setWebauthnError(data.message || `Não foi possível carregar (${res.status}).`)
-        return
-      }
-      setWebauthnList(Array.isArray(data.credentials) ? data.credentials : [])
-    } catch {
-      setWebauthnList([])
-      setWebauthnError('Erro de rede ao carregar a biometria.')
-    } finally {
-      setWebauthnLoading(false)
-    }
-  }, [usuarioIdHeader])
-
-  useEffect(() => {
-    loadWebAuthn()
-  }, [loadWebAuthn])
-
-  const handleRegisterBiometric = async () => {
-    if (!usuarioIdHeader) return
-    if (!webAuthnSupported()) {
-      showToast('Biometria requer HTTPS (ou localhost) e navegador compatível.')
-      return
-    }
-    setBioRegistering(true)
-    try {
-      await registerWebAuthnCredential(() => horizonteApiAuthHeaders())
-      showToast('Biometria ativada neste aparelho.')
-      await loadWebAuthn()
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Não foi possível ativar a biometria.')
-    } finally {
-      setBioRegistering(false)
-    }
-  }
-
-  const handleRemoveBiometric = async (credentialRowId) => {
-    if (!usuarioIdHeader) return
-    try {
-      const res = await fetch(apiUrl(`/api/auth/webauthn/credentials/${credentialRowId}`), {
-        method: 'DELETE',
-        headers: horizonteApiAuthHeaders(),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.message || 'Erro ao remover.')
-      }
-      showToast('Biometria removida.')
-      await loadWebAuthn()
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Erro ao remover.')
-    }
-  }
-
   const isAdmin = String(perfil.role || '').toUpperCase() === 'ADMIN'
-  const biometricSupported = webAuthnSupported()
   const profileInitial = (perfil.nome || perfil.email || '?').charAt(0).toUpperCase()
   const roleLabel = isAdmin ? 'Administrador' : 'Usuário'
   const telefoneLabel = perfil.telefone ? formatPhoneBRDisplay(perfil.telefone) : 'Não informado'
@@ -577,52 +522,12 @@ export default function Configuracoes() {
             </div>
           </section>
 
-          <section className="config-card config-card--preferences" aria-labelledby="config-preferencias-heading">
-            <div className="config-card-head">
-              <span className="config-card-kicker">Preferências</span>
-              <h2 id="config-preferencias-heading" className="config-card-title-clean">
-                Aparência
-              </h2>
-              <p className="config-card-subtitle">Escolha o tema e o nível de privacidade da interface.</p>
-            </div>
-
-            <div className="config-themes config-themes--compact" role="group" aria-label="Tema da interface">
-              <button
-                type="button"
-                className={`config-theme-card ${theme === 'light' ? 'is-active' : ''}`}
-                onClick={() => setTheme('light')}
-                aria-pressed={theme === 'light'}
-              >
-                <div className="config-theme-preview config-theme-preview--light" aria-hidden />
-                <div className="config-theme-body">
-                  <h4>Claro</h4>
-                  <p>Visual leve para o dia.</p>
-                </div>
-              </button>
-              <button
-                type="button"
-                className={`config-theme-card ${theme === 'dark' ? 'is-active' : ''}`}
-                onClick={() => setTheme('dark')}
-                aria-pressed={theme === 'dark'}
-              >
-                <div className="config-theme-preview config-theme-preview--dark" aria-hidden />
-                <div className="config-theme-body">
-                  <h4>Escuro</h4>
-                  <p>Menos brilho à noite.</p>
-                </div>
-              </button>
-            </div>
-
-            <div className="config-preference-list">
-              <label className="config-pref-row config-pref-row--clean">
-                <span className="config-pref-label">
-                  <strong>Modo privacidade</strong>
-                  <span>Oculta valores sensíveis nas telas principais.</span>
-                </span>
-                <input type="checkbox" className="switch-apple" checked={privacyMode} onChange={togglePrivacy} aria-label="Modo privacidade" />
-              </label>
-            </div>
-          </section>
+          <ConfigAparenciaCard
+            theme={theme}
+            setTheme={setTheme}
+            privacyMode={privacyMode}
+            togglePrivacy={togglePrivacy}
+          />
 
           {familiaPainelCarregado && Boolean(usuarioIdHeader) && !perfil.conta_familiar_membro && familiaTitular === false && (
             <section className="config-card config-card--full" id="config-secao-convite-familia">
@@ -866,62 +771,16 @@ export default function Configuracoes() {
             </section>
           )}
 
-          <section className="config-card config-card--full config-security-card">
-            <div className="config-card-head config-card-head--row">
-              <div>
-                <span className="config-card-kicker">Segurança</span>
-                <h2 className="config-card-title-clean">Login por biometria</h2>
-                <p className="config-card-subtitle">Use digital ou Face ID neste aparelho quando disponível.</p>
-              </div>
-              <button
-                type="button"
-                className="config-action-btn config-action-btn--primary"
-                disabled={!usuarioIdHeader || bioRegistering || !biometricSupported}
-                onClick={handleRegisterBiometric}
-              >
-                {bioRegistering ? 'Ativando…' : 'Ativar'}
-              </button>
-            </div>
-
-            <div className="config-security-panel">
-              {webauthnLoading ? (
-                <p className="config-empty-note">Carregando dispositivos…</p>
-              ) : webauthnError ? (
-                <div className="config-empty-note">
-                  <span>{webauthnError}</span>
-                  <button type="button" className="config-action-btn" onClick={() => loadWebAuthn()}>
-                    Tentar de novo
-                  </button>
-                </div>
-              ) : webauthnList.length === 0 ? (
-                <p className="config-empty-note">
-                  Nenhuma biometria cadastrada nesta conta.
-                </p>
-              ) : (
-                <ul className="config-bio-list">
-                  {webauthnList.map((row) => (
-                    <li key={row.id} className="config-bio-item">
-                      <span>
-                        <strong>
-                          {row.created_at
-                            ? new Date(row.created_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
-                            : 'Dispositivo cadastrado'}
-                        </strong>
-                        {row.last_used_at ? (
-                          <small>
-                            Último uso: {new Date(row.last_used_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
-                          </small>
-                        ) : null}
-                      </span>
-                      <button type="button" className="config-action-btn" onClick={() => setConfirmBiometricRemoval(row.id)}>
-                        Remover
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </section>
+          <ConfigBiometriaCard
+            usuarioIdHeader={usuarioIdHeader}
+            webauthnList={webauthnList}
+            webauthnLoading={webauthnLoading}
+            webauthnError={webauthnError}
+            bioRegistering={bioRegistering}
+            handleRegisterBiometric={handleRegisterBiometric}
+            setConfirmBiometricRemoval={setConfirmBiometricRemoval}
+            loadWebAuthn={loadWebAuthn}
+          />
 
           {isAdmin && (
             <section className="config-card config-card--full config-admin-card">

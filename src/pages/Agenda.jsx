@@ -8,6 +8,25 @@ import { apiUrl } from '../lib/apiUrl'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { showToast } from '../lib/toastStore'
+import {
+  SAO_PAULO_OFFSET,
+  saoPauloDateKey,
+  toDatetimeLocal,
+  localToIso,
+  formatDate,
+  formatTime,
+  isToday,
+  dateKeyToDate,
+  dateKeyToMonthKey,
+  monthKeyToDate,
+  addMonths,
+  formatCompactDate,
+  buildMonthCalendar,
+  getWeekRange,
+  agendaItemKind,
+} from '../lib/agendaDateUtils'
+import { AgendaCalendarPanel } from '../components/agenda/AgendaCalendarPanel'
+import { AgendaDayList } from '../components/agenda/AgendaDayList'
 
 const EMPTY_FORM = {
   titulo: '',
@@ -26,238 +45,6 @@ const STATUS_LABEL = {
   CANCELADO: 'Cancelado',
 }
 
-const AGENDA_TIME_ZONE = 'America/Sao_Paulo'
-const SAO_PAULO_OFFSET = '-03:00'
-
-function saoPauloParts(date) {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: AGENDA_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).formatToParts(date)
-  const get = (type) => parts.find((part) => part.type === type)?.value
-  return {
-    year: get('year'),
-    month: get('month'),
-    day: get('day'),
-    hour: get('hour'),
-    minute: get('minute'),
-  }
-}
-
-function saoPauloDateKey(isoOrDate) {
-  const date = isoOrDate instanceof Date ? isoOrDate : new Date(isoOrDate)
-  const parts = saoPauloParts(date)
-  return `${parts.year}-${parts.month}-${parts.day}`
-}
-
-function toDatetimeLocal(iso) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  const parts = saoPauloParts(d)
-  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`
-}
-
-function localToIso(value) {
-  if (!value) return ''
-  const normalized = value.length === 16 ? `${value}:00${SAO_PAULO_OFFSET}` : `${value}${SAO_PAULO_OFFSET}`
-  const d = new Date(normalized)
-  return Number.isNaN(d.getTime()) ? '' : d.toISOString()
-}
-
-function capitalizeDateLabel(value) {
-  return value
-    .replace('.', '')
-    .replace(/(^|,\s*|\s+de\s+)(\p{L})/gu, (_, prefix, letter) => `${prefix}${letter.toLocaleUpperCase('pt-BR')}`)
-}
-
-function formatDate(iso) {
-  const formatted = new Intl.DateTimeFormat('pt-BR', {
-    timeZone: AGENDA_TIME_ZONE,
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-  }).format(new Date(iso))
-  return capitalizeDateLabel(formatted)
-}
-
-function formatTime(iso) {
-  return new Intl.DateTimeFormat('pt-BR', {
-    timeZone: AGENDA_TIME_ZONE,
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(iso))
-}
-
-function formatReminderOffset(minutes) {
-  const n = Number.parseInt(String(minutes ?? 0), 10)
-  if (!Number.isFinite(n) || n <= 0) return 'Na hora'
-  return `${n} min`
-}
-
-function formatAgendaListReminderMeta(evento, kind) {
-  if (evento.whatsapp_notificar === false) return null
-  if (kind === 'reminder') {
-    return `Aviso de notificação às ${formatTime(evento.inicio)}`
-  }
-  const offset = formatReminderOffset(evento.lembrar_minutos_antes)
-  return offset === 'Na hora' ? 'Lembrete na hora' : `Lembrete ${offset} antes`
-}
-
-function plural(count, singular, pluralText) {
-  return `${count} ${count === 1 ? singular : pluralText}`
-}
-
-function isToday(iso) {
-  return saoPauloDateKey(iso) === saoPauloDateKey(new Date())
-}
-
-function eventTone(status) {
-  if (status === 'CONFIRMADO') return 'confirmed'
-  if (status === 'CONCLUIDO') return 'done'
-  if (status === 'CANCELADO') return 'cancelled'
-  return 'scheduled'
-}
-
-function dateKeyToDate(dateKey) {
-  return new Date(`${dateKey}T12:00:00${SAO_PAULO_OFFSET}`)
-}
-
-function dateKeyToMonthKey(dateKey) {
-  return dateKey.slice(0, 7)
-}
-
-function monthKeyToDate(monthKey) {
-  return new Date(`${monthKey}-01T12:00:00${SAO_PAULO_OFFSET}`)
-}
-
-function addMonths(monthKey, amount) {
-  const date = monthKeyToDate(monthKey)
-  date.setMonth(date.getMonth() + amount)
-  return saoPauloDateKey(date).slice(0, 7)
-}
-
-function formatMonthTitle(monthKey) {
-  const formatted = new Intl.DateTimeFormat('pt-BR', {
-    timeZone: AGENDA_TIME_ZONE,
-    month: 'long',
-    year: 'numeric',
-  }).format(monthKeyToDate(monthKey))
-  return capitalizeDateLabel(formatted)
-}
-
-function formatSelectedDayTitle(dateKey) {
-  const formatted = new Intl.DateTimeFormat('pt-BR', {
-    timeZone: AGENDA_TIME_ZONE,
-    day: '2-digit',
-    month: 'long',
-    weekday: 'long',
-  }).format(dateKeyToDate(dateKey))
-  return capitalizeDateLabel(formatted)
-}
-
-function formatCompactDate(dateKey) {
-  const formatted = new Intl.DateTimeFormat('pt-BR', {
-    timeZone: AGENDA_TIME_ZONE,
-    day: '2-digit',
-    month: 'long',
-  }).format(dateKeyToDate(dateKey))
-  return capitalizeDateLabel(formatted)
-}
-
-function buildMonthCalendar(monthKey) {
-  const first = monthKeyToDate(monthKey)
-  const month = first.getMonth()
-  const firstDay = (first.getDay() + 6) % 7
-  const start = new Date(first)
-  start.setDate(first.getDate() - firstDay)
-  return Array.from({ length: 42 }, (_, index) => {
-    const date = new Date(start)
-    date.setDate(start.getDate() + index)
-    const key = saoPauloDateKey(date)
-    return {
-      key,
-      day: date.getDate(),
-      isCurrentMonth: date.getMonth() === month,
-    }
-  })
-}
-
-function getWeekRange(dateKey) {
-  const date = dateKeyToDate(dateKey)
-  const start = new Date(date)
-  const mondayOffset = (date.getDay() + 6) % 7
-  start.setDate(date.getDate() - mondayOffset)
-  start.setHours(0, 0, 0, 0)
-  const end = new Date(start)
-  end.setDate(start.getDate() + 6)
-  end.setHours(23, 59, 59, 999)
-  return { start, end }
-}
-
-function isReminderEvent(evento) {
-  const text = `${evento.titulo || ''} ${evento.descricao || ''}`.toLowerCase()
-  return /\b(lembra|lembrete|avise|alerte|notifica[cç][aã]o|pagar|tomar|ligar|renovar|buscar|comprar)\b/.test(text)
-    || /^(quando for|notifica[cç][aã]o)$/i.test(String(evento.titulo || '').trim())
-}
-
-function isMilestoneEvent(evento) {
-  const text = `${evento.titulo || ''} ${evento.descricao || ''}`.toLowerCase()
-  return /\b(marco|milestone|entrega|prazo|vencimento)\b/.test(text)
-}
-
-function agendaItemKind(evento) {
-  if (evento.status === 'CONCLUIDO') return 'done'
-  if (isReminderEvent(evento)) return 'reminder'
-  if (isMilestoneEvent(evento)) return 'milestone'
-  return 'event'
-}
-
-const AGENDA_KIND_META = {
-  event: { label: 'Compromisso', icon: 'calendar', tone: 'event' },
-  reminder: { label: 'Notificação', icon: 'bell', tone: 'reminder' },
-  milestone: { label: 'Marco', icon: 'flag', tone: 'milestone' },
-  done: { label: 'Concluído', icon: 'check', tone: 'done' },
-}
-
-function AgendaKindIcon({ type }) {
-  if (type === 'flag') {
-    return (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M4 22V4" />
-        <path d="M4 4h12l-1 4 1 4H4" />
-      </svg>
-    )
-  }
-  if (type === 'bell') {
-    return (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-      </svg>
-    )
-  }
-  if (type === 'check') {
-    return (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M20 6 9 17l-5-5" />
-      </svg>
-    )
-  }
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M8 2v4" />
-      <path d="M16 2v4" />
-      <rect width="18" height="18" x="3" y="4" rx="2" />
-      <path d="M3 10h18" />
-    </svg>
-  )
-}
 
 export default function Agenda() {
   const [usuario] = useState(() => readHorizonteUser())
@@ -595,118 +382,31 @@ export default function Agenda() {
                 </div>
               </section>
 
-              <section className="agenda-calendar-panel" aria-label="Calendário da agenda">
-                <div className="agenda-calendar-head">
-                  <div>
-                    <strong>{formatMonthTitle(calendarMonthKey)}</strong>
-                    <span>
-                      {plural(stats.today, 'item hoje', 'itens hoje')} · {plural(stats.reminders, 'notificação', 'notificações')} no dia
-                    </span>
-                  </div>
-                  <div className="agenda-calendar-nav" aria-label="Navegar meses">
-                    <button type="button" onClick={() => goToMonth(-1)} aria-label="Mês anterior">
-                      ‹
-                    </button>
-                    <button type="button" onClick={() => goToMonth(1)} aria-label="Próximo mês">
-                      ›
-                    </button>
-                  </div>
-                </div>
+              <AgendaCalendarPanel
+                calendarDays={calendarDays}
+                selectedDateKey={selectedDateKey}
+                eventDateKeys={eventDateKeys}
+                eventDateKinds={eventDateKinds}
+                calendarMonthKey={calendarMonthKey}
+                statsToday={stats.today}
+                statsReminders={stats.reminders}
+                onSelectDay={(dateKey) => {
+                  setSelectedDateKey(dateKey)
+                  setCalendarMonthKey(dateKeyToMonthKey(dateKey))
+                }}
+                onNavigateMonth={goToMonth}
+              />
 
-                <div className="agenda-calendar-weekdays" aria-hidden="true">
-                  {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((day) => (
-                    <span key={day}>{day}</span>
-                  ))}
-                </div>
-
-                <div className="agenda-calendar-grid">
-                  {calendarDays.map((day) => {
-                    const isSelected = day.key === selectedDateKey
-                    const hasEvent = eventDateKeys.has(day.key)
-                    const dayKind = eventDateKinds.get(day.key)
-                    const isCurrentDay = day.key === saoPauloDateKey(new Date())
-                    return (
-                      <button
-                        type="button"
-                        key={day.key}
-                        className={[
-                          'agenda-calendar-day',
-                          day.isCurrentMonth ? '' : 'agenda-calendar-day--muted',
-                          isCurrentDay ? 'agenda-calendar-day--today' : '',
-                          isSelected ? 'agenda-calendar-day--selected' : '',
-                          hasEvent ? 'agenda-calendar-day--has-event' : '',
-                          dayKind ? `agenda-calendar-day--kind-${dayKind}` : '',
-                        ].filter(Boolean).join(' ')}
-                        onClick={() => {
-                          setSelectedDateKey(day.key)
-                          setCalendarMonthKey(dateKeyToMonthKey(day.key))
-                        }}
-                        aria-pressed={isSelected}
-                        aria-label={`${day.day} ${hasEvent ? 'com itens' : 'sem itens'}`}
-                      >
-                        <span>{day.day}</span>
-                      </button>
-                    )
-                  })}
-                </div>
-              </section>
-
-              <section className="agenda-list-panel agenda-list-panel--daily" aria-label="Lista do dia selecionado">
-                <div className="agenda-list-panel__header">
-                  <div>
-                    <span className="agenda-section-eyebrow">Agenda do dia</span>
-                    <h2>{formatSelectedDayTitle(selectedDateKey)}</h2>
-                  </div>
-                  <button type="button" className="agenda-floating-add" onClick={openNew} aria-label="Adicionar compromisso ou notificação">+</button>
-                </div>
-
-                {loading ? (
-                  <div className="agenda-empty">Carregando agenda...</div>
-                ) : error ? (
-                  <div className="agenda-empty agenda-empty--error">{error}</div>
-                ) : selectedEvents.length === 0 ? (
-                  <div className="agenda-empty">
-                    <strong>Nenhum item neste dia.</strong>
-                    <span>
-                      Toque no + para criar um item. No modal, use “Interpretar com IA” ou envie pelo WhatsApp:
-                      “me avise de pagar a luz amanhã às 9h”.
-                    </span>
-                  </div>
-                ) : (
-                  <div className="agenda-daily-list">
-                    {selectedEvents.map((evento) => {
-                      const kind = agendaItemKind(evento)
-                      const meta = AGENDA_KIND_META[kind]
-                      const reminderMeta = formatAgendaListReminderMeta(evento, kind)
-                      return (
-                        <article className={`agenda-day-item agenda-day-item--${meta.tone} agenda-event--${eventTone(evento.status)}`} key={evento.id}>
-                          <div className="agenda-day-item__icon" aria-hidden="true">
-                            <AgendaKindIcon type={meta.icon} />
-                          </div>
-                          <div className="agenda-day-item__main">
-                            <span className="agenda-day-item__type">{meta.label}</span>
-                            <h3>{evento.titulo}</h3>
-                            {reminderMeta ? <p className="agenda-day-item__reminder">{reminderMeta}</p> : null}
-                            {evento.local ? <p className="agenda-event__local">{evento.local}</p> : null}
-                          </div>
-                          <div className="agenda-day-item__actions">
-                            <button type="button" onClick={() => openEdit(evento)} aria-label={`Editar ${evento.titulo}`}>Editar</button>
-                            <button type="button" onClick={() => setStatus(evento, 'CONCLUIDO')} aria-label={`Concluir ${evento.titulo}`}>Concluir</button>
-                            <button
-                              type="button"
-                              className="agenda-day-item__btn agenda-day-item__btn--danger"
-                              onClick={() => setPendingDelete(evento)}
-                              aria-label={`Excluir ${evento.titulo}`}
-                            >
-                              Excluir
-                            </button>
-                          </div>
-                        </article>
-                      )
-                    })}
-                  </div>
-                )}
-              </section>
+              <AgendaDayList
+                selectedEvents={selectedEvents}
+                loading={loading}
+                error={error}
+                selectedDateKey={selectedDateKey}
+                onOpenNew={openNew}
+                onEdit={openEdit}
+                onSetStatus={setStatus}
+                onDelete={setPendingDelete}
+              />
             </RefDashboardScroll>
           </div>
         </main>

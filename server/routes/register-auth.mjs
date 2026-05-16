@@ -3,30 +3,19 @@ import { log } from '../lib/logger.mjs'
 import { clientIpFromHono } from '../lib/http/client-ip.mjs'
 import { authenticateUser, isValidEmail } from '../lib/password-reset.mjs'
 import { getSupabaseAdmin } from '../lib/supabase-admin.mjs'
-import { requestPasswordOtpWhatsApp, confirmPasswordOtpWhatsApp } from '../lib/password-otp-whatsapp.mjs'
 import { sendRegistrationOtp, verifyRegistrationOtp } from '../lib/registration-otp.mjs'
 import { evolutionEnvConfigured } from '../lib/evolution-send.mjs'
 import { sendEmailOtp, verifyEmailOtp, emailOtpEnabled } from '../lib/email-otp.mjs'
-import { getPerfilUsuario } from '../lib/usuarios.mjs'
 import { insertAdminAuditLog } from '../lib/admin-audit.mjs'
 import { buildAssinaturaUsuarioPayload, buildAssinaturaFallbackPayload } from '../lib/assinatura.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { mapSupabaseOrNetworkError } from '../lib/http/hono-error-map.mjs'
-import { isUuidString } from '../lib/transacao-validate.mjs'
 import { normalizeUsuarioRow, stripSenha } from '../lib/usuario-schema.mjs'
-import {
-  beginRegistration,
-  finishRegistration,
-  beginAuthentication,
-  finishAuthentication,
-  findUserByEmailForWebAuthn,
-  countWebAuthnCredentialsForUsuario,
-  deleteCredentialForUser,
-  listCredentialSummariesForUser,
-} from '../lib/webauthn.mjs'
 import { signAccessToken } from '../lib/auth-access-token.mjs'
 import { createRefreshToken, rotateRefreshToken, revokeRefreshToken } from '../lib/refresh-token.mjs'
-import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
+import { parseJsonBody } from '../lib/http/parse-body.mjs'
+import { registerAuthWebAuthnRoutes } from './register-auth-webauthn.mjs'
+import { registerAuthPasswordRoutes } from './register-auth-password.mjs'
 
 export function registerAuthRoutes(app) {
   app.post('/api/auth/login', async (c) => {
@@ -252,12 +241,9 @@ export function registerAuthRoutes(app) {
       if (!await rateLimitTake(`verify-reg:${ip}`, 15, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
-      let body
-      try {
-        body = await c.req.json()
-      } catch {
-        return c.json({ message: 'JSON inválido.' }, 400)
-      }
+      const parsed0 = await parseJsonBody(c)
+      if (!parsed0.ok) return parsed0.response
+      const body = parsed0.body
       const userId = String(body?.userId || '').trim()
       const otp = String(body?.otp || '').replace(/\D/g, '')
       if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
@@ -325,12 +311,9 @@ export function registerAuthRoutes(app) {
       if (!await rateLimitTake(`resend-reg-otp:${ip}`, 5, 15 * 60_000)) {
         return c.json({ message: 'Muitas solicitações. Aguarde alguns minutos.' }, 429)
       }
-      let body
-      try {
-        body = await c.req.json()
-      } catch {
-        return c.json({ message: 'JSON inválido.' }, 400)
-      }
+      const parsed1 = await parseJsonBody(c)
+      if (!parsed1.ok) return parsed1.response
+      const body = parsed1.body
       const userId = String(body?.userId || '').trim()
       if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
 
@@ -369,12 +352,9 @@ export function registerAuthRoutes(app) {
       if (!await rateLimitTake(`verify-email-otp:${ip}`, 15, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
-      let body
-      try {
-        body = await c.req.json()
-      } catch {
-        return c.json({ message: 'JSON inválido.' }, 400)
-      }
+      const parsed2 = await parseJsonBody(c)
+      if (!parsed2.ok) return parsed2.response
+      const body = parsed2.body
       const userId = String(body?.userId || '').trim()
       const otp = String(body?.otp || '').replace(/\D/g, '')
       if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
@@ -431,12 +411,9 @@ export function registerAuthRoutes(app) {
       if (!await rateLimitTake(`resend-email-otp:${ip}`, 5, 15 * 60_000)) {
         return c.json({ message: 'Muitas solicitações. Aguarde alguns minutos.' }, 429)
       }
-      let body
-      try {
-        body = await c.req.json()
-      } catch {
-        return c.json({ message: 'JSON inválido.' }, 400)
-      }
+      const parsed3 = await parseJsonBody(c)
+      if (!parsed3.ok) return parsed3.response
+      const body = parsed3.body
       const userId = String(body?.userId || '').trim()
       if (!userId) return c.json({ message: 'userId é obrigatório.' }, 400)
 
@@ -465,239 +442,6 @@ export function registerAuthRoutes(app) {
     }
   })
 
-  /** WebAuthn — biometria / passkey (celular, tablet; requer HTTPS exceto localhost) */
-  app.post('/api/auth/webauthn/register/options', async (c) => {
-    try {
-      const ip = clientKeyFromHono(c)
-      if (!await rateLimitTake(`webauthn-reg-opt:${ip}`, 20, 60_000)) {
-        return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
-      }
-      const usuarioId = resolveRequestUserId(c)
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
-
-      const perfil = await getPerfilUsuario(usuarioId)
-      if (!perfil?.email) return c.json({ message: 'Perfil não encontrado.' }, 404)
-
-      const { optionsJSON, challengeId } = await beginRegistration({
-        c,
-        usuarioId,
-        userEmail: perfil.email,
-        userName: perfil.nome || perfil.email,
-      })
-      return c.json({ optionsJSON, challengeId })
-    } catch (error) {
-      log.error('webauthn register options', error)
-      const mapped = mapSupabaseOrNetworkError(error)
-      if (mapped) return c.json({ message: mapped.message }, mapped.status)
-      return c.json({ message: 'Não foi possível preparar o registro biométrico.' }, 500)
-    }
-  })
-
-  app.post('/api/auth/webauthn/register/verify', async (c) => {
-    try {
-      const ip = clientKeyFromHono(c)
-      if (!await rateLimitTake(`webauthn-reg-verify:${ip}`, 20, 60_000)) {
-        return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
-      }
-      const usuarioId = resolveRequestUserId(c)
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
-
-      let body
-      try {
-        body = await c.req.json()
-      } catch {
-        return c.json({ message: 'JSON inválido.' }, 400)
-      }
-      const challengeId = String(body?.challengeId || '')
-      const credential = body?.credential
-      if (!challengeId || !credential) {
-        return c.json({ message: 'challengeId e credential são obrigatórios.' }, 400)
-      }
-
-      const result = await finishRegistration({ c, usuarioId, challengeId, credential, log })
-      if (!result.verified) {
-        return c.json({ message: 'Não foi possível confirmar a biometria. Tente de novo.' }, 400)
-      }
-      return c.json({ ok: true })
-    } catch (error) {
-      log.error('webauthn register verify', error)
-      const mapped = mapSupabaseOrNetworkError(error)
-      if (mapped) return c.json({ message: mapped.message }, mapped.status)
-      return c.json({ message: 'Erro ao salvar credencial biométrica.' }, 500)
-    }
-  })
-
-  app.get('/api/auth/webauthn/status', async (c) => {
-    try {
-      const email = String(c.req.query('email') || '')
-        .trim()
-        .toLowerCase()
-      if (!isValidEmail(email)) {
-        return c.json({ hasCredential: false })
-      }
-      const user = await findUserByEmailForWebAuthn(email)
-      if (!user?.id) {
-        return c.json({ hasCredential: false })
-      }
-      const n = await countWebAuthnCredentialsForUsuario(user.id)
-      return c.json({ hasCredential: n > 0 })
-    } catch (error) {
-      log.error('webauthn status', error)
-      return c.json({ hasCredential: false })
-    }
-  })
-
-  app.post('/api/auth/webauthn/login/options', async (c) => {
-    try {
-      const ip = clientKeyFromHono(c)
-      if (!await rateLimitTake(`webauthn-auth-opt:${ip}`, 25, 60_000)) {
-        return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
-      }
-      let body
-      try {
-        body = await c.req.json()
-      } catch {
-        return c.json({ message: 'JSON inválido.' }, 400)
-      }
-      const email = String(body?.email || '')
-        .trim()
-        .toLowerCase()
-      if (!isValidEmail(email)) {
-        return c.json({ message: 'Informe um e-mail válido.' }, 400)
-      }
-
-      const started = await beginAuthentication({ c, email })
-      if (!started) {
-        return c.json({ message: 'Nenhuma biometria cadastrada para este e-mail.' }, 404)
-      }
-      const { optionsJSON, challengeId } = started
-      return c.json({ optionsJSON, challengeId })
-    } catch (error) {
-      log.error('webauthn login options', error)
-      const mapped = mapSupabaseOrNetworkError(error)
-      if (mapped) return c.json({ message: mapped.message }, mapped.status)
-      return c.json({ message: 'Não foi possível preparar o login biométrico.' }, 500)
-    }
-  })
-
-  app.post('/api/auth/webauthn/login/verify', async (c) => {
-    try {
-      const ip = clientKeyFromHono(c)
-      if (!await rateLimitTake(`webauthn-auth-verify:${ip}`, 25, 60_000)) {
-        return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
-      }
-      let body
-      try {
-        body = await c.req.json()
-      } catch {
-        return c.json({ message: 'JSON inválido.' }, 400)
-      }
-      const challengeId = String(body?.challengeId || '')
-      const credential = body?.credential
-      if (!challengeId || !credential) {
-        return c.json({ message: 'challengeId e credential são obrigatórios.' }, 400)
-      }
-
-      const out = await finishAuthentication({ c, challengeId, credential, log })
-      if (!out) {
-        return c.json({ message: 'Biometria não reconhecida. Use a senha ou tente de novo.' }, 401)
-      }
-      const u = out.user
-      if (u?.id && u?.email) {
-        await insertAdminAuditLog({
-          actorUserId: u.id,
-          targetUserId: u.id,
-          targetEmail: u.email,
-          action: 'login_sucesso',
-          clientIp: clientIpFromHono(c),
-          detail: { email: u.email, method: 'webauthn' },
-        })
-      }
-      const [accessToken, refreshToken] = await Promise.all([
-        signAccessToken(out.user.id),
-        createRefreshToken(out.user.id),
-      ])
-      return c.json({ ...out, accessToken, refreshToken })
-    } catch (error) {
-      log.error('webauthn login verify', error)
-      const mapped = mapSupabaseOrNetworkError(error)
-      if (mapped) return c.json({ message: mapped.message }, mapped.status)
-      return c.json({ message: 'Não foi possível validar a biometria.' }, 500)
-    }
-  })
-
-  app.get('/api/auth/webauthn/credentials', async (c) => {
-    try {
-      const usuarioId = resolveRequestUserId(c)
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
-      const rows = await listCredentialSummariesForUser(usuarioId)
-      return c.json({ credentials: rows })
-    } catch (error) {
-      const mapped = mapSupabaseOrNetworkError(error)
-      if (mapped) {
-        log.warn('webauthn list credentials', error?.message || error)
-        return c.json({ message: mapped.message }, mapped.status)
-      }
-      log.error('webauthn list credentials', error)
-      return c.json({ message: 'Erro ao listar credenciais biométricas.' }, 500)
-    }
-  })
-
-  app.delete('/api/auth/webauthn/credentials/:id', async (c) => {
-    try {
-      const usuarioId = resolveRequestUserId(c)
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
-      const id = c.req.param('id')
-      if (!isUuidString(id)) {
-        return c.json({ message: 'ID inválido.' }, 400)
-      }
-      await deleteCredentialForUser({ usuarioId, credentialId: id })
-      return c.json({ ok: true })
-    } catch (error) {
-      const mapped = mapSupabaseOrNetworkError(error)
-      if (mapped) {
-        log.warn('webauthn delete credential', error?.message || error)
-        return c.json({ message: mapped.message }, mapped.status)
-      }
-      log.error('webauthn delete credential', error)
-      return c.json({ message: 'Não foi possível remover.' }, 500)
-    }
-  })
-
-  /** Redefinição de senha: código de 6 dígitos pelo WhatsApp (Evolution API). */
-  app.post('/api/auth/request-password-otp-whatsapp', async (c) => {
-    try {
-      const ip = clientKeyFromHono(c)
-      if (!await rateLimitTake(`pw-otp-wa:${ip}`, 10, 15 * 60_000)) {
-        return c.json({ message: 'Muitas solicitações. Tente de novo em alguns minutos.' }, 429)
-      }
-      let body
-      try {
-        body = await c.req.json()
-      } catch {
-        return c.json({ message: 'Envie JSON com o campo email.' }, 400)
-      }
-      const email = String(body?.email || '').trim().toLowerCase()
-      if (!isValidEmail(email)) {
-        return c.json({ message: 'Informe um e-mail válido.' }, 400)
-      }
-      if (!await rateLimitTake(`pw-otp-wa-email:${email}`, 5, 60 * 60_000)) {
-        return c.json({ message: 'Limite de códigos para este e-mail. Tente mais tarde.' }, 429)
-      }
-      const result = await requestPasswordOtpWhatsApp(email)
-      return c.json({ message: result.message })
-    } catch (error) {
-      log.error('request-password-otp-whatsapp failed', error)
-      const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
-      if (status !== 500) {
-        return c.json({ message: error.message || 'Solicitação inválida.' }, status)
-      }
-      const mapped = mapSupabaseOrNetworkError(error)
-      if (mapped) return c.json({ message: mapped.message }, mapped.status)
-      return c.json({ message: 'Não foi possível enviar o código agora.' }, 500)
-    }
-  })
-
   /** Troca o refresh token por um novo par access + refresh (rotação). */
   app.post('/api/auth/refresh', async (c) => {
     try {
@@ -705,12 +449,9 @@ export function registerAuthRoutes(app) {
       if (!await rateLimitTake(`refresh:${ip}`, 30, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um minuto.' }, 429)
       }
-      let body
-      try {
-        body = await c.req.json()
-      } catch {
-        return c.json({ message: 'JSON inválido.' }, 400)
-      }
+      const parsed7 = await parseJsonBody(c)
+      if (!parsed7.ok) return parsed7.response
+      const body = parsed7.body
       const plainToken = String(body?.refreshToken || '').trim()
       if (!plainToken) return c.json({ message: 'refreshToken é obrigatório.' }, 400)
 
@@ -743,35 +484,6 @@ export function registerAuthRoutes(app) {
     }
   })
 
-  app.post('/api/auth/reset-password-whatsapp', async (c) => {
-    try {
-      const ip = clientKeyFromHono(c)
-      if (!await rateLimitTake(`pw-reset-wa:${ip}`, 20, 15 * 60_000)) {
-        return c.json({ message: 'Muitas tentativas. Aguarde alguns minutos.' }, 429)
-      }
-      let body
-      try {
-        body = await c.req.json()
-      } catch {
-        return c.json({ message: 'JSON inválido.' }, 400)
-      }
-      const email = String(body?.email || '').trim().toLowerCase()
-      const code = body?.code ?? body?.otp
-      const password = String(body?.password || '')
-      if (email && !await rateLimitTake(`otp-confirm-email:${email}`, 5, 15 * 60_000)) {
-        return c.json({ message: 'Muitas tentativas para este e-mail. Solicite um novo código.' }, 429)
-      }
-      await confirmPasswordOtpWhatsApp(email, code, password)
-      return c.json({ message: 'Senha redefinida com sucesso. Faça login.' })
-    } catch (error) {
-      log.error('reset-password-whatsapp failed', error)
-      const status = error.statusCode && Number.isFinite(error.statusCode) ? error.statusCode : 500
-      if (status !== 500) {
-        return c.json({ message: error.message || 'Não foi possível redefinir.' }, status)
-      }
-      const mapped = mapSupabaseOrNetworkError(error)
-      if (mapped) return c.json({ message: mapped.message }, mapped.status)
-      return c.json({ message: 'Não foi possível redefinir a senha.' }, 500)
-    }
-  })
+  registerAuthWebAuthnRoutes(app)
+  registerAuthPasswordRoutes(app)
 }
