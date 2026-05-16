@@ -281,18 +281,6 @@ export default function Configuracoes() {
     navigator.clipboard.writeText(perfil.email).then(() => showToast('E-mail copiado.')).catch(() => {})
   }
 
-  const mostrarCampoConviteFamilia =
-    Boolean(usuarioIdHeader) && familiaPainelCarregado && !perfil.conta_familiar_membro
-
-  const podeColarConviteFamilia = mostrarCampoConviteFamilia
-
-  const irParaCodigoConviteFamilia = () => {
-    document.getElementById('config-secao-convite-familia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    window.setTimeout(() => {
-      document.getElementById('config-familia-convite-textarea')?.focus()
-    }, 380)
-  }
-
   const copiarTexto = (t, okMsg = 'Copiado.') => {
     if (!t) return
     navigator.clipboard.writeText(t).then(() => showToast(okMsg)).catch(() => {})
@@ -586,40 +574,7 @@ export default function Configuracoes() {
               >
                 {resetSending ? 'Enviando…' : 'Código no WhatsApp'}
               </button>
-              {podeColarConviteFamilia ? (
-                <button
-                  type="button"
-                  className="config-action-btn"
-                  onClick={irParaCodigoConviteFamilia}
-                  title="Abre o campo para colar o código ou o link do convite"
-                >
-                  Código de convite familiar
-                </button>
-              ) : null}
             </div>
-
-            {mostrarCampoConviteFamilia ? (
-              <div id="config-secao-convite-familia" className="config-familia-no-perfil">
-                <div className="config-card-head">
-                  <span className="config-card-kicker">Família</span>
-                  <h3 className="config-subsection__title">Código de convite familiar</h3>
-                  <p className="config-card-subtitle">
-                    Use o campo abaixo para colar o <strong>código</strong> ou o <strong>link</strong> enviado pelo titular.
-                  </p>
-                </div>
-                <FamiliaConviteColarBlock
-                  idPrefix="config-familia-convite"
-                  usuarioIdParaAceitar={usuarioIdHeader}
-                  visualVariant="shell"
-                  onAceitarSucesso={(data) => {
-                    showToast(data?.message || 'Convite familiar aceito.')
-                    void refreshAssinaturaPerfil()
-                    void loadFamiliaPainel()
-                  }}
-                  onAceitarErro={(msg) => showToast(msg)}
-                />
-              </div>
-            ) : null}
           </section>
 
           <section className="config-card config-card--preferences" aria-labelledby="config-preferencias-heading">
@@ -668,6 +623,29 @@ export default function Configuracoes() {
               </label>
             </div>
           </section>
+
+          {familiaPainelCarregado && Boolean(usuarioIdHeader) && !perfil.conta_familiar_membro && familiaTitular === false && (
+            <section className="config-card config-card--full" id="config-secao-convite-familia">
+              <div className="config-card-head">
+                <span className="config-card-kicker">Família</span>
+                <h2 className="config-card-title-clean">Entrar em uma família</h2>
+                <p className="config-card-subtitle">
+                  Cole o <strong>código</strong> ou o <strong>link</strong> de convite enviado pelo titular para vincular sua conta à conta familiar.
+                </p>
+              </div>
+              <FamiliaConviteColarBlock
+                idPrefix="config-familia-convite"
+                usuarioIdParaAceitar={usuarioIdHeader}
+                visualVariant="shell"
+                onAceitarSucesso={(data) => {
+                  showToast(data?.message || 'Convite familiar aceito.')
+                  void refreshAssinaturaPerfil()
+                  void loadFamiliaPainel()
+                }}
+                onAceitarErro={(msg) => showToast(msg)}
+              />
+            </section>
+          )}
 
           {familiaTitular === true && (
             <section className="config-card config-card--full">
