@@ -182,10 +182,13 @@ export default function HorizonChat() {
   const windowRef = useRef(null)
 
   useEffect(() => {
-    if (aberto) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-      setTimeout(() => inputRef.current?.focus(), 100)
-    }
+    if (!aberto) return
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    /* No mobile não forçar foco ao abrir — evita zoom/teclado imediato no iOS */
+    const mobile = window.matchMedia('(max-width: 768px)').matches
+    if (mobile) return
+    const t = window.setTimeout(() => inputRef.current?.focus(), 100)
+    return () => window.clearTimeout(t)
   }, [aberto, mensagens.length])
 
   /* Focus trap + Escape dentro da janela de chat */
