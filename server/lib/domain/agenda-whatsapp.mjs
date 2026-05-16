@@ -25,6 +25,14 @@ const WEEKDAY_MAP = new Map([
   ['sexta', 5],
   ['sábado', 6],
   ['sabado', 6],
+  // Abreviações (3 letras) — verificadas com \b para não colidir com palavras maiores
+  ['dom', 0],
+  ['seg', 1],
+  ['ter', 2],
+  ['qua', 3],
+  ['qui', 4],
+  ['sex', 5],
+  ['sab', 6],
 ])
 
 function pad2(value) {
@@ -238,7 +246,11 @@ export function parseAgendaDateTime(message, base = new Date()) {
   } else {
     let weekdayMatched = false
     for (const [name, weekday] of WEEKDAY_MAP.entries()) {
-      if (text.includes(name)) {
+      // Abreviações (≤3 chars) usam \b para não casar dentro de palavras maiores
+      const matched = name.length <= 3
+        ? new RegExp(`\\b${name}\\b`).test(text)
+        : text.includes(name)
+      if (matched) {
         parts = saoPauloParts(nextWeekday(weekday))
         weekdayMatched = true
         break
@@ -292,7 +304,7 @@ function stripDateTime(text) {
   t = t.replace(/\bmeio[\s-]dia\b/gi, '')
   t = t.replace(/\bmeia[\s-]noite\b/gi, '')
   t = t.replace(/\b(?:depois\s+de\s+amanh[aã]|amanh[aã]|hoje)(?!\w)/gi, '')
-  t = t.replace(/\b(?:segunda(?:-feira)?|ter[cç]a(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|s[aá]bado|domingo)\b/gi, '')
+  t = t.replace(/\b(?:segunda(?:-feira)?|ter[cç]a(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|s[aá]bado|domingo|seg|ter|qua|qui|sex|sab|dom)\.?\b/gi, '')
   t = t.replace(/\b(?:daqui\s+a|em)\s+\d{1,3}\s*(?:min|minuto|minutos|hora|horas|h|dia|dias|semana|semanas)\b/gi, '')
   t = t.replace(/\b(?:dia\s+)?\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b/gi, '')
   t = t.replace(/(?<!\w)(?:às|as|pelas?)\s*\d{1,2}(?:h\d{2}|:\d{2}|\s+horas?\s+e\s+meia|\s+horas?|h)?(?=\s|$|[^\w])/gi, '')
