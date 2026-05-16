@@ -749,6 +749,51 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   body.horizon-chat-open .horizon-chat-window * {
     touch-action: manipulation;
   }
+
+  /* Cartão do Severino no mobile — sólido, altura estável, sem inline JS que esmagava o layout */
+  body.horizon-chat-open .horizon-chat-window.horizon-chat-window--mobile-sheet.chat-window-open {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: min(384px, calc(100vw - 24px)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
+    height: min(64dvh, 500px) !important;
+    max-height: min(64dvh, 500px) !important;
+    transform: scale(1) translateY(0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 9600 !important;
+    overflow: hidden !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  body.horizon-chat-open[data-theme='light'] .horizon-chat-window.horizon-chat-window--mobile-sheet.chat-window-open {
+    background: #0c0e12 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow:
+      0 24px 64px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(255, 255, 255, 0.06) inset !important;
+  }
+
+  body.horizon-chat-open[data-theme='dark'] .horizon-chat-window.horizon-chat-window--mobile-sheet.chat-window-open {
+    background: linear-gradient(180deg, #121212 0%, #060606 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Anula regra 04c que empurrava o cartão para cima do nav oculto */
+  body.horizon-chat-open:has(.mobile-bottom-nav) .horizon-chat-window {
+    bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  body.horizon-chat-open.horizon-chat-keyboard .horizon-chat-window.horizon-chat-window--mobile-sheet.chat-window-open {
+    bottom: var(--horizon-chat-kb-bottom, max(12px, env(safe-area-inset-bottom, 0px))) !important;
+    height: min(52dvh, 420px) !important;
+    max-height: min(52dvh, 420px) !important;
+  }
 }
 
 /* Telas estreitas: chips e texto um pouco menores */

@@ -10,10 +10,17 @@ import { BRAND_ASSETS } from '../lib/brandAssets'
    AppSessionOutlet pode bloquear a rota e o import em Dashboard.jsx não roda — chat ficava sem CSS. */
 import '../pages/dashboard.css'
 
+const MOBILE_CHAT_MQ = '(max-width: 768px)'
+const KEYBOARD_OPEN_THRESHOLD_PX = 100
+
 function keyboardOverlapPx() {
   const vv = window.visualViewport
   if (!vv) return 0
   return Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+}
+
+function isMobileChatViewport() {
+  return typeof window !== 'undefined' && window.matchMedia(MOBILE_CHAT_MQ).matches
 }
 
 /** Ancora FAB + janela ao `main.main-content` do app shell (canto inferior direito “dentro” do painel). */
@@ -81,26 +88,11 @@ function useHorizonShellDock(chatOpen) {
         const w = Math.min(maxCardW, Math.max(260, mainW - sideInset * 2))
         const left = mainL + (mainW - w) / 2
 
+        /* Cartão aberto no mobile: geometria só via CSS (.horizon-chat-window--mobile-sheet) */
         if (chatOpen) {
-          const vv = window.visualViewport
-          const gap = 10
-          const kb = keyboardOverlapPx()
-          const bottomPx = kb > 0 ? kb + gap : gap
-          const availH = vv ? vv.height : window.innerHeight
-          const winH = Math.min(500, Math.max(220, Math.round(availH * 0.58)))
-
           setDock({
             fabStyle: { position: 'fixed', bottom: fabBottom, right: fabRight },
-            winStyle: {
-              position: 'fixed',
-              left: `${left}px`,
-              width: `${w}px`,
-              right: 'auto',
-              bottom: `${bottomPx}px`,
-              maxWidth: `${w}px`,
-              height: `${winH}px`,
-              maxHeight: `${Math.min(winH, Math.max(200, availH - gap * 2))}px`,
-            },
+            winStyle: null,
           })
           return
         }
@@ -233,20 +225,40 @@ export default function HorizonChat() {
   const fabRef = useRef(null)
   const windowRef = useRef(null)
 
-  /* Mobile: esconde nav inferior e trava scroll da página enquanto o chat está aberto */
+  /* Mobile: esconde nav inferior, trava scroll e ajusta cartão acima do teclado virtual */
   useLayoutEffect(() => {
     if (!aberto) return undefined
-    const mobile = window.matchMedia('(max-width: 768px)').matches
-    if (!mobile) return undefined
+    if (!isMobileChatViewport()) return undefined
 
     document.body.classList.add('horizon-chat-open')
     const scrollEl = document.querySelector('.ref-dashboard-scroll')
     const prevOverflow = scrollEl?.style.overflow ?? ''
     if (scrollEl) scrollEl.style.overflow = 'hidden'
 
+    const vv = window.visualViewport
+    const root = document.documentElement
+
+    const syncKeyboard = () => {
+      const kb = keyboardOverlapPx()
+      if (kb > KEYBOARD_OPEN_THRESHOLD_PX) {
+        document.body.classList.add('horizon-chat-keyboard')
+        root.style.setProperty('--horizon-chat-kb-bottom', `${kb + 12}px`)
+      } else {
+        document.body.classList.remove('horizon-chat-keyboard')
+        root.style.removeProperty('--horizon-chat-kb-bottom')
+      }
+    }
+
+    syncKeyboard()
+    vv?.addEventListener('resize', syncKeyboard)
+    vv?.addEventListener('scroll', syncKeyboard)
+
     return () => {
-      document.body.classList.remove('horizon-chat-open')
+      document.body.classList.remove('horizon-chat-open', 'horizon-chat-keyboard')
+      root.style.removeProperty('--horizon-chat-kb-bottom')
       if (scrollEl) scrollEl.style.overflow = prevOverflow
+      vv?.removeEventListener('resize', syncKeyboard)
+      vv?.removeEventListener('scroll', syncKeyboard)
     }
   }, [aberto])
 
@@ -404,8 +416,8 @@ export default function HorizonChat() {
         role="dialog"
         aria-label="Chat com Severino IA"
         aria-modal="true"
-        className={`horizon-chat-window ${aberto ? 'chat-window-open' : ''} ${shellDock ? 'horizon-chat-window--shell-dock' : ''}`}
-        style={shellDock?.winStyle}
+        className={`horizon-chat-window ${aberto ? 'chat-window-open' : ''} ${shellDock ? 'horizon-chat-window--shell-dock' : ''} ${aberto && isMobileChatViewport() ? 'horizon-chat-window--mobile-sheet' : ''}`}
+        style={shellDock?.winStyle || undefined}
         aria-hidden={!aberto}
       >
         {/* Header */}
