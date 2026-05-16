@@ -2,6 +2,23 @@ import { getTransacoes } from '../transacoes.mjs'
 
 const TZ = 'America/Sao_Paulo'
 
+/** Offset UTC dinâmico de America/Sao_Paulo — lida com BRT (-03:00) e BRST (-02:00). */
+function spOffset(date = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: TZ,
+    timeZoneName: 'shortOffset',
+  }).formatToParts(date)
+  const raw = parts.find((p) => p.type === 'timeZoneName')?.value ?? 'GMT-3'
+  const m = raw.match(/GMT([+-])(\d+)(?::(\d+))?/)
+  if (!m) return '-03:00'
+  return `${m[1]}${m[2].padStart(2, '0')}:${(m[3] || '0').padStart(2, '0')}`
+}
+
+/** Offset para um dia específico (ano/mês/dia strings): usa noon UTC como referência. */
+function spOffsetForDay(y, m, d) {
+  return spOffset(new Date(`${y}-${m}-${d}T12:00:00Z`))
+}
+
 function stripAccents(value) {
   return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
@@ -23,15 +40,15 @@ function spYmd(date = new Date()) {
 }
 
 function isoStartOfDaySP(y, m, d) {
-  return new Date(`${y}-${m}-${d}T00:00:00-03:00`).toISOString()
+  return new Date(`${y}-${m}-${d}T00:00:00${spOffsetForDay(y, m, d)}`).toISOString()
 }
 
 function isoEndOfDaySP(y, m, d) {
-  return new Date(`${y}-${m}-${d}T23:59:59.999-03:00`).toISOString()
+  return new Date(`${y}-${m}-${d}T23:59:59.999${spOffsetForDay(y, m, d)}`).toISOString()
 }
 
 function addDaysFromSpYmd(y, m, d, delta) {
-  const t = new Date(`${y}-${m}-${d}T12:00:00-03:00`)
+  const t = new Date(`${y}-${m}-${d}T12:00:00${spOffsetForDay(y, m, d)}`)
   t.setUTCDate(t.getUTCDate() + delta)
   return spYmd(t)
 }
@@ -39,7 +56,7 @@ function addDaysFromSpYmd(y, m, d, delta) {
 /** Segunda-feira 00:00 até domingo 23:59:59 da semana que contém `ref` (calendário SP). */
 function boundsSemanaSP(ref = new Date()) {
   let { y, m, d } = spYmd(ref)
-  let t = new Date(`${y}-${m}-${d}T12:00:00-03:00`)
+  let t = new Date(`${y}-${m}-${d}T12:00:00${spOffsetForDay(y, m, d)}`)
   for (let i = 0; i < 7; i++) {
     const wd = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short' }).format(t)
     if (String(wd).startsWith('Mon')) break

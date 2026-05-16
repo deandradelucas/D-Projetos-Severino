@@ -27,10 +27,23 @@ const WEEKDAY_MAP = new Map([
   ['sabado', 6],
 ])
 
-const SAO_PAULO_OFFSET = '-03:00'
-
 function pad2(value) {
   return String(value).padStart(2, '0')
+}
+
+/**
+ * Retorna o offset UTC atual de America/Sao_Paulo como string "+HH:MM" ou "-HH:MM".
+ * Lida corretamente com BRST (-02:00) e BRT (-03:00).
+ */
+function saoPauloOffset(date = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: AGENDA_TZ,
+    timeZoneName: 'shortOffset',
+  }).formatToParts(date)
+  const raw = parts.find((p) => p.type === 'timeZoneName')?.value ?? 'GMT-3'
+  const m = raw.match(/GMT([+-])(\d+)(?::(\d+))?/)
+  if (!m) return '-03:00'
+  return `${m[1]}${m[2].padStart(2, '0')}:${(m[3] || '0').padStart(2, '0')}`
 }
 
 function saoPauloParts(date = new Date()) {
@@ -45,17 +58,21 @@ function saoPauloParts(date = new Date()) {
   const key = `${get('year')}-${get('month')}-${get('day')}`
   const weekdayName = String(get('weekday') || '').toLowerCase()
   const weekday = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].indexOf(weekdayName.slice(0, 3))
+  // Fallback: key já é data local SP; noon UTC garante mesmo dia calendário sem depender de offset fixo
   return {
     year: Number.parseInt(get('year'), 10),
     month: Number.parseInt(get('month'), 10),
     day: Number.parseInt(get('day'), 10),
     key,
-    weekday: weekday >= 0 ? weekday : new Date(`${key}T00:00:00${SAO_PAULO_OFFSET}`).getUTCDay(),
+    weekday: weekday >= 0 ? weekday : new Date(`${key}T12:00:00Z`).getUTCDay(),
   }
 }
 
 function saoPauloDateFromParts({ year, month, day, hour = 0, minute = 0 }) {
-  return new Date(`${year}-${pad2(month)}-${pad2(day)}T${pad2(hour)}:${pad2(minute)}:00${SAO_PAULO_OFFSET}`)
+  // Usa noon UTC do dia-alvo como referência para derivar o offset correto (BRT ou BRST)
+  const ref = new Date(Date.UTC(year, month - 1, day, 12, 0, 0))
+  const offset = saoPauloOffset(ref)
+  return new Date(`${year}-${pad2(month)}-${pad2(day)}T${pad2(hour)}:${pad2(minute)}:00${offset}`)
 }
 
 function stripAccents(value) {
