@@ -66,7 +66,16 @@
       "Bash(Get-ChildItem -Path \"d:\\\\Projetos\\\\Severino\" -Directory)",
       "Bash(Select-Object Name)",
       "mcp__filesystem__directory_tree",
-      "Bash(vercel *)"
+      "Bash(vercel *)",
+      "Bash(npm list *)",
+      "Bash(python -c \"print\\('ok'\\)\")",
+      "Bash(py -c \"print\\('ok'\\)\")",
+      "Bash(python3.exe -c \"print\\('ok'\\)\")",
+      "Bash(python *)",
+      "Bash(ssh-add -l)",
+      "Bash(sshpass *)",
+      "Bash(py --version)",
+      "Bash(python3.11 --version)"
     ]
   }
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
@@ -268,6 +268,7 @@ export default function Agenda() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
+  const savingRef = useRef(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   /** Exclusão direta na lista do dia (confirmação em `ConfirmDialog`). */
   const [pendingDelete, setPendingDelete] = useState(null)
@@ -471,7 +472,8 @@ export default function Agenda() {
 
   async function saveEvent(e) {
     e.preventDefault()
-    if (!usuarioId) return
+    if (!usuarioId || savingRef.current) return
+    savingRef.current = true
     setSaving(true)
     try {
       const payload = {
@@ -493,6 +495,7 @@ export default function Agenda() {
     } catch (err) {
       showToast(err.message || 'Falha ao salvar item da agenda.', 'error')
     } finally {
+      savingRef.current = false
       setSaving(false)
     }
   }
@@ -508,7 +511,8 @@ export default function Agenda() {
   }
 
   async function deleteEvent() {
-    if (!usuarioId || !editing?.id) return
+    if (!usuarioId || !editing?.id || savingRef.current) return
+    savingRef.current = true
     setSaving(true)
     try {
       await removeAgendaItem(editing.id)
@@ -521,6 +525,7 @@ export default function Agenda() {
       showToast(err.message || 'Falha ao remover item da agenda.', 'error')
       throw err
     } finally {
+      savingRef.current = false
       setSaving(false)
     }
   }

@@ -20,7 +20,7 @@ import {
   fallbackParseMensagemSimples,
 } from './domain/transaction-heuristics.mjs'
 
-const MAX_WHATSAPP_AUDIO_BYTES = 12 * 1024 * 1024
+const MAX_WHATSAPP_AUDIO_BYTES = 20 * 1024 * 1024
 
 function looksLikeNonBinaryAudioPayload(buf) {
   if (!buf?.length) return false
@@ -340,19 +340,21 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
     '- whatsapp_notificar: true, salvo pedido explícito para não notificar.\n' +
     '- local e descricao: strings, podem ser vazias.\n\n' +
     'Regras para o TÍTULO:\n' +
-    '- Extraia o que é o compromisso/lembrete em si, sem incluir data, hora, dia da semana nem verbos de ação (marcar, agendar, lembrar, avise, etc.).\n' +
-    '- NUNCA inclua no título: data, hora, dia da semana, "horas", "h", "às", "e meia", verbos de ação (marcar, lembrar, ir, avise), artigos soltos (a, o, as, os).\n' +
-    '- Capitalize a primeira letra. Use 2 a 8 palavras. Extraia SOMENTE o nome do compromisso.\n' +
-    '- O texto pode vir de transcrição de áudio e PODE ter preamble conversacional antes do comando de agendamento — ignore tudo antes do verbo de ação e extraia só o evento.\n' +
+    '- Use de 2 a 6 palavras. Capitalize a primeira letra.\n' +
+    '- REMOVA APENAS: verbos de agendamento no início (marcar, agendar, me lembra de, avise, lembrar de) e referências de data/hora (dia da semana, hora, "às", "amanhã").\n' +
+    '- MANTENHA: verbos que descrevem o evento (pagar, buscar, ir, ligar, levar, chamar, comprar, tomar), artigos e preposições que fazem parte natural da frase.\n' +
+    '- Ignore preamble conversacional antes do comando de agendamento.\n' +
     '- Se o usuário só informar horário sem descrever o evento, use "Compromisso" como título.\n' +
     '- Exemplos de entrada → título correto:\n' +
     '  "marcar dentista segunda 10h" → "Dentista"\n' +
     '  "Fala Severino, como você tá? Marque uma reunião importante para as 16:30" → "Reunião importante"\n' +
-    '  "lembrar de ir buscar a Fabiana às dezesseis e meia" → "Buscar Fabiana"\n' +
+    '  "lembrar de ir buscar a Fabiana às dezesseis e meia" → "Ir buscar a Fabiana"\n' +
     '  "Oi, tudo bem? Agenda uma consulta médica pra amanhã às 9h" → "Consulta médica"\n' +
     '  "me lembra de pagar a luz sexta 9h" → "Pagar a luz"\n' +
     '  "amanhã às quinze e meia buscar filha na escola" → "Buscar filha na escola"\n' +
-    '  "call com cliente às dezesseis horas" → "Call com cliente"\n\n' +
+    '  "call com cliente às dezesseis horas" → "Call com cliente"\n' +
+    '  "ligar para o contador amanhã 9h" → "Ligar para o contador"\n' +
+    '  "levar os filhos na escola segunda 7h30" → "Levar os filhos na escola"\n\n' +
     `Texto do usuário:\n"""${safeUserText}"""`
 
   const models = resolveGeminiModelCandidates()

@@ -238,15 +238,20 @@ async function audioBufferFromWhatsAppBody(body) {
   const evolutionKey = body?.evolutionApiKey || process.env.EVOLUTION_API_KEY
   if (evolutionKey && !headers.apikey) headers.apikey = String(evolutionKey)
 
+  const controller = new AbortController()
+  const tid = setTimeout(() => controller.abort(), 30_000)
   try {
-    const response = await fetch(audioUrl, { headers })
+    const response = await fetch(audioUrl, { headers, signal: controller.signal })
     if (!response.ok) {
       throw new Error(`Falha ao baixar áudio (${response.status}).`)
     }
     return Buffer.from(await response.arrayBuffer())
   } catch (e) {
-    log.warn('[whatsapp] fetch audioUrl falhou', { url: audioUrl.slice(0, 120), detail: String(e?.message || e).slice(0, 200) })
+    const detail = e?.name === 'AbortError' ? 'timeout (30s)' : String(e?.message || e).slice(0, 200)
+    log.warn('[whatsapp] fetch audioUrl falhou', { url: audioUrl.slice(0, 120), detail })
     throw e
+  } finally {
+    clearTimeout(tid)
   }
 }
 

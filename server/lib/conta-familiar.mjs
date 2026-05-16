@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
+import { log } from './logger.mjs'
 
 /** Total máximo na conta familiar: 1 titular + membros vinculados (fixo no produto). */
 export const FAMILIA_MAX_MEMBROS_TOTAL = 5
@@ -136,8 +137,8 @@ async function registrarAuditFamilia({ titularId, actorId, membroId = null, acao
       papel_antes: papelAntes,
       papel_depois: papelDepois,
     })
-  } catch {
-    // audit não bloqueia operação principal
+  } catch (e) {
+    log.warn('[familia_audit_log] insert falhou', e?.message || e)
   }
 }
 
