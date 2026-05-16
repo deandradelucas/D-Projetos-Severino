@@ -3,6 +3,7 @@ import RecorrenciaArrowIcon from '../RecorrenciaArrowIcon'
 import { TransacaoCategoriaIcon } from '../TransacaoCategoriaIcon'
 import { formatCurrencyBRL } from '../../lib/formatCurrency'
 import { formatTransacaoListDateTime } from '../../lib/transacaoDateDisplay'
+import { transacaoDescricaoEfetiva } from '../../lib/transacaoUtils'
 
 /**
  * Renderiza uma linha individual da lista de transações.
@@ -25,6 +26,7 @@ export function TransacaoRow({ t, mostrarQuemLancou, privacyMode, onEdit, onDele
       : '—'
   const valorAbs = Math.abs(parseFloat(t.valor) || 0)
   const mostraIconeRecorrente = Boolean(t.recorrencia_mensal_id) || Boolean(t.recorrente_index)
+  const descricaoExibir = transacaoDescricaoEfetiva(t)
 
   return (
     <div key={t.id} className="ref-tx-row">
@@ -39,12 +41,12 @@ export function TransacaoRow({ t, mostrarQuemLancou, privacyMode, onEdit, onDele
         </div>
       </div>
       <div className="ref-tx-meta-cell">
-        <time className="ref-tx-date" dateTime={dateTimeAttr}>
+        <time className="ref-tx-date ref-tx-date--row-meta" dateTime={dateTimeAttr}>
           {dateLine}
         </time>
-        {t.descricao && String(t.descricao).trim() ? (
-          <span className="ref-tx-desc" title={String(t.descricao).trim()}>
-            {String(t.descricao).trim()}
+        {descricaoExibir ? (
+          <span className="ref-tx-desc" title={descricaoExibir}>
+            {descricaoExibir}
           </span>
         ) : null}
         {mostrarQuemLancou && t.lancado_por_nome ? (
@@ -73,7 +75,12 @@ export function TransacaoRow({ t, mostrarQuemLancou, privacyMode, onEdit, onDele
       </div>
       <div className="ref-tx-sub-cell">
         <span className="ref-tx-field-label">Subcategoria</span>
-        <p className="ref-tx-sub-text">{subNome}</p>
+        <p className="ref-tx-sub-text">
+          <span className="ref-tx-sub-text__name">{subNome}</span>
+          <time className="ref-tx-date ref-tx-date--paired-sub" dateTime={dateTimeAttr}>
+            {dateLine}
+          </time>
+        </p>
       </div>
       <div className="ref-tx-rec-cell">
         {mostraIconeRecorrente ? (
@@ -103,7 +110,7 @@ export function TransacaoRow({ t, mostrarQuemLancou, privacyMode, onEdit, onDele
               type="button"
               className="btn-edit"
               onClick={() => onEdit(t)}
-              aria-label={`Editar transação ${t.descricao || 'sem descrição'}`}
+              aria-label={`Editar transação ${descricaoExibir || subNome || catNome}`}
               title="Editar"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -115,7 +122,7 @@ export function TransacaoRow({ t, mostrarQuemLancou, privacyMode, onEdit, onDele
               type="button"
               className="btn-delete"
               onClick={() => onDelete(t)}
-              aria-label={`Excluir transação ${t.descricao || 'sem descrição'}`}
+              aria-label={`Excluir transação ${descricaoExibir || subNome || catNome}`}
               title="Excluir"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

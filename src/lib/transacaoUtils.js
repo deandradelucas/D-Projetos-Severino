@@ -36,3 +36,25 @@ export function parseValorTransacao(t) {
   if (Number.isFinite(val)) return val
   return parseFloat(String(t.valor).replace(',', '.')) || 0
 }
+
+/**
+ * Descrição livre do utilizador — ignora vazio e legado que copiava sub/categoria.
+ */
+export function transacaoDescricaoEfetiva(transacao) {
+  const desc = String(transacao?.descricao || '').trim()
+  if (!desc) return ''
+
+  const subRaw = transacao?.subcategorias
+  const subNome =
+    subRaw && typeof subRaw === 'object' && subRaw.nome && String(subRaw.nome).trim()
+      ? String(subRaw.nome).trim()
+      : ''
+  const catNome =
+    transacao?.categorias?.nome && String(transacao.categorias.nome).trim()
+      ? String(transacao.categorias.nome).trim()
+      : ''
+
+  if (subNome && desc === subNome) return ''
+  if (catNome && desc === catNome) return ''
+  return desc
+}

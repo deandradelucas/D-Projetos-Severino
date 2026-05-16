@@ -4,6 +4,7 @@ import {
   transacaoMesKey,
   parseValorTransacao,
   isDespesaRecorrente,
+  transacaoDescricaoEfetiva,
 } from './transacaoUtils.js'
 
 describe('transacaoUtils', () => {
@@ -19,6 +20,31 @@ describe('transacaoUtils', () => {
   it('parseValorTransacao aceita número e string', () => {
     expect(parseValorTransacao({ valor: 10.5 })).toBe(10.5)
     expect(parseValorTransacao({ valor: '10,5' })).toBe(10.5)
+  })
+
+  it('transacaoDescricaoEfetiva ignora cópia de sub/categoria', () => {
+    expect(
+      transacaoDescricaoEfetiva({
+        descricao: 'Mercado',
+        categorias: { nome: 'Alimentação' },
+        subcategorias: { nome: 'Supermercado' },
+      })
+    ).toBe('Mercado')
+    expect(
+      transacaoDescricaoEfetiva({
+        descricao: 'Supermercado',
+        categorias: { nome: 'Alimentação' },
+        subcategorias: { nome: 'Supermercado' },
+      })
+    ).toBe('')
+    expect(
+      transacaoDescricaoEfetiva({
+        descricao: 'Alimentação',
+        categorias: { nome: 'Alimentação' },
+        subcategorias: null,
+      })
+    ).toBe('')
+    expect(transacaoDescricaoEfetiva({ descricao: '  ' })).toBe('')
   })
 
   it('isDespesaRecorrente', () => {

@@ -129,6 +129,12 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-h
   display: none !important;
 }
 
+/* Desktop / tablet largo: data só na coluna meta (não ao lado da subcategoria). */
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--paired-sub,
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--paired-sub {
+  display: none !important;
+}
+
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-list-head {
   display: none !important;
 }
@@ -604,34 +610,49 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   word-break: break-word !important;
 }
 
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date {
-  display: block !important;
+/* Data/hora em chip — só .ref-tx-date--row-meta (evita reabrir .ref-tx-date--paired-sub no desktop) */
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--row-meta {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
   margin: 0 !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
   font-size: 0.8125rem !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   letter-spacing: 0.01em !important;
-  line-height: 1.45 !important;
+  line-height: 1.35 !important;
   font-variant-numeric: tabular-nums !important;
-  color: var(--tx-dir-muted, #8e959c) !important;
-  background: transparent !important;
-  border: none !important;
+  white-space: nowrap !important;
+  color: rgba(71, 85, 105, 0.82) !important;
+  background: rgba(15, 23, 42, 0.045) !important;
+  border: 1px solid rgba(15, 23, 42, 0.06) !important;
 }
 
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date {
-  display: block !important;
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--row-meta {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
   margin: 0 !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
   font-size: 0.8125rem !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   letter-spacing: 0.01em !important;
-  line-height: 1.45 !important;
+  line-height: 1.35 !important;
   font-variant-numeric: tabular-nums !important;
-  color: var(--tx-dir-muted, #9ca3af) !important;
-  background: transparent !important;
-  border: none !important;
+  white-space: nowrap !important;
+  color: rgba(255, 255, 255, 0.56) !important;
+  background: #000000 !important;
+  border: 0.5px solid #0b0b0b !important;
+}
+
+/* Reforço: chip global em .ref-tx-date não pode anular o paired-sub oculto no desktop */
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--paired-sub,
+body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--paired-sub {
+  display: none !important;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-meta-cell {
@@ -655,46 +676,36 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   object-fit: contain;
 }
 
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val {
-  padding: 0 !important;
-  border-radius: 0 !important;
-  font-size: 0.9375rem !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.02em !important;
-  line-height: 1.25 !important;
-  font-variant-numeric: tabular-nums !important;
-  background: transparent !important;
-  border: none !important;
-  color: var(--tx-dir-title, #1a1a1b) !important;
-}
-
+/* Valor em chip arredondado — verde receita, vermelho despesa (como no Dashboard) */
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val {
-  padding: 0 !important;
-  border-radius: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  padding: 6px 8px !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
   font-size: 0.9375rem !important;
   font-weight: 600 !important;
   letter-spacing: -0.02em !important;
   line-height: 1.25 !important;
   font-variant-numeric: tabular-nums !important;
-  background: transparent !important;
-  border: none !important;
-  color: var(--tx-dir-title, #f4f4f5) !important;
+  white-space: nowrap !important;
 }
 
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--pos {
-  color: var(--tx-dir-title-rec, #107c52) !important;
-}
-
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--neg {
-  color: var(--danger, #dc2626) !important;
-}
-
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--pos,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--pos {
-  color: var(--tx-dir-title-rec, #3ecf8e) !important;
+  color: var(--success, #107c52) !important;
+  background: color-mix(in srgb, var(--success, #107c52) 16%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--success, #107c52) 28%, transparent) !important;
 }
 
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--neg,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--neg {
-  color: var(--danger, #f87171) !important;
+  color: var(--danger, #dc2626) !important;
+  background: color-mix(in srgb, var(--danger, #dc2626) 14%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--danger, #dc2626) 28%, transparent) !important;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .transacoes-actions {
@@ -1052,6 +1063,93 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     height: 14px !important;
     font-size: 14px !important;
     object-fit: contain;
+  }
+
+  /* Subcategoria + data/hora na mesma linha (bloco de classificação do cartão). */
+  .page-transacoes.app-horizon-shell
+    .page-transacoes-ref-table
+    .ref-tx-table-subgrid--actions
+    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-date--row-meta {
+    display: none !important;
+  }
+
+  .page-transacoes.app-horizon-shell
+    .page-transacoes-ref-table
+    .ref-tx-table-subgrid--actions
+    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-sub-text {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.15rem;
+    row-gap: 0.1rem;
+    line-height: 1.45 !important;
+  }
+
+  .page-transacoes.app-horizon-shell
+    .page-transacoes-ref-table
+    .ref-tx-table-subgrid--actions
+    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-sub-text__name {
+    min-width: 0;
+  }
+
+  .page-transacoes.app-horizon-shell
+    .page-transacoes-ref-table
+    .ref-tx-table-subgrid--actions
+    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-date--paired-sub {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 0 0 0 0.1rem !important;
+    padding: 3px 7px !important;
+    border-radius: 999px !important;
+    font-size: 0.66rem !important;
+    letter-spacing: -0.01em !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  body[data-theme='light']
+    .page-transacoes.app-horizon-shell
+    .page-transacoes-ref-table
+    .ref-tx-table-subgrid--actions
+    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-date--paired-sub {
+    background: rgba(15, 23, 42, 0.045) !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    color: rgba(71, 85, 105, 0.82) !important;
+  }
+
+  body[data-theme='dark']
+    .page-transacoes.app-horizon-shell
+    .page-transacoes-ref-table
+    .ref-tx-table-subgrid--actions
+    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-date--paired-sub {
+    background: #000000 !important;
+    border: 0.5px solid #0b0b0b !important;
+    color: rgba(255, 255, 255, 0.56) !important;
+  }
+
+  /* Separador fora do chip da data (não dentro da borda arredondada). */
+  .page-transacoes.app-horizon-shell
+    .page-transacoes-ref-table
+    .ref-tx-table-subgrid--actions
+    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-sub-text__name::after {
+    content: '·';
+    margin-inline: 0.35rem;
+    opacity: 0.55;
+  }
+
+  .page-transacoes.app-horizon-shell
+    .page-transacoes-ref-table
+    .ref-tx-table-subgrid--actions
+    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    > .ref-tx-meta-cell:not(:has(.ref-tx-desc, .ref-tx-lancador)) {
+    display: none !important;
   }
 }
 

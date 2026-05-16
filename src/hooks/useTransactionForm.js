@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { apiUrl } from '../lib/apiUrl'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { showToast } from '../lib/toastStore'
+import { transacaoDescricaoEfetiva } from '../lib/transacaoUtils'
 
 /**
  * Retorna o datetime local (sem UTC shift) no formato ISO slice(0,16).
@@ -36,7 +37,7 @@ const INITIAL_FORM = {
 /**
  * Hook centralizado para o estado e lógica do formulário de transação.
  */
-export function useTransactionForm({ usuarioId, editingTransaction, isOpen, categorias, onSave, onClose }) {
+export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSave, onClose }) {
   const isEditMode = Boolean(editingTransaction?.id)
 
   const [formData, setFormData] = useState(INITIAL_FORM)
@@ -65,7 +66,7 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, cate
       }
 
       setFormData({
-        descricao: t.descricao || '',
+        descricao: transacaoDescricaoEfetiva(t),
         valor: String(numValue),
         tipo: t.tipo || 'DESPESA',
         data_transacao: dtStr,
@@ -121,20 +122,14 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, cate
       return
     }
 
-    // Auto-preenche descrição pela categoria se vazio
-    let finalDescricao = formData.descricao
-    if (!finalDescricao) {
-      const cat = categorias.find((c) => c.id === formData.categoria_id)
-      const sub = cat?.subcategorias?.find((s) => s.id === formData.subcategoria_id)
-      finalDescricao = sub?.nome || cat?.nome || ''
-    }
+    const descricao = String(formData.descricao || '').trim()
 
     setSaving(true)
     try {
       const payload = {
         ...formData,
         data_transacao: new Date(formData.data_transacao).toISOString(),
-        descricao: finalDescricao,
+        descricao,
       }
 
       if (!isEditMode) {
@@ -170,7 +165,7 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, cate
     } finally {
       setSaving(false)
     }
-  }, [formData, categorias, isEditMode, editingTransaction, onSave, onClose])
+  }, [formData, isEditMode, editingTransaction, onSave, onClose])
 
   return {
     formData,
