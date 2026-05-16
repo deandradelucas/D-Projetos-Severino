@@ -264,18 +264,83 @@ export function parseReminderMinutes(message) {
   return Math.min(unit.startsWith('h') || unit.startsWith('hora') ? n * 60 : n, 1440)
 }
 
+/** Conta palavras com 2+ caracteres (exclui artigos soltos de 1 letra). */
+function wordCount(text) {
+  return String(text || '').split(/\s+/).filter(w => w.length >= 2).length
+}
+
+/** Remove marcadores de data/hora de um texto. Reutilizado em dois contextos. */
+function stripDateTime(text) {
+  let t = text
+  t = t.replace(/\bmeio[\s-]dia\b/gi, '')
+  t = t.replace(/\bmeia[\s-]noite\b/gi, '')
+  t = t.replace(/\b(?:depois\s+de\s+amanh[aã]|amanh[aã]|hoje)(?!\w)/gi, '')
+  t = t.replace(/\b(?:segunda(?:-feira)?|ter[cç]a(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|s[aá]bado|domingo)\b/gi, '')
+  t = t.replace(/\b(?:daqui\s+a|em)\s+\d{1,3}\s*(?:min|minuto|minutos|hora|horas|h|dia|dias|semana|semanas)\b/gi, '')
+  t = t.replace(/\b(?:dia\s+)?\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b/gi, '')
+  t = t.replace(/(?<!\w)(?:às|as|pelas?)\s*\d{1,2}(?:h\d{2}|:\d{2}|\s+horas?\s+e\s+meia|\s+horas?|h)?(?=\s|$|[^\w])/gi, '')
+  t = t.replace(/\bpara\s+(?:as|às)\s+\d{1,2}(?:[:h]\d{2}|\s+horas?\s+e\s+meia|\s+horas?)?\b/gi, '')
+  t = t.replace(/\b\d{1,2}[:h]\d{2}\b/gi, '')
+  t = t.replace(/\b\d{1,2}\s+horas?\s+e\s+meia\b/gi, '')
+  t = t.replace(/\b\d{1,2}\s+e\s+meia\b/gi, '')
+  t = t.replace(/\b\d{1,2}\s+horas?\b/gi, '')
+  t = t.replace(/\b\d{1,2}h\b/gi, '')
+  t = t.replace(/\b(?:da|de|pela)\s+(?:manh[aã]|tarde|noite)\b/gi, '')
+  t = t.replace(/\b(?:pr[oó]xim[ao]s?)\b/gi, '')
+  return t
+}
+
+/**
+ * Extração leve: remove só o verbo de agendamento no início e marcadores de data/hora.
+ * Preserva verbos de ação (pagar, buscar, ir...), artigos e preposições.
+ * Usado como fallback quando a extração completa produz < 3 palavras.
+ */
+function lightExtractTitle(message) {
+  let text = normalizeWordTime(String(message || '').trim())
+
+  // Remove "Severino"
+  if (/^.{0,60}severino\b/i.test(text)) {
+    text = text.replace(/^.*?\bseverino\b[,!\s]*/i, '')
+  }
+
+  // Salta para o verbo de agendamento se houver preamble conversacional
+  const schedVerb =
+    /\b(?:me\s+)?(?:marqu[ae]|agende?|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
+  const schedMatch = text.match(schedVerb)
+  if (schedMatch && schedMatch.index > 0) text = text.slice(schedMatch.index)
+
+  // Remove verbo de agendamento no início + conector opcional (exige espaço após conector para não cortar palavras como "dentista")
+  text = text.replace(
+    /^(?:me\s+)?(?:marcar|marque|agendar|agende|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|lembrete)\s+(?:(?:de|para|um|uma|o|a)\s+)*/i,
+    ''
+  )
+
+  // Remove frases de lembrete ao final
+  text = text.replace(/[\s,]+\b(?:me\s+)?(?:avise|avisar|alerte|alerta|alertar|lembre|lembrar|lembra)\b.*$/i, '')
+
+  // Remove marcadores de data/hora
+  text = stripDateTime(text)
+
+  // Retorna até 6 palavras (preserva verbos, artigos, preposições intactos)
+  return text
+    .replace(/\s+/g, ' ')
+    .replace(/^[\s,;:?!]+|[\s,;:?!]+$/g, '')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 6)
+    .join(' ')
+}
+
 function extractTitle(message) {
   // 1. Normaliza horas por extenso
   let text = normalizeWordTime(String(message || '').trim())
 
   // 2. Remove "Severino" (vocativo em qualquer posição dentro dos primeiros 60 chars)
-  //    "Fala Severino, ..." → "..." | "Severino, lembra..." → "lembra..."
   if (/^.{0,60}severino\b/i.test(text)) {
     text = text.replace(/^.*?\bseverino\b[,!\s]*/i, '')
   }
 
-  // 3. Localiza verbo de agendamento em QUALQUER posição (não só no início).
-  //    Se existe preamble conversacional ("como você tá? Marque..."), salta para o verbo.
+  // 3. Localiza verbo de agendamento em QUALQUER posição; salta preamble conversacional
   const schedVerb =
     /\b(?:me\s+)?(?:marqu[ae]|agende?|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
   const schedMatch = text.match(schedVerb)
@@ -283,40 +348,31 @@ function extractTitle(message) {
     text = text.slice(schedMatch.index)
   }
 
-  // 4. Remove verbos de ação no início (infinitivo + imperativo)
+  // 4. Remove verbos de agendamento no início (infinitivo + imperativo)
+  // Conector com espaço obrigatório evita cortar palavras como "dentista" (não absorver "de" de "de+ntista")
   text = text.replace(
-    /^(?:me\s+)?(?:marcar|marque|agendar|agende|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|lembrete)\s+(?:de|para|um|uma|o|a)?\s*/i,
+    /^(?:me\s+)?(?:marcar|marque|agendar|agende|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|lembrete)\s+(?:(?:de|para|um|uma|o|a)\s+)*/i,
     ''
   )
   text = text.replace(/^(?:um|uma|o|a)\s+(?:compromisso|lembrete|evento)\s+(?:de|para)?\s*/i, '')
 
-  // 5. Remove verbo auxiliar de movimento "ir" ("ir buscar" → "buscar")
-  text = text.replace(/^ir\s+/i, '')
-
-  // 6. Remove frases de lembrete ao final
+  // 5. Remove frases de lembrete ao final
   text = text.replace(/[\s,]+\b(?:me\s+)?(?:avise|avisar|alerte|alerta|alertar|lembre|lembrar|lembra)\b.*$/i, '')
 
-  // 7. Remove marcadores de data/hora em QUALQUER posição
-  text = text.replace(/\bmeio[\s-]dia\b/gi, '')
-  text = text.replace(/\bmeia[\s-]noite\b/gi, '')
-  text = text.replace(/\b(?:depois\s+de\s+amanh[aã]|amanh[aã]|hoje)\b/gi, '')
-  text = text.replace(/\b(?:segunda(?:-feira)?|ter[cç]a(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|s[aá]bado|domingo)\b/gi, '')
-  text = text.replace(/\b(?:daqui\s+a|em)\s+\d{1,3}\s*(?:min|minuto|minutos|hora|horas|h|dia|dias|semana|semanas)\b/gi, '')
-  text = text.replace(/\b(?:dia\s+)?\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b/gi, '')
-  text = text.replace(/\b(?:às|as|pelas?)\s*\d{1,2}(?:[:h]\d{2}|\s+horas?\s+e\s+meia|\s+horas?)?\b/gi, '')
-  text = text.replace(/\bpara\s+(?:as|às)\s+\d{1,2}(?:[:h]\d{2}|\s+horas?\s+e\s+meia|\s+horas?)?\b/gi, '')
-  text = text.replace(/\b\d{1,2}[:h]\d{2}\b/gi, '')
-  text = text.replace(/\b\d{1,2}\s+horas?\s+e\s+meia\b/gi, '')
-  text = text.replace(/\b\d{1,2}\s+e\s+meia\b/gi, '')
-  text = text.replace(/\b\d{1,2}\s+horas?\b/gi, '')
-  text = text.replace(/\b\d{1,2}h\b/gi, '')
-  text = text.replace(/\b(?:da|de|pela)\s+(?:manh[aã]|tarde|noite)\b/gi, '')
-  text = text.replace(/\b(?:pr[oó]xim[ao]s?)\b/gi, '')
+  // 6. Remove marcadores de data/hora em QUALQUER posição
+  text = stripDateTime(text)
 
-  // 8. Remove artigo "a/o/as/os" entre verbo de ação e pessoa/coisa (padrão da fala)
-  text = text.replace(/\b(buscar|pegar|pagar|levar|trazer|chamar|ligar|falar|ver|comprar)\s+(a|o|as|os)\s+/gi, '$1 ')
-
+  // 7. Limpa e mede resultado
   const cleaned = text.replace(/\s+/g, ' ').replace(/^[\s,;:?!]+|[\s,;:?!]+$/g, '').trim()
+
+  // 8. Fallback: se resultado tem < 3 palavras, usa extração leve (preserva verbos/artigos)
+  if (wordCount(cleaned) < 3) {
+    const light = lightExtractTitle(message)
+    if (wordCount(light) > wordCount(cleaned) && light.length > 1) {
+      return (light.charAt(0).toUpperCase() + light.slice(1)).slice(0, 160)
+    }
+  }
+
   if (cleaned.length < 2) return 'Compromisso'
   return (cleaned.charAt(0).toUpperCase() + cleaned.slice(1)).slice(0, 160)
 }
