@@ -57,7 +57,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     handleCurrencyChange,
     setDateShortcut,
     handleSubmit,
-  } = useTransactionForm({ usuarioId, editingTransaction, isOpen, categorias, onSave, onClose })
+  } = useTransactionForm({ usuarioId, editingTransaction, isOpen, onSave, onClose })
 
   // Inicializa o formulário e busca categorias ao abrir
   useEffect(() => {
