@@ -56,8 +56,8 @@ export function AgendaDayList({
         <div className="agenda-empty">
           <strong>Nenhum item neste dia.</strong>
           <span>
-            Toque no + para criar um item. No modal, use "Interpretar com IA" ou envie pelo WhatsApp:
-            "me avise de pagar a luz amanhã às 9h".
+            Toque no + para criar um item ou envie pelo WhatsApp:
+            &quot;me avise de pagar a luz amanhã às 9h&quot;.
           </span>
         </div>
       ) : (
