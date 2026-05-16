@@ -1,0 +1,132 @@
+import React from 'react'
+import RecorrenciaArrowIcon from '../RecorrenciaArrowIcon'
+import { TransacaoCategoriaIcon } from '../TransacaoCategoriaIcon'
+import { formatCurrencyBRL } from '../../lib/formatCurrency'
+import { formatTransacaoListDateTime } from '../../lib/transacaoDateDisplay'
+
+/**
+ * Renderiza uma linha individual da lista de transações.
+ *
+ * Props:
+ *   t               — objeto transação
+ *   mostrarQuemLancou — boolean
+ *   privacyMode     — boolean
+ *   onEdit          — fn(transacao)
+ *   onDelete        — fn(transacao)
+ */
+export function TransacaoRow({ t, mostrarQuemLancou, privacyMode, onEdit, onDelete }) {
+  const isRec = t.tipo === 'RECEITA'
+  const { line: dateLine, dateTimeAttr } = formatTransacaoListDateTime(t.data_transacao)
+  const catNome = (t.categorias?.nome && String(t.categorias.nome).trim()) || '—'
+  const subRaw = t.subcategorias
+  const subNome =
+    subRaw && typeof subRaw === 'object' && subRaw.nome && String(subRaw.nome).trim()
+      ? String(subRaw.nome).trim()
+      : '—'
+  const valorAbs = Math.abs(parseFloat(t.valor) || 0)
+  const mostraIconeRecorrente = Boolean(t.recorrencia_mensal_id) || Boolean(t.recorrente_index)
+
+  return (
+    <div key={t.id} className="ref-tx-row">
+      <div className="ref-tx-icon-cell">
+        <div className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}`} aria-hidden>
+          <TransacaoCategoriaIcon
+            categoriaNome={catNome}
+            subcategoriaNome={subNome}
+            isReceita={isRec}
+            size={16}
+          />
+        </div>
+      </div>
+      <div className="ref-tx-meta-cell">
+        <time className="ref-tx-date" dateTime={dateTimeAttr}>
+          {dateLine}
+        </time>
+        {t.descricao && String(t.descricao).trim() ? (
+          <span className="ref-tx-desc" title={String(t.descricao).trim()}>
+            {String(t.descricao).trim()}
+          </span>
+        ) : null}
+        {mostrarQuemLancou && t.lancado_por_nome ? (
+          <span className={`ref-tx-lancador ${privacyMode ? 'privacy-blur' : ''}`} title="Quem registrou este lançamento">
+            Lançado por {t.lancado_por_nome}
+          </span>
+        ) : null}
+      </div>
+      <div className="ref-tx-cat-cell">
+        <span className="ref-tx-field-label">Categoria</span>
+        <p className="ref-tx-cat-text">
+          <span
+            className={`ref-tx-tipo-pulse ${isRec ? 'ref-tx-tipo-pulse--receita' : 'ref-tx-tipo-pulse--despesa'}`}
+            role="img"
+            aria-label={isRec ? 'Receita' : 'Despesa'}
+          />
+          <span className="ref-tx-cat-text__label">
+            {catNome}
+            {t.recorrente_index ? (
+              <span className="ref-tx-rec-badge">
+                {t.recorrente_index}/{t.recorrente_total}
+              </span>
+            ) : null}
+          </span>
+        </p>
+      </div>
+      <div className="ref-tx-sub-cell">
+        <span className="ref-tx-field-label">Subcategoria</span>
+        <p className="ref-tx-sub-text">{subNome}</p>
+      </div>
+      <div className="ref-tx-rec-cell">
+        {mostraIconeRecorrente ? (
+          <span
+            className="ref-tx-recorrencia-ico-wrap"
+            title="Lançamento recorrente"
+            aria-label="Lançamento recorrente"
+          >
+            <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
+          </span>
+        ) : null}
+      </div>
+      <div className="ref-tx-val-act-wrap">
+        <div className="ref-tx-val-cell">
+          <span
+            className={`ref-tx-val ${isRec ? 'ref-tx-val--pos' : 'ref-tx-val--neg'} ${privacyMode ? 'privacy-blur' : ''}`}
+          >
+            <span className="ref-tx-val__amount">
+              {isRec ? '+' : '−'}
+              {formatCurrencyBRL(valorAbs)}
+            </span>
+          </span>
+        </div>
+        <div className="ref-tx-actions-cell">
+          <div className="transacoes-actions" role="group" aria-label="Ações da transação">
+            <button
+              type="button"
+              className="btn-edit"
+              onClick={() => onEdit(t)}
+              aria-label={`Editar transação ${t.descricao || 'sem descrição'}`}
+              title="Editar"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                <path d="m15 5 4 4" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="btn-delete"
+              onClick={() => onDelete(t)}
+              aria-label={`Excluir transação ${t.descricao || 'sem descrição'}`}
+              title="Excluir"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M3 6h18" />
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

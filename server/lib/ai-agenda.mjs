@@ -1,0 +1,128 @@
+import './load-env.mjs'
+import { log } from './logger.mjs'
+import { draftAgendaFromTextHeuristic, snapReminderToAppOptions } from './domain/agenda-whatsapp.mjs'
+import {
+  geminiPostGenerateContent,
+  resolveGeminiModelCandidates,
+} from './ai/gemini-client.mjs'
+import { tryParseJsonBlock } from './ai/parsers.mjs'
+
+/**
+ * Interpreta texto livre para preencher o formulário da agenda (web). Usa Gemini com fallback heurístico (mesmo núcleo do WhatsApp).
+ */
+export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
+  const trimmed = String(texto || '').trim()
+  if (!trimmed) throw new Error('Texto vazio.')
+
+  const fallback = () => draftAgendaFromTextHeuristic(trimmed, baseDate)
+
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) {
+    const h = fallback()
+    if (h) return h
+    throw new Error('GEMINI_API_KEY não configurada e não foi possível interpretar só com regras locais.')
+  }
+
+  const base = baseDate instanceof Date ? baseDate : new Date(baseDate)
+  const baseReadable = base.toLocaleString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  const safeUserText = trimmed.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+
+  const instruction =
+    'Você interpreta pedidos em português brasileiro para preencher um formulário de agenda (compromisso ou lembrete).\n\n' +
+    `REFERÊNCIA DE DATA/HORA no fuso America/Sao_Paulo: ${baseReadable}\n\n` +
+    'Retorne APENAS um JSON válido (sem markdown), formato exato:\n' +
+    '{"titulo":"string","data_local":"YYYY-MM-DD","hora_local":"HH:mm","local":"","descricao":"","lembrar_minutos_antes":15,"whatsapp_notificar":true}\n\n' +
+    'Regras gerais:\n' +
+    '- data_local e hora_local são no horário de Brasília (não use UTC no JSON).\n' +
+    '- lembrar_minutos_antes deve ser exatamente um destes valores: 0, 5, 10, 15, 30, 60.\n' +
+    '- Se o texto pedir lembrete/aviso sem especificar quantos minutos antes, use 15.\n' +
+    '- whatsapp_notificar: true, salvo pedido explícito para não notificar.\n' +
+    '- local e descricao: strings, podem ser vazias.\n\n' +
+    'Regras para o TÍTULO:\n' +
+    '- Use de 2 a 6 palavras. Capitalize a primeira letra.\n' +
+    '- REMOVA APENAS: verbos de agendamento no início (marcar, agendar, me lembra de, avise, lembrar de) e referências de data/hora (dia da semana, hora, "às", "amanhã").\n' +
+    '- MANTENHA: verbos que descrevem o evento (pagar, buscar, ir, ligar, levar, chamar, comprar, tomar), artigos e preposições que fazem parte natural da frase.\n' +
+    '- Ignore preamble conversacional antes do comando de agendamento.\n' +
+    '- Se o usuário só informar horário sem descrever o evento, use "Compromisso" como título.\n' +
+    '- Exemplos de entrada → título correto:\n' +
+    '  "marcar dentista segunda 10h" → "Dentista"\n' +
+    '  "Fala Severino, como você tá? Marque uma reunião importante para as 16:30" → "Reunião importante"\n' +
+    '  "lembrar de ir buscar a Fabiana às dezesseis e meia" → "Ir buscar a Fabiana"\n' +
+    '  "Oi, tudo bem? Agenda uma consulta médica pra amanhã às 9h" → "Consulta médica"\n' +
+    '  "me lembra de pagar a luz sexta 9h" → "Pagar a luz"\n' +
+    '  "amanhã às quinze e meia buscar filha na escola" → "Buscar filha na escola"\n' +
+    '  "call com cliente às dezesseis horas" → "Call com cliente"\n' +
+    '  "ligar para o contador amanhã 9h" → "Ligar para o contador"\n' +
+    '  "levar os filhos na escola segunda 7h30" → "Levar os filhos na escola"\n\n' +
+    `Texto do usuário:\n"""${safeUserText}"""`
+
+  const models = resolveGeminiModelCandidates()
+  let lastErr = null
+
+  for (const mid of models) {
+    try {
+      const response = await geminiPostGenerateContent(mid, apiKey, {
+        contents: [{ role: 'user', parts: [{ text: instruction }] }],
+        generationConfig: { maxOutputTokens: 400, temperature: 0.15 },
+      })
+      if (!response.ok) {
+        const t = await response.text()
+        lastErr = new Error(`Gemini ${response.status}: ${t.slice(0, 200)}`)
+        continue
+      }
+      const json = await response.json()
+      const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+      const parsed = tryParseJsonBlock(text)
+      if (!parsed || typeof parsed !== 'object') {
+        lastErr = new Error('JSON inválido na resposta da IA.')
+        continue
+      }
+      const titulo = String(parsed.titulo || '').trim().slice(0, 160) || 'Compromisso'
+      const dl = String(parsed.data_local || '').trim()
+      const hlRaw = String(parsed.hora_local || '').trim()
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dl) || !/^\d{1,2}:\d{2}$/.test(hlRaw)) {
+        lastErr = new Error('data_local ou hora_local inválidos na resposta da IA.')
+        continue
+      }
+      const [hh, mm] = hlRaw.split(':').map((x) => Number.parseInt(x, 10))
+      if (!Number.isFinite(hh) || !Number.isFinite(mm) || hh > 23 || mm > 59) {
+        lastErr = new Error('hora inválida na resposta da IA.')
+        continue
+      }
+      const hlNorm = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
+      const iso = new Date(`${dl}T${hlNorm}:00-03:00`)
+      if (Number.isNaN(iso.getTime())) {
+        lastErr = new Error('Combinação data/hora inválida.')
+        continue
+      }
+      let lem = Number.parseInt(String(parsed.lembrar_minutos_antes), 10)
+      if (![0, 5, 10, 15, 30, 60].includes(lem)) lem = snapReminderToAppOptions(lem)
+
+      return {
+        titulo,
+        descricao: String(parsed.descricao || '').trim().slice(0, 1000),
+        local: String(parsed.local || '').trim().slice(0, 180),
+        inicio: iso.toISOString(),
+        lembrar_minutos_antes: lem,
+        whatsapp_notificar: parsed.whatsapp_notificar !== false,
+        origem: 'ia',
+      }
+    } catch (e) {
+      lastErr = e
+    }
+  }
+
+  log.warn('[parseAgendaFromTextWithAI] usando fallback heurístico', lastErr?.message || lastErr)
+  const h = fallback()
+  if (h) return h
+  throw lastErr || new Error('Não foi possível interpretar o texto da agenda.')
+}

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
-import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { useTheme } from '../context/ThemeContext'
 import { useTransactionCache, TRANSACOES_REVALIDATED_EVENT } from '../context/transactionCacheStore'
@@ -22,9 +21,9 @@ import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
-import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon'
-import { formatTransacaoListDateTime } from '../lib/transacaoDateDisplay'
 import { getWhatsappContactUrl } from '../lib/whatsappContactUrl.js'
+import { TransacaoRow } from '../components/transacoes/TransacaoRow'
+import { TransacoesFiltrosPanel } from '../components/transacoes/TransacoesFiltrosPanel'
 import './dashboard.css'
 
 /** Itens por requisição — menos DOM inicial; “Carregar mais” busca o restante. */
@@ -362,100 +361,14 @@ export default function Transacoes() {
         </section>
 
         <section className="ref-bottom-grid ref-bottom-grid--single page-transacoes-panels" aria-label="Filtros e transações">
-        <article className="ref-panel page-transacoes-ref-filters">
-          <div className="ref-panel__head page-transacoes-filters-head">
-            <button
-              type="button"
-              className="page-transacoes-filters-toggle"
-              id="transacoes-filtros-trigger"
-              aria-expanded={filtrosAbertos}
-              aria-controls="transacoes-filtros-fields"
-              onClick={() => setFiltrosAbertos((open) => !open)}
-            >
-              <span className="page-transacoes-filters-toggle__lead">
-                <span className="ref-panel__title" role="heading" aria-level={2}>
-                  Filtros
-                </span>
-              </span>
-              <svg
-                className={`page-transacoes-filters-toggle__chevron ${filtrosAbertos ? 'page-transacoes-filters-toggle__chevron--open' : ''}`}
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </button>
-            <button type="button" className="ref-panel__link ref-panel__link--button" onClick={clearFilters}>
-              Limpar filtros
-            </button>
-          </div>
-          <div
-            id="transacoes-filtros-fields"
-            role="region"
-            aria-labelledby="transacoes-filtros-trigger"
-            hidden={!filtrosAbertos}
-          >
-            <div className="transacoes-filter-grid page-transacoes-filter-grid">
-              <div className="filter-group transacoes-filter-grid__search">
-                <label htmlFor="tx-busca">Busca</label>
-                <input
-                  id="tx-busca"
-                  type="text"
-                  name="busca"
-                  placeholder="Ex: Aluguel, Supermercado…"
-                  className="filter-input"
-                  value={filters.busca}
-                  onChange={handleFilterChange}
-                />
-              </div>
-              <div className="filter-group">
-                <label htmlFor="tx-cat">Categoria</label>
-                <select id="tx-cat" name="categoria_id" className="filter-input" value={filters.categoria_id} onChange={handleFilterChange}>
-                  <option value="">Todas</option>
-                  {categorias.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.nome}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="filter-group">
-                <label htmlFor="tx-tipo">Tipo</label>
-                <select id="tx-tipo" name="tipo" className="filter-input" value={filters.tipo} onChange={handleFilterChange}>
-                  <option value="">Todos</option>
-                  <option value="RECEITA">Receitas</option>
-                  <option value="DESPESA">Despesas</option>
-                </select>
-              </div>
-              <div className="filter-group transacoes-filter-grid__lancamentos">
-                <label htmlFor="tx-lancamentos">Lançamentos</label>
-                <select
-                  id="tx-lancamentos"
-                  name="lancamentos"
-                  className="filter-input"
-                  value={filters.lancamentos}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">Todos</option>
-                  <option value="recorrentes">Recorrentes</option>
-                </select>
-              </div>
-              <div className="filter-group">
-                <label htmlFor="tx-ini">Início</label>
-                <input id="tx-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />
-              </div>
-              <div className="filter-group">
-                <label htmlFor="tx-fim">Fim</label>
-                <input id="tx-fim" type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={handleFilterChange} />
-              </div>
-            </div>
-          </div>
-        </article>
+        <TransacoesFiltrosPanel
+          filters={filters}
+          filtrosAbertos={filtrosAbertos}
+          categorias={categorias}
+          onToggle={() => setFiltrosAbertos((open) => !open)}
+          onChange={handleFilterChange}
+          onClearFilters={clearFilters}
+        />
 
         {filtroRecorrentesAtivo && (
           <article className="ref-panel page-transacoes-ref-recorrencias" aria-label="Regras de repetição no dia 1">
@@ -555,124 +468,19 @@ export default function Transacoes() {
                   <span className="ref-tx-list-head__val">Valor</span>
                   <span className="ref-tx-list-head__actions">Ações</span>
                 </div>
-                {transacoes.map((t) => {
-                  const isRec = t.tipo === 'RECEITA'
-                  const { line: dateLine, dateTimeAttr } = formatTransacaoListDateTime(t.data_transacao)
-                  const catNome = (t.categorias?.nome && String(t.categorias.nome).trim()) || '—'
-                  const subRaw = t.subcategorias
-                  const subNome =
-                    subRaw && typeof subRaw === 'object' && subRaw.nome && String(subRaw.nome).trim()
-                      ? String(subRaw.nome).trim()
-                      : '—'
-                  const valorAbs = Math.abs(parseFloat(t.valor) || 0)
-                  const mostraIconeRecorrente = Boolean(t.recorrencia_mensal_id) || Boolean(t.recorrente_index)
-                  return (
-                    <div key={t.id} className="ref-tx-row">
-                      <div className="ref-tx-icon-cell">
-                        <div className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}`} aria-hidden>
-                          <TransacaoCategoriaIcon
-                            categoriaNome={catNome}
-                            subcategoriaNome={subNome}
-                            isReceita={isRec}
-                            size={16}
-                          />
-                        </div>
-                      </div>
-                      <div className="ref-tx-meta-cell">
-                        <time className="ref-tx-date" dateTime={dateTimeAttr}>
-                          {dateLine}
-                        </time>
-                        {t.descricao && String(t.descricao).trim() ? (
-                          <span className="ref-tx-desc" title={String(t.descricao).trim()}>
-                            {String(t.descricao).trim()}
-                          </span>
-                        ) : null}
-                        {mostrarQuemLancou && t.lancado_por_nome ? (
-                          <span className={`ref-tx-lancador ${privacyMode ? 'privacy-blur' : ''}`} title="Quem registrou este lançamento">
-                            Lançado por {t.lancado_por_nome}
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className="ref-tx-cat-cell">
-                        <span className="ref-tx-field-label">Categoria</span>
-                        <p className="ref-tx-cat-text">
-                          <span
-                            className={`ref-tx-tipo-pulse ${isRec ? 'ref-tx-tipo-pulse--receita' : 'ref-tx-tipo-pulse--despesa'}`}
-                            role="img"
-                            aria-label={isRec ? 'Receita' : 'Despesa'}
-                          />
-                          <span className="ref-tx-cat-text__label">
-                            {catNome}
-                            {t.recorrente_index ? (
-                              <span className="ref-tx-rec-badge">
-                                {t.recorrente_index}/{t.recorrente_total}
-                              </span>
-                            ) : null}
-                          </span>
-                        </p>
-                      </div>
-                      <div className="ref-tx-sub-cell">
-                        <span className="ref-tx-field-label">Subcategoria</span>
-                        <p className="ref-tx-sub-text">{subNome}</p>
-                      </div>
-                      <div className="ref-tx-rec-cell">
-                        {mostraIconeRecorrente ? (
-                          <span
-                            className="ref-tx-recorrencia-ico-wrap"
-                            title="Lançamento recorrente"
-                            aria-label="Lançamento recorrente"
-                          >
-                            <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className="ref-tx-val-act-wrap">
-                        <div className="ref-tx-val-cell">
-                          <span
-                            className={`ref-tx-val ${isRec ? 'ref-tx-val--pos' : 'ref-tx-val--neg'} ${privacyMode ? 'privacy-blur' : ''}`}
-                          >
-                            <span className="ref-tx-val__amount">
-                              {isRec ? '+' : '−'}
-                              {formatCurrencyBRL(valorAbs)}
-                            </span>
-                          </span>
-                        </div>
-                        <div className="ref-tx-actions-cell">
-                          <div className="transacoes-actions" role="group" aria-label="Ações da transação">
-                            <button
-                              type="button"
-                              className="btn-edit"
-                              onClick={() => {
-                                setEditingTransaction(t)
-                                setIsModalOpen(true)
-                              }}
-                              aria-label={`Editar transação ${t.descricao || 'sem descrição'}`}
-                              title="Editar"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                                <path d="m15 5 4 4" />
-                              </svg>
-                            </button>
-                            <button
-                              type="button"
-                              className="btn-delete"
-                              onClick={() => handleDelete(t)}
-                              aria-label={`Excluir transação ${t.descricao || 'sem descrição'}`}
-                              title="Excluir"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                <path d="M3 6h18" />
-                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
+                {transacoes.map((t) => (
+                  <TransacaoRow
+                    key={t.id}
+                    t={t}
+                    mostrarQuemLancou={mostrarQuemLancou}
+                    privacyMode={privacyMode}
+                    onEdit={(tx) => {
+                      setEditingTransaction(tx)
+                      setIsModalOpen(true)
+                    }}
+                    onDelete={handleDelete}
+                  />
+                ))}
               </div>
               <div className="page-transacoes-load-more">
                 <p className="page-transacoes-tx-meta" aria-live="polite">

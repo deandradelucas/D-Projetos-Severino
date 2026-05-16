@@ -9,6 +9,13 @@ import {
 } from './asaas.mjs'
 import { usuarioStripeSubscriptionLiberaAcesso } from './pagamentos-stripe.mjs'
 
+function getStartOfCurrentMonthMs() {
+  const d = new Date()
+  d.setUTCDate(1)
+  d.setUTCHours(0, 0, 0, 0)
+  return d.getTime()
+}
+
 const asaas403DebugLast = new Map()
 const ASAAS403_DEBUG_MIN_INTERVAL_MS = 5 * 60 * 1000
 
@@ -344,10 +351,7 @@ export async function aggregatePagamentosFinanceirosPorUsuarioIds(userIds) {
   const ids = [...new Set((userIds || []).map((id) => String(id || '').trim()).filter(Boolean))]
   if (!ids.length) return map
 
-  const startMonth = new Date()
-  startMonth.setUTCDate(1)
-  startMonth.setUTCHours(0, 0, 0, 0)
-  const startMs = startMonth.getTime()
+  const startMs = getStartOfCurrentMonthMs()
 
   const supabase = getSupabaseAdmin()
   let from = 0
@@ -397,10 +401,7 @@ export async function aggregatePagamentosFinanceirosPorUsuarioIds(userIds) {
 
 export async function agregarPagamentosAprovadosGlobais() {
   const supabase = getSupabaseAdmin()
-  const startMonth = new Date()
-  startMonth.setUTCDate(1)
-  startMonth.setUTCHours(0, 0, 0, 0)
-  const startMs = startMonth.getTime()
+  const startMs = getStartOfCurrentMonthMs()
 
   let accumulatedRevenue = 0
   let monthlyRevenue = 0
@@ -494,10 +495,7 @@ const STATUS_GRUPO_ESTORNADO = ['refunded']
 export function computePaymentAdminSummary(rows, meta = {}) {
   const list = Array.isArray(rows) ? rows : []
   const now = Date.now()
-  const startMonth = new Date()
-  startMonth.setUTCDate(1)
-  startMonth.setUTCHours(0, 0, 0, 0)
-  const startMs = startMonth.getTime()
+  const startMs = getStartOfCurrentMonthMs()
 
   let accumulatedRevenue = 0
   let approvedCount = 0
