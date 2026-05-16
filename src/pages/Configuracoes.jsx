@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
@@ -46,6 +46,8 @@ export default function Configuracoes() {
   const [familiaBusy, setFamiliaBusy] = useState(false)
   const [novoConvitePapel, setNovoConvitePapel] = useState('MEMBER')
   const [ultimoTokenConvite, setUltimoTokenConvite] = useState('')
+  const [conviteCopiadoVisivel, setConviteCopiadoVisivel] = useState(false)
+  const conviteCopiadoTimerRef = useRef(null)
   const [familiaConfirm, setFamiliaConfirm] = useState(null)
   const [alterarPapelMembro, setAlterarPapelMembro] = useState(null)
   const [familiaPainelCarregado, setFamiliaPainelCarregado] = useState(false)
@@ -229,6 +231,28 @@ export default function Configuracoes() {
     if (!t) return
     navigator.clipboard.writeText(t).then(() => showToast(okMsg)).catch(() => {})
   }
+
+  const copiarConviteFamilia = useCallback((texto) => {
+    if (!texto) return
+    navigator.clipboard
+      .writeText(texto)
+      .then(() => {
+        setConviteCopiadoVisivel(true)
+        if (conviteCopiadoTimerRef.current) window.clearTimeout(conviteCopiadoTimerRef.current)
+        conviteCopiadoTimerRef.current = window.setTimeout(() => setConviteCopiadoVisivel(false), 2800)
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (conviteCopiadoTimerRef.current) window.clearTimeout(conviteCopiadoTimerRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    setConviteCopiadoVisivel(false)
+  }, [ultimoTokenConvite])
 
   const papelFamiliaLabel = (p) => {
     const x = String(p || '').toUpperCase()
@@ -609,11 +633,11 @@ export default function Configuracoes() {
                     {ultimoTokenConvite}
                   </div>
                   <div className="config-invite-actions">
-                    <button type="button" className="config-action-btn" onClick={() => copiarTexto(ultimoTokenConvite, 'Código copiado.')}>
+                    <button type="button" className="config-action-btn" onClick={() => copiarConviteFamilia(ultimoTokenConvite)}>
                       Copiar código
                     </button>
                     {loginConviteHref ? (
-                      <button type="button" className="config-action-btn" onClick={() => copiarTexto(loginConviteHref, 'Link copiado.')}>
+                      <button type="button" className="config-action-btn" onClick={() => copiarConviteFamilia(loginConviteHref)}>
                         Copiar link
                       </button>
                     ) : null}
@@ -621,7 +645,7 @@ export default function Configuracoes() {
                       <button
                         type="button"
                         className="config-action-btn"
-                        onClick={() => copiarTexto(textoConviteCompletoComPwa, 'Mensagem copiada — cole no WhatsApp ou no e-mail.')}
+                        onClick={() => copiarConviteFamilia(textoConviteCompletoComPwa)}
                       >
                         Copiar mensagem completa
                       </button>
@@ -640,6 +664,13 @@ export default function Configuracoes() {
                       />
                     </div>
                   ) : null}
+                  <p
+                    className={`config-invite-copiado${conviteCopiadoVisivel ? ' config-invite-copiado--visible' : ''}`}
+                    role="status"
+                    aria-live="polite"
+                  >
+                    Copiado
+                  </p>
                 </div>
               ) : null}
 
