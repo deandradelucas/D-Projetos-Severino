@@ -13,6 +13,27 @@ function parseJsonEnv(value) {
   }
 }
 
+// SEC-A02: bloqueia SSRF — só HTTPS e sem IPs privados/link-local
+function isSafeMediaUrl(rawUrl) {
+  let u
+  try { u = new URL(rawUrl) } catch { return false }
+  if (u.protocol !== 'https:') return false
+  const h = u.hostname.toLowerCase()
+  if (
+    h === 'localhost' ||
+    h === '0.0.0.0' ||
+    /^127\./.test(h) ||
+    /^10\./.test(h) ||
+    /^192\.168\./.test(h) ||
+    /^172\.(1[6-9]|2\d|3[01])\./.test(h) ||
+    /^169\.254\./.test(h) ||
+    /^::1$/.test(h) ||
+    /^fc00:/i.test(h) ||
+    /^fe80:/i.test(h)
+  ) return false
+  return true
+}
+
 function base64ToBuffer(value) {
   const raw = String(value || '').trim()
   if (!raw) return null
@@ -230,10 +251,14 @@ async function audioBufferFromWhatsAppBody(body) {
 
   const audioUrl = String(body?.audioUrl || body?.mediaUrl || body?.url || '').trim()
   if (!audioUrl) return null
+  if (!isSafeMediaUrl(audioUrl)) {
+    log.warn('[whatsapp] audioUrl bloqueada por SSRF guard', { url: audioUrl.slice(0, 120) })
+    return null
+  }
 
   const headers = {
     ...parseJsonEnv(process.env.WHATSAPP_MEDIA_FETCH_HEADERS),
-    ...(body?.mediaHeaders && typeof body.mediaHeaders === 'object' ? body.mediaHeaders : {}),
+    // body.mediaHeaders removido — injeção de headers pelo caller (SEC-A02)
   }
   const evolutionKey = body?.evolutionApiKey || process.env.EVOLUTION_API_KEY
   if (evolutionKey && !headers.apikey) headers.apikey = String(evolutionKey)
