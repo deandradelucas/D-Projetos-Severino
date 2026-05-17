@@ -1,4 +1,5 @@
 import { log } from '../lib/logger.mjs'
+import { Alerts } from '../lib/notify-telegram.mjs'
 import {
   askHorizon,
   parseAgendaFromTextWithAI,
@@ -51,6 +52,7 @@ export function registerAiRoutes(app) {
           raw,
         )
       ) {
+        Alerts.geminiKeyInvalid()
         return c.json(
           {
             message:
@@ -60,6 +62,7 @@ export function registerAiRoutes(app) {
         )
       }
       if (/quota|RESOURCE_EXHAUSTED|exceeded your current quota|429/i.test(raw)) {
+        Alerts.geminiQuota()
         return c.json(
           {
             message:
@@ -73,6 +76,7 @@ export function registerAiRoutes(app) {
         raw.includes('Resposta vazia da API do Gemini') ||
         /^Resposta vazia \(/i.test(raw)
       ) {
+        Alerts.geminiGenericFail(raw)
         return c.json(
           {
             message:
