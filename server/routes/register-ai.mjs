@@ -68,7 +68,11 @@ export function registerAiRoutes(app) {
           503,
         )
       }
-      if (/^Gemini API \d{3}:/i.test(raw) || raw.includes('Resposta vazia da API do Gemini')) {
+      if (
+        /^Gemini API \d{3}:/i.test(raw) ||
+        raw.includes('Resposta vazia da API do Gemini') ||
+        /^Resposta vazia \(/i.test(raw)
+      ) {
         return c.json(
           {
             message:
