@@ -4,6 +4,7 @@ import { HTTPException } from 'hono/http-exception'
 import { cors } from 'hono/cors'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { log } from './lib/logger.mjs'
+import { Alerts } from './lib/notify-telegram.mjs'
 import { createApp } from './app-factory.mjs'
 import { httpRequestLogger, pagamentosRequestLogger } from './middleware/request-logger.mjs'
 import { errorToText, mapSupabaseOrNetworkError } from './lib/http/hono-error-map.mjs'
@@ -106,6 +107,7 @@ app.onError((err, c) => {
     method: c.req.method,
     err: errorToText(err),
   })
+  Alerts.serverError(c.req.path, err?.message)
   const mapped = mapSupabaseOrNetworkError(err)
   if (mapped) {
     return c.json({ message: mapped.message }, mapped.status)

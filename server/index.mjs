@@ -2,6 +2,7 @@ import './lib/load-env.mjs'
 import { serve } from '@hono/node-server'
 import app from './app.mjs'
 import { log } from './lib/logger.mjs'
+import { Alerts } from './lib/notify-telegram.mjs'
 import { pruneExpiredWebAuthnChallenges } from './lib/webauthn.mjs'
 
 const port = Number(process.env.API_PORT || 3001)
@@ -17,6 +18,7 @@ const server = serve(
   (addr) => {
     const p = addr?.port ?? port
     log.info(`API local pronta em http://127.0.0.1:${p}`)
+    Alerts.serverStarted(p)
   },
 )
 
