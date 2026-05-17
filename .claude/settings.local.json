@@ -101,7 +101,16 @@
       "Bash(ssh *)",
       "mcp__easypanel__list_projects",
       "Bash(python3.exe -c ' *)",
-      "Bash(C:\\\\Users\\\\lucas\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe *)"
+      "Bash(C:\\\\Users\\\\lucas\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe *)",
+      "Bash(Get-Process -Name rclone -ErrorAction SilentlyContinue)",
+      "Bash(Get-Content 'D:/Backup/backup-local.log' -Tail 5 -Encoding UTF8)",
+      "Bash(powershell.exe -Command \"Get-Process -Name rclone -ErrorAction SilentlyContinue\")",
+      "PowerShell(python \"D:\\\\Backup\\\\check-backup.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\rotate-secrets.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\rotate-supabase.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\rotate-asaas.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\rotate-gemini.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\rotate-n8n.py\")"
     ]
   }
 }
