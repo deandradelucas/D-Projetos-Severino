@@ -59,7 +59,8 @@ export function extractTextFromGeminiResponse(json) {
   let text = ''
   if (Array.isArray(parts)) {
     for (const p of parts) {
-      if (p && typeof p.text === 'string') text += p.text
+      if (!p || p.thought) continue
+      if (typeof p.text === 'string') text += p.text
     }
   }
   text = text.trim()

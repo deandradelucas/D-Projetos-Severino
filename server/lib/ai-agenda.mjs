@@ -2,6 +2,7 @@ import './load-env.mjs'
 import { log } from './logger.mjs'
 import { draftAgendaFromTextHeuristic, snapReminderToAppOptions } from './domain/agenda-whatsapp.mjs'
 import {
+  buildGeminiGenerationConfig,
   geminiPostGenerateContent,
   resolveGeminiModelCandidates,
 } from './ai/gemini-client.mjs'
@@ -72,7 +73,7 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
     try {
       const response = await geminiPostGenerateContent(mid, apiKey, {
         contents: [{ role: 'user', parts: [{ text: instruction }] }],
-        generationConfig: { maxOutputTokens: 400, temperature: 0.15 },
+        generationConfig: buildGeminiGenerationConfig(mid, { maxOutputTokens: 400, temperature: 0.15 }),
       })
       if (!response.ok) {
         const t = await response.text()

@@ -1,5 +1,6 @@
 import './load-env.mjs'
 import {
+  buildGeminiGenerationConfig,
   geminiPostGenerateContent,
   resolveGeminiModelCandidates,
 } from './ai/gemini-client.mjs'
@@ -49,7 +50,7 @@ export async function suggestCategoryForTransaction(descricao, tipo, categoriasU
     try {
       const response = await geminiPostGenerateContent(mid, apiKey, {
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 100, temperature: 0.1 },
+        generationConfig: buildGeminiGenerationConfig(mid, { maxOutputTokens: 100, temperature: 0.1 }),
       })
       if (!response.ok) continue
 

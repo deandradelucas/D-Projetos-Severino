@@ -1,8 +1,28 @@
 import '../load-env.mjs'
 
-/** Ordem: modelos mais recentes primeiro (áudio inline costuma variar por modelo). */
+/**
+ * Ordem: 2.5 primeiro (chaves novas); 2.0 só para contas legadas.
+ * Em 2.5+ use buildGeminiGenerationConfig (thinkingBudget: 0) — senão a resposta pode vir vazia.
+ */
 const GEMINI_MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash']
 const DEFAULT_MODEL = 'gemini-2.0-flash'
+
+/** Modelos com thinking ativo por defeito (tokens de raciocínio contam no orçamento de saída). */
+export function modelUsesThinkingBudget(modelId) {
+  const id = String(modelId || '').toLowerCase()
+  return /gemini-2\.5|gemini-3|thinking/.test(id)
+}
+
+/**
+ * generationConfig seguro por modelo (desliga thinking em 2.5+ para não esvaziar a resposta).
+ */
+export function buildGeminiGenerationConfig(modelId, overrides = {}) {
+  const config = { ...overrides }
+  if (modelUsesThinkingBudget(modelId)) {
+    config.thinkingConfig = { thinkingBudget: 0 }
+  }
+  return config
+}
 
 /**
  * Resolve a lista de modelos candidatos baseada no .env e fallbacks.

@@ -1,5 +1,9 @@
 import './load-env.mjs'
-import { geminiPostGenerateContent, resolveGeminiModelCandidates } from './ai/gemini-client.mjs'
+import {
+  buildGeminiGenerationConfig,
+  geminiPostGenerateContent,
+  resolveGeminiModelCandidates,
+} from './ai/gemini-client.mjs'
 import { extractTextFromGeminiResponse } from './ai/parsers.mjs'
 
 /**
@@ -27,7 +31,7 @@ Responda APENAS o UUID do usuário. Se não houver certeza absoluta, responda "n
     try {
       const response = await geminiPostGenerateContent(mid, apiKey, {
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 100 }
+        generationConfig: buildGeminiGenerationConfig(mid, { temperature: 0.1, maxOutputTokens: 100 }),
       })
       if (!response.ok) continue
       const json = await response.json()
