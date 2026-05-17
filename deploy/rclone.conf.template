@@ -1,0 +1,57 @@
+# =============================================================================
+# rclone.conf — Template para Google Drive com Service Account
+# =============================================================================
+#
+# ONDE COLOCAR ESTE ARQUIVO:
+#   ~/.config/rclone/rclone.conf
+#
+# ANTES DE USAR:
+#   1. Crie um Service Account no Google Cloud (instruções abaixo)
+#   2. Baixe o JSON do Service Account
+#   3. Copie o conteúdo do JSON para o campo "service_account_credentials"
+#      (cole como uma única linha, sem quebras de linha)
+#   4. Compartilhe a pasta do Google Drive com o e-mail do Service Account
+#      (ex: severino-backup@seu-projeto.iam.gserviceaccount.com)
+#
+# CAMPOS OBRIGATÓRIOS para preencher:
+#   - service_account_credentials: conteúdo do JSON (minificado, 1 linha)
+#   - root_folder_id: ID da pasta no Google Drive (ver instruções)
+#
+# =============================================================================
+#
+# COMO CRIAR O SERVICE ACCOUNT (resumo — ver detalhes no guia):
+#
+# 1. Acesse: https://console.cloud.google.com/
+# 2. Crie ou selecione um projeto (ex: "severino-backup")
+# 3. Menu: APIs e Serviços → Biblioteca → buscar "Google Drive API" → Ativar
+# 4. Menu: APIs e Serviços → Credenciais → Criar credenciais → Conta de serviço
+#    - Nome: severino-backup-sa
+#    - Sem função necessária (acesso é dado via compartilhamento de pasta)
+# 5. Abra a conta de serviço criada → aba "Chaves" → Adicionar chave → JSON
+#    - Salve o arquivo JSON gerado (ex: severino-backup-key.json)
+# 6. Copie o e-mail da conta de serviço (ex: severino-backup-sa@PROJETO.iam.gserviceaccount.com)
+# 7. No Google Drive: crie uma pasta "Backup - Severino"
+#    → clique direito → Compartilhar → cole o e-mail do SA → Editor
+# 8. Copie o ID da pasta da URL:
+#    https://drive.google.com/drive/folders/ESTE_E_O_ID_DA_PASTA
+#
+# MINIFICAR O JSON para uma linha:
+#   python3 -c "import json,sys; print(json.dumps(json.load(open('severino-backup-key.json'))))"
+#   ou: cat severino-backup-key.json | tr -d '\n'
+#
+# =============================================================================
+
+[gdrive-backup]
+type = drive
+scope = drive
+# Cole aqui o conteúdo COMPLETO do JSON do Service Account, numa única linha
+# Exemplo (substitua por seu JSON real):
+# service_account_credentials = {"type":"service_account","project_id":"SEU-PROJETO","private_key_id":"abc123","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"severino-backup-sa@SEU-PROJETO.iam.gserviceaccount.com","client_id":"123456789","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/severino-backup-sa%40SEU-PROJETO.iam.gserviceaccount.com"}
+service_account_credentials = COLE_O_JSON_DO_SERVICE_ACCOUNT_AQUI_NUMA_UNICA_LINHA
+
+# ID da pasta "Backup - Severino" no Google Drive
+# Cole o ID da URL: drive.google.com/drive/folders/ESTE_ID_AQUI
+root_folder_id = COLE_O_ID_DA_PASTA_AQUI
+
+# Configurações fixas — não alterar
+server_side_across_configs = true
