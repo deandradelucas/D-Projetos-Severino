@@ -47,14 +47,14 @@ export function registerAiRoutes(app) {
         return c.json({ message: raw }, 422)
       }
       if (
-        /API key not valid|API_KEY_INVALID|PERMISSION_DENIED|invalid\s*API\s*key|API\s*key\s*not\s*valid/i.test(
+        /API key not valid|API_KEY_INVALID|PERMISSION_DENIED|invalid\s*API\s*key|API\s*key\s*not\s*valid|API key expired|key expired/i.test(
           raw,
         )
       ) {
         return c.json(
           {
             message:
-              'A chave GEMINI_API_KEY é inválida ou foi revogada. Crie uma nova em https://aistudio.google.com/app/apikey e atualize o servidor (.env ou variáveis no Vercel).',
+              'A chave GEMINI_API_KEY expirou ou é inválida. Gere uma nova em https://aistudio.google.com/app/apikey e atualize o .env do servidor (depois reinicie com pm2 restart severino).',
           },
           503,
         )
