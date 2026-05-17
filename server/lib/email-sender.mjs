@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer'
 import { log } from './logger.mjs'
+import { Alerts } from './notify-telegram.mjs'
 
 export function smtpConfigured() {
   return Boolean(
@@ -41,6 +42,7 @@ export async function sendEmail({ to, subject, html, text }) {
     return true
   } catch (err) {
     log.error('[email-sender] falha ao enviar e-mail', { to, subject, error: err?.message })
+    void Alerts.smtpFail({ to, subject, error: err?.message }).catch(() => {})
     return false
   }
 }

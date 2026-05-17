@@ -112,6 +112,26 @@ export const Alerts = {
       { key: 'startup', level: 'startup', debounce: 'startup' },
     ),
 
+  novaAssinaturaPaga: ({ nome = '', email = '?', valor = 0, metodo = '?', paymentId = '' }) => {
+    const metodoLabel = { PIX: 'Pix', CREDIT_CARD: 'Cartão', BOLETO: 'Boleto' }[metodo] ?? metodo
+    return notifyTelegram(
+      `💰 *Nova assinatura paga*\n\n${nome ? `👤 *Nome:* ${nome}\n` : ''}📧 *Email:* ${email}\n💵 *Valor:* R$ ${Number(valor).toFixed(2)}\n💳 *Método:* ${metodoLabel}`,
+      { key: `assinatura-paga-${paymentId || email}`, level: 'info', debounce: 'startup' },
+    )
+  },
+
+  assinaturaCancelada: ({ nome = '', email = '?', motivo = 'cancelada' }) =>
+    notifyTelegram(
+      `🚨 *Assinatura ${motivo}*\n\n${nome ? `👤 *Nome:* ${nome}\n` : ''}📧 *Email:* ${email}\n\nVerifique no painel Asaas.`,
+      { key: `assinatura-churn-${email}`, level: 'warn' },
+    ),
+
+  smtpFail: ({ to = '?', subject = '?', error = '' }) =>
+    notifyTelegram(
+      `📧 *Falha no envio de e-mail*\n\nPara: \`${to}\`\nAssunto: \`${subject}\`\nErro: \`${String(error).slice(0, 200)}\`\n\nVerifique as credenciais SMTP.`,
+      { key: 'smtp-fail', level: 'error' },
+    ),
+
   novoCadastro: ({ nome, email, telefone }) => {
     const token  = process.env.TELEGRAM_BOT_TOKEN_CADASTROS?.trim()
     const chatId = process.env.TELEGRAM_CHAT_ID_CADASTROS?.trim()
