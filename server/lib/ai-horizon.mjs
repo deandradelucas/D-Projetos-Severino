@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { log } from './logger.mjs'
 import { listarAgendaEventos } from './domain/agenda.mjs'
 import {
+  buildGeminiGenerationConfig,
   geminiPostGenerateContent,
   resolveGeminiModelCandidates,
 } from './ai/gemini-client.mjs'
@@ -229,12 +230,14 @@ ${contextoAgenda ? `--- AGENDA (próximas semanas) ---\n${contextoAgenda}\n--- F
   const modelIds = resolveGeminiModelCandidates()
   let lastError = null
 
-  const generationConfig = { maxOutputTokens: 1024, temperature: 0.7 }
-
   for (const modelId of modelIds) {
+    const generationConfig = buildGeminiGenerationConfig(modelId, {
+      maxOutputTokens: 2048,
+      temperature: 0.7,
+    })
     const payloads = [
       { systemInstruction: { parts: [{ text: systemPrompt }] }, contents, generationConfig },
-      { contents: contentsWithSystemPrepended(systemPrompt, contents), generationConfig }
+      { contents: contentsWithSystemPrepended(systemPrompt, contents), generationConfig },
     ]
 
     for (const payload of payloads) {
@@ -247,6 +250,7 @@ ${contextoAgenda ? `--- AGENDA (próximas semanas) ---\n${contextoAgenda}\n--- F
             json = JSON.parse(rawBody)
           } catch {
             lastError = new Error(`Gemini API ${response.status}: resposta JSON inválida`)
+            if (payload.systemInstruction) continue
             break
           }
         }
@@ -255,7 +259,7 @@ ${contextoAgenda ? `--- AGENDA (próximas semanas) ---\n${contextoAgenda}\n--- F
           const apiMsg = json?.error?.message || rawBody?.slice(0, 500) || 'sem detalhe'
           lastError = new Error(`Gemini API ${response.status}: ${apiMsg}`)
           log.warn('[askHorizon] modelo falhou', { modelId, status: response.status, apiMsg: String(apiMsg).slice(0, 200) })
-          if (response.status === 400 && payload.systemInstruction) continue
+          if (payload.systemInstruction) continue
           break
         }
 
@@ -270,7 +274,8 @@ ${contextoAgenda ? `--- AGENDA (próximas semanas) ---\n${contextoAgenda}\n--- F
         log.warn('[askHorizon] resposta sem texto', { modelId, kind: extracted.kind, detail: extracted.detail })
       } catch (e) {
         lastError = e
-        break
+        if (/filtro de segurança/i.test(e?.message || '')) throw e
+        continue
       }
     }
   }

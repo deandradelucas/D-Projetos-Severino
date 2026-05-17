@@ -1,6 +1,7 @@
 import './load-env.mjs'
 import { log } from './logger.mjs'
 import {
+  buildGeminiGenerationConfig,
   geminiPostGenerateContent,
   resolveGeminiModelCandidates,
 } from './ai/gemini-client.mjs'
@@ -86,10 +87,10 @@ export async function transcribeWhatsAppAudioWithGemini(audioBytes, mimeHint = '
       for (const parts of partVariants) {
         const body = {
           contents: [{ role: 'user', parts }],
-          generationConfig: {
+          generationConfig: buildGeminiGenerationConfig(mid, {
             maxOutputTokens: 1024,
             temperature: 0.1,
-          },
+          }),
         }
 
         try {
@@ -180,7 +181,7 @@ ATENÇÃO: Nunca responda com texto puro. Sempre use o formato JSON acima. Se a 
     try {
       const response = await geminiPostGenerateContent(mid, apiKey, {
         contents: [{ role: 'user', parts: [{ text: systemPrompt }] }],
-        generationConfig: { maxOutputTokens: 500, temperature: 0.2 },
+        generationConfig: buildGeminiGenerationConfig(mid, { maxOutputTokens: 500, temperature: 0.2 }),
       })
 
       if (!response.ok) {
