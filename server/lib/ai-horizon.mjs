@@ -241,11 +241,20 @@ ${contextoAgenda ? `--- AGENDA (próximas semanas) ---\n${contextoAgenda}\n--- F
       try {
         const response = await geminiPostGenerateContent(modelId, apiKey, payload)
         const rawBody = await response.text()
-        const json = rawBody ? JSON.parse(rawBody) : {}
+        let json = {}
+        if (rawBody) {
+          try {
+            json = JSON.parse(rawBody)
+          } catch {
+            lastError = new Error(`Gemini API ${response.status}: resposta JSON inválida`)
+            break
+          }
+        }
 
         if (!response.ok) {
-          const apiMsg = json?.error?.message || rawBody
+          const apiMsg = json?.error?.message || rawBody?.slice(0, 500) || 'sem detalhe'
           lastError = new Error(`Gemini API ${response.status}: ${apiMsg}`)
+          log.warn('[askHorizon] modelo falhou', { modelId, status: response.status, apiMsg: String(apiMsg).slice(0, 200) })
           if (response.status === 400 && payload.systemInstruction) continue
           break
         }
@@ -255,7 +264,10 @@ ${contextoAgenda ? `--- AGENDA (próximas semanas) ---\n${contextoAgenda}\n--- F
         if (extracted.kind === 'prompt_blocked' || extracted.kind === 'response_blocked') {
           throw new Error('O assistente não pôde responder a este pedido (filtro de segurança).')
         }
-        lastError = new Error(`Resposta vazia (${extracted.kind})`)
+        lastError = new Error(
+          `Resposta vazia da API do Gemini (${extracted.kind}${extracted.detail ? `: ${extracted.detail}` : ''})`,
+        )
+        log.warn('[askHorizon] resposta sem texto', { modelId, kind: extracted.kind, detail: extracted.detail })
       } catch (e) {
         lastError = e
         break
