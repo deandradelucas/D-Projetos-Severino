@@ -33,7 +33,10 @@ set -euo pipefail
 # Caminho do .env de produção na VPS
 ENV_FILE="/home/lucas/severino/.env"
 
-# Diretório de uploads (se existir, será incluído no backup)
+# Diretório raiz da aplicação (backup completo, excluindo node_modules e dist)
+APP_DIR="/home/lucas/severino"
+
+# Diretório de uploads (se existir, será incluído via APP_DIR)
 UPLOADS_DIR="/home/lucas/severino/uploads"
 
 # Nome do remote configurado no rclone.conf
@@ -212,23 +215,21 @@ log "INFO" ".env encontrado ($(wc -l < "$ENV_FILE") linhas)"
 # ---------------------------------------------------------------------------
 
 log "INFO" "Criando estrutura temporária em: ${TEMP_DIR}"
-mkdir -p "${TEMP_DIR}/config"
+mkdir -p "${TEMP_DIR}/app"
 mkdir -p "${TEMP_DIR}/db"
 
-# 3a. Copiar .env (prioridade máxima)
-log "INFO" "Copiando .env..."
-cp "$ENV_FILE" "${TEMP_DIR}/config/.env"
-log "INFO" ".env copiado com sucesso"
-
-# 3b. Copiar uploads se existirem
-if [[ -d "$UPLOADS_DIR" ]]; then
-  log "INFO" "Copiando uploads de: ${UPLOADS_DIR}"
-  cp -r "$UPLOADS_DIR" "${TEMP_DIR}/uploads"
-  UPLOADS_COUNT=$(find "${TEMP_DIR}/uploads" -type f | wc -l)
-  log "INFO" "Uploads copiados: ${UPLOADS_COUNT} arquivos"
-else
-  log "INFO" "Diretório de uploads não encontrado (${UPLOADS_DIR}) — ignorado"
-fi
+# 3a. Copiar aplicação completa (excluindo node_modules, dist, .git)
+log "INFO" "Copiando aplicação de: ${APP_DIR}"
+rsync -a \
+  --exclude='node_modules/' \
+  --exclude='.git/' \
+  --exclude='dist/' \
+  --exclude='.cache/' \
+  --exclude='*.log' \
+  "${APP_DIR}/" "${TEMP_DIR}/app/"
+APP_SIZE=$(du -sh "${TEMP_DIR}/app" | cut -f1)
+APP_FILES=$(find "${TEMP_DIR}/app" -type f | wc -l)
+log "INFO" "Aplicação copiada: ${APP_FILES} arquivos (${APP_SIZE})"
 
 # ---------------------------------------------------------------------------
 # PASSO 4 — Dump SQL do Supabase (opcional, mas recomendado)
