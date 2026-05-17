@@ -97,7 +97,11 @@
       "PowerShell(python3 --version)",
       "PowerShell(python --version)",
       "PowerShell(python \"C:\\\\Users\\\\lucas\\\\deploy_severino.py\")",
-      "Bash(npx vitest *)"
+      "Bash(npx vitest *)",
+      "Bash(ssh *)",
+      "mcp__easypanel__list_projects",
+      "Bash(python3.exe -c ' *)",
+      "Bash(C:\\\\Users\\\\lucas\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe *)"
     ]
   }
 }
