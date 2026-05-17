@@ -33,9 +33,9 @@ function escapeMarkdown(text) {
  * @param {'error'|'warn'|'info'|'startup'} opts.level  Nível do alerta
  * @param {string} [opts.debounce]  'default' | 'critical' | 'startup'
  */
-export async function notifyTelegram(message, { key = 'default', level = 'error', debounce = 'default' } = {}) {
+export async function notifyTelegram(message, { key = 'default', level = 'error', debounce = 'default', chatId: chatIdOverride } = {}) {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim()
-  const chatId = process.env.TELEGRAM_CHAT_ID?.trim()
+  const chatId = chatIdOverride || process.env.TELEGRAM_CHAT_ID?.trim()
   if (!token || !chatId) return
 
   if (!canSend(key, debounce)) return
@@ -111,4 +111,23 @@ export const Alerts = {
       `🟢 *Servidor iniciado* na porta ${port}`,
       { key: 'startup', level: 'startup', debounce: 'startup' },
     ),
+
+  novoCadastro: ({ nome, email, telefone }) => {
+    const token  = process.env.TELEGRAM_BOT_TOKEN_CADASTROS?.trim()
+    const chatId = process.env.TELEGRAM_CHAT_ID_CADASTROS?.trim()
+    if (!token || !chatId) return Promise.resolve()
+    const tel = telefone ? `+${telefone}` : '—'
+    const now = new Date().toLocaleString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    })
+    const text = `🎉 *Novo membro cadastrado*\n\n👤 *Nome:* ${nome}\n📧 *Email:* ${email}\n📱 *Telefone:* ${tel}\n🕐 ${now}`
+    return fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' }),
+      signal: AbortSignal.timeout(8000),
+    }).catch(() => {})
+  },
 }

@@ -12,6 +12,7 @@ import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { mapSupabaseOrNetworkError } from '../lib/http/hono-error-map.mjs'
 import { normalizeUsuarioRow, stripSenha } from '../lib/usuario-schema.mjs'
 import { signAccessToken } from '../lib/auth-access-token.mjs'
+import { Alerts } from '../lib/notify-telegram.mjs'
 import { createRefreshToken, rotateRefreshToken, revokeRefreshToken } from '../lib/refresh-token.mjs'
 import { parseJsonBody } from '../lib/http/parse-body.mjs'
 import { registerAuthWebAuthnRoutes } from './register-auth-webauthn.mjs'
@@ -186,6 +187,7 @@ export function registerAuthRoutes(app) {
         clientIp: clientIpFromHono(c),
         detail: { email: newUser.email },
       })
+      Alerts.novoCadastro({ nome: newUser.nome, email: newUser.email, telefone: newUser.telefone })
 
       const hasPhone = evolutionEnvConfigured() && Boolean(telefoneLimpo)
       const hasEmail = emailOtpEnabled()
