@@ -20,10 +20,29 @@ import { errorToText } from '../lib/http/hono-error-map.mjs'
 import { assertSessaoRotasPagamento } from '../lib/assinatura.mjs'
 import { resolveEscopoUsuario } from '../lib/conta-familiar.mjs'
 import { subscriptionIdFromAsaasWebhookBody } from '../lib/asaas-webhook-subscription-id.mjs'
+import { parseUsuarioIdFromExternalReference } from '../lib/asaas.mjs'
+import { getSupabaseAdmin } from '../lib/supabase-admin.mjs'
+import { Alerts } from '../lib/notify-telegram.mjs'
 import { AsaasPixPrecisaCpfError, criarPixAnualComQrCode } from '../lib/asaas-pix-qr.mjs'
 import { assertAgendaCronSecret } from '../lib/http/agenda-route-auth.mjs'
 import { processExtratoRenovacaoCron } from '../lib/extrato-renovacao.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
+
+async function buscarUidPorSubscriptionId(sid) {
+  if (!sid) return null
+  try {
+    const { data } = await getSupabaseAdmin().from('usuarios').select('id').eq('asaas_subscription_id', sid).maybeSingle()
+    return data?.id || null
+  } catch { return null }
+}
+
+async function buscarInfoUsuario(uid) {
+  if (!uid) return null
+  try {
+    const { data } = await getSupabaseAdmin().from('usuarios').select('nome, email').eq('id', uid).maybeSingle()
+    return data
+  } catch { return null }
+}
 
 export function registerPagamentosRoutes(app) {
   app.get('/api/pagamentos/config', async (c) => {
@@ -375,6 +394,14 @@ export function registerPagamentosRoutes(app) {
         if (sid) {
           await sincronizarSubscriptionPorIdFromWebhook(sid)
           logAsaasWebhook({ stage: 'subscription_ok', subscription_id: sid })
+          if (ev === 'SUBSCRIPTION_INACTIVATED' || ev === 'SUBSCRIPTION_DELETED') {
+            void (async () => {
+              const uid = await buscarUidPorSubscriptionId(sid)
+              const u = await buscarInfoUsuario(uid)
+              const motivo = ev === 'SUBSCRIPTION_DELETED' ? 'cancelada' : 'inativada'
+              await Alerts.assinaturaCancelada({ nome: u?.nome, email: u?.email || '?', motivo })
+            })().catch(() => {})
+          }
         } else {
           logAsaasWebhook({ stage: 'subscription_skip', event: ev || undefined, reason: 'missing_subscription_id' })
         }
@@ -384,6 +411,23 @@ export function registerPagamentosRoutes(app) {
       if (body.payment && ev.startsWith('PAYMENT_')) {
         await upsertFromWebhookAsaasPayment(body.payment)
         logAsaasWebhook({ stage: 'payment_ok', payment_id: body.payment.id })
+        const p = body.payment
+        if ((ev === 'PAYMENT_CONFIRMED' || ev === 'PAYMENT_RECEIVED') && p.subscription) {
+          void (async () => {
+            const uid = parseUsuarioIdFromExternalReference(p.externalReference)
+              || await buscarUidPorSubscriptionId(p.subscription)
+            const u = await buscarInfoUsuario(uid)
+            await Alerts.novaAssinaturaPaga({ nome: u?.nome, email: u?.email || '?', valor: p.value, metodo: p.billingType, paymentId: p.id })
+          })().catch(() => {})
+        }
+        if (ev === 'PAYMENT_OVERDUE' && p.subscription) {
+          void (async () => {
+            const uid = parseUsuarioIdFromExternalReference(p.externalReference)
+              || await buscarUidPorSubscriptionId(p.subscription)
+            const u = await buscarInfoUsuario(uid)
+            await Alerts.assinaturaCancelada({ nome: u?.nome, email: u?.email || '?', motivo: 'inadimplente' })
+          })().catch(() => {})
+        }
         return c.json({ ok: true })
       }
 
