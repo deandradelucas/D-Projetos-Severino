@@ -401,3 +401,21 @@ log "INFO" "Arquivo:   ${BACKUP_NAME}.tar.gz (${ARCHIVE_SIZE})"
 log "INFO" "Destino:   ${RCLONE_REMOTE}:${RCLONE_DEST_PATH}/"
 log "INFO" "Retenção:  ${RETENTION_DAYS} dias | Backups no Drive: ${REMAINING}"
 log_separator
+
+# Notificação de sucesso no Telegram
+token=$(load_env_var "TELEGRAM_BOT_TOKEN")
+chat_id=$(load_env_var "TELEGRAM_CHAT_ID")
+if [[ -n "$token" && -n "$chat_id" ]]; then
+  success_msg="✅ Backup Severino concluído
+
+📦 Arquivo: ${BACKUP_NAME}.tar.gz
+📏 Tamanho: ${ARCHIVE_SIZE}
+☁️ Backups no Drive: ${REMAINING}
+🕐 $(date -u +"%d/%m/%Y %H:%M") UTC"
+
+  curl --silent --max-time 10 \
+    -X POST "https://api.telegram.org/bot${token}/sendMessage" \
+    -d "chat_id=${chat_id}" \
+    --data-urlencode "text=${success_msg}" \
+    > /dev/null 2>&1 || true
+fi
