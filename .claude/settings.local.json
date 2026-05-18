@@ -114,7 +114,24 @@
       "PowerShell(python \"D:\\\\Backup\\\\rotate-stripe.py\")",
       "Bash(grep -E \"\\\\.\\(jsx|js\\)$\")",
       "Bash(grep -E \"\\\\.\\(mjs|jsx|js\\)$\")",
-      "PowerShell(python \"D:\\\\Backup\\\\check-webhook-log.py\")"
+      "PowerShell(python \"D:\\\\Backup\\\\check-webhook-log.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\fix-cors-vps.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\check-vps-commit.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\deploy-vps.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\check-vps-diff.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\deploy-vps-force.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\check-health-vps.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\check-env-vps.py\")",
+      "PowerShell(python \"D:\\\\Backup\\\\check-env-keys.py\")",
+      "PowerShell(python -c \"import secrets; print\\(secrets.token_hex\\(32\\)\\)\")",
+      "PowerShell(python \"D:\\\\Backup\\\\add-otp-pepper.py\")",
+      "WebFetch(domain:www.pluggy.ai)",
+      "WebFetch(domain:docs.pluggy.ai)",
+      "WebFetch(domain:status.pluggy.ai)",
+      "WebFetch(domain:belvo.com)",
+      "WebFetch(domain:blog.openi.com.br)",
+      "WebFetch(domain:help.importax.tech)",
+      "WebFetch(domain:www.npmjs.com)"
     ]
   }
 }
