@@ -34,6 +34,18 @@ function CheckIcon() {
   )
 }
 
+function ArrowRightIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="auth-login-copy__arrow-svg" aria-hidden>
+      <path
+        fillRule="evenodd"
+        d="M3 10a.75.75 0 0 1 .75-.75h10.638L11.23 6.29a.75.75 0 1 1 1.06-1.06l4.5 4.25a.75.75 0 0 1 0 1.06l-4.5 4.25a.75.75 0 0 1-1.06-1.06l2.158-2.959H3.75A.75.75 0 0 1 3 10Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  )
+}
+
 function WhatsAppIcon() {
   return (
     <svg
@@ -77,6 +89,9 @@ export default function LoginCopyPanel() {
             <span className="auth-login-copy__benefit-body">
               <span className="auth-login-copy__benefit-title">{item.title}</span>
               <span className="auth-login-copy__benefit-text">{item.text}</span>
+            </span>
+            <span className="auth-login-copy__arrow" aria-hidden>
+              <ArrowRightIcon />
             </span>
           </li>
         ))}
