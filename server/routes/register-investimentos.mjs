@@ -48,18 +48,19 @@ export function registerInvestimentosRoutes(app) {
       return c.json(data, 201)
     } catch (error) {
       log.error('criar investimento', error)
-      const msg = error.message || 'Erro ao criar investimento.'
+      const domMsg = error.message || ''
       const status =
-        msg.includes('mínimo') ||
-        msg.includes('lista') ||
-        msg.includes('banco') ||
-        msg.includes('corretora') ||
-        msg.includes('valor') ||
-        msg.includes('Percentual') ||
-        msg.includes('CDI') ||
-        msg.includes('aquisição')
+        domMsg.includes('mínimo') ||
+        domMsg.includes('lista') ||
+        domMsg.includes('banco') ||
+        domMsg.includes('corretora') ||
+        domMsg.includes('valor') ||
+        domMsg.includes('Percentual') ||
+        domMsg.includes('CDI') ||
+        domMsg.includes('aquisição')
           ? 400
           : 500
+      const msg = status === 500 ? 'Erro ao criar investimento.' : (domMsg || 'Erro ao criar investimento.')
       return c.json({ message: msg }, status)
     }
   })
@@ -87,20 +88,21 @@ export function registerInvestimentosRoutes(app) {
       return c.json(data)
     } catch (error) {
       log.error('atualizar investimento', error)
-      const msg = error.message || 'Erro ao atualizar investimento.'
+      const domMsg = error.message || ''
       const status =
-        msg.includes('não encontrado')
+        domMsg.includes('não encontrado')
           ? 404
-          : msg.includes('mínimo') ||
-              msg.includes('lista') ||
-              msg.includes('banco') ||
-              msg.includes('corretora') ||
-              msg.includes('valor') ||
-              msg.includes('Percentual') ||
-              msg.includes('CDI') ||
-              msg.includes('aquisição')
+          : domMsg.includes('mínimo') ||
+              domMsg.includes('lista') ||
+              domMsg.includes('banco') ||
+              domMsg.includes('corretora') ||
+              domMsg.includes('valor') ||
+              domMsg.includes('Percentual') ||
+              domMsg.includes('CDI') ||
+              domMsg.includes('aquisição')
             ? 400
             : 500
+      const msg = status === 500 ? 'Erro ao atualizar investimento.' : (domMsg || 'Erro ao atualizar investimento.')
       return c.json({ message: msg }, status)
     }
   })
@@ -121,8 +123,9 @@ export function registerInvestimentosRoutes(app) {
       return c.json({ message: 'Removido.' })
     } catch (error) {
       log.error('remover investimento', error)
-      const msg = error.message || 'Erro ao remover investimento.'
-      const status = msg.includes('não encontrado') ? 404 : 500
+      const domMsg = error.message || ''
+      const status = domMsg.includes('não encontrado') ? 404 : 500
+      const msg = status === 500 ? 'Erro ao remover investimento.' : (domMsg || 'Erro ao remover investimento.')
       return c.json({ message: msg }, status)
     }
   })
@@ -151,12 +154,13 @@ export function registerInvestimentosRoutes(app) {
       return c.json(data, 201)
     } catch (error) {
       log.error('criar aporte', error)
-      const msg = error.message || 'Erro ao criar aporte.'
-      const status = msg.includes('não encontrado')
+      const domMsg = error.message || ''
+      const status = domMsg.includes('não encontrado')
         ? 404
-        : msg.includes('mínimo') || msg.includes('valor') || msg.includes('aquisição')
+        : domMsg.includes('mínimo') || domMsg.includes('valor') || domMsg.includes('aquisição')
           ? 400
           : 500
+      const msg = status === 500 ? 'Erro ao criar aporte.' : (domMsg || 'Erro ao criar aporte.')
       return c.json({ message: msg }, status)
     }
   })
@@ -179,12 +183,13 @@ export function registerInvestimentosRoutes(app) {
       return c.json(data)
     } catch (error) {
       log.error('remover aporte', error)
-      const msg = error.message || 'Erro ao remover aporte.'
-      const status = msg.includes('não encontrado')
+      const domMsg = error.message || ''
+      const status = domMsg.includes('não encontrado')
         ? 404
-        : msg.includes('único aporte')
+        : domMsg.includes('único aporte')
           ? 409
           : 500
+      const msg = status === 500 ? 'Erro ao remover aporte.' : (domMsg || 'Erro ao remover aporte.')
       return c.json({ message: msg }, status)
     }
   })

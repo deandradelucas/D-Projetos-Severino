@@ -108,7 +108,7 @@ export function registerTransacoesRoutes(app) {
       return c.json({ message: 'Transação inserida com sucesso.', data }, 201)
     } catch (error) {
       log.error('insert transaction failed', error)
-      return c.json({ message: error.message || 'Erro ao inserir transação.' }, 500)
+      return c.json({ message: 'Erro ao inserir transação.' }, 500)
     }
   })
 
@@ -122,7 +122,7 @@ export function registerTransacoesRoutes(app) {
       return c.json(result)
     } catch (error) {
       log.error('sincronizar recorrências mensais', error)
-      return c.json({ message: error.message || 'Erro ao sincronizar.' }, 500)
+      return c.json({ message: 'Erro ao sincronizar.' }, 500)
     }
   })
 
@@ -136,7 +136,7 @@ export function registerTransacoesRoutes(app) {
       return c.json(data)
     } catch (error) {
       log.error('listar recorrências mensais', error)
-      return c.json({ message: error.message || 'Erro ao listar.' }, 500)
+      return c.json({ message: 'Erro ao listar.' }, 500)
     }
   })
 
@@ -151,7 +151,7 @@ export function registerTransacoesRoutes(app) {
       return c.json({ message: 'Recorrência encerrada.' })
     } catch (error) {
       log.error('desativar recorrência mensal', error)
-      return c.json({ message: error.message || 'Erro ao encerrar.' }, 500)
+      return c.json({ message: 'Erro ao encerrar.' }, 500)
     }
   })
 
@@ -165,7 +165,7 @@ export function registerTransacoesRoutes(app) {
       return c.json({ ok: true, ...result })
     } catch (error) {
       log.error('cron recorrências mensais', error)
-      return c.json({ message: error.message || 'Erro no cron.' }, 500)
+      return c.json({ message: 'Erro no cron.' }, 500)
     }
   })
 
@@ -200,7 +200,7 @@ export function registerTransacoesRoutes(app) {
       return c.json({ message: 'Transação atualizada com sucesso.' })
     } catch (error) {
       log.error('update transaction failed', error)
-      return c.json({ message: error.message || 'Erro ao atualizar transação.' }, 500)
+      return c.json({ message: 'Erro ao atualizar transação.' }, 500)
     }
   })
 

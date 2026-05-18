@@ -189,7 +189,7 @@ export function registerPagamentosRoutes(app) {
       })
     } catch (error) {
       log.error('criar checkout asaas failed', error)
-      return c.json({ message: error.message || 'Erro ao criar pagamento.' }, 500)
+      return c.json({ message: 'Erro ao criar pagamento.' }, 500)
     }
   })
 
@@ -263,7 +263,7 @@ export function registerPagamentosRoutes(app) {
         )
       }
       log.error('pix anual qrcode failed', error)
-      return c.json({ message: error.message || 'Erro ao gerar QR Code Pix.' }, 500)
+      return c.json({ message: 'Erro ao gerar QR Code Pix.' }, 500)
     }
   })
 
@@ -332,7 +332,7 @@ export function registerPagamentosRoutes(app) {
       })
     } catch (error) {
       log.error('criar checkout stripe failed', error)
-      return c.json({ message: error.message || 'Erro ao criar checkout Stripe.' }, 500)
+      return c.json({ message: 'Erro ao criar checkout Stripe.' }, 500)
     }
   })
 
@@ -491,7 +491,7 @@ export function registerPagamentosRoutes(app) {
       return c.json(result)
     } catch (error) {
       log.error('cron extrato-renovacao', error)
-      return c.json({ message: error.message || 'Erro no cron de extrato.' }, 500)
+      return c.json({ message: 'Erro no cron de extrato.' }, 500)
     }
   })
 }

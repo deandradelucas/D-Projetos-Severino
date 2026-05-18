@@ -200,7 +200,7 @@ export function registerFamiliaRoutes(app) {
       return c.json({ message: 'Você saiu da conta familiar. Seus dados próprios permanecem na sua conta.' })
     } catch (error) {
       log.error('familia sair', error)
-      return c.json({ message: error.message || 'Erro ao sair.' }, 500)
+      return c.json({ message: 'Erro ao sair.' }, 500)
     }
   })
 
