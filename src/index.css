@@ -336,7 +336,7 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 0.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -345,37 +345,31 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   display: flex;
   gap: 0.75rem;
   align-items: center;
-  padding: 0.85rem 0.15rem 0.85rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.7rem 0.5rem 0.7rem 0.75rem;
+  border-radius: 0.625rem;
+  border: 1px solid rgba(212, 168, 75, 0.24);
+  background: rgba(212, 168, 75, 0.06);
   opacity: 0;
   animation: auth-login-copy-benefit-in 0.45s ease forwards;
   animation-delay: calc(var(--benefit-i) * var(--benefit-stagger) + 80ms);
-  transition: background-color 0.2s ease;
-}
-
-.auth-login-copy__benefit:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .auth-login-copy__benefit:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 0.5rem;
+  background: rgba(212, 168, 75, 0.1);
+  border-color: rgba(212, 168, 75, 0.38);
 }
 
 .auth-login-copy__benefit--whatsapp {
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.15rem;
-  padding: 0.7rem 0.5rem 0.7rem 0.75rem;
-  border-radius: 0.625rem;
-  border: 1px solid rgba(37, 211, 102, 0.22);
-  border-bottom: 1px solid rgba(37, 211, 102, 0.22);
+  border-color: rgba(37, 211, 102, 0.28);
   background: rgba(37, 211, 102, 0.06);
 }
 
 .auth-login-copy__benefit--whatsapp:hover {
   background: rgba(37, 211, 102, 0.1);
+  border-color: rgba(37, 211, 102, 0.42);
 }
 
 @keyframes auth-login-copy-benefit-in {
