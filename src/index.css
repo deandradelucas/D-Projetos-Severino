@@ -480,24 +480,6 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   }
 }
 
-/* Mobile: copy compacta no topo, formulário abaixo */
-@media (max-width: 1023px) {
-  .auth-shell-copy-column__inner {
-    padding-bottom: 0.75rem;
-  }
-
-  .auth-login-copy__solution,
-  .auth-login-copy__benefits,
-  .auth-login-copy__proof {
-    display: none;
-  }
-
-  .auth-login-copy__cta-hint {
-    margin-top: 0.65rem;
-    font-size: 0.8125rem;
-  }
-}
-
 /* Encadeia altura no mobile: rotas preenchem a viewport sem scroll lateral */
 .app-layout-shell {
   position: relative;
