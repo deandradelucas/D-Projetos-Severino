@@ -4,6 +4,7 @@ import { sendEvolutionText } from '../evolution-send.mjs'
 import { transcribeWhatsAppAudioWithGemini } from '../ai.mjs'
 import { processarMensagemBot } from '../domain/whatsapp-bot.mjs'
 import { atualizarWhatsappId, buscarUsuarioPorTelefone } from '../usuarios.mjs'
+import { Alerts } from '../notify-telegram.mjs'
 
 function parseJsonEnv(value) {
   try {
@@ -521,10 +522,21 @@ export async function handleEvolutionWebhook(c) {
         remoteJid: botBody.remoteJid,
         text: textOut,
       })
+      if (!sent) {
+        Alerts.whatsappSendFailed(botBody.phone).catch(() => {})
+      }
+    }
+    if (result.response?.ok === false && !result.response?.duplicate) {
+      const reply = String(result.response?.reply || '')
+      const isExpected = reply.includes('não cadastrado') || reply.includes('Mensagem vazia')
+      if (!isExpected) {
+        Alerts.whatsappBotFailed(botBody.phone, reply).catch(() => {})
+      }
     }
     return c.json({ ok: true, sent, inputType: result.response?.inputType })
   } catch (error) {
     log.error('[whatsapp-webhook] failed', error)
+    Alerts.whatsappBotFailed(botBody?.phone, String(error?.message || error).slice(0, 300)).catch(() => {})
     return c.json({ ok: false, message: 'Falha ao processar webhook WhatsApp.' }, 200)
   }
 }
