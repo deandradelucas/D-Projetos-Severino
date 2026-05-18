@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { log } from '../lib/logger.mjs'
 import { getRequestOrigin } from '../lib/password-reset.mjs'
 import { getPerfilUsuario } from '../lib/usuarios.mjs'
-import { criarAssinaturaComLink, isAsaasConfigured } from '../lib/asaas.mjs'
+import { criarAssinaturaComLink, isAsaasConfigured, cancelarAssinaturaAsaas } from '../lib/asaas.mjs'
 import {
   insertCheckoutRecord,
   listPagamentosUsuario,
@@ -355,6 +355,43 @@ export function registerPagamentosRoutes(app) {
     }
     await handleStripeWebhookEvent(event)
     return c.json({ received: true })
+  })
+
+  app.post('/api/pagamentos/cancelar', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+
+      const ip = clientKeyFromHono(c)
+      if (!await rateLimitTake(`cancelar-assinatura:${usuarioId}:${ip}`, 3, 60 * 60_000)) {
+        return c.json({ message: 'Limite de tentativas. Tente de novo em uma hora.' }, 429)
+      }
+
+      const { data: user } = await getSupabaseAdmin()
+        .from('usuarios')
+        .select('asaas_subscription_id, nome, email')
+        .eq('id', usuarioId)
+        .maybeSingle()
+
+      if (!user?.asaas_subscription_id) {
+        return c.json({ message: 'Nenhuma assinatura Asaas ativa encontrada.' }, 404)
+      }
+
+      await cancelarAssinaturaAsaas(user.asaas_subscription_id)
+
+      await getSupabaseAdmin()
+        .from('usuarios')
+        .update({ assinatura_asaas_status: 'INACTIVE' })
+        .eq('id', usuarioId)
+
+      void Alerts.assinaturaCancelada({ nome: user.nome, email: user.email || '?', motivo: 'cancelada pelo usuário' }).catch(() => {})
+      log.info('[pagamentos] assinatura cancelada pelo usuario', { usuarioId, subscriptionId: user.asaas_subscription_id })
+
+      return c.json({ ok: true, message: 'Assinatura cancelada com sucesso.' })
+    } catch (error) {
+      log.error('cancelar assinatura failed', error)
+      return c.json({ message: 'Erro ao cancelar assinatura. Tente novamente.' }, 500)
+    }
   })
 
   app.get('/api/pagamentos/webhook', (c) => c.json({ ok: true }))

@@ -112,6 +112,12 @@ export async function buscarAssinaturaAsaas(subscriptionId) {
   return asaasFetch(`/subscriptions/${encodeURIComponent(id)}`, { method: 'GET' })
 }
 
+export async function cancelarAssinaturaAsaas(subscriptionId) {
+  const id = String(subscriptionId || '').trim()
+  if (!id) throw new Error('ID de assinatura inválido.')
+  return asaasFetch(`/subscriptions/${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
 /**
  * Localiza cliente Asaas pelo CPF/CNPJ ou e-mail. Cria se não encontrar.
  * Retorna o customerId.

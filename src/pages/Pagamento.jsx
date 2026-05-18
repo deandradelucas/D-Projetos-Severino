@@ -64,6 +64,10 @@ export default function Pagamento() {
   const [pixCpfCnpj, setPixCpfCnpj] = useState('')
   const [pixData, setPixData] = useState(null)
 
+  const [cancelModalOpen, setCancelModalOpen] = useState(false)
+  const [cancelLoading, setCancelLoading] = useState(false)
+  const [cancelError, setCancelError] = useState('')
+
   useEffect(() => {
     const saved = localStorage.getItem('horizonte_cpf_cnpj')
     if (saved) setCpfCnpj(saved)
@@ -383,6 +387,28 @@ export default function Pagamento() {
 
   const onAtualizar = async () => {
     await fetchDados({ silent: true })
+  }
+
+  const handleCancelarAssinatura = async () => {
+    setCancelLoading(true)
+    setCancelError('')
+    try {
+      const res = await fetch(apiUrl('/api/pagamentos/cancelar'), {
+        method: 'POST',
+        headers: horizonteApiAuthHeaders(),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setCancelError(data?.message || 'Erro ao cancelar. Tente novamente.')
+        return
+      }
+      setCancelModalOpen(false)
+      await fetchDados({ silent: true })
+    } catch {
+      setCancelError('Erro de conexão. Tente novamente.')
+    } finally {
+      setCancelLoading(false)
+    }
   }
   const orientacao = buildOrientacaoUsuario({
     painel: painelAssinatura,
@@ -712,6 +738,49 @@ export default function Pagamento() {
                 ) : null}
 
                 <PagamentoHistorico historico={historico} loading={loading} formatCurrency={formatCurrency} />
+
+                {painelAssinatura.situacao === 'ativo' && !loading ? (
+                  <div className="pagamento-cancelar-zona">
+                    <button
+                      type="button"
+                      className="btn-danger-ghost pagamento-cancelar-btn"
+                      onClick={() => { setCancelError(''); setCancelModalOpen(true) }}
+                    >
+                      Cancelar assinatura
+                    </button>
+                  </div>
+                ) : null}
+
+                {cancelModalOpen ? (
+                  <div className="pagamento-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title">
+                    <div className="pagamento-modal">
+                      <h2 id="cancel-modal-title" className="pagamento-modal__title">Cancelar assinatura</h2>
+                      <p className="pagamento-modal__body">
+                        Tem certeza que deseja cancelar? Você perderá acesso ao app ao final do período atual.
+                        Esta ação não pode ser desfeita.
+                      </p>
+                      {cancelError ? <p className="pagamento-modal__error">{cancelError}</p> : null}
+                      <div className="pagamento-modal__actions">
+                        <button
+                          type="button"
+                          className="btn-secondary"
+                          onClick={() => setCancelModalOpen(false)}
+                          disabled={cancelLoading}
+                        >
+                          Voltar
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-danger"
+                          onClick={handleCancelarAssinatura}
+                          disabled={cancelLoading}
+                        >
+                          {cancelLoading ? 'Cancelando…' : 'Sim, cancelar'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
 
                 {isentaOrientacaoAbaixoHistorico ? (
                   <PagamentoOrientacaoCard
