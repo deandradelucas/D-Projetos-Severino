@@ -214,6 +214,20 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+.auth-shell-glass input,
+.auth-shell-glass button,
+.auth-shell-glass textarea,
+.auth-shell-glass select,
+.auth-shell-glass label,
+.auth-shell-glass a,
+.auth-shell-glass h1,
+.auth-shell-glass h2,
+.auth-shell-glass p,
+.auth-shell-glass li,
+.auth-shell-glass span {
+  font-family: var(--tx-dir-font);
+}
+
 /* Login/Cadastro — fallback atrás da foto (evita flash/branco nas bordas em alguns viewports) */
 .auth-shell-glass--hero {
   background-color: #0f172a;
@@ -251,6 +265,16 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
 .auth-shell-copy-column {
   background: linear-gradient(165deg, #0b1830 0%, #122a4a 42%, #0e1f38 100%);
   color: #f1f5f9;
+  font-family: var(--tx-dir-font, 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif)));
+}
+
+.auth-login-copy,
+.auth-login-copy h2,
+.auth-login-copy p,
+.auth-login-copy li,
+.auth-login-copy span,
+.auth-login-copy strong {
+  font-family: inherit;
 }
 
 .auth-shell-copy-column__inner {
