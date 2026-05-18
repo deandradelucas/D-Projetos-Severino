@@ -74,18 +74,15 @@ export function formatTime(iso) {
 
 export function formatEventDatetime(evento) {
   if (!evento.inicio) return null
-  const start = new Date(evento.inicio)
-  if (Number.isNaN(start.getTime())) return null
-  const sp = saoPauloParts(start)
+  const local = toDatetimeLocal(evento.inicio)
+  if (!local) return null
+  const [datePart, timePart] = local.split('T')
+  const [, month, day] = datePart.split('-')
   const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-  const month = months[parseInt(sp.month, 10) - 1]
-  const base = `${sp.day} ${month} · ${sp.hour}:${sp.minute}`
+  const base = `${day} ${months[parseInt(month, 10) - 1]} · ${timePart}`
   if (evento.fim) {
-    const end = new Date(evento.fim)
-    if (!Number.isNaN(end.getTime())) {
-      const ep = saoPauloParts(end)
-      return `${base} – ${ep.hour}:${ep.minute}`
-    }
+    const endLocal = toDatetimeLocal(evento.fim)
+    if (endLocal) return `${base} – ${endLocal.split('T')[1]}`
   }
   return base
 }
