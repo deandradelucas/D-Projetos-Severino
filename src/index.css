@@ -288,7 +288,7 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
 
 .auth-login-copy__eyebrow {
   margin: 0 0 0.75rem;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -297,7 +297,7 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
 
 .auth-login-copy__headline {
   margin: 0;
-  font-size: clamp(1.35rem, 4.2vw, 2.05rem);
+  font-size: clamp(1.5rem, 4.2vw, 2.25rem);
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -310,14 +310,14 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
 
 .auth-login-copy__lead {
   margin: 0.85rem 0 0;
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
   line-height: 1.55;
   color: rgba(226, 232, 240, 0.88);
 }
 
 .auth-login-copy__solution {
   margin: 0.75rem 0 0;
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
   line-height: 1.55;
   color: rgba(241, 245, 249, 0.95);
 }
@@ -356,7 +356,7 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
 
 .auth-login-copy__benefit-title {
   display: block;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
 }
@@ -364,7 +364,7 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
 .auth-login-copy__benefit-text {
   display: block;
   margin-top: 0.15rem;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   line-height: 1.45;
   color: rgba(203, 213, 225, 0.9);
 }
@@ -373,14 +373,14 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   margin: 1.35rem 0 0;
   padding-top: 1.1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
   color: rgba(203, 213, 225, 0.85);
 }
 
 .auth-login-copy__cta-hint {
   margin: 1rem 0 0;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: rgba(212, 168, 75, 0.95);
 }
@@ -476,7 +476,7 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   }
 
   .auth-login-copy__headline {
-    font-size: 2.125rem;
+    font-size: 2.25rem;
   }
 }
 
@@ -494,7 +494,7 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
 
   .auth-login-copy__cta-hint {
     margin-top: 0.65rem;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
   }
 }
 
