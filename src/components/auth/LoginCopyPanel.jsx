@@ -33,7 +33,7 @@ function CheckIcon() {
 export default function LoginCopyPanel() {
   return (
     <div className="auth-login-copy flex h-full flex-col justify-center">
-      <p className="auth-login-copy__eyebrow">Horizonte Financeiro</p>
+      <p className="auth-login-copy__eyebrow">Severino</p>
 
       <h2 className="auth-login-copy__headline">
         Veja para onde vai cada real — <span className="auth-login-copy__headline-accent">antes do mês acabar</span>.
