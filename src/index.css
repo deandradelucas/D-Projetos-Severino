@@ -344,8 +344,8 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   --benefit-i: 0;
   display: flex;
   gap: 0.75rem;
-  align-items: flex-start;
-  padding: 0.85rem 0;
+  align-items: center;
+  padding: 0.85rem 0.15rem 0.85rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   opacity: 0;
   animation: auth-login-copy-benefit-in 0.45s ease forwards;
@@ -367,7 +367,7 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   align-items: center;
   gap: 0.75rem;
   margin-top: 0.15rem;
-  padding: 0.7rem 0.75rem;
+  padding: 0.7rem 0.5rem 0.7rem 0.75rem;
   border-radius: 0.625rem;
   border: 1px solid rgba(37, 211, 102, 0.22);
   border-bottom: 1px solid rgba(37, 211, 102, 0.22);
@@ -393,6 +393,10 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   width: 1.05rem;
   height: 1.05rem;
   flex-shrink: 0;
+}
+
+.auth-login-copy__benefit .auth-login-copy__icon {
+  margin-top: 0;
 }
 
 .auth-login-copy__icon {
@@ -424,6 +428,38 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
 .auth-login-copy__benefit-body {
   min-width: 0;
   flex: 1;
+}
+
+.auth-login-copy__arrow {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  align-self: center;
+  margin-left: 0.35rem;
+  color: rgba(232, 197, 106, 0.9);
+  animation: auth-login-copy-arrow-pulse 1.65s ease-in-out infinite;
+}
+
+.auth-login-copy__arrow-svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.auth-login-copy__benefit--whatsapp .auth-login-copy__arrow {
+  color: #4ade80;
+}
+
+@keyframes auth-login-copy-arrow-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateX(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(5px);
+  }
 }
 
 .auth-login-copy__benefit-title {
@@ -594,6 +630,12 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   .auth-login-copy__benefit {
     opacity: 1;
     animation: none;
+  }
+
+  .auth-login-copy__arrow {
+    opacity: 0.85;
+    animation: none;
+    transform: none;
   }
 }
 
