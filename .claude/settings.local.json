@@ -111,7 +111,9 @@
       "PowerShell(python \"D:\\\\Backup\\\\rotate-asaas.py\")",
       "PowerShell(python \"D:\\\\Backup\\\\rotate-gemini.py\")",
       "PowerShell(python \"D:\\\\Backup\\\\rotate-n8n.py\")",
-      "PowerShell(python \"D:\\\\Backup\\\\rotate-stripe.py\")"
+      "PowerShell(python \"D:\\\\Backup\\\\rotate-stripe.py\")",
+      "Bash(grep -E \"\\\\.\\(jsx|js\\)$\")",
+      "Bash(grep -E \"\\\\.\\(mjs|jsx|js\\)$\")"
     ]
   }
 }
