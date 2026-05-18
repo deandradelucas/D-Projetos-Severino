@@ -223,6 +223,20 @@ body {
   background-color: #ffffff;
 }
 
+/* Login — fundo branco sólido (sem foto lateral nem blobs) */
+.auth-shell-glass--plain-white {
+  background-color: #ffffff;
+}
+
+body[data-theme='light']:has(.auth-shell-glass--plain-white) {
+  background-color: #ffffff;
+  background-image: none;
+}
+
+html:has(body[data-theme='light']:has(.auth-shell-glass--plain-white)) {
+  background-color: #ffffff;
+}
+
 /* Login com foto — overlay separado mobile (cartão sobre foto) vs desktop (só na coluna da imagem) */
 .auth-shell-glass-hero-overlay--mobile {
   background-color: rgba(255, 255, 255, 0.52);
@@ -286,6 +300,19 @@ body {
       0 0 0 1px rgba(255, 255, 255, 0.55) inset;
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
+  }
+
+  .auth-shell-glass--plain-white .auth-shell-glass-form-column {
+    background-color: #ffffff;
+    box-shadow: none;
+  }
+
+  .auth-shell-glass--plain-white .auth-shell-glass-card {
+    border-color: #e5e7eb;
+    background-color: #ffffff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: 0 12px 40px -24px rgba(15, 23, 42, 0.1);
   }
 }
 

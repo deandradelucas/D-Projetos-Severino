@@ -23,6 +23,8 @@ export default function AuthPhoneShell({
   bodyLogoAlt = '',
   heroImageSrc,
   heroImageAlt = '',
+  /** Fundo branco sólido em toda a viewport (sem foto nem blobs decorativos). */
+  plainWhiteBackground = false,
   /** Se definido, não mostra o `<h1>` visível (ex.: login só com logo); mantém título para leitores de ecrã. */
   visuallyHiddenTitle,
 }) {
@@ -31,11 +33,23 @@ export default function AuthPhoneShell({
   const hasHeadingBlock = srTitle || headerTitle || title
   const logoTopClass = hasVisibleHeading ? 'mt-3 sm:mt-4' : 'mt-0 sm:mt-1'
 
+  const shellVariant = plainWhiteBackground
+    ? 'auth-shell-glass--plain-white'
+    : heroImageSrc
+      ? 'auth-shell-glass--hero'
+      : 'auth-shell-glass--blobs'
+
+  const cardClassName = plainWhiteBackground
+    ? 'auth-shell-glass-card w-full rounded-[26px] border border-neutral-200/80 bg-white px-7 py-9 shadow-[0_12px_40px_-24px_rgba(15,23,42,0.12)] sm:rounded-[28px] sm:px-9 sm:py-10'
+    : 'auth-shell-glass-card w-full rounded-[26px] border border-neutral-200/90 bg-white/40 px-7 py-9 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.14)] backdrop-blur-3xl backdrop-saturate-150 sm:rounded-[28px] sm:px-9 sm:py-10'
+
   const shell = (
     <div
-      className={`auth-shell-glass fixed inset-0 z-[100] flex min-h-0 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain text-neutral-900 lg:min-h-0 lg:flex-row ${heroImageSrc ? 'auth-shell-glass--hero' : 'auth-shell-glass--blobs'}`}
+      className={`auth-shell-glass fixed inset-0 z-[100] flex min-h-0 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain text-neutral-900 lg:min-h-0 lg:flex-row ${shellVariant}`}
     >
-      {heroImageSrc ? (
+      {plainWhiteBackground ? (
+        <div className="pointer-events-none absolute inset-0 z-0 bg-white" aria-hidden="true" />
+      ) : heroImageSrc ? (
         <>
           {/* Mobile / tablet: foto full-bleed atrás do formulário */}
           <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden lg:hidden" aria-hidden="true">
@@ -72,12 +86,10 @@ export default function AuthPhoneShell({
       )}
 
       <div className="auth-shell-glass-form-column relative z-[1] box-border flex min-h-0 w-full flex-1 flex-col justify-center px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 lg:min-h-dvh lg:px-10 xl:px-14">
-        <div className="auth-shell-glass-card-reflect mx-auto w-full max-w-[400px] lg:max-w-[420px] xl:max-w-[440px]">
-          <main
-            className={`auth-shell-glass-card w-full rounded-[26px] border border-neutral-200/90 bg-white/40 px-7 py-9 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.14)] backdrop-blur-3xl backdrop-saturate-150 sm:rounded-[28px] sm:px-9 sm:py-10 ${
-              compact ? 'sm:min-h-0' : ''
-            }`}
-          >
+        <div
+          className={`mx-auto w-full max-w-[400px] lg:max-w-[420px] xl:max-w-[440px] ${plainWhiteBackground ? '' : 'auth-shell-glass-card-reflect'}`}
+        >
+          <main className={`${cardClassName} ${compact ? 'sm:min-h-0' : ''}`}>
             {showBack ? (
               <Link
                 to={backTo}
