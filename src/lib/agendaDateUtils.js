@@ -72,6 +72,24 @@ export function formatTime(iso) {
   }).format(new Date(iso))
 }
 
+export function formatEventDatetime(evento) {
+  if (!evento.inicio) return null
+  const start = new Date(evento.inicio)
+  if (Number.isNaN(start.getTime())) return null
+  const sp = saoPauloParts(start)
+  const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+  const month = months[parseInt(sp.month, 10) - 1]
+  const base = `${sp.day} ${month} · ${sp.hour}:${sp.minute}`
+  if (evento.fim) {
+    const end = new Date(evento.fim)
+    if (!Number.isNaN(end.getTime())) {
+      const ep = saoPauloParts(end)
+      return `${base} – ${ep.hour}:${ep.minute}`
+    }
+  }
+  return base
+}
+
 export function formatReminderOffset(minutes) {
   const n = Number.parseInt(String(minutes ?? 0), 10)
   if (!Number.isFinite(n) || n <= 0) return 'Na hora'
