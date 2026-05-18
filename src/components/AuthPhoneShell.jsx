@@ -95,7 +95,7 @@ export default function AuthPhoneShell({
 
       {isSplit ? (
         <aside
-          className="auth-shell-copy-column relative z-[1] hidden min-h-0 shrink-0 box-border lg:flex lg:min-h-dvh lg:w-1/2 lg:flex-col lg:justify-center"
+          className="auth-shell-copy-column relative z-[1] hidden min-h-0 shrink-0 box-border lg:flex lg:min-h-dvh lg:w-1/2 lg:flex-col lg:justify-center lg:overflow-y-auto lg:overscroll-y-contain"
           aria-label="Sobre o Severino"
         >
           <div className="auth-shell-copy-column__inner">{asidePanel}</div>
