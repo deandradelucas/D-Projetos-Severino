@@ -519,6 +519,10 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__type {
   color: rgba(250, 250, 250, 0.52) !important;
 }
 
+body[data-theme='dark'] .agenda-page .agenda-day-item__datetime {
+  color: rgba(250, 250, 250, 0.55) !important;
+}
+
 body[data-theme='dark'] .agenda-page .agenda-day-item .agenda-event__local {
   color: rgba(250, 250, 250, 0.55) !important;
 }
@@ -614,6 +618,14 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions button {
   color: #4b5563;
   font-size: 0.78rem;
   font-weight: 560;
+}
+
+.agenda-page .agenda-day-item__datetime {
+  margin: 4px 0 0 !important;
+  color: #6b7280 !important;
+  font-size: 0.76rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
 }
 
 .agenda-page .agenda-day-item .agenda-event__local {

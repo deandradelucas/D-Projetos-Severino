@@ -3,6 +3,7 @@ import { AgendaKindIcon } from './AgendaKindIcon'
 import {
   formatSelectedDayTitle,
   formatAgendaListReminderMeta,
+  formatEventDatetime,
   eventTone,
   agendaItemKind,
   AGENDA_KIND_META,
@@ -66,6 +67,7 @@ export function AgendaDayList({
             const kind = agendaItemKind(evento)
             const meta = AGENDA_KIND_META[kind]
             const reminderMeta = formatAgendaListReminderMeta(evento, kind)
+            const datetime = formatEventDatetime(evento)
             return (
               <article
                 className={`agenda-day-item agenda-day-item--${meta.tone} agenda-event--${eventTone(evento.status)}`}
@@ -77,6 +79,7 @@ export function AgendaDayList({
                 <div className="agenda-day-item__main">
                   <span className="agenda-day-item__type">{meta.label}</span>
                   <h3>{evento.titulo}</h3>
+                  {datetime ? <p className="agenda-day-item__datetime">{datetime}</p> : null}
                   {reminderMeta ? <p className="agenda-day-item__reminder">{reminderMeta}</p> : null}
                   {evento.local ? <p className="agenda-event__local">{evento.local}</p> : null}
                 </div>
