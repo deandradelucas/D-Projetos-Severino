@@ -348,7 +348,7 @@ export default function Login() {
       bodyLogoIntrinsicSize={BRAND_LOGO_PIXEL_SIZE.severinoTemaClaro}
       bodyLogoAlt="Severino"
       subtitle="Seu financeiro pessoal, organizado"
-      heroImageSrc="/images/Login/01.avif"
+      plainWhiteBackground
       compact={!showRecovery && !(webAuthnSupported() && hasWebAuthn)}
       footer={
         <>
