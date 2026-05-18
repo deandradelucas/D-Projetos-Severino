@@ -131,7 +131,8 @@
       "WebFetch(domain:belvo.com)",
       "WebFetch(domain:blog.openi.com.br)",
       "WebFetch(domain:help.importax.tech)",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "PowerShell(python -c $script)"
     ]
   }
 }

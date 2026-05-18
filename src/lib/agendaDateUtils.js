@@ -79,12 +79,7 @@ export function formatEventDatetime(evento) {
   const [datePart, timePart] = local.split('T')
   const [, month, day] = datePart.split('-')
   const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-  const base = `${day} ${months[parseInt(month, 10) - 1]} · ${timePart}`
-  if (evento.fim) {
-    const endLocal = toDatetimeLocal(evento.fim)
-    if (endLocal) return `${base} – ${endLocal.split('T')[1]}`
-  }
-  return base
+  return `${day} ${months[parseInt(month, 10) - 1]} · ${timePart}`
 }
 
 export function formatReminderOffset(minutes) {
