@@ -120,12 +120,9 @@ export async function authenticateUser(email, password) {
   }
 
   const senhaHash = String(raw.senha || '')
-  // Suporta senhas ainda em plaintext (período de transição pós-migração)
   let match = false
   if (senhaHash.startsWith('$2b$') || senhaHash.startsWith('$2a$')) {
     match = await bcrypt.compare(normalizedPassword, senhaHash)
-  } else {
-    match = normalizedPassword === senhaHash
   }
   if (!match) return null
 

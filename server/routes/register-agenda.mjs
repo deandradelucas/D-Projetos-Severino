@@ -13,6 +13,14 @@ import { processAgendaReminderCron } from '../lib/domain/agenda-reminder-cron.mj
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
+const AGENDA_ALLOWED_FIELDS = ['titulo', 'descricao', 'local', 'inicio', 'fim', 'status', 'lembrar_minutos_antes', 'whatsapp_notificar']
+
+function sanitizeAgendaBody(raw) {
+  return Object.fromEntries(
+    AGENDA_ALLOWED_FIELDS.filter(k => k in raw).map(k => [k, raw[k]])
+  )
+}
+
 export function registerAgendaRoutes(app) {
   app.get('/api/agenda', async (c) => {
     try {
@@ -29,7 +37,7 @@ export function registerAgendaRoutes(app) {
       return c.json(data)
     } catch (error) {
       log.error('listar agenda', error)
-      return c.json({ message: error.message || 'Erro ao listar agenda.' }, 500)
+      return c.json({ message: 'Erro ao listar agenda.' }, 500)
     }
   })
 
@@ -50,11 +58,11 @@ export function registerAgendaRoutes(app) {
         return c.json({ message: 'JSON inválido.' }, 400)
       }
 
-      const data = await criarAgendaEvento(parsed.dataUsuarioId, body, 'APP')
+      const data = await criarAgendaEvento(parsed.dataUsuarioId, sanitizeAgendaBody(body), 'APP')
       return c.json({ message: 'Compromisso criado.', data }, 201)
     } catch (error) {
       log.error('criar agenda', error)
-      return c.json({ message: error.message || 'Erro ao criar compromisso.' }, 500)
+      return c.json({ message: 'Erro ao criar compromisso.' }, 500)
     }
   })
 
@@ -77,11 +85,11 @@ export function registerAgendaRoutes(app) {
         return c.json({ message: 'JSON inválido.' }, 400)
       }
 
-      const data = await atualizarAgendaEvento(id, parsed.dataUsuarioId, body)
+      const data = await atualizarAgendaEvento(id, parsed.dataUsuarioId, sanitizeAgendaBody(body))
       return c.json({ message: 'Compromisso atualizado.', data })
     } catch (error) {
       log.error('atualizar agenda', error)
-      return c.json({ message: error.message || 'Erro ao atualizar compromisso.' }, 500)
+      return c.json({ message: 'Erro ao atualizar compromisso.' }, 500)
     }
   })
 
@@ -104,7 +112,7 @@ export function registerAgendaRoutes(app) {
       return c.json({ message: 'Status atualizado.', data })
     } catch (error) {
       log.error('status agenda', error)
-      return c.json({ message: error.message || 'Erro ao atualizar status.' }, 500)
+      return c.json({ message: 'Erro ao atualizar status.' }, 500)
     }
   })
 
@@ -120,7 +128,7 @@ export function registerAgendaRoutes(app) {
       return c.json({ message: 'Compromisso removido.' })
     } catch (error) {
       log.error('remover agenda', error)
-      return c.json({ message: error.message || 'Erro ao remover compromisso.' }, 500)
+      return c.json({ message: 'Erro ao remover compromisso.' }, 500)
     }
   })
 
@@ -134,7 +142,7 @@ export function registerAgendaRoutes(app) {
       return c.json(result)
     } catch (error) {
       log.error('cron agenda lembretes', error)
-      return c.json({ message: error.message || 'Erro no cron de lembretes.' }, 500)
+      return c.json({ message: 'Erro no cron de lembretes.' }, 500)
     }
   })
 }
