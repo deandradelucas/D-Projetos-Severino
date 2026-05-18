@@ -132,6 +132,18 @@ export const Alerts = {
       { key: 'smtp-fail', level: 'error' },
     ),
 
+  whatsappBotFailed: (phone = '', detail = '') =>
+    notifyTelegram(
+      `📱 *WhatsApp Bot — falha ao processar mensagem*\n\nTelefone: \`+${phone || '?'}\`\n${detail ? `Erro: \`${String(detail).slice(0, 300)}\`` : ''}\n\nVerifique: \`pm2 logs severino --lines 50\``,
+      { key: `whatsapp-bot-fail-${phone}`, level: 'error', debounce: 'critical' },
+    ),
+
+  whatsappSendFailed: (phone = '') =>
+    notifyTelegram(
+      `📱 *WhatsApp Bot — resposta não enviada*\n\nO bot gerou uma resposta mas *não conseguiu enviar* pelo WhatsApp\\.\nTelefone: \`+${phone || '?'}\`\n\nVerifique a Evolution API e a conexão da instância Severino\\.\`pm2 logs severino --lines 20\``,
+      { key: `whatsapp-send-fail-${phone}`, level: 'warn', debounce: 'critical' },
+    ),
+
   novoCadastro: ({ nome, email, telefone }) => {
     const token  = process.env.TELEGRAM_BOT_TOKEN_CADASTROS?.trim()
     const chatId = process.env.TELEGRAM_CHAT_ID_CADASTROS?.trim()
