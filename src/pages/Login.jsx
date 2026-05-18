@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthPasswordToggleButton from '../components/AuthPasswordToggleButton'
 import AuthPhoneShell from '../components/AuthPhoneShell'
+import LoginCopyPanel from '../components/auth/LoginCopyPanel'
 import { apiUrl, severinoProdApiMisconfigured } from '../lib/apiUrl'
 import {
   clearConviteTokenSession,
@@ -348,7 +349,7 @@ export default function Login() {
       bodyLogoIntrinsicSize={BRAND_LOGO_PIXEL_SIZE.severinoTemaClaro}
       bodyLogoAlt="Severino"
       subtitle="Seu financeiro pessoal, organizado"
-      plainWhiteBackground
+      asidePanel={<LoginCopyPanel />}
       compact={!showRecovery && !(webAuthnSupported() && hasWebAuthn)}
       footer={
         <>
