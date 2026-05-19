@@ -382,7 +382,8 @@ export async function getTransacoes(usuarioId, filters = {}) {
       recorrente_grupo_id, recorrente_index, recorrente_total, recorrencia_mensal_id,
       lancado_por_usuario_id,
       categorias(nome, cor),
-      subcategorias(nome)
+      subcategorias(nome),
+      lancado_por:usuarios!lancado_por_usuario_id(nome)
     `
 
   const txQuery = applyFilters(supabaseAdmin.from('transacoes').select(selectComEmbed))
@@ -419,8 +420,14 @@ export async function getTransacoes(usuarioId, filters = {}) {
     return await enrichTransacoesComCategorias(supabaseAdmin, r2.data || [], titularNomeLista)
   }
 
-  const rows = Array.isArray(data) ? data : []
-  return await enrichTransacoesLancadorNome(supabaseAdmin, rows, titularNomeLista)
+  return (Array.isArray(data) ? data : []).map((r) => {
+    const { lancado_por: lp, ...rest } = r
+    const nomeEmbed = lp?.nome ? String(lp.nome).trim() || null : null
+    return {
+      ...rest,
+      lancado_por_nome: nomeEmbed ?? (!r.lancado_por_usuario_id && titularNomeLista ? titularNomeLista : null),
+    }
+  })
 }
 
 export async function atualizarTransacao(id, usuarioId, body) {

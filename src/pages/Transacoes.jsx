@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
@@ -59,6 +60,7 @@ export default function Transacoes() {
   const firstFetchDoneRef = useRef(false)
   const fetchTransacoesRef = useRef(null)
   const filterChangeSkipRef = useRef(true)
+  const scrollContainerRef = useRef(null)
   
   // Só exibe Skeleton se o cache estiver vazio
   const [loading, setLoading] = useState(() => 
@@ -193,6 +195,13 @@ export default function Transacoes() {
     }
   }, [loading, refreshing, loadingMore, hasMore, transacoes.length, buildTxQuery])
 
+  const virtualizer = useVirtualizer({
+    count: transacoes.length,
+    getScrollElement: () => scrollContainerRef.current,
+    estimateSize: () => 72,
+    overscan: 5,
+  })
+
   // Reset de estado ao trocar de usuário
   useEffect(() => {
     firstFetchDoneRef.current = false
@@ -208,7 +217,6 @@ export default function Transacoes() {
       fetchTransacoesRef.current()
       fetchRecorrencias()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usuario.id, fetchCategorias, fetchRecorrencias])
 
   // Filtros: debounce de 400ms para evitar fetch a cada tecla
@@ -220,6 +228,22 @@ export default function Transacoes() {
     const t = setTimeout(() => void fetchTransacoesRef.current?.(), 400)
     return () => clearTimeout(t)
   }, [filters])
+
+  // Infinite scroll: carrega mais quando último item virtual fica visível
+  const virtualItems = virtualizer.getVirtualItems()
+  const lastVirtualIndex = virtualItems[virtualItems.length - 1]?.index ?? -1
+  useEffect(() => {
+    if (
+      lastVirtualIndex >= transacoes.length - 1 &&
+      hasMore &&
+      !loadingMore &&
+      !loading &&
+      !refreshing
+    ) {
+      void loadMoreTransacoes()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastVirtualIndex, hasMore, loadingMore, loading, refreshing, transacoes.length])
 
   /** Lista filtrada: alinhar ao cache global quando há novo fetch (ex.: despesa/receita pelo WhatsApp). */
   useEffect(() => {
@@ -317,7 +341,7 @@ export default function Transacoes() {
 
       <main className="main-content relative z-10 ref-dashboard-main">
         <div className="ref-dashboard-inner dashboard-hub">
-        <RefDashboardScroll>
+        <RefDashboardScroll ref={scrollContainerRef}>
         <section className="dashboard-hub__hero" aria-label="Transações e atalhos">
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
@@ -488,36 +512,50 @@ export default function Transacoes() {
                   <span className="ref-tx-list-head__val">Valor</span>
                   <span className="ref-tx-list-head__actions">Ações</span>
                 </div>
-                {transacoes.map((t) => (
-                  <TransacaoRow
-                    key={t.id}
-                    t={t}
-                    mostrarQuemLancou={mostrarQuemLancou}
-                    privacyMode={privacyMode}
-                    onEdit={(tx) => {
-                      setEditingTransaction(tx)
-                      setIsModalOpen(true)
-                    }}
-                    onDelete={handleDelete}
-                  />
-                ))}
+                {/* Contêiner virtual: apenas os itens visíveis são renderizados no DOM */}
+                <div
+                  style={{
+                    height: virtualizer.getTotalSize(),
+                    position: 'relative',
+                    gridColumn: '1 / -1',
+                  }}
+                >
+                  {virtualItems.map((vRow) => {
+                    const t = transacoes[vRow.index]
+                    return (
+                      <div
+                        key={vRow.key}
+                        data-index={vRow.index}
+                        ref={virtualizer.measureElement}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          transform: `translateY(${vRow.start}px)`,
+                        }}
+                      >
+                        <TransacaoRow
+                          t={t}
+                          mostrarQuemLancou={mostrarQuemLancou}
+                          privacyMode={privacyMode}
+                          onEdit={(tx) => {
+                            setEditingTransaction(tx)
+                            setIsModalOpen(true)
+                          }}
+                          onDelete={handleDelete}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
               <div className="page-transacoes-load-more">
                 <p className="page-transacoes-tx-meta" aria-live="polite">
-                  Mostrando {transacoes.length}{' '}
+                  {transacoes.length}{' '}
                   {transacoes.length === 1 ? 'transação' : 'transações'}
-                  {hasMore ? ' · há mais com os filtros atuais' : ' · fim da lista'}
+                  {loadingMore ? ' · carregando…' : hasMore ? ' · role para carregar mais' : ' · fim da lista'}
                 </p>
-                {hasMore ? (
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    disabled={loadingMore || refreshing}
-                    onClick={() => void loadMoreTransacoes()}
-                  >
-                    {loadingMore ? 'Carregando…' : 'Carregar mais'}
-                  </button>
-                ) : null}
               </div>
               </>
             )}

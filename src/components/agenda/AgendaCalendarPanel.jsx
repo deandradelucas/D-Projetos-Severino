@@ -1,5 +1,5 @@
 import React from 'react'
-import { saoPauloDateKey, formatMonthTitle, dateKeyToMonthKey, plural } from '../../lib/agendaDateUtils'
+import { saoPauloDateKey, formatMonthTitle, plural } from '../../lib/agendaDateUtils'
 
 /**
  * Grid do calendário mensal da Agenda.

@@ -227,11 +227,6 @@ export default function Configuracoes() {
     navigator.clipboard.writeText(perfil.email).then(() => showToast('E-mail copiado.')).catch(() => {})
   }
 
-  const copiarTexto = (t, okMsg = 'Copiado.') => {
-    if (!t) return
-    navigator.clipboard.writeText(t).then(() => showToast(okMsg)).catch(() => {})
-  }
-
   const copiarConviteFamilia = useCallback((texto) => {
     if (!texto) return
     navigator.clipboard
