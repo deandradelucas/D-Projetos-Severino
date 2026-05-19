@@ -21,7 +21,6 @@ import {
   dateKeyToMonthKey,
   monthKeyToDate,
   addMonths,
-  formatCompactDate,
   buildMonthCalendar,
   getWeekRange,
   agendaItemKind,
@@ -309,7 +308,6 @@ export default function Agenda() {
                 <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                   <div className="agenda-hero__title">
-                    <span>{formatCompactDate(selectedDateKey)}</span>
                     <div className="agenda-hero__title-row">
                       <strong>Agenda</strong>
                       <div className="agenda-hero__stats" aria-label="Resumo de compromissos">
