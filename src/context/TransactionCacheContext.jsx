@@ -58,7 +58,7 @@ export function TransactionCacheProvider({ children }) {
     setError('')
 
     try {
-      await syncRecorrenciasMensais(session.id)
+      void syncRecorrenciasMensais(session.id)
 
       const res = await fetchWithRetry(apiUrl('/api/transacoes'), {
         headers: horizonteApiAuthHeaders(),
