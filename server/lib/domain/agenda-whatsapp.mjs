@@ -340,13 +340,13 @@ function lightExtractTitle(message) {
 
   // Salta para o verbo de agendamento se houver preamble conversacional
   const schedVerb =
-    /\b(?:me\s+)?(?:marqu[ae]|agende?|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
+    /\b(?:me\s+)?(?:marqu[ae]|agend[ae]|agenda(?=\s)|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
   const schedMatch = text.match(schedVerb)
   if (schedMatch && schedMatch.index > 0) text = text.slice(schedMatch.index)
 
   // Remove verbo de agendamento no início + conector opcional (exige espaço após conector para não cortar palavras como "dentista")
   text = text.replace(
-    /^(?:me\s+)?(?:marcar|marque|agendar|agende|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|lembrete)\s+(?:(?:de|para|um|uma|o|a)\s+)*/i,
+    /^(?:me\s+)?(?:marcar|marque|agendar|agende|agenda|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|lembrete)\s+(?:(?:de|para|um|uma|o|a)\s+)*/i,
     ''
   )
 
@@ -388,7 +388,7 @@ function extractTitle(message) {
 
   // 3. Localiza verbo de agendamento em QUALQUER posição; salta preamble conversacional
   const schedVerb =
-    /\b(?:me\s+)?(?:marqu[ae]|agende?|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
+    /\b(?:me\s+)?(?:marqu[ae]|agend[ae]|agenda(?=\s)|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
   const schedMatch = text.match(schedVerb)
   if (schedMatch && schedMatch.index > 0) {
     text = text.slice(schedMatch.index)
@@ -397,7 +397,7 @@ function extractTitle(message) {
   // 4. Remove verbos de agendamento no início (infinitivo + imperativo)
   // Conector com espaço obrigatório evita cortar palavras como "dentista" (não absorver "de" de "de+ntista")
   text = text.replace(
-    /^(?:me\s+)?(?:marcar|marque|agendar|agende|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|lembrete)\s+(?:(?:de|para|um|uma|o|a)\s+)*/i,
+    /^(?:me\s+)?(?:marcar|marque|agendar|agende|agenda|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|lembrete)\s+(?:(?:de|para|um|uma|o|a)\s+)*/i,
     ''
   )
   text = text.replace(/^(?:um|uma|o|a)\s+(?:compromisso|lembrete|evento)\s+(?:de|para)?\s*/i, '')
