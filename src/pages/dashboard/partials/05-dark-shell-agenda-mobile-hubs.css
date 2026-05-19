@@ -849,6 +849,13 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
   .agenda-page .agenda-floating-add {
     display: none !important;
   }
+
+  /* iOS Safari: com 0-1 itens o conteúdo pode não ultrapassar a altura do container (shell usa
+     100dvh − safe-areas; hero tem margin-top negativa igual ao notch). min-height garante overflow
+     suficiente para o scroll funcionar em qualquer iPhone, incluindo modelos Pro/Max maiores. */
+  .agenda-page .agenda-list-panel--daily {
+    min-height: max(160px, calc(100svh - 490px));
+  }
 }
 
 @media (max-width: 900px) {
