@@ -173,12 +173,16 @@ function parseTime(message) {
   if (/\bmeio[\s-]dia\b/.test(text)) return { hour: 12, minute: 0 }
   if (/\bmeia[\s-]noite\b/.test(text)) return { hour: 0, minute: 0 }
 
+  const isManha = /\b(?:da|de|pela)?\s*manh[aã]\b/.test(text)
+  const isTardeNoite = /\b(?:da|de)?\s*(?:tarde|noite)\b/.test(text)
+
   // "14 e meia" / "14 horas e meia" → :30
   const eMeia = text.match(/\b(?:(?:às|as|pelas?)\s*)?(\d{1,2})(?:\s+horas?)?\s+e\s+meia\b/i)
   if (eMeia) {
     let h = Number.parseInt(eMeia[1], 10)
     if (Number.isFinite(h) && h >= 0 && h <= 23) {
-      if (h >= 1 && h <= 11 && /\b(da|de)?\s*(tarde|noite)\b/.test(text)) h += 12
+      if (h >= 1 && h <= 6 && !isManha) h += 12        // "5 e meia" → 17:30
+      else if (h >= 1 && h <= 11 && isTardeNoite) h += 12
       return { hour: h, minute: 30 }
     }
   }
@@ -193,10 +197,12 @@ function parseTime(message) {
   const minute = Number.parseInt(match[2] || match[4] || match[6] || match[8] || '0', 10)
 
   if (!Number.isFinite(hour)) return null
-  if (hour >= 1 && hour <= 11 && /\b(da|de)?\s*(tarde|noite)\b/.test(text)) hour += 12
-  if (hour >= 1 && hour <= 6 && /\b(da|de|pela)?\s*manh[aã]\b/.test(text)) {
-    // "6 da manhã" — já está correto, nenhum ajuste necessário (hora < 12)
-  }
+
+  // Horas 1–6 sem "manhã" → assume tarde/noite (17h–22h é mais comum que madrugada)
+  // "às 5 horas" → 17h | "às 5 da manhã" → 5h | "às 5 da tarde" → 17h
+  if (hour >= 1 && hour <= 6 && !isManha) hour += 12
+  else if (hour >= 7 && hour <= 11 && isTardeNoite) hour += 12
+
   if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null
   return { hour, minute }
 }

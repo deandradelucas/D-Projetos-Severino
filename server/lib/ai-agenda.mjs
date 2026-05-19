@@ -60,7 +60,8 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
     '- lembrar_minutos_antes deve ser exatamente um destes valores: 0, 5, 10, 15, 30, 60.\n' +
     '- Se o texto pedir lembrete/aviso sem especificar quantos minutos antes, use 15.\n' +
     '- whatsapp_notificar: true, salvo pedido explícito para não notificar.\n' +
-    '- local e descricao: strings, podem ser vazias.\n\n' +
+    '- local e descricao: strings, podem ser vazias.\n' +
+    '- HORÁRIO AMBÍGUO: horas de 1 a 6 sem qualificador explícito ("da manhã", "da tarde", "da noite") devem ser interpretadas como tarde/noite (some 12). Ex: "às 5 horas" → 17:00, "às 3 horas" → 15:00, "às 5 da manhã" → 05:00.\n\n' +
     'Regras para o TÍTULO:\n' +
     '- Use de 2 a 6 palavras. Capitalize a primeira letra.\n' +
     '- REMOVA APENAS: verbos de agendamento no início (marcar, agendar, me lembra de, avise, lembrar de) e referências de data/hora (dia da semana, hora, "às", "amanhã").\n' +
