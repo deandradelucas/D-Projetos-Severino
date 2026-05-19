@@ -54,6 +54,7 @@ export default function Agenda() {
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
   const savingRef = useRef(false)
+  const editingRef = useRef(null)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   /** Exclusão direta na lista do dia (confirmação em `ConfirmDialog`). */
   const [pendingDelete, setPendingDelete] = useState(null)
@@ -192,12 +193,14 @@ export default function Agenda() {
     const d = selectedDateKey === todayKey ? new Date() : dateKeyToDate(selectedDateKey)
     d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15, 0, 0)
     if (selectedDateKey !== todayKey) d.setHours(9, 0, 0, 0)
+    editingRef.current = null
     setEditing(null)
     setForm({ ...EMPTY_FORM, inicio: toDatetimeLocal(d.toISOString()) })
     setModalOpen(true)
   }
 
   function openEdit(evento) {
+    editingRef.current = evento
     setEditing(evento)
     setForm({
       titulo: evento.titulo || '',
@@ -212,24 +215,40 @@ export default function Agenda() {
   async function saveEvent(e) {
     e.preventDefault()
     if (!usuarioId || savingRef.current) return
+
+    const eventoEmEdicao = editingRef.current ?? editing
+    const eventoId = eventoEmEdicao?.id ? String(eventoEmEdicao.id).trim() : ''
+    const isEdit = Boolean(eventoId)
+
+    const inicioIso = localToIso(form.inicio)
+    if (!inicioIso) {
+      showToast('Informe uma data e hora válidas.', 'error')
+      return
+    }
+
     savingRef.current = true
     setSaving(true)
     try {
       const payload = {
-        ...form,
-        inicio: localToIso(form.inicio),
-        fim: form.fim ? localToIso(form.fim) : null,
+        titulo: form.titulo.trim(),
+        inicio: inicioIso,
         lembrar_minutos_antes: Number(form.lembrar_minutos_antes),
+        whatsapp_notificar: form.whatsapp_notificar !== false,
       }
-      const res = await fetch(apiUrl(editing ? `/api/agenda/${editing.id}` : '/api/agenda'), {
-        method: editing ? 'PUT' : 'POST',
+      const fimIso = form.fim ? localToIso(form.fim) : ''
+      if (fimIso) payload.fim = fimIso
+
+      const res = await fetch(apiUrl(isEdit ? `/api/agenda/${eventoId}` : '/api/agenda'), {
+        method: isEdit ? 'PUT' : 'POST',
         headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.message || 'Falha ao salvar item da agenda.')
-      showToast(editing ? 'Item atualizado.' : 'Item criado.', 'success')
+      showToast(isEdit ? 'Item atualizado.' : 'Item criado.', 'success')
       setModalOpen(false)
+      editingRef.current = null
+      setEditing(null)
       await loadAgenda()
     } catch (err) {
       showToast(err.message || 'Falha ao salvar item da agenda.', 'error')
@@ -402,7 +421,7 @@ export default function Agenda() {
             <div className="agenda-modal__grid">
               <label className="agenda-field">
                 <span>Aviso de notificação</span>
-                <select value={form.lembrar_minutos_antes} onChange={(e) => setForm((f) => ({ ...f, lembrar_minutos_antes: e.target.value }))}>
+                <select value={form.lembrar_minutos_antes} onChange={(e) => setForm((f) => ({ ...f, lembrar_minutos_antes: Number(e.target.value) }))}>
                   <option value={0}>Na hora</option>
                   <option value={5}>5 min antes</option>
                   <option value={10}>10 min antes</option>

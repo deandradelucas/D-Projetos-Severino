@@ -147,3 +147,35 @@ body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-h
 .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-panel.page-relatorios-ref-filters {
   margin-top: clamp(16px, 2.5vw, 24px);
 }
+
+/* KPIs — valor com sinal (ex.: despesas) numa linha só no mobile */
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-card__value--signed {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card {
+    min-height: 0;
+    padding: 12px 10px;
+    gap: 10px;
+  }
+
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card__body {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-card--expense .ref-kpi-card__value--signed {
+    font-size: clamp(14px, 3.5vw, 17px);
+    letter-spacing: -0.03em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+}

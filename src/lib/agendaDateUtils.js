@@ -43,7 +43,15 @@ export function toDatetimeLocal(iso) {
 
 export function localToIso(value) {
   if (!value) return ''
-  const normalized = value.length === 16 ? `${value}:00${SAO_PAULO_OFFSET}` : `${value}${SAO_PAULO_OFFSET}`
+  const trimmed = String(value).trim()
+  let normalized
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(trimmed)) {
+    normalized = `${trimmed}:00${SAO_PAULO_OFFSET}`
+  } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(trimmed)) {
+    normalized = `${trimmed}${SAO_PAULO_OFFSET}`
+  } else {
+    normalized = `${trimmed}${SAO_PAULO_OFFSET}`
+  }
   const d = new Date(normalized)
   return Number.isNaN(d.getTime()) ? '' : d.toISOString()
 }
