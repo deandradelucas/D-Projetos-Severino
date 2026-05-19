@@ -671,9 +671,52 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions button {
   background: color-mix(in srgb, #ef4444 9%, #ffffff);
 }
 
+.agenda-page .agenda-day-item__actions .agenda-day-item__btn--delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.agenda-page .agenda-day-item__delete-icon {
+  display: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+}
+
 .agenda-page .agenda-day-item__actions .agenda-day-item__btn--danger:focus-visible {
   outline: 2px solid color-mix(in srgb, #ef4444 55%, transparent);
   outline-offset: 2px;
+}
+
+/* Mobile: Editar + Concluir + lixeira na mesma linha */
+@media (max-width: 559px) {
+  .agenda-page .agenda-day-item__actions {
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .agenda-page .agenda-day-item__actions button:not(.agenda-day-item__btn--delete) {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .agenda-page .agenda-day-item__actions .agenda-day-item__btn--delete {
+    flex: 0 0 40px;
+    width: 40px;
+    min-width: 40px;
+    padding: 0;
+  }
+
+  .agenda-page .agenda-day-item__btn-label {
+    display: none;
+  }
+
+  .agenda-page .agenda-day-item__delete-icon {
+    display: block;
+  }
 }
 
 @media (min-width: 560px) {
