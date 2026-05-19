@@ -310,7 +310,19 @@ export default function Agenda() {
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                   <div className="agenda-hero__title">
                     <span>{formatCompactDate(selectedDateKey)}</span>
-                    <strong>Agenda</strong>
+                    <div className="agenda-hero__title-row">
+                      <strong>Agenda</strong>
+                      <div className="agenda-hero__stats" aria-label="Resumo de compromissos">
+                        <div className="agenda-hero__stat">
+                          <span>Hoje</span>
+                          <strong>{stats.selectedDay}</strong>
+                        </div>
+                        <div className="agenda-hero__stat">
+                          <span>Semana</span>
+                          <strong>{stats.week}</strong>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações da agenda">
                     <button type="button" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={openNew}>
@@ -318,15 +330,7 @@ export default function Agenda() {
                     </button>
                   </div>
                 </div>
-                <div className="agenda-hero__summary" aria-label="Resumo de compromissos">
-                  <div>
-                    <span>Hoje</span>
-                    <strong>{stats.selectedDay}</strong>
-                  </div>
-                  <div>
-                    <span>Semana</span>
-                    <strong>{stats.week}</strong>
-                  </div>
+                <div className="agenda-hero__summary">
                   {nextEvento ? (
                     <p>Próximo: {nextEvento.titulo} · {formatDate(nextEvento.inicio)} às {formatTime(nextEvento.inicio)}</p>
                   ) : (
