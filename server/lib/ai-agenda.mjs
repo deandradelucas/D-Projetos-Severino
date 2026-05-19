@@ -8,6 +8,19 @@ import {
 } from './ai/gemini-client.mjs'
 import { tryParseJsonBlock } from './ai/parsers.mjs'
 
+const TRAILING_STOPWORDS = /[\s,;.]*(para|de|do|da|dos|das|com|a|ao|aos|às|e|ou|que|um|uma|o|os|as|no|na|nos|nas|pelo|pela|pelos|pelas|num|numa|por|sem|sob|sobre|até|após|ante|perante|entre|contra|durante|mediante|exceto|salvo|conforme|segundo)\s*[.,;]*$/i
+
+function sanitizeTitulo(raw) {
+  let t = raw.replace(/[.,;]+$/, '').trim()
+  // remove trailing stopwords repetidamente até estabilizar
+  let prev
+  do {
+    prev = t
+    t = t.replace(TRAILING_STOPWORDS, '').trim()
+  } while (t !== prev)
+  return (t.slice(0, 160) || 'Compromisso')
+}
+
 /**
  * Interpreta texto livre para preencher o formulário da agenda (web). Usa Gemini com fallback heurístico (mesmo núcleo do WhatsApp).
  */
@@ -53,10 +66,14 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
     '- REMOVA APENAS: verbos de agendamento no início (marcar, agendar, me lembra de, avise, lembrar de) e referências de data/hora (dia da semana, hora, "às", "amanhã").\n' +
     '- MANTENHA: verbos que descrevem o evento (pagar, buscar, ir, ligar, levar, chamar, comprar, tomar), artigos e preposições que fazem parte natural da frase.\n' +
     '- Ignore preamble conversacional antes do comando de agendamento.\n' +
+    '- NUNCA termine o título com preposição, artigo ou conjunção solta (para, de, do, da, com, a, ao, aos, às, e, ou, que, um, uma). Se o complemento não estiver claro, omita a preposição.\n' +
+    '- NUNCA inclua pontuação no final do título (ponto, vírgula, ponto e vírgula).\n' +
     '- Se o usuário só informar horário sem descrever o evento, use "Compromisso" como título.\n' +
     '- Exemplos de entrada → título correto:\n' +
     '  "marcar dentista segunda 10h" → "Dentista"\n' +
     '  "Fala Severino, como você tá? Marque uma reunião importante para as 16:30" → "Reunião importante"\n' +
+    '  "reunião para o cliente amanhã 15h" → "Reunião com cliente"\n' +
+    '  "reunião para . 15h" → "Reunião"\n' +
     '  "lembrar de ir buscar a Fabiana às dezesseis e meia" → "Ir buscar a Fabiana"\n' +
     '  "Oi, tudo bem? Agenda uma consulta médica pra amanhã às 9h" → "Consulta médica"\n' +
     '  "me lembra de pagar a luz sexta 9h" → "Pagar a luz"\n' +
@@ -87,7 +104,7 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
         lastErr = new Error('JSON inválido na resposta da IA.')
         continue
       }
-      const titulo = String(parsed.titulo || '').trim().slice(0, 160) || 'Compromisso'
+      const titulo = sanitizeTitulo(String(parsed.titulo || '').trim())
       const dl = String(parsed.data_local || '').trim()
       const hlRaw = String(parsed.hora_local || '').trim()
       if (!/^\d{4}-\d{2}-\d{2}$/.test(dl) || !/^\d{1,2}:\d{2}$/.test(hlRaw)) {
