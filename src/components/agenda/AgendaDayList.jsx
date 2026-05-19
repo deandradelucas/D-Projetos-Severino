@@ -104,8 +104,8 @@ export function AgendaDayList({
                       src="/images/icons/excluir.png"
                       alt=""
                       className="agenda-day-item__delete-icon"
-                      width={22}
-                      height={22}
+                      width={26}
+                      height={26}
                       decoding="async"
                     />
                     <span className="agenda-day-item__btn-label">Excluir</span>
