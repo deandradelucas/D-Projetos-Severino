@@ -680,9 +680,11 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions button {
 
 .agenda-page .agenda-day-item__delete-icon {
   display: none;
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1.125rem;
+  height: 1.125rem;
   flex-shrink: 0;
+  object-fit: contain;
+  pointer-events: none;
 }
 
 .agenda-page .agenda-day-item__actions .agenda-day-item__btn--danger:focus-visible {
