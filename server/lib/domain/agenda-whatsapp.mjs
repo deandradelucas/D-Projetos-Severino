@@ -351,13 +351,24 @@ function lightExtractTitle(message) {
   text = stripDateTime(text)
 
   // Retorna até 6 palavras (preserva verbos, artigos, preposições intactos)
-  return text
-    .replace(/\s+/g, ' ')
-    .replace(/^[\s,;:?!]+|[\s,;:?!]+$/g, '')
-    .trim()
-    .split(/\s+/)
-    .slice(0, 6)
-    .join(' ')
+  return stripTrailingStopwords(
+    text
+      .replace(/\s+/g, ' ')
+      .replace(/^[\s,;:?!.]+|[\s,;:?!.]+$/g, '')
+      .trim()
+      .split(/\s+/)
+      .slice(0, 6)
+      .join(' ')
+  )
+}
+
+const _TRAILING_SW = /[\s,;.]*(para|de|do|da|dos|das|com|a|ao|aos|às|e|ou|que|um|uma|o|os|as|no|na|nos|nas|pelo|pela|pelos|pelas|num|numa|por|sem|sob|sobre|até|após|ante|entre|contra|durante|sem)\s*[.,;]*$/i
+
+function stripTrailingStopwords(t) {
+  let s = t.replace(/[.,;]+$/, '').trim()
+  let prev
+  do { prev = s; s = s.replace(_TRAILING_SW, '').trim() } while (s !== prev)
+  return s
 }
 
 function extractTitle(message) {
@@ -392,7 +403,7 @@ function extractTitle(message) {
   text = stripDateTime(text)
 
   // 7. Limpa e mede resultado
-  const cleaned = text.replace(/\s+/g, ' ').replace(/^[\s,;:?!]+|[\s,;:?!]+$/g, '').trim()
+  const cleaned = stripTrailingStopwords(text.replace(/\s+/g, ' ').replace(/^[\s,;:?!.]+|[\s,;:?!.]+$/g, '').trim())
 
   // 8. Fallback: se resultado tem < 3 palavras, usa extração leve (preserva verbos/artigos)
   if (wordCount(cleaned) < 3) {
