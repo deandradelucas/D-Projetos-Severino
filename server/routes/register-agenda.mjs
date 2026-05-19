@@ -21,6 +21,13 @@ function sanitizeAgendaBody(raw) {
   )
 }
 
+function agendaErrorResponse(error, fallback) {
+  const message = error instanceof Error ? error.message : fallback
+  const status =
+    /inválid|informe|não encontrad|json/i.test(message) ? 400 : 500
+  return { message, status }
+}
+
 export function registerAgendaRoutes(app) {
   app.get('/api/agenda', async (c) => {
     try {
@@ -58,11 +65,12 @@ export function registerAgendaRoutes(app) {
         return c.json({ message: 'JSON inválido.' }, 400)
       }
 
-      const data = await criarAgendaEvento(parsed.dataUsuarioId, sanitizeAgendaBody(body), 'APP')
+      const data = await criarAgendaEvento(parsed.dataUsuarioId, sanitizeAgendaBody(body))
       return c.json({ message: 'Compromisso criado.', data }, 201)
     } catch (error) {
       log.error('criar agenda', error)
-      return c.json({ message: 'Erro ao criar compromisso.' }, 500)
+      const { message, status } = agendaErrorResponse(error, 'Erro ao criar compromisso.')
+      return c.json({ message }, status)
     }
   })
 
@@ -89,7 +97,8 @@ export function registerAgendaRoutes(app) {
       return c.json({ message: 'Compromisso atualizado.', data })
     } catch (error) {
       log.error('atualizar agenda', error)
-      return c.json({ message: 'Erro ao atualizar compromisso.' }, 500)
+      const { message, status } = agendaErrorResponse(error, 'Erro ao atualizar compromisso.')
+      return c.json({ message }, status)
     }
   })
 

@@ -364,7 +364,10 @@ export default function Relatorios() {
                 </div>
                 <div className="ref-kpi-card__body">
                   <p className="ref-kpi-card__label">Despesas</p>
-                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>− {formatCurrency(summary.despesas)}</p>
+                  <p className={`ref-kpi-card__value ref-kpi-card__value--signed ${privacyMode ? 'privacy-blur' : ''}`}>
+                    −{'\u00a0'}
+                    {formatCurrency(summary.despesas)}
+                  </p>
                 </div>
               </article>
             </>

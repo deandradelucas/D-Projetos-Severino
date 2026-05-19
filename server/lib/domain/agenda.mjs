@@ -109,7 +109,7 @@ function normalizeEvento(row) {
   }
 }
 
-function buildEventoPayload(usuarioId, body, partial = false) {
+export function buildEventoPayload(usuarioId, body, partial = false) {
   const payload = {}
 
   if (!partial || body.titulo !== undefined) {
@@ -124,11 +124,15 @@ function buildEventoPayload(usuarioId, body, partial = false) {
   if (!partial || body.inicio !== undefined) {
     const inicio = parseDateOrThrow(body.inicio, 'Data de início')
     payload.inicio_em = inicio.toISOString()
-    if (!body.fim) payload.fim_em = defaultEndDate(payload.inicio_em)
   }
 
-  if (body.fim !== undefined) {
-    payload.fim_em = body.fim ? parseDateOrThrow(body.fim, 'Data de fim').toISOString() : defaultEndDate(payload.inicio_em || body.inicio)
+  if (body.fim) {
+    payload.fim_em = parseDateOrThrow(body.fim, 'Data de fim').toISOString()
+  } else if (!partial || body.inicio !== undefined) {
+    const inicioIso =
+      payload.inicio_em ||
+      parseDateOrThrow(body.inicio, 'Data de início').toISOString()
+    payload.fim_em = defaultEndDate(inicioIso)
   }
 
   if (!partial || body.lembrar_minutos_antes !== undefined || body.whatsapp_notificar !== undefined) {
