@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { HTTPException } from 'hono/http-exception'
 import { cors } from 'hono/cors'
+import { compress } from 'hono/compress'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { log } from './lib/logger.mjs'
 import { Alerts } from './lib/notify-telegram.mjs'
@@ -12,6 +13,10 @@ import healthRoutes from './routes/health.mjs'
 import { registerApiDomainRoutes } from './routes/register-all.mjs'
 
 const app = createApp()
+
+// Comprime todas as respostas (gzip/br). Registrado antes de tudo para envolver
+// a chain inteira — security headers e Cache-Control são preservados pelo compress.
+app.use('*', compress())
 
 function corsAllowedOrigin(origin) {
   if (!origin) return null
@@ -77,6 +82,13 @@ app.use('/api/pagamentos/*', pagamentosRequestLogger)
 app.route('/api', healthRoutes)
 
 registerApiDomainRoutes(app)
+
+// Assets com hash no nome (gerados pelo Vite) podem ser cacheados para sempre.
+// O browser nunca re-baixa JS/CSS entre visitas enquanto o hash não mudar.
+app.use('/assets/*', async (c, next) => {
+  await next()
+  c.header('Cache-Control', 'public, max-age=31536000, immutable')
+})
 
 app.use('*', serveStatic({ root: './dist' }))
 
