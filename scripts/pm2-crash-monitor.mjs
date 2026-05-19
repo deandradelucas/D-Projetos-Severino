@@ -55,7 +55,7 @@ async function main() {
   // Detecta restart por mudança de PID
   if (pidChanged) {
     const minutesSince = Math.round(timeSinceLastCheck / 60000)
-    console.log(`[pm2-monitor] Restart detectado (PID ${prevPid} → ${currentPid}) — notificando`)
+    console.log(`[pm2-monitor] Restart detectado após ~${minutesSince} min (PID ${prevPid} → ${currentPid}) — notificando`)
     await Alerts.pm2Crash(1)
   }
 

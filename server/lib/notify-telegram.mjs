@@ -20,10 +20,6 @@ function canSend(key, debounceKey = 'default') {
   return true
 }
 
-function escapeMarkdown(text) {
-  return String(text).replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&')
-}
-
 /**
  * Envia notificação para o Telegram. Nunca lança exceção — falha silenciosa.
  *
