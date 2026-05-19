@@ -598,8 +598,7 @@ body:has(.sidebar.open) .horizon-chat-window {
     padding-bottom: calc(130px + var(--safe-bottom));
   }
 
-  body:has(.dashboard-mobile-fabs) .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
-  body:has(.dashboard-mobile-fabs) .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  body:has(.dashboard-mobile-fabs) .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     /* Igual ao scroll com FAB só na Visão Geral (pill ao mesmo baseline) */
     padding-bottom: calc(130px + var(--safe-bottom));
   }
