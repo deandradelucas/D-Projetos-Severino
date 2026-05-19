@@ -64,12 +64,13 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
     '- HORÁRIO AMBÍGUO: horas de 1 a 6 sem qualificador explícito ("da manhã", "da tarde", "da noite") devem ser interpretadas como tarde/noite (some 12). Ex: "às 5 horas" → 17:00, "às 3 horas" → 15:00, "às 5 da manhã" → 05:00.\n\n' +
     'Regras para o TÍTULO:\n' +
     '- Use de 2 a 6 palavras. Capitalize a primeira letra.\n' +
-    '- REMOVA APENAS: verbos de agendamento no início (marcar, agendar, me lembra de, avise, lembrar de) e referências de data/hora (dia da semana, hora, "às", "amanhã").\n' +
-    '- MANTENHA: verbos que descrevem o evento (pagar, buscar, ir, ligar, levar, chamar, comprar, tomar), artigos e preposições que fazem parte natural da frase.\n' +
-    '- Ignore preamble conversacional antes do comando de agendamento.\n' +
-    '- NUNCA termine o título com preposição, artigo ou conjunção solta (para, de, do, da, com, a, ao, aos, às, e, ou, que, um, uma). Se o complemento não estiver claro, omita a preposição.\n' +
-    '- NUNCA inclua pontuação no final do título (ponto, vírgula, ponto e vírgula).\n' +
+    '- VERBOS DE AGENDAMENTO a remover do início: marcar, agendar, agenda, criar, adicionar, anotar, anota, colocar, coloca, bota, salva, registra, me lembra de, lembrar de, avise, lembre, tenho, terei.\n' +
+    '- MANTENHA: verbos que descrevem o evento (pagar, buscar, ir, ligar, levar, chamar, comprar, tomar, buscar, pegar), artigos e preposições que fazem parte natural da frase.\n' +
+    '- Ignore preamble conversacional (saudações, "oi", "tudo bem?", "Fala Severino") antes do comando de agendamento.\n' +
+    '- NUNCA termine o título com preposição, artigo ou conjunção solta (para, de, do, da, com, a, ao, aos, às, e, ou, que, um, uma, o, os, as). Se o complemento não estiver claro, omita a preposição.\n' +
+    '- NUNCA inclua pontuação no final do título (ponto, vírgula, ponto e vírgula, reticências).\n' +
     '- Se o usuário só informar horário sem descrever o evento, use "Compromisso" como título.\n' +
+    '- Erros de digitação comuns (corrigir silenciosamente no título): "reuiao"→"reunião", "dentitas"→"dentista", "exeme"→"exame", "vascina"→"vacina", "medico"→"médico".\n' +
     '- Exemplos de entrada → título correto:\n' +
     '  "marcar dentista segunda 10h" → "Dentista"\n' +
     '  "Fala Severino, como você tá? Marque uma reunião importante para as 16:30" → "Reunião importante"\n' +
@@ -81,7 +82,15 @@ export async function parseAgendaFromTextWithAI(texto, baseDate = new Date()) {
     '  "amanhã às quinze e meia buscar filha na escola" → "Buscar filha na escola"\n' +
     '  "call com cliente às dezesseis horas" → "Call com cliente"\n' +
     '  "ligar para o contador amanhã 9h" → "Ligar para o contador"\n' +
-    '  "levar os filhos na escola segunda 7h30" → "Levar os filhos na escola"\n\n' +
+    '  "levar os filhos na escola segunda 7h30" → "Levar os filhos na escola"\n' +
+    '  "coloca aí vacina do João quinta" → "Vacina do João"\n' +
+    '  "bota na agenda treino quarta 6h" → "Treino"\n' +
+    '  "salva aqui aniversário da Ana sábado" → "Aniversário da Ana"\n' +
+    '  "registra consulta médico sexta 15h" → "Consulta médico"\n' +
+    '  "tenho exame de sangue segunda 7h" → "Exame de sangue"\n' +
+    '  "terei reunião com a equipe quinta 14h" → "Reunião com a equipe"\n' +
+    '  "preciso pegar o carro na oficina amanhã 10h" → "Pegar carro na oficina"\n' +
+    '  "pagar boleto da academia até sexta" → "Pagar boleto academia"\n\n' +
     `Texto do usuário:\n"""${safeUserText}"""`
 
   const models = resolveGeminiModelCandidates()
