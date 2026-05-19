@@ -88,6 +88,46 @@ function stripAccents(value) {
 }
 
 /**
+ * Corrige abrevia\u00e7\u00f5es e erros de digita\u00e7\u00e3o comuns em portugu\u00eas brasileiro (mobile/voz).
+ * Aplicado antes de qualquer regex de parsing para aumentar toler\u00e2ncia a typos.
+ */
+function normalizeTypos(text) {
+  let t = String(text || '')
+
+  // Abrevia\u00e7\u00f5es de m\u00f3vel BR
+  t = t.replace(/\bhj\b/gi, 'hoje')
+  t = t.replace(/\btb\b|\btbm\b|\ttamb[e\u00e9]m?\b/gi, 'tamb\u00e9m')
+  t = t.replace(/\bpf\b/gi, 'por favor')
+  t = t.replace(/\bfds\b/gi, 'fim de semana')
+  t = t.replace(/\bpdx\b|\bdepos\b/gi, 'depois')
+
+  // Transposi\u00e7\u00f5es comuns em datas (antes de stripAccents)
+  t = t.replace(/\bamnh[a\u00e3]\b|\bamna\b|\bamnha\b/gi, 'amanh\u00e3')
+  t = t.replace(/\bdeposi[s]?\b/gi, 'depois')
+
+  // Dias da semana com typo
+  t = t.replace(/\bseguda(?:-feira)?\b/gi, 'segunda')
+  t = t.replace(/\bquita(?:-feira)?\b|\bquinta-feira?\b/gi, 'quinta')
+  t = t.replace(/\bsexat(?:-feira)?\b/gi, 'sexta')
+  t = t.replace(/\bsabdo\b|\bsabado\b/gi, 's\u00e1bado')
+  t = t.replace(/\bdomingo[s]?\b/gi, 'domingo')
+
+  // Palavras-chave de agenda com typo comum
+  t = t.replace(/\breunia[o]?\b|\breuiao\b|\breuinao\b|\breniao\b/gi, 'reuni\u00e3o')
+  t = t.replace(/\blembrte\b|\blembete\b|\blembree\b/gi, 'lembrete')
+  t = t.replace(/\bdentitas\b|\bdenstita\b|\bdentitsa\b/gi, 'dentista')
+  t = t.replace(/\bcompromiss[ao]\b/gi, 'compromisso')
+  t = t.replace(/\bconsluta\b|\bconsulat\b/gi, 'consulta')
+  t = t.replace(/\bmedico\b/gi, 'm\u00e9dico')
+  t = t.replace(/\bagendar?\b/gi, (m) => m) // deixa como est\u00e1 \u2014 j\u00e1 coberto
+  t = t.replace(/\bageda\b|\bagedna\b/gi, 'agenda')
+  t = t.replace(/\bcaneclar\b|\bcanclear\b/gi, 'cancelar')
+  t = t.replace(/\breagendaar\b|\bremarcar\b/gi, 'reagendar')
+
+  return t
+}
+
+/**
  * Normaliza horas/minutos por extenso em portugu\u00eas para formato num\u00e9rico.
  * "dezesseis e meia" \u2192 "16:30" | "\u00e0s quatorze horas" \u2192 "\u00e0s 14 horas"
  * Seguro: compostos resolvidos antes dos simples; amb\u00edguos s\u00f3 com preposi\u00e7\u00e3o ou "horas".
@@ -208,7 +248,7 @@ function parseTime(message) {
 }
 
 export function parseAgendaDateTime(message, base = new Date()) {
-  const raw = String(message || '')
+  const raw = normalizeTypos(String(message || ''))
   const text = normalizeWordTime(stripAccents(raw.toLowerCase()))
   const time = parseTime(text)
 
@@ -378,8 +418,8 @@ function stripTrailingStopwords(t) {
 }
 
 function extractTitle(message) {
-  // 1. Normaliza horas por extenso
-  let text = normalizeWordTime(String(message || '').trim())
+  // 1. Normaliza typos e horas por extenso
+  let text = normalizeWordTime(normalizeTypos(String(message || '').trim()))
 
   // 2. Remove "Severino" (vocativo em qualquer posição dentro dos primeiros 60 chars)
   if (/^.{0,60}severino\b/i.test(text)) {
@@ -528,7 +568,7 @@ export function isAgendaMessage(message) {
 }
 
 export async function processarMensagemAgenda(usuario, phone, rawMessage) {
-  const message = String(rawMessage || '').trim()
+  const message = normalizeTypos(String(rawMessage || '').trim())
   if (!isAgendaMessage(message)) return null
 
   let reply = ''
