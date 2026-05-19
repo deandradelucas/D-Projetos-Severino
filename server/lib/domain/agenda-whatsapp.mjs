@@ -11,9 +11,9 @@ import {
 import { assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 
 const AGENDA_KEYWORD_RE =
-  /\b(agenda|compromisso|compromissos|reuni[aã]o|reuniao|evento|consulta|consult[óo]rio|dentista|m[eé]dico|agendar|marcar|anotar|anota|cancelar|desmarcar|reagendar|remarcar|confirmar|concluir|finalizar|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar)\b/i
+  /\b(agenda|compromisso|compromissos|reuni[aã]o|reuniao|evento|consulta|consult[óo]rio|dentista|m[eé]dico|exame[s]?|vacina[s]?|anivers[aá]rio|viagem|voo|aula[s]?|treino|academia|apresenta[cç][aã]o|entrevista|cirurgia|check.?in|pagar|pagamento|boleto|conta|agendar|marcar|anotar|anota|cancelar|desmarcar|reagendar|remarcar|confirmar|concluir|finalizar|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar|buscar|pegar|levar|tomar|ligar)\b/i
 const CREATE_INTENT_RE =
-  /\b(marcar|agendar|criar|adicionar|anotar|anota|colocar|inclui|incluir|tenho|terei|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar|consulta|reuni[aã]o|reuniao|evento|compromisso|dentista|m[eé]dico)\b/i
+  /\b(marcar|agendar|criar|adicionar|anotar|anota|colocar|coloca|bota|salva|registra|inclui|incluir|tenho|terei|preciso|precisa|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar|consulta|reuni[aã]o|reuniao|evento|compromisso|dentista|m[eé]dico|exame[s]?|vacina[s]?|anivers[aá]rio|viagem|voo|aula[s]?|treino|academia|entrevista|cirurgia|pagar|buscar|pegar|levar|tomar|ligar)\b/i
 
 const WEEKDAY_MAP = new Map([
   ['domingo', 0],
@@ -119,10 +119,29 @@ function normalizeTypos(text) {
   t = t.replace(/\bcompromiss[ao]\b/gi, 'compromisso')
   t = t.replace(/\bconsluta\b|\bconsulat\b/gi, 'consulta')
   t = t.replace(/\bmedico\b/gi, 'm\u00e9dico')
-  t = t.replace(/\bagendar?\b/gi, (m) => m) // deixa como est\u00e1 \u2014 j\u00e1 coberto
-  t = t.replace(/\bageda\b|\bagedna\b/gi, 'agenda')
+  t = t.replace(/\bageda\b|\bagedna\b|\bagendar?\b/gi, (m) => /^agend/i.test(m) ? m : 'agenda')
   t = t.replace(/\bcaneclar\b|\bcanclear\b/gi, 'cancelar')
-  t = t.replace(/\breagendaar\b|\bremarcar\b/gi, 'reagendar')
+  t = t.replace(/\breagendaar\b/gi, 'reagendar')
+
+  // Verbos informais de agendamento
+  t = t.replace(/\bbot[ao]\b/gi, 'coloca')
+  t = t.replace(/\bregistra\b|\bregistrar?\b/gi, 'anotar')
+  t = t.replace(/\bp\u00f5e\b|\bpoe\b/gi, 'coloca')
+  t = t.replace(/\bsalv[ao]\b/gi, 'salvar')
+
+  // Novos tipos de evento com typo comum
+  t = t.replace(/\bexeme\b|\bezame\b|\bezam[e]?\b/gi, 'exame')
+  t = t.replace(/\bvascina\b|\bvaciani\b/gi, 'vacina')
+  t = t.replace(/\banivers[a\u00e1]iro\b|\baniversaro\b|\baniversar[iy]o\b/gi, 'anivers\u00e1rio')
+  t = t.replace(/\bviajem\b/gi, 'viagem')
+  t = t.replace(/\bacademai\b|\bacadema\b/gi, 'academia')
+  t = t.replace(/\btrieno\b|\btreini\b/gi, 'treino')
+  t = t.replace(/\baula[s]?\b/gi, (m) => m) // j\u00e1 ok
+  t = t.replace(/\bentrevsta\b|\bentrevist[ao]\b/gi, 'entrevista')
+  t = t.replace(/\bcirurgi[ao]\b/gi, 'cirurgia')
+  t = t.replace(/\bbolt[eo]\b/gi, 'boleto')
+  t = t.replace(/\bpagamt[eo]\b|\bpgto\b|\bpgmt\b/gi, 'pagamento')
+  t = t.replace(/\bconsulat[\u00f3o]rio\b/gi, 'consult\u00f3rio')
 
   return t
 }
@@ -380,13 +399,13 @@ function lightExtractTitle(message) {
 
   // Salta para o verbo de agendamento se houver preamble conversacional
   const schedVerb =
-    /\b(?:me\s+)?(?:marqu[ae]|agend[ae]|agenda(?=\s)|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
+    /\b(?:me\s+)?(?:marqu[ae]|agend[ae]|agenda(?=\s)|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|coloca(?=\s)|bota(?=\s)|salva(?=\s)|registra(?=\s)|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
   const schedMatch = text.match(schedVerb)
   if (schedMatch && schedMatch.index > 0) text = text.slice(schedMatch.index)
 
   // Remove verbo de agendamento no início + conector opcional (exige espaço após conector para não cortar palavras como "dentista")
   text = text.replace(
-    /^(?:me\s+)?(?:marcar|marque|agendar|agende|agenda|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|lembrete)\s+(?:(?:de|para|um|uma|o|a)\s+)*/i,
+    /^(?:me\s+)?(?:marcar|marque|agendar|agende|agenda|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|coloca|bota|salva|registra|registrar|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|preciso|precisa|lembrete)\s+(?:(?:de|para|um|uma|o|a|ir\s+ao?|ir\s+na?)\s+)*/i,
     ''
   )
 
@@ -428,7 +447,7 @@ function extractTitle(message) {
 
   // 3. Localiza verbo de agendamento em QUALQUER posição; salta preamble conversacional
   const schedVerb =
-    /\b(?:me\s+)?(?:marqu[ae]|agend[ae]|agenda(?=\s)|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
+    /\b(?:me\s+)?(?:marqu[ae]|agend[ae]|agenda(?=\s)|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|coloca(?=\s)|bota(?=\s)|salva(?=\s)|registra(?=\s)|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
   const schedMatch = text.match(schedVerb)
   if (schedMatch && schedMatch.index > 0) {
     text = text.slice(schedMatch.index)
@@ -437,7 +456,7 @@ function extractTitle(message) {
   // 4. Remove verbos de agendamento no início (infinitivo + imperativo)
   // Conector com espaço obrigatório evita cortar palavras como "dentista" (não absorver "de" de "de+ntista")
   text = text.replace(
-    /^(?:me\s+)?(?:marcar|marque|agendar|agende|agenda|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|lembrete)\s+(?:(?:de|para|um|uma|o|a)\s+)*/i,
+    /^(?:me\s+)?(?:marcar|marque|agendar|agende|agenda|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|coloca|bota|salva|registra|registrar|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|preciso|precisa|lembrete)\s+(?:(?:de|para|um|uma|o|a|ir\s+ao?|ir\s+na?)\s+)*/i,
     ''
   )
   text = text.replace(/^(?:um|uma|o|a)\s+(?:compromisso|lembrete|evento)\s+(?:de|para)?\s*/i, '')
