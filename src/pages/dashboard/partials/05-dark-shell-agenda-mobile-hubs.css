@@ -432,11 +432,12 @@ body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__actions .dashboard
 }
 
 .agenda-page .agenda-floating-add {
-  display: grid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  place-items: center;
   border: none;
   border-radius: 12px;
   background: linear-gradient(180deg, #e8c677 0%, #c9a24e 100%);
@@ -444,6 +445,7 @@ body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__actions .dashboard
   font: inherit;
   font-size: 1.45rem;
   line-height: 1;
+  padding: 0 0 2px 0;
   box-shadow: 0 14px 28px -18px rgba(212, 168, 75, 0.42);
   cursor: pointer;
 }
