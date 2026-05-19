@@ -361,7 +361,6 @@ export async function getTransacoes(usuarioId, filters = {}) {
 
   const { dataInicio, dataFim, tipo, categoria_id, status, busca, somenteRecorrentes } = filters
   const { off, rangeEnd } = parseTransacoesListPagination(filters)
-  const titularNomeLista = await fetchNomeUsuarioResumo(supabaseAdmin, uid)
 
   const applyFilters = (q) => {
     let query = q.eq('usuario_id', uid)
@@ -386,9 +385,15 @@ export async function getTransacoes(usuarioId, filters = {}) {
       subcategorias(nome)
     `
 
-  let query = applyFilters(supabaseAdmin.from('transacoes').select(selectComEmbed))
+  const txQuery = applyFilters(supabaseAdmin.from('transacoes').select(selectComEmbed))
+    .order('data_transacao', { ascending: false })
+    .range(off, rangeEnd)
 
-  const { data, error } = await query.order('data_transacao', { ascending: false }).range(off, rangeEnd)
+  // Executa em paralelo: nome do titular + busca de transações
+  const [titularNomeLista, { data, error }] = await Promise.all([
+    fetchNomeUsuarioResumo(supabaseAdmin, uid),
+    txQuery,
+  ])
 
   if (error) {
     log.warn('[getTransacoes] embed falhou, fallback sem join:', error.message || error)

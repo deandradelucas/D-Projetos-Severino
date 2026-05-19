@@ -57,6 +57,8 @@ export default function Transacoes() {
   const [transacoes, setTransacoes] = useState(cachedTx || [])
   const [categorias, setCategorias] = useState([])
   const firstFetchDoneRef = useRef(false)
+  const fetchTransacoesRef = useRef(null)
+  const filterChangeSkipRef = useRef(true)
   
   // Só exibe Skeleton se o cache estiver vazio
   const [loading, setLoading] = useState(() => 
@@ -142,7 +144,7 @@ export default function Transacoes() {
       return
     }
     try {
-      await syncRecorrenciasMensais(session.id)
+      void syncRecorrenciasMensais(session.id)
       const res = await fetchWithRetry(apiUrl(`/api/transacoes?${buildTxQuery(0).toString()}`), {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
@@ -162,6 +164,9 @@ export default function Transacoes() {
       firstFetchDoneRef.current = true
     }
   }, [buildTxQuery])
+
+  // Mantém ref sempre atualizada sem precisar de dep no useEffect abaixo
+  fetchTransacoesRef.current = fetchTransacoes
 
   const loadMoreTransacoes = useCallback(async () => {
     if (loading || refreshing || loadingMore || !hasMore) return
@@ -188,18 +193,33 @@ export default function Transacoes() {
     }
   }, [loading, refreshing, loadingMore, hasMore, transacoes.length, buildTxQuery])
 
+  // Reset de estado ao trocar de usuário
   useEffect(() => {
     firstFetchDoneRef.current = false
+    filterChangeSkipRef.current = true
   }, [usuario.id])
 
+  // Carga inicial: dispara imediatamente sem depender de fetchTransacoes
+  // (que muda a cada alteração de filtro — evita re-runs desnecessários)
   useEffect(() => {
     const session = readHorizonteUser()
     if (session?.id) {
       fetchCategorias()
-      fetchTransacoes()
+      fetchTransacoesRef.current()
       fetchRecorrencias()
     }
-  }, [usuario.id, fetchCategorias, fetchTransacoes, fetchRecorrencias])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuario.id, fetchCategorias, fetchRecorrencias])
+
+  // Filtros: debounce de 400ms para evitar fetch a cada tecla
+  useEffect(() => {
+    if (filterChangeSkipRef.current) {
+      filterChangeSkipRef.current = false
+      return
+    }
+    const t = setTimeout(() => void fetchTransacoesRef.current?.(), 400)
+    return () => clearTimeout(t)
+  }, [filters])
 
   /** Lista filtrada: alinhar ao cache global quando há novo fetch (ex.: despesa/receita pelo WhatsApp). */
   useEffect(() => {
