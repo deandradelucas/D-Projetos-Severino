@@ -415,13 +415,7 @@ export default function Agenda() {
             </div>
 
             <div className="agenda-modal__actions">
-              {editing ? (
-                <button type="button" className="agenda-danger-btn" onClick={() => setConfirmDeleteOpen(true)} disabled={saving}>
-                  Remover
-                </button>
-              ) : (
-                <span aria-hidden="true" />
-              )}
+              <span aria-hidden="true" />
               <div className="agenda-modal__actions-main">
                 <button type="button" className="agenda-secondary-btn" onClick={() => setModalOpen(false)} disabled={saving}>Cancelar</button>
                 <button type="submit" className="dashboard-hub__btn dashboard-hub__btn--primary" disabled={saving}>
