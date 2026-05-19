@@ -76,8 +76,10 @@ export function prefetchRoute(path) {
   })
 }
 
-/** Rotas do menu principal (shell autenticado) — pré-carrega para troca de aba rápida. */
-const APP_NAV_PATHS = ['/dashboard', '/transacoes', '/investimentos', '/relatorios', '/agenda', '/pagamento', '/configuracoes']
+// Apenas as 3 rotas mais leves e mais acessadas são pré-carregadas em idle.
+// Investimentos (recharts 370KB + canvas 351KB) e Relatorios (jspdf 430KB + canvas 351KB)
+// ficam fora: são carregados sob demanda ao navegar, não em background.
+const APP_NAV_PATHS = ['/dashboard', '/transacoes', '/agenda']
 
 /** Dispara `import()` de todas as telas do menu (deduplicado). Útil ao abrir o menu no mobile. */
 export function prefetchAppNavChunksNow() {
