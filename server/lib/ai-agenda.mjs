@@ -8,7 +8,7 @@ import {
 } from './ai/gemini-client.mjs'
 import { tryParseJsonBlock } from './ai/parsers.mjs'
 
-const TRAILING_STOPWORDS = /[\s,;.]*(para|de|do|da|dos|das|com|a|ao|aos|às|e|ou|que|um|uma|o|os|as|no|na|nos|nas|pelo|pela|pelos|pelas|num|numa|por|sem|sob|sobre|até|após|ante|perante|entre|contra|durante|mediante|exceto|salvo|conforme|segundo)\s*[.,;]*$/i
+const TRAILING_STOPWORDS = /[\s,;.]+(?:para|de|do|da|dos|das|com|a|ao|aos|às|e|ou|que|um|uma|o|os|as|no|na|nos|nas|pelo|pela|pelos|pelas|num|numa|por|sem|sob|sobre|até|após|ante|perante|entre|contra|durante|mediante|exceto|salvo|conforme|segundo)\s*[.,;]*$/i
 
 function sanitizeTitulo(raw) {
   let t = raw.replace(/[.,;]+$/, '').trim()
