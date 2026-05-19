@@ -362,7 +362,7 @@ function lightExtractTitle(message) {
   )
 }
 
-const _TRAILING_SW = /[\s,;.]*(para|de|do|da|dos|das|com|a|ao|aos|às|e|ou|que|um|uma|o|os|as|no|na|nos|nas|pelo|pela|pelos|pelas|num|numa|por|sem|sob|sobre|até|após|ante|entre|contra|durante|sem)\s*[.,;]*$/i
+const _TRAILING_SW = /[\s,;.]+(?:para|de|do|da|dos|das|com|a|ao|aos|às|e|ou|que|um|uma|o|os|as|no|na|nos|nas|pelo|pela|pelos|pelas|num|numa|por|sem|sob|sobre|até|após|ante|entre|contra|durante)\s*[.,;]*$/i
 
 function stripTrailingStopwords(t) {
   let s = t.replace(/[.,;]+$/, '').trim()
