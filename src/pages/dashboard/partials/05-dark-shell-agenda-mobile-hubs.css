@@ -77,6 +77,7 @@
 
 body:has(.agenda-modal-backdrop) .mobile-bottom-nav,
 body:has(.agenda-modal-backdrop) .dashboard-mobile-tx-fab,
+body:has(.agenda-modal-backdrop) .dashboard-mobile-fabs,
 body:has(.agenda-modal-backdrop) .horizon-chat-fab,
 body:has(.agenda-modal-backdrop) .horizon-chat-window,
 body:has(.agenda-modal-backdrop) .pwa-install-sheet {
@@ -823,6 +824,20 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
 
   .agenda-page .agenda-calendar-day {
     min-height: 44px;
+  }
+}
+
+@media (max-width: 768px) {
+  body:has(.dashboard-mobile-fabs) .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    padding-bottom: calc(130px + var(--safe-bottom));
+  }
+
+  .agenda-page .agenda-hero .dashboard-hub__hero-actions {
+    display: none !important;
+  }
+
+  .agenda-page .agenda-floating-add {
+    display: none !important;
   }
 }
 

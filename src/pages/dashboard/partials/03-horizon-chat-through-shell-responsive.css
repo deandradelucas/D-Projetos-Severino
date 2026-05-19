@@ -732,7 +732,8 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   body.horizon-chat-open:has(.mobile-bottom-nav) .dashboard-container.app-horizon-shell .main-content,
   body.horizon-chat-open:has(.mobile-bottom-nav) .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
   body.horizon-chat-open:has(.dashboard-mobile-tx-fab) .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
-  body.horizon-chat-open:has(.dashboard-mobile-fabs) .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+  body.horizon-chat-open:has(.dashboard-mobile-fabs) .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
+  body.horizon-chat-open:has(.dashboard-mobile-fabs) .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
   }
 
