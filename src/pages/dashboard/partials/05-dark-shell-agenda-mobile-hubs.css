@@ -685,6 +685,7 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions button {
   flex-shrink: 0;
   object-fit: contain;
   pointer-events: none;
+  border-radius: 999px;
 }
 
 .agenda-page .agenda-day-item__actions .agenda-day-item__btn--danger:focus-visible {
@@ -706,10 +707,19 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions button {
   }
 
   .agenda-page .agenda-day-item__actions .agenda-day-item__btn--delete {
-    flex: 0 0 40px;
-    width: 40px;
-    min-width: 40px;
+    flex: 0 0 2.75rem;
+    width: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 40px;
     padding: 0;
+    border: none;
+    background: transparent !important;
+    box-shadow: none;
+  }
+
+  .agenda-page .agenda-day-item__actions .agenda-day-item__btn--delete:active {
+    transform: scale(0.92);
+    opacity: 0.88;
   }
 
   .agenda-page .agenda-day-item__btn-label {
@@ -718,7 +728,17 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions button {
 
   .agenda-page .agenda-day-item__delete-icon {
     display: block;
+    width: 1.375rem;
+    height: 1.375rem;
+    box-shadow:
+      0 2px 6px rgba(220, 38, 38, 0.28),
+      0 0 0 1px rgba(255, 255, 255, 0.12) inset;
   }
+}
+
+body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item__btn--delete {
+  background: transparent !important;
+  border: none !important;
 }
 
 @media (min-width: 560px) {
@@ -746,6 +766,13 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions button {
   .agenda-page .agenda-day-item__actions .agenda-day-item__btn--danger {
     flex: 0 1 auto;
     min-width: 4.25rem;
+  }
+
+  .agenda-page .agenda-day-item__actions .agenda-day-item__btn--delete .agenda-day-item__delete-icon {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    box-shadow: none;
   }
 }
 
