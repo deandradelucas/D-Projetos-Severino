@@ -310,6 +310,10 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-avatar--cl
   gap: 12px;
 }
 
+.config-field-grid--single {
+  grid-template-columns: 1fr;
+}
+
 /* Mobile: coluna única */
 @media (max-width: 639px) {
   .config-field-grid {
@@ -455,6 +459,15 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-avatar--cl
   color: var(--bg-card);
 }
 
+@media (hover: hover) {
+  .page-configuracoes.app-horizon-shell .config-action-btn--primary:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--accent) 44%, var(--border-default));
+    background: color-mix(in srgb, var(--accent) 9%, var(--bg-card));
+    color: #0f172a;
+    transform: translateY(-1px);
+  }
+}
+
 /* ——— Preference rows ——— */
 .config-pref-row {
   display: flex;
@@ -588,13 +601,6 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-avatar--cl
 
 .config-themes--compact .config-theme-body {
   padding: 11px 12px 12px;
-}
-
-/* Mobile: compact → coluna única */
-@media (max-width: 639px) {
-  .config-themes--compact {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ——— Security card ——— */
@@ -736,77 +742,182 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-avatar--cl
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact {
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card {
-  border-radius: 14px;
-  border-width: 1px;
-  box-shadow: none;
+  min-width: 0;
+  border-radius: 16px;
+  border: 1.5px solid color-mix(in srgb, var(--border-default) 88%, transparent);
+  background: var(--bg-card);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 6px 18px -10px rgba(15, 23, 42, 0.1);
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card:hover {
-  box-shadow: 0 8px 20px -14px rgba(15, 23, 42, 0.14);
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--border-default));
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.05),
+    0 12px 28px -12px rgba(15, 23, 42, 0.16);
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card.is-active {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent-border);
+  border-color: color-mix(in srgb, var(--accent) 72%, var(--border-default));
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent),
+    0 10px 28px -10px color-mix(in srgb, var(--accent) 28%, rgba(15, 23, 42, 0.12));
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-card.is-active::after {
   content: '✓';
   position: absolute;
-  top: 6px;
-  right: 6px;
-  z-index: 2;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
   display: grid;
   place-items: center;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.35rem;
+  height: 1.35rem;
   border-radius: 999px;
-  font-size: 0.58rem;
+  font-size: 0.6rem;
   font-weight: 900;
   line-height: 1;
-  color: color-mix(in srgb, var(--bg-card) 92%, var(--text-primary));
-  background: linear-gradient(145deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #1e293b));
-  box-shadow: 0 1px 6px color-mix(in srgb, var(--accent) 35%, transparent);
+  color: #1a1206;
+  background: linear-gradient(155deg, #f0d78a 0%, var(--accent) 48%, #a67c2e 100%);
+  box-shadow:
+    0 2px 8px color-mix(in srgb, var(--accent) 45%, transparent),
+    0 0 0 2px rgba(255, 255, 255, 0.92);
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-preview {
-  height: 36px;
-  border-bottom: 1px solid color-mix(in srgb, var(--border-default) 80%, transparent);
+  position: relative;
+  display: block;
+  height: auto;
+  min-height: 52px;
+  padding: 10px 10px 8px;
+  border-bottom: none;
+  overflow: hidden;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-preview--light {
-  background:
-    linear-gradient(180deg, #cbd5e1 0%, #cbd5e1 13px, #f8fafc 13px, #f1f5f9 45%, #e2e8f0 100%);
-  box-shadow: inset 0 -12px 24px -8px rgba(148, 163, 184, 0.2);
+  background: linear-gradient(165deg, #e8eef6 0%, #f8fafc 42%, #ffffff 100%);
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-preview--dark {
-  background:
-    linear-gradient(180deg, #3f3f46 0%, #3f3f46 13px, #18181b 13px, #0a0a0a 55%, #000000 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -16px 32px -10px rgba(0, 0, 0, 0.75);
+  background: linear-gradient(165deg, #27272a 0%, #141414 48%, #050505 100%);
 }
 
-.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-body {
-  padding: 8px 10px 10px;
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-mock {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-mock__traffic {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-mock__traffic i {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.35;
+  font-style: normal;
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-preview--light .config-theme-mock__traffic {
+  color: #94a3b8;
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-preview--dark .config-theme-mock__traffic {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-mock__surface {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 7px 8px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-preview--light .config-theme-mock__surface {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(226, 232, 240, 0.95);
+  box-shadow: 0 4px 14px -8px rgba(15, 23, 42, 0.12);
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-preview--dark .config-theme-mock__surface {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.65);
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-mock__line {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  width: 88%;
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-mock__line--short {
+  width: 58%;
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-preview--light .config-theme-mock__line {
+  background: linear-gradient(90deg, #cbd5e1, #e2e8f0);
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-preview--light .config-theme-mock__line--short {
+  background: linear-gradient(90deg, #e2e8f0, #f1f5f9);
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-preview--dark .config-theme-mock__line {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1));
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-preview--dark .config-theme-mock__line--short {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-card--light .config-theme-body {
+  padding: 10px 12px 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-card--dark .config-theme-body {
+  padding: 10px 12px 12px;
+  background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-body h4 {
-  margin: 0 0 2px;
-  font-size: 0.84rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  margin: 0 0 3px;
+  font-size: 0.86rem;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-body p {
-  font-size: 0.7rem;
+  margin: 0;
+  font-size: 0.68rem;
   line-height: 1.35;
-  opacity: 0.9;
+  color: var(--text-secondary);
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-preference-list {
@@ -879,22 +990,35 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--pref
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card {
   background: #0a0a0a;
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 16px 40px -24px rgba(0, 0, 0, 0.75);
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 12px 32px -18px rgba(0, 0, 0, 0.8);
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card:hover {
-  border-color: rgba(255, 255, 255, 0.14);
+  border-color: color-mix(in srgb, var(--accent) 32%, rgba(255, 255, 255, 0.14));
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card.is-active {
-  border-color: color-mix(in srgb, var(--accent) 55%, rgba(255, 255, 255, 0.12));
+  border-color: color-mix(in srgb, var(--accent) 62%, rgba(255, 255, 255, 0.14));
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent),
-    0 14px 40px -16px rgba(0, 0, 0, 0.85),
-    0 1px 0 rgba(212, 168, 75, 0.12) inset;
+    0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent),
+    0 12px 36px -14px rgba(0, 0, 0, 0.88),
+    0 1px 0 rgba(212, 168, 75, 0.1) inset;
+}
+
+body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-card--light .config-theme-body,
+body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-card--dark .config-theme-body {
+  background: linear-gradient(180deg, #141414 0%, #0a0a0a 100%);
+}
+
+body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-body h4 {
+  color: #f4f4f5;
+}
+
+body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-body p {
+  color: rgba(161, 161, 170, 0.95);
 }
 
 /* ——— Toast ——— */
@@ -1336,6 +1460,35 @@ body[data-theme='dark'] .config-familia-convite-shell__preview-erro {
   margin-bottom: 12px;
 }
 
+.page-configuracoes.app-horizon-shell .config-familia-intro {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  line-height: 1.38;
+}
+
+/* Família — convite + conta familiar após Aparência */
+.config-familia-group,
+.config-layout__full-span {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 18px;
+  width: 100%;
+}
+
+.page-configuracoes.app-horizon-shell .config-familia-convite-interno {
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--border-default) 72%, transparent);
+}
+
+.page-configuracoes.app-horizon-shell .config-familia-convite-interno .config-subsection__title {
+  margin: 0 0 6px;
+}
+
+.page-configuracoes.app-horizon-shell .config-familia-convite-interno .config-familia-intro {
+  margin-bottom: 10px;
+}
+
 /* ——— Gerar convite: papel + botão ——— */
 .config-familia-generate-row {
   display: grid;
@@ -1500,7 +1653,12 @@ body[data-theme='dark'] .switch-apple:checked {
     transform: none;
   }
 
-  .page-configuracoes.app-horizon-shell .config-card--preferences .config-pref-row--clean {
+  .page-configuracoes.app-horizon-shell .config-card--preferences .config-pref-row--clean,
+  .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card {
     transition: none;
+  }
+
+  .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card:hover {
+    transform: none;
   }
 }

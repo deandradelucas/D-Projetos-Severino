@@ -169,7 +169,6 @@ export default function Configuracoes() {
 
   const isAdmin = String(perfil.role || '').toUpperCase() === 'ADMIN'
   const profileInitial = (perfil.nome || perfil.email || '?').charAt(0).toUpperCase()
-  const roleLabel = isAdmin ? 'Administrador' : 'Usuário'
   const telefoneLabel = perfil.telefone ? formatPhoneBRDisplay(perfil.telefone) : 'Não informado'
 
   const abrirEditarTelefone = () => {
@@ -219,11 +218,6 @@ export default function Configuracoes() {
     } finally {
       setTelefoneSaving(false)
     }
-  }
-
-  const copiarEmail = () => {
-    if (!perfil.email) return
-    navigator.clipboard.writeText(perfil.email).then(() => showToast('E-mail copiado.')).catch(() => {})
   }
 
   const copiarConviteFamilia = useCallback((texto) => {
@@ -426,11 +420,7 @@ export default function Configuracoes() {
               </div>
             </div>
 
-            <div className="config-field-grid" aria-label="Dados do perfil">
-              <div className="config-field">
-                <span>Perfil</span>
-                <strong>{roleLabel}</strong>
-              </div>
+            <div className="config-field-grid config-field-grid--single" aria-label="Dados do perfil">
               <div className="config-field">
                 <span>Telefone</span>
                 <strong>{telefoneLabel}</strong>
@@ -498,9 +488,6 @@ export default function Configuracoes() {
             ) : null}
 
             <div className="config-quick-actions">
-              <button type="button" className="config-action-btn" onClick={copiarEmail} disabled={!perfil.email}>
-                Copiar e-mail
-              </button>
               <button type="button" className="config-action-btn" onClick={abrirEditarTelefone} disabled={!usuarioIdHeader}>
                 {perfil.telefone ? 'Alterar telefone' : 'Cadastrar telefone'}
               </button>
@@ -514,39 +501,62 @@ export default function Configuracoes() {
             togglePrivacy={togglePrivacy}
           />
 
-          {familiaPainelCarregado && Boolean(usuarioIdHeader) && !perfil.conta_familiar_membro && familiaTitular === false && (
-            <section className="config-card config-card--full" id="config-secao-convite-familia">
-              <div className="config-card-head">
-                <span className="config-card-kicker">Família</span>
-                <h2 className="config-card-title-clean">Entrar em uma família</h2>
-                <p className="config-card-subtitle">
-                  Cole o <strong>código</strong> ou o <strong>link</strong> de convite enviado pelo titular para vincular sua conta à conta familiar.
-                </p>
-              </div>
-              <FamiliaConviteColarBlock
-                idPrefix="config-familia-convite"
-                usuarioIdParaAceitar={usuarioIdHeader}
-                visualVariant="shell"
-                onAceitarSucesso={(data) => {
-                  showToast(data?.message || 'Convite familiar aceito.')
-                  void refreshAssinaturaPerfil()
-                  void loadFamiliaPainel()
-                }}
-                onAceitarErro={(msg) => showToast(msg)}
-              />
-            </section>
-          )}
+          <div className="config-familia-group config-layout__full-span">
+            {Boolean(usuarioIdHeader) && !perfil.conta_familiar_membro && familiaTitular !== true ? (
+              <section className="config-card config-card--full" id="config-secao-convite-familia">
+                <div className="config-card-head">
+                  <span className="config-card-kicker">Família</span>
+                  <h2 className="config-card-title-clean">Código de convite familiar</h2>
+                  <p className="config-card-subtitle config-familia-intro">
+                    Cole o <strong>link</strong> ou o <strong>código</strong> que o titular enviou. Quando aparecer convite válido, toque em{' '}
+                    <strong>Vincular à esta conta</strong>.
+                  </p>
+                </div>
+                <FamiliaConviteColarBlock
+                  idPrefix="config-familia-convite"
+                  usuarioIdParaAceitar={usuarioIdHeader}
+                  visualVariant="shell"
+                  onAceitarSucesso={(data) => {
+                    showToast(data?.message || 'Convite familiar aceito.')
+                    void refreshAssinaturaPerfil()
+                    void loadFamiliaPainel()
+                  }}
+                  onAceitarErro={(msg) => showToast(msg)}
+                />
+              </section>
+            ) : null}
 
-          {familiaTitular === true && (
-            <section className="config-card config-card--full">
+            {familiaTitular === true ? (
+            <section className="config-card config-card--full config-familia-titular-card">
               <div className="config-card-head">
                 <span className="config-card-kicker">Família</span>
                 <h2 className="config-card-title-clean">Conta familiar</h2>
-                <p className="config-card-subtitle">
-                  Convites com link ou código curto, validade e revogação. Cada familiar usa login próprio para ver e lançar dados; só o <strong>titular</strong> gere convites e membros aqui — quem foi convidado não altera estas definições.{' '}
-                  <strong>Limite:</strong> 5 pessoas no total (titular + até 4 vinculados). Convites pendentes ocupam vaga até aceitos, expirarem ou serem removidos.
+                <p className="config-card-subtitle config-familia-intro">
+                  Convide por link ou código. Cada familiar com login próprio; só o <strong>titular</strong> gere convites e membros aqui.{' '}
+                  <strong>Até 5</strong> (titular + 4) — pendentes contam na vaga até aceitar ou expirar.
                 </p>
               </div>
+
+              {!perfil.conta_familiar_membro ? (
+                <div className="config-subsection config-familia-convite-interno" id="config-secao-convite-familia">
+                  <h3 className="config-subsection__title">Código de convite familiar</h3>
+                  <p className="config-card-subtitle config-familia-intro">
+                    Recebeu convite de outra família? Cole o <strong>link</strong> ou o <strong>código</strong> e confirme em{' '}
+                    <strong>Vincular à esta conta</strong>.
+                  </p>
+                  <FamiliaConviteColarBlock
+                    idPrefix="config-familia-convite-titular"
+                    usuarioIdParaAceitar={usuarioIdHeader}
+                    visualVariant="shell"
+                    onAceitarSucesso={(data) => {
+                      showToast(data?.message || 'Convite familiar aceito.')
+                      void refreshAssinaturaPerfil()
+                      void loadFamiliaPainel()
+                    }}
+                    onAceitarErro={(msg) => showToast(msg)}
+                  />
+                </div>
+              ) : null}
 
               {familiaLoadErr ? <p className="config-empty-note">{familiaLoadErr}</p> : null}
 
@@ -745,7 +755,8 @@ export default function Configuracoes() {
               )}
               </div>
             </section>
-          )}
+            ) : null}
+          </div>
 
           <ConfigBiometriaCard
             usuarioIdHeader={usuarioIdHeader}
