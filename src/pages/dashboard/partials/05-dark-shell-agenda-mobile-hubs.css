@@ -850,11 +850,22 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
     display: none !important;
   }
 
-  /* iOS Safari: com 0-1 itens o conteúdo pode não ultrapassar a altura do container (shell usa
-     100dvh − safe-areas; hero tem margin-top negativa igual ao notch). min-height garante overflow
-     suficiente para o scroll funcionar em qualquer iPhone, incluindo modelos Pro/Max maiores. */
-  .agenda-page .agenda-list-panel--daily {
-    min-height: max(160px, calc(100svh - 490px));
+  /* Lista/calendário: altura pelo conteúdo — evita fundo branco cortado com vários itens
+     (.ref-dashboard-scroll tem height:100% em flex; shrink:0 impede encolher o cartão). */
+  .agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > .agenda-calendar-panel,
+  .agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > .agenda-list-panel--daily {
+    flex: 0 0 auto !important;
+    flex-shrink: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    align-self: stretch;
+    box-sizing: border-box;
+  }
+
+  .agenda-page .agenda-list-panel--daily .agenda-daily-list {
+    min-height: 0;
   }
 }
 
