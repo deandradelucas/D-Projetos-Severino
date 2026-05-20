@@ -61,6 +61,10 @@ export default function Transacoes() {
   const fetchTransacoesRef = useRef(null)
   const filterChangeSkipRef = useRef(true)
   const scrollContainerRef = useRef(null)
+  const txLoadMoreSentinelRef = useRef(null)
+  const [useDesktopTxGrid, setUseDesktopTxGrid] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 769px)').matches,
+  )
   
   // Só exibe Skeleton se o cache estiver vazio
   const [loading, setLoading] = useState(() => 
@@ -195,10 +199,19 @@ export default function Transacoes() {
     }
   }, [loading, refreshing, loadingMore, hasMore, transacoes.length, buildTxQuery])
 
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 769px)')
+    const sync = () => setUseDesktopTxGrid(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
+
   const virtualizer = useVirtualizer({
-    count: transacoes.length,
+    count: useDesktopTxGrid ? 0 : transacoes.length,
     getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => 72,
+    estimateSize: () => 172,
+    gap: 14,
     overscan: 5,
   })
 
@@ -229,10 +242,11 @@ export default function Transacoes() {
     return () => clearTimeout(t)
   }, [filters])
 
-  // Infinite scroll: carrega mais quando último item virtual fica visível
+  // Infinite scroll (mobile virtualizado): carrega mais quando último item virtual fica visível
   const virtualItems = virtualizer.getVirtualItems()
   const lastVirtualIndex = virtualItems[virtualItems.length - 1]?.index ?? -1
   useEffect(() => {
+    if (useDesktopTxGrid) return
     if (
       lastVirtualIndex >= transacoes.length - 1 &&
       hasMore &&
@@ -243,7 +257,23 @@ export default function Transacoes() {
       void loadMoreTransacoes()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastVirtualIndex, hasMore, loadingMore, loading, refreshing, transacoes.length])
+  }, [useDesktopTxGrid, lastVirtualIndex, hasMore, loadingMore, loading, refreshing, transacoes.length])
+
+  // Infinite scroll (desktop — linhas são filhos diretos da grelha de cartões)
+  useEffect(() => {
+    if (!useDesktopTxGrid || !hasMore || loading || refreshing || loadingMore) return
+    const root = scrollContainerRef.current
+    const target = txLoadMoreSentinelRef.current
+    if (!root || !target) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) void loadMoreTransacoes()
+      },
+      { root, rootMargin: '240px' },
+    )
+    io.observe(target)
+    return () => io.disconnect()
+  }, [useDesktopTxGrid, hasMore, loading, refreshing, loadingMore, transacoes.length, loadMoreTransacoes])
 
   /** Lista filtrada: alinhar ao cache global quando há novo fetch (ex.: despesa/receita pelo WhatsApp). */
   useEffect(() => {
@@ -512,45 +542,61 @@ export default function Transacoes() {
                   <span className="ref-tx-list-head__val">Valor</span>
                   <span className="ref-tx-list-head__actions">Ações</span>
                 </div>
-                {/* Contêiner virtual: apenas os itens visíveis são renderizados no DOM */}
-                <div
-                  style={{
-                    height: virtualizer.getTotalSize(),
-                    position: 'relative',
-                    gridColumn: '1 / -1',
-                  }}
-                >
-                  {virtualItems.map((vRow) => {
-                    const t = transacoes[vRow.index]
-                    return (
-                      <div
-                        key={vRow.key}
-                        data-index={vRow.index}
-                        ref={virtualizer.measureElement}
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          transform: `translateY(${vRow.start}px)`,
-                        }}
-                      >
-                        <TransacaoRow
-                          t={t}
-                          mostrarQuemLancou={mostrarQuemLancou}
-                          privacyMode={privacyMode}
-                          onEdit={(tx) => {
-                            setEditingTransaction(tx)
-                            setIsModalOpen(true)
+                {useDesktopTxGrid ? (
+                  transacoes.map((t) => (
+                    <TransacaoRow
+                      key={t.id}
+                      t={t}
+                      mostrarQuemLancou={mostrarQuemLancou}
+                      privacyMode={privacyMode}
+                      onEdit={(tx) => {
+                        setEditingTransaction(tx)
+                        setIsModalOpen(true)
+                      }}
+                      onDelete={handleDelete}
+                    />
+                  ))
+                ) : (
+                  <div
+                    className="ref-tx-virtual-scroll"
+                    style={{
+                      height: virtualizer.getTotalSize(),
+                      position: 'relative',
+                      gridColumn: '1 / -1',
+                    }}
+                  >
+                    {virtualItems.map((vRow) => {
+                      const t = transacoes[vRow.index]
+                      return (
+                        <div
+                          key={vRow.key}
+                          data-index={vRow.index}
+                          ref={virtualizer.measureElement}
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            transform: `translateY(${vRow.start}px)`,
                           }}
-                          onDelete={handleDelete}
-                        />
-                      </div>
-                    )
-                  })}
-                </div>
+                        >
+                          <TransacaoRow
+                            t={t}
+                            mostrarQuemLancou={mostrarQuemLancou}
+                            privacyMode={privacyMode}
+                            onEdit={(tx) => {
+                              setEditingTransaction(tx)
+                              setIsModalOpen(true)
+                            }}
+                            onDelete={handleDelete}
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
-              <div className="page-transacoes-load-more">
+              <div ref={txLoadMoreSentinelRef} className="page-transacoes-load-more">
                 <p className="page-transacoes-tx-meta" aria-live="polite">
                   {transacoes.length}{' '}
                   {transacoes.length === 1 ? 'transação' : 'transações'}
