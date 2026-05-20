@@ -616,8 +616,14 @@
 
 /* Agenda — desktop (≥901px): hero vidro + painéis como KPI do dashboard inicial */
 @media (min-width: 901px) {
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+    background: #ffffff !important;
+    background-image: none !important;
+  }
+
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    background: transparent !important;
+    background: #ffffff !important;
+    background-image: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
   }

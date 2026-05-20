@@ -2424,7 +2424,7 @@ body[data-theme='dark'] .agenda-page .agenda-toggle {
 
 .agenda-page .main-content.ref-dashboard-main,
 body[data-theme='light'] .agenda-page .main-content.ref-dashboard-main {
-  background: #f3f4f7 !important;
+  background: #ffffff !important;
   border: none !important;
   box-shadow: none !important;
 }
@@ -2592,7 +2592,7 @@ body[data-theme='dark'] .agenda-page .agenda-event__local {
     min-height: 100svh !important;
     padding: 0 !important;
     overflow-x: hidden !important;
-    background: #f3f4f7 !important;
+    background: #ffffff !important;
   }
 
   body[data-theme='dark'] .agenda-page.dashboard-container {
