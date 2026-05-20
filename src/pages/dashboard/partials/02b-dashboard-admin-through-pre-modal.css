@@ -61,6 +61,15 @@
   display: none;
 }
 
+/* Menu inferior mobile — mesma tipografia que sidebar / Transações (Poppins + fallbacks) */
+.mobile-bottom-nav,
+.mobile-bottom-nav__item,
+.mobile-bottom-nav__label {
+  font-family: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .mobile-bottom-nav {
   display: none;
 }

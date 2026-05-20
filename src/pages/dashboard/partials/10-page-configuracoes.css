@@ -699,108 +699,82 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-avatar--cl
 .page-configuracoes.app-horizon-shell .config-card--preferences {
   align-self: stretch;
   overflow: hidden;
-  border-radius: 26px;
-  padding: 20px 22px 22px;
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border-default));
-  box-shadow:
-    0 1px 0 color-mix(in srgb, var(--accent) 8%, transparent) inset,
-    0 24px 48px -28px color-mix(in srgb, var(--accent) 18%, transparent),
-    0 12px 32px -18px rgba(15, 23, 42, 0.12);
+  border-radius: 18px;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-sm);
 }
 
-.page-configuracoes.app-horizon-shell .config-card--preferences::before {
-  background:
-    radial-gradient(ellipse 100% 85% at 0% -30%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 52%),
-    radial-gradient(circle at 100% 0%, rgba(124, 58, 237, 0.09), transparent 42%),
-    radial-gradient(ellipse 80% 60% at 50% 110%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 55%);
-}
-
+.page-configuracoes.app-horizon-shell .config-card--preferences::before,
 .page-configuracoes.app-horizon-shell .config-card--preferences::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 18%;
-  right: 18%;
-  height: 3px;
-  border-radius: 0 0 6px 6px;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    color-mix(in srgb, var(--accent) 55%, transparent) 22%,
-    var(--accent) 50%,
-    color-mix(in srgb, var(--accent) 55%, transparent) 78%,
-    transparent 100%
-  );
-  opacity: 0.9;
-  box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--accent) 35%, transparent);
+  display: none;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences:hover {
-  border-color: color-mix(in srgb, var(--accent) 32%, var(--border-default));
-  box-shadow:
-    0 1px 0 color-mix(in srgb, var(--accent) 10%, transparent) inset,
-    0 28px 56px -26px color-mix(in srgb, var(--accent) 22%, transparent),
-    0 14px 36px -16px rgba(15, 23, 42, 0.14);
+  border-color: rgba(148, 163, 184, 0.45);
+  box-shadow: var(--shadow-md);
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-card-head {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-card-kicker {
-  color: color-mix(in srgb, var(--accent) 42%, var(--text-secondary));
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-card-title-clean {
+  margin: 4px 0 0;
+  font-size: clamp(1.05rem, 2.8vw, 1.2rem);
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-card-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.3;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact {
-  gap: 14px;
+  gap: 8px;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card {
-  border-radius: 20px;
+  border-radius: 14px;
   border-width: 1px;
-  box-shadow:
-    0 1px 0 color-mix(in srgb, var(--text-primary) 6%, transparent) inset,
-    0 10px 28px -16px rgba(15, 23, 42, 0.14);
+  box-shadow: none;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card:hover {
-  box-shadow:
-    0 1px 0 color-mix(in srgb, var(--text-primary) 8%, transparent) inset,
-    0 16px 40px -14px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 8px 20px -14px rgba(15, 23, 42, 0.14);
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card.is-active {
-  border-color: color-mix(in srgb, var(--accent) 65%, var(--border-default));
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent),
-    0 12px 36px -12px color-mix(in srgb, var(--accent) 28%, transparent),
-    0 1px 0 color-mix(in srgb, var(--accent) 14%, transparent) inset;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-border);
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-card.is-active::after {
   content: '✓';
   position: absolute;
-  top: 9px;
-  right: 9px;
+  top: 6px;
+  right: 6px;
   z-index: 2;
   display: grid;
   place-items: center;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
   border-radius: 999px;
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 900;
   line-height: 1;
   color: color-mix(in srgb, var(--bg-card) 92%, var(--text-primary));
   background: linear-gradient(145deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #1e293b));
-  box-shadow:
-    0 2px 8px color-mix(in srgb, var(--accent) 40%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent) inset;
+  box-shadow: 0 1px 6px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-preview {
-  height: 52px;
+  height: 36px;
   border-bottom: 1px solid color-mix(in srgb, var(--border-default) 80%, transparent);
 }
 
@@ -819,36 +793,46 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-avatar--cl
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-body {
-  padding: 13px 14px 15px;
+  padding: 8px 10px 10px;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-body h4 {
-  font-size: 0.94rem;
-  font-weight: 820;
-  letter-spacing: -0.03em;
+  margin: 0 0 2px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-theme-body p {
-  font-size: 0.74rem;
-  line-height: 1.42;
-  opacity: 0.92;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  opacity: 0.9;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-preference-list {
-  margin-top: 18px;
-  padding: 6px 6px 6px 14px;
-  border-radius: 18px;
+  margin-top: 10px;
+  padding: 0 10px;
+  border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--border-default) 72%, transparent);
-  background: color-mix(in srgb, var(--bg-secondary) 58%, var(--bg-card));
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-primary) 5%, transparent);
+  background: color-mix(in srgb, var(--bg-secondary) 50%, var(--bg-card));
+  box-shadow: none;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-pref-row--clean {
   margin: 0;
-  padding: 14px 10px 14px 4px;
+  padding: 10px 0;
   border-top: none;
-  border-radius: 14px;
+  border-radius: 0;
   transition: background 0.2s ease;
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-pref-label strong {
+  font-size: 0.84rem;
+}
+
+.page-configuracoes.app-horizon-shell .config-card--preferences .config-pref-label span {
+  margin-top: 2px;
+  font-size: 0.7rem;
 }
 
 .page-configuracoes.app-horizon-shell .config-card--preferences .config-pref-row--clean:hover {
@@ -856,40 +840,31 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-avatar--cl
 }
 
 body[data-theme='light'] .page-configuracoes.app-horizon-shell .config-card--preferences {
-  background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--bg-card) 88%, var(--accent-muted)) 0%,
-    var(--bg-card) 38%,
-    color-mix(in srgb, var(--bg-card) 94%, #f8fafc) 100%
-  );
+  background: var(--bg-card);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.75) inset,
-    0 28px 56px -32px color-mix(in srgb, var(--accent) 16%, rgba(15, 23, 42, 0.08)),
-    0 10px 28px -12px rgba(15, 23, 42, 0.08);
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 6px 20px rgba(15, 23, 42, 0.05);
 }
 
 body[data-theme='light'] .page-configuracoes.app-horizon-shell .config-card--preferences:hover {
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.85) inset,
-    0 32px 64px -28px color-mix(in srgb, var(--accent) 18%, rgba(15, 23, 42, 0.1)),
-    0 12px 32px -12px rgba(15, 23, 42, 0.1);
+    0 2px 4px rgba(15, 23, 42, 0.05),
+    0 10px 28px rgba(15, 23, 42, 0.07);
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences {
-  border-color: rgba(255, 255, 255, 0.12);
-  background: linear-gradient(165deg, #0d0d0d 0%, #000000 45%, #050505 100%);
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #000000;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 28px 64px -36px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(212, 168, 75, 0.08);
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 12px 32px -20px rgba(0, 0, 0, 0.65);
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences:hover {
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.14);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.08) inset,
-    0 32px 72px -32px rgba(0, 0, 0, 0.92),
-    0 0 0 1px rgba(212, 168, 75, 0.12);
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 16px 40px -22px rgba(0, 0, 0, 0.75);
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-preference-list {
@@ -1502,8 +1477,8 @@ body[data-theme='dark'] .switch-apple:checked {
   }
 
   .page-configuracoes.app-horizon-shell .config-card--preferences {
-    padding: 1.15rem 1.2rem 1.3rem;
-    border-radius: 22px;
+    padding: 12px 14px 14px;
+    border-radius: 16px;
   }
 }
 
