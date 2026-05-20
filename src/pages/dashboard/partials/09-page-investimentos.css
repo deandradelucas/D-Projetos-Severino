@@ -1637,8 +1637,49 @@ body[data-theme='light'] .taxa-cdi-badge--hero {
     gap: 0.65rem;
   }
 
+  /* Selic + CDI: dois cartões lado a lado, compactos */
   .page-investimentos-hero__rates-row {
-    gap: 0.35rem 0.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.35rem;
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 0.3rem;
+  }
+
+  .page-investimentos-hero__rates-row .taxa-selic-badge--hero,
+  .page-investimentos-hero__rates-row .taxa-cdi-badge--hero {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    padding: 4px 7px;
+    gap: 0.12rem 0.35rem;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .page-investimentos-hero__rates-row .taxa-selic-badge__k,
+  .page-investimentos-hero__rates-row .taxa-cdi-badge__k {
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+    line-height: 1.15;
+  }
+
+  .page-investimentos-hero__rates-row .taxa-selic-badge__pill,
+  .page-investimentos-hero__rates-row .taxa-cdi-badge__pill {
+    font-size: 0.72rem;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .page-investimentos-hero__rates-row .taxa-selic-badge__pill--muted,
+  .page-investimentos-hero__rates-row .taxa-cdi-badge__pill--muted,
+  .page-investimentos-hero__rates-row .taxa-selic-badge__pill--warn,
+  .page-investimentos-hero__rates-row .taxa-cdi-badge__pill--warn {
+    font-size: 0.66rem;
   }
 
   .page-investimentos-ir-isento {
@@ -1688,10 +1729,20 @@ body[data-theme='light'] .taxa-cdi-badge--hero {
     padding-right: 0.15rem;
   }
 
-  .taxa-selic-badge--hero,
-  .taxa-cdi-badge--hero {
-    max-width: 100%;
-    justify-content: flex-start;
+  .page-investimentos-hero__rates-row .taxa-selic-badge--hero,
+  .page-investimentos-hero__rates-row .taxa-cdi-badge--hero {
+    padding: 3px 6px;
+    gap: 0.1rem 0.28rem;
+  }
+
+  .page-investimentos-hero__rates-row .taxa-selic-badge__k,
+  .page-investimentos-hero__rates-row .taxa-cdi-badge__k {
+    font-size: 0.54rem;
+  }
+
+  .page-investimentos-hero__rates-row .taxa-selic-badge__pill,
+  .page-investimentos-hero__rates-row .taxa-cdi-badge__pill {
+    font-size: 0.68rem;
   }
 
   .page-investimentos-chip {
