@@ -14,11 +14,23 @@ export default function ConfigAparenciaCard({ theme, setTheme, privacyMode, togg
       <div className="config-themes config-themes--compact" role="group" aria-label="Tema da interface">
         <button
           type="button"
-          className={`config-theme-card ${theme === 'light' ? 'is-active' : ''}`}
+          className={`config-theme-card config-theme-card--light ${theme === 'light' ? 'is-active' : ''}`}
           onClick={() => setTheme('light')}
           aria-pressed={theme === 'light'}
         >
-          <div className="config-theme-preview config-theme-preview--light" aria-hidden />
+          <div className="config-theme-preview config-theme-preview--light" aria-hidden>
+            <span className="config-theme-mock">
+              <span className="config-theme-mock__traffic" aria-hidden>
+                <i />
+                <i />
+                <i />
+              </span>
+              <span className="config-theme-mock__surface">
+                <span className="config-theme-mock__line" />
+                <span className="config-theme-mock__line config-theme-mock__line--short" />
+              </span>
+            </span>
+          </div>
           <div className="config-theme-body">
             <h4>Claro</h4>
             <p>Visual leve para o dia.</p>
@@ -26,11 +38,23 @@ export default function ConfigAparenciaCard({ theme, setTheme, privacyMode, togg
         </button>
         <button
           type="button"
-          className={`config-theme-card ${theme === 'dark' ? 'is-active' : ''}`}
+          className={`config-theme-card config-theme-card--dark ${theme === 'dark' ? 'is-active' : ''}`}
           onClick={() => setTheme('dark')}
           aria-pressed={theme === 'dark'}
         >
-          <div className="config-theme-preview config-theme-preview--dark" aria-hidden />
+          <div className="config-theme-preview config-theme-preview--dark" aria-hidden>
+            <span className="config-theme-mock">
+              <span className="config-theme-mock__traffic" aria-hidden>
+                <i />
+                <i />
+                <i />
+              </span>
+              <span className="config-theme-mock__surface">
+                <span className="config-theme-mock__line" />
+                <span className="config-theme-mock__line config-theme-mock__line--short" />
+              </span>
+            </span>
+          </div>
           <div className="config-theme-body">
             <h4>Escuro</h4>
             <p>Menos brilho à noite.</p>
