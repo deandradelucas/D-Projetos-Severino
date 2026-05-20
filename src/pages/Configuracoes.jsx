@@ -38,7 +38,6 @@ export default function Configuracoes() {
   })
 
   const [toast, setToast] = useState('')
-  const [resetSending, setResetSending] = useState(false)
   const [familiaTitular, setFamiliaTitular] = useState(null)
   const [familiaMembros, setFamiliaMembros] = useState([])
   const [familiaConvites, setFamiliaConvites] = useState([])
@@ -391,28 +390,6 @@ export default function Configuracoes() {
     finally { setFamiliaBusy(false) }
   }
 
-  const solicitarCodigoSenhaWhatsapp = async () => {
-    if (!perfil.email) return
-    setResetSending(true)
-    try {
-      const res = await fetch(apiUrl('/api/auth/request-password-otp-whatsapp'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: perfil.email }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (res.ok) {
-        showToast(data.message || 'Se houver WhatsApp no cadastro, enviamos o código.')
-      } else {
-        showToast(data.message || 'Não foi possível enviar o código.')
-      }
-    } catch {
-      showToast('Erro de rede.')
-    } finally {
-      setResetSending(false)
-    }
-  }
-
   return (
     <div className="dashboard-container page-configuracoes ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
@@ -497,7 +474,7 @@ export default function Configuracoes() {
                   />
                 </label>
                 <p className="config-telefone-form__hint">
-                  Usado para recuperar senha via WhatsApp e para o assistente no celular.
+                  Usado pelo assistente no WhatsApp. Para trocar a senha, use Esqueceu a senha? na tela de login.
                 </p>
                 <div className="config-telefone-form__actions">
                   <button
@@ -526,15 +503,6 @@ export default function Configuracoes() {
               </button>
               <button type="button" className="config-action-btn" onClick={abrirEditarTelefone} disabled={!usuarioIdHeader}>
                 {perfil.telefone ? 'Alterar telefone' : 'Cadastrar telefone'}
-              </button>
-              <button
-                type="button"
-                className="config-action-btn"
-                onClick={() => void solicitarCodigoSenhaWhatsapp()}
-                disabled={!perfil.email || resetSending}
-                title="Envia um código de 6 dígitos para o WhatsApp cadastrado. Conclua a troca na tela de login em Esqueceu a senha."
-              >
-                {resetSending ? 'Enviando…' : 'Código no WhatsApp'}
               </button>
             </div>
           </section>

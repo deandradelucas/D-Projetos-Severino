@@ -46,7 +46,7 @@ export default function AuthPhoneShell({
         : 'auth-shell-glass--blobs'
 
   const cardClassName = isSplit
-    ? 'auth-shell-glass-card w-full border-0 bg-transparent px-0 py-0 shadow-none lg:px-2 lg:py-2'
+    ? 'auth-shell-glass-card w-full rounded-[24px] border border-neutral-200/90 bg-white px-6 py-8 shadow-[0_8px_32px_-16px_rgba(15,23,42,0.1)] sm:rounded-[26px] sm:px-8 sm:py-9 lg:px-9 lg:py-10'
     : plainWhiteBackground
       ? 'auth-shell-glass-card w-full rounded-[26px] border border-neutral-200/80 bg-white px-7 py-9 shadow-[0_12px_40px_-24px_rgba(15,23,42,0.12)] sm:rounded-[28px] sm:px-9 sm:py-10'
       : 'auth-shell-glass-card w-full rounded-[26px] border border-neutral-200/90 bg-white/40 px-7 py-9 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.14)] backdrop-blur-3xl backdrop-saturate-150 sm:rounded-[28px] sm:px-9 sm:py-10'
