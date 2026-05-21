@@ -473,6 +473,36 @@ body[data-theme='light'] .pagamento-banner {
   padding: 0.75rem;
 }
 
+/* Tema escuro — CTA de checkout: fundo preto, borda e texto no verde do sistema (--success) */
+body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full,
+body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside__btn-stack .btn-primary.page-pagamento-cta {
+  background: #000000 !important;
+  background-image: none !important;
+  color: var(--success-text, #4ade80) !important;
+  border: 1.5px solid var(--success, #22c55e) !important;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--success, #22c55e) 32%, transparent) !important;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--success-text, #4ade80) 45%, transparent);
+}
+
+body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full:hover:not(:disabled),
+body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside__btn-stack .btn-primary.page-pagamento-cta:hover:not(:disabled) {
+  background: #050505 !important;
+  background-image: none !important;
+  color: var(--success, #22c55e) !important;
+  border-color: var(--success, #22c55e) !important;
+  box-shadow: 0 0 22px color-mix(in srgb, var(--success, #22c55e) 42%, transparent) !important;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--success, #22c55e) 50%, transparent);
+  transform: none;
+}
+
+body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full:focus-visible,
+body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside__btn-stack .btn-primary.page-pagamento-cta:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--success, #22c55e) 38%, transparent),
+    0 0 18px color-mix(in srgb, var(--success, #22c55e) 36%, transparent) !important;
+}
+
 .page-pagamento .page-pagamento-cta {
   width: 100%;
   max-width: 100%;
