@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
+import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog'
 import ConfigSelectCustom from '../components/ConfigSelectCustom.jsx'
@@ -392,6 +393,7 @@ export default function Configuracoes() {
         <RefDashboardScroll>
         <section className="dashboard-hub__hero page-configuracoes__hero" aria-label="Ajustes">
           <div className="dashboard-hub__hero-row">
+            <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} aria-label="Abrir menu" />
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">Ajustes</h1>
             </div>

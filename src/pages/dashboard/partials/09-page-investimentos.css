@@ -3,11 +3,26 @@
 /* Mesma tipografia que Transações (07-page-transacoes.css) */
 .dashboard-container.dashboard-page.page-investimentos.ref-dashboard.app-horizon-shell {
   --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+  --tx-nova-btn-bg: #b58d3d;
+  --tx-nova-btn-bg-hover: #c69d4d;
+  --tx-nova-btn-fg: #111111;
+  --tx-nova-btn-border: rgba(0, 0, 0, 0.14);
+  --tx-nova-btn-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+  --tx-nova-btn-ring: rgba(181, 141, 61, 0.42);
 
   font-family: var(--tx-dir-font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell {
+  --tx-nova-btn-bg: #c4a052;
+  --tx-nova-btn-bg-hover: #d1ae62;
+  --tx-nova-btn-fg: #111111;
+  --tx-nova-btn-border: rgba(0, 0, 0, 0.22);
+  --tx-nova-btn-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --tx-nova-btn-ring: rgba(212, 177, 98, 0.48);
 }
 
 .page-investimentos-hero__rates-row {
@@ -3245,21 +3260,7 @@ body[data-theme='dark'] .page-investimentos-aportes-table td {
       inset 0 -1px 0 rgba(15, 23, 42, 0.06);
   }
 
-  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab {
-    border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 48%, rgba(255, 255, 255, 0.12));
-    background:
-      linear-gradient(
-        158deg,
-        rgba(255, 255, 255, 0.14) 0%,
-        rgba(255, 255, 255, 0.04) 38%,
-        transparent 62%
-      ),
-      rgba(15, 23, 42, 0.38);
-    box-shadow:
-      0 14px 36px -20px rgba(0, 0, 0, 0.55),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.25);
-  }
+  /* Dark: dourado alinhado ao Dashboard — detalhe em 07b-page-dashboard-home-align.css (!important) */
 
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab__icon {
     display: grid;
@@ -3274,13 +3275,6 @@ body[data-theme='dark'] .page-investimentos-aportes-table td {
       inset 0 -1px 0 rgba(15, 23, 42, 0.06);
   }
 
-  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab__icon {
-    background: rgba(255, 255, 255, 0.11);
-    color: #ffffff;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.24),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.32);
-  }
 
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab__label {
     overflow: hidden;
@@ -3295,11 +3289,4 @@ body[data-theme='dark'] .page-investimentos-aportes-table td {
     background-clip: text;
   }
 
-  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab__label {
-    background: linear-gradient(185deg, #f0deaa 0%, #d4a84b 45%, #b58d3d 100%);
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
 }
