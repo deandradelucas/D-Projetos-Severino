@@ -3173,3 +3173,29 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   box-shadow: none !important;
 }
 
+/* Nova transação — Salvar igual ao Cancelar (só tema escuro) */
+body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary,
+body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary.loading {
+  background: rgba(255, 255, 255, 0.055) !important;
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary:hover:not(:disabled),
+body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1) !important;
+  background-image: none !important;
+  border-color: rgba(212, 168, 75, 0.35) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(212, 168, 75, 0.28) !important;
+}
+
