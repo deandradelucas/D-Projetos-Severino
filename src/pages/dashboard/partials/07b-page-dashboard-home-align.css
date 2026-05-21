@@ -148,6 +148,21 @@ body[data-theme='dark']
   filter: none;
 }
 
+/* Dark: setas PNG claras sobre fundo vermelho/verde do KPI */
+body[data-theme='dark']
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(.page-investimentos)
+  .ref-dashboard-kpi-strip
+  .ref-kpi-card--expense
+  .ref-kpi-card__icon-img,
+body[data-theme='dark']
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(.page-investimentos)
+  .ref-dashboard-kpi-strip
+  .ref-kpi-card--income
+  .ref-kpi-card__icon-img {
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+}
+
 @media (max-width: 768px) {
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(.page-investimentos)
     .ref-dashboard-kpi-strip

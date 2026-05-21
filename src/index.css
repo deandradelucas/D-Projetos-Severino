@@ -1336,6 +1336,14 @@ body:has(.pwa-install-sheet) .horizon-chat-window {
     --sb-thumb-inset: inset 0 1px 0 rgba(255, 255, 255, 0.85);
   }
 
+  body[data-theme='dark'] {
+    --sb-track: #000000;
+    --sb-thumb: #141414;
+    --sb-thumb-hover: #1f1f1f;
+    --sb-thumb-border: rgba(255, 255, 255, 0.1);
+    --sb-thumb-inset: none;
+  }
+
   html {
     scrollbar-gutter: stable;
   }

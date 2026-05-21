@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
-import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog'
 import ConfigSelectCustom from '../components/ConfigSelectCustom.jsx'
@@ -168,7 +167,6 @@ export default function Configuracoes() {
   }, [usuarioIdHeader, refreshAssinaturaPerfil])
 
   const isAdmin = String(perfil.role || '').toUpperCase() === 'ADMIN'
-  const profileInitial = (perfil.nome || perfil.email || '?').charAt(0).toUpperCase()
   const telefoneLabel = perfil.telefone ? formatPhoneBRDisplay(perfil.telefone) : 'Não informado'
 
   const abrirEditarTelefone = () => {
@@ -394,7 +392,6 @@ export default function Configuracoes() {
         <RefDashboardScroll>
         <section className="dashboard-hub__hero page-configuracoes__hero" aria-label="Ajustes">
           <div className="dashboard-hub__hero-row">
-            <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} aria-label="Abrir menu" />
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">Ajustes</h1>
             </div>
@@ -410,9 +407,6 @@ export default function Configuracoes() {
         <div className="config-layout config-layout--clean">
           <section className="config-card config-profile-card">
             <div className="config-profile-main">
-              <div className="config-avatar config-avatar--clean" aria-hidden>
-                {profileInitial}
-              </div>
               <div className="config-profile-copy">
                 <span className="config-card-kicker">Conta</span>
                 <h2 className="config-profile-name">{perfil.nome || 'Usuário'}</h2>

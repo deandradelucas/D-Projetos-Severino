@@ -134,11 +134,16 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
     return <Navigate to="/trial-expirado" replace />
   }
 
+  /* Pagamento fica fora de requireAppAccess (trial/checkout), mas usa o menu inferior no mobile */
+  const showMobileBottomNav =
+    Boolean(state.user?.id) &&
+    (requireAppAccess || location.pathname === '/pagamento')
+
   return (
     <>
       {requireAppAccess ? <AuthenticatedNavPrefetch /> : null}
       <Outlet />
-      {requireAppAccess ? <MobileBottomNav /> : null}
+      {showMobileBottomNav ? <MobileBottomNav /> : null}
     </>
   )
 }

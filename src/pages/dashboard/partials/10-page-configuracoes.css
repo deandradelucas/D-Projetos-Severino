@@ -31,6 +31,11 @@
   padding-bottom: 0.35rem;
 }
 
+.page-configuracoes.app-horizon-shell .page-configuracoes__hero .dashboard-hub__hero-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 #config-secao-convite-familia {
   scroll-margin-top: 1rem;
 }

@@ -502,7 +502,6 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                     placeholder="dd/mm/aaaa"
                     lang="pt-BR"
                     required
-                    aria-describedby={`${dataInputId}-fmt`}
                     className="page-investimentos-modal__input page-investimentos-modal__input--date-br"
                     disabled={submitting}
                     value={dataAquisicaoBr}
@@ -528,9 +527,6 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                     </svg>
                   </button>
                 </div>
-                <p id={`${dataInputId}-fmt`} className="page-investimentos-modal__hint page-investimentos-modal__hint--date-fmt">
-                  Formato brasileiro <strong>dd/mm/aaaa</strong> ou ícone do calendário.
-                </p>
               </div>
               <div>
                 <label htmlFor={valorInputId} className="page-investimentos-modal__section-label">
@@ -569,7 +565,6 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                   autoComplete="off"
                   placeholder="dd/mm/aaaa"
                   lang="pt-BR"
-                  aria-describedby={`${dataVencimentoInputId}-fmt`}
                   className="page-investimentos-modal__input page-investimentos-modal__input--date-br"
                   disabled={submitting}
                   value={dataVencimentoBr}
@@ -595,12 +590,6 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
                   </svg>
                 </button>
               </div>
-              <p id={`${dataVencimentoInputId}-fmt`} className="page-investimentos-modal__hint page-investimentos-modal__hint--date-fmt">
-                Opcional · mesmo formato <strong>dd/mm/aaaa</strong>.
-              </p>
-              <p className="page-investimentos-modal__hint">
-                Preencha se souber quando vence — o app mostrará o prazo restante e usará esta data no simulador.
-              </p>
             </div>
 
             {/* Taxa */}
@@ -693,7 +682,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
               <button type="button" className="btn-secondary" onClick={onClose} disabled={submitting}>
                 Cancelar
               </button>
-              <button type="submit" className="btn-primary" disabled={submitting}>
+              <button type="submit" className="btn-secondary" disabled={submitting}>
                 {submitting ? 'A guardar…' : editando ? 'Guardar' : 'Adicionar'}
               </button>
             </div>
