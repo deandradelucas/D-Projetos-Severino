@@ -408,7 +408,10 @@ export default function Dashboard() {
       usuarioId={readHorizonteUser()?.id || usuario.id}
     />
     {showTutorial && (
-      <TutorialDashboard onDismiss={() => setShowTutorial(false)} />
+      <TutorialDashboard
+        onDismiss={() => setShowTutorial(false)}
+        isModalOpen={isModalOpen}
+      />
     )}
     </>
   )
