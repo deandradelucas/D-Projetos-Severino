@@ -81,11 +81,24 @@ const STAGES = {
     forceAbove:  true,
     badge:       'Organize sua receita',
     title:       'Escolha a categoria',
-    body:        'Selecione a categoria que melhor representa essa receita. Se aparecer subcategoria, escolha também.',
-    nextTrigger: null,            // avanço manual — usuário clica no botão do card
+    body:        'Selecione a categoria que melhor representa essa receita. Experimente cadastrar Saldo.',
+    nextTrigger: null,
     ctaLabel:    'Já escolhi →',
+    nextStage:   'modal-subcategoria',
+    nextDelay:   0,
+  },
+  'modal-subcategoria': {
+    targetId:    'subcategoria-selector',
+    overlay:     false,
+    forceAbove:  true,
+    badge:       'Detalhe sua receita',
+    title:       'Escolha a subcategoria',
+    body:        'Experimente utilizar Saldo Atual e depois vá para Valor.',
+    nextTrigger: null,
+    ctaLabel:    'Ir para Valor →',
     nextStage:   'modal-valor',
     nextDelay:   0,
+    skipIfMissing: true,          // pula para nextStage se o elemento não estiver visível
   },
   'modal-valor': {
     targetId:    'tx-valor-input',
@@ -224,7 +237,7 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
 
   // Quando o modal fecha enquanto estamos num estágio dentro dele → volta ao estágio inicial
   useEffect(() => {
-    if (!isModalOpen && (stage === 'modal-receita' || stage === 'modal-valor')) {
+    if (!isModalOpen && (stage === 'modal-receita' || stage === 'modal-categoria' || stage === 'modal-subcategoria' || stage === 'modal-valor')) {
       if (pendingStageRef.current) {
         window.clearTimeout(pendingStageRef.current)
         pendingStageRef.current = null
@@ -239,13 +252,30 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
     const cfg = STAGES[stage]
     if (!cfg) return
 
+    let retries = 0
+    let retryTimer = null
+
     function calc() {
-      // Pequeno rAF para garantir que o DOM (modal) já foi pintado
-      requestAnimationFrame(() => setRect(getRectOf(cfg.targetId)))
+      requestAnimationFrame(() => {
+        const r = getRectOf(cfg.targetId)
+        if (r) { setRect(r); return }
+        // Elemento ausente: se skipIfMissing, tenta por até 400ms depois avança
+        if (cfg.skipIfMissing && retries < 4) {
+          retries++
+          retryTimer = window.setTimeout(calc, 100)
+        } else if (cfg.skipIfMissing) {
+          setStage(cfg.nextStage)
+        } else {
+          setRect(null)
+        }
+      })
     }
     calc()
     window.addEventListener('resize', calc)
-    return () => window.removeEventListener('resize', calc)
+    return () => {
+      window.removeEventListener('resize', calc)
+      if (retryTimer) window.clearTimeout(retryTimer)
+    }
   }, [stage, visible])
 
   // Listener de clique no elemento trigger do estágio atual
