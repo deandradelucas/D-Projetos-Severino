@@ -210,7 +210,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                 </div>
               </div>
 
-              <div className="form-group" style={{ opacity: loadingCats ? 0.5 : 1 }}>
+              <div data-tutorial-id="categoria-selector" className="form-group" style={{ opacity: loadingCats ? 0.5 : 1 }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   Categoria
                   {aiSuggesting && (

@@ -72,6 +72,17 @@ const STAGES = {
     title:       'Selecione Receita',
     body:        'Toque em Receita e cadastre o saldo atual das suas contas bancárias — o valor que você tem disponível hoje.',
     nextTrigger: 'tipo-receita-btn',
+    nextStage:   'modal-categoria',
+    nextDelay:   0,
+  },
+  'modal-categoria': {
+    targetId:    'categoria-selector',
+    overlay:     false,
+    badge:       'Organize sua receita',
+    title:       'Escolha a categoria',
+    body:        'Selecione a categoria que melhor representa essa receita. Se aparecer subcategoria, escolha também.',
+    nextTrigger: null,            // avanço manual — usuário clica no botão do card
+    ctaLabel:    'Já escolhi →',
     nextStage:   'modal-valor',
     nextDelay:   0,
   },
@@ -119,7 +130,7 @@ function GlowRing({ t, l, r, b, ring }) {
   )
 }
 
-function TooltipCard({ rect, badge, title, body, onSkip, skipLabel = 'Pular', showArrow = true }) {
+function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLabel = 'Pular', showArrow = true }) {
   const vw = typeof window !== 'undefined' ? window.innerWidth : 800
   const vh = typeof window !== 'undefined' ? window.innerHeight : 800
   const W  = Math.min(300, vw - 32)
@@ -161,6 +172,23 @@ function TooltipCard({ rect, badge, title, body, onSkip, skipLabel = 'Pular', sh
 
         <h2 style={{ margin:'0 0 6px', fontSize:15, fontWeight:700, color:'rgba(255,255,255,.92)', lineHeight:1.3 }}>{title}</h2>
         <p  style={{ margin:'0 0 12px', fontSize:12, color:'rgba(255,255,255,.48)', lineHeight:1.6 }}>{body}</p>
+
+        {ctaLabel && onCta && (
+          <button
+            type="button"
+            onClick={onCta}
+            style={{
+              width:'100%', padding:'10px 16px', borderRadius:12, border:'none',
+              background:'linear-gradient(135deg,#d4a84b 0%,#c49535 100%)',
+              color:'#1a1100', fontWeight:700, fontSize:13, cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center', gap:5,
+              marginBottom:8,
+              boxShadow:'0 3px 14px rgba(212,168,75,.25)',
+            }}
+          >
+            {ctaLabel}
+          </button>
+        )}
 
         {onSkip && (
           <button type="button" onClick={onSkip} style={{ background:'transparent', border:'none', color:'rgba(255,255,255,.26)', fontSize:11, cursor:'pointer', padding:'2px 0', display:'block', width:'100%', textAlign:'center' }}>
@@ -254,6 +282,13 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
     onDismiss?.()
   }, [onDismiss])
 
+  const advanceStage = useCallback(() => {
+    const cfg = STAGES[stage]
+    if (!cfg?.nextStage) return
+    if (cfg.nextStage === 'done') { dismiss() }
+    else { setStage(cfg.nextStage) }
+  }, [stage, dismiss])
+
   if (!visible || stage === 'done' || !rect) return null
 
   const cfg = STAGES[stage]
@@ -276,6 +311,8 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
         badge={cfg.badge}
         title={cfg.title}
         body={cfg.body}
+        ctaLabel={cfg.ctaLabel}
+        onCta={cfg.ctaLabel ? advanceStage : undefined}
         onSkip={dismiss}
         skipLabel={stage === 'modal-valor' ? 'Fechar dica' : 'Pular'}
         showArrow
