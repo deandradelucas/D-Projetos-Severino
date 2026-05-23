@@ -100,6 +100,7 @@ export const DEFAULT_CATEGORIES = [
   { nome: 'Investimentos e Patrimônio', tipo: 'DESPESA', cor: '#0ea5e9', subcategorias: ['Aporte em Investimentos', 'Compra de Ações / FIIs', 'Tesouro Direto', 'CDB / Renda Fixa', 'Criptomoedas', 'Previdência Privada', 'Reserva de Emergência', 'Compra de Imóvel', 'Compra de Veículo', 'Seguro de Vida', 'Consórcio / Carta de Crédito'] },
 
   // RECEITAS
+  { nome: 'Saldo', tipo: 'RECEITA', cor: '#d4a84b', subcategorias: ['Saldo Atual'] },
   { nome: 'Renda Principal', tipo: 'RECEITA', cor: '#22c55e', subcategorias: ['Salário', 'Férias', '13º Salário', 'PLR / Bônus', 'Aposentadoria / INSS', 'BPC', 'Adiantamento Salarial', 'Horas Extras', 'Comissão CLT', 'Vale / Benefício em Dinheiro'] },
   { nome: 'Rendas PJ / Empresa', tipo: 'RECEITA', cor: '#15803d', subcategorias: ['Pró-labore', 'Distribuição de Lucros', 'Reembolso de Despesas Empresariais', 'Vendas Corporativas', 'Serviços Prestados', 'Consultoria', 'Contrato Mensal', 'Royalties / Licenciamento', 'Comissão de Vendas PJ'] },
   { nome: 'Renda Extra', tipo: 'RECEITA', cor: '#10b981', subcategorias: ['Freelance / Serviços Extras', 'Vendas e Comissionamentos', 'Aluguéis Recebidos', 'Restituição de Imposto', 'Venda de Bens/Ativos Usados', 'Bicos / Diárias', 'Afiliados', 'Aulas Particulares', 'Conteúdo Digital', 'Cashback Recebido', 'Reembolso Pessoal'] },

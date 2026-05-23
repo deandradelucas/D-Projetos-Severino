@@ -78,6 +78,7 @@ const STAGES = {
   'modal-categoria': {
     targetId:    'categoria-selector',
     overlay:     false,
+    forceAbove:  true,
     badge:       'Organize sua receita',
     title:       'Escolha a categoria',
     body:        'Selecione a categoria que melhor representa essa receita. Se aparecer subcategoria, escolha também.',
@@ -130,14 +131,14 @@ function GlowRing({ t, l, r, b, ring }) {
   )
 }
 
-function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLabel = 'Pular', showArrow = true }) {
+function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLabel = 'Pular', showArrow = true, forceAbove = false }) {
   const vw = typeof window !== 'undefined' ? window.innerWidth : 800
   const vh = typeof window !== 'undefined' ? window.innerHeight : 800
   const W  = Math.min(300, vw - 32)
   const L  = Math.max(12, Math.min(rect.left + (rect.right - rect.left) / 2 - W / 2, vw - W - 12))
 
-  const CARD_H  = 160
-  const below   = rect.bottom + 14 + CARD_H < vh
+  const CARD_H  = 200
+  const below   = !forceAbove && rect.bottom + 14 + CARD_H < vh
   const top     = below ? rect.bottom + 14 : rect.top - 14 - CARD_H
 
   return (
@@ -313,6 +314,7 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
         body={cfg.body}
         ctaLabel={cfg.ctaLabel}
         onCta={cfg.ctaLabel ? advanceStage : undefined}
+        forceAbove={cfg.forceAbove}
         onSkip={dismiss}
         skipLabel={stage === 'modal-valor' ? 'Fechar dica' : 'Pular'}
         showArrow
