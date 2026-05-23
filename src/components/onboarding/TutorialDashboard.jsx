@@ -105,7 +105,7 @@ const STAGES = {
     overlay:     false,
     badge:       'Quanto você tem hoje?',
     title:       'Informe o saldo total',
-    body:        'Some o saldo de todas as suas contas (corrente, poupança, digital) e coloque o total aqui.',
+    body:        'Some o saldo de todas as suas contas e coloque o total aqui.',
     nextTrigger: null,
     nextStage:   'done',
     nextDelay:   0,
