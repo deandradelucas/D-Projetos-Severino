@@ -354,6 +354,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
             </button>
             <button
               type="submit"
+              data-tutorial-id="salvar-transacao-btn"
               className={`btn-primary ${saving ? 'loading' : ''}`}
               disabled={saving}
             >
