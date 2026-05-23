@@ -156,27 +156,28 @@ function GlowRing({ t, l, r, b, ring }) {
   )
 }
 
+const FONT = "'Poppins', 'Inter', system-ui, sans-serif"
+
 function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLabel = 'Pular', showArrow = true, forceAbove = false }) {
   const vw = typeof window !== 'undefined' ? window.innerWidth : 800
   const vh = typeof window !== 'undefined' ? window.innerHeight : 800
-  const W  = Math.min(300, vw - 32)
-  const L  = Math.max(12, Math.min(rect.left + (rect.right - rect.left) / 2 - W / 2, vw - W - 12))
+  const W  = Math.min(272, vw - 24)
+  const L  = Math.max(8, Math.min(rect.left + (rect.right - rect.left) / 2 - W / 2, vw - W - 8))
 
-  const CARD_H  = 200
-  const below   = !forceAbove && rect.bottom + 14 + CARD_H < vh
-  const top     = below ? rect.bottom + 14 : rect.top - 14 - CARD_H
+  const CARD_H  = 160
+  const below   = !forceAbove && rect.bottom + 10 + CARD_H < vh
+  const top     = below ? rect.bottom + 10 : rect.top - 10 - CARD_H
 
   return (
     <div
       role="dialog"
       aria-modal="false"
       aria-label={title}
-      style={{ position:'fixed', top, left:L, width:W, zIndex:Z_CARD, animation:'tut-fadein .3s ease-out both' }}
+      style={{ position:'fixed', top, left:L, width:W, zIndex:Z_CARD, animation:'tut-fadein .3s ease-out both', fontFamily:FONT }}
     >
-      {/* seta para cima */}
       {showArrow && below && (
-        <div aria-hidden style={{ display:'flex', justifyContent:'center', marginBottom:6, animation:'tut-bounce 1.4s ease-in-out infinite' }}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#d4a84b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div aria-hidden style={{ display:'flex', justifyContent:'center', marginBottom:4, animation:'tut-bounce 1.4s ease-in-out infinite' }}>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#d4a84b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M8 12V4M4 8l4-4 4 4" />
           </svg>
         </div>
@@ -185,31 +186,31 @@ function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLa
       <div style={{
         background:'#0c0d11',
         border:'1px solid rgba(212,168,75,.18)',
-        borderRadius:18,
-        padding:'16px 18px 14px',
-        boxShadow:'0 0 0 1px rgba(255,255,255,.03) inset, 0 24px 48px -12px rgba(0,0,0,.95), 0 0 40px -15px rgba(212,168,75,.14)',
+        borderRadius:14,
+        padding:'11px 14px 10px',
+        boxShadow:'0 0 0 1px rgba(255,255,255,.03) inset, 0 16px 40px -8px rgba(0,0,0,.95), 0 0 30px -12px rgba(212,168,75,.14)',
         position:'relative',
       }}>
-        <div aria-hidden style={{ position:'absolute', top:-1, left:24, right:24, height:1, background:'linear-gradient(90deg,transparent,rgba(212,168,75,.50),transparent)' }} />
+        <div aria-hidden style={{ position:'absolute', top:-1, left:18, right:18, height:1, background:'linear-gradient(90deg,transparent,rgba(212,168,75,.45),transparent)' }} />
 
-        <div style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 9px', borderRadius:20, background:'rgba(212,168,75,.10)', border:'1px solid rgba(212,168,75,.24)', marginBottom:8 }}>
-          <span style={{ fontSize:9, fontWeight:700, color:'#d4a84b', textTransform:'uppercase', letterSpacing:'0.09em' }}>{badge}</span>
+        <div style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'2px 7px', borderRadius:20, background:'rgba(212,168,75,.10)', border:'1px solid rgba(212,168,75,.22)', marginBottom:6 }}>
+          <span style={{ fontSize:8, fontWeight:700, color:'#d4a84b', textTransform:'uppercase', letterSpacing:'0.10em', fontFamily:FONT }}>{badge}</span>
         </div>
 
-        <h2 style={{ margin:'0 0 6px', fontSize:15, fontWeight:700, color:'rgba(255,255,255,.92)', lineHeight:1.3 }}>{title}</h2>
-        <p  style={{ margin:'0 0 12px', fontSize:12, color:'rgba(255,255,255,.48)', lineHeight:1.6 }}>{body}</p>
+        <h2 style={{ margin:'0 0 4px', fontSize:13, fontWeight:600, color:'rgba(255,255,255,.92)', lineHeight:1.3, fontFamily:FONT }}>{title}</h2>
+        <p  style={{ margin:'0 0 9px', fontSize:11, color:'rgba(255,255,255,.50)', lineHeight:1.55, fontFamily:FONT }}>{body}</p>
 
         {ctaLabel && onCta && (
           <button
             type="button"
             onClick={onCta}
             style={{
-              width:'100%', padding:'10px 16px', borderRadius:12, border:'none',
+              width:'100%', padding:'8px 12px', borderRadius:9, border:'none',
               background:'linear-gradient(135deg,#d4a84b 0%,#c49535 100%)',
-              color:'#1a1100', fontWeight:700, fontSize:13, cursor:'pointer',
-              display:'flex', alignItems:'center', justifyContent:'center', gap:5,
-              marginBottom:8,
-              boxShadow:'0 3px 14px rgba(212,168,75,.25)',
+              color:'#1a1100', fontWeight:600, fontSize:12, cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center', gap:4,
+              marginBottom:6, fontFamily:FONT,
+              boxShadow:'0 2px 10px rgba(212,168,75,.22)',
             }}
           >
             {ctaLabel}
@@ -217,16 +218,15 @@ function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLa
         )}
 
         {onSkip && (
-          <button type="button" onClick={onSkip} style={{ background:'transparent', border:'none', color:'rgba(255,255,255,.26)', fontSize:11, cursor:'pointer', padding:'2px 0', display:'block', width:'100%', textAlign:'center' }}>
+          <button type="button" onClick={onSkip} style={{ background:'transparent', border:'none', color:'rgba(255,255,255,.24)', fontSize:10, cursor:'pointer', padding:'1px 0', display:'block', width:'100%', textAlign:'center', fontFamily:FONT }}>
             {skipLabel}
           </button>
         )}
       </div>
 
-      {/* seta para baixo */}
       {showArrow && !below && (
-        <div aria-hidden style={{ display:'flex', justifyContent:'center', marginTop:6, animation:'tut-bounce 1.4s ease-in-out infinite' }}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#d4a84b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div aria-hidden style={{ display:'flex', justifyContent:'center', marginTop:4, animation:'tut-bounce 1.4s ease-in-out infinite' }}>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#d4a84b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M8 4v8M4 8l4 4 4-4" />
           </svg>
         </div>
