@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import TutorialPrimeiraTransacao, { tutorialTransacaoFoiVisto } from '../components/onboarding/TutorialPrimeiraTransacao'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
@@ -53,6 +54,7 @@ export default function Transacoes() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState(null)
+  const [showTutorial, setShowTutorial] = useState(() => !tutorialTransacaoFoiVisto())
   
   // Inicializa com o cache global para evitar "saltos" de tela (SWR)
   const [transacoes, setTransacoes] = useState(cachedTx || [])
@@ -388,6 +390,7 @@ export default function Transacoes() {
             <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos da página">
               <button
                 type="button"
+                data-tutorial-id="nova-transacao-btn"
                 className="dashboard-hub__btn dashboard-hub__btn--primary"
                 onClick={() => {
                   setEditingTransaction(null)
@@ -660,6 +663,15 @@ export default function Transacoes() {
       onConfirm={confirmDialog?.onConfirm}
       onClose={() => setConfirmDialog(null)}
     />
+    {showTutorial && (
+      <TutorialPrimeiraTransacao
+        onComplete={() => {
+          setShowTutorial(false)
+          setEditingTransaction(null)
+          setIsModalOpen(true)
+        }}
+      />
+    )}
     </>
   )
 }
