@@ -1,7 +1,10 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 const TUTORIAL_KEY = 'horizonte_tutorial_transacao_visto'
-const PAD = 14
+const PAD          = 14   // padding ao redor do spotlight
+const Z_BARS       = 10100
+const Z_RING       = 10101
+const Z_CARD       = 10102
 
 export function tutorialDashboardFoiVisto() {
   try { return Boolean(localStorage.getItem(TUTORIAL_KEY)) }
@@ -12,8 +15,9 @@ function marcarVisto() {
   try { localStorage.setItem(TUTORIAL_KEY, '1') } catch {}
 }
 
-function findTargetRect() {
-  const els = document.querySelectorAll('[data-tutorial-id="nova-transacao-btn"]')
+/** Retorna o DOMRect do PRIMEIRO elemento visível com esse data-tutorial-id */
+function getRectOf(id) {
+  const els = document.querySelectorAll(`[data-tutorial-id="${id}"]`)
   for (const el of els) {
     const r = el.getBoundingClientRect()
     if (r.width > 0 && r.height > 0) return r
@@ -21,217 +25,250 @@ function findTargetRect() {
   return null
 }
 
-const BG = 'rgba(4, 5, 10, 0.90)'
-
-/** Injeta o keyframe uma única vez no documento */
-let keyframesInjected = false
+let _keyframesDone = false
 function ensureKeyframes() {
-  if (keyframesInjected || typeof document === 'undefined') return
-  const style = document.createElement('style')
-  style.textContent = `
-    @keyframes tutorial-glow {
-      0%, 100% { box-shadow: 0 0 0 2px rgba(212,168,75,0.80), 0 0 18px rgba(212,168,75,0.22); }
-      50%       { box-shadow: 0 0 0 2.5px rgba(212,168,75,1),   0 0 32px rgba(212,168,75,0.45); }
+  if (_keyframesDone || typeof document === 'undefined') return
+  _keyframesDone = true
+  const s = document.createElement('style')
+  s.textContent = `
+    @keyframes tut-glow {
+      0%,100% { box-shadow: 0 0 0 2px rgba(212,168,75,.80), 0 0 18px rgba(212,168,75,.22); }
+      50%      { box-shadow: 0 0 0 2.5px rgba(212,168,75,1), 0 0 36px rgba(212,168,75,.50); }
     }
-    @keyframes tutorial-fadein {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
+    @keyframes tut-fadein {
+      from { opacity:0; transform:translateY(6px); }
+      to   { opacity:1; transform:translateY(0); }
     }
-    @keyframes tutorial-arrow-bounce {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-4px); }
+    @keyframes tut-bounce {
+      0%,100% { transform:translateY(0); }
+      50%     { transform:translateY(-5px); }
+    }
+    @keyframes tut-ring-pulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(212,168,75,.70), 0 0 24px rgba(212,168,75,.30); }
+      50%      { box-shadow: 0 0 0 4px rgba(212,168,75,1),   0 0 40px rgba(212,168,75,.55); }
     }
   `
-  document.head.appendChild(style)
-  keyframesInjected = true
+  document.head.appendChild(s)
 }
 
-export default function TutorialDashboard({ onDismiss }) {
-  const [rect, setRect]       = useState(null)
-  const [visible, setVisible] = useState(true)
+// ─────────────────────────────────────────────────────────────────────────────
+// Configuração por estágio
+// ─────────────────────────────────────────────────────────────────────────────
+const STAGES = {
+  'btn-nova': {
+    targetId:    'nova-transacao-btn',
+    overlay:     true,
+    badge:       'Primeiro passo',
+    title:       'Registre sua primeira transação',
+    body:        'Toque no botão destacado para abrir o formulário. Leva menos de 20 segundos.',
+    nextTrigger: 'btn-nova',      // id do elemento que avança ao ser clicado
+    nextStage:   'modal-receita',
+    nextDelay:   480,             // ms de espera após o clique (aguarda o modal abrir)
+  },
+  'modal-receita': {
+    targetId:    'tipo-receita-btn',
+    overlay:     false,
+    badge:       'Comece pela receita',
+    title:       'Informe o saldo das suas contas',
+    body:        'Selecione Receita para registrar quanto você tem disponível hoje nas suas contas bancárias.',
+    nextTrigger: 'tipo-receita-btn',
+    nextStage:   'modal-valor',
+    nextDelay:   0,
+  },
+  'modal-valor': {
+    targetId:    'tx-valor-input',
+    overlay:     false,
+    badge:       'Valor total',
+    title:       'Saldo total das suas contas',
+    body:        'Some o saldo de todas as suas contas (corrente, poupança, digital) e coloque o total aqui.',
+    nextTrigger: null,            // não avança automaticamente — usuário salva e tchau
+    nextStage:   'done',
+    nextDelay:   0,
+  },
+}
 
-  // Calcula e re-calcula rect ao montar e no resize
+// ─────────────────────────────────────────────────────────────────────────────
+// Sub-componentes de layout
+// ─────────────────────────────────────────────────────────────────────────────
+
+function OverlayBars({ t, l, r, b }) {
+  const bg = 'rgba(4, 5, 10, .90)'
+  return (
+    <>
+      <div aria-hidden style={{ position:'fixed', inset:0, bottom:'auto', height: Math.max(0,t), background:bg, zIndex:Z_BARS, pointerEvents:'all' }} />
+      <div aria-hidden style={{ position:'fixed', top:b,  left:0, right:0, bottom:0, background:bg, zIndex:Z_BARS, pointerEvents:'all' }} />
+      <div aria-hidden style={{ position:'fixed', top:t, left:0, width:Math.max(0,l), height:b-t, background:bg, zIndex:Z_BARS, pointerEvents:'all' }} />
+      <div aria-hidden style={{ position:'fixed', top:t, left:r, right:0, height:b-t, background:bg, zIndex:Z_BARS, pointerEvents:'all' }} />
+    </>
+  )
+}
+
+function GlowRing({ t, l, r, b, ring }) {
+  return (
+    <div
+      aria-hidden
+      style={{
+        position:'fixed', top:t, left:l, width:r-l, height:b-t,
+        borderRadius:14, zIndex:Z_RING, pointerEvents:'none',
+        animation: ring ? 'tut-ring-pulse 1.8s ease-in-out infinite' : 'tut-glow 1.8s ease-in-out infinite',
+        boxShadow: ring
+          ? '0 0 0 3px rgba(212,168,75,.70), 0 0 24px rgba(212,168,75,.30)'
+          : '0 0 0 2px rgba(212,168,75,.80), 0 0 18px rgba(212,168,75,.22)',
+      }}
+    />
+  )
+}
+
+function TooltipCard({ rect, badge, title, body, onSkip, skipLabel = 'Pular', showArrow = true }) {
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 800
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 800
+  const W  = Math.min(300, vw - 32)
+  const L  = Math.max(12, Math.min(rect.left + (rect.right - rect.left) / 2 - W / 2, vw - W - 12))
+
+  const CARD_H  = 160
+  const below   = rect.bottom + 14 + CARD_H < vh
+  const top     = below ? rect.bottom + 14 : rect.top - 14 - CARD_H
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="false"
+      aria-label={title}
+      style={{ position:'fixed', top, left:L, width:W, zIndex:Z_CARD, animation:'tut-fadein .3s ease-out both' }}
+    >
+      {/* seta para cima */}
+      {showArrow && below && (
+        <div aria-hidden style={{ display:'flex', justifyContent:'center', marginBottom:6, animation:'tut-bounce 1.4s ease-in-out infinite' }}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#d4a84b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8 12V4M4 8l4-4 4 4" />
+          </svg>
+        </div>
+      )}
+
+      <div style={{
+        background:'#0c0d11',
+        border:'1px solid rgba(212,168,75,.18)',
+        borderRadius:18,
+        padding:'16px 18px 14px',
+        boxShadow:'0 0 0 1px rgba(255,255,255,.03) inset, 0 24px 48px -12px rgba(0,0,0,.95), 0 0 40px -15px rgba(212,168,75,.14)',
+        position:'relative',
+      }}>
+        <div aria-hidden style={{ position:'absolute', top:-1, left:24, right:24, height:1, background:'linear-gradient(90deg,transparent,rgba(212,168,75,.50),transparent)' }} />
+
+        <div style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 9px', borderRadius:20, background:'rgba(212,168,75,.10)', border:'1px solid rgba(212,168,75,.24)', marginBottom:8 }}>
+          <span style={{ fontSize:9, fontWeight:700, color:'#d4a84b', textTransform:'uppercase', letterSpacing:'0.09em' }}>{badge}</span>
+        </div>
+
+        <h2 style={{ margin:'0 0 6px', fontSize:15, fontWeight:700, color:'rgba(255,255,255,.92)', lineHeight:1.3 }}>{title}</h2>
+        <p  style={{ margin:'0 0 12px', fontSize:12, color:'rgba(255,255,255,.48)', lineHeight:1.6 }}>{body}</p>
+
+        {onSkip && (
+          <button type="button" onClick={onSkip} style={{ background:'transparent', border:'none', color:'rgba(255,255,255,.26)', fontSize:11, cursor:'pointer', padding:'2px 0', display:'block', width:'100%', textAlign:'center' }}>
+            {skipLabel}
+          </button>
+        )}
+      </div>
+
+      {/* seta para baixo */}
+      {showArrow && !below && (
+        <div aria-hidden style={{ display:'flex', justifyContent:'center', marginTop:6, animation:'tut-bounce 1.4s ease-in-out infinite' }}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#d4a84b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8 4v8M4 8l4 4 4-4" />
+          </svg>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Componente principal
+// ─────────────────────────────────────────────────────────────────────────────
+
+export default function TutorialDashboard({ onDismiss }) {
+  const [stage,   setStage]   = useState('btn-nova')
+  const [rect,    setRect]    = useState(null)
+  const [visible, setVisible] = useState(true)
+  const pendingStageRef       = useRef(null)
+
+  useEffect(() => { ensureKeyframes() }, [])
+
+  // Recalcula rect quando o estágio muda ou a janela é redimensionada
   useEffect(() => {
-    ensureKeyframes()
+    if (!visible || stage === 'done') return
+    const cfg = STAGES[stage]
+    if (!cfg) return
 
     function calc() {
-      // Pequeno delay para garantir que o DOM esteja pintado
-      requestAnimationFrame(() => setRect(findTargetRect()))
+      // Pequeno rAF para garantir que o DOM (modal) já foi pintado
+      requestAnimationFrame(() => setRect(getRectOf(cfg.targetId)))
     }
     calc()
     window.addEventListener('resize', calc)
     return () => window.removeEventListener('resize', calc)
-  }, [])
+  }, [stage, visible])
 
-  // Escuta clique no botão alvo para auto-fechar
+  // Listener de clique no elemento trigger do estágio atual
   useEffect(() => {
-    if (!visible) return
-    function handleBtnClick() {
-      marcarVisto()
-      setVisible(false)
-      onDismiss?.()
-    }
-    const els = document.querySelectorAll('[data-tutorial-id="nova-transacao-btn"]')
-    els.forEach((el) => el.addEventListener('click', handleBtnClick, { once: true }))
-    return () => els.forEach((el) => el.removeEventListener('click', handleBtnClick))
-  }, [visible, onDismiss])
+    if (!visible || stage === 'done') return
+    const cfg = STAGES[stage]
+    if (!cfg?.nextTrigger) return
 
-  const handleSkip = useCallback(() => {
+    function onTriggerClick() {
+      const { nextStage, nextDelay } = cfg
+      if (nextDelay > 0) {
+        pendingStageRef.current = window.setTimeout(() => {
+          setStage(nextStage)
+        }, nextDelay)
+      } else {
+        setStage(nextStage)
+      }
+    }
+
+    const els = document.querySelectorAll(`[data-tutorial-id="${cfg.nextTrigger}"]`)
+    els.forEach((el) => el.addEventListener('click', onTriggerClick, { once: true }))
+
+    return () => {
+      els.forEach((el) => el.removeEventListener('click', onTriggerClick))
+      if (pendingStageRef.current) {
+        window.clearTimeout(pendingStageRef.current)
+        pendingStageRef.current = null
+      }
+    }
+  }, [stage, visible])
+
+  const dismiss = useCallback(() => {
     marcarVisto()
     setVisible(false)
     onDismiss?.()
   }, [onDismiss])
 
-  if (!visible || !rect) return null
+  if (!visible || stage === 'done' || !rect) return null
 
-  const T = rect.top    - PAD
-  const L = rect.left   - PAD
-  const R = rect.right  + PAD
-  const B = rect.bottom + PAD
-  const W = R - L
-  const H = B - T
-
-  // Decide se o tooltip vai abaixo ou acima do botão
-  const vw = window.innerWidth
-  const vh = window.innerHeight
-  const tooltipBelow = T + H + 12 + 180 < vh  // 180 = altura estimada do card
-  const tooltipW = Math.min(300, vw - 32)
-  const tooltipL = Math.max(12, Math.min(L + W / 2 - tooltipW / 2, vw - tooltipW - 12))
-  const tooltipTop = tooltipBelow ? B + 12 : T - 12 - 180
+  const cfg = STAGES[stage]
+  const T   = rect.top    - PAD
+  const L   = rect.left   - PAD
+  const R   = rect.right  + PAD
+  const B   = rect.bottom + PAD
 
   return (
     <>
-      {/* ── 4 barras de overlay — bloqueiam toda interação exceto a janela do botão ── */}
-      {/* Topo */}
-      <div aria-hidden style={{ position: 'fixed', inset: 0, bottom: 'auto', height: Math.max(0, T), background: BG, zIndex: 1000, pointerEvents: 'all' }} />
-      {/* Rodapé */}
-      <div aria-hidden style={{ position: 'fixed', inset: 0, top: 'auto', top: B, background: BG, zIndex: 1000, pointerEvents: 'all' }} />
-      {/* Esquerda */}
-      <div aria-hidden style={{ position: 'fixed', top: T, left: 0, width: Math.max(0, L), height: H, background: BG, zIndex: 1000, pointerEvents: 'all' }} />
-      {/* Direita */}
-      <div aria-hidden style={{ position: 'fixed', top: T, left: R, right: 0, height: H, background: BG, zIndex: 1000, pointerEvents: 'all' }} />
+      {/* Overlay bloqueante (só no estágio do Dashboard) */}
+      {cfg.overlay && <OverlayBars t={T} l={L} r={R} b={B} />}
 
-      {/* ── Anel de destaque pulsante ── */}
-      <div
-        aria-hidden
-        style={{
-          position: 'fixed',
-          top: T,
-          left: L,
-          width: W,
-          height: H,
-          borderRadius: 14,
-          zIndex: 1001,
-          pointerEvents: 'none',
-          animation: 'tutorial-glow 2s ease-in-out infinite',
-          boxShadow: '0 0 0 2px rgba(212,168,75,0.80), 0 0 18px rgba(212,168,75,0.22)',
-        }}
+      {/* Anel de destaque */}
+      <GlowRing t={T} l={L} r={R} b={B} ring={!cfg.overlay} />
+
+      {/* Tooltip */}
+      <TooltipCard
+        rect={{ top:T, bottom:B, left:L, right:R }}
+        badge={cfg.badge}
+        title={cfg.title}
+        body={cfg.body}
+        onSkip={dismiss}
+        skipLabel={stage === 'modal-valor' ? 'Fechar dica' : 'Pular'}
+        showArrow
       />
-
-      {/* ── Tooltip card ── */}
-      <div
-        role="dialog"
-        aria-modal="false"
-        aria-label="Dica: como criar uma transação"
-        style={{
-          position: 'fixed',
-          top: tooltipTop,
-          left: tooltipL,
-          width: tooltipW,
-          zIndex: 1002,
-          animation: 'tutorial-fadein 0.3s ease-out both',
-        }}
-      >
-        {/* Seta apontando para o botão */}
-        {tooltipBelow && (
-          <div
-            aria-hidden
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              marginBottom: 6,
-              animation: 'tutorial-arrow-bounce 1.4s ease-in-out infinite',
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#d4a84b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 14V4M4 9l5-5 5 5" />
-            </svg>
-          </div>
-        )}
-
-        {/* Card */}
-        <div
-          style={{
-            background: '#0c0d11',
-            border: '1px solid rgba(212,168,75,0.18)',
-            borderRadius: 18,
-            padding: '16px 18px 14px',
-            boxShadow: '0 0 0 1px rgba(255,255,255,0.03) inset, 0 24px 48px -12px rgba(0,0,0,0.95), 0 0 40px -15px rgba(212,168,75,0.14)',
-            position: 'relative',
-          }}
-        >
-          {/* Linha dourada no topo */}
-          <div aria-hidden style={{ position: 'absolute', top: -1, left: 24, right: 24, height: 1, background: 'linear-gradient(90deg, transparent, rgba(212,168,75,0.50), transparent)' }} />
-
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            padding: '3px 9px',
-            borderRadius: 20,
-            background: 'rgba(212,168,75,0.10)',
-            border: '1px solid rgba(212,168,75,0.24)',
-            marginBottom: 8,
-          }}>
-            <span style={{ fontSize: 9, fontWeight: 700, color: '#d4a84b', textTransform: 'uppercase', letterSpacing: '0.09em' }}>
-              Primeiro passo
-            </span>
-          </div>
-
-          <h2 style={{ margin: '0 0 6px', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.92)', lineHeight: 1.3 }}>
-            Registre sua primeira transação
-          </h2>
-          <p style={{ margin: '0 0 12px', fontSize: 12, color: 'rgba(255,255,255,0.48)', lineHeight: 1.6 }}>
-            Toque no botão destacado acima. O formulário leva menos de 20 segundos.
-          </p>
-
-          <button
-            type="button"
-            onClick={handleSkip}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'rgba(255,255,255,0.26)',
-              fontSize: 11,
-              cursor: 'pointer',
-              padding: '2px 0',
-              display: 'block',
-              width: '100%',
-              textAlign: 'center',
-              letterSpacing: '0.02em',
-            }}
-          >
-            Pular
-          </button>
-        </div>
-
-        {/* Seta apontando para baixo (quando botão está acima do tooltip) */}
-        {!tooltipBelow && (
-          <div
-            aria-hidden
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              marginTop: 6,
-              animation: 'tutorial-arrow-bounce 1.4s ease-in-out infinite',
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#d4a84b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 4v10M4 9l5 5 5-5" />
-            </svg>
-          </div>
-        )}
-      </div>
     </>
   )
 }
