@@ -107,6 +107,18 @@ const STAGES = {
     title:       'Informe o saldo total',
     body:        'Some o saldo de todas as suas contas e coloque o total aqui.',
     nextTrigger: null,
+    ctaLabel:    'Próximo →',
+    nextStage:   'modal-salvar',
+    nextDelay:   0,
+  },
+  'modal-salvar': {
+    targetId:    'salvar-transacao-btn',
+    overlay:     false,
+    forceAbove:  true,
+    badge:       'Último passo',
+    title:       'Salve sua transação',
+    body:        'Toque em Salvar Transação para registrar seu saldo.',
+    nextTrigger: 'salvar-transacao-btn',
     nextStage:   'done',
     nextDelay:   0,
   },
@@ -237,7 +249,7 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
 
   // Quando o modal fecha enquanto estamos num estágio dentro dele → volta ao estágio inicial
   useEffect(() => {
-    if (!isModalOpen && (stage === 'modal-receita' || stage === 'modal-categoria' || stage === 'modal-subcategoria' || stage === 'modal-valor')) {
+    if (!isModalOpen && (stage === 'modal-receita' || stage === 'modal-categoria' || stage === 'modal-subcategoria' || stage === 'modal-valor' || stage === 'modal-salvar')) {
       if (pendingStageRef.current) {
         window.clearTimeout(pendingStageRef.current)
         pendingStageRef.current = null
