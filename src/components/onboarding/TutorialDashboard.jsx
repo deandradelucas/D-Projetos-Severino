@@ -60,17 +60,17 @@ const STAGES = {
     overlay:     true,
     badge:       'Primeiro passo',
     title:       'Registre sua primeira transação',
-    body:        'Toque no botão destacado para abrir o formulário. Leva menos de 20 segundos.',
-    nextTrigger: 'btn-nova',      // id do elemento que avança ao ser clicado
+    body:        'Toque no botão destacado para abrir o formulário.',
+    nextTrigger: 'nova-transacao-btn', // data-tutorial-id do elemento que dispara a transição
     nextStage:   'modal-receita',
-    nextDelay:   480,             // ms de espera após o clique (aguarda o modal abrir)
+    nextDelay:   320,                  // aguarda o modal terminar de abrir
   },
   'modal-receita': {
     targetId:    'tipo-receita-btn',
     overlay:     false,
-    badge:       'Comece pela receita',
-    title:       'Informe o saldo das suas contas',
-    body:        'Selecione Receita para registrar quanto você tem disponível hoje nas suas contas bancárias.',
+    badge:       'Cadastre seu saldo atual',
+    title:       'Selecione Receita',
+    body:        'Toque em Receita e cadastre o saldo atual das suas contas bancárias — o valor que você tem disponível hoje.',
     nextTrigger: 'tipo-receita-btn',
     nextStage:   'modal-valor',
     nextDelay:   0,
@@ -78,10 +78,10 @@ const STAGES = {
   'modal-valor': {
     targetId:    'tx-valor-input',
     overlay:     false,
-    badge:       'Valor total',
-    title:       'Saldo total das suas contas',
+    badge:       'Quanto você tem hoje?',
+    title:       'Informe o saldo total',
     body:        'Some o saldo de todas as suas contas (corrente, poupança, digital) e coloque o total aqui.',
-    nextTrigger: null,            // não avança automaticamente — usuário salva e tchau
+    nextTrigger: null,
     nextStage:   'done',
     nextDelay:   0,
   },
@@ -185,13 +185,24 @@ function TooltipCard({ rect, badge, title, body, onSkip, skipLabel = 'Pular', sh
 // Componente principal
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function TutorialDashboard({ onDismiss }) {
+export default function TutorialDashboard({ onDismiss, isModalOpen }) {
   const [stage,   setStage]   = useState('btn-nova')
   const [rect,    setRect]    = useState(null)
   const [visible, setVisible] = useState(true)
   const pendingStageRef       = useRef(null)
 
   useEffect(() => { ensureKeyframes() }, [])
+
+  // Quando o modal fecha enquanto estamos num estágio dentro dele → volta ao estágio inicial
+  useEffect(() => {
+    if (!isModalOpen && (stage === 'modal-receita' || stage === 'modal-valor')) {
+      if (pendingStageRef.current) {
+        window.clearTimeout(pendingStageRef.current)
+        pendingStageRef.current = null
+      }
+      setStage('btn-nova')
+    }
+  }, [isModalOpen, stage])
 
   // Recalcula rect quando o estágio muda ou a janela é redimensionada
   useEffect(() => {
