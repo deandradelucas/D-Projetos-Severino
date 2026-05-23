@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
@@ -23,6 +23,7 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon'
 import PwaInstallBanner from '../components/PwaInstallBanner'
 import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
+import TutorialDashboard, { tutorialDashboardFoiVisto } from '../components/onboarding/TutorialDashboard'
 
 export default function Dashboard() {
   const location = useLocation()
@@ -32,6 +33,7 @@ export default function Dashboard() {
   const [usuario, setUsuario] = useState(() => readHorizonteUserPainelState())
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [showTutorial, setShowTutorial] = useState(() => !tutorialDashboardFoiVisto())
 
   // Consome a store de cache compartilhada — sem fetch local duplicado
   const {
@@ -142,7 +144,7 @@ export default function Dashboard() {
                   </h1>
                 </div>
                 <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos do painel">
-                  <button type="button" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={() => setIsModalOpen(true)}>
+                  <button type="button" data-tutorial-id="nova-transacao-btn" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={() => setIsModalOpen(true)}>
                     + Nova transação
                   </button>
                   <a
@@ -379,6 +381,7 @@ export default function Dashboard() {
     {!isModalOpen && (
       <button
         type="button"
+        data-tutorial-id="nova-transacao-btn"
         className="dashboard-mobile-tx-fab"
         onClick={() => setIsModalOpen(true)}
         aria-label="Criar nova transação"
@@ -399,6 +402,9 @@ export default function Dashboard() {
       onSave={fetchTransacoes}
       usuarioId={readHorizonteUser()?.id || usuario.id}
     />
+    {showTutorial && (
+      <TutorialDashboard onDismiss={() => setShowTutorial(false)} />
+    )}
     </>
   )
 }
