@@ -247,7 +247,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               </div>
 
               {subcategorias.length > 0 && (
-                <div className="form-group slide-down">
+                <div data-tutorial-id="subcategoria-selector" className="form-group slide-down">
                   <label>Subcategoria</label>
                   <CategorySelector
                     name="subcategoria_id"
