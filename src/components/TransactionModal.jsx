@@ -201,6 +201,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   </button>
                   <button
                     type="button"
+                    data-tutorial-id="tipo-receita-btn"
                     className={`type-btn receita ${formData.tipo === 'RECEITA' ? 'active' : ''}`}
                     onClick={() => handleTypeChangeWithReset('RECEITA')}
                   >
@@ -284,6 +285,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                 <label htmlFor="tx-valor">Valor (R$)</label>
                 <input
                   id="tx-valor"
+                  data-tutorial-id="tx-valor-input"
                   type="text"
                   name="valorDisplay"
                   value={displayValor}
