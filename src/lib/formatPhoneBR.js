@@ -2,7 +2,10 @@
  * Máscara de celular BR: (DD) 9XXXX-XXXX (até 11 dígitos).
  */
 export function maskPhoneBRMobile(raw) {
-  const numbers = String(raw ?? '').replace(/\D/g, '').slice(0, 11)
+  let numbers = String(raw ?? '').replace(/\D/g, '')
+  // Remove DDI 55 se o usuário colar número internacional (+5511999999999 → 11999999999)
+  if (numbers.length >= 12 && numbers.startsWith('55')) numbers = numbers.slice(2)
+  numbers = numbers.slice(0, 11)
   if (numbers.length <= 2) return numbers.length ? `(${numbers}` : ''
   if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`
   return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`

@@ -142,12 +142,16 @@ export function registerAuthRoutes(app) {
       const supabaseAdmin = getSupabaseAdmin()
 
       // TTL de 30 min: se o email já existe mas nunca foi verificado, limpa e reutiliza
-      const { data: existingEmail } = await supabaseAdmin
+      const { data: existingEmail, error: emailCheckErr } = await supabaseAdmin
         .from('usuarios')
         .select('id, telefone_verificado, email_verificado, created_at')
         .eq('email', email)
         .limit(1)
         .maybeSingle()
+      if (emailCheckErr) {
+        log.error('[register] erro ao verificar email existente', emailCheckErr)
+        return c.json({ message: 'Não foi possível verificar o cadastro. Tente novamente.' }, 503)
+      }
 
       if (existingEmail) {
         const isVerified = existingEmail.telefone_verificado || existingEmail.email_verificado
@@ -169,12 +173,16 @@ export function registerAuthRoutes(app) {
       }
 
       if (telefoneLimpo) {
-        const { data: existingPhone } = await supabaseAdmin
+        const { data: existingPhone, error: phoneCheckErr } = await supabaseAdmin
           .from('usuarios')
           .select('id, telefone_verificado, email_verificado, created_at')
           .eq('telefone', telefoneLimpo)
           .limit(1)
           .maybeSingle()
+        if (phoneCheckErr) {
+          log.error('[register] erro ao verificar telefone existente', phoneCheckErr)
+          return c.json({ message: 'Não foi possível verificar o cadastro. Tente novamente.' }, 503)
+        }
         if (existingPhone) {
           const isVerified = existingPhone.telefone_verificado || existingPhone.email_verificado
           if (isVerified) {
