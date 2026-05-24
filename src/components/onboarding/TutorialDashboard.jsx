@@ -187,14 +187,18 @@ function GlowRing({ t, l, r, b, ring }) {
 const FONT = "'Poppins', 'Inter', system-ui, sans-serif"
 
 function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLabel = 'Pular', showArrow = true, forceAbove = false }) {
-  const vw = typeof window !== 'undefined' ? window.innerWidth : 800
-  const vh = typeof window !== 'undefined' ? window.innerHeight : 800
-  const W  = Math.min(272, vw - 24)
-  const L  = Math.max(8, Math.min(rect.left + (rect.right - rect.left) / 2 - W / 2, vw - W - 8))
+  const vw   = typeof window !== 'undefined' ? window.innerWidth  : 800
+  const vh   = typeof window !== 'undefined' ? window.innerHeight : 800
+  // visualViewport.height shrinks when keyboard is open (iOS/Android); window.innerHeight doesn't on iOS
+  const vvH  = typeof window !== 'undefined' ? (window.visualViewport?.height ?? vh) : vh
+  const W    = Math.min(272, vw - 24)
+  const L    = Math.max(8, Math.min(rect.left + (rect.right - rect.left) / 2 - W / 2, vw - W - 8))
 
-  const CARD_H  = 160
-  const below   = !forceAbove && rect.bottom + 10 + CARD_H < vh
-  const top     = below ? rect.bottom + 10 : rect.top - 10 - CARD_H
+  const CARD_H = 160
+  const below  = !forceAbove && rect.bottom + 10 + CARD_H < vvH
+  const rawTop = below ? rect.bottom + 10 : rect.top - 10 - CARD_H
+  // clamp: nunca sai da tela (nem acima nem abaixo do visual viewport)
+  const top    = Math.max(8, Math.min(rawTop, vvH - CARD_H - 10))
 
   return (
     <div
@@ -315,7 +319,7 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
     let vvTimer = null
     function calcDebounced() {
       if (vvTimer) clearTimeout(vvTimer)
-      vvTimer = setTimeout(calc, 180)
+      vvTimer = setTimeout(calc, 350)
     }
 
     calc()
