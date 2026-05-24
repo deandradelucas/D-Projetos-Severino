@@ -158,7 +158,7 @@ function SpotlightBox({ t, l, r, b }) {
       aria-hidden
       style={{
         position:'fixed', top:t, left:l, width:Math.max(0,r-l), height:Math.max(0,b-t),
-        borderRadius:50, zIndex:Z_BARS, pointerEvents:'none',
+        borderRadius:8, zIndex:Z_BARS, pointerEvents:'none',
         animation:'tut-glow 1.8s ease-in-out infinite',
       }}
     />
