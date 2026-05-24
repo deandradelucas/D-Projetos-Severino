@@ -47,6 +47,7 @@ export default function Cadastro() {
   const [emailOtpLoading, setEmailOtpLoading] = useState(false)
   const [emailResendCooldown, setEmailResendCooldown] = useState(0)
   const [totalSteps, setTotalSteps] = useState(null)
+  const [submitError, setSubmitError] = useState('')
 
   const forca = senhaForca(senha)
 
@@ -70,12 +71,14 @@ export default function Cadastro() {
   const handleNext = () => {
     if (step === 1 && validateStep1()) {
       setErrors({})
+      setSubmitError('')
       setStep(2)
     }
   }
 
   const handleBack = () => {
     setErrors({})
+    setSubmitError('')
     setStep(1)
   }
 
@@ -113,11 +116,12 @@ export default function Cadastro() {
         const msg = data.message || 'Erro ao criar conta.'
         if (data.field === 'telefone') {
           setErrors({ telefone: msg })
+          setSubmitError('')
           setStep(1)
         } else if (data.field === 'email' || response.status === 409) {
           setErrors({ email: msg })
         } else {
-          showToast(msg, 'error')
+          setSubmitError(msg)
         }
         setLoading(false)
         return
@@ -146,7 +150,7 @@ export default function Cadastro() {
       window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
       navigateAfterLogin(data.user)
     } catch {
-      showToast('Erro ao conectar com o servidor', 'error')
+      setSubmitError('Erro ao conectar com o servidor. Verifique sua conexão e tente novamente.')
       setLoading(false)
     }
   }
@@ -296,7 +300,7 @@ export default function Cadastro() {
       <div className="mb-5">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-500">
-            Passo {step} de {totalSteps ?? (step > 2 ? step : 2)}
+            Passo {step} de {totalSteps ?? 3}
           </span>
           <span className="text-[10px] text-neutral-400">
             {step === 1 ? 'Dados pessoais' : step === 2 ? 'Segurança' : step === 3 ? 'WhatsApp' : 'E-mail'}
@@ -305,7 +309,7 @@ export default function Cadastro() {
         <div className="h-1 overflow-hidden rounded-full bg-neutral-200/90">
           <div
             className="h-full rounded-full bg-[var(--accent)] transition-all duration-500"
-            style={{ width: `${(step / (totalSteps ?? (step > 2 ? step : 2))) * 100}%` }}
+            style={{ width: `${(step / (totalSteps ?? 3)) * 100}%` }}
           />
         </div>
       </div>
@@ -477,7 +481,7 @@ export default function Cadastro() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors((p) => ({ ...p, email: undefined })); if (submitError) setSubmitError('') }}
                 placeholder="seu@email.com"
                 required
                 autoComplete="email"
@@ -493,7 +497,7 @@ export default function Cadastro() {
                   id="senha"
                   type={showSenha ? 'text' : 'password'}
                   value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
+                  onChange={(e) => { setSenha(e.target.value); if (submitError) setSubmitError('') }}
                   placeholder="••••••••"
                   required
                   autoComplete="new-password"
@@ -533,6 +537,12 @@ export default function Cadastro() {
                 {loading ? 'Criando...' : 'Criar conta'}
               </button>
             </div>
+
+            {submitError && (
+              <div role="alert" className="rounded-[10px] border border-red-200 bg-red-50 px-3 py-2.5 text-[12px] text-red-700">
+                {submitError}
+              </div>
+            )}
           </div>
         )}
       </form>
