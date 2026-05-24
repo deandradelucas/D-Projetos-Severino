@@ -168,12 +168,15 @@ function SpotlightBox({ t, l, r, b }) {
 const FONT = "'Poppins', 'Inter', system-ui, sans-serif"
 
 function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLabel = 'Pular', showArrow = true, forceAbove = false }) {
-  const vw   = typeof window !== 'undefined' ? window.innerWidth  : 800
-  const vh   = typeof window !== 'undefined' ? window.innerHeight : 800
+  const vw         = typeof window !== 'undefined' ? window.innerWidth  : 800
+  const vh         = typeof window !== 'undefined' ? window.innerHeight : 800
   // visualViewport.height shrinks when keyboard is open (iOS/Android); window.innerHeight doesn't on iOS
-  const vvH  = typeof window !== 'undefined' ? (window.visualViewport?.height ?? vh) : vh
-  const W    = Math.min(272, vw - 24)
-  const L    = Math.max(8, Math.min(rect.left + (rect.right - rect.left) / 2 - W / 2, vw - W - 8))
+  const vvH        = typeof window !== 'undefined' ? (window.visualViewport?.height ?? vh) : vh
+  const W          = Math.min(272, vw - 24)
+  const spotCenterX = rect.left + (rect.right - rect.left) / 2
+  const L          = Math.max(8, Math.min(spotCenterX - W / 2, vw - W - 8))
+  // offset da seta dentro do card para apontar ao centro do elemento destacado
+  const arrowLeft  = Math.max(7, Math.min(spotCenterX - L - 7, W - 14))
 
   const CARD_H = 160
   const below  = !forceAbove && rect.bottom + 10 + CARD_H < vvH
@@ -189,7 +192,7 @@ function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLa
       style={{ position:'fixed', top, left:L, width:W, zIndex:Z_CARD, animation:'tut-fadein .3s ease-out both', fontFamily:FONT }}
     >
       {showArrow && below && (
-        <div aria-hidden style={{ display:'flex', justifyContent:'center', marginBottom:4, animation:'tut-bounce 1.4s ease-in-out infinite' }}>
+        <div aria-hidden style={{ marginLeft: arrowLeft, marginBottom:4, animation:'tut-bounce 1.4s ease-in-out infinite', width:14 }}>
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#d4a84b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M8 12V4M4 8l4-4 4 4" />
           </svg>
@@ -238,7 +241,7 @@ function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLa
       </div>
 
       {showArrow && !below && (
-        <div aria-hidden style={{ display:'flex', justifyContent:'center', marginTop:4, animation:'tut-bounce 1.4s ease-in-out infinite' }}>
+        <div aria-hidden style={{ marginLeft: arrowLeft, marginTop:4, animation:'tut-bounce 1.4s ease-in-out infinite', width:14 }}>
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#d4a84b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M8 4v8M4 8l4 4 4-4" />
           </svg>
