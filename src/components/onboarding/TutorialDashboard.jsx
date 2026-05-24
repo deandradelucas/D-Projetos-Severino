@@ -16,12 +16,26 @@ function marcarVisto() {
   try { localStorage.setItem(TUTORIAL_KEY, '1') } catch {}
 }
 
-/** Retorna o DOMRect do PRIMEIRO elemento visível com esse data-tutorial-id */
+/** Retorna o DOMRect do PRIMEIRO elemento visível com esse data-tutorial-id.
+ *  Ajusta pelo offsetTop do visualViewport para que elementos dentro de modais
+ *  com teclado virtual aberto tenham coordenadas corretas para position:fixed. */
 function getRectOf(id) {
   const els = document.querySelectorAll(`[data-tutorial-id="${id}"]`)
+  const vvOffset = window.visualViewport?.offsetTop ?? 0
   for (const el of els) {
     const r = el.getBoundingClientRect()
-    if (r.width > 0 && r.height > 0) return r
+    if (r.width > 0 && r.height > 0) {
+      if (vvOffset === 0) return r
+      // Quando o teclado está aberto o vv está deslocado; compensar para fixed
+      return {
+        top:    r.top    - vvOffset,
+        bottom: r.bottom - vvOffset,
+        left:   r.left,
+        right:  r.right,
+        width:  r.width,
+        height: r.height,
+      }
+    }
   }
   return null
 }
@@ -296,16 +310,25 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
         }
       })
     }
+
+    // Debounce para visualViewport — aguarda animação do teclado terminar
+    let vvTimer = null
+    function calcDebounced() {
+      if (vvTimer) clearTimeout(vvTimer)
+      vvTimer = setTimeout(calc, 180)
+    }
+
     calc()
     const vv = window.visualViewport
     window.addEventListener('resize', calc)
-    vv?.addEventListener('resize', calc)
-    vv?.addEventListener('scroll', calc)
+    vv?.addEventListener('resize', calcDebounced)
+    vv?.addEventListener('scroll', calcDebounced)
     return () => {
       window.removeEventListener('resize', calc)
-      vv?.removeEventListener('resize', calc)
-      vv?.removeEventListener('scroll', calc)
+      vv?.removeEventListener('resize', calcDebounced)
+      vv?.removeEventListener('scroll', calcDebounced)
       if (retryTimer) window.clearTimeout(retryTimer)
+      if (vvTimer) clearTimeout(vvTimer)
     }
   }, [stage, visible])
 
