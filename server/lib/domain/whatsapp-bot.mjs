@@ -210,9 +210,9 @@ function formatDataTransacaoReplyPtBr(iso) {
 const AJUDA =
   '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n📈 *Investimentos:* "meus investimentos", "quanto tenho investido"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite *ajuda* para ver isto de novo.'
 
-// Detecta saudações isoladas: "Olá", "Oi", "Bom dia", etc.
+// Detecta saudações isoladas: "Olá", "Oi", "Bom dia", "Salve", "Opa", etc.
 const BOA_VINDAS_RE =
-  /^(ol[aá]|oi+|e\s+a[ií]|bom\s+dia|boa\s+tarde|boa\s+noite|tudo\s+(bem|bom|certo)|como\s+vai|hey|hello|hi)[\s!?.,🙂😊🖐👋]*$/i
+  /^(ol[aá]|oi+|e\s*a[ií]|bom\s+dia|boa\s+tarde|boa\s+noite|boa|bom|tudo\s+(bem|bom|certo|ok)|como\s+(vai|vc\s+vai|voce\s+vai|est[aá])|hey|hello|hi|salve+|opa|fala|al[oô]|boas|eae|eai|ol[aá]\s+tudo|bom\s+dia\s+severino|boa\s+tarde\s+severino|boa\s+noite\s+severino|ol[aá]\s+severino|oi\s+severino)[\s!?.,🙂😊🖐👋]*$/i
 
 function buildTutorialBoasVindas(nome) {
   return (
@@ -301,7 +301,8 @@ export async function processarMensagemBot(phone, rawMessage) {
 
   // Saudação isolada ou pedido de tutorial → tutorial de boas-vindas
   const msgNorm = message.replace(/\s+/g, ' ').trim()
-  const TUTORIAL_RE = /^(tutorial|como\s+funciona|o\s+que\s+(voc[êe]\s+)?(faz|sabe|pode)|me\s+ensina|me\s+ajuda)[\s!?.,]*$/i
+  const TUTORIAL_RE =
+    /^(tutorial|como\s+funciona(r|isso)?|como\s+usar|como\s+te\s+usar|como\s+uso|o\s+que\s+(voc[êe]\s+)?(faz|sabe|pode|consegue)|me\s+(ensina|explica|mostra|ajuda)|explica\s+(ai|a[ií]|pra\s+mim)?|comandos|instru[cç][oõ]es|manual|guia|dicas|o\s+que\s+posso\s+(fazer|pedir|falar)|quais\s+(s[aã]o\s+)?(os\s+)?comandos|come[cç]ar|come[cç]ando|iniciar|primeiro\s+uso|nunca\s+usei|n[aã]o\s+sei\s+(usar|como)|t[oô]\s+perdido|perdido|n[aã]o\s+entendi|como\s+registro|como\s+(lan[cç]o|cadastro)|como\s+lembro|lembrete)[\s!?.,]*$/i
   if (BOA_VINDAS_RE.test(msgNorm) || TUTORIAL_RE.test(msgNorm)) {
     const nome = usuario.nome ? `, ${usuario.nome.split(' ')[0]}` : ''
     return { ok: true, reply: buildTutorialBoasVindas(nome) }
