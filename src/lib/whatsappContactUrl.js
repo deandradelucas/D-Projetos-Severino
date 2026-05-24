@@ -11,10 +11,15 @@ function trimEnv(key) {
   return typeof v === 'string' ? v.trim() : ''
 }
 
-export function getWhatsappContactUrl() {
+export function getWhatsappContactUrl(text) {
   const link = trimEnv('VITE_WHATSAPP_LINK')
-  if (link) return link
-  const phone = trimEnv('VITE_WHATSAPP_PHONE').replace(/\D/g, '')
-  if (phone) return `https://wa.me/${phone}`
-  return DEFAULT_SUPPORT_WA
+  const base = link || (() => {
+    const phone = trimEnv('VITE_WHATSAPP_PHONE').replace(/\D/g, '')
+    return phone ? `https://wa.me/${phone}` : DEFAULT_SUPPORT_WA
+  })()
+  return text ? `${base}?text=${encodeURIComponent(text)}` : base
+}
+
+export function getWhatsappOnboardingUrl() {
+  return getWhatsappContactUrl('Olá')
 }

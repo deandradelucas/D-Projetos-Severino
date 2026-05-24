@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { getWhatsappOnboardingUrl } from '../../lib/whatsappContactUrl.js'
 
 const TUTORIAL_KEY = 'horizonte_tutorial_transacao_visto'
 const PAD          = 14   // padding ao redor do spotlight
@@ -119,6 +120,19 @@ const STAGES = {
     title:       'Salve sua transação',
     body:        'Toque em Salvar Transação para registrar seu saldo.',
     nextTrigger: 'salvar-transacao-btn',
+    nextStage:   'dashboard-whatsapp',
+    nextDelay:   700,
+  },
+  'dashboard-whatsapp': {
+    targetId:    'whatsapp-btn',
+    overlay:     true,
+    forceAbove:  false,
+    badge:       'Dica final',
+    title:       'Converse pelo WhatsApp',
+    body:        'Toque no botão e envie "Olá" para o assistente — controle suas finanças direto pelo celular!',
+    nextTrigger: null,
+    ctaLabel:    'Abrir WhatsApp →',
+    ctaUrl:      getWhatsappOnboardingUrl(),
     nextStage:   'done',
     nextDelay:   0,
   },
@@ -247,12 +261,12 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
 
   useEffect(() => { ensureKeyframes() }, [])
 
-  // Quando o modal fecha enquanto estamos num estágio dentro dele → volta ao estágio inicial
+  // Quando o modal fecha → volta ao início, EXCETO se há transição agendada (após save)
   useEffect(() => {
     if (!isModalOpen && (stage === 'modal-receita' || stage === 'modal-categoria' || stage === 'modal-subcategoria' || stage === 'modal-valor' || stage === 'modal-salvar')) {
       if (pendingStageRef.current) {
-        window.clearTimeout(pendingStageRef.current)
-        pendingStageRef.current = null
+        // Modal fechou após save — deixa a transição agendada acontecer
+        return
       }
       setStage('btn-nova')
     }
@@ -332,6 +346,12 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
     else { setStage(cfg.nextStage) }
   }, [stage, dismiss])
 
+  const handleCta = useCallback(() => {
+    const cfg = STAGES[stage]
+    if (cfg?.ctaUrl) window.open(cfg.ctaUrl, '_blank', 'noopener,noreferrer')
+    advanceStage()
+  }, [stage, advanceStage])
+
   if (!visible || stage === 'done' || !rect) return null
 
   const cfg = STAGES[stage]
@@ -355,7 +375,7 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
         title={cfg.title}
         body={cfg.body}
         ctaLabel={cfg.ctaLabel}
-        onCta={cfg.ctaLabel ? advanceStage : undefined}
+        onCta={cfg.ctaLabel ? handleCta : undefined}
         forceAbove={cfg.forceAbove}
         onSkip={dismiss}
         skipLabel={stage === 'modal-valor' ? 'Fechar dica' : 'Pular'}
