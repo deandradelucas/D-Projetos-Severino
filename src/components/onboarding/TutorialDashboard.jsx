@@ -72,66 +72,8 @@ const STAGES = {
     badge:       'Primeiro passo',
     title:       'Registre sua primeira transação',
     body:        'Toque no botão destacado para abrir o formulário.',
-    nextTrigger: 'nova-transacao-btn', // data-tutorial-id do elemento que dispara a transição
-    nextStage:   'modal-receita',
-    nextDelay:   320,                  // aguarda o modal terminar de abrir
-  },
-  'modal-receita': {
-    targetId:    'tipo-receita-btn',
-    overlay:     true,
-    badge:       'Cadastre seu saldo atual',
-    title:       'Selecione Receita',
-    body:        'Toque em Receita e cadastre o saldo atual das suas contas bancárias — o valor que você tem disponível hoje.',
-    nextTrigger: 'tipo-receita-btn',
-    nextStage:   'modal-categoria',
-    nextDelay:   0,
-  },
-  'modal-categoria': {
-    targetId:    'categoria-selector',
-    overlay:     true,
-    forceAbove:  true,
-    badge:       'Organize sua receita',
-    title:       'Escolha a categoria',
-    body:        'Selecione a categoria que melhor representa essa receita. Experimente cadastrar Saldo.',
     nextTrigger: null,
-    ctaLabel:    'Já escolhi →',
-    nextStage:   'modal-subcategoria',
-    nextDelay:   0,
-  },
-  'modal-subcategoria': {
-    targetId:    'subcategoria-selector',
-    overlay:     true,
-    forceAbove:  true,
-    badge:       'Detalhe sua receita',
-    title:       'Escolha a subcategoria',
-    body:        'Experimente utilizar Saldo Atual e depois vá para Valor.',
-    nextTrigger: null,
-    ctaLabel:    'Ir para Valor →',
-    nextStage:   'modal-valor',
-    nextDelay:   0,
-    skipIfMissing: true,          // pula para nextStage se o elemento não estiver visível
-  },
-  'modal-valor': {
-    targetId:    'tx-valor-input',
-    overlay:     true,
-    badge:       'Quanto você tem hoje?',
-    title:       'Informe o saldo total',
-    body:        'Some o saldo de todas as suas contas e coloque o total aqui.',
-    nextTrigger: null,
-    ctaLabel:    'Próximo →',
-    nextStage:   'modal-salvar',
-    nextDelay:   0,
-  },
-  'modal-salvar': {
-    targetId:    'salvar-transacao-btn',
-    overlay:     true,
-    forceAbove:  true,
-    badge:       'Último passo',
-    title:       'Salve sua transação',
-    body:        'Toque em Salvar Transação para registrar seu saldo.',
-    nextTrigger: 'salvar-transacao-btn',
-    nextStage:   'dashboard-whatsapp',
-    nextDelay:   700,
+    nextStage:   null,
   },
   'dashboard-whatsapp': {
     targetId:    'whatsapp-btn',
@@ -260,17 +202,22 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
   const [rect,    setRect]    = useState(null)
   const [visible, setVisible] = useState(true)
   const pendingStageRef       = useRef(null)
+  const modalWasOpenRef       = useRef(false)
 
   useEffect(() => { ensureKeyframes() }, [])
 
-  // Quando o modal fecha → volta ao início, EXCETO se há transição agendada (após save)
+  // Rastreia abertura do modal enquanto está no estágio btn-nova
   useEffect(() => {
-    if (!isModalOpen && (stage === 'modal-receita' || stage === 'modal-categoria' || stage === 'modal-subcategoria' || stage === 'modal-valor' || stage === 'modal-salvar')) {
-      if (pendingStageRef.current) {
-        // Modal fechou após save — deixa a transição agendada acontecer
-        return
-      }
-      setStage('btn-nova')
+    if (isModalOpen && stage === 'btn-nova') {
+      modalWasOpenRef.current = true
+    }
+  }, [isModalOpen, stage])
+
+  // Quando modal fecha após ter sido aberto → avança para WhatsApp
+  useEffect(() => {
+    if (!isModalOpen && modalWasOpenRef.current && stage === 'btn-nova') {
+      modalWasOpenRef.current = false
+      setStage('dashboard-whatsapp')
     }
   }, [isModalOpen, stage])
 
@@ -401,7 +348,7 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
         onCta={cfg.ctaLabel ? handleCta : undefined}
         forceAbove={cfg.forceAbove}
         onSkip={dismiss}
-        skipLabel={stage === 'modal-valor' ? 'Fechar dica' : 'Pular'}
+        skipLabel="Pular"
         showArrow
       />
     </>
