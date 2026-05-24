@@ -47,8 +47,8 @@ function ensureKeyframes() {
   const s = document.createElement('style')
   s.textContent = `
     @keyframes tut-glow {
-      0%,100% { box-shadow: 0 0 0 2px rgba(212,168,75,.80), 0 0 18px rgba(212,168,75,.22); }
-      50%      { box-shadow: 0 0 0 2.5px rgba(212,168,75,1), 0 0 36px rgba(212,168,75,.50); }
+      0%,100% { box-shadow: 0 0 0 9999px rgba(4,5,10,.90), 0 0 0 2px rgba(212,168,75,.80), 0 0 18px rgba(212,168,75,.22); }
+      50%      { box-shadow: 0 0 0 9999px rgba(4,5,10,.90), 0 0 0 2.5px rgba(212,168,75,1), 0 0 36px rgba(212,168,75,.50); }
     }
     @keyframes tut-fadein {
       from { opacity:0; transform:translateY(6px); }
@@ -57,10 +57,6 @@ function ensureKeyframes() {
     @keyframes tut-bounce {
       0%,100% { transform:translateY(0); }
       50%     { transform:translateY(-5px); }
-    }
-    @keyframes tut-ring-pulse {
-      0%,100% { box-shadow: 0 0 0 3px rgba(212,168,75,.70), 0 0 24px rgba(212,168,75,.30); }
-      50%      { box-shadow: 0 0 0 4px rgba(212,168,75,1),   0 0 40px rgba(212,168,75,.55); }
     }
   `
   document.head.appendChild(s)
@@ -156,29 +152,14 @@ const STAGES = {
 // Sub-componentes de layout
 // ─────────────────────────────────────────────────────────────────────────────
 
-function OverlayBars({ t, l, r, b }) {
-  const bg = 'rgba(4, 5, 10, .90)'
-  return (
-    <>
-      <div aria-hidden style={{ position:'fixed', inset:0, bottom:'auto', height: Math.max(0,t), background:bg, zIndex:Z_BARS, pointerEvents:'all' }} />
-      <div aria-hidden style={{ position:'fixed', top:b,  left:0, right:0, bottom:0, background:bg, zIndex:Z_BARS, pointerEvents:'all' }} />
-      <div aria-hidden style={{ position:'fixed', top:t, left:0, width:Math.max(0,l), height:b-t, background:bg, zIndex:Z_BARS, pointerEvents:'all' }} />
-      <div aria-hidden style={{ position:'fixed', top:t, left:r, right:0, height:b-t, background:bg, zIndex:Z_BARS, pointerEvents:'all' }} />
-    </>
-  )
-}
-
-function GlowRing({ t, l, r, b, ring }) {
+function SpotlightBox({ t, l, r, b }) {
   return (
     <div
       aria-hidden
       style={{
-        position:'fixed', top:t, left:l, width:r-l, height:b-t,
-        borderRadius:14, zIndex:Z_RING, pointerEvents:'none',
-        animation: ring ? 'tut-ring-pulse 1.8s ease-in-out infinite' : 'tut-glow 1.8s ease-in-out infinite',
-        boxShadow: ring
-          ? '0 0 0 3px rgba(212,168,75,.70), 0 0 24px rgba(212,168,75,.30)'
-          : '0 0 0 2px rgba(212,168,75,.80), 0 0 18px rgba(212,168,75,.22)',
+        position:'fixed', top:t, left:l, width:Math.max(0,r-l), height:Math.max(0,b-t),
+        borderRadius:50, zIndex:Z_BARS, pointerEvents:'none',
+        animation:'tut-glow 1.8s ease-in-out infinite',
       }}
     />
   )
@@ -404,11 +385,8 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
 
   return (
     <>
-      {/* Overlay bloqueante (só no estágio do Dashboard) */}
-      {cfg.overlay && <OverlayBars t={T} l={L} r={R} b={B} />}
-
-      {/* Anel de destaque */}
-      <GlowRing t={T} l={L} r={R} b={B} ring={!cfg.overlay} />
+      {/* Spotlight arredondado: overlay escuro + borda dourada animada */}
+      <SpotlightBox t={T} l={L} r={R} b={B} />
 
       {/* Tooltip */}
       <TooltipCard
