@@ -296,7 +296,7 @@ export function registerAuthRoutes(app) {
       log.error('register failed', error)
       const mapped = mapSupabaseOrNetworkError(error)
       if (mapped) return c.json({ message: mapped.message }, mapped.status)
-      return c.json({ message: 'Não foi possível criar a conta agora. Tente novamente em alguns instantes.' }, 500)
+      return c.json({ field: 'telefone', message: 'Não foi possível criar a conta. Verifique suas informações de telefone e tente novamente.' }, 500)
     }
   })
 
