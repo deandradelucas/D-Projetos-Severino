@@ -143,7 +143,7 @@ const STAGES = {
     forceAbove:  false,
     badge:       'Dica final',
     title:       'Converse pelo WhatsApp',
-    body:        'Toque no botão e envie "Olá" para o assistente — controle suas finanças direto pelo celular!',
+    body:        'Toque no botão e envie "ajuda" para o assistente — controle suas finanças direto pelo celular!',
     nextTrigger: null,
     ctaLabel:    'Abrir WhatsApp →',
     ctaUrl:      getWhatsappOnboardingUrl(),
