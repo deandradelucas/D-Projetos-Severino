@@ -141,24 +141,55 @@ export function registerAuthRoutes(app) {
 
       const supabaseAdmin = getSupabaseAdmin()
 
-      const { data: existing } = await supabaseAdmin
+      // TTL de 30 min: se o email já existe mas nunca foi verificado, limpa e reutiliza
+      const { data: existingEmail } = await supabaseAdmin
         .from('usuarios')
-        .select('id')
+        .select('id, telefone_verificado, email_verificado, created_at')
         .eq('email', email)
         .limit(1)
+        .maybeSingle()
 
-      if (existing && existing.length > 0) {
-        return c.json({ message: 'Este e-mail já está cadastrado.' }, 409)
+      if (existingEmail) {
+        const isVerified = existingEmail.telefone_verificado || existingEmail.email_verificado
+        if (isVerified) {
+          return c.json({ field: 'email', message: 'Este e-mail já está cadastrado.' }, 409)
+        }
+        const ageMs = Date.now() - new Date(existingEmail.created_at).getTime()
+        if (ageMs < 30 * 60 * 1000) {
+          // Cadastro recente e não verificado — bloqueia e orienta a reenviar código
+          return c.json({
+            field: 'email',
+            message: 'Você já iniciou um cadastro com este e-mail. Use a opção "Reenviar código" para receber o código novamente.',
+          }, 409)
+        }
+        // Cadastro antigo e não verificado — limpa e libera para novo cadastro
+        log.warn('[register] removendo cadastro não verificado expirado para reutilizar email', existingEmail.id)
+        await supabaseAdmin.from('usuarios').delete().eq('id', existingEmail.id)
+          .catch(e => log.error('[register] falha ao limpar cadastro expirado', e))
       }
 
       if (telefoneLimpo) {
         const { data: existingPhone } = await supabaseAdmin
           .from('usuarios')
-          .select('id')
+          .select('id, telefone_verificado, email_verificado, created_at')
           .eq('telefone', telefoneLimpo)
           .limit(1)
-        if (existingPhone && existingPhone.length > 0) {
-          return c.json({ message: 'Este número de WhatsApp já está cadastrado. Tente fazer login.' }, 409)
+          .maybeSingle()
+        if (existingPhone) {
+          const isVerified = existingPhone.telefone_verificado || existingPhone.email_verificado
+          if (isVerified) {
+            return c.json({ field: 'telefone', message: 'Este número de WhatsApp já está cadastrado. Tente fazer login.' }, 409)
+          }
+          const ageMs = Date.now() - new Date(existingPhone.created_at).getTime()
+          if (ageMs < 30 * 60 * 1000) {
+            return c.json({
+              field: 'telefone',
+              message: 'Você já iniciou um cadastro com este número. Use a opção "Reenviar código" para receber o código novamente.',
+            }, 409)
+          }
+          log.warn('[register] removendo cadastro não verificado expirado para reutilizar telefone', existingPhone.id)
+          await supabaseAdmin.from('usuarios').delete().eq('id', existingPhone.id)
+            .catch(e => log.error('[register] falha ao limpar cadastro expirado', e))
         }
       }
 
@@ -172,7 +203,11 @@ export function registerAuthRoutes(app) {
 
       if (insertError) {
         if (insertError.code === '23505') {
-          return c.json({ message: 'Este e-mail já está cadastrado.' }, 409)
+          const detail = (insertError.constraint || insertError.details || insertError.message || '').toLowerCase()
+          if (detail.includes('telefone') || detail.includes('phone')) {
+            return c.json({ field: 'telefone', message: 'Este número de WhatsApp já está cadastrado. Tente fazer login.' }, 409)
+          }
+          return c.json({ field: 'email', message: 'Este e-mail já está cadastrado.' }, 409)
         }
         log.error('register insert error', insertError)
         const mapped = mapSupabaseOrNetworkError(insertError)

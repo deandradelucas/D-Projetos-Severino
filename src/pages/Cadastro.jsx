@@ -111,15 +111,13 @@ export default function Cadastro() {
 
       if (!response.ok) {
         const msg = data.message || 'Erro ao criar conta.'
-        // Erros de duplicata: mostrar inline no campo correto
         if (response.status === 409) {
-          if (msg.toLowerCase().includes('e-mail')) {
-            setErrors({ email: msg })
-          } else if (msg.toLowerCase().includes('número') || msg.toLowerCase().includes('whatsapp')) {
+          if (data.field === 'telefone') {
             setErrors({ telefone: msg })
             setStep(1)
           } else {
-            showToast(msg, 'error')
+            // email ou genérico
+            setErrors({ email: msg })
           }
         } else {
           showToast(msg, 'error')
