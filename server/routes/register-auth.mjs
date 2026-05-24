@@ -151,6 +151,17 @@ export function registerAuthRoutes(app) {
         return c.json({ message: 'Este e-mail já está cadastrado.' }, 409)
       }
 
+      if (telefoneLimpo) {
+        const { data: existingPhone } = await supabaseAdmin
+          .from('usuarios')
+          .select('id')
+          .eq('telefone', telefoneLimpo)
+          .limit(1)
+        if (existingPhone && existingPhone.length > 0) {
+          return c.json({ message: 'Este número de WhatsApp já está cadastrado. Tente fazer login.' }, 409)
+        }
+      }
+
       const senhaHash = await bcrypt.hash(senha, 10)
 
       const { data: newUser, error: insertError } = await supabaseAdmin

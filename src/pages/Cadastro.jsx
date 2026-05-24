@@ -520,7 +520,7 @@ export default function Cadastro() {
               <button
                 type="submit"
                 disabled={loading}
-                className="min-h-[46px] flex-[1.5] cursor-pointer rounded-[14px] bg-[var(--accent)] px-4 py-3 text-[12px] font-semibold text-[var(--accent-foreground)] shadow-[var(--shadow-accent)] transition hover:bg-[var(--accent-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-border)] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[48px] sm:text-[13px]"
+                className="min-h-[46px] flex-[1.5] cursor-pointer rounded-[14px] bg-[var(--accent)] px-4 py-3 text-[12px] font-semibold text-[var(--accent-foreground)] shadow-[var(--shadow-accent)] transition hover:bg-[var(--accent-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-border)] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[48px] sm:text-[13px] overflow-hidden whitespace-nowrap"
               >
                 {loading ? 'Criando...' : 'Criar conta'}
               </button>
