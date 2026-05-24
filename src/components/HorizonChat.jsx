@@ -213,7 +213,7 @@ export default function HorizonChat() {
     {
       id: 1,
       role: 'model',
-      text: 'Olá! Sou o **Severino**, seu assistente financeiro pessoal. 👋\n\nPosso ajudar você a entender seus gastos, analisar seu saldo, identificar padrões e dar dicas financeiras. Como posso te ajudar hoje?',
+      text: 'Olá! Sou o **Severino**, seu assistente financeiro pessoal. 👋\n\nPosso ajudar você a entender seus gastos, analisar seu saldo, identificar padrões e dar dicas financeiras. Como posso te ajudar hoje?\n\n📱 **Use também pelo WhatsApp:**\n\n💸 **Gastos:** "Severino, gastei 200 com combustível"\n✅ **Receitas:** "Severino, ganhei 70 reais com rendimentos"\n🗓️ **Agenda:** "Severino, reunião às 17 horas" (eu aviso na hora certa! ⏰)\n📊 **Consultas:** "Meu saldo" · "Extrato do dia" · "Meus investimentos"\n\nDigite **tutorial** no WhatsApp para ver este guia a qualquer momento.',
       ts: new Date()
     }
   ])
