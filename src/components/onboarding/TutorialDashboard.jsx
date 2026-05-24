@@ -117,7 +117,7 @@ const STAGES = {
   },
   'modal-valor': {
     targetId:    'tx-valor-input',
-    overlay:     true,
+    overlay:     false,
     badge:       'Quanto você tem hoje?',
     title:       'Informe o saldo total',
     body:        'Some o saldo de todas as suas contas e coloque o total aqui.',
