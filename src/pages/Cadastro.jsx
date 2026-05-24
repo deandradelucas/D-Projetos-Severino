@@ -8,7 +8,7 @@ import { apiUrl } from '../lib/apiUrl'
 import { writeHorizonteAccessToken, writeHorizonteRefreshToken } from '../lib/horizonteAccessToken'
 import { showToast } from '../lib/toastStore'
 import { validateEmail } from '../lib/validateEmail'
-import { maskPhoneBRMobile } from '../lib/formatPhoneBR'
+import { maskPhoneBRMobile, validatePhoneBRMobile } from '../lib/formatPhoneBR'
 
 // 1 = fraca, 2 = média, 3 = forte
 function senhaForca(s) {
@@ -18,7 +18,7 @@ function senhaForca(s) {
   return 1
 }
 
-const FORCA_LABEL = ['', 'Fraca', 'Média', 'Forte']
+const FORCA_LABEL = ['Muito curta', 'Fraca', 'Média', 'Forte']
 const FORCA_COR = ['', 'bg-red-400', 'bg-amber-400', 'bg-[var(--accent)]']
 
 export default function Cadastro() {
@@ -52,18 +52,16 @@ export default function Cadastro() {
 
   const validateStep1 = () => {
     const newErrors = {}
-    if (!nome.trim()) newErrors.nome = 'Nome é obrigatório'
-    const digits = telefone.replace(/\D/g, '')
-    if (digits.length < 10 || digits.length > 11) {
-      newErrors.telefone = 'Informe DDD + número (10 ou 11 dígitos)'
-    }
+    if (!nome.trim() || nome.trim().length < 3) newErrors.nome = 'Informe seu nome completo (mínimo 3 caracteres)'
+    const phoneResult = validatePhoneBRMobile(telefone)
+    if (!phoneResult.ok) newErrors.telefone = phoneResult.message
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const validateStep2 = () => {
     const newErrors = {}
-    if (!validateEmail(email)) newErrors.email = 'E-mail inválido'
+    if (!validateEmail(email.trim())) newErrors.email = 'E-mail inválido'
     if (senha.length < 6) newErrors.senha = 'Mínimo 6 caracteres'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -71,11 +69,13 @@ export default function Cadastro() {
 
   const handleNext = () => {
     if (step === 1 && validateStep1()) {
+      setErrors({})
       setStep(2)
     }
   }
 
   const handleBack = () => {
+    setErrors({})
     setStep(1)
   }
 
@@ -291,7 +291,7 @@ export default function Cadastro() {
         </>
       }
     >
-      {conviteQuery && (
+      {conviteQuery && step <= 2 && (
         <div className="mb-4 sm:mb-5">
           <FamiliaConviteColarBlock idPrefix="cadastro-familia-convite" />
         </div>
@@ -442,7 +442,7 @@ export default function Cadastro() {
                 autoComplete="name"
                 className={AUTH_SHELL_INPUT_CLASS}
               />
-              {errors.nome && <p className="mt-1 text-[10px] text-red-600">{errors.nome}</p>}
+              {errors.nome && <p role="alert" className="mt-1 text-[10px] text-red-600">{errors.nome}</p>}
             </label>
 
             <label className="block" htmlFor="telefone">
@@ -459,7 +459,7 @@ export default function Cadastro() {
                 className={AUTH_SHELL_INPUT_CLASS}
               />
               <p className="mt-1 text-[10px] text-neutral-400">Usado para recuperar sua senha via WhatsApp</p>
-              {errors.telefone && <p className="mt-1 text-[10px] text-red-600">{errors.telefone}</p>}
+              {errors.telefone && <p role="alert" className="mt-1 text-[10px] text-red-600">{errors.telefone}</p>}
             </label>
 
             <button
@@ -486,7 +486,7 @@ export default function Cadastro() {
                 autoComplete="email"
                 className={AUTH_SHELL_INPUT_CLASS}
               />
-              {errors.email && <p className="mt-1 text-[10px] text-red-600">{errors.email}</p>}
+              {errors.email && <p role="alert" className="mt-1 text-[10px] text-red-600">{errors.email}</p>}
             </label>
 
             <label className="block" htmlFor="senha">
@@ -510,14 +510,14 @@ export default function Cadastro() {
                     {[1, 2, 3].map((n) => (
                       <div
                         key={n}
-                        className={`h-1 flex-1 rounded-full transition-colors duration-300 ${forca >= n ? FORCA_COR[forca] : 'bg-neutral-200'}`}
+                        className={`h-1 flex-1 rounded-full transition-colors duration-300 ${forca > 0 && forca >= n ? FORCA_COR[forca] : 'bg-neutral-200'}`}
                       />
                     ))}
                   </div>
                   <p className="mt-1 text-[10px] text-neutral-400">{FORCA_LABEL[forca]}</p>
                 </div>
               )}
-              {errors.senha && <p className="mt-1 text-[10px] text-red-600">{errors.senha}</p>}
+              {errors.senha && <p role="alert" className="mt-1 text-[10px] text-red-600">{errors.senha}</p>}
             </label>
 
             <div className="flex gap-3 pt-1">
