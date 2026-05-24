@@ -302,7 +302,14 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
     function calc() {
       requestAnimationFrame(() => {
         const r = getRectOf(cfg.targetId)
-        if (r) { setRect(r); return }
+        if (r) {
+          // Só aceita rect se o elemento está visível no visual viewport
+          // (evita posições erradas enquanto o teclado ainda está abrindo)
+          const effH = window.visualViewport?.height ?? window.innerHeight
+          if (r.bottom > 0 && r.top < effH) { setRect(r); return }
+          // Fora do viewport — aguarda próxima chamada debounced
+          return
+        }
         // Elemento ausente: se skipIfMissing, tenta por até 400ms depois avança
         if (cfg.skipIfMissing && retries < 4) {
           retries++
@@ -319,6 +326,9 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
     let vvTimer = null
     function calcDebounced() {
       if (vvTimer) clearTimeout(vvTimer)
+      // Esconde overlay imediatamente quando viewport muda (teclado abrindo/fechando)
+      // Evita que o spotlight fique na posição antiga cobrindo o elemento deslocado
+      setRect(null)
       vvTimer = setTimeout(calc, 350)
     }
 
