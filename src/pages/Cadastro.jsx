@@ -110,7 +110,20 @@ export default function Cadastro() {
       const data = await response.json()
 
       if (!response.ok) {
-        showToast(data.message || 'Erro ao criar conta.', 'error')
+        const msg = data.message || 'Erro ao criar conta.'
+        // Erros de duplicata: mostrar inline no campo correto
+        if (response.status === 409) {
+          if (msg.toLowerCase().includes('e-mail')) {
+            setErrors({ email: msg })
+          } else if (msg.toLowerCase().includes('número') || msg.toLowerCase().includes('whatsapp')) {
+            setErrors({ telefone: msg })
+            setStep(1)
+          } else {
+            showToast(msg, 'error')
+          }
+        } else {
+          showToast(msg, 'error')
+        }
         setLoading(false)
         return
       }
