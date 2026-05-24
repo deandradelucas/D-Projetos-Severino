@@ -258,10 +258,12 @@ export function registerAuthRoutes(app) {
           await supabaseAdmin.from('usuarios').delete().eq('id', newUser.id).catch((e) =>
             log.error('[register] falha ao reverter usuário após OTP inválido', e)
           )
-          const status = otpErr.statusCode && Number.isFinite(otpErr.statusCode) ? otpErr.statusCode : 400
+          const rawStatus = otpErr.statusCode && Number.isFinite(otpErr.statusCode) ? otpErr.statusCode : 400
+          const errorStatus = rawStatus >= 400 ? rawStatus : 400
           return c.json({
+            field: 'telefone',
             message: otpErr.message || 'Não foi possível enviar o código de verificação. Verifique se o número tem WhatsApp ativo e tente novamente.',
-          }, status)
+          }, errorStatus)
         }
       }
 

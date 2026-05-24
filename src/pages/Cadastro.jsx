@@ -111,14 +111,11 @@ export default function Cadastro() {
 
       if (!response.ok) {
         const msg = data.message || 'Erro ao criar conta.'
-        if (response.status === 409) {
-          if (data.field === 'telefone') {
-            setErrors({ telefone: msg })
-            setStep(1)
-          } else {
-            // email ou genérico
-            setErrors({ email: msg })
-          }
+        if (data.field === 'telefone') {
+          setErrors({ telefone: msg })
+          setStep(1)
+        } else if (data.field === 'email' || response.status === 409) {
+          setErrors({ email: msg })
         } else {
           showToast(msg, 'error')
         }
