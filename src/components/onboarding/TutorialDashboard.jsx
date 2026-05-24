@@ -206,10 +206,11 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
 
   useEffect(() => { ensureKeyframes() }, [])
 
-  // Rastreia abertura do modal enquanto está no estágio btn-nova
+  // Rastreia abertura do modal enquanto está no estágio btn-nova e esconde o estágio 1
   useEffect(() => {
     if (isModalOpen && stage === 'btn-nova') {
       modalWasOpenRef.current = true
+      setRect(null)
     }
   }, [isModalOpen, stage])
 
