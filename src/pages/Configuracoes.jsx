@@ -765,6 +765,24 @@ export default function Configuracoes() {
             loadWebAuthn={loadWebAuthn}
           />
 
+          <section className="config-card config-card--full">
+            <div className="config-card-head">
+              <span className="config-card-kicker">Ajuda</span>
+              <h2 className="config-card-title-clean">Suporte humanizado</h2>
+              <p className="config-card-subtitle">Precisa de ajuda? Fale diretamente com a nossa equipe pelo WhatsApp.</p>
+            </div>
+            <div className="config-quick-actions">
+              <a
+                href="https://wa.me/5554996994482?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20o%20Severino"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="config-action-btn config-action-btn--whatsapp"
+              >
+                💬 Falar com suporte
+              </a>
+            </div>
+          </section>
+
           {isAdmin && (
             <section className="config-card config-card--full config-admin-card">
               <div className="config-card-head">

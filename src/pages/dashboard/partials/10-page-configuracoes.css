@@ -464,6 +464,25 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-avatar--cl
   color: var(--bg-card);
 }
 
+.config-action-btn--whatsapp {
+  border-color: #25d366;
+  background: #25d366;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (hover: hover) {
+  .config-action-btn--whatsapp:hover {
+    background: #1ebe5d;
+    border-color: #1ebe5d;
+    transform: translateY(-1px);
+  }
+}
+
 @media (hover: hover) {
   .page-configuracoes.app-horizon-shell .config-action-btn--primary:hover:not(:disabled) {
     border-color: color-mix(in srgb, var(--accent) 44%, var(--border-default));
