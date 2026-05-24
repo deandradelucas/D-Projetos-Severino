@@ -77,7 +77,7 @@ const STAGES = {
   },
   'modal-categoria': {
     targetId:    'categoria-selector',
-    overlay:     false,
+    overlay:     true,
     forceAbove:  true,
     badge:       'Organize sua receita',
     title:       'Escolha a categoria',
@@ -89,7 +89,7 @@ const STAGES = {
   },
   'modal-subcategoria': {
     targetId:    'subcategoria-selector',
-    overlay:     false,
+    overlay:     true,
     forceAbove:  true,
     badge:       'Detalhe sua receita',
     title:       'Escolha a subcategoria',
@@ -102,7 +102,7 @@ const STAGES = {
   },
   'modal-valor': {
     targetId:    'tx-valor-input',
-    overlay:     false,
+    overlay:     true,
     badge:       'Quanto você tem hoje?',
     title:       'Informe o saldo total',
     body:        'Some o saldo de todas as suas contas e coloque o total aqui.',
@@ -113,7 +113,7 @@ const STAGES = {
   },
   'modal-salvar': {
     targetId:    'salvar-transacao-btn',
-    overlay:     false,
+    overlay:     true,
     forceAbove:  true,
     badge:       'Último passo',
     title:       'Salve sua transação',
