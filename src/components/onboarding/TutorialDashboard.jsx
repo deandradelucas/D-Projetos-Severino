@@ -220,7 +220,7 @@ function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLa
         border:'1px solid rgba(212,168,75,.18)',
         borderRadius:14,
         padding:'11px 14px 10px',
-        boxShadow:'0 0 0 1px rgba(255,255,255,.03) inset, 0 16px 40px -8px rgba(0,0,0,.95), 0 0 30px -12px rgba(212,168,75,.14)',
+        boxShadow:'0 0 0 1px rgba(255,255,255,.03) inset, 0 0 30px -12px rgba(212,168,75,.14)',
         position:'relative',
       }}>
         <div aria-hidden style={{ position:'absolute', top:-1, left:18, right:18, height:1, background:'linear-gradient(90deg,transparent,rgba(212,168,75,.45),transparent)' }} />
