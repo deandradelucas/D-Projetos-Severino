@@ -157,6 +157,7 @@ export default function Dashboard() {
                     target={whatsappContactUrl ? '_blank' : undefined}
                     rel={whatsappContactUrl ? 'noopener noreferrer' : undefined}
                     tabIndex={whatsappContactUrl ? undefined : -1}
+                    data-tutorial-id="whatsapp-btn"
                     className={`dashboard-hub__icon-btn dashboard-hub__icon-btn--wa ${!whatsappContactUrl ? 'dashboard-hub__icon-btn--disabled' : ''}`}
                     aria-label="Abrir WhatsApp"
                     title={
