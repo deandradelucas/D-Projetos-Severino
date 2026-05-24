@@ -67,7 +67,7 @@ const STAGES = {
   },
   'modal-receita': {
     targetId:    'tipo-receita-btn',
-    overlay:     false,
+    overlay:     true,
     badge:       'Cadastre seu saldo atual',
     title:       'Selecione Receita',
     body:        'Toque em Receita e cadastre o saldo atual das suas contas bancárias — o valor que você tem disponível hoje.',
