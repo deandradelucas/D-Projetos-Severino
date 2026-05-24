@@ -299,8 +299,10 @@ export async function processarMensagemBot(phone, rawMessage) {
     return { ok: true, reply: AJUDA }
   }
 
-  // Saudação isolada → tutorial de boas-vindas
-  if (BOA_VINDAS_RE.test(message.replace(/\s+/g, ' ').trim())) {
+  // Saudação isolada ou pedido de tutorial → tutorial de boas-vindas
+  const msgNorm = message.replace(/\s+/g, ' ').trim()
+  const TUTORIAL_RE = /^(tutorial|como\s+funciona|o\s+que\s+(voc[êe]\s+)?(faz|sabe|pode)|me\s+ensina|me\s+ajuda)[\s!?.,]*$/i
+  if (BOA_VINDAS_RE.test(msgNorm) || TUTORIAL_RE.test(msgNorm)) {
     const nome = usuario.nome ? `, ${usuario.nome.split(' ')[0]}` : ''
     return { ok: true, reply: buildTutorialBoasVindas(nome) }
   }

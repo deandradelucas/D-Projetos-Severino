@@ -21,5 +21,5 @@ export function getWhatsappContactUrl(text) {
 }
 
 export function getWhatsappOnboardingUrl() {
-  return getWhatsappContactUrl('Olá')
+  return getWhatsappContactUrl('como funciona')
 }
