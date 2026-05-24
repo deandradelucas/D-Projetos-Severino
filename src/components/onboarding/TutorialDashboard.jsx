@@ -297,9 +297,14 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
       })
     }
     calc()
+    const vv = window.visualViewport
     window.addEventListener('resize', calc)
+    vv?.addEventListener('resize', calc)
+    vv?.addEventListener('scroll', calc)
     return () => {
       window.removeEventListener('resize', calc)
+      vv?.removeEventListener('resize', calc)
+      vv?.removeEventListener('scroll', calc)
       if (retryTimer) window.clearTimeout(retryTimer)
     }
   }, [stage, visible])
