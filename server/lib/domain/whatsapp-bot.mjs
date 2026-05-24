@@ -210,6 +210,43 @@ function formatDataTransacaoReplyPtBr(iso) {
 const AJUDA =
   '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n📈 *Investimentos:* "meus investimentos", "quanto tenho investido"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite *ajuda* para ver isto de novo.'
 
+// Detecta saudações isoladas: "Olá", "Oi", "Bom dia", etc.
+const BOA_VINDAS_RE =
+  /^(ol[aá]|oi+|e\s+a[ií]|bom\s+dia|boa\s+tarde|boa\s+noite|tudo\s+(bem|bom|certo)|como\s+vai|hey|hello|hi)[\s!?.,🙂😊🖐👋]*$/i
+
+function buildTutorialBoasVindas(nome) {
+  return (
+    `👋 *Olá${nome}! Bem-vindo ao Severino!*\n\n` +
+    `Sou seu assistente financeiro pessoal. Pode falar por texto ou 🎙️ áudio — entendo os dois!\n\n` +
+    `─────────────────────\n` +
+    `💸 *Registrar gastos*\n` +
+    `─────────────────────\n` +
+    `"Severino, gastei 200 com combustível"\n` +
+    `"Paguei 50 no mercado"\n` +
+    `"120 de conta de luz"\n\n` +
+    `─────────────────────\n` +
+    `✅ *Registrar receitas*\n` +
+    `─────────────────────\n` +
+    `"Severino, ganhei 70 reais com rendimentos"\n` +
+    `"Recebi 3000 de salário"\n` +
+    `"Entrou 500 de freelance"\n\n` +
+    `─────────────────────\n` +
+    `🗓️ *Agenda e lembretes*\n` +
+    `─────────────────────\n` +
+    `"Severino, reunião às 17 horas"\n` +
+    `"Consulta médica amanhã às 9h"\n` +
+    `"Pagar boleto na sexta"\n\n` +
+    `Após criar o evento, basta informar quantos minutos antes quer ser avisado — e o Severino te lembra na hora certa! ⏰\n\n` +
+    `─────────────────────\n` +
+    `📊 *Consultas rápidas*\n` +
+    `─────────────────────\n` +
+    `"Meu saldo" — resumo financeiro do mês\n` +
+    `"Extrato do dia" — transações de hoje\n` +
+    `"Meus investimentos" — carteira com rendimentos\n\n` +
+    `Digite *ajuda* para ver este menu novamente.`
+  )
+}
+
 /** WhatsApp: limite útil de caracteres; resume **markdown** do modelo para *negrito* WA. */
 function formatAssistantReplyForWhatsApp(text) {
   let s = String(text || '').trim()
@@ -260,6 +297,12 @@ export async function processarMensagemBot(phone, rawMessage) {
 
   if (/^(ajuda|help|menu)$/i.test(message.replace(/\s+/g, ' ').trim())) {
     return { ok: true, reply: AJUDA }
+  }
+
+  // Saudação isolada → tutorial de boas-vindas
+  if (BOA_VINDAS_RE.test(message.replace(/\s+/g, ' ').trim())) {
+    const nome = usuario.nome ? `, ${usuario.nome.split(' ')[0]}` : ''
+    return { ok: true, reply: buildTutorialBoasVindas(nome) }
   }
 
   // 2. Agenda via WhatsApp — antes do parser financeiro para não confundir compromissos com transações
