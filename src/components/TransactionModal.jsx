@@ -9,6 +9,14 @@ function tipoCategoriaIgual(tipoCampo, tipoAlvo) {
   return String(tipoCampo ?? '').trim().toUpperCase() === String(tipoAlvo ?? '').trim().toUpperCase()
 }
 
+const ParcelamentoIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
+    <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
+    <path d="M6 15h4M14 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
 export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, editingTransaction = null }) {
   const [categorias, setCategorias] = useState([])
   const [loadingCats, setLoadingCats] = useState(false)
@@ -336,8 +344,72 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               </div>
             </section>
 
-            {/* ── Seção: Recorrência (só criação) ── */}
-            {!isEditMode && (
+            {/* ── Seção: Parcelamento (só criação) ── */}
+            {!isEditMode && (() => {
+              const numParcelas = parseInt(formData.num_parcelas, 10)
+              const valorNum = parseFloat(formData.valor)
+              const valorParcela = formData.parcelado && numParcelas >= 2 && valorNum > 0
+                ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+                    .format(Math.floor((valorNum / numParcelas) * 100) / 100)
+                : null
+
+              return (
+                <section
+                  className={`nova-tx-section nova-tx-section--parcelamento ${formData.parcelado ? 'nova-tx-section--parcelamento-on' : ''}`}
+                  aria-labelledby="nova-tx-h-parcelamento"
+                >
+                  <h4 id="nova-tx-h-parcelamento" className="nova-tx-section__title">
+                    Parcelamento
+                  </h4>
+                  <div className={`form-group form-group--recorrencia ${formData.parcelado ? 'form-group--recorrencia-on' : ''}`}>
+                    <label htmlFor="tx-parcelado" className="modal-recorrencia-toggle-row">
+                      <span className="modal-recorrencia-toggle-row__iconWrap" aria-hidden>
+                        <ParcelamentoIcon />
+                      </span>
+                      <span className="modal-recorrencia-toggle-row__text">Compra parcelada</span>
+                      <input
+                        id="tx-parcelado"
+                        type="checkbox"
+                        checked={formData.parcelado}
+                        onChange={(e) => setFormData((prev) => ({
+                          ...prev,
+                          parcelado: e.target.checked,
+                          recorrencia_dia_1: e.target.checked ? false : prev.recorrencia_dia_1,
+                        }))}
+                        className="modal-recorrencia-toggle-row__checkbox"
+                      />
+                    </label>
+
+                    {formData.parcelado && (
+                      <div className="rec-sub-opts slide-down">
+                        <div className="rec-vezes-row">
+                          <label htmlFor="tx-num-parcelas" className="rec-vezes-row__label">
+                            Número de parcelas
+                          </label>
+                          <input
+                            id="tx-num-parcelas"
+                            type="number"
+                            min="2"
+                            max="120"
+                            value={formData.num_parcelas}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, num_parcelas: e.target.value }))}
+                            className="input-premium rec-vezes-row__input"
+                          />
+                        </div>
+                        {valorParcela && (
+                          <p className="parcelamento-preview">
+                            {numParcelas}x de {valorParcela} · total {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valorNum)}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )
+            })()}
+
+            {/* ── Seção: Recorrência (só criação, exclusiva com parcelamento) ── */}
+            {!isEditMode && !formData.parcelado && (
               <RecurrenceOptions
                 checked={formData.recorrencia_dia_1}
                 onChange={(e) =>

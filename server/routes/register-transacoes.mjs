@@ -12,6 +12,7 @@ import {
   listarRecorrenciasMensais,
   processarRecorrenciasPendentes,
 } from '../lib/recorrencias-mensais.mjs'
+import { processarParcelasPendentes } from '../lib/parcelas-pendentes.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import {
   validateNovaTransacaoBody,
@@ -100,11 +101,17 @@ export function registerTransacoesRoutes(app) {
         return c.json({ message: val.message }, 400)
       }
 
-      /* Sempre quem está logado (titular ou familiar): assim na lista aparece quem lançou cada despesa/receita. */
-      const data = await TransactionService.createTransaction(parsed.dataUsuarioId, body, {
-        lancadoPorUsuarioId: parsed.actorId,
-      })
+      const opts = { lancadoPorUsuarioId: parsed.actorId }
 
+      if (body.parcelamento?.num_parcelas >= 2) {
+        const data = await TransactionService.createParcelamento(parsed.dataUsuarioId, body, opts)
+        return c.json({
+          message: `${data.total_parcelas} parcelas registradas com sucesso.`,
+          data,
+        }, 201)
+      }
+
+      const data = await TransactionService.createTransaction(parsed.dataUsuarioId, body, opts)
       return c.json({ message: 'Transação inserida com sucesso.', data }, 201)
     } catch (error) {
       log.error('insert transaction failed', error)
@@ -165,6 +172,20 @@ export function registerTransacoesRoutes(app) {
       return c.json({ ok: true, ...result })
     } catch (error) {
       log.error('cron recorrências mensais', error)
+      return c.json({ message: 'Erro no cron.' }, 500)
+    }
+  })
+
+  app.get('/api/cron/parcelas-pendentes', async (c) => {
+    const auth = assertCronSecret(c)
+    if (!auth.ok) {
+      return c.json({ message: auth.message }, auth.status)
+    }
+    try {
+      const result = await processarParcelasPendentes()
+      return c.json({ ok: true, ...result })
+    } catch (error) {
+      log.error('cron parcelas pendentes', error)
       return c.json({ message: 'Erro no cron.' }, 500)
     }
   })

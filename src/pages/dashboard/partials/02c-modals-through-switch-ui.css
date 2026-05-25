@@ -673,6 +673,82 @@ body[data-theme='light'] .form-group--recorrencia-on label.modal-recorrencia-tog
   background: rgba(59, 130, 246, 0.06);
 }
 
+/* Preview de parcelamento — "10x de R$ 200,00 · total R$ 2.000,00" */
+.parcelamento-preview {
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent, #d4a84b);
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+body[data-theme='light'] .parcelamento-preview {
+  color: #2563eb;
+}
+
+/* Sub-opções de recorrência e parcelamento */
+.rec-sub-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding-left: 4px;
+}
+
+.modal-recorrencia-toggle-row--sub {
+  font-size: 13px !important;
+  padding: 8px 12px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.rec-vezes-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.rec-vezes-row__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.rec-vezes-row__input {
+  width: 72px !important;
+  padding: 6px 10px !important;
+  font-size: 14px !important;
+  text-align: center;
+}
+
+.rec-vezes-row__suffix {
+  font-size: 13px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+body[data-theme='light'] .rec-vezes-row {
+  background: #f8fafc;
+  border-color: var(--pf-line-soft, rgba(226, 232, 240, 0.95));
+}
+
+body[data-theme='light'] .rec-vezes-row__label,
+body[data-theme='light'] .rec-vezes-row__suffix {
+  color: #334155;
+}
+
+body[data-theme='light'] .modal-recorrencia-toggle-row--sub {
+  background: #f8fafc !important;
+}
+
 .type-toggle {
   display: flex;
   background: #f1f5f9;

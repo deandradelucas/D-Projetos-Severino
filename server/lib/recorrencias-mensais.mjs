@@ -68,29 +68,40 @@ async function inserirTransacaoGerada(supabase, usuarioId, rule, dataIso) {
   if (error) throw error
 }
 
+function monthDiff(mesInicio, mesAlvo) {
+  const [iy, im] = mesInicio.split('-').map(Number)
+  const [ay, am] = mesAlvo.split('-').map(Number)
+  return (ay - iy) * 12 + (am - im)
+}
+
 /**
  * Cria regra após salvar a primeira transação (mesmo fluxo do modal).
  * ultima_geracao_mes = mês (BR) da data da transação salva — evita duplicar no mesmo mês.
+ * @param {number|null} totalMeses - Total de meses incluindo o lançamento inicial. NULL = indeterminado.
  */
-export async function criarRegraRecorrenciaDia1(usuarioId, primeiraLinha) {
+export async function criarRegraRecorrenciaDia1(usuarioId, primeiraLinha, totalMeses = null) {
   const supabase = getSupabaseAdmin()
   const mesRef = monthKeyBrazil(primeiraLinha.data_transacao)
   const uid = String(primeiraLinha.usuario_id || usuarioId || '').trim()
   if (!uid) throw new Error('usuario_id ausente ao criar recorrência.')
 
+  const insertData = {
+    usuario_id: uid,
+    tipo: primeiraLinha.tipo,
+    valor: primeiraLinha.valor,
+    descricao: primeiraLinha.descricao ?? '',
+    categoria_id: primeiraLinha.categoria_id ?? null,
+    subcategoria_id: primeiraLinha.subcategoria_id ?? null,
+    dia_mes: 1,
+    ativo: true,
+    ultima_geracao_mes: mesRef,
+    mes_inicio: mesRef,
+    total_meses: totalMeses ?? null,
+  }
+
   const { data, error } = await supabase
     .from('recorrencias_mensais')
-    .insert({
-      usuario_id: uid,
-      tipo: primeiraLinha.tipo,
-      valor: primeiraLinha.valor,
-      descricao: primeiraLinha.descricao ?? '',
-      categoria_id: primeiraLinha.categoria_id ?? null,
-      subcategoria_id: primeiraLinha.subcategoria_id ?? null,
-      dia_mes: 1,
-      ativo: true,
-      ultima_geracao_mes: mesRef,
-    })
+    .insert(insertData)
     .select('id')
     .maybeSingle()
 
@@ -168,7 +179,7 @@ export async function processarRecorrenciasPendentes(usuarioIdFilter = null) {
   let q = supabase
     .from('recorrencias_mensais')
     .select(
-      'id, usuario_id, tipo, valor, descricao, categoria_id, subcategoria_id, ultima_geracao_mes, ativo'
+      'id, usuario_id, tipo, valor, descricao, categoria_id, subcategoria_id, ultima_geracao_mes, ativo, total_meses, mes_inicio'
     )
     .eq('ativo', true)
 
@@ -189,21 +200,42 @@ export async function processarRecorrenciasPendentes(usuarioIdFilter = null) {
       continue
     }
 
+    const temLimite = rule.total_meses != null && rule.mes_inicio != null
+
     while (true) {
       const proximoMes = addMonthKey(ultima, 1)
       if (compareMonthKeys(proximoMes, mesAtual) > 0) break
+
+      // Verifica se atingiu o limite de meses (total_meses inclui o lançamento inicial)
+      if (temLimite) {
+        const mesesDesdeInicio = monthDiff(rule.mes_inicio, proximoMes)
+        if (mesesDesdeInicio >= rule.total_meses) {
+          await supabase
+            .from('recorrencias_mensais')
+            .update({ ativo: false, updated_at: new Date().toISOString() })
+            .eq('id', rule.id)
+          break
+        }
+      }
 
       const dataIso = primeiroDiaMesMidMorningIso(proximoMes)
       await inserirTransacaoGerada(supabase, rule.usuario_id, rule, dataIso)
       inseridas++
 
+      const isUltimoMes = temLimite && monthDiff(rule.mes_inicio, proximoMes) === rule.total_meses - 1
+
+      const updateData = { ultima_geracao_mes: proximoMes, updated_at: new Date().toISOString() }
+      if (isUltimoMes) updateData.ativo = false
+
       const { error: upErr } = await supabase
         .from('recorrencias_mensais')
-        .update({ ultima_geracao_mes: proximoMes, updated_at: new Date().toISOString() })
+        .update(updateData)
         .eq('id', rule.id)
 
       if (upErr) throw upErr
       ultima = proximoMes
+
+      if (isUltimoMes) break
     }
   }
 
