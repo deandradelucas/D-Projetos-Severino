@@ -20,6 +20,7 @@ import {
   Configuracoes,
   Relatorios,
   Agenda,
+  ListaDeCompras,
   AdminUsuarios,
   AdminPagamentos,
   AdminAuditoria,
@@ -60,6 +61,7 @@ function App() {
                   <Route path="/investimentos" element={<Investimentos />} />
                   <Route path="/relatorios" element={<Relatorios />} />
                   <Route path="/agenda" element={<Agenda />} />
+                  <Route path="/lista-de-compras" element={<ListaDeCompras />} />
                   <Route path="/configuracoes" element={<Configuracoes />} />
                 </Route>
                 <Route element={<SuperAdminOutlet />}>
