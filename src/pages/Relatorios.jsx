@@ -187,6 +187,19 @@ export default function Relatorios() {
     }
   }
 
+  /**
+   * Pré-aquece os chunks `vendor-jspdf`/`jspdf-autotable` no hover/focus do
+   * botão de PDF. ~140 KB gz começam a baixar enquanto o cursor se move,
+   * deixando o clique imperceptível para quem realmente exporta. O bundle
+   * inicial não muda; o prefetch é descartável (catch silencioso).
+   */
+  const prefetchPdfDeps = () => {
+    void Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable'),
+    ]).catch(() => {})
+  }
+
   const exportToPDF = async () => {
     if (transacoes.length === 0) return
 
@@ -304,6 +317,8 @@ export default function Relatorios() {
                     type="button"
                     className="dashboard-hub__btn dashboard-hub__btn--primary relatorios-btn-export"
                     onClick={exportToPDF}
+                    onMouseEnter={prefetchPdfDeps}
+                    onFocus={prefetchPdfDeps}
                     disabled={transacoes.length === 0 || pdfExportLoading}
                     aria-label={pdfExportLoading ? 'Gerando relatório em PDF' : 'Exportar relatório em PDF'}
                     title={pdfExportLoading ? 'Gerando PDF…' : 'Baixar PDF'}
