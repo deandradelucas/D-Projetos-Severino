@@ -71,6 +71,8 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
 
       return () => {
         cancelled = true
+        window.clearTimeout(tid)
+        controller.abort()
       }
     }
 
@@ -103,6 +105,8 @@ export default function AppSessionOutlet({ requireAppAccess = false }) {
 
     return () => {
       cancelled = true
+      window.clearTimeout(tid)
+      controller.abort()
     }
   }, [requireAppAccess, location.state?.freshLogin, location.pathname])
 
