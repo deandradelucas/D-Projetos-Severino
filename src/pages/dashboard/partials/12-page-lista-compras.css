@@ -42,20 +42,18 @@
 /* ---------------------------------------------------------------------------
    Wrapper principal
    --------------------------------------------------------------------------- */
-/* --add-bar-height: altura da barra de adicionar (input + qty row + padding vertical).
-   No mobile acrescenta a altura do bottom nav (~70px). */
 :root {
-  --lista-add-bar-height: 108px;
+  --lista-fab-bottom: 80px;  /* altura do FAB + margem */
   --lista-mobile-nav-height: 70px;
 }
 
 .page-lista-compras-wrap {
-  padding: 0 0 calc(var(--lista-add-bar-height) + 60px); /* add-bar + footer visível */
+  padding: 0 0 calc(var(--lista-fab-bottom) + 60px);
 }
 
 @media (max-width: 768px) {
   .page-lista-compras-wrap {
-    padding-bottom: calc(var(--lista-add-bar-height) + var(--lista-mobile-nav-height) + 60px);
+    padding-bottom: calc(var(--lista-fab-bottom) + var(--lista-mobile-nav-height) + 40px);
   }
 }
 
@@ -472,115 +470,124 @@
 /* ---------------------------------------------------------------------------
    Barra de adicionar item (fixa no bottom)
    --------------------------------------------------------------------------- */
-.page-lista-compras__add-bar {
+/* ---------------------------------------------------------------------------
+   FAB: Novo item
+   --------------------------------------------------------------------------- */
+.page-lista-compras__novo-item-fab {
   position: fixed;
-  bottom: 0;
   left: 0;
   right: 0;
-  z-index: 75;
-  padding: 10px 16px 12px;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border-default);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  margin-inline: auto;
+  bottom: max(20px, calc(20px + var(--safe-bottom, 0px)));
+  z-index: 76;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: max-content;
+  min-width: 160px;
+  min-height: 42px;
+  max-width: calc(100vw - 104px);
+  padding: 0 16px 0 10px;
+  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 62%, rgba(255, 255, 255, 0.38));
+  border-radius: 999px;
+  background: linear-gradient(
+    175deg,
+    rgba(255, 255, 255, 0.58) 0%,
+    rgba(255, 255, 255, 0.22) 42%,
+    rgba(255, 255, 255, 0.40) 52%,
+    rgba(255, 255, 255, 0.28) 100%
+  );
+  -webkit-backdrop-filter: blur(22px) saturate(1.35);
+  backdrop-filter: blur(22px) saturate(1.35);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  box-shadow:
+    0 12px 30px -16px rgba(15, 23, 42, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.06);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-/* Mobile: empurra a barra acima do bottom nav */
 @media (max-width: 768px) {
-  .page-lista-compras__add-bar {
-    bottom: var(--lista-mobile-nav-height);
-    padding-bottom: 10px;
+  .page-lista-compras__novo-item-fab {
+    bottom: max(calc(var(--lista-mobile-nav-height) + 12px), calc(var(--lista-mobile-nav-height) + 12px + var(--safe-bottom, 0px)));
   }
 }
 
-/* Desktop: recua à direita da sidebar */
 @media (min-width: 769px) {
-  .page-lista-compras__add-bar {
+  .page-lista-compras__novo-item-fab {
     left: var(--sidebar-width, 260px);
   }
 }
 
-.page-lista-compras__add-bar-inner {
-  position: relative;
-  width: 100%;
+.page-lista-compras__novo-item-fab:active {
+  transform: scale(0.97);
 }
 
-/* Linha: input + botão enviar lado a lado */
-.page-lista-compras__input-row {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  position: relative;
-}
-
-.page-lista-compras__add-input {
-  flex: 1;
-  min-width: 0;
-  padding: 11px 52px 11px 14px; /* espaço para o botão enviar */
-  border-radius: var(--radius-lg);
-  border: 1.5px solid var(--border-default);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-size: 0.95rem;
-  font-family: inherit;
-  transition: var(--transition-base);
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.page-lista-compras__add-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15);
-  background: var(--bg-card);
-}
-
-.page-lista-compras__add-input::placeholder {
-  color: var(--text-muted);
-}
-
-/* Botão enviar — dentro da linha do input, lado direito */
-.page-lista-compras__send-btn {
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  border: none;
-  color: #111;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.page-lista-compras__novo-item-fab__icon {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+  color: rgba(15, 23, 42, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.06);
   flex-shrink: 0;
-  transition: var(--transition-base);
-  box-shadow: 0 2px 8px rgba(212, 168, 75, 0.3);
-  z-index: 2;
 }
 
-.page-lista-compras__send-btn:hover {
-  background: #c49535;
-  box-shadow: 0 4px 14px rgba(212, 168, 75, 0.4);
+.page-lista-compras__novo-item-fab__label {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(185deg, #c9a227 0%, #b58d3d 42%, #7a5a18 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-weight: 800;
 }
 
-.page-lista-compras__send-btn:active {
-  transform: translateY(-50%) scale(0.93);
+body[data-theme='dark'] .page-lista-compras__novo-item-fab {
+  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 52%, rgba(255, 255, 255, 0.12));
+  background: linear-gradient(
+      158deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.04) 38%,
+      transparent 62%
+    ),
+    rgba(15, 23, 42, 0.38);
+  -webkit-backdrop-filter: blur(22px) saturate(1.22);
+  backdrop-filter: blur(22px) saturate(1.22);
+  box-shadow:
+    0 14px 36px -20px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
-.page-lista-compras__send-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  box-shadow: none;
+body[data-theme='dark'] .page-lista-compras__novo-item-fab__icon {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28);
 }
 
-.page-lista-compras__send-btn svg {
-  width: 16px;
-  height: 16px;
+body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
+  background: linear-gradient(185deg, #f0deaa 0%, #d4a84b 45%, #b58d3d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
-/* Dropdown autocomplete */
+/* ---------------------------------------------------------------------------
+   Dropdown autocomplete (usado no modal)
+   --------------------------------------------------------------------------- */
 .page-lista-compras__autocomplete {
   position: absolute;
   bottom: calc(100% + 6px);
@@ -623,39 +630,17 @@
 }
 
 
-/* Linha de quantidade + unidade de medida */
-.page-lista-compras__add-qty-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.page-lista-compras__qty-input {
-  width: 62px;
-  padding: 6px 8px;
-  border-radius: var(--radius-md);
-  border: 1.5px solid var(--border-default);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-size: 0.88rem;
-  font-family: inherit;
+/* qty-input — usado no ModalNovoItem */
+.page-lista-compras__modal-input--qty {
+  width: 90px;
   text-align: center;
-  transition: var(--transition-base);
   -moz-appearance: textfield;
 }
 
-.page-lista-compras__qty-input::-webkit-inner-spin-button,
-.page-lista-compras__qty-input::-webkit-outer-spin-button {
+.page-lista-compras__modal-input--qty::-webkit-inner-spin-button,
+.page-lista-compras__modal-input--qty::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
-
-.page-lista-compras__qty-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15);
-  background: var(--bg-card);
 }
 
 .page-lista-compras__unit-pills {
@@ -702,7 +687,7 @@
    --------------------------------------------------------------------------- */
 .page-lista-compras__footer {
   position: fixed;
-  bottom: var(--lista-add-bar-height); /* desktop: acima da add-bar */
+  bottom: calc(var(--lista-fab-bottom) + 2px);
   left: 0;
   right: 0;
   z-index: 74;
@@ -717,10 +702,9 @@
   animation: slideUpFooter 0.2s ease;
 }
 
-/* Mobile: add-bar está acima do bottom nav, então footer sobe mais */
 @media (max-width: 768px) {
   .page-lista-compras__footer {
-    bottom: calc(var(--lista-add-bar-height) + var(--lista-mobile-nav-height));
+    bottom: calc(var(--lista-mobile-nav-height) + var(--lista-fab-bottom) + 4px);
   }
 }
 
@@ -1028,6 +1012,13 @@
   text-transform: uppercase;
 }
 
+.page-lista-compras__modal-label--optional {
+  font-weight: 400;
+  opacity: 0.55;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 .page-lista-compras__modal-input,
 .page-lista-compras__modal-select {
   padding: 10px 14px;
@@ -1198,12 +1189,6 @@
    --------------------------------------------------------------------------- */
 body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell {
   --nova-btn-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-}
-
-body[data-theme='dark'] .page-lista-compras__add-bar {
-  background: var(--bg-card);
-  border-top-color: var(--border-default);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
 }
 
 body[data-theme='dark'] .page-lista-compras__footer {
