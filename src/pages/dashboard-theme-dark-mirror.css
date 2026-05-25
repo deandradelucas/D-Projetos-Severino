@@ -2021,17 +2021,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
 }
 @media (min-width: 769px) {
 
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-    display: inline-flex;
-    align-items: center;
-    font-size: 24px;
-    line-height: 1;
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    color: #f8fafc;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
-    white-space: nowrap;
-  }
 }
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::after {

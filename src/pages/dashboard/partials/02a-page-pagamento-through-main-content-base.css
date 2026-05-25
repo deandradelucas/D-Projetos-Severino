@@ -679,10 +679,6 @@ body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-ho
   transform: scale(1.05); /* Micro-interação premium */
 }
 
-.brand-wordmark {
-  display: none;
-}
-
 .nav-menu {
   list-style: none;
   display: flex;

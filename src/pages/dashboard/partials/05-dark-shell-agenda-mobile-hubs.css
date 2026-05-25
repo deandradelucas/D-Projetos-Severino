@@ -125,10 +125,6 @@ body:has(.agenda-modal-backdrop) .pwa-install-sheet {
   white-space: nowrap;
 }
 
-.agenda-modal-backdrop .agenda-modal__actions .agenda-danger-btn {
-  flex-shrink: 0;
-}
-
 body[data-theme='light'] .agenda-modal-backdrop .agenda-modal__actions .dashboard-hub__btn--primary,
 body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__actions .dashboard-hub__btn--primary {
   background: linear-gradient(135deg, #d4a84b 0%, #c49535 52%, #a07520 100%) !important;
