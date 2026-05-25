@@ -1966,7 +1966,7 @@ body[data-theme='light'] .tx-parceladas-chip {
 }
 body[data-theme='light'] .tx-parceladas-chip:hover {
   border-color: var(--accent);
-  color: var(--accent);
+  color: #000;
 }
 body[data-theme='light'] .tx-parceladas-chip--active {
   background: var(--accent);
