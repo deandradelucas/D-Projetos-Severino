@@ -1010,24 +1010,37 @@ export default function ListaDeCompras() {
           {listaAtiva && (
             <div className="page-lista-compras__add-bar">
               <div className="page-lista-compras__add-bar-inner">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  className="page-lista-compras__add-input"
-                  placeholder="Adicionar item (ex: leite, arroz…)"
-                  value={novoItem}
-                  onChange={(e) => handleInputChange(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  onFocus={() => {
-                    if (sugestoes.length > 0) setShowAutocomplete(true)
-                  }}
-                  onBlur={() => {
-                    // Delay para permitir click nas sugestões
-                    setTimeout(() => setShowAutocomplete(false), 150)
-                  }}
-                  aria-label="Nome do item a adicionar"
-                  autoComplete="off"
-                />
+                <div className="page-lista-compras__input-row">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    className="page-lista-compras__add-input"
+                    placeholder="Adicionar item…"
+                    value={novoItem}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    onFocus={() => {
+                      if (sugestoes.length > 0) setShowAutocomplete(true)
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => setShowAutocomplete(false), 150)
+                    }}
+                    aria-label="Nome do item a adicionar"
+                    autoComplete="off"
+                  />
+                  <button
+                    type="button"
+                    className="page-lista-compras__send-btn"
+                    onClick={() => adicionarItem(novoItem)}
+                    disabled={adicionando || !novoItem.trim()}
+                    aria-label="Adicionar item"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <line x1="22" y1="2" x2="11" y2="13" />
+                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                    </svg>
+                  </button>
+                </div>
                 {showAutocomplete && sugestoes.length > 0 && (
                   <div className="page-lista-compras__autocomplete" role="listbox" aria-label="Sugestões">
                     {sugestoes.map((s) => (
@@ -1078,15 +1091,6 @@ export default function ListaDeCompras() {
                   </div>
                 </div>
               </div>
-              <button
-                type="button"
-                className="page-lista-compras__add-btn"
-                onClick={() => adicionarItem(novoItem)}
-                disabled={adicionando || !novoItem.trim()}
-                aria-label="Adicionar item"
-              >
-                <IconPlus />
-              </button>
             </div>
           )}
         </main>
