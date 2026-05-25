@@ -1744,20 +1744,13 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     color: var(--text-secondary, #64748b) !important;
   }
 
-  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card__value,
-  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero .ref-kpi-card__value {
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card__value {
     color: var(--text-primary, #0f172a) !important;
     margin-top: 3px;
     font-size: clamp(0.82rem, 3.2vw, 1rem);
     font-weight: 880;
     letter-spacing: -0.045em;
     line-height: 1.05;
-  }
-
-  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    align-items: center;
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-bottom-grid {
@@ -1968,13 +1961,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip {
     grid-template-columns: 1fr 1fr;
   }
-
-  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero {
-    grid-column: 1 / -1;
-    min-height: 62px;
-    flex-direction: row;
-    align-items: center;
-  }
 }
 
 @media (max-width: 768px) {
@@ -1989,9 +1975,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card,
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card,
-  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero,
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero {
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card {
     flex: 1 1 auto !important;
     flex-basis: auto !important;
     width: auto !important;
@@ -2005,13 +1989,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     padding: 10px !important;
   }
 
-  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero,
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero {
-    grid-column: 1 / -1;
-    flex-direction: row !important;
-    align-items: center !important;
-  }
-
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card__label {
     color: #0b0b0b !important;
   }
@@ -2021,9 +1998,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card__value,
-  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero .ref-kpi-card__value,
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card__value,
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero .ref-kpi-card__value {
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card__value {
     color: var(--text-primary);
     font-size: clamp(0.82rem, 3.2vw, 1rem) !important;
   }

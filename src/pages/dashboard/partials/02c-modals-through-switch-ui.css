@@ -1643,26 +1643,6 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
   }
 }
 
-body[data-theme='light'] .relatorios-kpi-saldo--pos {
-  color: #4f46e5 !important;
-  text-shadow: none;
-}
-
-body[data-theme='light'] .relatorios-kpi-saldo--neg {
-  color: #dc2626 !important;
-  text-shadow: none;
-}
-
-.relatorios-kpi-saldo--pos {
-  color: #c7d2fe !important;
-  text-shadow: 0 0 24px rgba(129, 140, 248, 0.35);
-}
-
-.relatorios-kpi-saldo--neg {
-  color: #fca5a5 !important;
-  text-shadow: 0 0 20px rgba(248, 113, 113, 0.25);
-}
-
 .relatorios-empty-msg {
   text-align: center;
   padding: 44px 20px;

@@ -528,17 +528,6 @@ body[data-theme='dark'] .btn-secondary:hover {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
-/* Saldo relatórios — azul principal */
-body[data-theme='dark'] .relatorios-kpi-saldo--pos {
-  color: var(--transacoes-balance-pos, #3b82f6) !important;
-  text-shadow: 0 0 28px rgba(59, 130, 246, 0.22);
-}
-
-body[data-theme='dark'] .relatorios-kpi-saldo--neg {
-  color: #f87171 !important;
-  text-shadow: 0 0 20px rgba(248, 113, 113, 0.22);
-}
-
 /* Sidebar espelho (largura / estrutura): só fundo e borda */
 body[data-theme='dark'] .sidebar {
   background: #050505;
@@ -721,8 +710,7 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   color: #93c5fd;
 }
 
-body[data-theme='dark'] .ref-kpi-card--balance .ref-kpi-card__value,
-body[data-theme='dark'] .relatorios-kpi-saldo--pos {
+body[data-theme='dark'] .ref-kpi-card--balance .ref-kpi-card__value {
   color: var(--transacoes-balance-pos, #3b82f6) !important;
   text-shadow: 0 0 22px rgba(59, 130, 246, 0.22);
 }
@@ -732,8 +720,7 @@ body[data-theme='dark'] .page-transacoes-recorrencia-row__tipo--rec {
   color: #10d68f;
 }
 
-body[data-theme='dark'] .ref-kpi-card--expense .ref-kpi-card__value,
-body[data-theme='dark'] .relatorios-kpi-saldo--neg {
+body[data-theme='dark'] .ref-kpi-card--expense .ref-kpi-card__value {
   color: #ff4d67 !important;
   text-shadow: 0 0 22px rgba(255, 77, 103, 0.28);
 }
