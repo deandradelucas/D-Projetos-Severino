@@ -76,6 +76,7 @@ export const TransactionService = {
     const status = String(payload.status || 'EFETIVADA').trim().toUpperCase()
 
     const agora = new Date()
+    const hojeStr = agora.toISOString().slice(0, 10) // "YYYY-MM-DD" UTC
     const rows = []
     for (let i = 1; i <= n; i++) {
       const dataParcela = addMonths(payload.data_transacao, i - 1)
@@ -83,8 +84,9 @@ export const TransactionService = {
       const valor = i === n ? +(valorBase + ajuste).toFixed(2) : valorBase
       const descricao = descricaoBase ? `${descricaoBase} (${i}/${n})` : `Parcela ${i}/${n}`
 
-      // Parcelas com data futura ficam PENDENTE; primeira (ou passadas) ficam com o status escolhido
-      const statusParcela = dataParcela > agora ? 'PENDENTE' : status
+      // Parcelas com data anterior a hoje ficam com o status escolhido; hoje e futuro = PENDENTE
+      const dataParcelaStr = dataIso.slice(0, 10)
+      const statusParcela = dataParcelaStr < hojeStr ? status : 'PENDENTE'
 
       const row = {
         usuario_id: userId,
