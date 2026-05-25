@@ -1,20 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { getWhatsappOnboardingUrl } from '../../lib/whatsappContactUrl.js'
+import { marcarTutorialDashboardVisto } from './tutorialDashboardState.js'
 
-const TUTORIAL_KEY = 'horizonte_tutorial_transacao_visto'
 const PAD          = 14   // padding ao redor do spotlight
 const Z_BARS       = 10100
 const Z_RING       = 10101
 const Z_CARD       = 10102
-
-export function tutorialDashboardFoiVisto() {
-  try { return Boolean(localStorage.getItem(TUTORIAL_KEY)) }
-  catch { return true }
-}
-
-function marcarVisto() {
-  try { localStorage.setItem(TUTORIAL_KEY, '1') } catch {}
-}
 
 /** Retorna o DOMRect do PRIMEIRO elemento visível com esse data-tutorial-id.
  *  Ajusta pelo offsetTop do visualViewport para que elementos dentro de modais
@@ -308,7 +299,7 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
   }, [stage, visible])
 
   const dismiss = useCallback(() => {
-    marcarVisto()
+    marcarTutorialDashboardVisto()
     setVisible(false)
     onDismiss?.()
   }, [onDismiss])
