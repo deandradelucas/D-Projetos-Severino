@@ -9,7 +9,7 @@ const MAX_DIGITS = 14
  * @param {string} raw valor atual do input (pode conter pontuação)
  * @returns {string} texto só com dígitos ou string vazia
  */
-export function digitsOnlyCurrency(raw) {
+function digitsOnlyCurrency(raw) {
   return String(raw ?? '').replace(/\D/g, '')
 }
 
@@ -17,7 +17,7 @@ export function digitsOnlyCurrency(raw) {
  * @param {string} digitsOnly apenas dígitos (sem vazio)
  * @returns {string} ex. "1.234,56" — sem símbolo R$
  */
-export function formatBRLFromDigits(digitsOnly) {
+function formatBRLFromDigits(digitsOnly) {
   const d = digitsOnly.length > MAX_DIGITS ? digitsOnly.slice(0, MAX_DIGITS) : digitsOnly
   const n = parseInt(d, 10) / 100
   return new Intl.NumberFormat('pt-BR', {

@@ -111,7 +111,7 @@ function dataLocalInicioApartirDeIso(iso) {
  * @param {string | undefined | null} iso Data de aquisição (`YYYY-MM-DD` ou ISO).
  * @returns {Date | null} Meia-noite local do primeiro dia de incidência; null se inválido.
  */
-export function dataLocalInicioRendimentoCdiApartirDeIso(iso) {
+function dataLocalInicioRendimentoCdiApartirDeIso(iso) {
   const ref = dataLocalInicioApartirDeIso(iso)
   if (!ref) return null
   const cursor = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate())
@@ -268,7 +268,7 @@ export function taxaEfetivaAaContratada(percentualCdi, cdiAa, tipoIndexador = 'C
   return (Number(percentualCdi) / 100) * Number(cdiAa)
 }
 
-export function rendimentoBrutoDiarioEstimado(valor, percentualCdi, cdiAa, tipoIndexador = 'CDI') {
+function rendimentoBrutoDiarioEstimado(valor, percentualCdi, cdiAa, tipoIndexador = 'CDI') {
   const v = Number(valor)
   const te = taxaEfetivaAaContratada(percentualCdi, cdiAa, tipoIndexador)
   return v * (Math.pow(1 + te / 100, 1 / DIAS_UTEIS_ANO_RENDIMENTO) - 1)
