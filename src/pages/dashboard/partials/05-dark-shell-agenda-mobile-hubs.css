@@ -1350,8 +1350,7 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
     color: #ffffff !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__balance-line span,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__hero .page-admin-header-sub {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__balance-line span {
     color: rgba(255, 255, 255, 0.64) !important;
   }
 
@@ -2656,8 +2655,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     color: #ffffff !important;
   }
 
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__balance-line span,
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__hero .page-admin-header-sub {
+  .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__balance-line span {
     color: rgba(255, 255, 255, 0.64) !important;
   }
 
