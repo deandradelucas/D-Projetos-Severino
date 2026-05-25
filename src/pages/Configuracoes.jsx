@@ -49,7 +49,7 @@ export default function Configuracoes() {
   const conviteCopiadoTimerRef = useRef(null)
   const [familiaConfirm, setFamiliaConfirm] = useState(null)
   const [alterarPapelMembro, setAlterarPapelMembro] = useState(null)
-  const [familiaPainelCarregado, setFamiliaPainelCarregado] = useState(false)
+  const [, setFamiliaPainelCarregado] = useState(false)
   const [telefoneEditando, setTelefoneEditando] = useState(false)
   const [telefoneInput, setTelefoneInput] = useState('')
   const [telefoneSaving, setTelefoneSaving] = useState(false)
