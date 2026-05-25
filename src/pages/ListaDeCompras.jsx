@@ -464,6 +464,15 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
     })
   }
 
+  const nomeTrim = nome.trim()
+  const precoNum = (() => {
+    const s = preco.replace(',', '.').trim()
+    if (!s) return null
+    const v = parseFloat(s)
+    return Number.isFinite(v) && v > 0 ? v : null
+  })()
+  const subtotal = precoNum != null ? precoNum * quantidade : null
+
   return (
     <div className="page-lista-compras__modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-novo-item-titulo">
@@ -558,6 +567,27 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
               ))}
             </div>
           </div>
+
+          {nomeTrim ? (
+            <div className="page-lista-compras__modal-resumo" aria-live="polite">
+              <div className="page-lista-compras__modal-resumo-info">
+                <span className="page-lista-compras__modal-resumo-nome">{nomeTrim}</span>
+                <span className="page-lista-compras__modal-resumo-meta">
+                  {quantidade} {unidade}
+                  {precoNum != null && (
+                    <> · {formatarMoeda(precoNum)} / {unidade}</>
+                  )}
+                </span>
+              </div>
+              {subtotal != null && (
+                <span className="page-lista-compras__modal-resumo-total">{formatarMoeda(subtotal)}</span>
+              )}
+            </div>
+          ) : (
+            <p className="page-lista-compras__modal-resumo-placeholder">
+              Digite o nome do item para ver o resumo
+            </p>
+          )}
 
           <div className="page-lista-compras__modal-actions">
             <button type="button" className="page-lista-compras__modal-cancel" onClick={onClose}>Cancelar</button>
