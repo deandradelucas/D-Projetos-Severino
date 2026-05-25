@@ -55,9 +55,12 @@ export default function Configuracoes() {
   const [telefoneSaving, setTelefoneSaving] = useState(false)
   const usuarioIdHeader = String(perfil?.id ?? '').trim()
 
+  const toastTimerRef = useRef(0)
+  useEffect(() => () => window.clearTimeout(toastTimerRef.current), [])
   const showToast = useCallback((msg) => {
     setToast(msg)
-    setTimeout(() => setToast(''), 4200)
+    window.clearTimeout(toastTimerRef.current)
+    toastTimerRef.current = window.setTimeout(() => setToast(''), 4200)
   }, [])
 
   const {
