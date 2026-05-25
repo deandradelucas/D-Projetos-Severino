@@ -147,7 +147,7 @@ function tierPrefixoInstituicao(nomeNorm, q) {
 }
 
 /** Lista ordenada (imutável) para a UI */
-export const INSTITUICOES_FINANCEIRAS = Object.freeze(
+const INSTITUICOES_FINANCEIRAS = Object.freeze(
   [...RAW].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })),
 )
 

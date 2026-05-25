@@ -30,7 +30,7 @@ export function pagamentoStatusLabelPt(status) {
  * @param {string|undefined|null} code
  * @returns {string}
  */
-export function situacaoAssinaturaLabel(code) {
+function situacaoAssinaturaLabel(code) {
   const m = {
     admin: 'Administrador',
     isento: 'Conta isenta de pagamento',

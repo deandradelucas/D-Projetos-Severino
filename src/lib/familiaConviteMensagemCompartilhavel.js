@@ -3,7 +3,7 @@
  */
 
 /** Bloco reutilizável: como instalar o Severino como app (PWA). */
-export function paragrafoInstrucoesPwaSeverino() {
+function paragrafoInstrucoesPwaSeverino() {
   return [
     '📱 Instalar o app Severino (PWA) no celular',
     '',

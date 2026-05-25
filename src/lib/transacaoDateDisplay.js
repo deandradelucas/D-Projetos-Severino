@@ -1,5 +1,5 @@
 /** Interpreta `data_transacao` (YYYY-MM-DD ou ISO) sem deslocar o dia no fuso local. */
-export function parseTransacaoDate(raw) {
+function parseTransacaoDate(raw) {
   if (raw == null || raw === '') return new Date(NaN)
   const s = String(raw).trim()
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {

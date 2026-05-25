@@ -58,16 +58,3 @@ export function ymdFromCalendarParts(year, monthIndex, day) {
   return `${year}-${m}-${d}`
 }
 
-export function openNativeDatePicker(inputEl) {
-  if (!inputEl) return
-  try {
-    if (typeof inputEl.showPicker === 'function') inputEl.showPicker()
-    else inputEl.focus()
-  } catch {
-    try {
-      inputEl.focus()
-    } catch {
-      /* ignore */
-    }
-  }
-}

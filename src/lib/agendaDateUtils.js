@@ -157,15 +157,6 @@ export function formatSelectedDayTitle(dateKey) {
   return capitalizeDateLabel(formatted)
 }
 
-export function formatCompactDate(dateKey) {
-  const formatted = new Intl.DateTimeFormat('pt-BR', {
-    timeZone: AGENDA_TIME_ZONE,
-    day: '2-digit',
-    month: 'long',
-  }).format(dateKeyToDate(dateKey))
-  return capitalizeDateLabel(formatted)
-}
-
 export function buildMonthCalendar(monthKey) {
   const first = monthKeyToDate(monthKey)
   const month = first.getMonth()
