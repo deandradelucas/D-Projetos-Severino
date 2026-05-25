@@ -93,6 +93,8 @@ export default function Dashboard() {
   const { totalReceitas, totalDespesas, saldoTotal } = useMemo(() => {
     return transacoes.reduce(
       (acc, t) => {
+        // Parcelas futuras (PENDENTE) não entram no saldo realizado
+        if (t.status === 'PENDENTE') return acc
         const valor = parseFloat(t.valor) || 0
         if (t.tipo === 'RECEITA') {
           acc.totalReceitas += valor

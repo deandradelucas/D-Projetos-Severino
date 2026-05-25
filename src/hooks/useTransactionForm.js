@@ -4,18 +4,12 @@ import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { showToast } from '../lib/toastStore'
 import { transacaoDescricaoEfetiva } from '../lib/transacaoUtils'
 
-/**
- * Retorna o datetime local (sem UTC shift) no formato ISO slice(0,16).
- */
 function localDateTimeNow() {
   const now = new Date()
   const offset = now.getTimezoneOffset() * 60000
   return new Date(now - offset).toISOString().slice(0, 16)
 }
 
-/**
- * Formata número como moeda BRL.
- */
 function formatBRL(numValue) {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -32,11 +26,10 @@ const INITIAL_FORM = {
   subcategoria_id: '',
   status: 'EFETIVADA',
   recorrencia_dia_1: false,
+  parcelado: false,
+  num_parcelas: '2',
 }
 
-/**
- * Hook centralizado para o estado e lógica do formulário de transação.
- */
 export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSave, onClose }) {
   const isEditMode = Boolean(editingTransaction?.id)
 
@@ -44,9 +37,6 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
   const [displayValor, setDisplayValor] = useState('')
   const [saving, setSaving] = useState(false)
 
-  /**
-   * Inicializa formulário ao abrir/trocar de modo.
-   */
   const initForm = useCallback(() => {
     if (!isOpen || !usuarioId) return
 
@@ -74,11 +64,12 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
         subcategoria_id: t.subcategoria_id != null ? String(t.subcategoria_id) : '',
         status: t.status || 'EFETIVADA',
         recorrencia_dia_1: false,
+        parcelado: false,
+        num_parcelas: '2',
       })
       return
     }
 
-    // Modo criação
     setDisplayValor('')
     setFormData({ ...INITIAL_FORM, data_transacao: localDateTimeNow() })
   }, [isOpen, usuarioId, editingTransaction])
@@ -122,6 +113,12 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
       return
     }
 
+    const numParcelas = parseInt(formData.num_parcelas, 10)
+    if (formData.parcelado && (!Number.isInteger(numParcelas) || numParcelas < 2 || numParcelas > 120)) {
+      showToast('Número de parcelas deve ser entre 2 e 120.', 'error')
+      return
+    }
+
     const descricao = String(formData.descricao || '').trim()
 
     setSaving(true)
@@ -132,12 +129,21 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
         descricao,
       }
 
+      // Limpa campos de controle de UI
+      delete payload.parcelado
+      delete payload.num_parcelas
+
       if (!isEditMode) {
         payload.recorrencia = null
+
+        if (formData.parcelado && numParcelas >= 2) {
+          // Parcelamento — recorrência não pode coexistir
+          payload.parcelamento = { num_parcelas: numParcelas }
+          delete payload.recorrencia_dia_1
+        } else if (!formData.recorrencia_dia_1) {
+          delete payload.recorrencia_dia_1
+        }
       } else {
-        delete payload.recorrencia_dia_1
-      }
-      if (!isEditMode && !formData.recorrencia_dia_1) {
         delete payload.recorrencia_dia_1
       }
 
@@ -153,7 +159,8 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
       })
 
       if (res.ok) {
-        showToast(isEditMode ? 'Alterações salvas!' : 'Transação registrada!')
+        const json = await res.json().catch(() => ({}))
+        showToast(json.message || (isEditMode ? 'Alterações salvas!' : 'Transação registrada!'))
         onSave()
         onClose()
       } else {

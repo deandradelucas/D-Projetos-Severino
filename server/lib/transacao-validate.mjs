@@ -82,6 +82,21 @@ export function validateNovaTransacaoBody(body) {
     return { ok: false, message: 'Campo recorrencia inválido.' }
   }
 
+  if (body.parcelamento != null) {
+    if (typeof body.parcelamento !== 'object' || Array.isArray(body.parcelamento)) {
+      return { ok: false, message: 'Campo parcelamento inválido.' }
+    }
+    const n = Number(body.parcelamento.num_parcelas)
+    if (!Number.isFinite(n) || !Number.isInteger(n) || n < 2 || n > 120) {
+      return { ok: false, message: 'Parcelamento: número de parcelas deve ser entre 2 e 120.' }
+    }
+    const rawDia1 = body.recorrencia_dia_1
+    const temRecorrencia = rawDia1 === true || rawDia1 === 'true' || rawDia1 === 1 || rawDia1 === '1'
+    if (temRecorrencia) {
+      return { ok: false, message: 'Não é possível combinar parcelamento e recorrência.' }
+    }
+  }
+
   return { ok: true }
 }
 

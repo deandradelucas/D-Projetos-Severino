@@ -1,8 +1,8 @@
 import RecorrenciaArrowIcon from '../RecorrenciaArrowIcon'
 
 /**
- * RecurrenceOptions — Seção de configuração de recorrência mensal.
- * Só renderiza no modo de criação (não edição).
+ * RecurrenceOptions — Checkbox "Repetir todo mês neste dia" (recorrência indefinida).
+ * Só renderiza no modo de criação.
  */
 const RecurrenceOptions = ({ checked, onChange }) => {
   return (
