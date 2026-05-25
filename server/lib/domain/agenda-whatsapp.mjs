@@ -594,7 +594,7 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
   let intent = 'agenda_chat'
   let ok = true
 
-  const uid = usuario?.dataUsuarioId ?? usuario?.id
+  const uid = usuario?.familiaEscopo?.actorId ?? usuario?.id
   const familiaEscopo = usuario?.familiaEscopo || { isMembroConta: false }
   const bloqueioEscritaViewer = () => {
     const b = assertFamiliaPodeEscrever(familiaEscopo)
