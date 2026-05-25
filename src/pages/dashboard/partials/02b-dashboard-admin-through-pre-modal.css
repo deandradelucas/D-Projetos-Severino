@@ -2672,56 +2672,11 @@ body[data-theme='dark'] .page-admin-payment-log-card--alert {
   }
 }
 
-.page-admin-payment-logs__table-wrap {
-  margin-top: 4px;
-}
-
-.page-admin-payment-logs__table-desktop {
-  min-width: 1100px;
-}
-
-.page-admin-payment-logs__row--alert td {
-  box-shadow: inset 3px 0 0 0 rgba(234, 88, 12, 0.85);
-}
-
-.page-admin-payment-logs__cell-muted {
-  font-size: 13px;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-
-.page-admin-payment-logs__cell-email {
-  font-size: 13px;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .page-admin-payment-logs__cell-mono {
   font-size: 11px;
   font-family: ui-monospace, monospace;
   word-break: break-all;
   max-width: 140px;
-}
-
-.page-admin-payment-logs__cell-detail {
-  font-size: 12px;
-  color: var(--text-secondary);
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.page-admin-payment-logs__sub {
-  display: block;
-  font-size: 11px;
-  color: var(--text-secondary);
-  opacity: 0.9;
-}
-
-.page-admin-payment-logs__provider {
-  font-size: 12px;
-  text-transform: capitalize;
 }
 
 .page-admin-payment-logs .admin-pill {
