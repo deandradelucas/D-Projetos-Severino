@@ -39,6 +39,12 @@
   /* ── Tipografia — fonte de marketing (auth/bem-vindo) ────── */
   --font-marketing: 'Poppins', var(--font-family-sans);
 
+  /* ── Tipografia — fonte premium das páginas autenticadas ──
+     Mobile (≤768px) = Poppins. Desktop (≥769px) sobrescreve para
+     Plus Jakarta Sans Variable (ver bloco @media adiante). Centralizado
+     aqui para evitar a redeclaração em cada partial de página. */
+  --tx-dir-font: 'Poppins', var(--font-family-sans);
+
   /* ── Border radius ───────────────────────────────────────── */
   --radius-sm:   6px;
   --radius-md:   8px;
@@ -133,6 +139,21 @@
   --ease-out:        cubic-bezier(0, 0, 0.2, 1);
   --ease-in-out:     cubic-bezier(0.4, 0, 0.2, 1);
   --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+}
+
+/*
+ * Desktop premium typography (≥769px): Plus Jakarta Sans Variable substitui
+ * Poppins/Inter em todos os tokens canônicos. O woff2 só é baixado em telas
+ * que efetivamente usam (mobile não dispara request graças à media query).
+ * Stack final preserva Inter Variable + system-ui como fallback metric-matched.
+ */
+@media (min-width: 769px) {
+  :root {
+    --font-sans:          'Plus Jakarta Sans Variable', 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+    --font-family-sans:   'Plus Jakarta Sans Variable', 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+    --font-marketing:     'Plus Jakarta Sans Variable', 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+    --tx-dir-font:        'Plus Jakarta Sans Variable', 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  }
 }
 
 html {

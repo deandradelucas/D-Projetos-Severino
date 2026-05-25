@@ -20,13 +20,11 @@
   }
 }
 
-/* Admin — utilizadores, auditoria, pagamentos, marketing: tipografia alinhada a Transações / Configurações (Poppins + fallbacks) */
+/* Admin — utilizadores, auditoria, pagamentos, marketing: tipografia premium herdada de :root */
 .dashboard-container.page-admin-usuarios.ref-dashboard.app-horizon-shell,
 .dashboard-container.page-admin-auditoria.ref-dashboard.app-horizon-shell,
 .dashboard-container.page-admin-pagamentos.ref-dashboard.app-horizon-shell,
 .dashboard-container.page-admin-marketing.ref-dashboard.app-horizon-shell {
-  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
-
   font-family: var(--tx-dir-font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

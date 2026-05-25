@@ -1,7 +1,5 @@
-/* --- Página Pagamento: tipografia alinhada à Transações (Poppins + fallbacks) --- */
+/* --- Página Pagamento: tipografia premium herdada de :root (--tx-dir-font) --- */
 .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
-  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
-
   font-family: var(--tx-dir-font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

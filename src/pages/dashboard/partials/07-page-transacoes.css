@@ -5,9 +5,8 @@
    Sobrescreve grids .ref-tx-table-subgrid--actions mais acima no ficheiro.
    ============================================================================= */
 
-/* ─── Tipografia + tokens visuais (referência: cartões claros, Poppins) ─── */
+/* ─── Tipografia + tokens visuais (referência: cartões claros, fonte premium via :root) ─── */
 .dashboard-container.page-transacoes.app-horizon-shell {
-  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
   --tx-dir-title: #1a1a1b;
   --tx-dir-title-rec: #107c52;
   --tx-dir-muted: #8e959c;
