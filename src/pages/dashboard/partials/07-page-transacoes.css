@@ -1077,16 +1077,16 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     object-fit: contain;
   }
 
-  /* Mobile: data só como chip ao lado da subcategoria — oculta a versão do meta-cell. */
+  /* Mobile: data só como chip ao lado da subcategoria — oculta a versão do meta-cell.
+     Usa .ref-tx-meta-cell como âncora (sem >) porque no mobile o row fica dentro
+     do virtualizer (.ref-tx-virtual-scroll > div > .ref-tx-row), não filho direto. */
   body[data-theme='light'] .page-transacoes.app-horizon-shell
     .page-transacoes-ref-table
-    .ref-tx-table-subgrid--actions
-    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-meta-cell
     .ref-tx-date--row-meta,
   body[data-theme='dark'] .page-transacoes.app-horizon-shell
     .page-transacoes-ref-table
-    .ref-tx-table-subgrid--actions
-    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-meta-cell
     .ref-tx-date--row-meta {
     display: none !important;
   }
