@@ -101,7 +101,7 @@ export default function Transacoes() {
         setCategorias(data || [])
       }
     } catch (err) {
-      console.error(err)
+      console.error('[Transacoes] fetchCategorias:', err)
     }
   }, [])
 
@@ -118,7 +118,7 @@ export default function Transacoes() {
         setRecorrencias(Array.isArray(data) ? data : [])
       }
     } catch (err) {
-      console.error(err)
+      console.error('[Transacoes] fetchRecorrencias:', err)
     }
   }, [])
 
@@ -164,7 +164,7 @@ export default function Transacoes() {
         setHasMore(rows.length === TX_PAGE_SIZE)
       }
     } catch (err) {
-      console.error(err)
+      console.error('[Transacoes] fetchTransacoes:', err)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -194,7 +194,7 @@ export default function Transacoes() {
         setHasMore(rows.length === TX_PAGE_SIZE)
       }
     } catch (err) {
-      console.error(err)
+      console.error('[Transacoes] loadMoreTransacoes:', err)
     } finally {
       setLoadingMore(false)
     }
@@ -298,7 +298,7 @@ export default function Transacoes() {
       if (redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) fetchRecorrencias()
     } catch (err) {
-      console.error(err)
+      console.error('[Transacoes] encerrarRecorrencia:', err)
     }
   }
 
@@ -336,7 +336,7 @@ export default function Transacoes() {
         fetchTransacoes()
       }
     } catch (err) {
-      console.error(err)
+      console.error('[Transacoes] deleteTransacao:', err)
       fetchTransacoes()
     }
   }

@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * RP ID e origens permitidas para WebAuthn (biometria / passkey).
  * Em produção HTTPS, o RP ID deve ser o hostname do site (sem porta).

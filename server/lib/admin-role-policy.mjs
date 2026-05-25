@@ -1,3 +1,4 @@
+// @ts-check
 import { isSuperAdminEmail } from './super-admin.mjs'
 
 export function normalizeRoleKey(role) {

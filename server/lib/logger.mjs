@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Logs com timestamp ISO em uma linha (grep, agregadores, produção).
  * Para auditoria em JSON puro (ex.: webhook), use `log.jsonLine`.
