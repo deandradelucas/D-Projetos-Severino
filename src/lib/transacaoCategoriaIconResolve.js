@@ -18,6 +18,8 @@ export function getTransacaoCategoriaIconKey(categoriaNome, subcategoriaNome) {
   const s = norm(subcategoriaNome)
   const hay = `${c} ${s}`
 
+  if (c === 'saldo' || s === 'saldo' || /\bsaldo\b/.test(hay)) return 'saldoPng'
+
   /* Antes de PNG genérico «Trabalho e Negócios» e heurísticas de carteira. */
   if (/\brenda principal\b/.test(hay) || c === 'renda principal' || s === 'renda principal') {
     return 'rendaPrincipalPng'
@@ -192,6 +194,9 @@ export const TRABALHO_E_NEGOCIOS_CATEGORIA_ICON_SRC =
 export const VIAGENS_CATEGORIA_ICON_SRC =
   '/images/icons/' + encodeURIComponent('Viagens.png')
 
+/** Ícone raster — «Saldo» (categoria de ajuste de saldo). */
+export const SALDO_CATEGORIA_ICON_SRC = '/images/icons/saldo.png'
+
 /** Ícone raster — «Renda principal» (receitas). */
 export const RENDA_PRINCIPAL_CATEGORIA_ICON_SRC = '/images/icons/RendaPrincipal.png'
 
@@ -213,6 +218,7 @@ export const RENDAS_PJ_CATEGORIA_ICON_SRC =
 
 /** Chaves que renderizam `<img>` em `TransacaoCategoriaIcon`. */
 export const RASTER_CATEGORIA_ICON_SRC_BY_KEY = {
+  saldoPng: SALDO_CATEGORIA_ICON_SRC,
   transportePng: TRANSPORTE_CATEGORIA_ICON_SRC,
   comprasVarejoPng: COMPRAS_E_VAREJO_CATEGORIA_ICON_SRC,
   alimentacaoPng: ALIMENTACAO_CATEGORIA_ICON_SRC,
