@@ -24,6 +24,9 @@ export const Relatorios = lazy(loadRelatorios)
 const loadAgenda = () => import('./pages/Agenda.jsx')
 export const Agenda = lazy(loadAgenda)
 
+const loadListaDeCompras = () => import('./pages/ListaDeCompras.jsx')
+export const ListaDeCompras = lazy(loadListaDeCompras)
+
 const loadAdminUsuarios = () => import('./pages/AdminUsuarios.jsx')
 export const AdminUsuarios = lazy(loadAdminUsuarios)
 
@@ -55,6 +58,7 @@ const ROUTE_PREFETCH = {
   '/configuracoes': loadConfiguracoes,
   '/relatorios': loadRelatorios,
   '/agenda': loadAgenda,
+  '/lista-de-compras': loadListaDeCompras,
   '/admin/usuarios': loadAdminUsuarios,
   '/admin/pagamentos': loadAdminPagamentos,
   '/admin/auditoria': loadAdminAuditoria,
