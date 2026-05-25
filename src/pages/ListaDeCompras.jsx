@@ -511,18 +511,35 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
             </div>
           </div>
 
-          <div className="page-lista-compras__modal-field">
-            <label className="page-lista-compras__modal-label" htmlFor="item-qty">Quantidade</label>
-            <input
-              id="item-qty"
-              className="page-lista-compras__modal-input page-lista-compras__modal-input--qty"
-              type="number"
-              inputMode="decimal"
-              min="0.1"
-              step="any"
-              value={quantidade}
-              onChange={(e) => { const v = parseFloat(e.target.value); if (!isNaN(v) && v > 0) setQuantidade(v) }}
-            />
+          <div className="page-lista-compras__modal-row">
+            <div className="page-lista-compras__modal-field">
+              <label className="page-lista-compras__modal-label" htmlFor="item-qty">Quantidade</label>
+              <input
+                id="item-qty"
+                className="page-lista-compras__modal-input page-lista-compras__modal-input--qty"
+                type="number"
+                inputMode="decimal"
+                min="0.1"
+                step="any"
+                value={quantidade}
+                onChange={(e) => { const v = parseFloat(e.target.value); if (!isNaN(v) && v > 0) setQuantidade(v) }}
+              />
+            </div>
+
+            <div className="page-lista-compras__modal-field">
+              <label className="page-lista-compras__modal-label" htmlFor="item-preco">
+                Preço <span className="page-lista-compras__modal-label--optional">(opcional)</span>
+              </label>
+              <input
+                id="item-preco"
+                className="page-lista-compras__modal-input"
+                type="text"
+                inputMode="decimal"
+                placeholder="Ex: 7,90"
+                value={preco}
+                onChange={(e) => setPreco(e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="page-lista-compras__modal-field">
@@ -540,21 +557,6 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="page-lista-compras__modal-field">
-            <label className="page-lista-compras__modal-label" htmlFor="item-preco">
-              Preço estimado <span className="page-lista-compras__modal-label--optional">(opcional)</span>
-            </label>
-            <input
-              id="item-preco"
-              className="page-lista-compras__modal-input"
-              type="text"
-              inputMode="decimal"
-              placeholder="Ex: 7,90"
-              value={preco}
-              onChange={(e) => setPreco(e.target.value)}
-            />
           </div>
 
           <div className="page-lista-compras__modal-actions">

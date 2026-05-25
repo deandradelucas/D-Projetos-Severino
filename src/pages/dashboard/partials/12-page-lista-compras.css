@@ -997,6 +997,17 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   gap: 6px;
 }
 
+.page-lista-compras__modal-row {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.page-lista-compras__modal-row > .page-lista-compras__modal-field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 .page-lista-compras__modal-label {
   font-size: 0.8rem;
   font-weight: 600;
