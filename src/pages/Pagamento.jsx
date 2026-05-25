@@ -75,7 +75,6 @@ export default function Pagamento() {
 
   const statusUrl = searchParams.get('status')
   const asaasCb = searchParams.get('asaas')
-  const stripeCb = searchParams.get('stripe')
   const expirado = searchParams.get('expirado') === '1' || asaasCb === 'expirado'
 
   const formatCurrency = formatCurrencyBRL
@@ -211,7 +210,7 @@ export default function Pagamento() {
    * Para quando a assinatura fica ativa, a conta é isenta, o último registro deixa de estar pendente, ou esgota o tempo máximo.
    */
   useEffect(() => {
-    const checkoutOk = asaasCb === 'ok' || stripeCb === 'ok'
+    const checkoutOk = asaasCb === 'ok'
     const urlPending = statusUrl === 'pending'
     const aguardandoCobranca =
       ultimoHistoricoPendente &&
@@ -230,10 +229,7 @@ export default function Pagamento() {
       setSearchParams(
         (prev) => {
           const next = new URLSearchParams(prev)
-          if (checkoutOk) {
-            next.delete('asaas')
-            next.delete('stripe')
-          }
+          if (checkoutOk) next.delete('asaas')
           if (urlPending) next.delete('status')
           return next
         },
@@ -273,7 +269,6 @@ export default function Pagamento() {
     }
   }, [
     asaasCb,
-    stripeCb,
     statusUrl,
     ultimoHistoricoPendente,
     config.isento_pagamento,
@@ -531,19 +526,6 @@ export default function Pagamento() {
                     <p className="pagamento-banner__text">
                       Conclua o pagamento no checkout Asaas e use &quot;Atualizar status&quot;.
                     </p>
-                  </div>
-                ) : null}
-
-                {stripeCb === 'cancel' ? (
-                  <div className="pagamento-banner pagamento-banner--warning" role="status">
-                    <p className="pagamento-banner__title">Checkout Stripe cancelado. Você pode tentar de novo quando quiser.</p>
-                    <button
-                      type="button"
-                      className="btn-secondary btn-secondary--compact"
-                      onClick={() => fecharParamCheckout('stripe')}
-                    >
-                      Fechar aviso
-                    </button>
                   </div>
                 ) : null}
 

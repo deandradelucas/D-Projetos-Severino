@@ -11,9 +11,6 @@ import {
   sincronizarSubscriptionUsuario,
   upsertFromWebhookAsaasPayment,
 } from '../lib/pagamentos-asaas.mjs'
-import { handleStripeWebhookEvent, sincronizarStripeUsuario } from '../lib/pagamentos-stripe.mjs'
-import { criarStripeSubscriptionCheckoutSession } from '../lib/stripe-checkout.mjs'
-import { getStripe, isStripeConfigured } from '../lib/stripe-client.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { logAsaasWebhook } from '../lib/asaas-webhook-log.mjs'
 import { errorToText } from '../lib/http/hono-error-map.mjs'
@@ -61,8 +58,6 @@ export function registerPagamentosRoutes(app) {
     return c.json({
       publicKey: null,
       ready: isAsaasConfigured(),
-      stripe_checkout_ready: isStripeConfigured(),
-      stripe_publishable_key: String(process.env.STRIPE_PUBLISHABLE_KEY || '').trim() || null,
       isento_pagamento,
       preco_mensal: Number.isFinite(precoMensal) && precoMensal > 0 ? precoMensal : 10,
       preco_anual: Number.isFinite(precoAnual) && precoAnual > 0 ? precoAnual : 100,
@@ -84,7 +79,6 @@ export function registerPagamentosRoutes(app) {
       }
       await sincronizarPagamentosPendentesDoUsuario(billingId)
       await sincronizarSubscriptionUsuario(billingId).catch(() => {})
-      await sincronizarStripeUsuario(billingId).catch(() => {})
       const rows = await listPagamentosUsuario(billingId)
       return c.json(rows)
     } catch (error) {
@@ -265,96 +259,6 @@ export function registerPagamentosRoutes(app) {
       log.error('pix anual qrcode failed', error)
       return c.json({ message: 'Erro ao gerar QR Code Pix.' }, 500)
     }
-  })
-
-  app.post('/api/pagamentos/stripe/checkout', async (c) => {
-    try {
-      const usuarioId = resolveRequestUserId(c)
-      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
-      const gate = await assertSessaoRotasPagamento(usuarioId)
-      if (gate) return c.json({ message: gate.message }, gate.status)
-      try {
-        const escopo = await resolveEscopoUsuario(usuarioId)
-        if (escopo.isMembroConta) {
-          return c.json(
-            {
-              message:
-                'Quem paga a assinatura é o titular da conta familiar. Peça para ele concluir o pagamento em Configurações ou Pagamento.',
-            },
-            403,
-          )
-        }
-      } catch {
-        return c.json({ message: 'Não autorizado.' }, 401)
-      }
-      const ip = clientKeyFromHono(c)
-      if (!await rateLimitTake(`stripe-checkout:${usuarioId}:${ip}`, 15, 60 * 60_000)) {
-        return c.json({ message: 'Limite de solicitações de pagamento. Tente de novo em até uma hora.' }, 429)
-      }
-      if (!isStripeConfigured()) {
-        return c.json({ message: 'Stripe não configurado no servidor (STRIPE_SECRET_KEY).' }, 503)
-      }
-
-      const body = await c.req.json().catch(() => ({}))
-      const planoRaw = String(body?.plano || 'mensal').trim().toLowerCase()
-      const plano = planoRaw === 'anual' ? 'anual' : 'mensal'
-
-      const perfil = await getPerfilUsuario(usuarioId)
-      if (!perfil?.email) {
-        return c.json({ message: 'Perfil sem e-mail. Atualize seu cadastro.' }, 400)
-      }
-      if (perfil.isento_pagamento === true) {
-        return c.json({
-          message: 'Sua conta está marcada como isenta de pagamento. Não é necessário concluir o checkout.',
-        }, 403)
-      }
-
-      const baseUrl = getRequestOrigin(c).replace(/\/+$/, '')
-      const session = await criarStripeSubscriptionCheckoutSession({
-        usuarioId,
-        email: perfil.email,
-        plano,
-        baseUrlApp: baseUrl,
-      })
-      const url = session?.url ? String(session.url) : ''
-      if (!url) {
-        log.error('stripe checkout sem url', session?.id)
-        return c.json({ message: 'Resposta inválida do Stripe ao criar checkout.' }, 502)
-      }
-
-      return c.json({
-        checkout_url: url,
-        preapproval_id: null,
-        preference_id: null,
-        init_point: url,
-        sandbox_init_point: url,
-        use_sandbox: false,
-      })
-    } catch (error) {
-      log.error('criar checkout stripe failed', error)
-      return c.json({ message: 'Erro ao criar checkout Stripe.' }, 500)
-    }
-  })
-
-  app.post('/api/pagamentos/stripe/webhook', async (c) => {
-    const stripe = getStripe()
-    const whSecret = String(process.env.STRIPE_WEBHOOK_SECRET || '').trim()
-    if (!stripe || !whSecret) {
-      log.warn('[stripe webhook] STRIPE_WEBHOOK_SECRET ou STRIPE_SECRET_KEY ausente')
-      return c.json({ message: 'Webhook Stripe não configurado.' }, 503)
-    }
-    const sig = c.req.header('stripe-signature')
-    if (!sig) return c.json({ message: 'Assinatura ausente.' }, 400)
-    let event
-    try {
-      const raw = await c.req.text()
-      event = stripe.webhooks.constructEvent(raw, sig, whSecret)
-    } catch (e) {
-      log.warn('[stripe webhook] verify', e?.message || e)
-      return c.json({ message: 'Assinatura inválida.' }, 400)
-    }
-    await handleStripeWebhookEvent(event)
-    return c.json({ received: true })
   })
 
   app.post('/api/pagamentos/cancelar', async (c) => {

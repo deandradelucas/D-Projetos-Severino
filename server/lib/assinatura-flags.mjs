@@ -24,11 +24,6 @@ export function mensagemBloqueioAssinaturaAsaas(status) {
   return 'Assinatura inativa ou período de teste encerrado. Conclua o pagamento no aplicativo para continuar.'
 }
 
-export function stripeSubscriptionLiberaAcesso(stripeStatus) {
-  const s = String(stripeStatus || '').trim().toLowerCase()
-  return s === 'active' || s === 'trialing'
-}
-
 export function situacaoAssinatura({ trialActive, assinatura_paga_efetiva, assinatura_asaas_status, gwBloqueia }) {
   if (trialActive && !assinatura_paga_efetiva) return 'trial'
   if (gwBloqueia) return String(assinatura_asaas_status || '').toLowerCase() === 'inactive' ? 'pausada' : 'cancelada'
@@ -50,7 +45,6 @@ export function computeAssinaturaFlags({
   bem_vindo_pagamento_visto_at,
   assinatura_paga,
   assinatura_asaas_status,
-  stripe_subscription_status = null,
 }) {
   if (isSuperAdminEmail(email) || isento_pagamento === true) {
     return {
@@ -65,8 +59,7 @@ export function computeAssinaturaFlags({
 
   const trialEnd = trial_ends_at ? new Date(trial_ends_at) : null
   const trialActive = trialEnd != null && !Number.isNaN(trialEnd.getTime()) && trialEnd > new Date()
-  const stripeOk = stripeSubscriptionLiberaAcesso(stripe_subscription_status)
-  const gwBloqueia = asaasSubscriptionBloqueiaAcesso(assinatura_asaas_status) && !stripeOk
+  const gwBloqueia = asaasSubscriptionBloqueiaAcesso(assinatura_asaas_status)
   const pagoHistorico = assinatura_paga === true
   const pagoEfetivo = pagoHistorico && !gwBloqueia
 

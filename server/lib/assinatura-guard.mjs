@@ -4,7 +4,6 @@ import { isSuperAdminEmail } from './super-admin.mjs'
 import { resolveEscopoUsuario } from './conta-familiar.mjs'
 import { usuarioTemPagamentoAprovado } from './pagamentos-asaas.mjs'
 import { computeAssinaturaFlags } from './assinatura-flags.mjs'
-import { isStripeConfigured } from './stripe-client.mjs'
 import {
   isMissingColumnError,
   rawIsentoPagamento,
@@ -79,17 +78,13 @@ export async function assertAcessoAppUsuario(usuarioId) {
     log.warn('[assertAcessoAppUsuario] ensureTrialIniciado:', e?.message || e)
   }
 
-  // Só inclui colunas Stripe quando o gateway está configurado — caso contrário
-  // o SELECT falha com 42703 (coluna inexistente) e dispara fallbacks ruidosos.
-  const stripeOn = isStripeConfigured()
   const baseCols = 'email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status'
-  const selectCols = stripeOn ? `${baseCols}, stripe_subscription_status` : baseCols
 
   let urow = null
   let uerr = null
   ;({ data: urow, error: uerr } = await supabase
     .from('usuarios')
-    .select(selectCols)
+    .select(baseCols)
     .eq('id', billingUid)
     .maybeSingle())
 
@@ -100,14 +95,6 @@ export async function assertAcessoAppUsuario(usuarioId) {
     ;({ data: urow, error: uerr } = await supabase
       .from('usuarios')
       .select('email, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status')
-      .eq('id', billingUid)
-      .maybeSingle())
-  }
-
-  if (stripeOn && uerr && isMissingColumnError(uerr, 'stripe_subscription_status')) {
-    ;({ data: urow, error: uerr } = await supabase
-      .from('usuarios')
-      .select(baseCols)
       .eq('id', billingUid)
       .maybeSingle())
   }
@@ -134,7 +121,6 @@ export async function assertAcessoAppUsuario(usuarioId) {
     bem_vindo_pagamento_visto_at: urow.bem_vindo_pagamento_visto_at,
     assinatura_paga: hasPay,
     assinatura_asaas_status: urow.assinatura_asaas_status,
-    stripe_subscription_status: urow.stripe_subscription_status ?? null,
   })
 
   if (!flags.acesso_app_liberado) {
