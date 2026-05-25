@@ -12,6 +12,7 @@ import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
 import { readHorizonteUserProfile, horizonteUserProfileTemId } from '../lib/horizonteSession'
 import { getRelatorioChartPalette } from '../lib/relatorioChartTokens'
 import { downloadRelatorioCsv } from '../lib/relatorioExportCsv'
+import { buildRelatorioPdfDoc, downloadRelatorioPdf } from '../lib/relatorioExportPdf'
 import { showToast } from '../lib/toastStore'
 import { formatLocalDateISO, getFirstDayOfMonth, getLastDayOfMonth } from '../lib/dateUtils'
 import { SkeletonKpi } from '../components/dashboard/DashboardSkeletons'
@@ -73,7 +74,7 @@ export default function Relatorios() {
         const data = await res.json()
         setCategorias(data || [])
       }
-    } catch (err) { console.error(err) }
+    } catch (err) { console.error('[Relatorios] fetchCategorias:', err) }
   }, [])
 
   // Fetch Transacoes
@@ -98,7 +99,7 @@ export default function Relatorios() {
         setTransacoes(data || [])
       }
     } catch (err) {
-      console.error(err)
+      console.error('[Relatorios] fetchTransacoes:', err)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -205,52 +206,17 @@ export default function Relatorios() {
 
     setPdfExportLoading(true)
     try {
-      const [{ default: jsPDF }, autoTableMod] = await Promise.all([
+      const [{ default: JsPdfCtor }, autoTableMod] = await Promise.all([
         import('jspdf'),
         import('jspdf-autotable'),
       ])
-      const autoTable = autoTableMod.default
-
-      const doc = new jsPDF()
-
-      // Título do Relatório
-      doc.setFontSize(18)
-      doc.text('Relatório Analítico de Transações', 14, 22)
-      doc.setFontSize(11)
-      doc.setTextColor(100)
-      doc.text(`Período: ${new Date(filters.dataInicio + 'T00:00:00').toLocaleDateString('pt-BR')} a ${new Date(filters.dataFim + 'T00:00:00').toLocaleDateString('pt-BR')}`, 14, 30)
-
-      // Resumo Financeiro
-      doc.setFontSize(12)
-      doc.setTextColor(0)
-      doc.text(`Total de Receitas: ${formatCurrency(summary.receitas)}`, 14, 40)
-      doc.text(`Total de Despesas: ${formatCurrency(summary.despesas)}`, 14, 48)
-      doc.text(`Saldo Líquido: ${formatCurrency(summary.saldo)}`, 14, 56)
-
-      // Tabela
-      const tableColumn = ['Data', 'Tipo', 'Categoria', 'Valor', 'Status']
-      const tableRows = []
-
-      transacoes.forEach((t) => {
-        const dataStr = new Date(t.data_transacao).toLocaleDateString('pt-BR')
-        const tipo = t.tipo
-        const cat = t.categorias?.nome || 'Sem categoria'
-        const valor = formatCurrency(t.valor)
-        const status = t.status || ''
-
-        tableRows.push([dataStr, tipo, cat, valor, status])
+      const doc = buildRelatorioPdfDoc(JsPdfCtor, autoTableMod.default, {
+        transacoes,
+        filtros: { dataInicio: filters.dataInicio, dataFim: filters.dataFim },
+        summary,
+        formatCurrency,
       })
-
-      autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: 65,
-        theme: 'grid',
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [44, 62, 80] },
-      })
-
-      doc.save(`relatorio_${filters.dataInicio}_a_${filters.dataFim}.pdf`)
+      downloadRelatorioPdf(doc, { dataInicio: filters.dataInicio, dataFim: filters.dataFim })
       showToast('PDF gerado com sucesso!')
     } catch {
       showToast('Erro ao gerar PDF', 'error')

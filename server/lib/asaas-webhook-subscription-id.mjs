@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Extrai o id da assinatura do JSON do webhook Asaas (formatos comuns).
  * @param {Record<string, unknown>} body

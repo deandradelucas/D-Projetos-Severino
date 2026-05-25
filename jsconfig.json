@@ -1,6 +1,12 @@
 {
+  // Type-check é opt-in: cada arquivo que quiser ser verificado pelo TS Language
+  // Server adiciona `// @ts-check` no topo. Ativar checkJs: true global hoje
+  // emite ~225 warnings em ~64 arquivos não preparados — preferimos uma migração
+  // incremental. Lista de módulos com @ts-check vive em server/lib/*.mjs.
+  // (Pasta `segunda-feira/` é submódulo de processo, ignorado.)
   "compilerOptions": {
     "baseUrl": ".",
+    "checkJs": false,
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"]
