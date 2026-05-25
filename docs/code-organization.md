@@ -10,8 +10,7 @@ Este projeto usa uma migração estrutural gradual. A regra principal é preserv
 - `server/routes`: handlers HTTP por contexto.
 - `server/middleware`: preocupações transversais de HTTP, segurança e request lifecycle.
 - `server/lib`: domínio, serviços, integrações e persistência do backend.
-- `scripts/migrations`: SQL versionado de Supabase.
-- `scripts/sql`: SQL manual ou legado que não é migration automática.
+- `scripts/migrations`: SQL versionado de Supabase (numerado, ordem cronológica).
 
 ## Aliases Frontend
 
