@@ -14,7 +14,7 @@ function createApiProxy(apiTarget) {
     target: apiTarget,
     changeOrigin: true,
     agent: apiProxyAgent,
-    /** Rotas como /api/assinatura/status podem demorar (sync Asaas/Stripe); evita corte prematuro. */
+    /** Rotas como /api/assinatura/status podem demorar (sync Asaas); evita corte prematuro. */
     timeout: 120_000,
     proxyTimeout: 120_000,
     configure(proxy) {
@@ -66,6 +66,11 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
         '@components': fileURLToPath(new URL('./src/components', import.meta.url)),
+        // jspdf 4.x importa `canvg` e `html2canvas` estaticamente para suportar `doc.svg()`/`doc.html()`,
+        // adicionando ~95 KB gzipped ao chunk de Relatórios mesmo sem uso. Apontamos para um stub vazio
+        // (Relatórios só usa tabelas/texto). Ver `src/lib/stubs/jspdf-canvas-stub.js` para reabilitar.
+        canvg: fileURLToPath(new URL('./src/lib/stubs/jspdf-canvas-stub.js', import.meta.url)),
+        html2canvas: fileURLToPath(new URL('./src/lib/stubs/jspdf-canvas-stub.js', import.meta.url)),
       },
     },
     build: {
@@ -79,7 +84,6 @@ export default defineConfig(({ mode }) => {
             }
             if (id.includes('recharts')) return 'vendor-recharts'
             if (id.includes('jspdf')) return 'vendor-jspdf'
-            if (id.includes('html2canvas') || id.includes('canvg')) return 'vendor-canvas'
           },
         },
       },
