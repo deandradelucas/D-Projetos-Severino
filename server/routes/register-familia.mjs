@@ -26,6 +26,22 @@ function titularGestaoOu403(escopo) {
 import { isUuidString } from '../lib/transacao-validate.mjs'
 
 export function registerFamiliaRoutes(app) {
+  /** Retorna o escopo familiar do utilizador autenticado. */
+  app.get('/api/familia/meu-escopo', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+      return c.json({
+        isMembroConta: parsed.escopo.isMembroConta,
+        familiaPapel: parsed.escopo.familiaPapel,
+      })
+    } catch (error) {
+      log.error('familia meu-escopo', error)
+      return c.json({ message: 'Erro ao buscar escopo.' }, 500)
+    }
+  })
+
   /** Público: validar token antes do login (sem dados sensíveis). */
   app.get('/api/familia/convite-info', async (c) => {
     try {

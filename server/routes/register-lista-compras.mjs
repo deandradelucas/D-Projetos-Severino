@@ -17,6 +17,11 @@ import { isUuidString } from '../lib/transacao-validate.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 
+function resolveListaDataId(parsed, c) {
+  const pessoal = c.req.query('pessoal')
+  return pessoal === '1' ? parsed.actorId : parsed.dataUsuarioId
+}
+
 export function registerListaComprasRoutes(app) {
   // GET /api/lista-compras — listar listas ativas com itens
   app.get('/api/lista-compras', async (c) => {
@@ -25,7 +30,7 @@ export function registerListaComprasRoutes(app) {
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      const rows = await listarListasUsuario(parsed.dataUsuarioId)
+      const rows = await listarListasUsuario(resolveListaDataId(parsed, c))
       return c.json(rows)
     } catch (error) {
       log.error('listar listas de compras', error)
@@ -41,7 +46,7 @@ export function registerListaComprasRoutes(app) {
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
       const q = c.req.query('q') || ''
-      const nomes = await listarHistoricoNomes(parsed.dataUsuarioId, 50)
+      const nomes = await listarHistoricoNomes(resolveListaDataId(parsed, c), 50)
 
       const filtrados = q.trim().length >= 1
         ? nomes.filter((n) => n.toLowerCase().includes(q.toLowerCase()))
@@ -61,7 +66,7 @@ export function registerListaComprasRoutes(app) {
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
 
-      const rows = await listarListasArquivadas(parsed.dataUsuarioId)
+      const rows = await listarListasArquivadas(resolveListaDataId(parsed, c))
       return c.json(rows)
     } catch (error) {
       log.error('listar listas arquivadas', error)
@@ -87,7 +92,7 @@ export function registerListaComprasRoutes(app) {
         return c.json({ message: 'JSON inválido.' }, 400)
       }
 
-      const data = await criarLista(parsed.dataUsuarioId, body)
+      const data = await criarLista(resolveListaDataId(parsed, c), body)
       return c.json(data, 201)
     } catch (error) {
       log.error('criar lista de compras', error)
@@ -117,7 +122,7 @@ export function registerListaComprasRoutes(app) {
         return c.json({ message: 'JSON inválido.' }, 400)
       }
 
-      const data = await atualizarLista(id, parsed.dataUsuarioId, body)
+      const data = await atualizarLista(id, resolveListaDataId(parsed, c), body)
       return c.json(data)
     } catch (error) {
       log.error('atualizar lista de compras', error)
@@ -142,7 +147,7 @@ export function registerListaComprasRoutes(app) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
-      await arquivarLista(id, parsed.dataUsuarioId)
+      await arquivarLista(id, resolveListaDataId(parsed, c))
       return c.json({ message: 'Lista arquivada.' })
     } catch (error) {
       log.error('arquivar lista de compras', error)
@@ -161,7 +166,7 @@ export function registerListaComprasRoutes(app) {
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
       if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
 
-      const rows = await listarItensLista(id, parsed.dataUsuarioId)
+      const rows = await listarItensLista(id, resolveListaDataId(parsed, c))
       return c.json(rows)
     } catch (error) {
       log.error('listar itens lista compras', error)
@@ -191,7 +196,7 @@ export function registerListaComprasRoutes(app) {
         return c.json({ message: 'JSON inválido.' }, 400)
       }
 
-      const data = await criarItem(id, parsed.dataUsuarioId, body)
+      const data = await criarItem(id, resolveListaDataId(parsed, c), body)
       return c.json(data, 201)
     } catch (error) {
       log.error('criar item lista compras', error)
@@ -224,7 +229,7 @@ export function registerListaComprasRoutes(app) {
         return c.json({ message: 'JSON inválido.' }, 400)
       }
 
-      const data = await atualizarItem(itemId, id, parsed.dataUsuarioId, body)
+      const data = await atualizarItem(itemId, id, resolveListaDataId(parsed, c), body)
       return c.json(data)
     } catch (error) {
       log.error('atualizar item lista compras', error)
@@ -250,7 +255,7 @@ export function registerListaComprasRoutes(app) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
-      const data = await toggleChecked(itemId, id, parsed.dataUsuarioId)
+      const data = await toggleChecked(itemId, id, resolveListaDataId(parsed, c))
       return c.json(data)
     } catch (error) {
       log.error('toggle item lista compras', error)
@@ -274,7 +279,7 @@ export function registerListaComprasRoutes(app) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
-      await removerItem(itemId, id, parsed.dataUsuarioId)
+      await removerItem(itemId, id, resolveListaDataId(parsed, c))
       return c.json({ message: 'Item removido.' })
     } catch (error) {
       log.error('remover item lista compras', error)

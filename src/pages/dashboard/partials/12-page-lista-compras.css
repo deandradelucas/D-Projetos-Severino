@@ -48,6 +48,41 @@
   min-width: 0;
 }
 
+.page-lista-compras__header-icon {
+  display: flex;
+  align-items: center;
+  color: var(--accent);
+}
+
+.page-lista-compras__header-icon svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.8;
+}
+
+/* Desktop: mostra o título textual em vez do ícone */
+@media (min-width: 769px) {
+  .page-lista-compras__header-icon {
+    display: none;
+  }
+
+  .page-lista-compras__title {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0;
+    overflow: visible !important;
+    clip: auto !important;
+    clip-path: none !important;
+    white-space: nowrap !important;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+}
+
 .page-lista-compras__title {
   margin: 0;
   font-size: 1.25rem;
@@ -84,6 +119,35 @@
 
 .page-lista-compras__nova-btn:active {
   transform: scale(0.97);
+}
+
+/* ---------------------------------------------------------------------------
+   Toggle escopo familiar (Família / Pessoal)
+   --------------------------------------------------------------------------- */
+.page-lista-compras__escopo-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.page-lista-compras__escopo-btn {
+  flex: 1;
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-muted, rgba(255,255,255,0.10));
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.page-lista-compras__escopo-btn--active {
+  background: rgba(var(--accent-rgb, 212,168,75), 0.12);
+  border-color: var(--accent, #d4a84b);
+  color: var(--accent, #d4a84b);
+  font-weight: 600;
 }
 
 /* ---------------------------------------------------------------------------

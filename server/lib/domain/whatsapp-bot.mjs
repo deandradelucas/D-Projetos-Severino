@@ -4,6 +4,7 @@ import { getCategorias, inserirTransacao } from '../transacoes.mjs'
 import { askHorizon, parseWhatsAppMessageWithAI } from '../ai.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
+import { isListaComprasMessage, processarMensagemListaCompras } from './lista-compras-whatsapp.mjs'
 import { detectExtratoPedido, montarRespostaExtratoWhatsApp } from './whatsapp-extrato.mjs'
 import { resolveEscopoUsuario, assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 import { listarInvestimentosUsuario } from '../investimentos.mjs'
@@ -208,7 +209,7 @@ function formatDataTransacaoReplyPtBr(iso) {
 }
 
 const AJUDA =
-  '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n📈 *Investimentos:* "meus investimentos", "quanto tenho investido"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n\nDigite *ajuda* para ver isto de novo.'
+  '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n📈 *Investimentos:* "meus investimentos", "quanto tenho investido"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n🛒 *Lista de compras:* "adiciona 2kg de arroz na lista Mercado" ou "ver lista Mercado"\n\nDigite *ajuda* para ver isto de novo.'
 
 // Detecta saudações isoladas: "Olá", "Oi", "Bom dia", "Salve", "Opa", etc.
 const BOA_VINDAS_RE =
@@ -237,6 +238,13 @@ function buildTutorialBoasVindas(nome) {
     `"Consulta médica amanhã às 9h"\n` +
     `"Pagar boleto na sexta"\n\n` +
     `Após criar o evento, basta informar quantos minutos antes quer ser avisado — e o Severino te lembra na hora certa! ⏰\n\n` +
+    `─────────────────────\n` +
+    `🛒 *Lista de compras*\n` +
+    `─────────────────────\n` +
+    `"Cria uma lista chamada Mercado"\n` +
+    `"Adiciona 2kg de arroz na lista Mercado"\n` +
+    `"Coloca 6 ovos e 1L de leite na lista Mercado"\n` +
+    `"Ver lista Mercado"\n\n` +
     `─────────────────────\n` +
     `📊 *Consultas rápidas*\n` +
     `─────────────────────\n` +
@@ -311,6 +319,17 @@ export async function processarMensagemBot(phone, rawMessage) {
   // 2. Agenda via WhatsApp — antes do parser financeiro para não confundir compromissos com transações
   if (isAgendaMessage(message)) {
     return processarMensagemAgenda(usuarioBot, phone, message)
+  }
+
+  // Lista de compras — antes da IA financeira para não interpretar itens como transações
+  if (isListaComprasMessage(message)) {
+    try {
+      const resultado = await processarMensagemListaCompras(dataUsuarioId, message)
+      if (resultado !== null) return resultado
+    } catch (e) {
+      log.error('[whatsapp-bot] processarMensagemListaCompras error', e)
+      return { ok: false, reply: '❌ Erro ao processar lista de compras. Tente novamente.' }
+    }
   }
 
   // Extrato / histórico (dia, semana ou mês) — antes da IA para não cair em CHAT genérico
