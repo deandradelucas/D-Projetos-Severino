@@ -1242,10 +1242,6 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     font-size: clamp(15px, 4vw, 17px);
   }
 
-  body[data-theme='light'] .ref-kpi-card--hero .ref-kpi-card__value {
-    font-size: clamp(16px, 4.2vw, 18px);
-  }
-
   body[data-theme='light'] .ref-panel {
     min-height: 0;
     padding: 12px 12px 10px;
@@ -1730,11 +1726,6 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     min-height: 104px;
     scroll-snap-align: start;
     scroll-snap-stop: always;
-  }
-
-  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero,
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card--hero {
-    flex-basis: min(86vw, 340px);
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-kpi-card {

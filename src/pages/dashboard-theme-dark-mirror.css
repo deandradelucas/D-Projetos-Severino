@@ -96,14 +96,6 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-filt
   background: #111820;
   border-color: rgba(148, 163, 184, 0.35);
 }
-body[data-theme='dark'] .relatorios-kpi-saldo--pos {
-  color: #4f46e5 !important;
-  text-shadow: none;
-}
-body[data-theme='dark'] .relatorios-kpi-saldo--neg {
-  color: #dc2626 !important;
-  text-shadow: none;
-}
 body[data-theme='dark'] .horizon-chat-fab {
   background: rgba(8, 8, 10, 0.58);
   color: #111820;
@@ -628,10 +620,6 @@ body[data-theme='dark'] .ref-kpi-card--balance,
 body[data-theme='dark'] .ref-kpi-card--expense,
 body[data-theme='dark'] .ref-kpi-card--income {
   background: #1a222e;
-}
-body[data-theme='dark'] .ref-kpi-card--hero .ref-kpi-card__value {
-  font-size: clamp(19px, 2.2vw, 24px);
-  letter-spacing: -0.03em;
 }
 body[data-theme='dark'] .ref-kpi-card--balance .ref-kpi-card__icon {
   background: linear-gradient(165deg, rgba(219, 234, 254, 0.95) 0%, rgba(191, 219, 254, 0.42) 100%);
@@ -2414,12 +2402,6 @@ body[data-theme='dark'] .ref-panel__link:focus-visible {
   body[data-theme='dark'] .ref-kpi-card__value {
     margin: 2px 0 0;
     font-size: clamp(15px, 4vw, 17px);
-  }
-}
-@media (max-width: 768px) {
-
-  body[data-theme='dark'] .ref-kpi-card--hero .ref-kpi-card__value {
-    font-size: clamp(16px, 4.2vw, 18px);
   }
 }
 @media (max-width: 768px) {

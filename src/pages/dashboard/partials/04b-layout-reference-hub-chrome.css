@@ -231,11 +231,6 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
   font-size: clamp(1rem, 1.15vw + 0.7rem, 1.375rem);
 }
 
-body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--hero .ref-kpi-card__value,
-body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--hero .ref-kpi-card__value {
-  font-size: clamp(1.0625rem, 1.35vw + 0.68rem, 1.5rem);
-}
-
 body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__title,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-panel__title {
   font-size: clamp(1rem, 0.6vw + 0.78rem, 1.1875rem);
@@ -1158,11 +1153,6 @@ body[data-theme='light'] .ref-kpi-card--balance,
 body[data-theme='light'] .ref-kpi-card--expense,
 body[data-theme='light'] .ref-kpi-card--income {
   background: #ffffff;
-}
-
-body[data-theme='light'] .ref-kpi-card--hero .ref-kpi-card__value {
-  font-size: clamp(19px, 2.2vw, 24px);
-  letter-spacing: -0.03em;
 }
 
 body[data-theme='light'] .ref-kpi-card--balance .ref-kpi-card__icon {
@@ -2258,25 +2248,3 @@ body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-ho
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
   color: var(--text-secondary, #64748b);
 }
-
-/* KPI card Saldo — cor do valor conforme positivo/negativo/zero */
-.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--pos {
-  color: var(--success-text);
-}
-
-body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--pos {
-  color: var(--success);
-}
-
-.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--neg {
-  color: #dc2626;
-}
-
-body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--neg {
-  color: #f87171;
-}
-
-.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub .ref-kpi-card--balance .ref-kpi-card__value--zero {
-  color: var(--text-secondary, #64748b);
-}
-
