@@ -20,8 +20,9 @@ body[data-theme='light'] {
   --shell-nav-py: clamp(8px, 0.55vw + 6px, 12px);
   --shell-nav-pl: clamp(10px, 0.85vw + 8px, 16px);
   --shell-nav-pr: clamp(14px, 1vw + 10px, 26px);
-  /* Menu lateral — mínimo compatível com PT-BR (Investimentos, Logs de Pagamentos, etc.) */
-  --app-sidebar-width: clamp(272px, 12vw + 126px, 312px);
+  /* Menu lateral — mínimo compatível com PT-BR (Investimentos, Logs de Pagamentos, etc.).
+     Reduzido ~10% (era 272–312) para liberar mais largura à área de conteúdo em desktop. */
+  --app-sidebar-width: clamp(252px, 11vw + 116px, 282px);
   --app-sidebar-pad: clamp(10px, 1.1vw + 6px, 18px) clamp(10px, 1vw + 8px, 16px)
     clamp(10px, 1vw + 6px, 18px);
   --app-shell-inner-max: 1180px;
