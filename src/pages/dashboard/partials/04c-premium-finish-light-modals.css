@@ -645,18 +645,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     margin: 0;
   }
 
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-    display: inline-flex;
-    align-items: center;
-    font-size: clamp(17px, 1.1vw + 13px, 24px);
-    line-height: 1;
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    color: #111827;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
-    white-space: nowrap;
-  }
-
   /* Escuro / vidro: mesma régua claro (sobrepõe .sidebar .brand-wrapper do mirror) */
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
     display: flex;
@@ -685,17 +673,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     margin: 0;
   }
 
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-    display: inline-flex;
-    align-items: center;
-    font-size: clamp(17px, 1.1vw + 13px, 24px);
-    line-height: 1;
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    color: #f8fafc;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
-    white-space: nowrap;
-  }
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .nav-menu {
     gap: clamp(5px, 0.45vw + 4px, 8px);
@@ -2203,36 +2180,6 @@ body[data-theme='dark'] .agenda-field select {
   gap: 12px;
 }
 
-.agenda-danger-btn {
-  min-height: 42px;
-  padding: 0 16px;
-  border: 1px solid color-mix(in srgb, var(--agenda-danger) 35%, transparent);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--agenda-danger) 10%, transparent);
-  color: var(--agenda-danger);
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
-}
-
-.agenda-danger-btn:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--agenda-danger) 54%, transparent);
-  background: color-mix(in srgb, var(--agenda-danger) 16%, transparent);
-  transform: translateY(-1px);
-}
-
-.agenda-danger-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.agenda-danger-btn:focus-visible {
-  outline: 2px solid var(--agenda-danger);
-  outline-offset: 2px;
-}
-
 @media (max-width: 768px) {
   .agenda-page .dashboard-hub__hero-row {
     display: grid;
@@ -2297,7 +2244,6 @@ body[data-theme='dark'] .agenda-field select {
     gap: 10px;
   }
 
-  .agenda-danger-btn,
   .agenda-modal__actions-main .agenda-secondary-btn,
   .agenda-modal__actions-main .dashboard-hub__btn--primary {
     width: 100%;

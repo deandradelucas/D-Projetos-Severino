@@ -81,12 +81,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   }
 }
 
-/* Tema escuro: fundo #000 + texto claro (ativo = chip escuro + ouro, sem pill branco) */
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-  color: #fafafa !important;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35) !important;
-}
-
 /* Marca no shell: fundo transparente — sem retângulo atrás da arte; usa o próprio cartão da sidebar (claro/escuro). */
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {

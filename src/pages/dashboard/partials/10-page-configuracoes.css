@@ -183,7 +183,6 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-bio-item {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-body[data-theme='dark'] .page-configuracoes.app-horizon-shell select.config-select,
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-select-custom__trigger {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.12);
@@ -1035,8 +1034,7 @@ body[data-theme='dark'] .config-toast {
   box-shadow: var(--shadow-md);
 }
 
-/* ——— Select nativo e custom ——— */
-select.config-select,
+/* ——— Select custom ——— */
 .config-select-custom__trigger {
   width: 100%;
   box-sizing: border-box;
@@ -1155,13 +1153,11 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-select-cus
   background: rgba(212, 168, 75, 0.22);
 }
 
-select.config-select:focus-visible,
 .config-select-custom__trigger:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-select.config-select:disabled,
 .config-select-custom__trigger:disabled {
   cursor: not-allowed;
   opacity: 0.55;
