@@ -1363,7 +1363,7 @@ body[data-theme='dark'] .tx-parceladas-chip {
 }
 body[data-theme='dark'] .tx-parceladas-chip:hover {
   border-color: var(--accent);
-  color: var(--accent);
+  color: #000;
 }
 body[data-theme='dark'] .tx-parceladas-chip--active {
   background: var(--accent);
