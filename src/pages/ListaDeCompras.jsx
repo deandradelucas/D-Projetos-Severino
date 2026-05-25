@@ -128,16 +128,6 @@ const CATEGORIA_EMOJI = {
   'Outros': '🛒',
 }
 
-const CATEGORIAS_FINANCEIRAS = [
-  'Alimentação',
-  'Saúde',
-  'Higiene',
-  'Limpeza',
-  'Lazer',
-  'Transporte',
-  'Outros',
-]
-
 function detectarCategoria(nome) {
   const lower = nome.toLowerCase()
   for (const [key, cat] of Object.entries(CATEGORIAS_LOOKUP)) {
@@ -333,14 +323,47 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
 // ---------------------------------------------------------------------------
 
 function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
-  const [categoria, setCategoria] = useState(lista?.categoria_financeira || 'Alimentação')
+  const [categorias, setCategorias] = useState([])
+  const [categoriaId, setCategoriaId] = useState('')
   const [descricao, setDescricao] = useState(`${lista?.nome || 'Lista de compras'} — ${dataHojeIso()}`)
   const [salvando, setSalvando] = useState(false)
+  const [carregandoCategorias, setCarregandoCategorias] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch(apiUrl('/api/categorias'), { headers: horizonteApiAuthHeaders() })
+        if (redirectAssinaturaExpiradaSe403(res)) return
+        if (!res.ok) return
+        const data = await res.json()
+        if (cancelled) return
+        const lista2 = Array.isArray(data) ? data : []
+        setCategorias(lista2)
+        // Pré-seleciona pela categoria_financeira da lista (case-insensitive).
+        const alvo = String(lista?.categoria_financeira || 'Alimentação').toLowerCase()
+        const match =
+          lista2.find((c) => String(c.nome || '').toLowerCase() === alvo) ||
+          lista2.find((c) => String(c.nome || '').toLowerCase().includes(alvo)) ||
+          lista2[0]
+        if (match) setCategoriaId(match.id)
+      } catch (err) {
+        console.error('[ListaDeCompras] fetchCategorias:', err)
+      } finally {
+        if (!cancelled) setCarregandoCategorias(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [lista?.categoria_financeira])
 
   async function handleSubmit(e) {
     e.preventDefault()
     if (total <= 0) {
       showToast('Nenhum item com preço estimado.', 'error')
+      return
+    }
+    if (!categoriaId) {
+      showToast('Selecione uma categoria.', 'error')
       return
     }
 
@@ -355,6 +378,7 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
           valor: total,
           data_transacao: dataHojeIso(),
           descricao: descricao.trim() || lista?.nome || 'Lista de compras',
+          categoria_id: categoriaId,
           status: 'EFETIVADA',
         }),
       })
@@ -392,11 +416,16 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
             <select
               id="gasto-cat"
               className="page-lista-compras__modal-select"
-              value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
+              value={categoriaId}
+              onChange={(e) => setCategoriaId(e.target.value)}
+              disabled={carregandoCategorias}
             >
-              {CATEGORIAS_FINANCEIRAS.map((c) => (
-                <option key={c} value={c}>{c}</option>
+              {carregandoCategorias && <option value="">Carregando…</option>}
+              {!carregandoCategorias && categorias.length === 0 && (
+                <option value="">Nenhuma categoria cadastrada</option>
+              )}
+              {categorias.map((c) => (
+                <option key={c.id} value={c.id}>{c.nome}</option>
               ))}
             </select>
           </div>
@@ -413,7 +442,11 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
           </div>
           <div className="page-lista-compras__modal-actions">
             <button type="button" className="page-lista-compras__modal-cancel" onClick={onClose}>Cancelar</button>
-            <button type="submit" className="page-lista-compras__modal-confirm" disabled={salvando || total <= 0}>
+            <button
+              type="submit"
+              className="page-lista-compras__modal-confirm"
+              disabled={salvando || total <= 0 || carregandoCategorias || !categoriaId}
+            >
               {salvando ? 'Registrando…' : 'Criar transação'}
             </button>
           </div>
