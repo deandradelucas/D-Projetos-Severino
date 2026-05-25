@@ -657,7 +657,11 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 }
 
 .page-lista-compras__unit-pill {
-  padding: 4px 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  padding: 5px 9px;
   border-radius: 999px;
   border: 1.5px solid var(--border-default);
   background: transparent;
@@ -666,8 +670,9 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   font-family: inherit;
   cursor: pointer;
   transition: var(--transition-base);
-  line-height: 1;
+  line-height: 1.2;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .page-lista-compras__unit-pill:hover {
