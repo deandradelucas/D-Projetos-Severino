@@ -102,8 +102,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       sheet.style.setProperty('--keyboard-overlap', `${overlap}px`)
     }
     update()
-    vv.addEventListener('resize', update)
-    vv.addEventListener('scroll', update)
+    vv.addEventListener('resize', update, { passive: true })
+    vv.addEventListener('scroll', update, { passive: true })
     return () => {
       vv.removeEventListener('resize', update)
       vv.removeEventListener('scroll', update)

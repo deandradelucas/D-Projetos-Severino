@@ -257,9 +257,9 @@ export default function TutorialDashboard({ onDismiss, isModalOpen }) {
 
     calc()
     const vv = window.visualViewport
-    window.addEventListener('resize', calc)
-    vv?.addEventListener('resize', calcDebounced)
-    vv?.addEventListener('scroll', calcDebounced)
+    window.addEventListener('resize', calc, { passive: true })
+    vv?.addEventListener('resize', calcDebounced, { passive: true })
+    vv?.addEventListener('scroll', calcDebounced, { passive: true })
     return () => {
       window.removeEventListener('resize', calc)
       vv?.removeEventListener('resize', calcDebounced)

@@ -172,10 +172,10 @@ function useHorizonShellDock(chatOpen) {
       if (mobileMq.matches && chatOpen) schedule()
     }
 
-    window.addEventListener('resize', onWindowResize)
-    window.addEventListener('scroll', onWindowScroll, true)
-    vv?.addEventListener('resize', onVvChange)
-    vv?.addEventListener('scroll', onVvChange)
+    window.addEventListener('resize', onWindowResize, { passive: true })
+    window.addEventListener('scroll', onWindowScroll, { capture: true, passive: true })
+    vv?.addEventListener('resize', onVvChange, { passive: true })
+    vv?.addEventListener('scroll', onVvChange, { passive: true })
 
     return () => {
       window.clearTimeout(fallback)
@@ -250,8 +250,8 @@ export default function HorizonChat() {
     }
 
     syncKeyboard()
-    vv?.addEventListener('resize', syncKeyboard)
-    vv?.addEventListener('scroll', syncKeyboard)
+    vv?.addEventListener('resize', syncKeyboard, { passive: true })
+    vv?.addEventListener('scroll', syncKeyboard, { passive: true })
 
     return () => {
       document.body.classList.remove('horizon-chat-open', 'horizon-chat-keyboard')
