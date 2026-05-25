@@ -108,7 +108,10 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-  font-family: var(--tx-dir-font);
+  /* Plus Jakarta forçado em qualquer breakpoint (mobile + desktop), independente
+     do --tx-dir-font (que é Poppins em mobile). A fonte já é carregada
+     globalmente em src/main.jsx via @fontsource-variable/plus-jakarta-sans. */
+  font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', var(--tx-dir-font);
   font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.01em;
