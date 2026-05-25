@@ -129,11 +129,6 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-h
   display: none !important;
 }
 
-/* Desktop / tablet largo: data só na coluna meta (não ao lado da subcategoria). */
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--paired-sub,
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--paired-sub {
-  display: none !important;
-}
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-list-head {
   display: none !important;
@@ -663,11 +658,6 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   border: 0.5px solid #0b0b0b !important;
 }
 
-/* Reforço: chip global em .ref-tx-date não pode anular o paired-sub oculto no desktop */
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--paired-sub,
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--paired-sub {
-  display: none !important;
-}
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-meta-cell {
   display: flex;
@@ -848,6 +838,11 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-list {
     overflow-x: hidden;
     min-width: 0;
+  }
+
+  /* Desktop: data já aparece no ref-tx-meta-cell — oculta a versão embutida na subcategoria. */
+  .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--paired-sub {
+    display: none !important;
   }
 
   /* Evita herdar `grid-column: 1 / -1` dos layouts subgrid globais (.ref-tx-table-subgrid--actions). */
