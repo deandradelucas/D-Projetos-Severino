@@ -7,7 +7,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist', 'segunda-feira', 'artifacts']),
   {
-    files: ['api/**/*.js', 'server/**/*.mjs', 'scripts/**/*.mjs'],
+    files: ['server/**/*.mjs', 'scripts/**/*.mjs'],
     extends: [js.configs.recommended],
     languageOptions: {
       ecmaVersion: 'latest',
@@ -20,7 +20,7 @@ export default defineConfig([
   },
   {
     files: ['**/*.{js,jsx}'],
-    ignores: ['api/**', 'server/**', 'scripts/**'],
+    ignores: ['server/**', 'scripts/**'],
     extends: [
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
