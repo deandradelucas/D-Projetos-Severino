@@ -17,6 +17,8 @@
     "ci": "npm run test:unit && npm run lint && npm run build && npm run audit:dashboard-css",
     "audit:dashboard-css": "node scripts/find-unused-dashboard-css.mjs",
     "audit:orphan-exports": "node scripts/audit-orphan-exports.mjs",
+    "audit:orphan-files": "node scripts/audit-orphan-files.mjs",
+    "audit:orphan-endpoints": "node scripts/audit-orphan-endpoints.mjs",
     "strip:dashboard-theme-css": "node scripts/strip-non-light-theme-css.mjs",
     "gen:dashboard-dark-css": "node scripts/gen-dashboard-dark-rules.mjs",
     "lint": "eslint .",
