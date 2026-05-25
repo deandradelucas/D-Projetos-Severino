@@ -1077,8 +1077,13 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     object-fit: contain;
   }
 
-  /* Subcategoria + data/hora na mesma linha (bloco de classificação do cartão). */
-  .page-transacoes.app-horizon-shell
+  /* Mobile: data só como chip ao lado da subcategoria — oculta a versão do meta-cell. */
+  body[data-theme='light'] .page-transacoes.app-horizon-shell
+    .page-transacoes-ref-table
+    .ref-tx-table-subgrid--actions
+    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-date--row-meta,
+  body[data-theme='dark'] .page-transacoes.app-horizon-shell
     .page-transacoes-ref-table
     .ref-tx-table-subgrid--actions
     > .ref-tx-row:not(.ref-tx-row--skeleton)
