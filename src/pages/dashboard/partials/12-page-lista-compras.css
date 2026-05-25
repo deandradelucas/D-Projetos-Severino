@@ -1,0 +1,1022 @@
+/* =============================================================================
+   Página Lista de Compras — mobile-first, tokens CSS do projeto.
+   Seletor raiz: .dashboard-container.page-lista-compras
+   ============================================================================= */
+
+.dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell {
+  font-family: var(--tx-dir-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---------------------------------------------------------------------------
+   Wrapper principal
+   --------------------------------------------------------------------------- */
+.page-lista-compras-wrap {
+  padding: 0 0 160px; /* espaço para add-bar + footer */
+}
+
+/* ---------------------------------------------------------------------------
+   Header
+   --------------------------------------------------------------------------- */
+.page-lista-compras__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 0 12px;
+}
+
+.page-lista-compras__header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.page-lista-compras__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.page-lista-compras__nova-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: #111;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: var(--transition-base);
+  box-shadow: 0 2px 8px rgba(212, 168, 75, 0.3);
+}
+
+.page-lista-compras__nova-btn:hover {
+  background: #c49535;
+  box-shadow: 0 4px 14px rgba(212, 168, 75, 0.4);
+}
+
+.page-lista-compras__nova-btn:active {
+  transform: scale(0.97);
+}
+
+/* ---------------------------------------------------------------------------
+   Abas de listas (scroll horizontal)
+   --------------------------------------------------------------------------- */
+.page-lista-compras__tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  margin-bottom: 16px;
+}
+
+.page-lista-compras__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.page-lista-compras__tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 99px;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-default);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: var(--transition-base);
+}
+
+.page-lista-compras__tab:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.page-lista-compras__tab--active {
+  background: rgba(212, 168, 75, 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.page-lista-compras__tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--accent);
+  color: #111;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.page-lista-compras__tab--active .page-lista-compras__tab-count {
+  background: var(--accent);
+  color: #111;
+}
+
+/* ---------------------------------------------------------------------------
+   Grupos de categoria
+   --------------------------------------------------------------------------- */
+.page-lista-compras__category-group {
+  margin-bottom: 8px;
+}
+
+.page-lista-compras__category-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 4px 6px 0;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.page-lista-compras__category-icon {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+/* ---------------------------------------------------------------------------
+   Item
+   --------------------------------------------------------------------------- */
+.page-lista-compras__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  margin-bottom: 6px;
+  transition: var(--transition-base);
+  position: relative;
+}
+
+.page-lista-compras__item:hover {
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.page-lista-compras__item--checked {
+  opacity: 0.5;
+}
+
+.page-lista-compras__item--checked .page-lista-compras__item-name {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+/* Botão de check */
+.page-lista-compras__item-check {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.page-lista-compras__item-check:hover {
+  background: rgba(212, 168, 75, 0.15);
+}
+
+.page-lista-compras__item-check--checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.page-lista-compras__item-check--checked svg {
+  stroke: #111;
+}
+
+.page-lista-compras__item-check svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  fill: none;
+}
+
+/* Conteúdo do item */
+.page-lista-compras__item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.page-lista-compras__item-name {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition-base), text-decoration var(--transition-base);
+}
+
+.page-lista-compras__item-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.page-lista-compras__item-meta-sep {
+  opacity: 0.4;
+}
+
+/* Botão deletar */
+.page-lista-compras__item-delete {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--error);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  opacity: 0;
+  transition: var(--transition-base);
+}
+
+.page-lista-compras__item:hover .page-lista-compras__item-delete {
+  opacity: 1;
+}
+
+/* Em mobile: sempre visível */
+@media (max-width: 640px) {
+  .page-lista-compras__item-delete {
+    opacity: 0.6;
+  }
+
+  .page-lista-compras__item-delete:hover {
+    opacity: 1;
+  }
+}
+
+.page-lista-compras__item-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.page-lista-compras__item-delete svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Seção de itens marcados (checked)
+   --------------------------------------------------------------------------- */
+.page-lista-compras__checked-section {
+  margin-top: 12px;
+}
+
+.page-lista-compras__checked-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  width: 100%;
+  text-align: left;
+  border-radius: var(--radius-md);
+  transition: var(--transition-base);
+}
+
+.page-lista-compras__checked-toggle:hover {
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+}
+
+.page-lista-compras__checked-chevron {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.page-lista-compras__checked-chevron--open {
+  transform: rotate(180deg);
+}
+
+/* ---------------------------------------------------------------------------
+   Barra de adicionar item (fixa no bottom)
+   --------------------------------------------------------------------------- */
+.page-lista-compras__add-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-default);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+/* Quando sidebar está visível em desktop, a add-bar recua */
+@media (min-width: 768px) {
+  .page-lista-compras__add-bar {
+    left: var(--sidebar-width, 260px);
+  }
+}
+
+.page-lista-compras__add-bar-inner {
+  flex: 1;
+  position: relative;
+}
+
+.page-lista-compras__add-input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border-default);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: var(--transition-base);
+  box-sizing: border-box;
+}
+
+.page-lista-compras__add-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15);
+  background: var(--bg-card);
+}
+
+.page-lista-compras__add-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Dropdown autocomplete */
+.page-lista-compras__autocomplete {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  z-index: 100;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.page-lista-compras__autocomplete-item {
+  width: 100%;
+  padding: 10px 14px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-lista-compras__autocomplete-item:hover,
+.page-lista-compras__autocomplete-item:focus {
+  background: var(--bg-secondary);
+}
+
+.page-lista-compras__autocomplete-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-size: 0.75rem;
+}
+
+.page-lista-compras__add-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  border: none;
+  color: #111;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition-base);
+  box-shadow: 0 2px 8px rgba(212, 168, 75, 0.3);
+}
+
+.page-lista-compras__add-btn:hover {
+  background: #c49535;
+  box-shadow: 0 4px 14px rgba(212, 168, 75, 0.4);
+}
+
+.page-lista-compras__add-btn:active {
+  transform: scale(0.95);
+}
+
+.page-lista-compras__add-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Footer com total + CTA registrar gasto
+   --------------------------------------------------------------------------- */
+.page-lista-compras__footer {
+  position: fixed;
+  bottom: 70px; /* acima da add-bar */
+  left: 0;
+  right: 0;
+  z-index: 49;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-accent);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+  animation: slideUpFooter 0.2s ease;
+}
+
+@keyframes slideUpFooter {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes slideUpFooter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+@media (min-width: 768px) {
+  .page-lista-compras__footer {
+    left: var(--sidebar-width, 260px);
+  }
+}
+
+.page-lista-compras__total {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.page-lista-compras__total strong {
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.page-lista-compras__cta-btn {
+  padding: 9px 18px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent) 0%, #c49535 100%);
+  color: #111;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition-base);
+  box-shadow: 0 2px 10px rgba(212, 168, 75, 0.3);
+  flex-shrink: 0;
+}
+
+.page-lista-compras__cta-btn:hover {
+  box-shadow: 0 4px 16px rgba(212, 168, 75, 0.45);
+  transform: translateY(-1px);
+}
+
+.page-lista-compras__cta-btn:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 400px) {
+  .page-lista-compras__footer {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .page-lista-compras__cta-btn {
+    text-align: center;
+    width: 100%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Empty state
+   --------------------------------------------------------------------------- */
+.page-lista-compras__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  gap: 12px;
+}
+
+.page-lista-compras__empty-icon {
+  font-size: 3rem;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.page-lista-compras__empty-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.page-lista-compras__empty-desc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+/* Empty state "onboarding" (primeira lista) */
+.page-lista-compras__onboarding {
+  margin: 24px 0;
+  padding: 24px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-secondary);
+  border: 1.5px dashed var(--border-accent);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-lista-compras__onboarding-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.page-lista-compras__onboarding-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.page-lista-compras__onboarding-desc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.page-lista-compras__onboarding-btn {
+  margin-top: 4px;
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: #111;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.page-lista-compras__onboarding-btn:hover {
+  background: #c49535;
+}
+
+/* ---------------------------------------------------------------------------
+   Shimmer loading
+   --------------------------------------------------------------------------- */
+.page-lista-compras__shimmer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.page-lista-compras__shimmer-item {
+  height: 54px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-card) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerSlide 1.4s ease infinite;
+}
+
+@keyframes shimmerSlide {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-lista-compras__shimmer-item {
+    animation: none;
+    background: var(--bg-secondary);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Modal base (nova lista + confirmar gasto)
+   --------------------------------------------------------------------------- */
+.page-lista-compras__modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  animation: overlayFadeIn 0.18s ease;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+@media (min-width: 480px) {
+  .page-lista-compras__modal-overlay {
+    align-items: center;
+  }
+}
+
+.page-lista-compras__modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-card);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: 24px 20px 32px;
+  box-shadow: var(--shadow-md);
+  animation: modalSlideUp 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes modalSlideUp {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+@media (min-width: 480px) {
+  .page-lista-compras__modal {
+    border-radius: var(--radius-xl);
+  }
+}
+
+.page-lista-compras__modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.page-lista-compras__modal-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.page-lista-compras__modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+  padding: 0;
+}
+
+.page-lista-compras__modal-close:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.page-lista-compras__modal-close svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.page-lista-compras__modal-field {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.page-lista-compras__modal-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.page-lista-compras__modal-input,
+.page-lista-compras__modal-select {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-default);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  transition: var(--transition-base);
+}
+
+.page-lista-compras__modal-input:focus,
+.page-lista-compras__modal-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15);
+}
+
+.page-lista-compras__modal-total-display {
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(212, 168, 75, 0.1);
+  border: 1px solid rgba(212, 168, 75, 0.3);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+}
+
+.page-lista-compras__modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.page-lista-compras__modal-cancel {
+  flex: 1;
+  padding: 11px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-default);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-family: inherit;
+}
+
+.page-lista-compras__modal-cancel:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.page-lista-compras__modal-confirm {
+  flex: 2;
+  padding: 11px;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: #111;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-family: inherit;
+}
+
+.page-lista-compras__modal-confirm:hover {
+  background: #c49535;
+}
+
+.page-lista-compras__modal-confirm:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------------------
+   Menu de opções da lista (arquivar, renomear)
+   --------------------------------------------------------------------------- */
+.page-lista-compras__list-menu {
+  position: relative;
+}
+
+.page-lista-compras__list-menu-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: var(--transition-base);
+}
+
+.page-lista-compras__list-menu-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.page-lista-compras__list-menu-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+.page-lista-compras__list-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  z-index: 80;
+  min-width: 160px;
+  animation: dropdownFadeIn 0.15s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes dropdownFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+.page-lista-compras__list-dropdown-item {
+  width: 100%;
+  padding: 10px 14px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.page-lista-compras__list-dropdown-item:hover {
+  background: var(--bg-secondary);
+}
+
+.page-lista-compras__list-dropdown-item--danger {
+  color: var(--error);
+}
+
+/* ---------------------------------------------------------------------------
+   Dark mode
+   --------------------------------------------------------------------------- */
+body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell {
+  --nova-btn-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+body[data-theme='dark'] .page-lista-compras__add-bar {
+  background: var(--bg-card);
+  border-top-color: var(--border-default);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+}
+
+body[data-theme='dark'] .page-lista-compras__footer {
+  background: var(--bg-card);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme='dark'] .page-lista-compras__modal {
+  background: var(--bg-card);
+}
+
+body[data-theme='dark'] .page-lista-compras__list-dropdown {
+  background: var(--bg-card);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme='dark'] .page-lista-compras__autocomplete {
+  background: var(--bg-card);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme='dark'] .page-lista-compras__shimmer-item {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerSlide 1.4s ease infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-theme='dark'] .page-lista-compras__shimmer-item {
+    animation: none;
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
