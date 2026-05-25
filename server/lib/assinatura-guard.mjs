@@ -4,6 +4,7 @@ import { isSuperAdminEmail } from './super-admin.mjs'
 import { resolveEscopoUsuario } from './conta-familiar.mjs'
 import { usuarioTemPagamentoAprovado } from './pagamentos-asaas.mjs'
 import { computeAssinaturaFlags } from './assinatura-flags.mjs'
+import { isStripeConfigured } from './stripe-client.mjs'
 import {
   isMissingColumnError,
   rawIsentoPagamento,
@@ -78,11 +79,17 @@ export async function assertAcessoAppUsuario(usuarioId) {
     log.warn('[assertAcessoAppUsuario] ensureTrialIniciado:', e?.message || e)
   }
 
+  // Só inclui colunas Stripe quando o gateway está configurado — caso contrário
+  // o SELECT falha com 42703 (coluna inexistente) e dispara fallbacks ruidosos.
+  const stripeOn = isStripeConfigured()
+  const baseCols = 'email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status'
+  const selectCols = stripeOn ? `${baseCols}, stripe_subscription_status` : baseCols
+
   let urow = null
   let uerr = null
   ;({ data: urow, error: uerr } = await supabase
     .from('usuarios')
-    .select('email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status, stripe_subscription_status')
+    .select(selectCols)
     .eq('id', billingUid)
     .maybeSingle())
 
@@ -97,10 +104,10 @@ export async function assertAcessoAppUsuario(usuarioId) {
       .maybeSingle())
   }
 
-  if (uerr && isMissingColumnError(uerr, 'stripe_subscription_status')) {
+  if (stripeOn && uerr && isMissingColumnError(uerr, 'stripe_subscription_status')) {
     ;({ data: urow, error: uerr } = await supabase
       .from('usuarios')
-      .select('email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, assinatura_asaas_status')
+      .select(baseCols)
       .eq('id', billingUid)
       .maybeSingle())
   }
