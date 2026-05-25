@@ -6,8 +6,12 @@ export const BRAND_LOGO_PIXEL_SIZE = {
 export const BRAND_ASSETS = {
   /** Wordmark Severino — login e superfícies claras (`public/images/Nova Logo/`) */
   loginSeverinoLight: '/images/Nova Logo/Severino Tema Claro.png',
-  /** Menu lateral — claro (`public/images/Nova Logo/Severino Tema Claro.png`) */
+  /** Menu lateral — claro (`public/images/Nova Logo/Severino Tema Claro.png`)
+   *  Mantido como histórico; o tema claro hoje renderiza `sidebarMarkLight`
+   *  (símbolo quadrado) + wordmark "Severino" como texto separado. */
   sidebarLogo: '/images/Nova Logo/Severino Tema Claro.png',
+  /** Símbolo "S" do tema claro (PNG quadrado, sem wordmark, sem tagline). */
+  sidebarMarkLight: '/images/Nova Logo/logo.png',
   /** Menu lateral — escuro (`public/images/Nova Logo/Tema Escuro.png`) */
   sidebarLogoDark: '/images/Nova Logo/Tema Escuro.png',
   /** Alias usado em telas como BemVindoAssinatura / TrialExpirado */
