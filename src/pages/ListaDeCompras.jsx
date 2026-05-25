@@ -230,7 +230,7 @@ function ShimmerLista() {
 // Modal Nova Lista
 // ---------------------------------------------------------------------------
 
-function ModalNovaLista({ onClose, onCriada }) {
+function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
   const [nome, setNome] = useState('')
   const [categoria, setCategoria] = useState('Alimentação')
   const [salvando, setSalvando] = useState(false)
@@ -247,7 +247,7 @@ function ModalNovaLista({ onClose, onCriada }) {
 
     setSalvando(true)
     try {
-      const res = await fetch(apiUrl('/api/lista-compras'), {
+      const res = await fetch(apiUrl(`/api/lista-compras${pessoalParam}`), {
         method: 'POST',
         headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
         cache: 'no-store',
@@ -435,18 +435,23 @@ export default function ListaDeCompras() {
   const [adicionando, setAdicionando] = useState(false)
   const [novaQtd, setNovaQtd] = useState(1)
   const [novaUnidade, setNovaUnidade] = useState('un')
+  // Conta familiar
+  const [isMembroConta, setIsMembroConta] = useState(false)
+  const [escopoLista, setEscopoLista] = useState('familia') // 'familia' | 'pessoal'
 
   const inputRef = useRef(null)
   const menuListaRef = useRef(null)
+
+  const pessoalParam = isMembroConta && escopoLista === 'pessoal' ? '?pessoal=1' : ''
 
   // -------------------------------------------------------------------------
   // Carregar listas
   // -------------------------------------------------------------------------
 
-  const carregarListas = useCallback(async () => {
+  const carregarListas = useCallback(async (pp = '') => {
     setLoading(true)
     try {
-      const res = await fetch(apiUrl('/api/lista-compras'), {
+      const res = await fetch(apiUrl(`/api/lista-compras${pp}`), {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
@@ -458,6 +463,9 @@ export default function ListaDeCompras() {
         const primeiraId = data[0].id
         setListaAtiva(primeiraId)
         setItens(data[0].itens || [])
+      } else {
+        setListaAtiva(null)
+        setItens([])
       }
     } catch {
       // silencioso
@@ -466,11 +474,11 @@ export default function ListaDeCompras() {
     }
   }, [])
 
-  const carregarItens = useCallback(async (listaId) => {
+  const carregarItens = useCallback(async (listaId, pp = '') => {
     if (!listaId) return
     setLoadingItens(true)
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaId}/itens`), {
+      const res = await fetch(apiUrl(`/api/lista-compras/${listaId}/itens${pp}`), {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
@@ -485,9 +493,9 @@ export default function ListaDeCompras() {
     }
   }, [])
 
-  const carregarHistorico = useCallback(async () => {
+  const carregarHistorico = useCallback(async (pp = '') => {
     try {
-      const res = await fetch(apiUrl('/api/lista-compras/historico-nomes'), {
+      const res = await fetch(apiUrl(`/api/lista-compras/historico-nomes${pp}`), {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
@@ -500,9 +508,32 @@ export default function ListaDeCompras() {
   }, [])
 
   useEffect(() => {
-    carregarListas()
-    carregarHistorico()
+    async function init() {
+      try {
+        const res = await fetch(apiUrl('/api/familia/meu-escopo'), {
+          headers: horizonteApiAuthHeaders(),
+          cache: 'no-store',
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setIsMembroConta(!!data.isMembroConta)
+        }
+      } catch {
+        // silencioso — feature opcional
+      }
+      carregarListas('')
+      carregarHistorico('')
+    }
+    init()
   }, [carregarListas, carregarHistorico])
+
+  // Recarregar ao mudar escopo (pessoal ↔ família)
+  useEffect(() => {
+    if (!isMembroConta) return
+    carregarListas(pessoalParam)
+    carregarHistorico(pessoalParam)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [escopoLista])
 
   // Fechar menu de lista ao clicar fora
   useEffect(() => {
@@ -526,7 +557,7 @@ export default function ListaDeCompras() {
     if (lista?.itens) {
       setItens(lista.itens)
     } else {
-      carregarItens(id)
+      carregarItens(id, pessoalParam)
     }
     setMenuListaAberto(false)
   }
@@ -561,7 +592,7 @@ export default function ListaDeCompras() {
     const categoria = detectarCategoria(nomeTrimmed)
 
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens`), {
+      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens${pessoalParam}`), {
         method: 'POST',
         headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
         cache: 'no-store',
@@ -587,7 +618,7 @@ export default function ListaDeCompras() {
       setAdicionando(false)
       inputRef.current?.focus()
     }
-  }, [listaAtiva, historico, novaQtd, novaUnidade])
+  }, [listaAtiva, historico, novaQtd, novaUnidade, pessoalParam])
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -612,7 +643,7 @@ export default function ListaDeCompras() {
     ))
 
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${item.id}/toggle`), {
+      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${item.id}/toggle${pessoalParam}`), {
         method: 'POST',
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
@@ -630,7 +661,7 @@ export default function ListaDeCompras() {
         i.id === item.id ? { ...i, checked: item.checked, checked_em: item.checked_em } : i
       ))
     }
-  }, [listaAtiva])
+  }, [listaAtiva, pessoalParam])
 
   // -------------------------------------------------------------------------
   // Remover item
@@ -641,7 +672,7 @@ export default function ListaDeCompras() {
     setItens((prev) => prev.filter((i) => i.id !== itemId))
 
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${itemId}`), {
+      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${itemId}${pessoalParam}`), {
         method: 'DELETE',
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
@@ -649,13 +680,13 @@ export default function ListaDeCompras() {
       if (redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
         // Recarregar se falhou
-        carregarItens(listaAtiva)
+        carregarItens(listaAtiva, pessoalParam)
         showToast('Erro ao remover item.', 'error')
       }
     } catch {
-      carregarItens(listaAtiva)
+      carregarItens(listaAtiva, pessoalParam)
     }
-  }, [listaAtiva, carregarItens])
+  }, [listaAtiva, carregarItens, pessoalParam])
 
   // -------------------------------------------------------------------------
   // Arquivar lista
@@ -668,7 +699,7 @@ export default function ListaDeCompras() {
     if (!window.confirm('Arquivar esta lista? Ela não aparecerá mais na tela.')) return
 
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}`), {
+      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}${pessoalParam}`), {
         method: 'DELETE',
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
@@ -694,7 +725,7 @@ export default function ListaDeCompras() {
     } catch {
       showToast('Erro ao arquivar lista.', 'error')
     }
-  }, [listaAtiva])
+  }, [listaAtiva, pessoalParam])
 
   // -------------------------------------------------------------------------
   // Callback: lista criada
@@ -769,7 +800,14 @@ export default function ListaDeCompras() {
                 <div className="page-lista-compras__header">
                   <div className="page-lista-compras__header-left">
                     <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
-                    <h1 className="page-lista-compras__title">Lista de Compras</h1>
+                    <span className="page-lista-compras__header-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <circle cx="9" cy="21" r="1" />
+                        <circle cx="20" cy="21" r="1" />
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                      </svg>
+                    </span>
+                    <h1 className="page-lista-compras__title sr-only">Lista de Compras</h1>
                   </div>
                   <button
                     type="button"
@@ -781,6 +819,28 @@ export default function ListaDeCompras() {
                     Nova lista
                   </button>
                 </div>
+
+                {/* Toggle conta familiar — só para membros */}
+                {isMembroConta && (
+                  <div className="page-lista-compras__escopo-toggle">
+                    <button
+                      type="button"
+                      className={`page-lista-compras__escopo-btn${escopoLista === 'familia' ? ' page-lista-compras__escopo-btn--active' : ''}`}
+                      onClick={() => setEscopoLista('familia')}
+                      aria-pressed={escopoLista === 'familia'}
+                    >
+                      👨‍👩‍👧 Família
+                    </button>
+                    <button
+                      type="button"
+                      className={`page-lista-compras__escopo-btn${escopoLista === 'pessoal' ? ' page-lista-compras__escopo-btn--active' : ''}`}
+                      onClick={() => setEscopoLista('pessoal')}
+                      aria-pressed={escopoLista === 'pessoal'}
+                    >
+                      👤 Pessoal
+                    </button>
+                  </div>
+                )}
 
                 {/* Estado: sem listas */}
                 {semListas && (
@@ -1037,6 +1097,7 @@ export default function ListaDeCompras() {
         <ModalNovaLista
           onClose={() => setModalNovaLista(false)}
           onCriada={handleListaCriada}
+          pessoalParam={pessoalParam}
         />
       )}
 
