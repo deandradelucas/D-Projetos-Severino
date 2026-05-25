@@ -91,17 +91,4 @@ describe('computeAssinaturaFlags', () => {
     expect(f.motivo_bloqueio_acesso).toMatch(/pausada/i)
   })
 
-  it('Asaas inactive mas Stripe ativo: acesso mantém-se (cartão Stripe)', () => {
-    const f = computeAssinaturaFlags({
-      email: 'user@example.com',
-      isento_pagamento: false,
-      trial_ends_at: pastIso(),
-      bem_vindo_pagamento_visto_at: null,
-      assinatura_paga: true,
-      assinatura_asaas_status: 'INACTIVE',
-      stripe_subscription_status: 'active',
-    })
-    expect(f.acesso_app_liberado).toBe(true)
-    expect(f.assinatura_situacao).toBe('ativo')
-  })
 })

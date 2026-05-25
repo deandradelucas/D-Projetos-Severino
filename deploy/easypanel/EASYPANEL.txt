@@ -20,7 +20,7 @@ VITE_SEVERINO_API_ORIGIN apontando para esse host (ou proxy /api no Nginx para o
    Copiar do teu env.example / produção, no mínimo:
    - SUPABASE_URL  (ou VITE_SUPABASE_URL — o servidor aceita ambos no código admin)
    - SUPABASE_SERVICE_ROLE_KEY
-   - (opcional) GEMINI_API_KEY, ASAAS_API_KEY, ASAAS_API_BASE_URL, ASAAS_WEBHOOK_TOKEN, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, etc.
+   - (opcional) GEMINI_API_KEY, ASAAS_API_KEY, ASAAS_API_BASE_URL, ASAAS_WEBHOOK_TOKEN, etc.
 
    Se o EasyPanel injeta **PORT** diferente de 3001, define também:
    - API_PORT=<mesmo valor que o proxy espera>

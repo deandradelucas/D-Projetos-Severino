@@ -8,13 +8,11 @@ import {
   sincronizarSubscriptionUsuario,
   usuarioTemPagamentoAprovado,
 } from './pagamentos-asaas.mjs'
-import { sincronizarStripeUsuario } from './pagamentos-stripe.mjs'
 import {
   computeAssinaturaFlags,
   asaasSubscriptionBloqueiaAcesso,
   mpStatusBloqueiaAcesso,
   mensagemBloqueioAssinaturaAsaas,
-  stripeSubscriptionLiberaAcesso,
   situacaoAssinatura,
   addDaysIso,
 } from './assinatura-flags.mjs'
@@ -34,7 +32,6 @@ export {
   asaasSubscriptionBloqueiaAcesso,
   mpStatusBloqueiaAcesso,
   mensagemBloqueioAssinaturaAsaas,
-  stripeSubscriptionLiberaAcesso,
   situacaoAssinatura,
   addDaysIso,
   computeAssinaturaFlags,
@@ -116,9 +113,6 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     }
     log.warn('[buildAssinaturaUsuarioPayload] sync subscription:', e?.message || e)
   })
-  await sincronizarStripeUsuario(billingUid).catch((e) => {
-    log.warn('[buildAssinaturaUsuarioPayload] sync stripe:', e?.message || e)
-  })
 
   row = await fetchAssinaturaCamposUsuario(billingUid)
 
@@ -161,7 +155,6 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at,
     assinatura_paga: hasPay,
     assinatura_asaas_status: row.assinatura_asaas_status,
-    stripe_subscription_status: row.stripe_subscription_status,
   })
 
   if (emailExibicao && isSuperAdminEmail(emailExibicao)) {
@@ -172,7 +165,6 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
       bem_vindo_pagamento_visto_at: row.bem_vindo_pagamento_visto_at,
       assinatura_paga: true,
       assinatura_asaas_status: row.assinatura_asaas_status,
-      stripe_subscription_status: row.stripe_subscription_status,
     })
     const precoMensalAdm = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
     const planoPrecoAdm = Number.isFinite(precoMensalAdm) && precoMensalAdm > 0 ? precoMensalAdm : 10

@@ -8,12 +8,12 @@ describe('isMissingColumnError', () => {
   })
 
   it('retorna false para coluna diferente da que falta, mesmo com code 42703', () => {
-    // Cenário real do bug: select pede stripe_subscription_status (que não existe)
-    // e o código testa por isento_pagamento (que existe). Antes do fix, retornava
-    // true para ambos por causa do code 42703.
-    const err = { code: '42703', message: 'column usuarios.stripe_subscription_status does not exist' }
+    // Cenário real do bug: o select pede uma coluna que ainda não existe no banco
+    // (ex.: migração não aplicada) e o código testa por outra que existe. Antes do
+    // fix, retornava true para AMBAS por causa do code 42703 — fallback errado.
+    const err = { code: '42703', message: 'column usuarios.bem_vindo_pagamento_visto_at does not exist' }
     expect(isMissingColumnError(err, 'isento_pagamento')).toBe(false)
-    expect(isMissingColumnError(err, 'stripe_subscription_status')).toBe(true)
+    expect(isMissingColumnError(err, 'bem_vindo_pagamento_visto_at')).toBe(true)
   })
 
   it('retorna true quando mensagem cita a coluna em português', () => {
