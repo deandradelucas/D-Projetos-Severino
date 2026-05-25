@@ -232,13 +232,10 @@ function ShimmerLista() {
 
 function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
   const [nome, setNome] = useState('')
-  const [categoria, setCategoria] = useState('Alimentação')
   const [salvando, setSalvando] = useState(false)
   const inputRef = useRef(null)
 
-  useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
+  useEffect(() => { inputRef.current?.focus() }, [])
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -251,7 +248,7 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
         method: 'POST',
         headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
         cache: 'no-store',
-        body: JSON.stringify({ nome: nomeTrimmed, categoria_financeira: categoria }),
+        body: JSON.stringify({ nome: nomeTrimmed }),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
@@ -292,19 +289,6 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
               maxLength={100}
               required
             />
-          </div>
-          <div className="page-lista-compras__modal-field">
-            <label className="page-lista-compras__modal-label" htmlFor="cat-financeira">Categoria financeira</label>
-            <select
-              id="cat-financeira"
-              className="page-lista-compras__modal-select"
-              value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
-            >
-              {CATEGORIAS_FINANCEIRAS.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
           </div>
           <div className="page-lista-compras__modal-actions">
             <button type="button" className="page-lista-compras__modal-cancel" onClick={onClose}>Cancelar</button>
@@ -414,6 +398,151 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
 }
 
 // ---------------------------------------------------------------------------
+// Modal Novo Item
+// ---------------------------------------------------------------------------
+
+function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
+  const [nome, setNome] = useState('')
+  const [quantidade, setQuantidade] = useState(1)
+  const [unidade, setUnidade] = useState('un')
+  const [preco, setPreco] = useState('')
+  const [sugestoes, setSugestoes] = useState([])
+  const [showAuto, setShowAuto] = useState(false)
+  const inputRef = useRef(null)
+
+  useEffect(() => { inputRef.current?.focus() }, [])
+
+  function handleNomeChange(value) {
+    setNome(value)
+    if (value.length >= 2) {
+      const f = historico.filter((h) => h.toLowerCase().includes(value.toLowerCase())).slice(0, 6)
+      setSugestoes(f)
+      setShowAuto(f.length > 0)
+    } else {
+      setSugestoes([])
+      setShowAuto(false)
+    }
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    const nomeTrimmed = nome.trim()
+    if (!nomeTrimmed) return
+    const precoStr = preco.replace(',', '.').trim()
+    const precoVal = precoStr !== '' ? parseFloat(precoStr) : null
+    onSalvar({
+      nome: nomeTrimmed,
+      quantidade,
+      unidade,
+      preco_estimado: precoVal && precoVal > 0 ? precoVal : null,
+    })
+  }
+
+  return (
+    <div className="page-lista-compras__modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-novo-item-titulo">
+        <div className="page-lista-compras__modal-header">
+          <h2 id="modal-novo-item-titulo" className="page-lista-compras__modal-title">Novo item</h2>
+          <button type="button" className="page-lista-compras__modal-close" onClick={onClose} aria-label="Fechar">
+            <IconX />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="page-lista-compras__modal-field">
+            <label className="page-lista-compras__modal-label" htmlFor="item-nome">Item</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                ref={inputRef}
+                id="item-nome"
+                className="page-lista-compras__modal-input"
+                type="text"
+                value={nome}
+                onChange={(e) => handleNomeChange(e.target.value)}
+                onFocus={() => sugestoes.length > 0 && setShowAuto(true)}
+                onBlur={() => setTimeout(() => setShowAuto(false), 150)}
+                placeholder="Ex: Arroz, Detergente…"
+                maxLength={200}
+                autoComplete="off"
+              />
+              {showAuto && sugestoes.length > 0 && (
+                <div className="page-lista-compras__autocomplete" role="listbox" aria-label="Sugestões">
+                  {sugestoes.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      role="option"
+                      className="page-lista-compras__autocomplete-item"
+                      onMouseDown={() => { setNome(s); setShowAuto(false) }}
+                    >
+                      <span className="page-lista-compras__autocomplete-icon">
+                        {CATEGORIA_EMOJI[detectarCategoria(s)] || '🛒'}
+                      </span>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="page-lista-compras__modal-field">
+            <label className="page-lista-compras__modal-label" htmlFor="item-qty">Quantidade</label>
+            <input
+              id="item-qty"
+              className="page-lista-compras__modal-input page-lista-compras__modal-input--qty"
+              type="number"
+              min="0.1"
+              step="1"
+              value={quantidade}
+              onChange={(e) => { const v = parseFloat(e.target.value); if (!isNaN(v) && v > 0) setQuantidade(v) }}
+            />
+          </div>
+
+          <div className="page-lista-compras__modal-field">
+            <span className="page-lista-compras__modal-label">Unidade</span>
+            <div className="page-lista-compras__unit-pills" role="group" aria-label="Unidade de medida">
+              {['un', 'kg', 'g', 'L', 'mL', 'cx', 'pct', 'dz'].map((u) => (
+                <button
+                  key={u}
+                  type="button"
+                  className={`page-lista-compras__unit-pill${unidade === u ? ' page-lista-compras__unit-pill--active' : ''}`}
+                  onClick={() => setUnidade(u)}
+                  aria-pressed={unidade === u}
+                >
+                  {u}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="page-lista-compras__modal-field">
+            <label className="page-lista-compras__modal-label" htmlFor="item-preco">
+              Preço estimado <span className="page-lista-compras__modal-label--optional">(opcional)</span>
+            </label>
+            <input
+              id="item-preco"
+              className="page-lista-compras__modal-input"
+              type="text"
+              inputMode="decimal"
+              placeholder="Ex: 7,90"
+              value={preco}
+              onChange={(e) => setPreco(e.target.value)}
+            />
+          </div>
+
+          <div className="page-lista-compras__modal-actions">
+            <button type="button" className="page-lista-compras__modal-cancel" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="page-lista-compras__modal-confirm" disabled={adicionando || !nome.trim()}>
+              {adicionando ? 'Adicionando…' : 'Adicionar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Componente principal
 // ---------------------------------------------------------------------------
 
@@ -424,23 +553,18 @@ export default function ListaDeCompras() {
   const [itens, setItens] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadingItens, setLoadingItens] = useState(false)
-  const [novoItem, setNovoItem] = useState('')
-  const [sugestoes, setSugestoes] = useState([])
   const [historico, setHistorico] = useState([])
-  const [showAutocomplete, setShowAutocomplete] = useState(false)
   const [modalNovaLista, setModalNovaLista] = useState(false)
+  const [modalNovoItem, setModalNovoItem] = useState(false)
   const [modalGasto, setModalGasto] = useState(false)
   const [checkedAberto, setCheckedAberto] = useState(true)
   const [menuListaAberto, setMenuListaAberto] = useState(false)
   const [adicionando, setAdicionando] = useState(false)
-  const [novaQtd, setNovaQtd] = useState(1)
-  const [novaUnidade, setNovaUnidade] = useState('un')
   // Conta familiar
   const [isMembroConta, setIsMembroConta] = useState(false)
   const [escopoLista, setEscopoLista] = useState('familia') // 'familia' | 'pessoal'
   const [titularPrimeiroNome, setTitularPrimeiroNome] = useState(null)
 
-  const inputRef = useRef(null)
   const menuListaRef = useRef(null)
 
   const pessoalParam = isMembroConta && escopoLista === 'pessoal' ? '?pessoal=1' : ''
@@ -568,29 +692,11 @@ export default function ListaDeCompras() {
   // Adicionar item
   // -------------------------------------------------------------------------
 
-  const handleInputChange = (value) => {
-    setNovoItem(value)
-    if (value.length >= 2) {
-      const filtradas = historico
-        .filter((h) => h.toLowerCase().includes(value.toLowerCase()))
-        .slice(0, 6)
-      setSugestoes(filtradas)
-      setShowAutocomplete(filtradas.length > 0)
-    } else {
-      setSugestoes([])
-      setShowAutocomplete(false)
-    }
-  }
-
-  const adicionarItem = useCallback(async (nome) => {
+  const adicionarItem = useCallback(async ({ nome, quantidade, unidade, preco_estimado }) => {
     const nomeTrimmed = nome.trim()
     if (!nomeTrimmed || !listaAtiva) return
 
     setAdicionando(true)
-    setNovoItem('')
-    setShowAutocomplete(false)
-    setSugestoes([])
-
     const categoria = detectarCategoria(nomeTrimmed)
 
     try {
@@ -598,7 +704,13 @@ export default function ListaDeCompras() {
         method: 'POST',
         headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
         cache: 'no-store',
-        body: JSON.stringify({ nome: nomeTrimmed, categoria_item: categoria, quantidade: novaQtd, unidade: novaUnidade }),
+        body: JSON.stringify({
+          nome: nomeTrimmed,
+          categoria_item: categoria,
+          quantidade,
+          unidade,
+          preco_estimado: preco_estimado || null,
+        }),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
@@ -608,30 +720,16 @@ export default function ListaDeCompras() {
       }
       const item = await res.json()
       setItens((prev) => [...prev, item])
-      setNovaQtd(1)
-      setNovaUnidade('un')
-      // Atualizar historico local
       if (!historico.includes(item.nome)) {
         setHistorico((prev) => [item.nome, ...prev].slice(0, 50))
       }
+      setModalNovoItem(false)
     } catch {
       showToast('Erro ao adicionar item.', 'error')
     } finally {
       setAdicionando(false)
-      inputRef.current?.focus()
     }
-  }, [listaAtiva, historico, novaQtd, novaUnidade, pessoalParam])
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      adicionarItem(novoItem)
-    }
-    if (e.key === 'Escape') {
-      setShowAutocomplete(false)
-      setSugestoes([])
-    }
-  }
+  }, [listaAtiva, historico, pessoalParam])
 
   // -------------------------------------------------------------------------
   // Toggle checked (optimistic update)
@@ -1055,95 +1153,26 @@ export default function ListaDeCompras() {
             </div>
           )}
 
-          {/* Barra de adicionar item */}
-          {listaAtiva && (
-            <div className="page-lista-compras__add-bar">
-              <div className="page-lista-compras__add-bar-inner">
-                <div className="page-lista-compras__input-row">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    className="page-lista-compras__add-input"
-                    placeholder="Adicionar item…"
-                    value={novoItem}
-                    onChange={(e) => handleInputChange(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onFocus={() => {
-                      if (sugestoes.length > 0) setShowAutocomplete(true)
-                    }}
-                    onBlur={() => {
-                      setTimeout(() => setShowAutocomplete(false), 150)
-                    }}
-                    aria-label="Nome do item a adicionar"
-                    autoComplete="off"
-                  />
-                  <button
-                    type="button"
-                    className="page-lista-compras__send-btn"
-                    onClick={() => adicionarItem(novoItem)}
-                    disabled={adicionando || !novoItem.trim()}
-                    aria-label="Adicionar item"
-                  >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <line x1="22" y1="2" x2="11" y2="13" />
-                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                    </svg>
-                  </button>
-                </div>
-                {showAutocomplete && sugestoes.length > 0 && (
-                  <div className="page-lista-compras__autocomplete" role="listbox" aria-label="Sugestões">
-                    {sugestoes.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        role="option"
-                        className="page-lista-compras__autocomplete-item"
-                        onMouseDown={() => {
-                          setNovoItem(s)
-                          setShowAutocomplete(false)
-                          adicionarItem(s)
-                        }}
-                      >
-                        <span className="page-lista-compras__autocomplete-icon">
-                          {CATEGORIA_EMOJI[detectarCategoria(s)] || '🛒'}
-                        </span>
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <div className="page-lista-compras__add-qty-row">
-                  <input
-                    type="number"
-                    className="page-lista-compras__qty-input"
-                    value={novaQtd}
-                    min="0.1"
-                    step="1"
-                    onChange={(e) => {
-                      const v = parseFloat(e.target.value)
-                      if (!isNaN(v) && v > 0) setNovaQtd(v)
-                    }}
-                    aria-label="Quantidade"
-                  />
-                  <div className="page-lista-compras__unit-pills" role="group" aria-label="Unidade de medida">
-                    {['un', 'kg', 'g', 'L', 'mL', 'cx', 'pct', 'dz'].map((u) => (
-                      <button
-                        key={u}
-                        type="button"
-                        className={`page-lista-compras__unit-pill${novaUnidade === u ? ' page-lista-compras__unit-pill--active' : ''}`}
-                        onClick={() => setNovaUnidade(u)}
-                        aria-pressed={novaUnidade === u}
-                      >
-                        {u}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </main>
       </div>
+
+      {/* FAB: Novo item */}
+      {listaAtiva && (
+        <button
+          type="button"
+          className="page-lista-compras__novo-item-fab"
+          onClick={() => setModalNovoItem(true)}
+          aria-label="Adicionar novo item à lista"
+        >
+          <span className="page-lista-compras__novo-item-fab__icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+          </span>
+          <span className="page-lista-compras__novo-item-fab__label">Novo item</span>
+        </button>
+      )}
 
       {/* Modal nova lista */}
       {modalNovaLista && (
@@ -1151,6 +1180,16 @@ export default function ListaDeCompras() {
           onClose={() => setModalNovaLista(false)}
           onCriada={handleListaCriada}
           pessoalParam={pessoalParam}
+        />
+      )}
+
+      {/* Modal novo item */}
+      {modalNovoItem && (
+        <ModalNovoItem
+          historico={historico}
+          onClose={() => setModalNovoItem(false)}
+          onSalvar={adicionarItem}
+          adicionando={adicionando}
         />
       )}
 
