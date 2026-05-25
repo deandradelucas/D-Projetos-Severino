@@ -131,6 +131,7 @@ export default function Transacoes() {
       if (filters.dataInicio) params.append('dataInicio', filters.dataInicio)
       if (filters.dataFim) params.append('dataFim', filters.dataFim)
       if (filters.lancamentos === 'recorrentes') params.append('recorrentes', '1')
+      if (filters.lancamentos === 'parceladas') params.append('parceladas', '1')
       params.append('limit', String(TX_PAGE_SIZE))
       params.append('offset', String(offset))
       return params
@@ -360,6 +361,13 @@ export default function Transacoes() {
     })
 
   const filtroRecorrentesAtivo = filters.lancamentos === 'recorrentes'
+  const filtroParceladasAtivo = filters.lancamentos === 'parceladas'
+
+  const toggleParceladas = () =>
+    setFilters((prev) => ({
+      ...prev,
+      lancamentos: prev.lancamentos === 'parceladas' ? '' : 'parceladas',
+    }))
 
   const whatsappContactUrl = useMemo(() => getWhatsappContactUrl(), [])
 
@@ -442,6 +450,8 @@ export default function Transacoes() {
           onToggle={() => setFiltrosAbertos((open) => !open)}
           onChange={handleFilterChange}
           onClearFilters={clearFilters}
+          filtroParceladasAtivo={filtroParceladasAtivo}
+          onToggleParceladas={toggleParceladas}
         />
 
         {filtroRecorrentesAtivo && (

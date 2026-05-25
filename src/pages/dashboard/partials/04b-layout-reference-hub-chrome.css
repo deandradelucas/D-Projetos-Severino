@@ -1948,6 +1948,32 @@ body[data-theme='light'] .ref-tx-pendente-chip {
   vertical-align: middle;
 }
 
+/* Chip "Parceladas" no cabeçalho do painel de filtros */
+body[data-theme='light'] .tx-parceladas-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+body[data-theme='light'] .tx-parceladas-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+body[data-theme='light'] .tx-parceladas-chip--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
 body[data-theme='light'] .ref-tx-rec-badge {
   display: inline-block;
   margin-left: 8px;
