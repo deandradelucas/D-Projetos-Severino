@@ -107,6 +107,10 @@ const SAFELIST = new Set([
   'agenda-day-item--done',
   'agenda-day-item--milestone',
   'agenda-day-item--reminder',
+  /* Pagamento.jsx: className={`pagamento-trial-urgencia pagamento-trial-urgencia--${trialUrgenciaVariant}`} */
+  'pagamento-trial-urgencia--normal',
+  'pagamento-trial-urgencia--aviso',
+  'pagamento-trial-urgencia--critico',
 ])
 
 function referencedInSources(className, bundle, tokens) {
