@@ -2,17 +2,28 @@ import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { resolveEscopoUsuario } from './conta-familiar.mjs'
 import { addDaysIso } from './assinatura-flags.mjs'
+import { isStripeConfigured } from './stripe-client.mjs'
 
 export const TRIAL_DIAS = Number.parseInt(process.env.HORIZONTE_TRIAL_DIAS || '7', 10) || 7
 
-/** Erro PostgREST/Postgres quando a coluna ainda não existe (migração não aplicada). */
+/**
+ * Erro PostgREST/Postgres quando a coluna ainda não existe (migração não aplicada).
+ *
+ * IMPORTANTE: Postgres usa o código `42703` para qualquer "column does not exist",
+ * sem distinguir qual coluna está faltando. Por isso é obrigatório casar o nome da
+ * coluna na mensagem — caso contrário, qualquer SELECT que misture várias colunas
+ * (ex.: `select email, isento_pagamento, ..., stripe_subscription_status`) faria
+ * todos os `isMissingColumnError(err, 'foo')` retornarem `true` quando na verdade
+ * só uma das colunas está ausente, disparando fallbacks errados.
+ */
 export function isMissingColumnError(err, column) {
   const msg = String(err?.message || err?.details || err || '')
   const code = String(err?.code || '')
-  if (code === '42703') return true
   const c = String(column || '').trim()
-  if (!c) return false
-  return msg.includes(c) && (msg.includes('does not exist') || msg.includes('não existe'))
+  if (!c) return code === '42703'
+  const mentionsColumn = msg.includes(c)
+  if (code === '42703') return mentionsColumn
+  return mentionsColumn && (msg.includes('does not exist') || msg.includes('não existe'))
 }
 
 /** Valor vindo do Postgres/PostgREST — evita falhar por tipos inesperados. */
@@ -116,16 +127,20 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
 
   out.stripe_subscription_id = null
   out.stripe_subscription_status = null
-  const tStripe = await supabase
-    .from('usuarios')
-    .select('stripe_subscription_id, stripe_subscription_status')
-    .eq('id', uid)
-    .maybeSingle()
-  if (!tStripe.error && tStripe.data) {
-    out.stripe_subscription_id = tStripe.data.stripe_subscription_id ?? null
-    out.stripe_subscription_status = tStripe.data.stripe_subscription_status ?? null
-  } else if (tStripe.error && !isMissingColumnError(tStripe.error, 'stripe_subscription_id')) {
-    log.warn('[fetchAssinaturaCamposUsuario] stripe:', tStripe.error.message || tStripe.error)
+  // Só consulta colunas Stripe quando o gateway está configurado — evita falhas
+  // 42703 ruidosas em ambientes que descontinuaram Stripe em favor de Asaas.
+  if (isStripeConfigured()) {
+    const tStripe = await supabase
+      .from('usuarios')
+      .select('stripe_subscription_id, stripe_subscription_status')
+      .eq('id', uid)
+      .maybeSingle()
+    if (!tStripe.error && tStripe.data) {
+      out.stripe_subscription_id = tStripe.data.stripe_subscription_id ?? null
+      out.stripe_subscription_status = tStripe.data.stripe_subscription_status ?? null
+    } else if (tStripe.error && !isMissingColumnError(tStripe.error, 'stripe_subscription_id')) {
+      log.warn('[fetchAssinaturaCamposUsuario] stripe:', tStripe.error.message || tStripe.error)
+    }
   }
 
   return out
