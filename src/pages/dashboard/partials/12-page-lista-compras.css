@@ -1021,6 +1021,14 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   transition: var(--transition-base);
 }
 
+/* iOS: font-size < 16px dispara zoom automático ao focar — força 16px no mobile */
+@media (max-width: 768px) {
+  .page-lista-compras__modal-input,
+  .page-lista-compras__modal-select {
+    font-size: 1rem;
+  }
+}
+
 .page-lista-compras__modal-input:focus,
 .page-lista-compras__modal-select:focus {
   outline: none;
