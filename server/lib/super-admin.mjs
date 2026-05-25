@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * E-mail da conta “principal” (não pode ser excluída nem rebaixada de ADMIN).
  * Outras contas com role ADMIN no banco também acessam /api/admin/* e o menu.

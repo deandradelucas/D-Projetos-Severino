@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Utilitários puros de normalização de telefone brasileiro.
  * Sem dependências externas — funções determinísticas testáveis isoladamente.

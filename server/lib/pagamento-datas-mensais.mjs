@@ -1,3 +1,4 @@
+// @ts-check
 /** Helpers de âncora mensal (legado MP / próxima cobrança) — usados em testes e reutilizáveis. */
 
 /** Mesmo dia no mês calendário seguinte (UTC); clamp ao último dia do mês (ex.: 31 jan → 28/29 fev). */
