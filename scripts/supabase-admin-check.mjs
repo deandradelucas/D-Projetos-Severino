@@ -30,7 +30,7 @@ async function checkUsuariosTable() {
     console.error(`Falha ao acessar public.usuarios: ${message}`)
 
     if (message.includes("Could not find the table 'public.usuarios' in the schema cache")) {
-      console.error('A tabela ainda nao existe no banco. Execute o SQL de src/scripts/setup_usuarios.sql no SQL Editor do Supabase.')
+      console.error('A tabela ainda nao existe no banco. Aplique as migrations em scripts/migrations/ no SQL Editor do Supabase, comecando por 03_user_admin_fields.sql ou pelos arquivos da Supabase CLI.')
     }
 
     process.exit(1)

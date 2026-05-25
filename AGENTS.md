@@ -25,7 +25,7 @@ CLI (opcional, ambiente local): `npm install -g ./segunda-feira` a partir da rai
 - **Frontend:** React 19, Vite 8, Tailwind 4 (`src/index.css` + `@theme`), React Router 7. Estilos de app autenticada em `src/pages/dashboard.css` (importado pelas páginas do shell).
 - **API:** Hono em `server/app.mjs`. **Dev local:** `node server/index.mjs`. **Deploy atual:** Hostinger VPS (`deploy/hostinger-vps/`, com PM2 + nginx); `vercel.json` mantém `"ignoreCommand": "exit 0"` para evitar builds automáticos enquanto o stack vive em VPS.
 - **Dados:** Supabase Postgres. Cliente admin no servidor: `server/lib/supabase-admin.mjs`. Cliente público (cadastro): `src/lib/supabase.js`.
-- **Migrations SQL:** `scripts/migrations/` — rodar no SQL Editor do Supabase na ordem numérica quando indicado. SQL manual/legado fica em `scripts/sql/`.
+- **Migrations SQL:** `scripts/migrations/` — rodar no SQL Editor do Supabase na ordem numérica quando indicado.
 
 ### Supabase e MCP (agente)
 
