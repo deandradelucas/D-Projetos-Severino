@@ -1,16 +1,15 @@
 import { describe, it, expect } from 'vitest'
-import { asaasSubscriptionBloqueiaAcesso, computeAssinaturaFlags, mpStatusBloqueiaAcesso } from '../lib/assinatura.mjs'
+import { asaasSubscriptionBloqueiaAcesso, computeAssinaturaFlags } from '../lib/assinatura.mjs'
 
 const futureIso = () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 const pastIso = () => new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
-describe('asaasSubscriptionBloqueiaAcesso / mpStatusBloqueiaAcesso (alias)', () => {
-  it('bloqueia inactive e expired', () => {
+describe('asaasSubscriptionBloqueiaAcesso', () => {
+  it('bloqueia inactive e expired (case-insensitive)', () => {
     expect(asaasSubscriptionBloqueiaAcesso('inactive')).toBe(true)
     expect(asaasSubscriptionBloqueiaAcesso('INACTIVE')).toBe(true)
     expect(asaasSubscriptionBloqueiaAcesso('expired')).toBe(true)
     expect(asaasSubscriptionBloqueiaAcesso('EXPIRED')).toBe(true)
-    expect(mpStatusBloqueiaAcesso('inactive')).toBe(true)
   })
   it('não bloqueia vazio ou active', () => {
     expect(asaasSubscriptionBloqueiaAcesso('')).toBe(false)

@@ -11,7 +11,6 @@ import {
 import {
   computeAssinaturaFlags,
   asaasSubscriptionBloqueiaAcesso,
-  mpStatusBloqueiaAcesso,
   mensagemBloqueioAssinaturaAsaas,
   situacaoAssinatura,
   addDaysIso,
@@ -30,7 +29,6 @@ export const TRIAL_DIAS = Number.parseInt(process.env.HORIZONTE_TRIAL_DIAS || '7
 
 export {
   asaasSubscriptionBloqueiaAcesso,
-  mpStatusBloqueiaAcesso,
   mensagemBloqueioAssinaturaAsaas,
   situacaoAssinatura,
   addDaysIso,
