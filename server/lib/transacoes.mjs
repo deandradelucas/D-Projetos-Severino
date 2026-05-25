@@ -360,8 +360,15 @@ export async function getTransacoes(usuarioId, filters = {}) {
   const uid = String(usuarioId || '').trim()
   if (!uid) return []
 
-  const { dataInicio, dataFim, tipo, categoria_id, status, busca, somenteRecorrentes } = filters
+  const { dataInicio, dataFim, tipo, categoria_id, status, busca, somenteRecorrentes, somenteParceladas } = filters
   const { off, rangeEnd } = parseTransacoesListPagination(filters)
+
+  // Mês corrente para filtro padrão de parcelamentos
+  const agora = new Date()
+  const anoAtual = agora.getUTCFullYear()
+  const mesAtual = agora.getUTCMonth() // 0-indexed
+  const inicioDeMes = new Date(Date.UTC(anoAtual, mesAtual, 1)).toISOString()
+  const inicioProxMes = new Date(Date.UTC(anoAtual, mesAtual + 1, 1)).toISOString()
 
   const applyFilters = (q) => {
     let query = q.eq('usuario_id', uid)
@@ -371,9 +378,18 @@ export async function getTransacoes(usuarioId, filters = {}) {
     if (categoria_id) query = query.eq('categoria_id', categoria_id)
     if (status) query = query.eq('status', status)
     if (busca) query = query.ilike('descricao', `%${busca}%`)
-    /* Parcelas (recorrente_grupo_id) ou regra mensal (recorrencia_mensal_id) */
-    if (somenteRecorrentes) {
+
+    if (somenteParceladas) {
+      /* Filtro explícito: só parcelas de compras parceladas */
+      query = query.not('recorrente_grupo_id', 'is', null)
+    } else if (somenteRecorrentes) {
+      /* Recorrentes: parcelas + regras mensais */
       query = query.or('recorrencia_mensal_id.not.is.null,recorrente_grupo_id.not.is.null')
+    } else if (!dataInicio && !dataFim) {
+      /* Padrão sem filtro de data: exibe parcelamentos só do mês atual */
+      query = query.or(
+        `recorrente_grupo_id.is.null,and(recorrente_grupo_id.not.is.null,data_transacao.gte.${inicioDeMes},data_transacao.lt.${inicioProxMes})`
+      )
     }
     return query
   }

@@ -18,6 +18,8 @@ export function TransacoesFiltrosPanel({
   onToggle,
   onChange,
   onClearFilters,
+  filtroParceladasAtivo,
+  onToggleParceladas,
 }) {
   return (
     <article className="ref-panel page-transacoes-ref-filters">
@@ -49,6 +51,20 @@ export function TransacoesFiltrosPanel({
           >
             <path d="m6 9 6 6 6-6" />
           </svg>
+        </button>
+        <button
+          type="button"
+          className={`tx-parceladas-chip${filtroParceladasAtivo ? ' tx-parceladas-chip--active' : ''}`}
+          onClick={onToggleParceladas}
+          aria-pressed={filtroParceladasAtivo}
+          title="Filtrar compras parceladas"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
+            <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
+            <path d="M6 15h4M14 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          Parceladas
         </button>
         <button type="button" className="ref-panel__link ref-panel__link--button" onClick={onClearFilters}>
           Limpar filtros
