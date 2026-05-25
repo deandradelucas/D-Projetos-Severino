@@ -1,8 +1,7 @@
 /* Página Investimentos — lista + modal novo (shell alinhado ao dashboard-page) */
 
-/* Mesma tipografia que Transações (07-page-transacoes.css) */
+/* Tipografia premium herdada de :root (--tx-dir-font) — mesma de Transações */
 .dashboard-container.dashboard-page.page-investimentos.ref-dashboard.app-horizon-shell {
-  --tx-dir-font: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
   --tx-nova-btn-bg: #b58d3d;
   --tx-nova-btn-bg-hover: #c69d4d;
   --tx-nova-btn-fg: #111111;
