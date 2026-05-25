@@ -10,24 +10,27 @@ import {
 // ---------------------------------------------------------------------------
 // Detecção rápida (sem IA) — garante que só mensagens de lista de compras
 // chegam ao parser Gemini.
+//
+// Construído com RegExp + array de padrões: regex literal multi-linha com
+// flag /x (free-spacing) NÃO existe em JavaScript — só em Perl/Ruby/.NET.
 // ---------------------------------------------------------------------------
-const LISTA_RE =
-  /\b(
-    adiciona[r]?\s+.{1,120}\s+na\s+lista |
-    coloca[r]?\s+.{1,120}\s+na\s+lista |
-    inclui[r]?\s+.{1,120}\s+na\s+lista |
-    bota[r]?\s+.{1,120}\s+na\s+lista |
-    p[oõ]e\s+.{1,120}\s+na\s+lista |
-    cria[r]?\s+(uma\s+)?lista(\s+chamada|\s+de|\s+para)? |
-    nova\s+lista |
-    lista\s+de\s+compras |
-    minha[s]?\s+lista[s]? |
-    ver\s+(a\s+|minha\s+)?lista |
-    o\s+que\s+(tem|est[aá])\s+na\s+lista |
-    remove[r]?\s+.{1,80}\s+da\s+lista |
-    tira[r]?\s+.{1,80}\s+da\s+lista |
-    apaga[r]?\s+.{1,80}\s+da\s+lista
-  )\b/xi
+const LISTA_PATTERNS = [
+  'adiciona[r]?\\s+.{1,120}\\s+na\\s+lista',
+  'coloca[r]?\\s+.{1,120}\\s+na\\s+lista',
+  'inclui[r]?\\s+.{1,120}\\s+na\\s+lista',
+  'bota[r]?\\s+.{1,120}\\s+na\\s+lista',
+  'p[oõ]e\\s+.{1,120}\\s+na\\s+lista',
+  'cria[r]?\\s+(uma\\s+)?lista(\\s+chamada|\\s+de|\\s+para)?',
+  'nova\\s+lista',
+  'lista\\s+de\\s+compras',
+  'minha[s]?\\s+lista[s]?',
+  'ver\\s+(a\\s+|minha\\s+)?lista',
+  'o\\s+que\\s+(tem|est[aá])\\s+na\\s+lista',
+  'remove[r]?\\s+.{1,80}\\s+da\\s+lista',
+  'tira[r]?\\s+.{1,80}\\s+da\\s+lista',
+  'apaga[r]?\\s+.{1,80}\\s+da\\s+lista',
+]
+const LISTA_RE = new RegExp(`\\b(${LISTA_PATTERNS.join('|')})\\b`, 'i')
 
 export function isListaComprasMessage(message) {
   return LISTA_RE.test(String(message || ''))
