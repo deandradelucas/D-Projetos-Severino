@@ -13,10 +13,6 @@ import '../pages/dashboard.css'
 const MOBILE_CHAT_MQ = '(max-width: 768px)'
 const KEYBOARD_OPEN_THRESHOLD_PX = 100
 
-/** Rotas onde o FAB do Severino IA não deve aparecer (Login/Cadastro/raiz são
- *  fluxos de autenticação; Lista de Compras foi excluída a pedido). */
-const CHAT_EXCLUDED_PATHS = new Set(['/login', '/cadastro', '/', '/lista-de-compras'])
-
 function keyboardOverlapPx() {
   const vv = window.visualViewport
   if (!vv) return 0
@@ -33,7 +29,7 @@ function useHorizonShellDock(chatOpen) {
   const [dock, setDock] = useState(null)
 
   useLayoutEffect(() => {
-    const excluded = CHAT_EXCLUDED_PATHS.has(location.pathname)
+    const excluded = ['/login', '/cadastro', '/'].includes(location.pathname)
     if (excluded) {
       queueMicrotask(() => setDock(null))
       return
@@ -373,7 +369,7 @@ export default function HorizonChat() {
     }
   }
 
-  if (CHAT_EXCLUDED_PATHS.has(location.pathname)) {
+  if (['/login', '/cadastro', '/', '/lista-de-compras'].includes(location.pathname)) {
     return null
   }
 

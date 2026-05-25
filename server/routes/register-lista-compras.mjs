@@ -4,6 +4,7 @@ import {
   criarLista,
   atualizarLista,
   arquivarLista,
+  excluirLista,
   listarItensLista,
   criarItem,
   atualizarItem,
@@ -154,6 +155,29 @@ export function registerListaComprasRoutes(app) {
       const domMsg = error.message || ''
       const status = domMsg.includes('não encontrada') ? 404 : 500
       return c.json({ message: status === 500 ? 'Erro ao arquivar lista.' : domMsg }, status)
+    }
+  })
+
+  // DELETE /api/lista-compras/:id/excluir — excluir lista permanentemente
+  app.delete('/api/lista-compras/:id/excluir', async (c) => {
+    try {
+      const id = c.req.param('id')
+      const usuarioId = resolveRequestUserId(c)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+      if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
+
+      if (!await rateLimitTake(`lista-compras-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
+        return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
+      }
+
+      await excluirLista(id, resolveListaDataId(parsed, c))
+      return c.json({ message: 'Lista excluída.' })
+    } catch (error) {
+      log.error('excluir lista de compras', error)
+      const domMsg = error.message || ''
+      const status = domMsg.includes('não encontrada') ? 404 : 500
+      return c.json({ message: status === 500 ? 'Erro ao excluir lista.' : domMsg }, status)
     }
   })
 
