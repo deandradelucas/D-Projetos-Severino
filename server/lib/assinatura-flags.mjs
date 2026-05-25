@@ -8,11 +8,6 @@ export function asaasSubscriptionBloqueiaAcesso(status) {
   return s !== '' && ASAAS_STATUS_BLOQUEIA_ACESSO.has(s)
 }
 
-/** @deprecated use asaasSubscriptionBloqueiaAcesso */
-export function mpStatusBloqueiaAcesso(status) {
-  return asaasSubscriptionBloqueiaAcesso(status)
-}
-
 export function mensagemBloqueioAssinaturaAsaas(status) {
   const s = String(status || '').trim().toLowerCase()
   if (s === 'inactive') {
