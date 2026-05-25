@@ -36,6 +36,8 @@ export function TransactionCacheProvider({ children }) {
   const fetchingRef = useRef(false)
   // Indica se já carregou dados ao menos uma vez
   const hasDataRef = useRef(false)
+  // Timer compartilhado pelas mutações otimistas (debounce de revalidação)
+  const optimisticRevalidateTimerRef = useRef(0)
 
   const fetchTransacoes = useCallback(async ({ silent = false } = {}) => {
     if (fetchingRef.current) return
@@ -127,6 +129,25 @@ export function TransactionCacheProvider({ children }) {
   }, [fetchTransacoes])
 
   /**
+   * Agenda a revalidação silenciosa após uma mutação otimista. Usa um único
+   * timer compartilhado: várias mutações em sequência (ex.: lançar 3 transações
+   * em 1 s) só geram um fetch ao final do debounce, e o cleanup do provider
+   * garante que nada fica pendente após desmontagem.
+   */
+  const scheduleOptimisticRevalidate = useCallback(() => {
+    window.clearTimeout(optimisticRevalidateTimerRef.current)
+    optimisticRevalidateTimerRef.current = window.setTimeout(
+      () => void fetchTransacoes({ silent: true }),
+      800,
+    )
+  }, [fetchTransacoes])
+
+  useEffect(
+    () => () => window.clearTimeout(optimisticRevalidateTimerRef.current),
+    [],
+  )
+
+  /**
    * Adiciona uma transação localmente de forma otimista,
    * depois aciona revalidação silenciosa em background.
    */
@@ -134,17 +155,16 @@ export function TransactionCacheProvider({ children }) {
     if (newTx?.id) {
       setTransacoes((prev) => [newTx, ...prev])
     }
-    // Revalida em background para garantir consistência com o servidor
-    setTimeout(() => void fetchTransacoes({ silent: true }), 800)
-  }, [fetchTransacoes])
+    scheduleOptimisticRevalidate()
+  }, [scheduleOptimisticRevalidate])
 
   /**
    * Remove transação localmente e dispara revalidação silenciosa.
    */
   const removeTransactionOptimistic = useCallback((id) => {
     setTransacoes((prev) => prev.filter((t) => t.id !== id))
-    setTimeout(() => void fetchTransacoes({ silent: true }), 800)
-  }, [fetchTransacoes])
+    scheduleOptimisticRevalidate()
+  }, [scheduleOptimisticRevalidate])
 
   /**
    * Atualiza transação localmente e dispara revalidação silenciosa.
@@ -152,8 +172,8 @@ export function TransactionCacheProvider({ children }) {
   const updateTransactionOptimistic = useCallback((updatedTx) => {
     if (!updatedTx?.id) return
     setTransacoes((prev) => prev.map((t) => (t.id === updatedTx.id ? { ...t, ...updatedTx } : t)))
-    setTimeout(() => void fetchTransacoes({ silent: true }), 800)
-  }, [fetchTransacoes])
+    scheduleOptimisticRevalidate()
+  }, [scheduleOptimisticRevalidate])
 
   /**
    * Invalida o cache e força um fetch limpo (ex: ao trocar de usuário).

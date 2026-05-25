@@ -21,7 +21,8 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
     setValorInput('') // eslint-disable-line react-hooks/set-state-in-effect
     setDataInput(localDateToday())
     setErrors({})
-    setTimeout(() => valorInputRef.current?.focus(), 60)
+    const focusTimer = window.setTimeout(() => valorInputRef.current?.focus(), 60)
+    return () => window.clearTimeout(focusTimer)
   }, [open])
 
   useEffect(() => {
