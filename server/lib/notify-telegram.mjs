@@ -1,3 +1,4 @@
+// @ts-check
 import './load-env.mjs'
 
 /**
