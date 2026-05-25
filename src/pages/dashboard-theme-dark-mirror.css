@@ -1356,7 +1356,7 @@ body[data-theme='dark'] .tx-parceladas-chip {
   font-weight: 600;
   border: 1.5px solid var(--border);
   background: transparent;
-  color: var(--text-secondary);
+  color: #000;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   white-space: nowrap;
