@@ -903,9 +903,9 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   background: rgba(0, 0, 0, 0.55);
   z-index: 200;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 16px;
   animation: overlayFadeIn 0.18s ease;
 }
 
@@ -921,24 +921,18 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   }
 }
 
-@media (min-width: 480px) {
-  .page-lista-compras__modal-overlay {
-    align-items: center;
-  }
-}
-
 .page-lista-compras__modal {
   width: 100%;
   max-width: 480px;
   background: var(--bg-card);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  padding: 24px 20px 32px;
+  border-radius: var(--radius-xl);
+  padding: 24px 20px 28px;
   box-shadow: var(--shadow-md);
   animation: modalSlideUp 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes modalSlideUp {
-  from { transform: translateY(20px); opacity: 0; }
+  from { transform: translateY(16px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
@@ -946,12 +940,6 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   @keyframes modalSlideUp {
     from { opacity: 0; }
     to { opacity: 1; }
-  }
-}
-
-@media (min-width: 480px) {
-  .page-lista-compras__modal {
-    border-radius: var(--radius-xl);
   }
 }
 
