@@ -1091,10 +1091,9 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     display: none !important;
   }
 
+  /* Subcategoria + chip de data na mesma linha (sem > — virtualizer envolve os rows no mobile). */
   .page-transacoes.app-horizon-shell
     .page-transacoes-ref-table
-    .ref-tx-table-subgrid--actions
-    > .ref-tx-row:not(.ref-tx-row--skeleton)
     .ref-tx-sub-text {
     display: flex !important;
     flex-wrap: wrap;
@@ -1106,16 +1105,12 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
   .page-transacoes.app-horizon-shell
     .page-transacoes-ref-table
-    .ref-tx-table-subgrid--actions
-    > .ref-tx-row:not(.ref-tx-row--skeleton)
     .ref-tx-sub-text__name {
     min-width: 0;
   }
 
   .page-transacoes.app-horizon-shell
     .page-transacoes-ref-table
-    .ref-tx-table-subgrid--actions
-    > .ref-tx-row:not(.ref-tx-row--skeleton)
     .ref-tx-date--paired-sub {
     display: inline-flex !important;
     align-items: center !important;
@@ -1131,8 +1126,6 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   body[data-theme='light']
     .page-transacoes.app-horizon-shell
     .page-transacoes-ref-table
-    .ref-tx-table-subgrid--actions
-    > .ref-tx-row:not(.ref-tx-row--skeleton)
     .ref-tx-date--paired-sub {
     background: rgba(15, 23, 42, 0.045) !important;
     border: 1px solid rgba(15, 23, 42, 0.06) !important;
@@ -1142,19 +1135,15 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   body[data-theme='dark']
     .page-transacoes.app-horizon-shell
     .page-transacoes-ref-table
-    .ref-tx-table-subgrid--actions
-    > .ref-tx-row:not(.ref-tx-row--skeleton)
     .ref-tx-date--paired-sub {
     background: #000000 !important;
     border: 0.5px solid #0b0b0b !important;
     color: rgba(255, 255, 255, 0.56) !important;
   }
 
-  /* Separador fora do chip da data (não dentro da borda arredondada). */
+  /* Separador · entre nome da subcategoria e chip da data. */
   .page-transacoes.app-horizon-shell
     .page-transacoes-ref-table
-    .ref-tx-table-subgrid--actions
-    > .ref-tx-row:not(.ref-tx-row--skeleton)
     .ref-tx-sub-text__name::after {
     content: '·';
     margin-inline: 0.35rem;
@@ -1164,7 +1153,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   .page-transacoes.app-horizon-shell
     .page-transacoes-ref-table
     .ref-tx-table-subgrid--actions
-    > .ref-tx-row:not(.ref-tx-row--skeleton)
+    .ref-tx-row:not(.ref-tx-row--skeleton)
     > .ref-tx-meta-cell:not(:has(.ref-tx-desc, .ref-tx-lancador)) {
     display: none !important;
   }
