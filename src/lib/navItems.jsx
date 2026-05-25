@@ -46,6 +46,7 @@ export const MAIN_NAV_ITEMS = [
     to: '/relatorios',
     label: 'Relatórios',
     end: true,
+    mobileHide: true,
     title: 'Gráficos, resumo do período e exportação CSV ou PDF',
     icon: (props) => (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden {...props}>
@@ -93,6 +94,7 @@ export const MAIN_NAV_ITEMS = [
     to: '/configuracoes',
     label: 'Ajustes',
     end: true,
+    mobileHide: true,
     title: 'Perfil, tema, biometria e dados',
     sidebarClassName: 'nav-item--settings',
     mobileClassName: 'mobile-bottom-nav__item--settings',

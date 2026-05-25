@@ -433,6 +433,8 @@ export default function ListaDeCompras() {
   const [checkedAberto, setCheckedAberto] = useState(true)
   const [menuListaAberto, setMenuListaAberto] = useState(false)
   const [adicionando, setAdicionando] = useState(false)
+  const [novaQtd, setNovaQtd] = useState(1)
+  const [novaUnidade, setNovaUnidade] = useState('un')
 
   const inputRef = useRef(null)
   const menuListaRef = useRef(null)
@@ -563,7 +565,7 @@ export default function ListaDeCompras() {
         method: 'POST',
         headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
         cache: 'no-store',
-        body: JSON.stringify({ nome: nomeTrimmed, categoria_item: categoria }),
+        body: JSON.stringify({ nome: nomeTrimmed, categoria_item: categoria, quantidade: novaQtd, unidade: novaUnidade }),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
@@ -573,6 +575,8 @@ export default function ListaDeCompras() {
       }
       const item = await res.json()
       setItens((prev) => [...prev, item])
+      setNovaQtd(1)
+      setNovaUnidade('un')
       // Atualizar historico local
       if (!historico.includes(item.nome)) {
         setHistorico((prev) => [item.nome, ...prev].slice(0, 50))
@@ -583,7 +587,7 @@ export default function ListaDeCompras() {
       setAdicionando(false)
       inputRef.current?.focus()
     }
-  }, [listaAtiva, historico])
+  }, [listaAtiva, historico, novaQtd, novaUnidade])
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -986,6 +990,33 @@ export default function ListaDeCompras() {
                     ))}
                   </div>
                 )}
+                <div className="page-lista-compras__add-qty-row">
+                  <input
+                    type="number"
+                    className="page-lista-compras__qty-input"
+                    value={novaQtd}
+                    min="0.1"
+                    step="1"
+                    onChange={(e) => {
+                      const v = parseFloat(e.target.value)
+                      if (!isNaN(v) && v > 0) setNovaQtd(v)
+                    }}
+                    aria-label="Quantidade"
+                  />
+                  <div className="page-lista-compras__unit-pills" role="group" aria-label="Unidade de medida">
+                    {['un', 'kg', 'g', 'L', 'mL', 'cx', 'pct', 'dz'].map((u) => (
+                      <button
+                        key={u}
+                        type="button"
+                        className={`page-lista-compras__unit-pill${novaUnidade === u ? ' page-lista-compras__unit-pill--active' : ''}`}
+                        onClick={() => setNovaUnidade(u)}
+                        aria-pressed={novaUnidade === u}
+                      >
+                        {u}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
               <button
                 type="button"
@@ -1042,18 +1073,14 @@ function ItemRow({ item, onToggle, onRemover }) {
       <div className="page-lista-compras__item-body">
         <span className="page-lista-compras__item-name">{item.nome}</span>
         <span className="page-lista-compras__item-meta">
-          {Number(item.quantidade) !== 1 && (
-            <>
-              <span>{Number(item.quantidade)} {item.unidade}</span>
-              {item.preco_estimado != null && (
-                <span className="page-lista-compras__item-meta-sep">·</span>
-              )}
-            </>
-          )}
+          <span className="page-lista-compras__item-qty">{Number(item.quantidade)} {item.unidade}</span>
           {item.preco_estimado != null && Number(item.preco_estimado) > 0 && (
-            <span>
-              {formatarMoeda(Number(item.preco_estimado) * Number(item.quantidade || 1))}
-            </span>
+            <>
+              <span className="page-lista-compras__item-meta-sep">·</span>
+              <span>
+                {formatarMoeda(Number(item.preco_estimado) * Number(item.quantidade || 1))}
+              </span>
+            </>
           )}
         </span>
       </div>

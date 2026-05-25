@@ -8,7 +8,7 @@ export default function MobileBottomNav() {
   return (
     <nav className="mobile-bottom-nav" aria-label="Navegação principal mobile">
       <div className="mobile-bottom-nav__bar">
-        {MAIN_NAV_ITEMS.map((item) => (
+        {MAIN_NAV_ITEMS.filter((item) => !item.mobileHide).map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
