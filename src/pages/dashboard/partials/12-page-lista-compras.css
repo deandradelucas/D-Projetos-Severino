@@ -13,8 +13,21 @@
 /* ---------------------------------------------------------------------------
    Wrapper principal
    --------------------------------------------------------------------------- */
+/* --add-bar-height: altura da barra de adicionar (input + qty row + padding vertical).
+   No mobile acrescenta a altura do bottom nav (~70px). */
+:root {
+  --lista-add-bar-height: 108px;
+  --lista-mobile-nav-height: 70px;
+}
+
 .page-lista-compras-wrap {
-  padding: 0 0 160px; /* espaço para add-bar + footer */
+  padding: 0 0 calc(var(--lista-add-bar-height) + 60px); /* add-bar + footer visível */
+}
+
+@media (max-width: 768px) {
+  .page-lista-compras-wrap {
+    padding-bottom: calc(var(--lista-add-bar-height) + var(--lista-mobile-nav-height) + 60px);
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -371,8 +384,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 50;
-  padding: 12px 16px;
+  z-index: 75; /* acima do mobile-bottom-nav (z-index 70) */
+  padding: 10px 16px 12px;
   background: var(--bg-card);
   border-top: 1px solid var(--border-default);
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
@@ -381,8 +394,16 @@
   align-items: flex-end;
 }
 
-/* Quando sidebar está visível em desktop, a add-bar recua */
-@media (min-width: 768px) {
+/* Mobile: empurra a barra acima do bottom nav */
+@media (max-width: 768px) {
+  .page-lista-compras__add-bar {
+    bottom: var(--lista-mobile-nav-height);
+    padding-bottom: 10px;
+  }
+}
+
+/* Desktop: recua à direita da sidebar */
+@media (min-width: 769px) {
   .page-lista-compras__add-bar {
     left: var(--sidebar-width, 260px);
   }
@@ -529,8 +550,15 @@
 
 .page-lista-compras__unit-pills {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 5px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.page-lista-compras__unit-pills::-webkit-scrollbar {
+  display: none;
 }
 
 .page-lista-compras__unit-pill {
@@ -564,10 +592,10 @@
    --------------------------------------------------------------------------- */
 .page-lista-compras__footer {
   position: fixed;
-  bottom: 70px; /* acima da add-bar */
+  bottom: var(--lista-add-bar-height); /* desktop: acima da add-bar */
   left: 0;
   right: 0;
-  z-index: 49;
+  z-index: 74;
   padding: 10px 16px;
   display: flex;
   align-items: center;
@@ -577,6 +605,13 @@
   border-top: 1px solid var(--border-accent);
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
   animation: slideUpFooter 0.2s ease;
+}
+
+/* Mobile: add-bar está acima do bottom nav, então footer sobe mais */
+@media (max-width: 768px) {
+  .page-lista-compras__footer {
+    bottom: calc(var(--lista-add-bar-height) + var(--lista-mobile-nav-height));
+  }
 }
 
 @keyframes slideUpFooter {
@@ -591,7 +626,7 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
   .page-lista-compras__footer {
     left: var(--sidebar-width, 260px);
   }
