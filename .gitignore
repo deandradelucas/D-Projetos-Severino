@@ -13,6 +13,7 @@ dist-ssr
 *.local
 
 # Environment variables (NUNCA fazer commit)
+# .env.*.local cobre .env.production.local, .env.staging.local, etc.
 .env
 .env.local
 .env.production
@@ -29,6 +30,5 @@ nul
 
 # Backup temp
 .backup-temp/
-.env*.local
 .tmp/
 docker_logs.txt

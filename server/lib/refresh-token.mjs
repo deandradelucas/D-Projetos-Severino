@@ -1,3 +1,4 @@
+// @ts-check
 import crypto from 'node:crypto'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { log } from './logger.mjs'

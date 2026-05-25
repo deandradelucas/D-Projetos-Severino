@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Alguns bancos legados usam a coluna `usuario` em `public.usuarios`;
  * o schema atual do projeto usa `nome`. Normalizamos para `nome` na API.
