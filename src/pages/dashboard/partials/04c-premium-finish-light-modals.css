@@ -479,10 +479,6 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-ref
   min-height: 0;
 }
 
-body[data-theme='light'] .page-pagamento.app-horizon-shell .page-pagamento-header-sub {
-  margin: 4px 0 0;
-  text-transform: none;
-}
 
 @media (min-width: 769px) {
   body[data-theme='light'] .page-relatorios.app-horizon-shell .relatorios-charts {

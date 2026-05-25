@@ -57,12 +57,6 @@
   min-width: 0;
 }
 
-.page-pagamento-header .page-pagamento-header-sub {
-  margin: 6px 0 0;
-  max-width: 42rem;
-  line-height: 1.45;
-}
-
 /* Mensal vs anual — checkout Asaas */
 .page-pagamento-planos.ref-panel {
   padding: 16px 20px 14px;
@@ -132,63 +126,12 @@
   line-height: 1.35;
 }
 
-.page-pagamento-planos__pix-inline {
-  margin-top: 12px;
-}
-
 /* Lateral: ações + orientação */
 .pagamento-aside {
   display: flex;
   flex-direction: column;
   gap: 16px;
   min-width: 0;
-}
-
-.pagamento-aside__actions.ref-panel {
-  padding: 20px 22px;
-  min-height: 0;
-}
-
-.pagamento-aside__title {
-  margin: 0 0 14px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-.pagamento-aside__btn-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.pagamento-aside__btn-stack .btn-primary.page-pagamento-cta {
-  min-height: 48px;
-  font-size: 14px;
-}
-
-.pagamento-aside__btn-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  text-decoration: none;
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 44px;
-  padding: 0 16px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.pagamento-aside__footnote {
-  margin: 12px 0 0;
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 1.45;
 }
 
 .pagamento-orientacao {
@@ -384,12 +327,6 @@ body[data-theme='light'] .pagamento-banner {
   word-break: break-word;
 }
 
-.pagamento-checkout-error {
-  margin: 0 0 10px;
-  font-size: 13px;
-  color: var(--danger);
-}
-
 /* Painel “Finalizar assinatura” (antes estilos inline no JSX) */
 .pagamento-checkout-panel.ref-panel {
   display: flex;
@@ -474,8 +411,7 @@ body[data-theme='light'] .pagamento-banner {
 }
 
 /* Tema escuro — CTA de checkout: fundo preto, borda e texto no verde do sistema (--success) */
-body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full,
-body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside__btn-stack .btn-primary.page-pagamento-cta {
+body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full {
   background: #000000 !important;
   background-image: none !important;
   color: var(--success-text, #4ade80) !important;
@@ -484,8 +420,7 @@ body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-ho
   text-shadow: 0 0 10px color-mix(in srgb, var(--success-text, #4ade80) 45%, transparent);
 }
 
-body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full:hover:not(:disabled),
-body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside__btn-stack .btn-primary.page-pagamento-cta:hover:not(:disabled) {
+body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full:hover:not(:disabled) {
   background: #050505 !important;
   background-image: none !important;
   color: var(--success, #22c55e) !important;
@@ -495,19 +430,11 @@ body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-ho
   transform: none;
 }
 
-body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full:focus-visible,
-body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside__btn-stack .btn-primary.page-pagamento-cta:focus-visible {
+body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full:focus-visible {
   outline: none;
   box-shadow:
     0 0 0 3px color-mix(in srgb, var(--success, #22c55e) 38%, transparent),
     0 0 18px color-mix(in srgb, var(--success, #22c55e) 36%, transparent) !important;
-}
-
-.page-pagamento .page-pagamento-cta {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  justify-content: center;
 }
 
 .page-pagamento-historico.ref-panel {
