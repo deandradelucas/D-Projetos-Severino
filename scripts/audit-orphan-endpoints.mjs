@@ -7,10 +7,24 @@
  * `app.post(...)`, `app.put(...)`, `app.delete(...)`, `app.patch(...)`.
  * Para cada path, transforma `:param` em padrão regex e busca em arquivos
  * `.js/.jsx` de `src/` por strings que correspondam.
+ *
+ * Endpoints "externos por design" (webhooks, cron, healthchecks) são
+ * filtrados via EXTERNAL_PATTERNS — eles não têm consumer no front porque
+ * são chamados por terceiros (Asaas, Evolution API, n8n, Vercel Cron, etc.).
+ * Use `--all` para ver a lista completa sem filtragem.
  */
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+
+/** Endpoints chamados por sistemas externos (não pelo browser do utilizador). */
+const EXTERNAL_PATTERNS = [
+  /^\/api\/cron\//,
+  /\/webhook(\/|$)/,
+  /^\/api\/admin\/pagamentos-saude$/,
+  /* Bot WhatsApp via n8n (ver docs/whatsapp-evolution-n8n.md) */
+  /^\/api\/whatsapp\/bot\//,
+]
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const ROUTE_DIRS = ['server/routes', 'server/app.mjs']
@@ -75,10 +89,24 @@ async function main() {
     if (!used) orphans.push(r)
   }
 
+  const includeAll = process.argv.includes('--all')
+  const isExternal = (r) => EXTERNAL_PATTERNS.some((re) => re.test(r.path))
+  const externals = orphans.filter(isExternal)
+  const suspects = orphans.filter((r) => !isExternal(r))
+  const visible = includeAll ? orphans : suspects
+
   console.log(`Total de rotas: ${routes.length}`)
-  console.log(`Sem consumidor identificável no front (${orphans.length}):`)
-  for (const o of orphans) {
-    console.log(`  ${o.method.padEnd(6)} ${o.path}  (${o.file})`)
+  console.log(
+    `Webhooks / cron / healthchecks (esperados sem consumer no front): ${externals.length}`,
+  )
+  console.log(
+    `Sem consumidor identificável no front (${visible.length}${
+      includeAll ? '' : ', --all para incluir os esperados'
+    }):`,
+  )
+  for (const o of visible) {
+    const tag = isExternal(o) ? ' [externo]' : ''
+    console.log(`  ${o.method.padEnd(6)} ${o.path}${tag}  (${o.file})`)
   }
 }
 
