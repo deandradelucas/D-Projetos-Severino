@@ -2,7 +2,6 @@ import { log } from '../lib/logger.mjs'
 import { Alerts } from '../lib/notify-telegram.mjs'
 import {
   askHorizon,
-  parseAgendaFromTextWithAI,
   suggestCategoryForTransaction,
 } from '../lib/ai.mjs'
 import { getCategorias } from '../lib/transacoes.mjs'
@@ -122,35 +121,4 @@ export function registerAiRoutes(app) {
     }
   })
 
-  app.post('/api/ai/agenda-parse', async (c) => {
-    try {
-      const usuarioId = resolveRequestUserId(c)
-      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
-      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
-
-      if (!await rateLimitTake(`ai-parse:${parsed.actorId}:${clientKeyFromHono(c)}`, 24, 60_000)) {
-        return c.json({ message: 'Muitas interpretações seguidas. Aguarde um minuto.' }, 429)
-      }
-
-      const body = await c.req.json()
-      const texto = String(body?.texto ?? '').trim()
-      if (!texto) return c.json({ message: 'Envie o texto a interpretar.' }, 400)
-
-      const rascunho = await parseAgendaFromTextWithAI(texto, new Date())
-      return c.json({ ok: true, rascunho })
-    } catch (error) {
-      log.error('ai agenda-parse failed', error)
-      const raw = String(error?.message || '')
-      if (raw.includes('GEMINI_API_KEY') || /GEMINI_API_KEY não configurada/i.test(raw)) {
-        return c.json(
-          {
-            message:
-              'IA não configurada no servidor (GEMINI_API_KEY). O app tentará regras locais quando possível.',
-          },
-          503,
-        )
-      }
-      return c.json({ message: 'Não foi possível interpretar o texto. Reformule com data e horário.' }, 400)
-    }
-  })
 }
