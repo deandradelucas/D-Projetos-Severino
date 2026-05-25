@@ -257,6 +257,10 @@ export default function Transacoes() {
     ) {
       void loadMoreTransacoes()
     }
+  // loadMoreTransacoes é omitido de propósito: suas deps internas (loading,
+  // refreshing, loadingMore, hasMore, transacoes.length, buildTxQuery) já
+  // disparam o efeito por outras vias. Adicioná-lo ao array criaria um trigger
+  // duplicado a cada recomposição do useCallback, sem mudança de comportamento.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useDesktopTxGrid, lastVirtualIndex, hasMore, loadingMore, loading, refreshing, transacoes.length])
 
