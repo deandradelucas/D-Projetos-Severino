@@ -151,7 +151,8 @@
       "Bash(where py *)",
       "Bash(where python3.11)",
       "Bash(ls /c/Python*/python.exe)",
-      "mcp__github__create_repository"
+      "mcp__github__create_repository",
+      "Bash(bash scripts/deploy.sh)"
     ]
   }
 }

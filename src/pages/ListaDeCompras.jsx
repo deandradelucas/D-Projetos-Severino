@@ -438,6 +438,7 @@ export default function ListaDeCompras() {
   // Conta familiar
   const [isMembroConta, setIsMembroConta] = useState(false)
   const [escopoLista, setEscopoLista] = useState('familia') // 'familia' | 'pessoal'
+  const [titularPrimeiroNome, setTitularPrimeiroNome] = useState(null)
 
   const inputRef = useRef(null)
   const menuListaRef = useRef(null)
@@ -517,6 +518,7 @@ export default function ListaDeCompras() {
         if (res.ok) {
           const data = await res.json()
           setIsMembroConta(!!data.isMembroConta)
+          if (data.titularPrimeiroNome) setTitularPrimeiroNome(data.titularPrimeiroNome)
         }
       } catch {
         // silencioso — feature opcional
@@ -728,6 +730,45 @@ export default function ListaDeCompras() {
   }, [listaAtiva, pessoalParam])
 
   // -------------------------------------------------------------------------
+  // Excluir lista permanentemente
+  // -------------------------------------------------------------------------
+
+  const excluirLista = useCallback(async () => {
+    if (!listaAtiva) return
+    setMenuListaAberto(false)
+
+    if (!window.confirm('Excluir lista permanentemente? Todos os itens serão removidos. Esta ação não pode ser desfeita.')) return
+
+    try {
+      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/excluir${pessoalParam}`), {
+        method: 'DELETE',
+        headers: horizonteApiAuthHeaders(),
+        cache: 'no-store',
+      })
+      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        showToast(err.message || 'Erro ao excluir.', 'error')
+        return
+      }
+      showToast('Lista excluída.', 'success')
+      setListas((prev) => {
+        const novasListas = prev.filter((l) => l.id !== listaAtiva)
+        if (novasListas.length > 0) {
+          setListaAtiva(novasListas[0].id)
+          setItens(novasListas[0].itens || [])
+        } else {
+          setListaAtiva(null)
+          setItens([])
+        }
+        return novasListas
+      })
+    } catch {
+      showToast('Erro ao excluir lista.', 'error')
+    }
+  }, [listaAtiva, pessoalParam])
+
+  // -------------------------------------------------------------------------
   // Callback: lista criada
   // -------------------------------------------------------------------------
 
@@ -829,7 +870,7 @@ export default function ListaDeCompras() {
                       onClick={() => setEscopoLista('familia')}
                       aria-pressed={escopoLista === 'familia'}
                     >
-                      👨‍👩‍👧 Família
+                      👨‍👩‍👧 {titularPrimeiroNome || 'Família'}
                     </button>
                     <button
                       type="button"
@@ -911,10 +952,18 @@ export default function ListaDeCompras() {
                           <button
                             type="button"
                             role="menuitem"
-                            className="page-lista-compras__list-dropdown-item page-lista-compras__list-dropdown-item--danger"
+                            className="page-lista-compras__list-dropdown-item"
                             onClick={arquivarLista}
                           >
                             🗄️ Arquivar lista
+                          </button>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            className="page-lista-compras__list-dropdown-item page-lista-compras__list-dropdown-item--danger"
+                            onClick={excluirLista}
+                          >
+                            🗑️ Excluir lista
                           </button>
                         </div>
                       )}
@@ -1137,17 +1186,12 @@ function ItemRow({ item, onToggle, onRemover }) {
 
       <div className="page-lista-compras__item-body">
         <span className="page-lista-compras__item-name">{item.nome}</span>
-        <span className="page-lista-compras__item-meta">
-          <span className="page-lista-compras__item-qty">{Number(item.quantidade)} {item.unidade}</span>
-          {item.preco_estimado != null && Number(item.preco_estimado) > 0 && (
-            <>
-              <span className="page-lista-compras__item-meta-sep">·</span>
-              <span>
-                {formatarMoeda(Number(item.preco_estimado) * Number(item.quantidade || 1))}
-              </span>
-            </>
-          )}
-        </span>
+        <span className="page-lista-compras__item-qty">{Number(item.quantidade)} {item.unidade}</span>
+        {item.preco_estimado != null && Number(item.preco_estimado) > 0 && (
+          <span className="page-lista-compras__item-price">
+            {formatarMoeda(Number(item.preco_estimado) * Number(item.quantidade || 1))}
+          </span>
+        )}
       </div>
 
       <button

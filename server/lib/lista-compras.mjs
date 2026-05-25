@@ -106,6 +106,40 @@ export async function arquivarLista(id, usuarioId) {
 }
 
 /**
+ * Exclui permanentemente uma lista e todos os seus itens.
+ * @param {string} id
+ * @param {string} usuarioId
+ * @returns {Promise<void>}
+ */
+export async function excluirLista(id, usuarioId) {
+  const supabase = getSupabaseAdmin()
+  // Verificar ownership antes de deletar
+  const { data: lista, error: findErr } = await supabase
+    .from('shopping_lists')
+    .select('id')
+    .eq('id', id)
+    .eq('usuario_id', usuarioId)
+    .maybeSingle()
+  if (findErr) throw new Error(findErr.message || 'Erro ao localizar lista.')
+  if (!lista) throw new Error('Lista não encontrada.')
+
+  // Deletar itens primeiro (FK)
+  const { error: itemErr } = await supabase
+    .from('shopping_list_items')
+    .delete()
+    .eq('lista_id', id)
+  if (itemErr) throw new Error(itemErr.message || 'Erro ao remover itens da lista.')
+
+  // Deletar lista
+  const { error } = await supabase
+    .from('shopping_lists')
+    .delete()
+    .eq('id', id)
+    .eq('usuario_id', usuarioId)
+  if (error) throw new Error(error.message || 'Erro ao excluir lista.')
+}
+
+/**
  * @param {string} listaId
  * @param {string} usuarioId
  * @returns {Promise<Array>}

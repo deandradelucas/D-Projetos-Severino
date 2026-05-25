@@ -32,9 +32,24 @@ export function registerFamiliaRoutes(app) {
       const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+
+      let titularPrimeiroNome = null
+      if (parsed.escopo.isMembroConta) {
+        const supabase = getSupabaseAdmin()
+        const { data: titular } = await supabase
+          .from('usuarios')
+          .select('nome')
+          .eq('id', parsed.escopo.dataUsuarioId)
+          .maybeSingle()
+        if (titular?.nome) {
+          titularPrimeiroNome = String(titular.nome).trim().split(' ')[0] || null
+        }
+      }
+
       return c.json({
         isMembroConta: parsed.escopo.isMembroConta,
         familiaPapel: parsed.escopo.familiaPapel,
+        titularPrimeiroNome,
       })
     } catch (error) {
       log.error('familia meu-escopo', error)
