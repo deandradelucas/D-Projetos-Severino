@@ -86,25 +86,3 @@ export async function revokeRefreshToken(plainToken) {
   const supabase = getSupabaseAdmin()
   await supabase.from('refresh_tokens').delete().eq('token_hash', hash)
 }
-
-/**
- * Revoga todos os tokens do usuário (troca de senha, comprometimento de conta).
- */
-export async function revokeAllRefreshTokensForUser(usuarioId) {
-  const uid = String(usuarioId || '').trim()
-  if (!uid) return
-  const supabase = getSupabaseAdmin()
-  await supabase.from('refresh_tokens').delete().eq('usuario_id', uid)
-}
-
-/**
- * Remove tokens expirados da tabela (manutenção — chamar periodicamente).
- */
-export async function purgeExpiredRefreshTokens() {
-  const supabase = getSupabaseAdmin()
-  const { error } = await supabase
-    .from('refresh_tokens')
-    .delete()
-    .lt('expires_at', new Date().toISOString())
-  if (error) log.warn('[refresh-token] purge expirados', error?.message || error)
-}

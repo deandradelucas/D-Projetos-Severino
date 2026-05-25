@@ -10,7 +10,6 @@ import {
 
 // Re-exporta módulos filhos para preservar compatibilidade de imports existentes
 export * from './phone-normalize.mjs'
-export * from './whatsapp-log.mjs'
 export * from './usuarios-admin.mjs'
 
 export async function atualizarTelefoneUsuario(usuarioId, telefoneLimpo) {
@@ -45,17 +44,6 @@ export async function atualizarWhatsappId(usuarioId, whatsappId) {
     .eq('id', usuarioId)
     .is('whatsapp_id', null)
   if (error) log.warn('[atualizarWhatsappId] Erro:', error.message)
-}
-
-export async function vincularWhatsappId(usuarioId, whatsappId) {
-  const supabaseAdmin = getSupabaseAdmin()
-  const digits = String(whatsappId || '').replace(/\D/g, '')
-  if (!digits) throw new Error('whatsapp_id vazio')
-  const { error } = await supabaseAdmin
-    .from('usuarios')
-    .update({ whatsapp_id: digits })
-    .eq('id', usuarioId)
-  if (error) throw error
 }
 
 /**
