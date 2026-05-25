@@ -26,16 +26,20 @@ export function usePwaInstall() {
   useEffect(() => {
     if (installed) return
 
-    const handler = (e) => {
+    const onBeforeInstall = (e) => {
       e.preventDefault()
       setDeferredPrompt(e)
       setCanInstall(true)
     }
+    const onInstalled = () => setInstalled(true)
 
-    window.addEventListener('beforeinstallprompt', handler)
-    window.addEventListener('appinstalled', () => setInstalled(true))
+    window.addEventListener('beforeinstallprompt', onBeforeInstall)
+    window.addEventListener('appinstalled', onInstalled)
 
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onBeforeInstall)
+      window.removeEventListener('appinstalled', onInstalled)
+    }
   }, [installed])
 
   async function install() {
