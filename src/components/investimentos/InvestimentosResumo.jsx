@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import DonutChart from './DonutChart'
 import {
   estimativaRendimentoAcumuladoAteHoje,
   contarDiasUteisComJurosAteYmd,
@@ -18,18 +18,6 @@ function labelTipo(key) {
   if (!key || String(key).trim() === '') return 'Personalizado'
   const k = String(key).toUpperCase()
   return INVESTIMENTOS_PRESETS_LIST.find((p) => p.key === k)?.label ?? k
-}
-
-
-function CustomTooltip({ active, payload }) {
-  if (!active || !payload || !payload.length) return null
-  const { name, value } = payload[0].payload
-  return (
-    <div className="page-investimentos-resumo__tooltip">
-      <p className="page-investimentos-resumo__tooltip-name">{name}</p>
-      <p className="page-investimentos-resumo__tooltip-value">{formatCurrencyBRL(value)}</p>
-    </div>
-  )
 }
 
 export default function InvestimentosResumo({ lista, cdiAa, cdiLoading }) {
@@ -223,41 +211,14 @@ export default function InvestimentosResumo({ lista, cdiAa, cdiLoading }) {
         </dl>
 
         {chartData.length > 0 && (
-          <div className="page-investimentos-resumo__chart" aria-hidden="true">
+          <div className="page-investimentos-resumo__chart">
             <p className="page-investimentos-resumo__chart-title">Alocação por tipo</p>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius="48%"
-                  outerRadius="70%"
-                  paddingAngle={chartData.length > 1 ? 2 : 0}
-                  dataKey="value"
-                  strokeWidth={0}
-                >
-                  {chartData.map((_, i) => (
-                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  iconType="circle"
-                  iconSize={7}
-                  wrapperStyle={{ fontSize: '0.75rem', paddingTop: '8px' }}
-                  formatter={(value, entry) => {
-                    const total = chartData.reduce((s, d) => s + d.value, 0)
-                    const pct = total > 0 ? ((entry.payload.value / total) * 100).toFixed(1) : '0'
-                    return (
-                      <span style={{ color: 'var(--text-secondary, #64748b)', fontWeight: 600 }}>
-                        {value} · {pct}%
-                      </span>
-                    )
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            <DonutChart
+              data={chartData}
+              colors={CHART_COLORS}
+              formatValue={formatCurrencyBRL}
+              legendStyle={{ fontSize: '0.75rem', paddingTop: '8px' }}
+            />
           </div>
         )}
       </div>
