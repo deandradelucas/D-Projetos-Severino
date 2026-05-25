@@ -213,6 +213,29 @@ function IconClock() {
 }
 
 // ---------------------------------------------------------------------------
+// Hook: detecta altura do teclado virtual via visualViewport API
+// ---------------------------------------------------------------------------
+
+function useKeyboardOffset() {
+  const [keyboardH, setKeyboardH] = useState(0)
+  useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+    function update() {
+      const kh = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+      setKeyboardH(kh > 80 ? kh : 0)
+    }
+    vv.addEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+    }
+  }, [])
+  return keyboardH
+}
+
+// ---------------------------------------------------------------------------
 // Componente shimmer
 // ---------------------------------------------------------------------------
 
@@ -234,6 +257,9 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
   const [nome, setNome] = useState('')
   const [salvando, setSalvando] = useState(false)
   const inputRef = useRef(null)
+  const keyboardH = useKeyboardOffset()
+  /** Quando o teclado mobile abre, ancora o modal embaixo para o input ficar visível. */
+  const overlayStyle = keyboardH > 0 ? { alignItems: 'flex-end', paddingBottom: keyboardH + 8 } : undefined
 
   useEffect(() => { inputRef.current?.focus() }, [])
 
@@ -267,7 +293,7 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
   }
 
   return (
-    <div className="page-lista-compras__modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="page-lista-compras__modal-overlay" style={overlayStyle} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-nova-lista-titulo">
         <div className="page-lista-compras__modal-header">
           <h2 id="modal-nova-lista-titulo" className="page-lista-compras__modal-title">Nova lista</h2>
@@ -491,8 +517,9 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
               id="item-qty"
               className="page-lista-compras__modal-input page-lista-compras__modal-input--qty"
               type="number"
+              inputMode="decimal"
               min="0.1"
-              step="1"
+              step="any"
               value={quantidade}
               onChange={(e) => { const v = parseFloat(e.target.value); if (!isNaN(v) && v > 0) setQuantidade(v) }}
             />
