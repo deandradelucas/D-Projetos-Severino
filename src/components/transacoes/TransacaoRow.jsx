@@ -5,6 +5,14 @@ import { formatCurrencyBRL } from '../../lib/formatCurrency'
 import { formatTransacaoListDateTime } from '../../lib/transacaoDateDisplay'
 import { transacaoDescricaoEfetiva } from '../../lib/transacaoUtils'
 
+const ParcelamentoIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
+    <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
+    <path d="M6 15h4M14 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
 /**
  * Renderiza uma linha individual da lista de transações.
  *
@@ -25,7 +33,10 @@ export function TransacaoRow({ t, mostrarQuemLancou, privacyMode, onEdit, onDele
       ? String(subRaw.nome).trim()
       : '—'
   const valorAbs = Math.abs(parseFloat(t.valor) || 0)
-  const mostraIconeRecorrente = Boolean(t.recorrencia_mensal_id) || Boolean(t.recorrente_index)
+  const isParcela = Boolean(t.recorrente_index)
+  const isRecorrente = !isParcela && Boolean(t.recorrencia_mensal_id)
+  const mostraIconeRecorrente = isParcela || isRecorrente
+  const isPendente = t.status === 'PENDENTE'
   const descricaoExibir = transacaoDescricaoEfetiva(t)
 
   return (
@@ -48,6 +59,9 @@ export function TransacaoRow({ t, mostrarQuemLancou, privacyMode, onEdit, onDele
           <span className="ref-tx-desc" title={descricaoExibir}>
             {descricaoExibir}
           </span>
+        ) : null}
+        {isPendente ? (
+          <span className="ref-tx-pendente-chip" aria-label="Parcela futura pendente">Pendente</span>
         ) : null}
         {mostrarQuemLancou && t.lancado_por_nome ? (
           <span className={`ref-tx-lancador ${privacyMode ? 'privacy-blur' : ''}`} title="Quem registrou este lançamento">
@@ -86,10 +100,13 @@ export function TransacaoRow({ t, mostrarQuemLancou, privacyMode, onEdit, onDele
         {mostraIconeRecorrente ? (
           <span
             className="ref-tx-recorrencia-ico-wrap"
-            title="Lançamento recorrente"
-            aria-label="Lançamento recorrente"
+            title={isParcela ? `Parcelamento ${t.recorrente_index}/${t.recorrente_total}` : 'Lançamento recorrente'}
+            aria-label={isParcela ? `Parcela ${t.recorrente_index} de ${t.recorrente_total}` : 'Lançamento recorrente'}
           >
-            <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
+            {isParcela
+              ? <ParcelamentoIcon />
+              : <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
+            }
           </span>
         ) : null}
       </div>
