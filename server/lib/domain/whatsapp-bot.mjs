@@ -212,7 +212,7 @@ const AJUDA =
 
 // Detecta saudações isoladas: "Olá", "Oi", "Bom dia", "Salve", "Opa", etc.
 const BOA_VINDAS_RE =
-  /^(ol[aá]|oi+|e\s*a[ií]|bom\s+dia|boa\s+tarde|boa\s+noite|boa|bom|tudo\s+(bem|bom|certo|ok)|como\s+(vai|vc\s+vai|voce\s+vai|est[aá])|hey|hello|hi|salve+|opa|fala|al[oô]|boas|eae|eai|ol[aá]\s+tudo|bom\s+dia\s+severino|boa\s+tarde\s+severino|boa\s+noite\s+severino|ol[aá]\s+severino|oi\s+severino)[\s!?.,🙂😊🖐👋]*$/i
+  /^(ol[aá]|oi+|e\s*a[ií]|bom\s+dia|boa\s+tarde|boa\s+noite|boa|bom|tudo\s+(bem|bom|certo|ok)|como\s+(vai|vc\s+vai|voce\s+vai|est[aá])|hey|hello|hi|salve+|opa|fala|al[oô]|boas|eae|eai|ol[aá]\s+tudo|bom\s+dia\s+severino|boa\s+tarde\s+severino|boa\s+noite\s+severino|ol[aá]\s+severino|oi\s+severino)[\s!?.,🙂😊🖐👋]*$/iu
 
 function buildTutorialBoasVindas(nome) {
   return (

@@ -8,9 +8,11 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
   const searchInputRef          = useRef(null)
   const [dropPos, setDropPos]   = useState(null)
 
-  // Calcula posição do dropdown com base no trigger
+  // Calcula posição do dropdown com base no trigger.
+  // Quando isOpen=false o markup não renderiza o dropdown, então deixar
+  // dropPos com valor antigo é benigno e evita setState dentro do effect.
   useEffect(() => {
-    if (!isOpen) { setDropPos(null); return }
+    if (!isOpen) return
     const update = () => {
       if (!triggerRef.current) return
       const r = triggerRef.current.getBoundingClientRect()

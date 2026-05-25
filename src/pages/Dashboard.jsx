@@ -23,7 +23,8 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon'
 import PwaInstallBanner from '../components/PwaInstallBanner'
 import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
-import TutorialDashboard, { tutorialDashboardFoiVisto } from '../components/onboarding/TutorialDashboard'
+import TutorialDashboard from '../components/onboarding/TutorialDashboard'
+import { tutorialDashboardFoiVisto } from '../components/onboarding/tutorialDashboardState'
 
 export default function Dashboard() {
   const location = useLocation()
