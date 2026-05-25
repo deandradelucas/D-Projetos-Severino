@@ -81,27 +81,42 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   }
 }
 
-/* Marca no shell: fundo transparente — sem retângulo atrás da arte; usa o próprio cartão da sidebar (claro/escuro). */
+/* Marca no shell: fundo transparente — sem retângulo atrás da arte; usa o próprio cartão da sidebar.
+   Os PNGs (Severino Tema Claro 1009×382 e Tema Escuro 1536×1024) trazem
+   tagline "Finanças e agenda sob controle" + ícones decorativos abaixo do
+   wordmark. Recortamos só a faixa superior (símbolo + Severino) com
+   object-fit: cover + object-position: center top. As duas imagens têm
+   proporções diferentes, então cada tema tem seu próprio aspect-ratio
+   calibrado para o ponto onde a tagline começa. */
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
   width: auto !important;
-  object-fit: contain !important;
   flex: 0 1 auto !important;
   background-color: transparent !important;
   border-radius: 0 !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+}
+
+/* Tema claro: PNG 1009×382, conteúdo principal vai do topo até ~y=215 (antes da linha decorativa). */
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+  aspect-ratio: 1009 / 215 !important;
+}
+
+/* Tema escuro: PNG 1536×1024 (mais quadrado, com padding generoso); conteúdo
+   principal vai do topo até ~y=590 (antes da linha decorativa + tagline). */
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
+  aspect-ratio: 1536 / 590 !important;
 }
 
 @media (min-width: 769px) {
-  /* Mesma caixa claro/escuro — PNG horizontal: escala pela largura, sem letterboxing vertical. */
+  /* Desktop: ~22% menor que antes (244 → 190). */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    width: min(100%, 244px) !important;
+    width: min(100%, 190px) !important;
     max-width: 100% !important;
-    height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    object-fit: contain !important;
-    object-position: left center !important;
     transform: none !important;
   }
 
@@ -111,15 +126,13 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-l
 }
 
 @media (max-width: 768px) {
+  /* Mobile: ~24% menor que antes (222 → 168). */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    width: min(100%, 222px) !important;
+    width: min(100%, 168px) !important;
     max-width: 100% !important;
-    height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    object-fit: contain !important;
-    object-position: center center !important;
     transform: none !important;
   }
 
