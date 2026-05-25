@@ -33,12 +33,7 @@ export default function Dashboard() {
   const [usuario, setUsuario] = useState(() => readHorizonteUserPainelState())
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  // TEST: forçar tutorial para lukas.andrd@gmail.com — remover após aprovação
-  const [showTutorial, setShowTutorial] = useState(() => {
-    const u = readHorizonteUser()
-    if (u?.email === 'lukas.andrd@gmail.com') return true
-    return !tutorialDashboardFoiVisto()
-  })
+  const [showTutorial, setShowTutorial] = useState(() => !tutorialDashboardFoiVisto())
 
   // Consome a store de cache compartilhada — sem fetch local duplicado
   const {
