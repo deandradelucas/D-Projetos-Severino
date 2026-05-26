@@ -704,7 +704,10 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   animation: slideUpFooter 0.2s ease;
 }
 
-/* Sem preço: apenas o botão "Novo item" centralizado, sem grid. */
+/* Sem preço: apenas o botão "Novo item" centralizado, sem grid.
+   Ignora o offset do sidebar (left/right = 0) para ficar realmente
+   centralizado na viewport, evitando descolar caso a variável de
+   largura do sidebar mude. */
 .page-lista-compras__footer--solo {
   display: flex;
   justify-content: center;
@@ -712,6 +715,8 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   background: transparent;
   box-shadow: none;
   padding: 0 16px;
+  left: 0;
+  right: 0;
 }
 
 .page-lista-compras__footer .page-lista-compras__total {
@@ -760,7 +765,15 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 
 @media (min-width: 769px) {
   .page-lista-compras__footer {
-    left: var(--sidebar-width, 260px);
+    left: var(--app-sidebar-width, var(--sidebar-width, 260px));
+  }
+
+  /* Estado solo: respeita o offset do sidebar mas continua flex-center,
+     resultando no botão "+ Novo item" centralizado na área de conteúdo
+     (depois do sidebar). */
+  .page-lista-compras__footer--solo {
+    left: var(--app-sidebar-width, var(--sidebar-width, 260px));
+    right: 0;
   }
 }
 

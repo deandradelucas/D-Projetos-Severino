@@ -56,7 +56,7 @@ export const DESPESA_RULES = [
   { re: /mercearia|emporio\b|minimercado|conveniencia\b|conveniência\b/i, categoriaNome: 'Alimentação', subLabels: ['Mercearia', 'Conveniência'] },
   { re: /cesta\s*basica|cesta\s*básica/i, categoriaNome: 'Alimentação', subLabels: ['Cesta Básica', 'Supermercado'] },
   // ── Transporte ────────────────────────────────────────────────────────────
-  { re: /combust|gasolina|etanol|posto|diesel|shell|ipiranga|petrobras/i, categoriaNome: 'Transporte', subLabels: ['Combustível'] },
+  { re: /combust|gasolina|etanol|posto|diesel|shell|ipiranga|petrobras|abasteci|botei\s*gasolina|coloquei\s*gasolina|coloquei\s*combust/i, categoriaNome: 'Transporte', subLabels: ['Combustível'] },
   { re: /\buber\b|\b99\b(?!\s*food)|taxi|táxi|cabify|indriver|bolt\b|99pop/i, categoriaNome: 'Transporte', subLabels: ['App de Transporte (Uber, 99)', 'Táxi'] },
   { re: /onibus|ônibus|metro|metrô|vlt|bilhete unico|integracao/i, categoriaNome: 'Transporte', subLabels: ['Transporte Público'] },
   { re: /estaciona|zona azul/i, categoriaNome: 'Transporte', subLabels: ['Estacionamento'] },
@@ -106,7 +106,7 @@ export const DESPESA_RULES = [
   { re: /intercambio\b|intercâmbio\b|exchange\b/i, categoriaNome: 'Educação', subLabels: ['Intercâmbio'] },
   { re: /aula\s*particular|professor\s*particular|reforco\b|reforço\b/i, categoriaNome: 'Educação', subLabels: ['Aulas Particulares'] },
   // ── Lazer e Entretenimento ────────────────────────────────────────────────
-  { re: /netflix|spotify|prime video|disney\+|hbo|globoplay|assinatura/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Assinaturas (Netflix, Spotify, etc)', 'Streaming de Vídeo', 'Streaming de Música'] },
+  { re: /netflix|spotify|prime\s*video|disney\+|hbo\b|\bmax\b|paramount|apple\s*tv|star\+|crunchyroll|globoplay|assinatura/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Assinaturas (Netflix, Spotify, etc)', 'Streaming de Vídeo', 'Streaming de Música'] },
   { re: /cinema|show\b|teatro|ingresso.*show/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Cinema, Shows e Teatro'] },
   { re: /bar\b|balada|cervejaria/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Bares e Baladas'] },
   { re: /poker|apostas?|bingo|cassino|loteria\b|\bbet\b|betano|pixbet|blaze\b|roleta|sportingbet|esport.*aposta|aposta.*esport/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Jogos e Hobbies'] },
@@ -118,7 +118,7 @@ export const DESPESA_RULES = [
   { re: /guitarra\b|violao\b|violão\b|teclado\b(?!.*computador|.*not[eo]book)|bateria\b(?!.*carro|.*veiculo)|piano\b|flauta\b|instrumento\s*musical/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Instrumentos Musicais'] },
   { re: /deezer\b|tidal\b|apple\s*music|streaming.*musica/i, categoriaNome: 'Lazer e Entretenimento', subLabels: ['Streaming de Música', 'Assinaturas (Netflix, Spotify, etc)'] },
   // ── Cuidados Pessoais ─────────────────────────────────────────────────────
-  { re: /salao|salão|barbearia|cabelo|manicure/i, categoriaNome: 'Cuidados Pessoais', subLabels: ['Salão de Beleza / Barbearia'] },
+  { re: /salao|salão|barbearia|cabelo|manicure|\bbarba\b|cortei.*cabelo|aparei.*cabelo|fiz.*barba|aparei.*barba/i, categoriaNome: 'Cuidados Pessoais', subLabels: ['Salão de Beleza / Barbearia'] },
   { re: /roupa|camisa|calca|calça|tenis|tênis|vestuario/i, categoriaNome: 'Cuidados Pessoais', subLabels: ['Vestuário (Roupas do Dia a Dia)', 'Sapatos e Tênis'] },
   { re: /maquiagem|batom\b|blush\b|rimmel|rimel|primer\b.*rosto|base\b.*maquiagem|sombra\b.*olho/i, categoriaNome: 'Cuidados Pessoais', subLabels: ['Maquiagem', 'Cosméticos e Perfumaria'] },
   { re: /perfume\b|colonia\b|eau\s*de/i, categoriaNome: 'Cuidados Pessoais', subLabels: ['Perfumes', 'Cosméticos e Perfumaria'] },
@@ -167,6 +167,7 @@ export const DESPESA_RULES = [
   { re: /impressora\b|cartucho\b|toner\b(?!.*skincare)|papel.*impressora/i, categoriaNome: 'Tecnologia e Gadgets', subLabels: ['Impressora e Suprimentos'] },
   { re: /alexa\b|google\s*home|casa\s*inteligente|smart\s*home|lampada\s*inteligente/i, categoriaNome: 'Tecnologia e Gadgets', subLabels: ['Casa Inteligente'] },
   // ── Serviços e Assinaturas ────────────────────────────────────────────────
+  { re: /recarga\s*(de\s*)?(celular|tim|claro|vivo|oi\b|nextel)|coloquei\s*(crédito|credito)\s*(no|do)?\s*cel|coloquei\s*crédito\s*no\s*cel|recarga\s*tel/i, categoriaNome: 'Serviços e Assinaturas', subLabels: ['Telefone / Celular'] },
   { re: /telefone|plano.*celular|nuvem|icloud|google drive|dropbox|antivirus|antivírus|correios|entrega|diarista|faxina|advogado/i, categoriaNome: 'Serviços e Assinaturas', subLabels: ['Telefone / Celular', 'Armazenamento em Nuvem', 'Antivírus / Segurança Digital', 'Correios e Entregas', 'Diarista / Faxina', 'Advogado / Serviços Jurídicos'] },
   { re: /contador\b|contabilidade\b|contabil\b/i, categoriaNome: 'Serviços e Assinaturas', subLabels: ['Contador Pessoal'] },
   { re: /manutencao\s*equipamento|conserto\b(?!.*celular|.*computador)|reparo\b/i, categoriaNome: 'Serviços e Assinaturas', subLabels: ['Manutenção de Equipamentos'] },
