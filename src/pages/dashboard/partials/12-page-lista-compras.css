@@ -730,8 +730,8 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 
 @media (max-width: 768px) {
   .page-lista-compras__footer {
-    /* Acima da nav-bottom mobile + safe-area. */
-    bottom: calc(var(--lista-mobile-nav-height) + max(8px, var(--safe-bottom, 0px)));
+    /* Acima da nav-bottom mobile, encostado (sem gap visual). */
+    bottom: calc(var(--lista-mobile-nav-height) + var(--safe-bottom, 0px));
   }
 }
 
