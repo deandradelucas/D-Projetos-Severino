@@ -999,6 +999,7 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   justify-content: center;
   padding: 16px;
   animation: overlayFadeIn 0.18s ease;
+  transition: padding-bottom 0.2s ease, align-items 0.2s ease;
 }
 
 @keyframes overlayFadeIn {
