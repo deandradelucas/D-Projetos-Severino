@@ -692,11 +692,12 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
    --------------------------------------------------------------------------- */
 .page-lista-compras__footer {
   position: fixed;
-  bottom: calc(var(--lista-fab-bottom) + 2px);
+  /* Cola o footer acima do FAB com gap pequeno (margem-FAB 20px + altura-FAB ~50px + 8px de gap). */
+  bottom: 78px;
   left: 0;
   right: 0;
   z-index: 74;
-  padding: 10px 16px;
+  padding: 8px 16px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -709,7 +710,8 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 
 @media (max-width: 768px) {
   .page-lista-compras__footer {
-    bottom: calc(var(--lista-mobile-nav-height) + var(--lista-fab-bottom) + 4px);
+    /* Mobile: barra de navegação + margem-FAB (12) + altura-FAB (~50) -16 = nav + 46. */
+    bottom: calc(var(--lista-mobile-nav-height) + 46px);
   }
 }
 
