@@ -1,7 +1,7 @@
 import { log } from '../logger.mjs'
 import { buscarUsuarioPorTelefone } from '../usuarios.mjs'
 import { getCategorias, inserirTransacao } from '../transacoes.mjs'
-import { askHorizon, parseWhatsAppMessageWithAI } from '../ai.mjs'
+import { askHorizon, parseWhatsAppMessageWithAI, parseWhatsAppAudioDirectWithAI } from '../ai.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
 import { isListaComprasMessage, processarMensagemListaCompras } from './lista-compras-whatsapp.mjs'
@@ -267,10 +267,11 @@ function formatAssistantReplyForWhatsApp(text) {
 
 /**
  * Ponto central do bot — recebe telefone + mensagem bruta do n8n e retorna o texto de resposta.
+ * options.audioBytes + options.mimeHint: áudio raw; usa parse combinado (áudio → JSON direto).
  */
-export async function processarMensagemBot(phone, rawMessage) {
+export async function processarMensagemBot(phone, rawMessage, options = {}) {
   const message = String(rawMessage || '').trim()
-  if (!message) return { ok: false, reply: '❌ Mensagem vazia.' }
+  if (!message && !options.audioBytes) return { ok: false, reply: '❌ Mensagem vazia.' }
 
   // 1. Resolve usuário pelo telefone
   let usuario
@@ -381,22 +382,29 @@ export async function processarMensagemBot(phone, rawMessage) {
 
   let parsed
   try {
-    parsed = await parseWhatsAppMessageWithAI(message, categorias)
+    if (options.audioBytes) {
+      // Combinado: áudio → JSON em um único call (sem transcrição separada)
+      parsed = await parseWhatsAppAudioDirectWithAI(options.audioBytes, options.mimeHint || '', categorias)
+    } else {
+      parsed = await parseWhatsAppMessageWithAI(message, categorias)
+    }
   } catch (e) {
-    log.error('[whatsapp-bot] parseWhatsAppMessageWithAI error', e)
+    log.error('[whatsapp-bot] parse IA error', e)
     return { ok: false, reply: '⚠️ Não consegui processar sua mensagem agora. Tente novamente.' }
   }
 
-  // 4. Conversa — mesmo motor do Severino IA no app (contexto financeiro + agenda)
+  // 4. Conversa — para áudio usa resposta direta da IA (não há texto transcrito disponível)
   if (parsed.tipo === 'CHAT') {
-    try {
-      const full = await askHorizon(message, dataUsuarioId, [], usuario.nome || null)
-      return { ok: true, reply: formatAssistantReplyForWhatsApp(full) }
-    } catch (e) {
-      log.warn('[whatsapp-bot] askHorizon (WhatsApp CHAT)', e?.message || e)
-      const resposta = parsed.resposta || AJUDA
-      return { ok: true, reply: formatAssistantReplyForWhatsApp(resposta) }
+    if (!options.audioBytes) {
+      try {
+        const full = await askHorizon(message, dataUsuarioId, [], usuario.nome || null)
+        return { ok: true, reply: formatAssistantReplyForWhatsApp(full) }
+      } catch (e) {
+        log.warn('[whatsapp-bot] askHorizon (WhatsApp CHAT)', e?.message || e)
+      }
     }
+    const resposta = parsed.resposta || AJUDA
+    return { ok: true, reply: formatAssistantReplyForWhatsApp(resposta) }
   }
 
   // 5. Validação mínima
