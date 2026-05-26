@@ -13,6 +13,7 @@ import { useTheme } from '../context/ThemeContext'
 import { useConfigWebAuthn } from '../hooks/useConfigWebAuthn'
 import { apiUrl } from '../lib/apiUrl'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { redirectSe401 } from '../lib/authRedirect'
 import { montarTextoConviteFamiliaComPwa } from '../lib/familiaConviteMensagemCompartilhavel'
 import { getPublicAppOriginForConvites } from '../lib/publicAppOrigin'
 import { formatPhoneBRDisplay, maskPhoneBRMobile, validatePhoneBRMobile } from '../lib/formatPhoneBR'
@@ -115,6 +116,7 @@ export default function Configuracoes() {
     setFamiliaLoadErr(null)
     try {
       const resM = await fetch(apiUrl('/api/familia/membros'), { headers: horizonteApiAuthHeaders() })
+      if (redirectSe401(resM)) return
       if (resM.status === 403) {
         setFamiliaTitular(false)
         setFamiliaMembros([])
@@ -198,6 +200,7 @@ export default function Configuracoes() {
         body: JSON.stringify({ telefone: check.digits }),
       })
       const data = await res.json().catch(() => ({}))
+      if (redirectSe401(res)) return
       if (!res.ok) {
         showToast(data.message || 'Não foi possível atualizar o telefone.')
         return
@@ -282,6 +285,7 @@ export default function Configuracoes() {
         body: JSON.stringify({ papel: novoConvitePapel }),
       })
       const data = await res.json().catch(() => ({}))
+      if (redirectSe401(res)) return
       if (!res.ok) {
         showToast(data.message || 'Não foi possível criar o convite.')
         return
@@ -306,6 +310,7 @@ export default function Configuracoes() {
           headers: horizonteApiAuthHeaders(),
         })
         const data = await res.json().catch(() => ({}))
+        if (redirectSe401(res)) return
         if (!res.ok) {
           showToast(data.message || 'Não foi possível remover o convite.')
           return
@@ -340,6 +345,7 @@ export default function Configuracoes() {
           headers: horizonteApiAuthHeaders(),
         })
         const data = await res.json().catch(() => ({}))
+        if (redirectSe401(res)) return
         if (!res.ok) {
           showToast(data.message || 'Não foi possível remover.')
           return
@@ -352,6 +358,7 @@ export default function Configuracoes() {
           headers: horizonteApiAuthHeaders(),
         })
         const data = await res.json().catch(() => ({}))
+        if (redirectSe401(res)) return
         if (!res.ok) {
           showToast(data.message || 'Não foi possível sair.')
           return
