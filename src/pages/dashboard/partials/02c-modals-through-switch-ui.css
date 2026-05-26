@@ -735,6 +735,17 @@ body[data-theme='light'] .parcelamento-preview.parcelamento-preview--hint {
   text-align: center;
 }
 
+/* Variante para input type="date": precisa exibir "dd/mm/aaaa" + ícone do
+   calendário, então ocupa o espaço disponível em vez de uma largura fixa.
+   Sem isso, no mobile só "mm" + ícone aparecem (largura 72px insuficiente). */
+.rec-vezes-row__input--date {
+  width: auto !important;
+  max-width: 220px !important;
+  flex: 1 1 auto;
+  min-width: 150px;
+  text-align: left;
+}
+
 body[data-theme='light'] .rec-vezes-row {
   background: #f8fafc;
   border-color: var(--pf-line-soft, rgba(226, 232, 240, 0.95));

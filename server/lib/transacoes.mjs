@@ -380,8 +380,11 @@ export async function getTransacoes(usuarioId, filters = {}) {
     if (busca) query = query.ilike('descricao', `%${busca}%`)
 
     if (somenteParceladas) {
-      /* Filtro explícito: só parcelas de compras parceladas */
-      query = query.not('recorrente_grupo_id', 'is', null)
+      /* Filtro explícito: parcelas de compras parceladas + recorrências
+       * mensais sem prazo (assinatura/stream lançada via "Prazo indeterminado").
+       * Ambos os modelos representam compras que se desdobram em vários
+       * pagamentos no tempo, então os agrupamos na mesma aba. */
+      query = query.or('recorrente_grupo_id.not.is.null,recorrencia_mensal_id.not.is.null')
     } else if (somenteRecorrentes) {
       /* Recorrentes: parcelas + regras mensais */
       query = query.or('recorrencia_mensal_id.not.is.null,recorrente_grupo_id.not.is.null')
