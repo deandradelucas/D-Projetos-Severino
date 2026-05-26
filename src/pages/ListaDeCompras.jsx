@@ -541,6 +541,8 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando, itemEditando
   const [sugestoes, setSugestoes] = useState([])
   const [showAuto, setShowAuto] = useState(false)
   const inputRef = useRef(null)
+  const keyboardH = useKeyboardOffset()
+  const overlayStyle = keyboardH > 0 ? { alignItems: 'flex-end', paddingBottom: keyboardH + 8 } : {}
 
   useEffect(() => { inputRef.current?.focus() }, [])
 
@@ -583,7 +585,7 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando, itemEditando
   const subtotal = precoNum != null ? precoNum * unidadesNum : null
 
   return (
-    <div className="page-lista-compras__modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="page-lista-compras__modal-overlay" style={overlayStyle} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-novo-item-titulo">
         <div className="page-lista-compras__modal-header">
           <h2 id="modal-novo-item-titulo" className="page-lista-compras__modal-title">
