@@ -91,6 +91,12 @@ export function validateNovaTransacaoBody(body) {
     if (!Number.isFinite(n) || !Number.isInteger(n) || n < 2 || n > 120) {
       return { ok: false, message: 'Parcelamento: número de parcelas deve ser entre 2 e 120.' }
     }
+    const dp = body.parcelamento.data_pagamento
+    if (dp != null && String(dp).trim() !== '') {
+      if (Number.isNaN(Date.parse(String(dp)))) {
+        return { ok: false, message: 'Parcelamento: data de pagamento inválida.' }
+      }
+    }
     const rawDia1 = body.recorrencia_dia_1
     const temRecorrencia = rawDia1 === true || rawDia1 === 'true' || rawDia1 === 1 || rawDia1 === '1'
     if (temRecorrencia) {

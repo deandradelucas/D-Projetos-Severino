@@ -382,21 +382,55 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
 
                     {formData.parcelado && (
                       <div className="rec-sub-opts slide-down">
+                        {!formData.prazo_indeterminado && (
+                          <div className="rec-vezes-row">
+                            <label htmlFor="tx-num-parcelas" className="rec-vezes-row__label">
+                              Número de parcelas
+                            </label>
+                            <input
+                              id="tx-num-parcelas"
+                              type="number"
+                              min="2"
+                              max="120"
+                              value={formData.num_parcelas}
+                              onChange={(e) => setFormData((prev) => ({ ...prev, num_parcelas: e.target.value }))}
+                              className="input-premium rec-vezes-row__input"
+                            />
+                          </div>
+                        )}
+                        <label htmlFor="tx-prazo-indeterminado" className="rec-vezes-row rec-vezes-row--toggle">
+                          <span className="rec-vezes-row__label">Prazo indeterminado</span>
+                          <input
+                            id="tx-prazo-indeterminado"
+                            type="checkbox"
+                            checked={formData.prazo_indeterminado}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, prazo_indeterminado: e.target.checked }))}
+                            className="modal-recorrencia-toggle-row__checkbox"
+                          />
+                        </label>
                         <div className="rec-vezes-row">
-                          <label htmlFor="tx-num-parcelas" className="rec-vezes-row__label">
-                            Número de parcelas
+                          <label htmlFor="tx-data-pagamento" className="rec-vezes-row__label">
+                            Data de pagamento
                           </label>
                           <input
-                            id="tx-num-parcelas"
-                            type="number"
-                            min="2"
-                            max="120"
-                            value={formData.num_parcelas}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, num_parcelas: e.target.value }))}
+                            id="tx-data-pagamento"
+                            type="date"
+                            value={formData.data_pagamento}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, data_pagamento: e.target.value }))}
                             className="input-premium rec-vezes-row__input"
                           />
                         </div>
-                        {valorParcela && (
+                        <p className="parcelamento-preview parcelamento-preview--hint">
+                          {formData.prazo_indeterminado
+                            ? 'Assinatura/stream sem fim: desconta esse valor todo mês até cancelar.'
+                            : 'Vencimento da 1ª parcela. Se vazio, usa a data da transação.'}
+                        </p>
+                        {formData.prazo_indeterminado && valorNum > 0 && (
+                          <p className="parcelamento-preview">
+                            Mensal · {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valorNum)} · sem prazo
+                          </p>
+                        )}
+                        {!formData.prazo_indeterminado && valorParcela && (
                           <p className="parcelamento-preview">
                             {numParcelas}x de {valorParcela} · total {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valorNum)}
                           </p>
