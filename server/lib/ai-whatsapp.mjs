@@ -18,6 +18,27 @@ import {
 
 const MAX_WHATSAPP_AUDIO_BYTES = 20 * 1024 * 1024
 
+/** Retorna data e hora atual no fuso de São Paulo, formatada em português. */
+function dataHoraAtualSP() {
+  try {
+    const now = new Date()
+    const partes = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).formatToParts(now)
+    const p = Object.fromEntries(partes.map((x) => [x.type, x.value]))
+    return `${p.weekday}, ${p.day} de ${p.month} de ${p.year} às ${p.hour}:${p.minute} (horário de Brasília)`
+  } catch {
+    return new Date().toISOString()
+  }
+}
+
 function looksLikeNonBinaryAudioPayload(buf) {
   if (!buf?.length) return false
   const head = buf.subarray(0, Math.min(buf.length, 120)).toString('utf8').trimStart()
@@ -68,11 +89,19 @@ export async function transcribeWhatsAppAudioWithGemini(audioBytes, mimeHint = '
   const b64 = buf.toString('base64')
 
   const instruction =
-    'Transcreve integralmente o áudio em português brasileiro. ' +
-    'Contexto: assistente financeiro pessoal — o usuário provavelmente menciona valores monetários ("dois mil reais", "R$ 500", "trezentos e vinte"), compras ou despesas. ' +
-    'Transcreva valores monetários com precisão, mantendo exatamente as palavras ditas (ex.: "dois mil reais", não "2000 reais"). ' +
-    'Devolve apenas o texto ditado pelo utilizador, sem comentários, sem rótulos como "Transcrição:" ou "O utilizador disse". ' +
-    'Se não houver fala inteligível, devolve exatamente: (silêncio)'
+    'Você é um transcritor de áudio para um assistente financeiro pessoal brasileiro chamado Severino. ' +
+    'Transcreva integralmente o áudio em português brasileiro com máxima fidelidade às palavras ditas. ' +
+    'CONTEXTO: o usuário provavelmente menciona ' +
+    'valores monetários ("vinte e cinco reais", "R$ 300", "dois mil e quinhentos", "oitenta e nove vírgula noventa", "cinco e vinte"), ' +
+    'ações financeiras ("paguei", "gastei", "comprei", "recebi", "entrou na conta", "caiu", "mandei pix", "transferi", "tomei um uber"), ' +
+    'e estabelecimentos ou serviços (mercado, farmácia, padaria, Uber, iFood, Rappi, Netflix, academia, salão, Smart Fit, Drogasil, Pão de Açúcar). ' +
+    'REGRAS OBRIGATÓRIAS: ' +
+    '(1) Transcreva EXATAMENTE as palavras ditas, sem corrigir gramática ou interpretar intenção. ' +
+    '(2) Preserve nomes de marcas como pronunciados: "iFood", "Smart Fit", "Drogasil", "Pão de Açúcar", "Mc Donalds". ' +
+    '(3) Mantenha valores verbais literalmente: "dois e cinquenta" permanece "dois e cinquenta", não "2,50". ' +
+    '(4) Se houver ruído de fundo mas a fala for inteligível, transcreva apenas a fala. ' +
+    '(5) Retorne APENAS o texto transcrito, sem prefixos como "Transcrição:" ou comentários adicionais. ' +
+    'Se não houver fala inteligível, retorne exatamente: (silêncio)'
 
   const mimes = uniqueMimeCandidates(buf, mimeHint)
   const models = resolveGeminiModelCandidates()
@@ -137,42 +166,75 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
 
-  const catMap = categoriasUsuario.map(c =>
-    `Categoria: "${c.nome}" (Tipo: ${c.tipo}, ID: ${c.id}) | Subcategorias: ${c.subcategorias.map(s => `"${s.nome}" (ID: ${s.id})`).join(', ')}`
-  ).join('\n')
+  const catMap = categoriasUsuario.map((c) => {
+    const subs = c.subcategorias.map((s) => `    • "${s.nome}" → ID: ${s.id}`).join('\n')
+    return `▸ ${c.tipo} | Categoria: "${c.nome}" → ID: ${c.id}\n${subs}`
+  }).join('\n')
 
-  const systemPrompt = `Você é um robô de extração financeira de alta precisão e assistente pessoal.
-Sua tarefa é analisar mensagens (texto ou áudio) e decidir se são uma TRANSAÇÃO FINANCEIRA ou apenas uma CONVERSA/CHAT.
+  const dataAtual = dataHoraAtualSP()
 
-REGRAS OBRIGATÓRIAS:
-1. Se for TRANSAÇÃO (gasto ou receita):
-   - Identifique o TIPO: "DESPESA" ou "RECEITA".
-   - Identifique o VALOR: número decimal puro, sem separadores (ex.: 2000, 1500.50). Formatos aceitos:
-     * Separador de milhar BR: "R$ 2.000" → 2000 (NÃO 2.0), "R$ 1.500,50" → 1500.50. O ponto em "2.000" é milhar, NÃO decimal.
-     * Verbais simples: "cinquenta reais" → 50, "trinta" → 30.
-     * Verbais compostos: "dois mil" → 2000, "três mil e quinhentos" → 3500, "dois mil e duzentos reais" → 2200.
-   - Identifique a DESCRIÇÃO: curta e clara (do que se trata o lançamento).
-   - Mapeie para as CATEGORIAS fornecidas usando os IDs exatos. Prefira SUBCATEGORIA quando o texto for específico (ex.: Uber → transporte por app; iFood → alimentação delivery).
-   - OBRIGATÓRIO: SEMPRE informe categoria_id e subcategoria_id quando for DESPESA ou RECEITA — mesmo que o contexto seja incomum (poker, apostas, hobby, presente, etc.). Escolha a categoria e subcategoria MAIS PRÓXIMAS do contexto. NUNCA retorne categoria_id como null para transações.
-   - Opcional: "data_transacao" em ISO 8601 completo se o usuário mencionar QUANDO ocorreu ("hoje às 14h", "ontem", "dia 15/03 às 9h", "amanhã de manhã"). Use o fuso America/Sao_Paulo. Se não houver menção de data/hora, use null.
-2. Se NÃO for transação (ex: comentários, perguntas, saudações, filosofia):
-   - Identifique o TIPO como "CHAT".
-   - Crie uma RESPOSTA curta, inteligente e amigável na voz do "Severino" (só usada se o servidor não puder chamar o assistente completo).
-   - Deixe valor, categoria_id, subcategoria_id e data_transacao como null.
-3. Retorne APENAS o bloco JSON puro.
+  const systemPrompt = `Você é o Severino, assistente financeiro pessoal. Analise a mensagem e extraia os dados de transação OU identifique como conversa.
 
-DADOS DO USUÁRIO PARA MAPEAR:
-${catMap || 'O usuário não tem categorias configuradas.'}
+DATA E HORA ATUAL: ${dataAtual}
+Use essa data para resolver referências temporais: "hoje", "ontem", "anteontem", "semana passada", "sexta", "dia 15", "essa manhã", "de tarde".
+Converta SEMPRE para ISO 8601 completo no fuso America/Sao_Paulo (ex: "2026-05-25T14:30:00-03:00").
 
-MENSAGEM DO USUÁRIO: "${message}"
+━━━ REGRAS DE CLASSIFICAÇÃO ━━━
 
-Exemplo de retorno (Transação):
-{"tipo": "DESPESA", "valor": 12.50, "descricao": "Café", "categoria_id": "...", "subcategoria_id": "...", "data_transacao": null}
+TIPO = "DESPESA" → paguei, gastei, comprei, tomei (uber), fui em, comi, bebi, assinei, renovei, transferi, mandei pix, enviei
+TIPO = "RECEITA" → recebi, entrou, caiu, ganhei, me pagaram, pix de [pessoa], salário, dividendo, vendeu
+TIPO = "CHAT"    → saudações, perguntas, comentários gerais, qualquer coisa que não seja lançamento financeiro
 
-Exemplo de retorno (Chat):
-{"tipo": "CHAT", "valor": null, "descricao": "Conversa", "resposta": "Entendi perfeitamente! Como seu assistente, estou aqui para ouvir e ajudar no que for preciso.", "data_transacao": null}
+━━━ EXTRAÇÃO DO VALOR ━━━
 
-ATENÇÃO: Nunca responda com texto puro. Sempre use o formato JSON acima. Se a mensagem for irrelevante ou incompreensível, use o tipo "CHAT".`
+Retorne número decimal puro (ex: 1500.50), aplicando estas conversões:
+• "R$ 2.000"              → 2000    (ponto = milhar BR, NÃO decimal)
+• "R$ 1.500,50"           → 1500.50
+• "cinquenta reais"       → 50
+• "dois mil e quinhentos" → 2500
+• "cento e vinte e três"  → 123
+• "cinco e vinte"         → 5.20    (R$5,20 — reais e centavos)
+• "oitenta e nove vírgula noventa" → 89.90
+• "trezentos"             → 300
+
+━━━ DESCRIÇÃO ━━━
+
+Seja ESPECÍFICO — nunca retorne apenas "Compra" ou "Pagamento":
+• Se houver nome de estabelecimento → use-o: "Uber", "iFood", "Drogasil", "Smart Fit"
+• Se não houver → use verbo + contexto: "Almoço no restaurante", "Conta de luz", "Mercado semanal"
+• Máximo 50 caracteres
+
+━━━ CATEGORIA E SUBCATEGORIA ━━━
+
+OBRIGATÓRIO para DESPESA e RECEITA — use os IDs EXATOS da lista abaixo.
+Escolha a MAIS ESPECÍFICA. Exemplos rápidos:
+• iFood / Rappi / Uber Eats / delivery    → Alimentação → Delivery
+• Uber / 99 / Cabify / aplicativo         → Transporte → App de Transporte
+• Farmácia / remédio / medicamento        → Saúde → Medicamentos
+• Academia / SmartFit / musculação        → Saúde → Academia e Esportes
+• Netflix / Spotify / streaming           → Lazer e Entretenimento → Assinaturas
+• Mercado / supermercado / feira          → Alimentação → Supermercado
+• Salário / CLT / holerite               → Renda Principal → Salário
+• Pix recebido de pessoa                  → Receitas Eventuais → Ajuda Familiar Recebida
+• Gasolina / posto / combustível          → Transporte → Combustível
+• Luz / energia / água / gás / internet   → Moradia → (categoria correspondente)
+• Aluguel (pagando)                       → Moradia → Aluguel
+• Consulta médica / dentista              → Saúde → Consultas Médicas
+• Roupa / tênis / vestuário               → Cuidados Pessoais → Vestuário
+• Salão / barbearia / cabelo              → Cuidados Pessoais → Salão de Beleza
+
+━━━ CATEGORIAS DO USUÁRIO ━━━
+${catMap || 'Usuário sem categorias configuradas — use categoria_id: null.'}
+
+━━━ FORMATO DE RETORNO (JSON PURO, sem markdown, sem explicações) ━━━
+
+Transação:
+{"tipo":"DESPESA","valor":12.50,"descricao":"iFood — Hambúrguer","categoria_id":"UUID_EXATO","subcategoria_id":"UUID_EXATO","data_transacao":null}
+
+Chat:
+{"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável do Severino","categoria_id":null,"subcategoria_id":null,"data_transacao":null}
+
+MENSAGEM DO USUÁRIO: "${message}"`
 
   const models = resolveGeminiModelCandidates()
   let lastWhatsappErr = null

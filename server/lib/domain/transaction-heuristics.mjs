@@ -305,13 +305,16 @@ export function enriquecerCategoriaPorTexto(message, extractedData, categoriasUs
 
 export function inferTipoBasicoFromTexto(message) {
   const m = normTxt(message)
-  if (/(recebi|ganhei|entrou|caiu na conta|salario|salário|deposito|dep[oó]sito|pix recebido)/.test(m)) {
+  // RECEITA — verbos e contextos de entrada de dinheiro
+  if (/(recebi|ganhei|entrou|caiu\s*na\s*conta|caiu\s*o\s*pix|caiu\s*o\s*salario|salario|holerite|folha\s*de\s*pagamento|deposito\s*recebido|pix\s*recebido|me\s*pagaram|me\s*transferiram|restituicao|reembolso.*recebi|dividendo|rendimento.*receb|freelance.*recebi|vendeu|vendi\s*um|vendi\s*a|bico\s*de|honorario.*recebi|pro.?labore|prolabore|bonus.*recebi|cashback.*recebi|fgts|seguro.?desemprego|aposentadoria|beneficio.*receb|auxilio.*receb)/.test(m)) {
     return 'RECEITA'
   }
-  if (/(gastei|paguei|pago|pagando|comprei|enviei pix|fiz um pix|transferi|debito|d[eé]bito|saquei)/.test(m)) {
+  // DESPESA — verbos e contextos de saída de dinheiro
+  if (/(gastei|paguei|pago|pagando|comprei|comprando|enviei\s*pix|mandei\s*pix|fiz\s*um\s*pix|transferi|debito|debitou|saquei|fui\s*no|fui\s*na|fui\s*em|tomei\s*um|comi\s*em|bebi\s*em|assinei|renovei|contratar|assinar|parcelei|boleto\s*de|fatura\s*de)/.test(m)) {
     return 'DESPESA'
   }
-  if (/(gasto|conta|boleto|fatura|aluguel|iptu|luz|agua|água|gas|gás)/.test(m)) {
+  // DESPESA — substantivos de gasto recorrente
+  if (/(gasto|conta\s*de|boleto|fatura|aluguel|condominio|iptu|ipva|luz|energia|agua|gas\b|internet|plano\s*cel|mensalidade|financiamento|parcela\s*do|academia\s*de|remedio|remedios|combustivel|gasolina|farmacia|mercado\s*de\s*hoje|feira\s*de\s*hoje)/.test(m)) {
     return 'DESPESA'
   }
   return null
