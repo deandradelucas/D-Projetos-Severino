@@ -322,9 +322,29 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
 // Modal Registrar Gasto
 // ---------------------------------------------------------------------------
 
+/**
+ * Procura subcategoria "Mercado" / "Supermercado" dentro da categoria selecionada.
+ * Match em ordem: equivalência exata → contém "supermercado" → contém "mercado".
+ * Diacríticos ignorados; útil pois a base default usa acentos.
+ */
+function encontrarSubcategoriaMercado(cat) {
+  const subs = Array.isArray(cat?.subcategorias) ? cat.subcategorias : []
+  if (!subs.length) return null
+  const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+  return (
+    subs.find((s) => norm(s.nome) === 'supermercado') ||
+    subs.find((s) => norm(s.nome) === 'mercado') ||
+    subs.find((s) => norm(s.nome).includes('supermercado')) ||
+    subs.find((s) => norm(s.nome).includes('mercado')) ||
+    null
+  )
+}
+
 function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
   const [categorias, setCategorias] = useState([])
   const [categoriaId, setCategoriaId] = useState('')
+  const [subcategoriaId, setSubcategoriaId] = useState('')
+  const [subcategoriaNome, setSubcategoriaNome] = useState('')
   const [descricao, setDescricao] = useState(`${lista?.nome || 'Lista de compras'} — ${dataHojeIso()}`)
   const [salvando, setSalvando] = useState(false)
   const [carregandoCategorias, setCarregandoCategorias] = useState(true)
@@ -356,6 +376,19 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
     return () => { cancelled = true }
   }, [lista?.categoria_financeira])
 
+  // Auto-match de subcategoria "Mercado/Supermercado" sempre que a categoria muda.
+  useEffect(() => {
+    if (!categoriaId || categorias.length === 0) {
+      setSubcategoriaId('')
+      setSubcategoriaNome('')
+      return
+    }
+    const cat = categorias.find((c) => c.id === categoriaId)
+    const sub = encontrarSubcategoriaMercado(cat)
+    setSubcategoriaId(sub?.id || '')
+    setSubcategoriaNome(sub?.nome || '')
+  }, [categoriaId, categorias])
+
   async function handleSubmit(e) {
     e.preventDefault()
     if (total <= 0) {
@@ -369,18 +402,20 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
 
     setSalvando(true)
     try {
+      const body = {
+        tipo: 'DESPESA',
+        valor: total,
+        data_transacao: dataHojeIso(),
+        descricao: descricao.trim() || lista?.nome || 'Lista de compras',
+        categoria_id: categoriaId,
+        status: 'EFETIVADA',
+      }
+      if (subcategoriaId) body.subcategoria_id = subcategoriaId
       const res = await fetch(apiUrl('/api/transacoes'), {
         method: 'POST',
         headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
         cache: 'no-store',
-        body: JSON.stringify({
-          tipo: 'DESPESA',
-          valor: total,
-          data_transacao: dataHojeIso(),
-          descricao: descricao.trim() || lista?.nome || 'Lista de compras',
-          categoria_id: categoriaId,
-          status: 'EFETIVADA',
-        }),
+        body: JSON.stringify(body),
       })
       if (redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
@@ -428,6 +463,15 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
                 <option key={c.id} value={c.id}>{c.nome}</option>
               ))}
             </select>
+            {subcategoriaNome ? (
+              <span className="page-lista-compras__modal-subhint">
+                Subcategoria: <strong>{subcategoriaNome}</strong>
+              </span>
+            ) : !carregandoCategorias && categoriaId ? (
+              <span className="page-lista-compras__modal-subhint page-lista-compras__modal-subhint--warn">
+                Sem subcategoria “Mercado” nesta categoria — será salvo só com a categoria.
+              </span>
+            ) : null}
           </div>
           <div className="page-lista-compras__modal-field">
             <label className="page-lista-compras__modal-label" htmlFor="gasto-desc">Descrição</label>
