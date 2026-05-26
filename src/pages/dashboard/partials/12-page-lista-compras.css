@@ -1063,6 +1063,25 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   text-align: center;
 }
 
+.page-lista-compras__modal-subhint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.page-lista-compras__modal-subhint strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.page-lista-compras__modal-subhint--warn {
+  color: var(--text-muted, var(--text-secondary));
+  font-style: italic;
+}
+
 .page-lista-compras__modal-label {
   font-size: 0.8rem;
   font-weight: 600;
