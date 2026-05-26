@@ -76,6 +76,8 @@ export default function Transacoes() {
   const [filtrosAbertos, setFiltrosAbertos] = useState(false)
   const [recorrencias, setRecorrencias] = useState([])
   const [confirmDialog, setConfirmDialog] = useState(null)
+  // Grupos expandidos no modo "Parceladas" (Set de recorrente_grupo_id)
+  const [parceladosExpandidos, setParceladosExpandidos] = useState(() => new Set())
 
   // Filters State
   const [filters, setFilters] = useState({
@@ -373,6 +375,93 @@ export default function Transacoes() {
       lancamentos: prev.lancamentos === 'parceladas' ? '' : 'parceladas',
     }))
 
+  // Agrupa lançamentos quando o filtro "Parceladas" está ativo:
+  //  - kind 'parcelado': agrupado por recorrente_grupo_id (compra parcelada N×)
+  //  - kind 'mensal':    agrupado por recorrencia_mensal_id (assinatura/stream
+  //                      sem prazo, lançada com "Prazo indeterminado")
+  // Cada grupo é renderizado como uma linha colapsável com seus pagamentos.
+  const gruposParcelados = useMemo(() => {
+    if (!filtroParceladasAtivo) return null
+    const map = new Map()
+    for (const t of transacoes) {
+      let key = null
+      let kind = null
+      if (t.recorrente_grupo_id && t.recorrente_index) {
+        key = `p:${t.recorrente_grupo_id}`
+        kind = 'parcelado'
+      } else if (t.recorrencia_mensal_id) {
+        key = `m:${t.recorrencia_mensal_id}`
+        kind = 'mensal'
+      }
+      if (!key) continue
+      if (!map.has(key)) {
+        map.set(key, {
+          id: key,
+          kind,
+          group_id: t.recorrente_grupo_id || t.recorrencia_mensal_id,
+          parcelas: [],
+          valor_total: 0,
+          tipo: t.tipo,
+          recorrente_total: t.recorrente_total || null,
+          categorias: t.categorias,
+          subcategorias: t.subcategorias,
+        })
+      }
+      const g = map.get(key)
+      g.parcelas.push(t)
+      g.valor_total += Math.abs(parseFloat(t.valor) || 0)
+    }
+    const out = []
+    for (const g of map.values()) {
+      if (g.kind === 'parcelado') {
+        g.parcelas.sort((a, b) => (a.recorrente_index || 0) - (b.recorrente_index || 0))
+      } else {
+        // Recorrência mensal: ordena por data crescente para "1ª, 2ª…" aparecerem em ordem
+        g.parcelas.sort((a, b) => new Date(a.data_transacao || 0) - new Date(b.data_transacao || 0))
+      }
+      const primeira = g.parcelas[0]
+      g.descricao_base =
+        (primeira?.descricao && String(primeira.descricao).replace(/\s*\(\d+\/\d+\)\s*$/, '').trim()) ||
+        (g.subcategorias?.nome && String(g.subcategorias.nome).trim()) ||
+        (g.categorias?.nome && String(g.categorias.nome).trim()) ||
+        (g.kind === 'mensal' ? 'Assinatura mensal' : 'Compra parcelada')
+      g.data_inicio = primeira?.data_transacao || null
+      out.push(g)
+    }
+    out.sort((a, b) => new Date(b.data_inicio || 0) - new Date(a.data_inicio || 0))
+    return out
+  }, [filtroParceladasAtivo, transacoes])
+
+  // Totais agregados para o footer da aba Parceladas:
+  // - totalMes: soma das parcelas que vencem no mês corrente (em qualquer compra)
+  // - totalGeral: soma do valor de todas as compras parceladas listadas
+  const totaisParcelados = useMemo(() => {
+    if (!gruposParcelados) return null
+    const agora = new Date()
+    const ymAtual = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}`
+    let totalMes = 0
+    let totalGeral = 0
+    for (const g of gruposParcelados) {
+      totalGeral += g.valor_total
+      for (const p of g.parcelas) {
+        const d = p.data_transacao ? new Date(p.data_transacao) : null
+        if (!d || Number.isNaN(d.getTime())) continue
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        if (ym === ymAtual) totalMes += Math.abs(parseFloat(p.valor) || 0)
+      }
+    }
+    return { totalMes, totalGeral }
+  }, [gruposParcelados])
+
+  const toggleGrupoParcelado = useCallback((id) => {
+    setParceladosExpandidos((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }, [])
+
   const whatsappContactUrl = useMemo(() => getWhatsappContactUrl(), [])
 
   return (
@@ -511,14 +600,21 @@ export default function Transacoes() {
         )}
 
         <article
-          className={`ref-panel ref-panel--transactions dashboard-hub__tx-panel page-transacoes-ref-table${refreshing ? ' page-panel--refreshing' : ''}`}
+          className={`ref-panel ref-panel--transactions dashboard-hub__tx-panel page-transacoes-ref-table${refreshing ? ' page-panel--refreshing' : ''}${filtroParceladasAtivo ? ' page-transacoes-ref-table--parceladas' : ''}`}
         >
           <div className="ref-panel__head page-transacoes-tx-panel-head">
             <div className="page-transacoes-tx-panel-head__titles">
-              <h2 className="ref-panel__title">Transações</h2>
+              <h2 className="ref-panel__title">
+                {filtroParceladasAtivo ? 'Compras parceladas' : 'Transações'}
+              </h2>
               {filtroRecorrentesAtivo ? (
                 <p className="ref-panel__subtitle page-transacoes-tx-filter-hint">
                   Exibindo só lançamentos com parcelamento ou repetição mensal.
+                </p>
+              ) : null}
+              {filtroParceladasAtivo ? (
+                <p className="ref-panel__subtitle page-transacoes-tx-filter-hint">
+                  Toque em uma compra para ver as parcelas.
                 </p>
               ) : null}
             </div>
@@ -536,7 +632,9 @@ export default function Transacoes() {
             ) : transacoes.length === 0 ? (
               <div className="ref-empty-state">
                 <p className="ref-empty">
-                  {filtroRecorrentesAtivo
+                  {filtroParceladasAtivo
+                    ? 'Nenhuma compra parcelada encontrada.'
+                    : filtroRecorrentesAtivo
                     ? 'Nenhum lançamento recorrente encontrado com os filtros atuais (período, busca ou categoria).'
                     : 'Nenhuma transação encontrada com os filtros atuais.'}
                 </p>
@@ -544,6 +642,138 @@ export default function Transacoes() {
                   Limpar filtros
                 </button>
               </div>
+            ) : filtroParceladasAtivo && gruposParcelados ? (
+              <ul className="page-transacoes-parcelados-list">
+                {gruposParcelados.map((g) => {
+                  const expandido = parceladosExpandidos.has(g.id)
+                  const isRec = g.tipo === 'RECEITA'
+                  const isMensal = g.kind === 'mensal'
+                  const catNome = (g.categorias?.nome && String(g.categorias.nome).trim()) || '—'
+                  const subNome =
+                    g.subcategorias?.nome && String(g.subcategorias.nome).trim()
+                      ? String(g.subcategorias.nome).trim()
+                      : ''
+                  // Texto do contador: "10×" para parcelado, "Mensal · sem prazo" para recorrência indeterminada
+                  const contadorLabel = isMensal
+                    ? `Mensal · sem prazo · ${g.parcelas.length}${g.parcelas.length === 1 ? ' lançamento' : ' lançamentos'}`
+                    : `${g.recorrente_total}×`
+                  // Valor mostrado no cabeçalho: parcelado = total da compra; mensal = valor mensal
+                  const valorCabecalho = isMensal
+                    ? Math.abs(parseFloat(g.parcelas[0]?.valor) || 0)
+                    : g.valor_total
+                  return (
+                    <li key={g.id} className={`page-transacoes-parcelado-grupo${expandido ? ' page-transacoes-parcelado-grupo--open' : ''}${isMensal ? ' page-transacoes-parcelado-grupo--mensal' : ''}`}>
+                      <button
+                        type="button"
+                        className="page-transacoes-parcelado-grupo__head"
+                        onClick={() => toggleGrupoParcelado(g.id)}
+                        aria-expanded={expandido}
+                        aria-controls={`parcelas-${g.id}`}
+                      >
+                        <span className="page-transacoes-parcelado-grupo__icon" aria-hidden>
+                          {isMensal ? (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M21 12a9 9 0 1 1-3-6.7" />
+                              <path d="M21 4v5h-5" />
+                            </svg>
+                          ) : (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="2" y="5" width="20" height="14" rx="2" />
+                              <path d="M2 10h20" />
+                              <path d="M6 15h4M14 15h4" />
+                            </svg>
+                          )}
+                        </span>
+                        <div className="page-transacoes-parcelado-grupo__main">
+                          <span className="page-transacoes-parcelado-grupo__desc">{g.descricao_base}</span>
+                          <span className="page-transacoes-parcelado-grupo__meta">
+                            {contadorLabel} · {catNome}
+                            {subNome ? ` · ${subNome}` : ''}
+                          </span>
+                        </div>
+                        <div className="page-transacoes-parcelado-grupo__right">
+                          <span className={`page-transacoes-parcelado-grupo__valor${isRec ? ' page-transacoes-parcelado-grupo__valor--rec' : ''} ${privacyMode ? 'privacy-blur' : ''}`}>
+                            {isRec ? '+' : '−'}
+                            {formatCurrencyBRL(valorCabecalho)}
+                            {isMensal ? <span className="page-transacoes-parcelado-grupo__valor-suf">/mês</span> : null}
+                          </span>
+                          <span className="page-transacoes-parcelado-grupo__chev" aria-hidden>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M6 9l6 6 6-6" />
+                            </svg>
+                          </span>
+                        </div>
+                      </button>
+                      {expandido && (
+                        <ul id={`parcelas-${g.id}`} className="page-transacoes-parcelado-grupo__parcelas">
+                          {g.parcelas.map((p, idx) => {
+                            const valorAbs = Math.abs(parseFloat(p.valor) || 0)
+                            const isPendente = p.status === 'PENDENTE'
+                            const dataObj = p.data_transacao ? new Date(p.data_transacao) : null
+                            const dataLabel = dataObj && !Number.isNaN(dataObj.getTime())
+                              ? dataObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: '2-digit' })
+                              : '—'
+                            return (
+                              <li key={p.id} className="page-transacoes-parcelado-parcela">
+                                <span className="page-transacoes-parcelado-parcela__idx">
+                                  {isMensal
+                                    ? `${idx + 1}ª`
+                                    : `${p.recorrente_index}/${p.recorrente_total}`}
+                                </span>
+                                <span className="page-transacoes-parcelado-parcela__data">{dataLabel}</span>
+                                <span className={`page-transacoes-parcelado-parcela__status${isPendente ? ' page-transacoes-parcelado-parcela__status--pendente' : ''}`}>
+                                  {isPendente ? 'Pendente' : 'Pago'}
+                                </span>
+                                <span className={`page-transacoes-parcelado-parcela__valor ${privacyMode ? 'privacy-blur' : ''}`}>
+                                  {formatCurrencyBRL(valorAbs)}
+                                </span>
+                                <div className="page-transacoes-parcelado-parcela__acoes" role="group">
+                                  <button
+                                    type="button"
+                                    className="btn-edit"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setEditingTransaction(p)
+                                      setIsModalOpen(true)
+                                    }}
+                                    aria-label={isMensal
+                                      ? `Editar lançamento ${idx + 1} de ${g.descricao_base}`
+                                      : `Editar parcela ${p.recorrente_index}/${p.recorrente_total}`}
+                                    title={isMensal ? 'Editar lançamento' : 'Editar parcela'}
+                                  >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                                      <path d="m15 5 4 4" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn-delete"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleDelete(p)
+                                    }}
+                                    aria-label={isMensal
+                                      ? `Excluir lançamento ${idx + 1} de ${g.descricao_base}`
+                                      : `Excluir parcela ${p.recorrente_index}/${p.recorrente_total}`}
+                                    title={isMensal ? 'Excluir lançamento' : 'Excluir parcela'}
+                                  >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                      <path d="M3 6h18" />
+                                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
             ) : (
               <>
               <div className="ref-tx-table-subgrid ref-tx-table-subgrid--actions tx-cal-grid">
@@ -647,6 +877,24 @@ export default function Transacoes() {
           </span>
           <span className="dashboard-mobile-tx-fab__label">Nova transação</span>
         </button>
+      </div>
+    )}
+
+    {filtroParceladasAtivo && totaisParcelados && (
+      <div className="page-transacoes-parcelados-footer" role="status" aria-live="polite">
+        <div className="page-transacoes-parcelados-footer__item">
+          <span className="page-transacoes-parcelados-footer__label">Mês atual</span>
+          <strong className={`page-transacoes-parcelados-footer__value ${privacyMode ? 'privacy-blur' : ''}`}>
+            {formatCurrencyBRL(totaisParcelados.totalMes)}
+          </strong>
+        </div>
+        <div className="page-transacoes-parcelados-footer__divider" aria-hidden />
+        <div className="page-transacoes-parcelados-footer__item">
+          <span className="page-transacoes-parcelados-footer__label">Total parcelado</span>
+          <strong className={`page-transacoes-parcelados-footer__value ${privacyMode ? 'privacy-blur' : ''}`}>
+            {formatCurrencyBRL(totaisParcelados.totalGeral)}
+          </strong>
+        </div>
       </div>
     )}
 

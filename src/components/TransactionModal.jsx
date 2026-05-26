@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { apiUrl } from '../lib/apiUrl'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import CategorySelector from './transaction/CategorySelector'
-import RecurrenceOptions from './transaction/RecurrenceOptions'
 import { useTransactionForm } from '../hooks/useTransactionForm'
 
 function tipoCategoriaIgual(tipoCampo, tipoAlvo) {
@@ -374,7 +373,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                         onChange={(e) => setFormData((prev) => ({
                           ...prev,
                           parcelado: e.target.checked,
-                          recorrencia_dia_1: e.target.checked ? false : prev.recorrencia_dia_1,
+                          // Reseta sub-opções ao desligar parcelado.
+                          prazo_indeterminado: e.target.checked ? prev.prazo_indeterminado : false,
                         }))}
                         className="modal-recorrencia-toggle-row__checkbox"
                       />
@@ -417,7 +417,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                             type="date"
                             value={formData.data_pagamento}
                             onChange={(e) => setFormData((prev) => ({ ...prev, data_pagamento: e.target.value }))}
-                            className="input-premium rec-vezes-row__input"
+                            className="input-premium rec-vezes-row__input rec-vezes-row__input--date"
                           />
                         </div>
                         <p className="parcelamento-preview parcelamento-preview--hint">
@@ -441,16 +441,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                 </section>
               )
             })()}
-
-            {/* ── Seção: Recorrência (só criação, exclusiva com parcelamento) ── */}
-            {!isEditMode && !formData.parcelado && (
-              <RecurrenceOptions
-                checked={formData.recorrencia_dia_1}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, recorrencia_dia_1: e.target.checked }))
-                }
-              />
-            )}
 
           </div>
 

@@ -328,6 +328,11 @@ export default function Dashboard() {
                           <time className="ref-tx-date" dateTime={dateTimeAttr}>
                             {dateLine}
                           </time>
+                          {isParcela ? (
+                            <span className="ref-tx-rec-badge" title={`Parcela ${t.recorrente_index} de ${t.recorrente_total}`}>
+                              {t.recorrente_index}/{t.recorrente_total}
+                            </span>
+                          ) : null}
                           {isPendente ? (
                             <span className="ref-tx-pendente-chip">Pendente</span>
                           ) : null}
@@ -345,12 +350,7 @@ export default function Dashboard() {
                               role="img"
                               aria-label={isRec ? 'Receita' : 'Despesa'}
                             />
-                            <span className="ref-tx-cat-text__label">
-                              {catNome}
-                              {isParcela ? (
-                                <span className="ref-tx-rec-badge">{t.recorrente_index}/{t.recorrente_total}</span>
-                              ) : null}
-                            </span>
+                            <span className="ref-tx-cat-text__label">{catNome}</span>
                           </p>
                         </div>
                         <div className="ref-tx-sub-cell">
