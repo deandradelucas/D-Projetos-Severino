@@ -1,7 +1,42 @@
 import { getSupabaseAdmin } from './supabase-admin.mjs'
+import { isMissingColumnError } from './assinatura-db.mjs'
 
 const LIST_SELECT_COLS = 'id, usuario_id, nome, categoria_financeira, arquivada_em, criada_em'
-const ITEM_SELECT_COLS = 'id, lista_id, nome, quantidade, unidade, preco_estimado, categoria_item, checked, checked_em, criado_em'
+const ITEM_BASE_COLS = 'id, lista_id, nome, quantidade, unidade, preco_estimado, categoria_item, checked, checked_em, criado_em'
+
+// Coluna `unidades` foi adicionada via migration 50_shopping_list_items_unidades.sql.
+// Mantemos fallback gracioso caso o schema ainda não tenha sido migrado: a primeira
+// chamada que falhar com 42703 desliga o flag e reusa o select sem `unidades`.
+let hasUnidadesColumn = true
+const itemSelectCols = () => (hasUnidadesColumn ? `${ITEM_BASE_COLS}, unidades` : ITEM_BASE_COLS)
+const listaWithItensSelect = () =>
+  `${LIST_SELECT_COLS}, itens:shopping_list_items(${itemSelectCols()})`
+
+function stripUnidadesIfMissing(payload) {
+  if (hasUnidadesColumn) return payload
+  if (payload && typeof payload === 'object' && 'unidades' in payload) {
+    const { unidades: _omit, ...rest } = payload
+    return rest
+  }
+  return payload
+}
+
+/**
+ * Executa um builder do Supabase. Se ele falhar com erro de coluna `unidades`
+ * inexistente, marca a flag e tenta de novo (o caller refaz o builder sem
+ * referenciar a coluna).
+ * @template T
+ * @param {() => Promise<{ data: T, error: any }>} run
+ * @returns {Promise<{ data: T, error: any }>}
+ */
+async function runWithUnidadesFallback(run) {
+  const res = await run()
+  if (res.error && hasUnidadesColumn && isMissingColumnError(res.error, 'unidades')) {
+    hasUnidadesColumn = false
+    return await run()
+  }
+  return res
+}
 
 /**
  * @param {string} usuarioId
@@ -9,12 +44,14 @@ const ITEM_SELECT_COLS = 'id, lista_id, nome, quantidade, unidade, preco_estimad
  */
 export async function listarListasUsuario(usuarioId) {
   const supabase = getSupabaseAdmin()
-  const { data, error } = await supabase
-    .from('shopping_lists')
-    .select(`${LIST_SELECT_COLS}, itens:shopping_list_items(${ITEM_SELECT_COLS})`)
-    .eq('usuario_id', usuarioId)
-    .is('arquivada_em', null)
-    .order('criada_em', { ascending: false })
+  const { data, error } = await runWithUnidadesFallback(() =>
+    supabase
+      .from('shopping_lists')
+      .select(listaWithItensSelect())
+      .eq('usuario_id', usuarioId)
+      .is('arquivada_em', null)
+      .order('criada_em', { ascending: false })
+  )
 
   if (error) throw new Error(error.message || 'Erro ao listar listas.')
   return data || []
@@ -32,15 +69,17 @@ export async function criarLista(usuarioId, { nome, categoria_financeira }) {
   }
 
   const supabase = getSupabaseAdmin()
-  const { data, error } = await supabase
-    .from('shopping_lists')
-    .insert({
-      usuario_id: usuarioId,
-      nome: nomeTrimmed,
-      categoria_financeira: String(categoria_financeira || 'Alimentação').trim(),
-    })
-    .select(`${LIST_SELECT_COLS}, itens:shopping_list_items(${ITEM_SELECT_COLS})`)
-    .maybeSingle()
+  const { data, error } = await runWithUnidadesFallback(() =>
+    supabase
+      .from('shopping_lists')
+      .insert({
+        usuario_id: usuarioId,
+        nome: nomeTrimmed,
+        categoria_financeira: String(categoria_financeira || 'Alimentação').trim(),
+      })
+      .select(listaWithItensSelect())
+      .maybeSingle()
+  )
 
   if (error) throw new Error(error.message || 'Erro ao criar lista.')
   return data
@@ -72,14 +111,16 @@ export async function atualizarLista(id, usuarioId, campos) {
   }
 
   const supabase = getSupabaseAdmin()
-  const { data, error } = await supabase
-    .from('shopping_lists')
-    .update(update)
-    .eq('id', id)
-    .eq('usuario_id', usuarioId)
-    .is('arquivada_em', null)
-    .select(`${LIST_SELECT_COLS}, itens:shopping_list_items(${ITEM_SELECT_COLS})`)
-    .maybeSingle()
+  const { data, error } = await runWithUnidadesFallback(() =>
+    supabase
+      .from('shopping_lists')
+      .update(update)
+      .eq('id', id)
+      .eq('usuario_id', usuarioId)
+      .is('arquivada_em', null)
+      .select(listaWithItensSelect())
+      .maybeSingle()
+  )
 
   if (error) throw new Error(error.message || 'Erro ao atualizar lista.')
   if (!data) throw new Error('Lista não encontrada.')
@@ -156,11 +197,13 @@ export async function listarItensLista(listaId, usuarioId) {
     .maybeSingle()
   if (!lista) throw new Error('Lista não encontrada.')
 
-  const { data, error } = await supabase
-    .from('shopping_list_items')
-    .select(ITEM_SELECT_COLS)
-    .eq('lista_id', listaId)
-    .order('criado_em', { ascending: true })
+  const { data, error } = await runWithUnidadesFallback(() =>
+    supabase
+      .from('shopping_list_items')
+      .select(itemSelectCols())
+      .eq('lista_id', listaId)
+      .order('criado_em', { ascending: true })
+  )
 
   if (error) throw new Error(error.message || 'Erro ao listar itens.')
   return data || []
@@ -169,10 +212,10 @@ export async function listarItensLista(listaId, usuarioId) {
 /**
  * @param {string} listaId
  * @param {string} usuarioId
- * @param {{ nome: string, quantidade?: number, unidade?: string, preco_estimado?: number|null, categoria_item?: string|null }} campos
+ * @param {{ nome: string, quantidade?: number, unidade?: string, unidades?: number, preco_estimado?: number|null, categoria_item?: string|null }} campos
  * @returns {Promise<object>}
  */
-export async function criarItem(listaId, usuarioId, { nome, quantidade, unidade, preco_estimado, categoria_item }) {
+export async function criarItem(listaId, usuarioId, { nome, quantidade, unidade, unidades, preco_estimado, categoria_item }) {
   const supabase = getSupabaseAdmin()
 
   // Verificar ownership
@@ -194,6 +237,11 @@ export async function criarItem(listaId, usuarioId, { nome, quantidade, unidade,
     throw new Error('Quantidade deve ser maior que zero.')
   }
 
+  const unid = unidades !== undefined && unidades !== null ? Math.floor(Number(unidades)) : 1
+  if (!Number.isFinite(unid) || unid < 1) {
+    throw new Error('Unidades deve ser ao menos 1.')
+  }
+
   const preco = preco_estimado !== undefined && preco_estimado !== null
     ? Number(preco_estimado)
     : null
@@ -201,18 +249,23 @@ export async function criarItem(listaId, usuarioId, { nome, quantidade, unidade,
     throw new Error('Preço estimado inválido.')
   }
 
-  const { data, error } = await supabase
-    .from('shopping_list_items')
-    .insert({
-      lista_id: listaId,
-      nome: nomeTrimmed,
-      quantidade: qty,
-      unidade: String(unidade || 'un').trim().slice(0, 20) || 'un',
-      preco_estimado: preco,
-      categoria_item: categoria_item ? String(categoria_item).trim() : null,
-    })
-    .select(ITEM_SELECT_COLS)
-    .maybeSingle()
+  const insertPayload = {
+    lista_id: listaId,
+    nome: nomeTrimmed,
+    quantidade: qty,
+    unidade: String(unidade || 'un').trim().slice(0, 20) || 'un',
+    unidades: unid,
+    preco_estimado: preco,
+    categoria_item: categoria_item ? String(categoria_item).trim() : null,
+  }
+
+  const { data, error } = await runWithUnidadesFallback(() =>
+    supabase
+      .from('shopping_list_items')
+      .insert(stripUnidadesIfMissing(insertPayload))
+      .select(itemSelectCols())
+      .maybeSingle()
+  )
 
   if (error) throw new Error(error.message || 'Erro ao criar item.')
   return data
@@ -255,6 +308,12 @@ export async function atualizarItem(id, listaId, usuarioId, campos) {
     update.unidade = String(campos.unidade).trim().slice(0, 20) || 'un'
   }
 
+  if (campos.unidades !== undefined) {
+    const u = Math.floor(Number(campos.unidades))
+    if (!Number.isFinite(u) || u < 1) throw new Error('Unidades deve ser ao menos 1.')
+    update.unidades = u
+  }
+
   if (campos.preco_estimado !== undefined) {
     const preco = campos.preco_estimado !== null ? Number(campos.preco_estimado) : null
     if (preco !== null && (!Number.isFinite(preco) || preco < 0)) throw new Error('Preço estimado inválido.')
@@ -267,13 +326,15 @@ export async function atualizarItem(id, listaId, usuarioId, campos) {
 
   if (Object.keys(update).length === 0) throw new Error('Nenhum campo para atualizar.')
 
-  const { data, error } = await supabase
-    .from('shopping_list_items')
-    .update(update)
-    .eq('id', id)
-    .eq('lista_id', listaId)
-    .select(ITEM_SELECT_COLS)
-    .maybeSingle()
+  const { data, error } = await runWithUnidadesFallback(() =>
+    supabase
+      .from('shopping_list_items')
+      .update(stripUnidadesIfMissing(update))
+      .eq('id', id)
+      .eq('lista_id', listaId)
+      .select(itemSelectCols())
+      .maybeSingle()
+  )
 
   if (error) throw new Error(error.message || 'Erro ao atualizar item.')
   if (!data) throw new Error('Item não encontrado.')
@@ -309,16 +370,18 @@ export async function toggleChecked(id, listaId, usuarioId) {
   if (!item) throw new Error('Item não encontrado.')
 
   const novoChecked = !item.checked
-  const { data, error } = await supabase
-    .from('shopping_list_items')
-    .update({
-      checked: novoChecked,
-      checked_em: novoChecked ? new Date().toISOString() : null,
-    })
-    .eq('id', id)
-    .eq('lista_id', listaId)
-    .select(ITEM_SELECT_COLS)
-    .maybeSingle()
+  const { data, error } = await runWithUnidadesFallback(() =>
+    supabase
+      .from('shopping_list_items')
+      .update({
+        checked: novoChecked,
+        checked_em: novoChecked ? new Date().toISOString() : null,
+      })
+      .eq('id', id)
+      .eq('lista_id', listaId)
+      .select(itemSelectCols())
+      .maybeSingle()
+  )
 
   if (error) throw new Error(error.message || 'Erro ao atualizar item.')
   return data
