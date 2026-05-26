@@ -160,6 +160,17 @@ export async function transcribeWhatsAppAudioWithGemini(audioBytes, mimeHint = '
 }
 
 /**
+ * Remove prefixos genéricos e capitaliza a descrição extraída pela IA.
+ */
+function normalizarDescricao(desc) {
+  if (!desc || typeof desc !== 'string') return desc
+  let d = desc.trim()
+  d = d.replace(/^(compra\s+de\s+|pagamento\s+de\s+|gasto\s+com\s+|despesa\s+com\s+)/i, '')
+  d = d.replace(/^(\w)/, (c) => c.toUpperCase())
+  return d.length > 80 ? d.slice(0, 77) + '…' : d
+}
+
+/**
  * Interpreta mensagem de WhatsApp.
  */
 export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
@@ -173,77 +184,84 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
 
   const dataAtual = dataHoraAtualSP()
 
-  const systemPrompt = `Você é o Severino, assistente financeiro pessoal. Analise a mensagem e extraia os dados de transação OU identifique como conversa.
+  // system_instruction: enviado como campo separado — Gemini processa diferente de mensagem do usuário
+  const systemInstruction = `Você é o Severino, assistente financeiro pessoal. Analise mensagens e extraia dados de transação OU classifique como conversa.
 
 DATA E HORA ATUAL: ${dataAtual}
-Use essa data para resolver referências temporais: "hoje", "ontem", "anteontem", "semana passada", "sexta", "dia 15", "essa manhã", "de tarde".
-Converta SEMPRE para ISO 8601 completo no fuso America/Sao_Paulo (ex: "2026-05-25T14:30:00-03:00").
+Use essa data para resolver referências temporais ("hoje", "ontem", "anteontem", "semana passada", "sexta", "dia 15", "essa manhã").
+Converta para ISO 8601 completo no fuso America/Sao_Paulo (ex: "2026-05-25T14:30:00-03:00").
 
-━━━ REGRAS DE CLASSIFICAÇÃO ━━━
+━━━ CLASSIFICAÇÃO ━━━
 
-TIPO = "DESPESA" → paguei, gastei, comprei, tomei (uber), fui em, comi, bebi, assinei, renovei, transferi, mandei pix, enviei
-TIPO = "RECEITA" → recebi, entrou, caiu, ganhei, me pagaram, pix de [pessoa], salário, dividendo, vendeu
-TIPO = "CHAT"    → saudações, perguntas, comentários gerais, qualquer coisa que não seja lançamento financeiro
+DESPESA → paguei, gastei, comprei, tomei (uber/taxi), fui em/no/na, comi, bebi, assinei, renovei, transferi, mandei pix, enviei, abasteci, botei gasolina, coloquei crédito
+RECEITA → recebi, entrou, caiu, ganhei, me pagaram, pix de [pessoa], salário, dividendo, vendi
+CHAT    → saudações, perguntas, comentários que não são lançamentos financeiros
 
-━━━ EXTRAÇÃO DO VALOR ━━━
+━━━ VALOR (número decimal puro) ━━━
 
-Retorne número decimal puro (ex: 1500.50), aplicando estas conversões:
-• "R$ 2.000"              → 2000    (ponto = milhar BR, NÃO decimal)
+• "R$ 2.000"              → 2000   (ponto = milhar BR, NÃO decimal)
 • "R$ 1.500,50"           → 1500.50
 • "cinquenta reais"       → 50
 • "dois mil e quinhentos" → 2500
 • "cento e vinte e três"  → 123
-• "cinco e vinte"         → 5.20    (R$5,20 — reais e centavos)
+• "cinco e vinte"         → 5.20   (R$5,20 = reais e centavos)
 • "oitenta e nove vírgula noventa" → 89.90
 • "trezentos"             → 300
 
-━━━ DESCRIÇÃO ━━━
+━━━ DESCRIÇÃO (específica, max 60 chars) ━━━
 
-Seja ESPECÍFICO — nunca retorne apenas "Compra" ou "Pagamento":
-• Se houver nome de estabelecimento → use-o: "Uber", "iFood", "Drogasil", "Smart Fit"
-• Se não houver → use verbo + contexto: "Almoço no restaurante", "Conta de luz", "Mercado semanal"
-• Máximo 50 caracteres
+• Nome do estabelecimento quando mencionado: "Uber", "iFood", "Drogasil", "Smart Fit"
+• Sem nome: verbo + contexto: "Almoço no restaurante", "Conta de luz", "Mercado"
+• NUNCA retorne apenas "Compra", "Pagamento" ou "Despesa"
 
-━━━ CATEGORIA E SUBCATEGORIA ━━━
+━━━ CATEGORIA/SUBCATEGORIA — USE IDs EXATOS ━━━
 
-OBRIGATÓRIO para DESPESA e RECEITA — use os IDs EXATOS da lista abaixo.
-Escolha a MAIS ESPECÍFICA. Exemplos rápidos:
-• iFood / Rappi / Uber Eats / delivery    → Alimentação → Delivery
-• Uber / 99 / Cabify / aplicativo         → Transporte → App de Transporte
-• Farmácia / remédio / medicamento        → Saúde → Medicamentos
-• Academia / SmartFit / musculação        → Saúde → Academia e Esportes
-• Netflix / Spotify / streaming           → Lazer e Entretenimento → Assinaturas
-• Mercado / supermercado / feira          → Alimentação → Supermercado
-• Salário / CLT / holerite               → Renda Principal → Salário
-• Pix recebido de pessoa                  → Receitas Eventuais → Ajuda Familiar Recebida
-• Gasolina / posto / combustível          → Transporte → Combustível
-• Luz / energia / água / gás / internet   → Moradia → (categoria correspondente)
-• Aluguel (pagando)                       → Moradia → Aluguel
-• Consulta médica / dentista              → Saúde → Consultas Médicas
-• Roupa / tênis / vestuário               → Cuidados Pessoais → Vestuário
-• Salão / barbearia / cabelo              → Cuidados Pessoais → Salão de Beleza
+Escolha a mais específica. Guia rápido:
+iFood/Rappi/Uber Eats/delivery → Alimentação → Delivery
+Uber/99/Cabify/aplicativo      → Transporte → App de Transporte (Uber, 99)
+Farmácia/remédio               → Saúde → Medicamentos
+Academia/SmartFit/musculação   → Saúde → Academia e Esportes
+Netflix/Spotify/Max/streaming  → Lazer e Entretenimento → Assinaturas
+Mercado/supermercado/feira     → Alimentação → Supermercado
+Salário/CLT/holerite           → Renda Principal → Salário
+Pix recebido de pessoa         → Receitas Eventuais → Ajuda Familiar Recebida
+Gasolina/posto/combustível     → Transporte → Combustível
+Conta de luz                   → Moradia → Conta de Luz
+Conta de água                  → Moradia → Conta de Água
+Internet/fibra/wi-fi           → Moradia → Internet e TV
+Gás/botijão                    → Moradia → Gás
+Aluguel (pagando)              → Moradia → Aluguel
+Consulta médica/dentista       → Saúde → Consultas Médicas
+Salão/barbearia/cabelo/barba   → Cuidados Pessoais → Salão de Beleza / Barbearia
+Roupa/tênis/vestuário          → Cuidados Pessoais → Vestuário
 
 ━━━ CATEGORIAS DO USUÁRIO ━━━
-${catMap || 'Usuário sem categorias configuradas — use categoria_id: null.'}
+${catMap || 'Sem categorias — use categoria_id: null.'}
 
-━━━ FORMATO DE RETORNO (JSON PURO, sem markdown, sem explicações) ━━━
+━━━ RETORNO: JSON PURO (sem markdown, sem texto extra) ━━━
 
-Transação:
-{"tipo":"DESPESA","valor":12.50,"descricao":"iFood — Hambúrguer","categoria_id":"UUID_EXATO","subcategoria_id":"UUID_EXATO","data_transacao":null}
+Transação: {"tipo":"DESPESA","valor":12.50,"descricao":"iFood","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null}
+Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável","categoria_id":null,"subcategoria_id":null,"data_transacao":null}`
 
-Chat:
-{"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável do Severino","categoria_id":null,"subcategoria_id":null,"data_transacao":null}
-
-MENSAGEM DO USUÁRIO: "${message}"`
+  const userMessage = `MENSAGEM: "${message}"`
 
   const models = resolveGeminiModelCandidates()
   let lastWhatsappErr = null
 
   for (const mid of models) {
     try {
+      // Thinking budget de 512 para 2.5-flash: melhora casos ambíguos sem custo relevante
+      const thinkingConfig = mid.includes('2.5') ? { thinkingBudget: 512 } : undefined
+      const genCfg = buildGeminiGenerationConfig(mid, {
+        maxOutputTokens: 700,
+        temperature: 0.15,
+        ...(thinkingConfig ? { thinkingConfig } : {}),
+      })
+
       const response = await geminiPostGenerateContent(mid, apiKey, {
-        contents: [{ role: 'user', parts: [{ text: systemPrompt }] }],
-        generationConfig: buildGeminiGenerationConfig(mid, { maxOutputTokens: 500, temperature: 0.2 }),
+        system_instruction: { parts: [{ text: systemInstruction }] },
+        contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+        generationConfig: genCfg,
       })
 
       if (!response.ok) {
@@ -256,24 +274,25 @@ MENSAGEM DO USUÁRIO: "${message}"`
       const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''
 
       const parsed = tryParseJsonBlock(text)
+      if (parsed?.descricao) parsed.descricao = normalizarDescricao(parsed.descricao)
+
       const sanitized = sanitizeTransacaoExtraidaIA(parsed, categoriasUsuario)
-      return enriquecerCategoriaPorTexto(message, sanitized, categoriasUsuario)
+      // Heurísticas rodam contra a mensagem E contra a descrição extraída
+      const textoEnriquecimento = [message, parsed?.descricao].filter(Boolean).join(' ')
+      return enriquecerCategoriaPorTexto(textoEnriquecimento, sanitized, categoriasUsuario)
     } catch {
-      // Fallback 1: Tenta extrair o básico (valor/tipo) localmente
       const simples = fallbackParseMensagemSimples(message)
       if (simples) return enriquecerCategoriaPorTexto(message, simples, categoriasUsuario)
 
-      // Fallback 2: Se não é transação, trata como CHAT sem erro
       return {
         tipo: 'CHAT',
         valor: null,
         descricao: 'Conversa',
-        resposta: 'Entendi o que você disse, mas não identifiquei uma transação financeira nessa mensagem. Se quiser lançar um gasto, pode falar algo como "gastei 50 no mercado".'
+        resposta: 'Entendi o que você disse, mas não identifiquei uma transação financeira. Se quiser lançar um gasto, tente: "gastei 50 no mercado".',
       }
     }
   }
 
-  // Todos os modelos falharam — tenta fallback local antes de lançar o erro
   const fallbackFinal = fallbackParseMensagemSimples(message)
   if (fallbackFinal) return enriquecerCategoriaPorTexto(message, fallbackFinal, categoriasUsuario)
 

@@ -14,11 +14,13 @@ export function modelUsesThinkingBudget(modelId) {
 }
 
 /**
- * generationConfig seguro por modelo (desliga thinking em 2.5+ para não esvaziar a resposta).
+ * generationConfig seguro por modelo.
+ * - Modelos 2.5+ têm thinking ativo por padrão; se overrides não trouxer thinkingConfig,
+ *   aplica budget = 0 (resposta imediata). Passe thinkingConfig nos overrides para ativar.
  */
 export function buildGeminiGenerationConfig(modelId, overrides = {}) {
   const config = { ...overrides }
-  if (modelUsesThinkingBudget(modelId)) {
+  if (modelUsesThinkingBudget(modelId) && config.thinkingConfig === undefined) {
     config.thinkingConfig = { thinkingBudget: 0 }
   }
   return config
