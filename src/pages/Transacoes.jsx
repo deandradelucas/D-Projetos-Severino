@@ -18,7 +18,7 @@ import {
   horizonteUserProfileTemId,
   subscribeHorizonteSessionRefresh,
 } from '../lib/horizonteSession'
-import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
+import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
@@ -95,7 +95,7 @@ export default function Transacoes() {
       const res = await fetch(apiUrl('/api/categorias'), {
         headers: horizonteApiAuthHeaders(),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
         const data = await res.json()
         setCategorias(data || [])
@@ -112,7 +112,7 @@ export default function Transacoes() {
       const res = await fetch(apiUrl('/api/recorrencias-mensais'), {
         headers: horizonteApiAuthHeaders(),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
         const data = await res.json()
         setRecorrencias(Array.isArray(data) ? data : [])
@@ -156,7 +156,7 @@ export default function Transacoes() {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
         const data = await res.json()
         const rows = Array.isArray(data) ? data : []
@@ -186,7 +186,7 @@ export default function Transacoes() {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
         const data = await res.json()
         const rows = Array.isArray(data) ? data : []
@@ -299,7 +299,7 @@ export default function Transacoes() {
         method: 'DELETE',
         headers: horizonteApiAuthHeaders(),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) fetchRecorrencias()
     } catch (err) {
       console.error('[Transacoes] encerrarRecorrencia:', err)
@@ -332,7 +332,7 @@ export default function Transacoes() {
         method: 'DELETE',
         headers: horizonteApiAuthHeaders(),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
         syncGlobalCache({ silent: true }) // Atualiza o Dashboard também
       } else {

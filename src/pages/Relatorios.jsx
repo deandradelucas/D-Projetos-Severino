@@ -5,6 +5,7 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { redirectSe401 } from '../lib/authRedirect'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { useRelatorioAggregates } from '../hooks/useRelatorioAggregates'
@@ -70,6 +71,7 @@ export default function Relatorios() {
       const res = await fetch(apiUrl('/api/categorias'), {
         headers: horizonteApiAuthHeaders(),
       })
+      if (redirectSe401(res)) return
       if (res.ok) {
         const data = await res.json()
         setCategorias(data || [])
@@ -94,6 +96,7 @@ export default function Relatorios() {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
+      if (redirectSe401(res)) return
       if (res.ok) {
         const data = await res.json()
         setTransacoes(data || [])

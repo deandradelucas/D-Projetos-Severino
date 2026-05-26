@@ -14,7 +14,7 @@ import TaxaCdiBadge from '../components/TaxaCdiBadge.jsx'
 import { apiUrl } from '../lib/apiUrl'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { readHorizonteUser } from '../lib/horizonteSession'
-import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
+import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
 import { INVESTIMENTOS_PRESETS_LIST } from '../lib/investimentosPresets'
 import { fetchTaxaCdiDeduplicated } from '../lib/taxaCdiClient'
@@ -77,7 +77,7 @@ export default function Investimentos() {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.message || 'Não foi possível carregar os investimentos.')
@@ -178,7 +178,7 @@ export default function Investimentos() {
         headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.message || (editingId ? 'Não foi possível atualizar.' : 'Não foi possível adicionar.'))
       if (editingId) {
@@ -212,7 +212,7 @@ export default function Investimentos() {
         method: 'DELETE',
         headers: horizonteApiAuthHeaders(),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       const errBody = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(errBody.message || 'Não foi possível remover.')
       showToast('Investimento removido.')
@@ -231,7 +231,7 @@ export default function Investimentos() {
         headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.message || 'Não foi possível adicionar o aporte.')
       setLista((prev) => prev.map((x) => (x.id === aporteTarget.id ? data : x)))
@@ -253,7 +253,7 @@ export default function Investimentos() {
         method: 'DELETE',
         headers: horizonteApiAuthHeaders(),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.message || 'Não foi possível remover o aporte.')
       setLista((prev) => prev.map((x) => (x.id === investimentoId ? data : x)))

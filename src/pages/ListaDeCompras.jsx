@@ -5,7 +5,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { apiUrl } from '../lib/apiUrl'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
-import { redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
+import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
 
 // ---------------------------------------------------------------------------
@@ -285,7 +285,7 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
         cache: 'no-store',
         body: JSON.stringify({ nome: nomeTrimmed }),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao criar lista.', 'error')
@@ -373,7 +373,7 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
     ;(async () => {
       try {
         const res = await fetch(apiUrl('/api/categorias'), { headers: horizonteApiAuthHeaders() })
-        if (redirectAssinaturaExpiradaSe403(res)) return
+        if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
         if (!res.ok) return
         const data = await res.json()
         if (cancelled) return
@@ -436,7 +436,7 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
         cache: 'no-store',
         body: JSON.stringify(body),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao registrar gasto.', 'error')
@@ -782,7 +782,7 @@ export default function ListaDeCompras() {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) return
       const data = await res.json()
       setListas(data)
@@ -809,7 +809,7 @@ export default function ListaDeCompras() {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) return
       const data = await res.json()
       setItens(data)
@@ -915,7 +915,7 @@ export default function ListaDeCompras() {
           preco_estimado: preco_estimado || null,
         }),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao adicionar item.', 'error')
@@ -969,7 +969,7 @@ export default function ListaDeCompras() {
           preco_estimado: preco_estimado || null,
         }),
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao salvar alterações.', 'error')
@@ -1003,7 +1003,7 @@ export default function ListaDeCompras() {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
         // Reverter em caso de erro
         setItens((prev) => prev.map((i) =>
@@ -1032,7 +1032,7 @@ export default function ListaDeCompras() {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
         // Recarregar se falhou
         carregarItens(listaAtiva, pessoalParam)
@@ -1059,7 +1059,7 @@ export default function ListaDeCompras() {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao arquivar.', 'error')
@@ -1098,7 +1098,7 @@ export default function ListaDeCompras() {
         headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
-      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao excluir.', 'error')

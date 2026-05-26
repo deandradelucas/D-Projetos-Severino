@@ -7,6 +7,7 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { apiUrl } from '../lib/apiUrl'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { redirectSe401 } from '../lib/authRedirect'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { showToast } from '../lib/toastStore'
 import {
@@ -86,6 +87,7 @@ export default function Agenda() {
         cache: 'no-store',
       })
       const data = await res.json().catch(() => [])
+      if (redirectSe401(res)) return
       if (!res.ok) throw new Error(data?.message || 'Falha ao carregar agenda.')
       setEventos(Array.isArray(data) ? data : [])
     } catch (err) {
@@ -244,6 +246,7 @@ export default function Agenda() {
         body: JSON.stringify(payload),
       })
       const data = await res.json().catch(() => ({}))
+      if (redirectSe401(res)) return
       if (!res.ok) throw new Error(data.message || 'Falha ao salvar item da agenda.')
       showToast(isEdit ? 'Item atualizado.' : 'Item criado.', 'success')
       setModalOpen(false)
@@ -265,6 +268,7 @@ export default function Agenda() {
       headers: horizonteApiAuthHeaders(),
     })
     const data = await res.json().catch(() => ({}))
+    if (redirectSe401(res)) return
     if (!res.ok) throw new Error(data.message || 'Falha ao remover item da agenda.')
   }
 
@@ -305,6 +309,7 @@ export default function Agenda() {
         body: JSON.stringify({ status }),
       })
       const data = await res.json().catch(() => ({}))
+      if (redirectSe401(res)) return
       if (!res.ok) throw new Error(data.message || 'Falha ao atualizar status.')
       showToast('Status atualizado.', 'success')
       await loadAgenda()
