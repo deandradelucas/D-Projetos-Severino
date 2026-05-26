@@ -1,7 +1,7 @@
 import { log } from '../logger.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { sendEvolutionText } from '../evolution-send.mjs'
-import { transcribeWhatsAppAudioWithGemini } from '../ai.mjs'
+// transcribeWhatsAppAudioWithGemini removido — áudio vai direto para parseWhatsAppAudioDirectWithAI via processarMensagemBot
 import { processarMensagemBot } from '../domain/whatsapp-bot.mjs'
 import { atualizarWhatsappId, buscarUsuarioPorTelefone } from '../usuarios.mjs'
 import { Alerts } from '../notify-telegram.mjs'
@@ -349,7 +349,9 @@ export async function processWhatsappBotBody(body, options = {}) {
         body?.messageId)
   )
 
-  /* Áudio: baixar/transcrever ANTES do claim — senão a Evolution retenta, o insert único bloqueia e o utilizador fica sem resposta. */
+  /* Áudio: baixar ANTES do claim — senão a Evolution retenta, o insert único bloqueia e o utilizador fica sem resposta.
+   * Parse combinado (áudio → JSON direto) acontece dentro de processarMensagemBot para evitar 2 calls sequenciais. */
+  let audioData = null
   if (wantsAudio) {
     const audioBuffer = await audioBufferFromWhatsAppBody(body)
     if (!audioBuffer?.length) {
@@ -358,24 +360,11 @@ export async function processWhatsappBotBody(body, options = {}) {
         response: { ok: false, reply: '🎙️ Não consegui receber o áudio. Tente enviar novamente.' },
       }
     }
-    try {
-      message = (
-        await transcribeWhatsAppAudioWithGemini(audioBuffer, body?.mimeType || body?.mimetype || 'audio/ogg')
-      ).trim()
-    } catch (e) {
-      log.warn('[whatsapp] transcrição áudio falhou', { detail: String(e?.message || e).slice(0, 320) })
-      return {
-        status: 400,
-        response: {
-          ok: false,
-          reply: '🎙️ Não consegui transcrever o áudio. Tente novamente ou envie por texto.',
-        },
-      }
-    }
+    audioData = { audioBytes: audioBuffer, mimeHint: body?.mimeType || body?.mimetype || 'audio/ogg' }
     inputType = 'audio'
   }
 
-  if (!phone || !message) {
+  if (!phone || (!message && !audioData)) {
     return { status: 400, response: { message: 'phone e message ou áudio são obrigatórios.' } }
   }
 
@@ -391,7 +380,7 @@ export async function processWhatsappBotBody(body, options = {}) {
     return { status: 200, response: { ok: true, duplicate: true, reply: '' } }
   }
 
-  const result = await processarMensagemBot(phone, message)
+  const result = await processarMensagemBot(phone, message, audioData || {})
   if (body?.remoteJid?.endsWith('@lid') && result?.ok === true && phone) {
     try {
       const lidDigits = jidToPhoneDigits(body.remoteJid)

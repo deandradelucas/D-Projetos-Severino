@@ -171,21 +171,10 @@ function normalizarDescricao(desc) {
 }
 
 /**
- * Interpreta mensagem de WhatsApp.
+ * Monta o system_instruction de parse financeiro (compartilhado entre texto e áudio).
  */
-export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
-  const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
-
-  const catMap = categoriasUsuario.map((c) => {
-    const subs = c.subcategorias.map((s) => `    • "${s.nome}" → ID: ${s.id}`).join('\n')
-    return `▸ ${c.tipo} | Categoria: "${c.nome}" → ID: ${c.id}\n${subs}`
-  }).join('\n')
-
-  const dataAtual = dataHoraAtualSP()
-
-  // system_instruction: enviado como campo separado — Gemini processa diferente de mensagem do usuário
-  const systemInstruction = `Você é o Severino, assistente financeiro pessoal. Analise mensagens e extraia dados de transação OU classifique como conversa.
+function buildTransactionParseSystemInstruction(catMap, dataAtual) {
+  return `Você é o Severino, assistente financeiro pessoal. Analise mensagens e extraia dados de transação OU classifique como conversa.
 
 DATA E HORA ATUAL: ${dataAtual}
 Use essa data para resolver referências temporais ("hoje", "ontem", "anteontem", "semana passada", "sexta", "dia 15", "essa manhã").
@@ -242,7 +231,21 @@ ${catMap || 'Sem categorias — use categoria_id: null.'}
 
 Transação: {"tipo":"DESPESA","valor":12.50,"descricao":"iFood","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null}
 Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável","categoria_id":null,"subcategoria_id":null,"data_transacao":null}`
+}
 
+/**
+ * Interpreta mensagem de WhatsApp.
+ */
+export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
+
+  const catMap = categoriasUsuario.map((c) => {
+    const subs = c.subcategorias.map((s) => `    • "${s.nome}" → ID: ${s.id}`).join('\n')
+    return `▸ ${c.tipo} | Categoria: "${c.nome}" → ID: ${c.id}\n${subs}`
+  }).join('\n')
+
+  const systemInstruction = buildTransactionParseSystemInstruction(catMap, dataHoraAtualSP())
   const userMessage = `MENSAGEM: "${message}"`
 
   const models = resolveGeminiModelCandidates()
@@ -250,13 +253,7 @@ Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta ami
 
   for (const mid of models) {
     try {
-      // Thinking budget de 512 para 2.5-flash: melhora casos ambíguos sem custo relevante
-      const thinkingConfig = mid.includes('2.5') ? { thinkingBudget: 512 } : undefined
-      const genCfg = buildGeminiGenerationConfig(mid, {
-        maxOutputTokens: 700,
-        temperature: 0.15,
-        ...(thinkingConfig ? { thinkingConfig } : {}),
-      })
+      const genCfg = buildGeminiGenerationConfig(mid, { maxOutputTokens: 700, temperature: 0.15 })
 
       const response = await geminiPostGenerateContent(mid, apiKey, {
         system_instruction: { parts: [{ text: systemInstruction }] },
@@ -277,7 +274,6 @@ Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta ami
       if (parsed?.descricao) parsed.descricao = normalizarDescricao(parsed.descricao)
 
       const sanitized = sanitizeTransacaoExtraidaIA(parsed, categoriasUsuario)
-      // Heurísticas rodam contra a mensagem E contra a descrição extraída
       const textoEnriquecimento = [message, parsed?.descricao].filter(Boolean).join(' ')
       return enriquecerCategoriaPorTexto(textoEnriquecimento, sanitized, categoriasUsuario)
     } catch {
@@ -297,6 +293,86 @@ Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta ami
   if (fallbackFinal) return enriquecerCategoriaPorTexto(message, fallbackFinal, categoriasUsuario)
 
   throw lastWhatsappErr || new Error('Falha na IA ao analisar mensagem.')
+}
+
+/**
+ * Parse de nota de voz → JSON de transação em um único call Gemini.
+ * Elimina a etapa separada de transcrição — corta latência pela metade para áudios.
+ */
+export async function parseWhatsAppAudioDirectWithAI(audioBytes, mimeHint = '', categoriasUsuario) {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
+
+  const buf = Buffer.isBuffer(audioBytes) ? audioBytes : Buffer.from(audioBytes)
+  if (buf.length === 0) throw new Error('Áudio vazio.')
+  if (buf.length > MAX_WHATSAPP_AUDIO_BYTES) {
+    throw new Error(`Áudio demasiado grande (máx. ${Math.floor(MAX_WHATSAPP_AUDIO_BYTES / 1024 / 1024)} MB).`)
+  }
+  if (looksLikeNonBinaryAudioPayload(buf)) {
+    throw new Error('Áudio inválido (payload não é ficheiro de som).')
+  }
+
+  const b64 = buf.toString('base64')
+
+  const catMap = categoriasUsuario.map((c) => {
+    const subs = c.subcategorias.map((s) => `    • "${s.nome}" → ID: ${s.id}`).join('\n')
+    return `▸ ${c.tipo} | Categoria: "${c.nome}" → ID: ${c.id}\n${subs}`
+  }).join('\n')
+
+  const systemInstruction = buildTransactionParseSystemInstruction(catMap, dataHoraAtualSP())
+
+  // WhatsApp envia sempre ogg/opus — limitar candidatos evita tentativas desnecessárias
+  const sniffed = sniffAudioMimeFromBuffer(buf)
+  const norm = normalizeAudioMimeForGemini(mimeHint)
+  const mimes = [...new Set([sniffed, norm, 'audio/ogg', 'audio/webm'].filter(Boolean))].slice(0, 4)
+
+  const models = resolveGeminiModelCandidates()
+  let lastErr = null
+
+  modelLoop: for (const mid of models) {
+    for (const mime of mimes) {
+      const body = {
+        system_instruction: { parts: [{ text: systemInstruction }] },
+        contents: [{ role: 'user', parts: [
+          { inline_data: { mime_type: mime, data: b64 } },
+          { text: 'Analise esta nota de voz e retorne o JSON conforme instruído.' },
+        ]}],
+        generationConfig: buildGeminiGenerationConfig(mid, { maxOutputTokens: 700, temperature: 0.15 }),
+      }
+
+      try {
+        const response = await geminiPostGenerateContent(mid, apiKey, body)
+        if (!response.ok) {
+          const t = await response.text()
+          const apiMsg = t?.slice(0, 500)
+          lastErr = new Error(`Gemini ${response.status}: ${apiMsg}`)
+          if (response.status === 401) throw lastErr
+          if (response.status === 404 || /not found/i.test(apiMsg)) continue modelLoop
+          continue
+        }
+
+        const json = await response.json()
+        const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+
+        const parsed = tryParseJsonBlock(text)
+        if (!parsed) {
+          lastErr = new Error('Resposta sem JSON válido')
+          continue
+        }
+
+        if (parsed.descricao) parsed.descricao = normalizarDescricao(parsed.descricao)
+        const sanitized = sanitizeTransacaoExtraidaIA(parsed, categoriasUsuario)
+        const textoEnriquecimento = [parsed?.descricao].filter(Boolean).join(' ')
+        return enriquecerCategoriaPorTexto(textoEnriquecimento, sanitized, categoriasUsuario)
+      } catch (e) {
+        if (e?.message?.includes?.('401')) throw e
+        lastErr = e
+      }
+    }
+  }
+
+  log.warn({ msg: 'whatsapp_audio_direct_parse_failed', detail: String(lastErr?.message || lastErr) })
+  throw lastErr || new Error('Não foi possível processar o áudio.')
 }
 
 /**
