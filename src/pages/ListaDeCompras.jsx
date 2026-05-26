@@ -175,6 +175,25 @@ function IconX() {
   )
 }
 
+function IconEdit() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  )
+}
+
+// Logo oficial do WhatsApp (Simple Icons / brand mark, viewBox 32×32).
+function IconWhatsApp() {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" fill="currentColor">
+      <path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.09-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.83 2.7.83.916 0 2.495-.74 2.838-1.612.13-.33.244-.74.244-1.118 0-.288-.027-.387-.273-.488-.115-.043-2.36-1.135-2.487-1.207-.058-.043-.115-.043-.187-.043z"/>
+      <path d="M16.227 3.005C9.05 3.005 3.252 8.804 3.252 15.98c0 2.21.572 4.39 1.665 6.29l-1.943 5.88a.696.696 0 0 0 .9.9l5.88-1.943a12.93 12.93 0 0 0 6.29 1.665c7.176 0 12.975-5.799 12.975-12.975S23.402 3.005 16.227 3.005zm0 23.83c-2.062 0-4.082-.567-5.835-1.643a.696.696 0 0 0-.582-.072l-3.42 1.13 1.13-3.42a.696.696 0 0 0-.072-.582 10.842 10.842 0 0 1-1.643-5.835c0-6.012 4.892-10.905 10.905-10.905 6.012 0 10.905 4.893 10.905 10.905s-4.893 10.422-10.905 10.422z"/>
+    </svg>
+  )
+}
+
 function IconChevronDown() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="page-lista-compras__checked-chevron">
@@ -504,11 +523,21 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
 // Modal Novo Item
 // ---------------------------------------------------------------------------
 
-function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
-  const [nome, setNome] = useState('')
-  const [quantidade, setQuantidade] = useState(1)
-  const [unidade, setUnidade] = useState('un')
-  const [preco, setPreco] = useState('')
+function ModalNovoItem({ historico, onClose, onSalvar, adicionando, itemEditando = null }) {
+  const editando = !!itemEditando
+  const [nome, setNome] = useState(itemEditando?.nome ?? '')
+  const [quantidade, setQuantidade] = useState(
+    itemEditando?.quantidade != null ? Number(itemEditando.quantidade) : 1
+  )
+  const [unidade, setUnidade] = useState(itemEditando?.unidade ?? 'un')
+  const [unidades, setUnidades] = useState(
+    itemEditando?.unidades != null ? Math.max(1, Number(itemEditando.unidades)) : 1
+  )
+  const [precoCentavos, setPrecoCentavos] = useState(
+    itemEditando?.preco_estimado != null && Number(itemEditando.preco_estimado) > 0
+      ? Math.round(Number(itemEditando.preco_estimado) * 100)
+      : 0
+  )
   const [sugestoes, setSugestoes] = useState([])
   const [showAuto, setShowAuto] = useState(false)
   const inputRef = useRef(null)
@@ -531,30 +560,35 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
     e.preventDefault()
     const nomeTrimmed = nome.trim()
     if (!nomeTrimmed) return
-    const precoStr = preco.replace(',', '.').trim()
-    const precoVal = precoStr !== '' ? parseFloat(precoStr) : null
-    onSalvar({
+    const precoVal = precoCentavos > 0 ? precoCentavos / 100 : null
+    const unidadesVal = Math.max(1, Number(unidades) || 1)
+    const payload = {
       nome: nomeTrimmed,
       quantidade,
       unidade,
-      preco_estimado: precoVal && precoVal > 0 ? precoVal : null,
-    })
+      unidades: unidadesVal,
+      preco_estimado: precoVal,
+    }
+    if (editando) {
+      onSalvar({ id: itemEditando.id, ...payload })
+    } else {
+      onSalvar(payload)
+    }
   }
 
   const nomeTrim = nome.trim()
-  const precoNum = (() => {
-    const s = preco.replace(',', '.').trim()
-    if (!s) return null
-    const v = parseFloat(s)
-    return Number.isFinite(v) && v > 0 ? v : null
-  })()
-  const subtotal = precoNum != null ? precoNum * quantidade : null
+  const precoNum = precoCentavos > 0 ? precoCentavos / 100 : null
+  const precoFormatado = precoCentavos > 0 ? formatarMoeda(precoCentavos / 100) : ''
+  const unidadesNum = Math.max(1, Number(unidades) || 1)
+  const subtotal = precoNum != null ? precoNum * unidadesNum : null
 
   return (
     <div className="page-lista-compras__modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-novo-item-titulo">
         <div className="page-lista-compras__modal-header">
-          <h2 id="modal-novo-item-titulo" className="page-lista-compras__modal-title">Novo item</h2>
+          <h2 id="modal-novo-item-titulo" className="page-lista-compras__modal-title">
+            {editando ? 'Editar item' : 'Novo item'}
+          </h2>
           <button type="button" className="page-lista-compras__modal-close" onClick={onClose} aria-label="Fechar">
             <IconX />
           </button>
@@ -613,6 +647,41 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
             </div>
 
             <div className="page-lista-compras__modal-field">
+              <label className="page-lista-compras__modal-label" htmlFor="item-unidade">Medida</label>
+              <select
+                id="item-unidade"
+                className="page-lista-compras__modal-input page-lista-compras__modal-select page-lista-compras__modal-select--unidade"
+                value={unidade}
+                onChange={(e) => setUnidade(e.target.value)}
+                aria-label="Medida"
+              >
+                {['un', 'kg', 'g', 'L', 'mL', 'cx', 'pct', 'dz'].map((u) => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="page-lista-compras__modal-row">
+            <div className="page-lista-compras__modal-field">
+              <label className="page-lista-compras__modal-label" htmlFor="item-unidades">Unidade</label>
+              <input
+                id="item-unidades"
+                className="page-lista-compras__modal-input page-lista-compras__modal-input--qty"
+                type="number"
+                inputMode="numeric"
+                min="1"
+                step="1"
+                value={unidades}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value, 10)
+                  if (!isNaN(v) && v >= 1) setUnidades(v)
+                  else if (e.target.value === '') setUnidades(1)
+                }}
+              />
+            </div>
+
+            <div className="page-lista-compras__modal-field">
               <label className="page-lista-compras__modal-label" htmlFor="item-preco">
                 Preço <span className="page-lista-compras__modal-label--optional">(opcional)</span>
               </label>
@@ -620,28 +689,20 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
                 id="item-preco"
                 className="page-lista-compras__modal-input"
                 type="text"
-                inputMode="decimal"
-                placeholder="Ex: 7,90"
-                value={preco}
-                onChange={(e) => setPreco(e.target.value)}
+                inputMode="numeric"
+                placeholder="R$ 0,00"
+                value={precoFormatado}
+                onChange={(e) => {
+                  const onlyDigits = e.target.value.replace(/\D/g, '')
+                  if (onlyDigits === '') {
+                    setPrecoCentavos(0)
+                  } else {
+                    const limited = onlyDigits.slice(0, 11)
+                    setPrecoCentavos(parseInt(limited, 10))
+                  }
+                }}
+                maxLength={20}
               />
-            </div>
-          </div>
-
-          <div className="page-lista-compras__modal-field">
-            <span className="page-lista-compras__modal-label">Unidade</span>
-            <div className="page-lista-compras__unit-pills" role="group" aria-label="Unidade de medida">
-              {['un', 'kg', 'g', 'L', 'mL', 'cx', 'pct', 'dz'].map((u) => (
-                <button
-                  key={u}
-                  type="button"
-                  className={`page-lista-compras__unit-pill${unidade === u ? ' page-lista-compras__unit-pill--active' : ''}`}
-                  onClick={() => setUnidade(u)}
-                  aria-pressed={unidade === u}
-                >
-                  {u}
-                </button>
-              ))}
             </div>
           </div>
 
@@ -652,7 +713,7 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
                 <span className="page-lista-compras__modal-resumo-meta">
                   {quantidade} {unidade}
                   {precoNum != null && (
-                    <> · {formatarMoeda(precoNum)} / {unidade}</>
+                    <> · {unidadesNum} × {formatarMoeda(precoNum)}</>
                   )}
                 </span>
               </div>
@@ -669,7 +730,9 @@ function ModalNovoItem({ historico, onClose, onSalvar, adicionando }) {
           <div className="page-lista-compras__modal-actions">
             <button type="button" className="page-lista-compras__modal-cancel" onClick={onClose}>Cancelar</button>
             <button type="submit" className="page-lista-compras__modal-confirm" disabled={adicionando || !nome.trim()}>
-              {adicionando ? 'Adicionando…' : 'Adicionar'}
+              {adicionando
+                ? (editando ? 'Salvando…' : 'Adicionando…')
+                : (editando ? 'Salvar alterações' : 'Adicionar')}
             </button>
           </div>
         </form>
@@ -692,6 +755,7 @@ export default function ListaDeCompras() {
   const [historico, setHistorico] = useState([])
   const [modalNovaLista, setModalNovaLista] = useState(false)
   const [modalNovoItem, setModalNovoItem] = useState(false)
+  const [itemEmEdicao, setItemEmEdicao] = useState(null)
   const [modalGasto, setModalGasto] = useState(false)
   const [checkedAberto, setCheckedAberto] = useState(true)
   const [menuListaAberto, setMenuListaAberto] = useState(false)
@@ -828,7 +892,7 @@ export default function ListaDeCompras() {
   // Adicionar item
   // -------------------------------------------------------------------------
 
-  const adicionarItem = useCallback(async ({ nome, quantidade, unidade, preco_estimado }) => {
+  const adicionarItem = useCallback(async ({ nome, quantidade, unidade, unidades, preco_estimado }) => {
     const nomeTrimmed = nome.trim()
     if (!nomeTrimmed || !listaAtiva) return
 
@@ -845,6 +909,7 @@ export default function ListaDeCompras() {
           categoria_item: categoria,
           quantidade,
           unidade,
+          unidades: Math.max(1, Number(unidades) || 1),
           preco_estimado: preco_estimado || null,
         }),
       })
@@ -866,6 +931,58 @@ export default function ListaDeCompras() {
       setAdicionando(false)
     }
   }, [listaAtiva, historico, pessoalParam])
+
+  // -------------------------------------------------------------------------
+  // Iniciar edição (abre o modal pré-preenchido)
+  // -------------------------------------------------------------------------
+
+  const iniciarEdicaoItem = useCallback((item) => {
+    setItemEmEdicao(item)
+    setModalNovoItem(true)
+  }, [])
+
+  // -------------------------------------------------------------------------
+  // Editar item (PATCH)
+  // -------------------------------------------------------------------------
+
+  const editarItem = useCallback(async ({ id, nome, quantidade, unidade, unidades, preco_estimado }) => {
+    if (!listaAtiva || !id) return
+    const nomeTrimmed = String(nome || '').trim()
+    if (!nomeTrimmed) return
+
+    setAdicionando(true)
+    const categoria = detectarCategoria(nomeTrimmed)
+
+    try {
+      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${id}${pessoalParam}`), {
+        method: 'PATCH',
+        headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({
+          nome: nomeTrimmed,
+          categoria_item: categoria,
+          quantidade,
+          unidade,
+          unidades: Math.max(1, Number(unidades) || 1),
+          preco_estimado: preco_estimado || null,
+        }),
+      })
+      if (redirectAssinaturaExpiradaSe403(res)) return
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        showToast(err.message || 'Erro ao salvar alterações.', 'error')
+        return
+      }
+      const atualizado = await res.json()
+      setItens((prev) => prev.map((i) => (i.id === id ? { ...i, ...atualizado } : i)))
+      setItemEmEdicao(null)
+      setModalNovoItem(false)
+    } catch {
+      showToast('Erro ao salvar alterações.', 'error')
+    } finally {
+      setAdicionando(false)
+    }
+  }, [listaAtiva, pessoalParam])
 
   // -------------------------------------------------------------------------
   // Toggle checked (optimistic update)
@@ -1044,10 +1161,49 @@ export default function ListaDeCompras() {
   const totalEstimado = useMemo(() =>
     itens.reduce((sum, i) => {
       if (i.checked) return sum
-      return sum + (i.preco_estimado != null ? Number(i.preco_estimado) * Number(i.quantidade || 1) : 0)
+      const preco = i.preco_estimado != null ? Number(i.preco_estimado) : 0
+      const unid = Math.max(1, Number(i.unidades) || 1)
+      return sum + preco * unid
     }, 0),
     [itens]
   )
+
+  const enviarWhatsApp = useCallback(() => {
+    if (!listaAtivaDados) return
+    const linhas = []
+    const tituloLista = (listaAtivaDados.nome || 'Lista de Compras').trim()
+    linhas.push(`🛒 *${tituloLista}*`)
+    if (listaAtivaDados.categoria_financeira) {
+      linhas.push(`_${listaAtivaDados.categoria_financeira}_`)
+    }
+    linhas.push('')
+
+    const cats = itensAgrupados.ordenadas
+    cats.forEach((cat, idx) => {
+      const emoji = CATEGORIA_EMOJI[cat] || '🛒'
+      linhas.push(`${emoji} *${cat}*`)
+      itensAgrupados.grupos[cat].forEach((item) => {
+        const qtd = Number(item.quantidade)
+        const u = item.unidade || 'un'
+        const unid = Math.max(1, Number(item.unidades) || 1)
+        const partes = [`${qtd} ${u}`]
+        if (unid > 1) partes.push(`${unid}un`)
+        const preco = item.preco_estimado != null ? Number(item.preco_estimado) : null
+        const subtotal = preco != null && preco > 0 ? preco * unid : null
+        const sufixo = subtotal != null ? ` — ${formatarMoeda(subtotal)}` : ''
+        linhas.push(`• ${item.nome} (${partes.join(' · ')})${sufixo}`)
+      })
+      if (idx < cats.length - 1) linhas.push('')
+    })
+
+    if (totalEstimado > 0) {
+      linhas.push('')
+      linhas.push(`💰 *Total estimado:* ${formatarMoeda(totalEstimado)}`)
+    }
+
+    const url = `https://wa.me/?text=${encodeURIComponent(linhas.join('\n'))}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }, [listaAtivaDados, itensAgrupados, totalEstimado])
 
   const temPreco = useMemo(() =>
     itens.some((i) => !i.checked && i.preco_estimado != null && Number(i.preco_estimado) > 0),
@@ -1234,6 +1390,7 @@ export default function ListaDeCompras() {
                         item={item}
                         onToggle={toggleItem}
                         onRemover={removerItem}
+                        onEditar={iniciarEdicaoItem}
                       />
                     ))}
                   </div>
@@ -1264,6 +1421,7 @@ export default function ListaDeCompras() {
                         item={item}
                         onToggle={toggleItem}
                         onRemover={removerItem}
+                        onEditar={iniciarEdicaoItem}
                       />
                     ))}
                   </div>
@@ -1273,42 +1431,54 @@ export default function ListaDeCompras() {
             </RefDashboardScroll>
           </div>
 
-          {/* Footer total + CTA (só com preço estimado) */}
-          {listaAtiva && temPreco && (
-            <div className="page-lista-compras__footer">
-              <p className="page-lista-compras__total">
-                Total estimado: <strong>{formatarMoeda(totalEstimado)}</strong>
-              </p>
+          {/* Footer unificado: Total + Novo item + Registrar como gasto */}
+          {listaAtiva && (
+            <div className={`page-lista-compras__footer${temPreco ? '' : ' page-lista-compras__footer--solo'}`}>
+              {temPreco && (
+                <p className="page-lista-compras__total">
+                  Total estimado: <strong>{formatarMoeda(totalEstimado)}</strong>
+                </p>
+              )}
               <button
                 type="button"
-                className="page-lista-compras__cta-btn"
-                onClick={() => setModalGasto(true)}
+                className="page-lista-compras__novo-item-fab"
+                onClick={() => setModalNovoItem(true)}
+                aria-label="Adicionar novo item à lista"
               >
-                Registrar como gasto
+                <span className="page-lista-compras__novo-item-fab__icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 5v14" />
+                    <path d="M5 12h14" />
+                  </svg>
+                </span>
+                <span className="page-lista-compras__novo-item-fab__label">Novo item</span>
               </button>
+              {temPreco && (
+                <button
+                  type="button"
+                  className="page-lista-compras__wa-btn"
+                  onClick={enviarWhatsApp}
+                  aria-label="Enviar lista pelo WhatsApp"
+                  title="Enviar lista pelo WhatsApp"
+                >
+                  <IconWhatsApp />
+                  <span className="page-lista-compras__wa-btn__label">WhatsApp</span>
+                </button>
+              )}
+              {temPreco && (
+                <button
+                  type="button"
+                  className="page-lista-compras__cta-btn"
+                  onClick={() => setModalGasto(true)}
+                >
+                  Registrar como gasto
+                </button>
+              )}
             </div>
           )}
 
         </main>
       </div>
-
-      {/* FAB: Novo item */}
-      {listaAtiva && (
-        <button
-          type="button"
-          className="page-lista-compras__novo-item-fab"
-          onClick={() => setModalNovoItem(true)}
-          aria-label="Adicionar novo item à lista"
-        >
-          <span className="page-lista-compras__novo-item-fab__icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 5v14" />
-              <path d="M5 12h14" />
-            </svg>
-          </span>
-          <span className="page-lista-compras__novo-item-fab__label">Novo item</span>
-        </button>
-      )}
 
       {/* Modal nova lista */}
       {modalNovaLista && (
@@ -1319,13 +1489,14 @@ export default function ListaDeCompras() {
         />
       )}
 
-      {/* Modal novo item */}
+      {/* Modal novo / editar item */}
       {modalNovoItem && (
         <ModalNovoItem
           historico={historico}
-          onClose={() => setModalNovoItem(false)}
-          onSalvar={adicionarItem}
+          onClose={() => { setModalNovoItem(false); setItemEmEdicao(null) }}
+          onSalvar={itemEmEdicao ? editarItem : adicionarItem}
           adicionando={adicionando}
+          itemEditando={itemEmEdicao}
         />
       )}
 
@@ -1346,7 +1517,7 @@ export default function ListaDeCompras() {
 // ItemRow — extraído para evitar re-renders desnecessários
 // ---------------------------------------------------------------------------
 
-function ItemRow({ item, onToggle, onRemover }) {
+function ItemRow({ item, onToggle, onRemover, onEditar }) {
   return (
     <div className={`page-lista-compras__item${item.checked ? ' page-lista-compras__item--checked' : ''}`}>
       <button
@@ -1362,21 +1533,36 @@ function ItemRow({ item, onToggle, onRemover }) {
       <div className="page-lista-compras__item-body">
         <span className="page-lista-compras__item-name">{item.nome}</span>
         <span className="page-lista-compras__item-qty">{Number(item.quantidade)} {item.unidade}</span>
+        <span className="page-lista-compras__item-units">
+          {Math.max(1, Number(item.unidades) || 1)}un
+        </span>
         {item.preco_estimado != null && Number(item.preco_estimado) > 0 && (
           <span className="page-lista-compras__item-price">
-            {formatarMoeda(Number(item.preco_estimado) * Number(item.quantidade || 1))}
+            {formatarMoeda(Number(item.preco_estimado) * Math.max(1, Number(item.unidades) || 1))}
           </span>
         )}
       </div>
 
-      <button
-        type="button"
-        className="page-lista-compras__item-delete"
-        onClick={() => onRemover(item.id)}
-        aria-label={`Remover ${item.nome}`}
-      >
-        <IconX />
-      </button>
+      <div className="page-lista-compras__item-actions">
+        {onEditar && (
+          <button
+            type="button"
+            className="page-lista-compras__item-edit"
+            onClick={() => onEditar(item)}
+            aria-label={`Editar ${item.nome}`}
+          >
+            <IconEdit />
+          </button>
+        )}
+        <button
+          type="button"
+          className="page-lista-compras__item-delete"
+          onClick={() => onRemover(item.id)}
+          aria-label={`Remover ${item.nome}`}
+        >
+          <IconX />
+        </button>
+      </div>
     </div>
   )
 }
