@@ -28,6 +28,8 @@ const INITIAL_FORM = {
   recorrencia_dia_1: false,
   parcelado: false,
   num_parcelas: '2',
+  data_pagamento: '',
+  prazo_indeterminado: false,
 }
 
 export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSave, onClose }) {
@@ -66,6 +68,8 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
         recorrencia_dia_1: false,
         parcelado: false,
         num_parcelas: '2',
+        data_pagamento: '',
+        prazo_indeterminado: false,
       })
       return
     }
@@ -114,7 +118,11 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
     }
 
     const numParcelas = parseInt(formData.num_parcelas, 10)
-    if (formData.parcelado && (!Number.isInteger(numParcelas) || numParcelas < 2 || numParcelas > 120)) {
+    if (
+      formData.parcelado &&
+      !formData.prazo_indeterminado &&
+      (!Number.isInteger(numParcelas) || numParcelas < 2 || numParcelas > 120)
+    ) {
       showToast('Número de parcelas deve ser entre 2 e 120.', 'error')
       return
     }
@@ -132,13 +140,32 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
       // Limpa campos de controle de UI
       delete payload.parcelado
       delete payload.num_parcelas
+      delete payload.data_pagamento
+      delete payload.prazo_indeterminado
 
       if (!isEditMode) {
         payload.recorrencia = null
 
-        if (formData.parcelado && numParcelas >= 2) {
-          // Parcelamento — recorrência não pode coexistir
-          payload.parcelamento = { num_parcelas: numParcelas }
+        // Data de pagamento (opcional): aplicada como data-base do lançamento.
+        // Input <type="date"> entrega "YYYY-MM-DD"; convertemos para ISO em UTC noon
+        // pra evitar deslize de fuso (fica no mesmo dia em qualquer timezone).
+        const dpRaw = String(formData.data_pagamento || '').trim()
+        let dpIso = null
+        if (dpRaw) {
+          const dp = new Date(`${dpRaw}T12:00:00Z`)
+          if (!Number.isNaN(dp.getTime())) dpIso = dp.toISOString()
+        }
+
+        if (formData.parcelado && formData.prazo_indeterminado) {
+          // Assinatura/stream sem fim: não cria N parcelas, ativa recorrência
+          // mensal indeterminada (mesmo modelo de "Repetir todo mês neste dia").
+          payload.recorrencia_dia_1 = true
+          if (dpIso) payload.data_transacao = dpIso
+          delete payload.parcelamento
+        } else if (formData.parcelado && numParcelas >= 2) {
+          const parcelamento = { num_parcelas: numParcelas }
+          if (dpIso) parcelamento.data_pagamento = dpIso
+          payload.parcelamento = parcelamento
           delete payload.recorrencia_dia_1
         } else if (!formData.recorrencia_dia_1) {
           delete payload.recorrencia_dia_1

@@ -77,9 +77,18 @@ export const TransactionService = {
 
     const agora = new Date()
     const hojeStr = agora.toISOString().slice(0, 10) // "YYYY-MM-DD" UTC
+
+    // Data-base das parcelas: usa data_pagamento (se informada) ou cai em data_transacao.
+    // data_pagamento representa o vencimento da 1ª parcela (ex.: fatura do cartão).
+    const dataPagamentoRaw = payload.parcelamento && payload.parcelamento.data_pagamento
+    const baseDataParcelas =
+      dataPagamentoRaw && !Number.isNaN(Date.parse(String(dataPagamentoRaw)))
+        ? String(dataPagamentoRaw)
+        : payload.data_transacao
+
     const rows = []
     for (let i = 1; i <= n; i++) {
-      const dataParcela = addMonths(payload.data_transacao, i - 1)
+      const dataParcela = addMonths(baseDataParcelas, i - 1)
       const dataIso = dataParcela.toISOString()
       const valor = i === n ? +(valorBase + ajuste).toFixed(2) : valorBase
       const descricao = descricaoBase ? `${descricaoBase} (${i}/${n})` : `Parcela ${i}/${n}`

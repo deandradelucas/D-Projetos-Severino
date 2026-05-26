@@ -688,6 +688,18 @@ body[data-theme='light'] .parcelamento-preview {
   color: #2563eb;
 }
 
+/* Hint discreto (não tem o destaque colorido do preview de valor). */
+.parcelamento-preview.parcelamento-preview--hint {
+  color: var(--text-secondary, #6b7280);
+  font-weight: 500;
+  font-size: 12px;
+  font-style: italic;
+}
+
+body[data-theme='light'] .parcelamento-preview.parcelamento-preview--hint {
+  color: var(--text-secondary, #6b7280);
+}
+
 /* Sub-opções de recorrência e parcelamento */
 .rec-sub-opts {
   display: flex;
@@ -730,6 +742,16 @@ body[data-theme='light'] .rec-vezes-row {
 
 body[data-theme='light'] .rec-vezes-row__label {
   color: #334155;
+}
+
+/* Variante toggle: label à esquerda + checkbox à direita (label clicável). */
+.rec-vezes-row.rec-vezes-row--toggle {
+  cursor: pointer;
+  justify-content: space-between;
+}
+
+.rec-vezes-row.rec-vezes-row--toggle .rec-vezes-row__label {
+  flex: 1;
 }
 
 .type-toggle {
