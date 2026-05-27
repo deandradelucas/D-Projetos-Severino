@@ -154,9 +154,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               className="brand-mark"
               decoding="sync"
             />
-            <span className={`brand-wordmark${isLightTheme ? '' : ' brand-wordmark--dark'}`}>
-              Severino
-            </span>
+            <strong className="brand-wordmark">Severino</strong>
           </span>
           <button
             ref={closeButtonRef}

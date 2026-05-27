@@ -10,8 +10,8 @@ export const BRAND_ASSETS = {
    *  Mantido como histórico; o tema claro hoje renderiza `sidebarMarkLight`
    *  (símbolo quadrado) + wordmark "Severino" como texto separado. */
   sidebarLogo: '/images/Nova Logo/Severino Tema Claro.png',
-  /** Símbolo "S" do tema claro (PNG quadrado, sem wordmark, sem tagline). */
-  sidebarMarkLight: '/images/Nova Logo/logo.png',
+  /** Símbolo do tema claro — mesmo layout do escuro (mark + wordmark no Sidebar). */
+  sidebarMarkLight: '/images/Nova Logo/logo tema claro.png',
   /** Símbolo do tema escuro — mesmo layout do claro (mark + wordmark). */
   sidebarMarkDark: '/images/Nova Logo/logo tema escuro.png',
   /** Menu lateral — escuro (legado; telas que ainda usam PNG completo) */

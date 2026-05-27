@@ -1439,26 +1439,31 @@ export default function ListaDeCompras() {
           {/* Footer unificado: Total + Novo item + Registrar como gasto */}
           {listaAtiva && (
             <div className={`page-lista-compras__footer${temPreco ? '' : ' page-lista-compras__footer--solo'}`}>
-              {temPreco && (
-                <p className="page-lista-compras__total">
-                  Total estimado: <strong>{formatarMoeda(totalEstimado)}</strong>
-                </p>
-              )}
-              <div className="page-lista-compras__footer-novo">
-                <button
-                  type="button"
-                  className="page-lista-compras__novo-item-fab"
-                  onClick={() => setModalNovoItem(true)}
-                  aria-label="Adicionar novo item à lista"
-                >
-                  <span className="page-lista-compras__novo-item-fab__icon" aria-hidden="true">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 5v14" />
-                      <path d="M5 12h14" />
-                    </svg>
-                  </span>
-                  <span className="page-lista-compras__novo-item-fab__label">Novo item</span>
-                </button>
+              <div className="page-lista-compras__footer-main">
+                <div className="page-lista-compras__footer-total-row">
+                  {temPreco && (
+                    <p className="page-lista-compras__total">
+                      <span className="page-lista-compras__total-label">Total:</span>
+                      <span className="page-lista-compras__total-value">{formatarMoeda(totalEstimado)}</span>
+                    </p>
+                  )}
+                  <div className="page-lista-compras__footer-novo">
+                    <button
+                      type="button"
+                      className="page-lista-compras__novo-item-fab"
+                      onClick={() => setModalNovoItem(true)}
+                      aria-label="Adicionar novo item à lista"
+                    >
+                      <span className="page-lista-compras__novo-item-fab__icon" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 5v14" />
+                          <path d="M5 12h14" />
+                        </svg>
+                      </span>
+                      <span className="page-lista-compras__novo-item-fab__label">Novo item</span>
+                    </button>
+                  </div>
+                </div>
               </div>
               {temPreco && (
                 <div className="page-lista-compras__footer-actions">

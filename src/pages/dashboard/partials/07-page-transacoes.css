@@ -1484,21 +1484,56 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   flex-shrink: 0;
 }
 
-/* Desktop: footer ancorado dentro da área de conteúdo (após o sidebar).
-   Usa max() para respeitar o container centralizado com max-width (--app-shell-max).
-   Em monitores largos o container é centrado — left/right precisam compensar. */
+/* Desktop: footer no fluxo da coluna main (como Lista de Compras), totais centralizados
+   e folga à direita para o FAB Severino (chat). */
 @media (min-width: 769px) {
+  .dashboard-container.page-transacoes .main-content.ref-dashboard-main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
+    min-height: 0;
+  }
+
+  .dashboard-container.page-transacoes .ref-dashboard-inner.dashboard-hub {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dashboard-container.page-transacoes .ref-dashboard-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .page-transacoes-parcelados-footer {
-    left: max(
-      calc(50vw - var(--app-shell-max, 1580px) / 2 + var(--app-sidebar-width, 260px) + 16px),
-      calc(var(--app-sidebar-width, 260px) + 16px)
-    );
-    right: max(
-      calc(50vw - var(--app-shell-max, 1580px) / 2 + 24px),
-      24px
-    );
-    bottom: 24px;
-    max-width: none;
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    max-width: 100%;
+    margin-top: auto;
+    flex-shrink: 0;
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0;
+    /* Reserva à direita para o FAB Severino (56px + 28px + folga) */
+    padding: 12px 96px 14px 24px;
+  }
+
+  .page-transacoes-parcelados-footer__item {
+    flex: unset;
+    min-width: 0;
+  }
+
+  .page-transacoes-parcelados-footer__divider {
+    margin: 4px 16px;
   }
 }
 
@@ -1510,7 +1545,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 
 @media (min-width: 769px) {
   .page-transacoes-ref-table--parceladas .page-transacoes-parcelados-list {
-    padding-bottom: 110px;
+    padding-bottom: 16px;
   }
 }
 
