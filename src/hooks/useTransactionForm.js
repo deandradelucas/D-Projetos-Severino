@@ -72,6 +72,8 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
         parcela_inicial: '1',
         data_pagamento: '',
         prazo_indeterminado: false,
+        recorrente_index: t.recorrente_index != null ? String(t.recorrente_index) : '',
+        recorrente_total: t.recorrente_total != null ? String(t.recorrente_total) : '',
       })
       return
     }
@@ -151,8 +153,21 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
       // Limpa campos de controle de UI
       delete payload.parcelado
       delete payload.num_parcelas
+      delete payload.parcela_inicial
       delete payload.data_pagamento
       delete payload.prazo_indeterminado
+
+      if (isEditMode) {
+        // Em edição: recorrente_index pode ser alterado pelo usuário.
+        // Reconstrói a descrição com o novo sufixo (N/total) se for parcelada.
+        const ri = parseInt(formData.recorrente_index, 10)
+        const rt = parseInt(formData.recorrente_total, 10)
+        if (ri > 0 && rt > 0) {
+          payload.recorrente_index = ri
+          payload.descricao = descricao ? `${descricao} (${ri}/${rt})` : `Parcela ${ri}/${rt}`
+        }
+        delete payload.recorrente_total
+      }
 
       if (!isEditMode) {
         payload.recorrencia = null

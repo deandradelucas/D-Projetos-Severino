@@ -343,6 +343,32 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               </div>
             </section>
 
+            {/* ── Parcela atual (só edição de parceladas) ── */}
+            {isEditMode && formData.recorrente_index && formData.recorrente_total && (
+              <section className="nova-tx-section" aria-label="Parcelamento">
+                <h4 className="nova-tx-section__title">Parcelamento</h4>
+                <div className="rec-vezes-row">
+                  <label htmlFor="tx-edit-parcela" className="rec-vezes-row__label">
+                    Parcela
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <input
+                      id="tx-edit-parcela"
+                      type="number"
+                      min="1"
+                      max={parseInt(formData.recorrente_total, 10)}
+                      value={formData.recorrente_index}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, recorrente_index: e.target.value }))}
+                      className="input-premium rec-vezes-row__input"
+                    />
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                      / {formData.recorrente_total}
+                    </span>
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* ── Seção: Parcelamento (só criação) ── */}
             {!isEditMode && (() => {
               const numParcelas = parseInt(formData.num_parcelas, 10)

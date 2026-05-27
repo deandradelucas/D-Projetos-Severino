@@ -468,6 +468,12 @@ export async function atualizarTransacao(id, usuarioId, body) {
     subcategoria_id: body.subcategoria_id || null,
   }
 
+  // Permite alterar o índice da parcela (ex.: 1/10 → 2/10)
+  const ri = body.recorrente_index != null ? parseInt(body.recorrente_index, 10) : null
+  if (ri != null && Number.isInteger(ri) && ri >= 1) {
+    update.recorrente_index = ri
+  }
+
   const { data, error } = await supabaseAdmin
     .from('transacoes')
     .update(update)
