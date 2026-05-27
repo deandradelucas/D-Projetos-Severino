@@ -44,7 +44,8 @@
    --------------------------------------------------------------------------- */
 :root {
   --lista-fab-bottom: 80px;  /* altura do FAB + margem */
-  --lista-mobile-nav-height: 70px;
+  /* Altura visual da .mobile-bottom-nav__bar (54px item + 8+8 padding) — encostar no menu */
+  --lista-mobile-nav-height: 62px;
 }
 
 .page-lista-compras-wrap {
@@ -53,7 +54,14 @@
 
 @media (max-width: 768px) {
   .page-lista-compras-wrap {
-    padding-bottom: calc(var(--lista-fab-bottom) + var(--lista-mobile-nav-height) + 40px);
+    padding-bottom: calc(148px + var(--lista-mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (min-width: 769px) {
+  .page-lista-compras-wrap {
+    /* Footer fica no fluxo do main — sem reserva grande para barra fixa */
+    padding-bottom: 16px;
   }
 }
 
@@ -704,58 +712,80 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   left: 0;
   right: 0;
   z-index: 74;
-  padding: 10px 16px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas:
-    'total'
-    'novo'
-    'actions';
-  justify-items: center;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px 12px;
+  justify-content: center;
+  gap: 10px;
   background: var(--bg-card);
   border-top: 1px solid var(--border-accent);
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
   animation: slideUpFooter 0.2s ease;
 }
 
-/* Linha dedicada: "+ Novo item" sempre centralizado na barra. */
-.page-lista-compras__footer-novo {
-  grid-area: novo;
+.page-lista-compras__footer-main {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 10px;
   width: 100%;
 }
 
+/* Desktop: blocos em coluna, largura total */
+.page-lista-compras__footer .page-lista-compras__total,
 .page-lista-compras__footer-actions {
-  grid-area: actions;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
+}
+
+.page-lista-compras__footer-novo {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (min-width: 769px) {
+  .page-lista-compras__footer-total-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .page-lista-compras__footer-novo {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+.page-lista-compras__footer-novo {
+  flex: 0 0 auto;
+}
+
+.page-lista-compras__footer-actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  justify-content: center;
+  justify-items: center;
   align-items: center;
   gap: 8px;
   width: 100%;
 }
 
-/* Sem preço: apenas o botão "Novo item" centralizado. */
+/* Sem preço: só "+ Novo item", mesma barra centralizada */
 .page-lista-compras__footer--solo {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: 'novo';
-  justify-items: center;
-  border-top: none;
-  background: transparent;
-  box-shadow: none;
-  padding: 10px 16px;
-  left: 0;
-  right: 0;
+  padding: 12px 16px;
 }
 
 .page-lista-compras__footer .page-lista-compras__total {
-  grid-area: total;
-  width: 100%;
   text-align: center;
 }
 
@@ -766,8 +796,109 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 
 @media (max-width: 768px) {
   .page-lista-compras__footer {
-    /* Acima da nav-bottom mobile, encostado (sem gap visual). */
-    bottom: calc(var(--lista-mobile-nav-height) + var(--safe-bottom, 0px));
+    bottom: calc(var(--lista-mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+    left: max(12px, env(safe-area-inset-left, 0px));
+    right: max(12px, env(safe-area-inset-right, 0px));
+    gap: 8px;
+    padding: 10px 12px 8px;
+    border-radius: 14px 14px 0 0;
+    box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+  }
+
+  .page-lista-compras__footer-main {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .page-lista-compras__footer-total-row {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: auto;
+    max-width: 100%;
+  }
+
+  .page-lista-compras__footer-total-row .page-lista-compras__total {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 0.35rem;
+    width: auto;
+    flex: 0 0 auto;
+    min-width: 0;
+    margin: 0;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .page-lista-compras__footer-total-row .page-lista-compras__total-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+  }
+
+  .page-lista-compras__footer-total-row .page-lista-compras__total-value {
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .page-lista-compras__footer-total-row .page-lista-compras__footer-novo {
+    width: auto;
+    flex: 0 0 auto;
+    justify-content: center;
+  }
+
+  .page-lista-compras__footer-total-row .page-lista-compras__novo-item-fab {
+    min-width: 0;
+    max-width: none;
+    min-height: 44px;
+    padding: 0 14px 0 10px;
+    font-size: 12px;
+  }
+
+  /* Linha 2: WhatsApp + registrar — mesma altura, largura total */
+  .page-lista-compras__footer-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .page-lista-compras__footer-actions .page-lista-compras__wa-btn {
+    flex: 0 0 48px;
+    width: 48px;
+    min-width: 48px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+    border-radius: 12px;
+  }
+
+  .page-lista-compras__footer-actions .page-lista-compras__wa-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .page-lista-compras__footer-actions .page-lista-compras__cta-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    line-height: 1.2;
   }
 }
 
@@ -783,50 +914,57 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   }
 }
 
+/* Desktop: footer na coluna main (largura do painel), não na viewport inteira */
 @media (min-width: 769px) {
-  /* Desktop: layout horizontal em flex row, centralizado */
-  .page-lista-compras__footer {
-    left: var(--app-sidebar-width, var(--sidebar-width, 260px));
+  .dashboard-container.page-lista-compras .main-content.ref-dashboard-main {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    padding: 10px 24px;
+    flex-direction: column;
+    overflow: hidden !important;
+    min-height: 0;
   }
 
-  /* Solo: mantém fundo + borda para que o FAB fique visível */
+  .dashboard-container.page-lista-compras .ref-dashboard-inner.dashboard-hub {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dashboard-container.page-lista-compras .ref-dashboard-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .page-lista-compras__footer,
   .page-lista-compras__footer--solo {
-    left: var(--app-sidebar-width, var(--sidebar-width, 260px));
-    right: 0;
-    background: var(--bg-card);
-    border-top: 1px solid var(--border-accent);
-    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* Em flex row os filhos não devem se esticar */
-  .page-lista-compras__footer-novo,
-  .page-lista-compras__footer-actions {
-    width: auto;
-  }
-
-  .page-lista-compras__footer .page-lista-compras__total {
-    width: auto;
-    text-align: left;
-    white-space: nowrap;
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    max-width: 100%;
+    flex-shrink: 0;
+    margin-top: auto;
+    padding: 12px 24px;
+    align-self: stretch;
   }
 }
 
 .page-lista-compras__total {
+  margin: 0;
   font-size: 0.88rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
+.page-lista-compras__total-label {
+  font-weight: 600;
+}
+
+.page-lista-compras__total-value,
 .page-lista-compras__total strong {
   color: var(--accent);
   font-size: 1rem;
@@ -893,6 +1031,12 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   transform: scale(0.97);
 }
 
+.page-lista-compras__footer .page-lista-compras__footer-actions .page-lista-compras__wa-btn,
+.page-lista-compras__footer .page-lista-compras__footer-actions .page-lista-compras__cta-btn {
+  width: auto;
+  flex: 0 0 auto;
+}
+
 @media (min-width: 540px) {
   .page-lista-compras__wa-btn {
     width: auto;
@@ -912,15 +1056,14 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 }
 
 @media (max-width: 400px) {
-  .page-lista-compras__footer-actions {
-    flex-direction: column;
-    align-items: stretch;
+  .page-lista-compras__footer-total-row .page-lista-compras__novo-item-fab {
+    min-width: 112px;
+    padding: 0 10px 0 8px;
   }
 
-  .page-lista-compras__footer-actions .page-lista-compras__cta-btn,
-  .page-lista-compras__footer-actions .page-lista-compras__wa-btn {
-    width: 100%;
-    justify-content: center;
+  .page-lista-compras__footer-actions .page-lista-compras__cta-btn {
+    font-size: 0.76rem;
+    padding: 0 10px;
   }
 }
 
@@ -1433,8 +1576,9 @@ body[data-theme='dark'] .page-lista-compras__footer--solo {
 }
 
 @media (max-width: 768px) {
-  body[data-theme='dark'] .page-lista-compras__footer:not(.page-lista-compras__footer--solo) {
-    padding: 12px 16px calc(12px + var(--safe-bottom, 0px));
+  body[data-theme='dark'] .page-lista-compras__footer {
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 28px rgba(0, 0, 0, 0.45);
   }
 }
 
@@ -1470,50 +1614,18 @@ body[data-theme='dark'] .page-lista-compras__shimmer-item {
   }
 }
 
-/* Desktop: centralização do footer — especificidade alta para sobrepor dark-mode rules */
-@media (min-width: 769px) {
-  body[data-theme='light'] .page-lista-compras__footer,
-  body[data-theme='dark'] .page-lista-compras__footer {
-    left: var(--app-sidebar-width, var(--sidebar-width, 260px));
-    right: 0;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    padding: 10px 24px;
-  }
+/* Garante centralização dos botões em ambos os temas */
+body[data-theme='light'] .page-lista-compras__footer .page-lista-compras__total,
+body[data-theme='dark'] .page-lista-compras__footer .page-lista-compras__total,
+body[data-theme='light'] .page-lista-compras__footer-novo,
+body[data-theme='dark'] .page-lista-compras__footer-novo,
+body[data-theme='light'] .page-lista-compras__footer-actions,
+body[data-theme='dark'] .page-lista-compras__footer-actions {
+  justify-content: center;
+  text-align: center;
+}
 
-  body[data-theme='light'] .page-lista-compras__footer--solo,
-  body[data-theme='dark'] .page-lista-compras__footer--solo {
-    left: var(--app-sidebar-width, var(--sidebar-width, 260px));
-    right: 0;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-card);
-    border-top: 1px solid var(--border-accent);
-    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
-  }
-
-  body[data-theme='dark'] .page-lista-compras__footer--solo {
-    background: #000000;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: none;
-  }
-
-  body[data-theme='light'] .page-lista-compras__footer-novo,
-  body[data-theme='dark'] .page-lista-compras__footer-novo,
-  body[data-theme='light'] .page-lista-compras__footer-actions,
-  body[data-theme='dark'] .page-lista-compras__footer-actions {
-    width: auto;
-  }
-
-  body[data-theme='light'] .page-lista-compras__footer .page-lista-compras__total,
-  body[data-theme='dark'] .page-lista-compras__footer .page-lista-compras__total {
-    width: auto;
-    text-align: left;
-    white-space: nowrap;
-  }
+body[data-theme='light'] .page-lista-compras__footer .page-lista-compras__novo-item-fab,
+body[data-theme='dark'] .page-lista-compras__footer .page-lista-compras__novo-item-fab {
+  margin-inline: auto;
 }

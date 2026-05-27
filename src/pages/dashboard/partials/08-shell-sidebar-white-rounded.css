@@ -81,55 +81,89 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   }
 }
 
-/* ===== Marca no shell — mark + wordmark "Severino" (claro e escuro) ===== */
+/* ===== Marca no shell — mark + wordmark "Severino" (mesmo layout claro/escuro) ===== */
+
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper,
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-stack,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-stack {
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
+  justify-content: flex-start;
   gap: 10px;
   flex: 0 1 auto;
+  min-width: 0;
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   aspect-ratio: 1 / 1;
   object-fit: contain;
+  object-position: center center;
   background-color: transparent;
   border-radius: 0;
   flex: 0 0 auto;
+  filter: none;
+  opacity: 1;
 }
 
-body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-  font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', var(--tx-dir-font);
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
+  font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', 'Poppins', var(--tx-dir-font);
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 800;
+  font-variation-settings: 'wght' 800;
+  font-synthesis: weight;
   letter-spacing: -0.01em;
   line-height: 1;
+  white-space: nowrap;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* Cores por tema (layout idêntico) */
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
   color: var(--color-text-primary, #0d1117);
 }
 
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark--dark {
-  font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', var(--tx-dir-font);
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1;
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
   color: #ffffff;
 }
 
 @media (min-width: 769px) {
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
-    width: 48px;
-    height: 48px;
+    width: 60px;
+    height: 60px;
   }
+
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
     font-size: 26px;
+  }
+}
+
+@media (max-width: 768px) {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-stack,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-stack {
+    flex: 1 1 auto;
+    max-width: calc(100% - 46px);
   }
 }
 
