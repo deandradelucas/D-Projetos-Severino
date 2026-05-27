@@ -1469,3 +1469,51 @@ body[data-theme='dark'] .page-lista-compras__shimmer-item {
     background: rgba(255, 255, 255, 0.05);
   }
 }
+
+/* Desktop: centralização do footer — especificidade alta para sobrepor dark-mode rules */
+@media (min-width: 769px) {
+  body[data-theme='light'] .page-lista-compras__footer,
+  body[data-theme='dark'] .page-lista-compras__footer {
+    left: var(--app-sidebar-width, var(--sidebar-width, 260px));
+    right: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 10px 24px;
+  }
+
+  body[data-theme='light'] .page-lista-compras__footer--solo,
+  body[data-theme='dark'] .page-lista-compras__footer--solo {
+    left: var(--app-sidebar-width, var(--sidebar-width, 260px));
+    right: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-accent);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  body[data-theme='dark'] .page-lista-compras__footer--solo {
+    background: #000000;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: none;
+  }
+
+  body[data-theme='light'] .page-lista-compras__footer-novo,
+  body[data-theme='dark'] .page-lista-compras__footer-novo,
+  body[data-theme='light'] .page-lista-compras__footer-actions,
+  body[data-theme='dark'] .page-lista-compras__footer-actions {
+    width: auto;
+  }
+
+  body[data-theme='light'] .page-lista-compras__footer .page-lista-compras__total,
+  body[data-theme='dark'] .page-lista-compras__footer .page-lista-compras__total {
+    width: auto;
+    text-align: left;
+    white-space: nowrap;
+  }
+}
