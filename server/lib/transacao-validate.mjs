@@ -97,6 +97,13 @@ export function validateNovaTransacaoBody(body) {
         return { ok: false, message: 'Parcelamento: data de pagamento inválida.' }
       }
     }
+    const piRaw = body.parcelamento.parcela_inicial
+    if (piRaw != null) {
+      const pi = Number(piRaw)
+      if (!Number.isFinite(pi) || !Number.isInteger(pi) || pi < 1 || pi >= n) {
+        return { ok: false, message: `Parcelamento: parcela inicial deve ser entre 1 e ${n - 1}.` }
+      }
+    }
     const rawDia1 = body.recorrencia_dia_1
     const temRecorrencia = rawDia1 === true || rawDia1 === 'true' || rawDia1 === 1 || rawDia1 === '1'
     if (temRecorrencia) {

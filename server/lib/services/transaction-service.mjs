@@ -86,9 +86,13 @@ export const TransactionService = {
         ? String(dataPagamentoRaw)
         : payload.data_transacao
 
+    // Parcela inicial: permite criar série a partir de uma parcela específica
+    // (ex.: parcela_inicial=2 cria 2/10..10/10, pois 1/10 já foi paga)
+    const parcelaInicial = Math.max(1, parseInt(payload.parcelamento.parcela_inicial || '1', 10) || 1)
+
     const rows = []
-    for (let i = 1; i <= n; i++) {
-      const dataParcela = addMonths(baseDataParcelas, i - 1)
+    for (let i = parcelaInicial; i <= n; i++) {
+      const dataParcela = addMonths(baseDataParcelas, i - parcelaInicial)
       const dataIso = dataParcela.toISOString()
       const valor = i === n ? +(valorBase + ajuste).toFixed(2) : valorBase
       const descricao = descricaoBase ? `${descricaoBase} (${i}/${n})` : `Parcela ${i}/${n}`
