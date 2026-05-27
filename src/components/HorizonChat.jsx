@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import DOMPurify from 'dompurify'
 import { useLocation } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { parseApiJsonResponse } from '../lib/apiErrors'
 import { readHorizonteUserProfile } from '../lib/horizonteSession'
 import { BRAND_ASSETS } from '../lib/brandAssets'
@@ -328,11 +328,10 @@ export default function HorizonChat() {
       .map(m => ({ role: m.role, text: m.text }))
 
     try {
-      const res = await fetch(apiUrl('/api/ai/chat'), {
+      const res = await apiFetch(apiUrl('/api/ai/chat'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...horizonteApiAuthHeaders(),
         },
         body: JSON.stringify({ message: msg, historico })
       })

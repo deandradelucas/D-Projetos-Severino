@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
 
@@ -283,9 +283,9 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
 
     setSalvando(true)
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras${pessoalParam}`), {
+      const res = await apiFetch(apiUrl(`/api/lista-compras${pessoalParam}`), {
         method: 'POST',
-        headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         cache: 'no-store',
         body: JSON.stringify({ nome: nomeTrimmed }),
       })
@@ -376,7 +376,7 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
     let cancelled = false
     ;(async () => {
       try {
-        const res = await fetch(apiUrl('/api/categorias'), { headers: horizonteApiAuthHeaders() })
+        const res = await apiFetch(apiUrl('/api/categorias'))
         if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
         if (!res.ok) return
         const data = await res.json()
@@ -434,9 +434,9 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
         status: 'EFETIVADA',
       }
       if (subcategoriaId) body.subcategoria_id = subcategoriaId
-      const res = await fetch(apiUrl('/api/transacoes'), {
+      const res = await apiFetch(apiUrl('/api/transacoes'), {
         method: 'POST',
-        headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         cache: 'no-store',
         body: JSON.stringify(body),
       })
@@ -782,8 +782,7 @@ export default function ListaDeCompras() {
   const carregarListas = useCallback(async (pp = '') => {
     setLoading(true)
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras${pp}`), {
-        headers: horizonteApiAuthHeaders(),
+      const res = await apiFetch(apiUrl(`/api/lista-compras${pp}`), {
         cache: 'no-store',
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
@@ -809,8 +808,7 @@ export default function ListaDeCompras() {
     if (!listaId) return
     setLoadingItens(true)
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaId}/itens${pp}`), {
-        headers: horizonteApiAuthHeaders(),
+      const res = await apiFetch(apiUrl(`/api/lista-compras/${listaId}/itens${pp}`), {
         cache: 'no-store',
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
@@ -826,8 +824,7 @@ export default function ListaDeCompras() {
 
   const carregarHistorico = useCallback(async (pp = '') => {
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/historico-nomes${pp}`), {
-        headers: horizonteApiAuthHeaders(),
+      const res = await apiFetch(apiUrl(`/api/lista-compras/historico-nomes${pp}`), {
         cache: 'no-store',
       })
       if (!res.ok) return
@@ -841,8 +838,7 @@ export default function ListaDeCompras() {
   useEffect(() => {
     async function init() {
       try {
-        const res = await fetch(apiUrl('/api/familia/meu-escopo'), {
-          headers: horizonteApiAuthHeaders(),
+        const res = await apiFetch(apiUrl('/api/familia/meu-escopo'), {
           cache: 'no-store',
         })
         if (res.ok) {
@@ -906,9 +902,9 @@ export default function ListaDeCompras() {
     const categoria = detectarCategoria(nomeTrimmed)
 
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens${pessoalParam}`), {
+      const res = await apiFetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens${pessoalParam}`), {
         method: 'POST',
-        headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         cache: 'no-store',
         body: JSON.stringify({
           nome: nomeTrimmed,
@@ -960,9 +956,9 @@ export default function ListaDeCompras() {
     const categoria = detectarCategoria(nomeTrimmed)
 
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${id}${pessoalParam}`), {
+      const res = await apiFetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${id}${pessoalParam}`), {
         method: 'PATCH',
-        headers: { ...horizonteApiAuthHeaders(), 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         cache: 'no-store',
         body: JSON.stringify({
           nome: nomeTrimmed,
@@ -1002,9 +998,8 @@ export default function ListaDeCompras() {
     ))
 
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${item.id}/toggle${pessoalParam}`), {
+      const res = await apiFetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${item.id}/toggle${pessoalParam}`), {
         method: 'POST',
-        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
@@ -1031,9 +1026,8 @@ export default function ListaDeCompras() {
     setItens((prev) => prev.filter((i) => i.id !== itemId))
 
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${itemId}${pessoalParam}`), {
+      const res = await apiFetch(apiUrl(`/api/lista-compras/${listaAtiva}/itens/${itemId}${pessoalParam}`), {
         method: 'DELETE',
-        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
@@ -1058,9 +1052,8 @@ export default function ListaDeCompras() {
     if (!window.confirm('Arquivar esta lista? Ela não aparecerá mais na tela.')) return
 
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}${pessoalParam}`), {
+      const res = await apiFetch(apiUrl(`/api/lista-compras/${listaAtiva}${pessoalParam}`), {
         method: 'DELETE',
-        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
@@ -1097,9 +1090,8 @@ export default function ListaDeCompras() {
     if (!window.confirm('Excluir lista permanentemente? Todos os itens serão removidos. Esta ação não pode ser desfeita.')) return
 
     try {
-      const res = await fetch(apiUrl(`/api/lista-compras/${listaAtiva}/excluir${pessoalParam}`), {
+      const res = await apiFetch(apiUrl(`/api/lista-compras/${listaAtiva}/excluir${pessoalParam}`), {
         method: 'DELETE',
-        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return

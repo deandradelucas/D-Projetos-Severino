@@ -381,25 +381,7 @@ body[data-theme='dark']:has(
     0 4px 16px rgba(0, 0, 0, 0.35) !important;
 }
 
-/* Dark — Transações + Investimentos: FAB e CTA hero dourados (como Dashboard; vence fullblack verde/roxo) */
-body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
-body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:hover {
-  background: var(--tx-nova-btn-bg, #c4a052) !important;
-  background-image: none !important;
-  color: var(--tx-nova-btn-fg, #111111) !important;
-  border: 1px solid var(--tx-nova-btn-border, rgba(0, 0, 0, 0.22)) !important;
-  box-shadow: var(--tx-nova-btn-shadow, 0 4px 16px rgba(0, 0, 0, 0.35)) !important;
-  transform: none !important;
-}
-
-body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:focus-visible {
-  outline: none !important;
-  box-shadow:
-    var(--tx-nova-btn-shadow, 0 4px 16px rgba(0, 0, 0, 0.35)),
-    0 0 0 3px var(--tx-nova-btn-ring, rgba(212, 177, 98, 0.48)) !important;
-}
-
-body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab,
+/* Dark — Investimentos: FAB vidro + rótulo dourado (Transações: pill sólido em 07-page-transacoes.css) */
 body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab {
   border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 52%, rgba(255, 255, 255, 0.12)) !important;
   background:
@@ -419,7 +401,6 @@ body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.ap
     inset 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
 }
 
-body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab__icon,
 body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab__icon {
   background: rgba(255, 255, 255, 0.08) !important;
   color: rgba(255, 255, 255, 0.92) !important;
@@ -428,7 +409,6 @@ body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.ap
     inset 0 -1px 0 rgba(0, 0, 0, 0.28) !important;
 }
 
-body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab__label,
 body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab__label {
   color: transparent !important;
   -webkit-text-fill-color: transparent !important;
@@ -438,7 +418,6 @@ body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.ap
   font-weight: 800 !important;
 }
 
-body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab:focus-visible,
 body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab:focus-visible {
   outline: 2px solid rgba(212, 177, 98, 0.65) !important;
   outline-offset: 3px !important;

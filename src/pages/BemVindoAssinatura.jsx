@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 
 function readUser() {
   try {
@@ -54,8 +54,7 @@ export default function BemVindoAssinatura() {
       const u = readUser()
       if (!u?.id) return
       try {
-        const res = await fetch(apiUrl('/api/assinatura/status'), {
-          headers: horizonteApiAuthHeaders(),
+        const res = await apiFetch(apiUrl('/api/assinatura/status'), {
           cache: 'no-store',
         })
         if (!res.ok || cancelled) return
@@ -82,9 +81,8 @@ export default function BemVindoAssinatura() {
     }
     setBusy(true)
     try {
-      const res = await fetch(apiUrl('/api/assinatura/bem-vindo-visto'), {
+      const res = await apiFetch(apiUrl('/api/assinatura/bem-vindo-visto'), {
         method: 'POST',
-        headers: horizonteApiAuthHeaders(),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.message || 'Não foi possível continuar.')

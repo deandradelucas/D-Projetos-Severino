@@ -24,6 +24,29 @@ body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.ap
   --tx-nova-btn-ring: rgba(212, 177, 98, 0.48);
 }
 
+body[data-theme='dark']
+  .dashboard-container.dashboard-page.page-investimentos.ref-dashboard.app-horizon-shell
+  .dashboard-hub__btn--primary,
+body[data-theme='dark']
+  .dashboard-container.dashboard-page.page-investimentos.ref-dashboard.app-horizon-shell
+  .dashboard-hub__btn--primary:hover {
+  background: var(--tx-nova-btn-bg) !important;
+  background-image: none !important;
+  color: var(--tx-nova-btn-fg) !important;
+  border: 1px solid var(--tx-nova-btn-border) !important;
+  box-shadow: var(--tx-nova-btn-shadow) !important;
+  transform: none !important;
+}
+
+body[data-theme='dark']
+  .dashboard-container.dashboard-page.page-investimentos.ref-dashboard.app-horizon-shell
+  .dashboard-hub__btn--primary:focus-visible {
+  outline: none !important;
+  box-shadow:
+    var(--tx-nova-btn-shadow),
+    0 0 0 3px var(--tx-nova-btn-ring) !important;
+}
+
 .page-investimentos-hero__rates-row {
   display: flex;
   flex-wrap: wrap;

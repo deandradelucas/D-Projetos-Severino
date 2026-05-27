@@ -5,7 +5,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { SkeletonKpi } from '../components/dashboard/DashboardSkeletons'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import './dashboard.css'
 
@@ -114,8 +114,7 @@ export default function AdminMarketing() {
         return
       }
       JSON.parse(userSaved)
-      const res = await fetch(apiUrl('/api/admin/marketing/stats'), {
-        headers: horizonteApiAuthHeaders(),
+      const res = await apiFetch(apiUrl('/api/admin/marketing/stats'), {
       })
       const data = await res.json().catch(() => null)
       if (!res.ok) {

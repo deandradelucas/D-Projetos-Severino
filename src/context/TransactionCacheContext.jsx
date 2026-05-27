@@ -13,7 +13,7 @@ import React, {
   useState,
 } from 'react'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
@@ -62,10 +62,11 @@ export function TransactionCacheProvider({ children }) {
     try {
       void syncRecorrenciasMensais(session.id)
 
-      const res = await fetchWithRetry(apiUrl('/api/transacoes'), {
-        headers: horizonteApiAuthHeaders(),
-        cache: 'no-store',
-      })
+      const res = await fetchWithRetry(
+        apiUrl('/api/transacoes'),
+        { cache: 'no-store' },
+        { fetchImpl: apiFetch },
+      )
 
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
 

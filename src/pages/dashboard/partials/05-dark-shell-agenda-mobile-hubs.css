@@ -1508,7 +1508,9 @@ body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-ho
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
 
-body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
+body[data-theme='dark']
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-investimentos)
+  .dashboard-hub__btn--primary,
 body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
 body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
 body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {

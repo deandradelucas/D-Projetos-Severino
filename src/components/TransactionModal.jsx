@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import CategorySelector from './transaction/CategorySelector'
 import { useTransactionForm } from '../hooks/useTransactionForm'
+import { useModalA11y } from '../hooks/useModalA11y'
 
 function tipoCategoriaIgual(tipoCampo, tipoAlvo) {
   return String(tipoCampo ?? '').trim().toUpperCase() === String(tipoAlvo ?? '').trim().toUpperCase()
@@ -37,8 +38,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   const fetchCategorias = useCallback(async () => {
     setLoadingCats(true)
     try {
-      const res = await fetch(apiUrl('/api/categorias'), {
-        headers: horizonteApiAuthHeaders(),
+      const res = await apiFetch(apiUrl('/api/categorias'), {
         cache: 'no-store',
       })
       if (res.ok) {
@@ -66,6 +66,17 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     handleSubmit,
   } = useTransactionForm({ usuarioId, editingTransaction, isOpen, onSave, onClose })
 
+  const { titleId } = useModalA11y({
+    open: isOpen,
+    onClose,
+    containerRef: modalSheetRef,
+    blockClose: saving,
+  })
+
+  const handleBackdropMouseDown = useCallback((event) => {
+    if (event.target === event.currentTarget && !saving) onClose()
+  }, [onClose, saving])
+
   // Inicializa o formulário e busca categorias ao abrir
   useEffect(() => {
     if (!isOpen || !usuarioId) return
@@ -73,14 +84,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     initForm()
     setAiSuggestedCat(false)
   }, [isOpen, usuarioId, editingTransaction?.id, fetchCategorias, initForm])
-
-  // Trava scroll do body enquanto modal está aberto
-  useEffect(() => {
-    if (!isOpen) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = prev }
-  }, [isOpen])
 
   // Limpa timeout ao fechar modal
   useEffect(() => {
@@ -124,9 +127,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     suggestTimeoutRef.current = setTimeout(async () => {
       setAiSuggesting(true)
       try {
-        const res = await fetch(apiUrl('/api/ai/suggest-category'), {
+        const res = await apiFetch(apiUrl('/api/ai/suggest-category'), {
           method: 'POST',
-          headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ descricao: desc, tipo: formData.tipo }),
         })
         if (!res.ok) return
@@ -180,11 +183,21 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   const subcategorias = selectedCategoria ? selectedCategoria.subcategorias : []
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-content modal-content--nova-tx" ref={modalSheetRef}>
+    <div
+      className="modal-backdrop"
+      role="presentation"
+      onMouseDown={handleBackdropMouseDown}
+    >
+      <div
+        className="modal-content modal-content--nova-tx"
+        ref={modalSheetRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+      >
         <div className="modal-header">
-          <h3>{isEditMode ? 'Editar Transação' : 'Nova Transação'}</h3>
-          <button type="button" onClick={onClose} className="close-btn" aria-label="Fechar">
+          <h3 id={titleId}>{isEditMode ? 'Editar Transação' : 'Nova Transação'}</h3>
+          <button type="button" onClick={onClose} className="close-btn" aria-label="Fechar" disabled={saving}>
             &times;
           </button>
         </div>

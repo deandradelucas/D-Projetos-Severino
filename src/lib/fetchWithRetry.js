@@ -3,12 +3,12 @@
  * Não reintenta respostas 4xx (exceto 408 e 429).
  */
 export async function fetchWithRetry(input, init = {}, options = {}) {
-  const { retries = 4, baseDelayMs = 350, maxDelayMs = 3500 } = options
+  const { retries = 4, baseDelayMs = 350, maxDelayMs = 3500, fetchImpl = fetch } = options
 
   let lastRes
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
-      const res = await fetch(input, {
+      const res = await fetchImpl(input, {
         ...init,
         cache: init?.cache ?? 'no-store',
       })

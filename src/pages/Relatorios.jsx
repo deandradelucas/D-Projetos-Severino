@@ -4,7 +4,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { redirectSe401 } from '../lib/authRedirect'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
@@ -69,8 +69,7 @@ export default function Relatorios() {
 
   const fetchCategorias = useCallback(async () => {
     try {
-      const res = await fetch(apiUrl('/api/categorias'), {
-        headers: horizonteApiAuthHeaders(),
+      const res = await apiFetch(apiUrl('/api/categorias'), {
       })
       if (redirectSe401(res)) return
       if (res.ok) {
@@ -94,7 +93,6 @@ export default function Relatorios() {
       params.append('status', 'EFETIVADA') // Para relatórios, focamos nas efetivadas normalmente
 
       const res = await fetchWithRetry(apiUrl(`/api/transacoes?${params.toString()}`), {
-        headers: horizonteApiAuthHeaders(),
         cache: 'no-store',
       })
       if (redirectSe401(res)) return
@@ -120,10 +118,7 @@ export default function Relatorios() {
   // período onde o cron ainda não gerou o lançamento.
   const fetchRecorrenciasAtivas = useCallback(async () => {
     try {
-      const res = await fetchWithRetry(apiUrl('/api/recorrencias-mensais'), {
-        headers: horizonteApiAuthHeaders(),
-        cache: 'no-store',
-      })
+      const res = await fetchWithRetry(apiUrl('/api/recorrencias-mensais'), { cache: 'no-store', }, { fetchImpl: apiFetch })
       if (redirectSe401(res)) return
       if (res.ok) {
         const data = await res.json()

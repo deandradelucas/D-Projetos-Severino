@@ -9,7 +9,7 @@ import AdminUsuariosKpis from '../components/admin/AdminUsuariosKpis'
 import AdminUsuariosFilters from '../components/admin/AdminUsuariosFilters'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { formatPhoneBRDisplay } from '../lib/formatPhoneBR'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import {
@@ -118,7 +118,7 @@ export default function AdminUsuarios() {
         trialEndsFrom: filterTrialEndsFrom,
         trialEndsTo: filterTrialEndsTo,
       })
-      const res = await fetch(apiUrl(`/api/admin/usuarios?${qs}`), { headers: horizonteApiAuthHeaders() })
+      const res = await apiFetch(apiUrl(`/api/admin/usuarios?${qs}`), {})
       const data = await res.json().catch(() => ({}))
       if (res.ok && data && Array.isArray(data.items)) {
         setListaUsuarios(data.items)
@@ -207,7 +207,7 @@ export default function AdminUsuarios() {
         trialEndsFrom: filterTrialEndsFrom,
         trialEndsTo: filterTrialEndsTo,
       })
-      const res = await fetch(apiUrl(`/api/admin/usuarios?${qs}`), { headers: horizonteApiAuthHeaders() })
+      const res = await apiFetch(apiUrl(`/api/admin/usuarios?${qs}`), {})
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.message || 'Falha ao exportar.')
       const items = Array.isArray(data.items) ? data.items : []
@@ -253,9 +253,9 @@ export default function AdminUsuarios() {
 
       const antes = listaUsuarios.find((row) => row.id === editingUserId)
 
-      const res = await fetch(apiUrl(`/api/admin/usuarios/${editingUserId}`), {
+      const res = await apiFetch(apiUrl(`/api/admin/usuarios/${editingUserId}`), {
         method: 'PUT',
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm),
       })
       const data = await res.json()
@@ -300,9 +300,8 @@ export default function AdminUsuarios() {
       if (!userSaved) throw new Error('Sessão expirada.')
       JSON.parse(userSaved)
 
-      const res = await fetch(apiUrl(`/api/admin/usuarios/${user.id}`), {
+      const res = await apiFetch(apiUrl(`/api/admin/usuarios/${user.id}`), {
         method: 'DELETE',
-        headers: horizonteApiAuthHeaders(),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Falha ao excluir usuário.')
@@ -328,9 +327,8 @@ export default function AdminUsuarios() {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
       JSON.parse(userSaved)
-      const res = await fetch(apiUrl(`/api/admin/usuarios/${user.id}/solicitar-otp-senha-whatsapp`), {
+      const res = await apiFetch(apiUrl(`/api/admin/usuarios/${user.id}/solicitar-otp-senha-whatsapp`), {
         method: 'POST',
-        headers: horizonteApiAuthHeaders(),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Falha ao solicitar código pelo WhatsApp.')
@@ -346,9 +344,9 @@ export default function AdminUsuarios() {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
       JSON.parse(userSaved)
-      const res = await fetch(apiUrl(`/api/admin/usuarios/${detailUser.id}`), {
+      const res = await apiFetch(apiUrl(`/api/admin/usuarios/${detailUser.id}`), {
         method: 'PUT',
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: nextActive }),
       })
       const data = await res.json()

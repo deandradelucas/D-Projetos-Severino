@@ -12,7 +12,7 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import TaxaSelicBadge from '../components/TaxaSelicBadge.jsx'
 import TaxaCdiBadge from '../components/TaxaCdiBadge.jsx'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
@@ -73,8 +73,7 @@ export default function Investimentos() {
     if (!uid) return
     setLoading(true)
     try {
-      const res = await fetch(apiUrl('/api/investimentos'), {
-        headers: horizonteApiAuthHeaders(),
+      const res = await apiFetch(apiUrl('/api/investimentos'), {
         cache: 'no-store',
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
@@ -173,9 +172,9 @@ export default function Investimentos() {
 
     setSubmitting(true)
     try {
-      const res = await fetch(apiUrl(editingId ? `/api/investimentos/${editingId}` : '/api/investimentos'), {
+      const res = await apiFetch(apiUrl(editingId ? `/api/investimentos/${editingId}` : '/api/investimentos'), {
         method: editingId ? 'PATCH' : 'POST',
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
@@ -208,9 +207,8 @@ export default function Investimentos() {
     setLista((prev) => prev.filter((x) => x.id !== targetId))
 
     try {
-      const res = await fetch(apiUrl(`/api/investimentos/${targetId}`), {
+      const res = await apiFetch(apiUrl(`/api/investimentos/${targetId}`), {
         method: 'DELETE',
-        headers: horizonteApiAuthHeaders(),
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       const errBody = await res.json().catch(() => ({}))
@@ -226,9 +224,9 @@ export default function Investimentos() {
     if (!uid || !aporteTarget?.id) return
     setAporteSubmitting(true)
     try {
-      const res = await fetch(apiUrl(`/api/investimentos/${aporteTarget.id}/aportes`), {
+      const res = await apiFetch(apiUrl(`/api/investimentos/${aporteTarget.id}/aportes`), {
         method: 'POST',
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
@@ -249,9 +247,8 @@ export default function Investimentos() {
     if (!uid) return
     setRemovendoAporteId(aporteId)
     try {
-      const res = await fetch(apiUrl(`/api/investimentos/${investimentoId}/aportes/${aporteId}`), {
+      const res = await apiFetch(apiUrl(`/api/investimentos/${investimentoId}/aportes/${aporteId}`), {
         method: 'DELETE',
-        headers: horizonteApiAuthHeaders(),
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       const data = await res.json().catch(() => ({}))

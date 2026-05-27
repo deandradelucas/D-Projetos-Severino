@@ -6,7 +6,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { redirectSe401 } from '../lib/authRedirect'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { showToast } from '../lib/toastStore'
@@ -82,8 +82,7 @@ export default function Agenda() {
         from: from.toISOString(),
         to: to.toISOString(),
       })
-      const res = await fetch(apiUrl(`/api/agenda?${params.toString()}`), {
-        headers: horizonteApiAuthHeaders(),
+      const res = await apiFetch(apiUrl(`/api/agenda?${params.toString()}`), {
         cache: 'no-store',
       })
       const data = await res.json().catch(() => [])
@@ -240,9 +239,9 @@ export default function Agenda() {
       const fimIso = form.fim ? localToIso(form.fim) : ''
       if (fimIso) payload.fim = fimIso
 
-      const res = await fetch(apiUrl(isEdit ? `/api/agenda/${eventoId}` : '/api/agenda'), {
+      const res = await apiFetch(apiUrl(isEdit ? `/api/agenda/${eventoId}` : '/api/agenda'), {
         method: isEdit ? 'PUT' : 'POST',
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
       const data = await res.json().catch(() => ({}))
@@ -263,9 +262,8 @@ export default function Agenda() {
 
   async function removeAgendaItem(id) {
     if (!usuarioId || !id) throw new Error('Sessão inválida.')
-    const res = await fetch(apiUrl(`/api/agenda/${id}`), {
+    const res = await apiFetch(apiUrl(`/api/agenda/${id}`), {
       method: 'DELETE',
-      headers: horizonteApiAuthHeaders(),
     })
     const data = await res.json().catch(() => ({}))
     if (redirectSe401(res)) return
@@ -303,9 +301,9 @@ export default function Agenda() {
   async function setStatus(evento, status) {
     if (!usuarioId) return
     try {
-      const res = await fetch(apiUrl(`/api/agenda/${evento.id}/status`), {
+      const res = await apiFetch(apiUrl(`/api/agenda/${evento.id}/status`), {
         method: 'PATCH',
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       })
       const data = await res.json().catch(() => ({}))

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import {
   extrairTokenConviteFamilia,
   persistConviteTokenSession,
@@ -69,7 +69,7 @@ export default function FamiliaConviteColarBlock({
     const timer = window.setTimeout(() => {
       void (async () => {
         try {
-          const res = await fetch(apiUrl(`/api/familia/convite-info?token=${encodeURIComponent(token)}`))
+          const res = await apiFetch(apiUrl(`/api/familia/convite-info?token=${encodeURIComponent(token)}`))
           const data = await res.json().catch(() => ({}))
           if (cancelled) return
           if (!data.valido) {
@@ -97,11 +97,9 @@ export default function FamiliaConviteColarBlock({
     if (!uid || !token) return
     setAceitarBusy(true)
     try {
-      const res = await fetch(apiUrl('/api/familia/aceitar'), {
+      const res = await apiFetch(apiUrl('/api/familia/aceitar'), {
         method: 'POST',
-        headers: horizonteApiAuthHeaders({
-          'Content-Type': 'application/json',
-        }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
       })
       const data = await res.json().catch(() => ({}))
