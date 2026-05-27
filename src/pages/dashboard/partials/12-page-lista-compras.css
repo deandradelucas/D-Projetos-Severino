@@ -784,13 +784,40 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 }
 
 @media (min-width: 769px) {
+  /* Desktop: layout horizontal em flex row, centralizado */
   .page-lista-compras__footer {
     left: var(--app-sidebar-width, var(--sidebar-width, 260px));
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 10px 24px;
   }
 
+  /* Solo: mantém fundo + borda para que o FAB fique visível */
   .page-lista-compras__footer--solo {
     left: var(--app-sidebar-width, var(--sidebar-width, 260px));
     right: 0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-accent);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Em flex row os filhos não devem se esticar */
+  .page-lista-compras__footer-novo,
+  .page-lista-compras__footer-actions {
+    width: auto;
+  }
+
+  .page-lista-compras__footer .page-lista-compras__total {
+    width: auto;
+    text-align: left;
+    white-space: nowrap;
   }
 }
 
