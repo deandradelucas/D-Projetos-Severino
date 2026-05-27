@@ -477,11 +477,15 @@ body:has(.sidebar.open) .horizon-chat-window {
     box-sizing: border-box;
   }
 
-  .sidebar .brand-logo {
+  .sidebar .brand-logo,
+  .sidebar .brand-stack {
     flex: 1 1 auto;
     min-width: 0;
-    width: auto;
     max-width: calc(100% - 46px);
+  }
+
+  .sidebar .brand-logo {
+    width: auto;
     height: auto;
     max-height: 44px;
     object-fit: contain;

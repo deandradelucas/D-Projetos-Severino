@@ -12,7 +12,9 @@ export const BRAND_ASSETS = {
   sidebarLogo: '/images/Nova Logo/Severino Tema Claro.png',
   /** Símbolo "S" do tema claro (PNG quadrado, sem wordmark, sem tagline). */
   sidebarMarkLight: '/images/Nova Logo/logo.png',
-  /** Menu lateral — escuro (`public/images/Nova Logo/Tema Escuro.png`) */
+  /** Símbolo do tema escuro — mesmo layout do claro (mark + wordmark). */
+  sidebarMarkDark: '/images/Nova Logo/logo tema escuro.png',
+  /** Menu lateral — escuro (legado; telas que ainda usam PNG completo) */
   sidebarLogoDark: '/images/Nova Logo/Tema Escuro.png',
   /** Alias usado em telas como BemVindoAssinatura / TrialExpirado */
   logo: '/images/Nova Logo/Tema Escuro.png',

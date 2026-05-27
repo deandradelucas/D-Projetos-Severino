@@ -302,7 +302,6 @@ export default function Dashboard() {
                   {txRecentes.map((t) => {
                     const isParcela = Boolean(t.recorrente_index)
                     const isRecorrente = !isParcela && Boolean(t.recorrencia_mensal_id)
-                    const mostraIconeRecorrente = isParcela || isRecorrente
                     const isPendente = t.status === 'PENDENTE'
                     const isRec = t.tipo === 'RECEITA'
                     const { line: dateLine, dateTimeAttr } = formatTransacaoListDateTime(t.data_transacao)
@@ -325,14 +324,25 @@ export default function Dashboard() {
                           </div>
                         </div>
                         <div className="ref-tx-meta-cell">
-                          <time className="ref-tx-date" dateTime={dateTimeAttr}>
-                            {dateLine}
-                          </time>
-                          {isParcela ? (
-                            <span className="ref-tx-rec-badge" title={`Parcela ${t.recorrente_index} de ${t.recorrente_total}`}>
-                              {t.recorrente_index}/{t.recorrente_total}
-                            </span>
-                          ) : null}
+                          <div className="ref-tx-meta-primary">
+                            <time className="ref-tx-date" dateTime={dateTimeAttr}>
+                              {dateLine}
+                            </time>
+                            {isParcela ? (
+                              <span className="ref-tx-rec-badge" title={`Parcela ${t.recorrente_index} de ${t.recorrente_total}`}>
+                                {t.recorrente_index}/{t.recorrente_total}
+                              </span>
+                            ) : null}
+                            {isRecorrente ? (
+                              <span
+                                className="ref-tx-recorrencia-ico-wrap ref-tx-recorrencia-ico-wrap--inline-meta"
+                                title="Assinatura mensal sem prazo"
+                                aria-label="Lançamento recorrente"
+                              >
+                                <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
+                              </span>
+                            ) : null}
+                          </div>
                           {isPendente ? (
                             <span className="ref-tx-pendente-chip">Pendente</span>
                           ) : null}
@@ -358,21 +368,17 @@ export default function Dashboard() {
                           <p className="ref-tx-sub-text break-words">{subNome}</p>
                         </div>
                         <div className="ref-tx-rec-cell">
-                          {mostraIconeRecorrente ? (
+                          {isParcela ? (
                             <span
                               className="ref-tx-recorrencia-ico-wrap"
-                              title={isParcela ? `Parcelamento ${t.recorrente_index}/${t.recorrente_total}` : 'Lançamento recorrente'}
-                              aria-label={isParcela ? `Parcela ${t.recorrente_index} de ${t.recorrente_total}` : 'Lançamento recorrente'}
+                              title={`Parcelamento ${t.recorrente_index}/${t.recorrente_total}`}
+                              aria-label={`Parcela ${t.recorrente_index} de ${t.recorrente_total}`}
                             >
-                              {isParcela ? (
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-                                  <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                  <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
-                                  <path d="M6 15h4M14 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                </svg>
-                              ) : (
-                                <RecorrenciaArrowIcon size={14} className="ref-tx-recorrencia-ico" />
-                              )}
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                                <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M6 15h4M14 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                              </svg>
                             </span>
                           ) : null}
                         </div>

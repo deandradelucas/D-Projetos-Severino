@@ -58,9 +58,12 @@ if (vitePort !== preferredVite) {
 const env = { ...process.env, API_PORT: String(apiPort), VITE_PORT: String(vitePort) }
 const viteBin = path.join(root, 'node_modules', 'vite', 'bin', 'vite.js')
 
+/* `--watch` (Node ≥18) reinicia o processo da API quando qualquer .mjs/.js
+ * em `server/` muda — evita o problema clássico de "edito em transacoes.mjs
+ * mas o servidor continua servindo a versão antiga". */
 const children = [
   spawn(process.execPath, [viteBin, '--port', String(vitePort)], { cwd: root, env, stdio: 'inherit' }),
-  spawn(process.execPath, ['server/index.mjs'], { cwd: root, env, stdio: 'inherit' }),
+  spawn(process.execPath, ['--watch', 'server/index.mjs'], { cwd: root, env, stdio: 'inherit' }),
 ]
 
 let exiting = false
