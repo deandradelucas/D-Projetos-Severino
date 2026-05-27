@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { apiUrl } from '../lib/apiUrl'
+import { apiFetch } from '../lib/apiFetch'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { webAuthnSupported, registerWebAuthnCredential } from '../lib/webauthnBrowser'
 
@@ -15,8 +16,7 @@ export function useConfigWebAuthn({ usuarioIdHeader, showToast }) {
     setWebauthnLoading(true)
     setWebauthnError(null)
     try {
-      const res = await fetch(apiUrl('/api/auth/webauthn/credentials'), {
-        headers: horizonteApiAuthHeaders(),
+      const res = await apiFetch(apiUrl('/api/auth/webauthn/credentials'), {
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -58,9 +58,8 @@ export function useConfigWebAuthn({ usuarioIdHeader, showToast }) {
   const handleRemoveBiometric = async (credentialRowId) => {
     if (!usuarioIdHeader) return
     try {
-      const res = await fetch(apiUrl(`/api/auth/webauthn/credentials/${credentialRowId}`), {
+      const res = await apiFetch(apiUrl(`/api/auth/webauthn/credentials/${credentialRowId}`), {
         method: 'DELETE',
-        headers: horizonteApiAuthHeaders(),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))

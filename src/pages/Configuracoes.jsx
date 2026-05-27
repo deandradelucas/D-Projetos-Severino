@@ -12,7 +12,7 @@ import ConfigBiometriaCard from '../components/configuracoes/ConfigBiometriaCard
 import { useTheme } from '../context/ThemeContext'
 import { useConfigWebAuthn } from '../hooks/useConfigWebAuthn'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { redirectSe401 } from '../lib/authRedirect'
 import { montarTextoConviteFamiliaComPwa } from '../lib/familiaConviteMensagemCompartilhavel'
 import { getPublicAppOriginForConvites } from '../lib/publicAppOrigin'
@@ -79,8 +79,7 @@ export default function Configuracoes() {
   const refreshAssinaturaPerfil = useCallback(async () => {
     if (!usuarioIdHeader) return
     try {
-      const res = await fetch(apiUrl('/api/assinatura/status'), {
-        headers: horizonteApiAuthHeaders(),
+      const res = await apiFetch(apiUrl('/api/assinatura/status'), {
         cache: 'no-store',
       })
       if (!res.ok) return
@@ -115,7 +114,7 @@ export default function Configuracoes() {
     }
     setFamiliaLoadErr(null)
     try {
-      const resM = await fetch(apiUrl('/api/familia/membros'), { headers: horizonteApiAuthHeaders() })
+      const resM = await apiFetch(apiUrl('/api/familia/membros'))
       if (redirectSe401(resM)) return
       if (resM.status === 403) {
         setFamiliaTitular(false)
@@ -130,7 +129,7 @@ export default function Configuracoes() {
       setFamiliaTitular(true)
       const m = await resM.json().catch(() => ({}))
       setFamiliaMembros(Array.isArray(m.membros) ? m.membros : [])
-      const resC = await fetch(apiUrl('/api/familia/convites'), { headers: horizonteApiAuthHeaders() })
+      const resC = await apiFetch(apiUrl('/api/familia/convites'))
       const c = resC.ok ? await resC.json().catch(() => ({})) : {}
       setFamiliaConvites(Array.isArray(c.convites) ? c.convites : [])
     } catch {
@@ -150,7 +149,7 @@ export default function Configuracoes() {
 
   useEffect(() => {
     if (!usuarioIdHeader) return
-    fetch(apiUrl('/api/usuarios/perfil'), { headers: horizonteApiAuthHeaders() })
+    apiFetch(apiUrl('/api/usuarios/perfil'))
       .then((res) => res.json())
       .then((data) => {
         if (data.perfil) {
@@ -194,9 +193,9 @@ export default function Configuracoes() {
     }
     setTelefoneSaving(true)
     try {
-      const res = await fetch(apiUrl('/api/usuarios/perfil/telefone'), {
+      const res = await apiFetch(apiUrl('/api/usuarios/perfil/telefone'), {
         method: 'PATCH',
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ telefone: check.digits }),
       })
       const data = await res.json().catch(() => ({}))
@@ -279,9 +278,9 @@ export default function Configuracoes() {
     if (!usuarioIdHeader || familiaBusy) return
     setFamiliaBusy(true)
     try {
-      const res = await fetch(apiUrl('/api/familia/convites'), {
+      const res = await apiFetch(apiUrl('/api/familia/convites'), {
         method: 'POST',
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ papel: novoConvitePapel }),
       })
       const data = await res.json().catch(() => ({}))
@@ -305,9 +304,8 @@ export default function Configuracoes() {
     setFamiliaBusy(true)
     try {
       if (familiaConfirm.type === 'revoke') {
-        const res = await fetch(apiUrl(`/api/familia/convites/${familiaConfirm.id}`), {
+        const res = await apiFetch(apiUrl(`/api/familia/convites/${familiaConfirm.id}`), {
           method: 'DELETE',
-          headers: horizonteApiAuthHeaders(),
         })
         const data = await res.json().catch(() => ({}))
         if (redirectSe401(res)) return
@@ -321,9 +319,8 @@ export default function Configuracoes() {
         const ids = familiaConvites.map((c) => c.id).filter(Boolean)
         const results = await Promise.all(
           ids.map((id) =>
-            fetch(apiUrl(`/api/familia/convites/${id}`), {
+            apiFetch(apiUrl(`/api/familia/convites/${id}`), {
               method: 'DELETE',
-              headers: horizonteApiAuthHeaders(),
             }).then((r) => r.ok)
           )
         )
@@ -340,9 +337,8 @@ export default function Configuracoes() {
         }
         await loadFamiliaPainel()
       } else if (familiaConfirm.type === 'remove') {
-        const res = await fetch(apiUrl(`/api/familia/membros/${familiaConfirm.usuarioId}`), {
+        const res = await apiFetch(apiUrl(`/api/familia/membros/${familiaConfirm.usuarioId}`), {
           method: 'DELETE',
-          headers: horizonteApiAuthHeaders(),
         })
         const data = await res.json().catch(() => ({}))
         if (redirectSe401(res)) return
@@ -353,9 +349,8 @@ export default function Configuracoes() {
         showToast(data.message || 'Membro removido.')
         await loadFamiliaPainel()
       } else if (familiaConfirm.type === 'sair') {
-        const res = await fetch(apiUrl('/api/familia/sair'), {
+        const res = await apiFetch(apiUrl('/api/familia/sair'), {
           method: 'POST',
-          headers: horizonteApiAuthHeaders(),
         })
         const data = await res.json().catch(() => ({}))
         if (redirectSe401(res)) return
@@ -379,9 +374,9 @@ export default function Configuracoes() {
     if (!usuarioIdHeader || familiaBusy) return
     setFamiliaBusy(true)
     try {
-      const res = await fetch(apiUrl(`/api/familia/membros/${membroId}`), {
+      const res = await apiFetch(apiUrl(`/api/familia/membros/${membroId}`), {
         method: 'PATCH',
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ papel: novoPapel }),
       })
       const data = await res.json().catch(() => ({}))

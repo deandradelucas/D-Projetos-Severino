@@ -101,7 +101,10 @@ export async function assertAcessoAppUsuario(usuarioId) {
 
   if (uerr) {
     log.warn('[assertAcessoAppUsuario] leitura usuarios:', uerr.message || uerr)
-    return null
+    return {
+      status: 503,
+      message: 'Serviço temporariamente indisponível. Tente novamente em instantes.',
+    }
   }
   if (!urow) return { status: 401, message: 'Não autorizado.' }
 

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { showToast } from '../lib/toastStore'
 import { transacaoDescricaoEfetiva } from '../lib/transacaoUtils'
 
@@ -206,9 +206,9 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
         : apiUrl('/api/transacoes')
       const method = isEditMode ? 'PUT' : 'POST'
 
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
 

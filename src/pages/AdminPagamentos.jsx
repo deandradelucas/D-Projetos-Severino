@@ -4,7 +4,7 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import AdminPaymentLogsPanel from '../components/admin/AdminPaymentLogsPanel'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { apiUrl } from '../lib/apiUrl'
-import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
+import { apiFetch } from '../lib/apiFetch'
 import { buildPaymentLogsQuery, normalizePaymentLogsResponse } from '../lib/paymentLogsAdmin'
 import './dashboard.css'
 
@@ -41,7 +41,7 @@ export default function AdminPagamentos() {
       if (!userSaved) return
       JSON.parse(userSaved)
       const qs = buildPaymentLogsQuery(loadParams)
-      const res = await fetch(apiUrl(`/api/admin/pagamentos?${qs}`), { headers: horizonteApiAuthHeaders() })
+      const res = await apiFetch(apiUrl(`/api/admin/pagamentos?${qs}`), {})
       if (!res.ok) throw new Error('Falha ao carregar logs de pagamento.')
       const data = await res.json()
       const { rows: nextRows, summary: nextSummary } = normalizePaymentLogsResponse(data)
@@ -66,9 +66,9 @@ export default function AdminPagamentos() {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
       JSON.parse(userSaved)
-      const res = await fetch(apiUrl(`/api/admin/usuarios/${usuarioId}`), {
+      const res = await apiFetch(apiUrl(`/api/admin/usuarios/${usuarioId}`), {
         method: 'PUT',
-        headers: horizonteApiAuthHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isento_pagamento: proximo }),
       })
       const data = await res.json().catch(() => ({}))
@@ -103,9 +103,8 @@ export default function AdminPagamentos() {
       const userSaved = localStorage.getItem('horizonte_user')
       if (!userSaved) throw new Error('Sessão expirada.')
       JSON.parse(userSaved)
-      const res = await fetch(apiUrl('/api/admin/pagamentos/pendentes'), {
+      const res = await apiFetch(apiUrl('/api/admin/pagamentos/pendentes'), {
         method: 'DELETE',
-        headers: horizonteApiAuthHeaders(),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.message || 'Falha ao excluir logs pendentes.')

@@ -1,0 +1,91 @@
+import { useEffect, useId } from 'react'
+
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
+
+function isFocusableVisible(el) {
+  if (el.getAttribute('aria-hidden') === 'true') return false
+  if (typeof el.checkVisibility === 'function') {
+    try {
+      return el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })
+    } catch {
+      // checkVisibility indisponível em alguns ambientes de teste
+    }
+  }
+  return el.offsetParent !== null || el.getClientRects().length > 0 || el === document.activeElement
+}
+
+export function getFocusableElements(container) {
+  if (!container) return []
+  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter(isFocusableVisible)
+}
+
+/**
+ * Escape, body scroll lock, horizon-modal-open e focus trap para modais.
+ * @param {{ open: boolean, onClose?: () => void, containerRef: React.RefObject<HTMLElement|null>, blockClose?: boolean }} opts
+ */
+export function useModalA11y({ open, onClose, containerRef, blockClose = false }) {
+  const titleId = useId()
+
+  useEffect(() => {
+    if (!open) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.body.classList.add('horizon-modal-open')
+
+    const focusTimer = window.setTimeout(() => {
+      const focusable = getFocusableElements(containerRef.current)
+      focusable[0]?.focus()
+    }, 0)
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        if (blockClose) return
+        event.preventDefault()
+        onClose?.()
+        return
+      }
+
+      if (event.key !== 'Tab') return
+
+      const focusable = getFocusableElements(containerRef.current)
+      if (focusable.length === 0) {
+        event.preventDefault()
+        return
+      }
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const active = document.activeElement
+      const inside = containerRef.current?.contains(active)
+
+      if (event.shiftKey) {
+        if (active === first || !inside) {
+          event.preventDefault()
+          last.focus()
+        }
+      } else if (active === last || !inside) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.clearTimeout(focusTimer)
+      document.body.style.overflow = previousOverflow
+      document.body.classList.remove('horizon-modal-open')
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open, onClose, blockClose, containerRef])
+
+  return { titleId }
+}
