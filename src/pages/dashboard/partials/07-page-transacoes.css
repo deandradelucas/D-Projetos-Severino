@@ -1423,8 +1423,9 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
    Footer fixo com totais (acima do bottom-nav e do FAB de nova transação) */
 .page-transacoes-parcelados-footer {
   position: fixed;
-  left: 16px;
-  right: 16px;
+  /* Mobile: 24px de margem de cada lado — fica visivelmente dentro do container */
+  left: 24px;
+  right: 24px;
   z-index: 75;
   display: flex;
   align-items: stretch;
@@ -1437,6 +1438,9 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   /* Logo acima do FAB "Nova transação" do mobile (que fica em ~78px) */
   bottom: max(140px, calc(132px + var(--safe-bottom, 0px)));
   animation: parcelados-footer-in 0.22s ease;
+  box-sizing: border-box;
+  /* Hard cap: nunca ultrapassa o viewport */
+  max-width: calc(100vw - 48px);
 }
 
 @keyframes parcelados-footer-in {
@@ -1451,6 +1455,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   align-items: center;
   gap: 2px;
   text-align: center;
+  min-width: 0;
 }
 
 .page-transacoes-parcelados-footer__label {
@@ -1466,6 +1471,10 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   font-size: 1rem;
   font-weight: 700;
   color: var(--accent, #d4a84b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .page-transacoes-parcelados-footer__divider {
@@ -1475,13 +1484,21 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   flex-shrink: 0;
 }
 
-/* Desktop: footer ancorado dentro da área de conteúdo (após o sidebar) */
+/* Desktop: footer ancorado dentro da área de conteúdo (após o sidebar).
+   Usa max() para respeitar o container centralizado com max-width (--app-shell-max).
+   Em monitores largos o container é centrado — left/right precisam compensar. */
 @media (min-width: 769px) {
   .page-transacoes-parcelados-footer {
-    left: var(--app-sidebar-width, 260px);
-    right: 24px;
+    left: max(
+      calc(50vw - var(--app-shell-max, 1580px) / 2 + var(--app-sidebar-width, 260px) + 16px),
+      calc(var(--app-sidebar-width, 260px) + 16px)
+    );
+    right: max(
+      calc(50vw - var(--app-shell-max, 1580px) / 2 + 24px),
+      24px
+    );
     bottom: 24px;
-    margin-left: 16px;
+    max-width: none;
   }
 }
 
