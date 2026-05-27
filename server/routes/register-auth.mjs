@@ -64,6 +64,12 @@ export function registerAuthRoutes(app) {
         return c.json({ message: 'E-mail ou senha incorretos.' }, 401)
       }
 
+      const nowIso = new Date().toISOString()
+      try {
+        await getSupabaseAdmin().from('usuarios').update({ last_login_at: nowIso }).eq('id', user.id)
+        user = { ...user, last_login_at: nowIso }
+      } catch { /* ignore — login não falha por isso */ }
+
       let payloadUser = { ...user }
       try {
         const assinatura = await buildAssinaturaUsuarioPayload(user.id, user)
@@ -330,10 +336,14 @@ export function registerAuthRoutes(app) {
       }
 
       const safeUser = normalizeUsuarioRow(stripSenha(userRow))
-      let payloadUser = { ...safeUser }
+      const nowIsoReg = new Date().toISOString()
+      try {
+        await supabaseAdmin.from('usuarios').update({ last_login_at: nowIsoReg }).eq('id', userId)
+      } catch { /* ignore */ }
+      let payloadUser = { ...safeUser, last_login_at: nowIsoReg }
       try {
         const assinatura = await buildAssinaturaUsuarioPayload(userRow.id, safeUser)
-        payloadUser = { ...safeUser, ...assinatura }
+        payloadUser = { ...payloadUser, ...assinatura }
       } catch (err) {
         log.error('assinatura no verify-registration', err)
         payloadUser = buildAssinaturaFallbackPayload(safeUser)
@@ -441,10 +451,14 @@ export function registerAuthRoutes(app) {
       }
 
       const safeUser = normalizeUsuarioRow(stripSenha(userRow))
-      let payloadUser = { ...safeUser }
+      const nowIsoEmail = new Date().toISOString()
+      try {
+        await supabaseAdmin.from('usuarios').update({ last_login_at: nowIsoEmail }).eq('id', userId)
+      } catch { /* ignore */ }
+      let payloadUser = { ...safeUser, last_login_at: nowIsoEmail }
       try {
         const assinatura = await buildAssinaturaUsuarioPayload(userRow.id, safeUser)
-        payloadUser = { ...safeUser, ...assinatura }
+        payloadUser = { ...payloadUser, ...assinatura }
       } catch (err) {
         log.error('assinatura no verify-email-otp', err)
         payloadUser = buildAssinaturaFallbackPayload(safeUser)

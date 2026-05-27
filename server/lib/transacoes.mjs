@@ -363,12 +363,8 @@ export async function getTransacoes(usuarioId, filters = {}) {
   const { dataInicio, dataFim, tipo, categoria_id, status, busca, somenteRecorrentes, somenteParceladas } = filters
   const { off, rangeEnd } = parseTransacoesListPagination(filters)
 
-  // Mês corrente para filtro padrão de parcelamentos
-  const agora = new Date()
-  const anoAtual = agora.getUTCFullYear()
-  const mesAtual = agora.getUTCMonth() // 0-indexed
-  const inicioDeMes = new Date(Date.UTC(anoAtual, mesAtual, 1)).toISOString()
-  const inicioProxMes = new Date(Date.UTC(anoAtual, mesAtual + 1, 1)).toISOString()
+  // Na visão padrão (sem filtro de data/status), parceladas são buscadas separadamente
+  const isDefaultView = !dataInicio && !dataFim && !somenteParceladas && !somenteRecorrentes && !status
 
   const applyFilters = (q) => {
     let query = q.eq('usuario_id', uid)
@@ -388,11 +384,10 @@ export async function getTransacoes(usuarioId, filters = {}) {
     } else if (somenteRecorrentes) {
       /* Recorrentes: parcelas + regras mensais */
       query = query.or('recorrencia_mensal_id.not.is.null,recorrente_grupo_id.not.is.null')
-    } else if (!dataInicio && !dataFim) {
-      /* Padrão sem filtro de data: exibe parcelamentos só do mês atual */
-      query = query.or(
-        `recorrente_grupo_id.is.null,and(recorrente_grupo_id.not.is.null,data_transacao.gte.${inicioDeMes},data_transacao.lt.${inicioProxMes})`
-      )
+    } else if (isDefaultView) {
+      /* Padrão sem filtro de data: busca apenas transações não-parceladas.
+       * A próxima parcela PENDENTE de cada grupo parcelado é injetada abaixo. */
+      query = query.is('recorrente_grupo_id', null)
     }
     return query
   }
@@ -405,6 +400,29 @@ export async function getTransacoes(usuarioId, filters = {}) {
       subcategorias(nome),
       lancado_por:usuarios!lancado_por_usuario_id(nome)
     `
+
+  // Retorna a próxima parcela PENDENTE de cada grupo parcelado do usuário.
+  // Usado na visão padrão para exibir automaticamente a parcela atual de cada compra.
+  const fetchNextPendingParceladas = async (select) => {
+    let q = supabaseAdmin
+      .from('transacoes')
+      .select(select)
+      .eq('usuario_id', uid)
+      .not('recorrente_grupo_id', 'is', null)
+      .eq('status', 'PENDENTE')
+    if (tipo) q = q.eq('tipo', tipo)
+    if (categoria_id) q = q.eq('categoria_id', categoria_id)
+    if (busca) q = q.ilike('descricao', `%${busca}%`)
+    const { data: parcelasData } = await q
+      .order('recorrente_grupo_id', { ascending: true })
+      .order('recorrente_index', { ascending: true })
+    const seen = new Set()
+    return (parcelasData || []).filter((t) => {
+      if (seen.has(t.recorrente_grupo_id)) return false
+      seen.add(t.recorrente_grupo_id)
+      return true
+    })
+  }
 
   const txQuery = applyFilters(supabaseAdmin.from('transacoes').select(selectComEmbed))
     .order('data_transacao', { ascending: false })
@@ -440,7 +458,15 @@ export async function getTransacoes(usuarioId, filters = {}) {
     return await enrichTransacoesComCategorias(supabaseAdmin, r2.data || [], titularNomeLista)
   }
 
-  return (Array.isArray(data) ? data : []).map((r) => {
+  let rows = Array.isArray(data) ? data : []
+
+  if (isDefaultView) {
+    const nextPending = await fetchNextPendingParceladas(selectComEmbed)
+    rows = [...rows, ...nextPending]
+    rows.sort((a, b) => new Date(b.data_transacao) - new Date(a.data_transacao))
+  }
+
+  return rows.map((r) => {
     const { lancado_por: lp, ...rest } = r
     const nomeEmbed = lp?.nome ? String(lp.nome).trim() || null : null
     return {
