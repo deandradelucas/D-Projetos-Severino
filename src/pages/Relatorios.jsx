@@ -47,6 +47,7 @@ export default function Relatorios() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [transacoes, setTransacoes] = useState([])
   const [categorias, setCategorias] = useState([])
+  const [recorrenciasAtivas, setRecorrenciasAtivas] = useState([])
   const firstFetchDoneRef = useRef(false)
   const [loading, setLoading] = useState(() => horizonteUserProfileTemId(readHorizonteUserProfile()))
   const [refreshing, setRefreshing] = useState(false)
@@ -114,12 +115,32 @@ export default function Relatorios() {
     firstFetchDoneRef.current = false
   }, [usuario.id])
 
+  // Carrega regras mensais ativas (assinaturas / "Prazo indeterminado") para
+  // que o gráfico de Recorrentes possa projetar valores em meses futuros do
+  // período onde o cron ainda não gerou o lançamento.
+  const fetchRecorrenciasAtivas = useCallback(async () => {
+    try {
+      const res = await fetchWithRetry(apiUrl('/api/recorrencias-mensais'), {
+        headers: horizonteApiAuthHeaders(),
+        cache: 'no-store',
+      })
+      if (redirectSe401(res)) return
+      if (res.ok) {
+        const data = await res.json()
+        setRecorrenciasAtivas(Array.isArray(data) ? data : [])
+      }
+    } catch (err) {
+      console.error('[Relatorios] fetchRecorrenciasAtivas:', err)
+    }
+  }, [])
+
   useEffect(() => {
     if (usuario.id) {
       fetchCategorias()
       fetchTransacoes()
+      fetchRecorrenciasAtivas()
     }
-  }, [usuario.id, fetchCategorias, fetchTransacoes])
+  }, [usuario.id, fetchCategorias, fetchTransacoes, fetchRecorrenciasAtivas])
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target
@@ -162,6 +183,28 @@ export default function Relatorios() {
     showToast('Período atualizado')
   }
 
+  // Lista de meses 'YYYY-MM' dentro do período filtrado — usada como base para
+  // a projeção das recorrências ativas no gráfico de Recorrentes.
+  const periodoMeses = useMemo(() => {
+    if (!filters.dataInicio || !filters.dataFim) return null
+    const start = new Date(filters.dataInicio)
+    const end = new Date(filters.dataFim)
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null
+    const out = []
+    let cur = new Date(start.getFullYear(), start.getMonth(), 1)
+    const limit = new Date(end.getFullYear(), end.getMonth(), 1)
+    while (cur <= limit) {
+      out.push(`${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}`)
+      cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1)
+    }
+    return out
+  }, [filters.dataInicio, filters.dataFim])
+
+  const aggregateOptions = useMemo(
+    () => ({ recorrenciasAtivas, periodoMeses }),
+    [recorrenciasAtivas, periodoMeses]
+  )
+
   const {
     summary,
     chartDataPorMes,
@@ -169,7 +212,7 @@ export default function Relatorios() {
     totalComprasRecorrentesPeriodo,
     chartDataPorCategoria,
     chartDataReceitasPorCategoria,
-  } = useRelatorioAggregates(transacoes)
+  } = useRelatorioAggregates(transacoes, aggregateOptions)
 
   const totalPieDesp = useMemo(
     () => chartDataPorCategoria.reduce((s, x) => s + (Number(x.value) || 0), 0),

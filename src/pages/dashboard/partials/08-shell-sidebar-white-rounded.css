@@ -81,23 +81,18 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
   }
 }
 
-/* ===== Marca no shell — duas estratégias por tema =====
-   Tema claro: símbolo quadrado limpo (logo.png 1254×1254) + wordmark "Severino"
-   renderizado como texto. JSX usa <span.brand-stack> com <img.brand-mark> e
-   <span.brand-wordmark>.
-   Tema escuro: PNG legado (Tema Escuro.png 1536×1024) com tagline e ícones
-   decorativos embutidos — recortamos só a faixa superior via object-fit + aspect-ratio.
-   Quando a versão escura limpa chegar, migramos o escuro pro mesmo padrão do claro. */
+/* ===== Marca no shell — mark + wordmark "Severino" (claro e escuro) ===== */
 
-/* --- Tema claro: stack lado a lado (símbolo + wordmark) --- */
-body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-stack {
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-stack,
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-stack {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   flex: 0 1 auto;
 }
 
-body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark,
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
   width: 44px;
   height: 44px;
   aspect-ratio: 1 / 1;
@@ -108,9 +103,6 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-
 }
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-  /* Plus Jakarta forçado em qualquer breakpoint (mobile + desktop), independente
-     do --tx-dir-font (que é Poppins em mobile). A fonte já é carregada
-     globalmente em src/main.jsx via @fontsource-variable/plus-jakarta-sans. */
   font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', var(--tx-dir-font);
   font-size: 24px;
   font-weight: 700;
@@ -119,46 +111,25 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-
   color: var(--color-text-primary, #0d1117);
 }
 
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark--dark {
+  font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', var(--tx-dir-font);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: #ffffff;
+}
+
 @media (min-width: 769px) {
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
     width: 48px;
     height: 48px;
   }
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
+  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
     font-size: 26px;
-  }
-}
-
-/* --- Tema escuro: continua usando o PNG legado com crop CSS --- */
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-  width: auto !important;
-  flex: 0 1 auto !important;
-  background-color: transparent !important;
-  border-radius: 0 !important;
-  object-fit: cover !important;
-  object-position: center top !important;
-  aspect-ratio: 1536 / 590 !important;
-}
-
-@media (min-width: 769px) {
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    width: min(100%, 190px) !important;
-    max-width: 100% !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    transform: none !important;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
-  }
-}
-
-@media (max-width: 768px) {
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    width: min(100%, 168px) !important;
-    max-width: 100% !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    transform: none !important;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
   }
 }
 

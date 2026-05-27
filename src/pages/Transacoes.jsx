@@ -433,8 +433,9 @@ export default function Transacoes() {
   }, [filtroParceladasAtivo, transacoes])
 
   // Totais agregados para o footer da aba Parceladas:
-  // - totalMes: soma das parcelas que vencem no mês corrente (em qualquer compra)
-  // - totalGeral: soma do valor de todas as compras parceladas listadas
+  // - totalMes: quanto vai sair no mês corrente (parcelas vencendo + valor
+  //   mensal das recorrências indeterminadas ainda ativas).
+  // - totalGeral: soma do valor total de todas as compras parceladas listadas.
   const totaisParcelados = useMemo(() => {
     if (!gruposParcelados) return null
     const agora = new Date()
@@ -443,11 +444,35 @@ export default function Transacoes() {
     let totalGeral = 0
     for (const g of gruposParcelados) {
       totalGeral += g.valor_total
-      for (const p of g.parcelas) {
-        const d = p.data_transacao ? new Date(p.data_transacao) : null
-        if (!d || Number.isNaN(d.getTime())) continue
-        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-        if (ym === ymAtual) totalMes += Math.abs(parseFloat(p.valor) || 0)
+      if (g.kind === 'mensal' && g.parcelas.length > 0) {
+        // Assinatura/stream sem prazo: contabiliza o valor mensal mesmo que
+        // o lançamento do mês atual ainda não tenha sido gerado pelo cron de
+        // recorrências (evita o footer "esquecer" o gasto da assinatura).
+        // Procura primeiro um lançamento já existente para o mês atual; se
+        // não houver, usa o valor da última parcela como referência.
+        let valorMes = 0
+        for (const p of g.parcelas) {
+          const d = p.data_transacao ? new Date(p.data_transacao) : null
+          if (!d || Number.isNaN(d.getTime())) continue
+          const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+          if (ym === ymAtual) {
+            valorMes = Math.abs(parseFloat(p.valor) || 0)
+            break
+          }
+        }
+        if (!valorMes) {
+          const ultima = g.parcelas[g.parcelas.length - 1]
+          valorMes = Math.abs(parseFloat(ultima?.valor) || 0)
+        }
+        totalMes += valorMes
+      } else {
+        // Parcelado fixo: só conta a parcela que vence no mês corrente.
+        for (const p of g.parcelas) {
+          const d = p.data_transacao ? new Date(p.data_transacao) : null
+          if (!d || Number.isNaN(d.getTime())) continue
+          const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+          if (ym === ymAtual) totalMes += Math.abs(parseFloat(p.valor) || 0)
+        }
       }
     }
     return { totalMes, totalGeral }

@@ -1976,6 +1976,30 @@ body[data-theme='light'] .ref-tx-rec-badge {
   vertical-align: middle;
 }
 
+/* Data + badge/ícone na mesma linha (parcelas e assinaturas sem prazo) */
+.ref-tx-meta-primary {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ref-tx-meta-primary .ref-tx-rec-badge {
+  margin-left: 0;
+}
+
+/* Ícone de recorrente ao lado da data (Dashboard mobile oculta .ref-tx-rec-cell) */
+.ref-tx-recorrencia-ico-wrap--inline-meta {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0;
+  color: var(--accent-hover, #c49535);
+}
+
 body[data-theme='light'] .ref-tx-actions-cell {
   grid-area: act;
   justify-self: end;

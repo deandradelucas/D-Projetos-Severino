@@ -113,6 +113,9 @@ const CATEGORIAS_LOOKUP = {
   'molho': 'Temperos',
 }
 
+/** Rótulo exibido na lista — gastos são lançados em Alimentação → Supermercado. */
+const LISTA_GASTO_ROTULO = 'Supermercado'
+
 const CATEGORIA_EMOJI = {
   'Grãos e Cereais': '🌾',
   'Laticínios': '🥛',
@@ -212,11 +215,12 @@ function IconMoreVertical() {
   )
 }
 
-function IconClock() {
+function IconSupermercado() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none">
-      <circle cx="12" cy="12" r="9" />
-      <polyline points="12 7 12 12 15 14" />
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="13" height="13" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="20" r="1" />
+      <circle cx="17" cy="20" r="1" />
+      <path d="M2 4h2l2.4 12.4a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 7H6" />
     </svg>
   )
 }
@@ -1175,9 +1179,7 @@ export default function ListaDeCompras() {
     const linhas = []
     const tituloLista = (listaAtivaDados.nome || 'Lista de Compras').trim()
     linhas.push(`🛒 *${tituloLista}*`)
-    if (listaAtivaDados.categoria_financeira) {
-      linhas.push(`_${listaAtivaDados.categoria_financeira}_`)
-    }
+    linhas.push(`_${LISTA_GASTO_ROTULO}_`)
     linhas.push('')
 
     const cats = itensAgrupados.ordenadas
@@ -1326,8 +1328,9 @@ export default function ListaDeCompras() {
                 {/* Cabeçalho da lista ativa com opções */}
                 {listaAtivaDados && (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      <IconClock /> {listaAtivaDados.categoria_financeira}
+                    <span className="page-lista-compras__lista-gasto-tag">
+                      <IconSupermercado />
+                      {LISTA_GASTO_ROTULO}
                     </span>
                     <div className="page-lista-compras__list-menu" ref={menuListaRef}>
                       <button
@@ -1441,40 +1444,42 @@ export default function ListaDeCompras() {
                   Total estimado: <strong>{formatarMoeda(totalEstimado)}</strong>
                 </p>
               )}
-              <button
-                type="button"
-                className="page-lista-compras__novo-item-fab"
-                onClick={() => setModalNovoItem(true)}
-                aria-label="Adicionar novo item à lista"
-              >
-                <span className="page-lista-compras__novo-item-fab__icon" aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 5v14" />
-                    <path d="M5 12h14" />
-                  </svg>
-                </span>
-                <span className="page-lista-compras__novo-item-fab__label">Novo item</span>
-              </button>
-              {temPreco && (
+              <div className="page-lista-compras__footer-novo">
                 <button
                   type="button"
-                  className="page-lista-compras__wa-btn"
-                  onClick={enviarWhatsApp}
-                  aria-label="Enviar lista pelo WhatsApp"
-                  title="Enviar lista pelo WhatsApp"
+                  className="page-lista-compras__novo-item-fab"
+                  onClick={() => setModalNovoItem(true)}
+                  aria-label="Adicionar novo item à lista"
                 >
-                  <IconWhatsApp />
-                  <span className="page-lista-compras__wa-btn__label">WhatsApp</span>
+                  <span className="page-lista-compras__novo-item-fab__icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 5v14" />
+                      <path d="M5 12h14" />
+                    </svg>
+                  </span>
+                  <span className="page-lista-compras__novo-item-fab__label">Novo item</span>
                 </button>
-              )}
+              </div>
               {temPreco && (
-                <button
-                  type="button"
-                  className="page-lista-compras__cta-btn"
-                  onClick={() => setModalGasto(true)}
-                >
-                  Registrar como gasto
-                </button>
+                <div className="page-lista-compras__footer-actions">
+                  <button
+                    type="button"
+                    className="page-lista-compras__wa-btn"
+                    onClick={enviarWhatsApp}
+                    aria-label="Enviar lista pelo WhatsApp"
+                    title="Enviar lista pelo WhatsApp"
+                  >
+                    <IconWhatsApp />
+                    <span className="page-lista-compras__wa-btn__label">WhatsApp</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="page-lista-compras__cta-btn"
+                    onClick={() => setModalGasto(true)}
+                  >
+                    Registrar como gasto
+                  </button>
+                </div>
               )}
             </div>
           )}

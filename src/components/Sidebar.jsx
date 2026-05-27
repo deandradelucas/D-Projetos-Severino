@@ -37,7 +37,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const { theme } = useTheme()
   const { pathname } = useLocation()
   const isLightTheme = theme !== 'dark'
-  const sidebarLogoSrc = theme === 'dark' ? BRAND_ASSETS.sidebarLogoDark : BRAND_ASSETS.sidebarLogo
+  const sidebarMarkSrc = isLightTheme ? BRAND_ASSETS.sidebarMarkLight : BRAND_ASSETS.sidebarMarkDark
   const showAdminNav = canAccessAdminPanelSession()
   const sidebarRef = useRef(null)
   const closeButtonRef = useRef(null)
@@ -146,26 +146,18 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
         aria-label="Menu principal"
       >
         <div className="brand-wrapper">
-          {isLightTheme ? (
-            <span className="brand-stack" aria-label="Severino">
-              <img
-                src={BRAND_ASSETS.sidebarMarkLight}
-                alt=""
-                aria-hidden="true"
-                className="brand-mark"
-                decoding="sync"
-              />
-              <span className="brand-wordmark">Severino</span>
-            </span>
-          ) : (
+          <span className="brand-stack" aria-label="Severino">
             <img
-              key={sidebarLogoSrc}
-              src={sidebarLogoSrc}
-              alt="Severino"
-              className="brand-logo"
+              src={sidebarMarkSrc}
+              alt=""
+              aria-hidden="true"
+              className="brand-mark"
               decoding="sync"
             />
-          )}
+            <span className={`brand-wordmark${isLightTheme ? '' : ' brand-wordmark--dark'}`}>
+              Severino
+            </span>
+          </span>
           <button
             ref={closeButtonRef}
             type="button"

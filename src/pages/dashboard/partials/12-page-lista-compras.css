@@ -243,6 +243,21 @@
   color: #111;
 }
 
+/* Tag de onde o gasto será registrado (Supermercado) */
+.page-lista-compras__lista-gasto-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.page-lista-compras__lista-gasto-tag svg {
+  flex-shrink: 0;
+  color: var(--accent-hover, #c49535);
+}
+
 /* ---------------------------------------------------------------------------
    Grupos de categoria
    --------------------------------------------------------------------------- */
@@ -548,7 +563,6 @@
 }
 
 .page-lista-compras__footer .page-lista-compras__novo-item-fab {
-  grid-area: novo;
   margin: 0;
 }
 
@@ -692,10 +706,12 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   z-index: 74;
   padding: 10px 16px;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
-    'total novo'
-    'wa cta';
+    'total'
+    'novo'
+    'actions';
+  justify-items: center;
   align-items: center;
   gap: 8px 12px;
   background: var(--bg-card);
@@ -704,32 +720,47 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   animation: slideUpFooter 0.2s ease;
 }
 
-/* Sem preço: apenas o botão "Novo item" centralizado, sem grid.
-   Ignora o offset do sidebar (left/right = 0) para ficar realmente
-   centralizado na viewport, evitando descolar caso a variável de
-   largura do sidebar mude. */
-.page-lista-compras__footer--solo {
+/* Linha dedicada: "+ Novo item" sempre centralizado na barra. */
+.page-lista-compras__footer-novo {
+  grid-area: novo;
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.page-lista-compras__footer-actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Sem preço: apenas o botão "Novo item" centralizado. */
+.page-lista-compras__footer--solo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'novo';
+  justify-items: center;
   border-top: none;
   background: transparent;
   box-shadow: none;
-  padding: 0 16px;
+  padding: 10px 16px;
   left: 0;
   right: 0;
 }
 
 .page-lista-compras__footer .page-lista-compras__total {
   grid-area: total;
-}
-
-.page-lista-compras__footer .page-lista-compras__wa-btn {
-  grid-area: wa;
+  width: 100%;
+  text-align: center;
 }
 
 .page-lista-compras__footer .page-lista-compras__cta-btn {
-  grid-area: cta;
-  width: 100%;
+  width: auto;
   text-align: center;
 }
 
@@ -737,17 +768,6 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   .page-lista-compras__footer {
     /* Acima da nav-bottom mobile, encostado (sem gap visual). */
     bottom: calc(var(--lista-mobile-nav-height) + var(--safe-bottom, 0px));
-  }
-}
-
-/* Desktop estreito ainda usa o layout em duas linhas; com 540px+ tudo numa linha. */
-@media (min-width: 540px) {
-  .page-lista-compras__footer {
-    grid-template-columns: 1fr auto auto auto;
-    grid-template-areas: 'total novo wa cta';
-  }
-  .page-lista-compras__footer .page-lista-compras__cta-btn {
-    width: auto;
   }
 }
 
@@ -768,9 +788,6 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
     left: var(--app-sidebar-width, var(--sidebar-width, 260px));
   }
 
-  /* Estado solo: respeita o offset do sidebar mas continua flex-center,
-     resultando no botão "+ Novo item" centralizado na área de conteúdo
-     (depois do sidebar). */
   .page-lista-compras__footer--solo {
     left: var(--app-sidebar-width, var(--sidebar-width, 260px));
     right: 0;
@@ -868,15 +885,15 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 }
 
 @media (max-width: 400px) {
-  .page-lista-compras__footer {
+  .page-lista-compras__footer-actions {
     flex-direction: column;
-    gap: 8px;
     align-items: stretch;
   }
 
-  .page-lista-compras__cta-btn {
-    text-align: center;
+  .page-lista-compras__footer-actions .page-lista-compras__cta-btn,
+  .page-lista-compras__footer-actions .page-lista-compras__wa-btn {
     width: 100%;
+    justify-content: center;
   }
 }
 
@@ -1379,8 +1396,19 @@ body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.ap
 }
 
 body[data-theme='dark'] .page-lista-compras__footer {
-  background: var(--bg-card);
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.2);
+  background: #000000;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
+body[data-theme='dark'] .page-lista-compras__footer--solo {
+  background: #000000;
+}
+
+@media (max-width: 768px) {
+  body[data-theme='dark'] .page-lista-compras__footer:not(.page-lista-compras__footer--solo) {
+    padding: 12px 16px calc(12px + var(--safe-bottom, 0px));
+  }
 }
 
 body[data-theme='dark'] .page-lista-compras__modal {
