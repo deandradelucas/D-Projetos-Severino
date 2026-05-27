@@ -28,6 +28,7 @@ const INITIAL_FORM = {
   recorrencia_dia_1: false,
   parcelado: false,
   num_parcelas: '2',
+  parcela_inicial: '1',
   data_pagamento: '',
   prazo_indeterminado: false,
 }
@@ -68,6 +69,7 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
         recorrencia_dia_1: false,
         parcelado: false,
         num_parcelas: '2',
+        parcela_inicial: '1',
         data_pagamento: '',
         prazo_indeterminado: false,
       })
@@ -126,6 +128,15 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
       showToast('Número de parcelas deve ser entre 2 e 120.', 'error')
       return
     }
+    const parcelaInicial = parseInt(formData.parcela_inicial, 10) || 1
+    if (
+      formData.parcelado &&
+      !formData.prazo_indeterminado &&
+      (parcelaInicial < 1 || parcelaInicial >= numParcelas)
+    ) {
+      showToast(`Parcela inicial deve ser entre 1 e ${numParcelas - 1}.`, 'error')
+      return
+    }
 
     const descricao = String(formData.descricao || '').trim()
 
@@ -165,6 +176,7 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
         } else if (formData.parcelado && numParcelas >= 2) {
           const parcelamento = { num_parcelas: numParcelas }
           if (dpIso) parcelamento.data_pagamento = dpIso
+          if (parcelaInicial > 1) parcelamento.parcela_inicial = parcelaInicial
           payload.parcelamento = parcelamento
           delete payload.recorrencia_dia_1
         } else if (!formData.recorrencia_dia_1) {

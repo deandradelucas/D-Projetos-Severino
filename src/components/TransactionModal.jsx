@@ -346,6 +346,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
             {/* ── Seção: Parcelamento (só criação) ── */}
             {!isEditMode && (() => {
               const numParcelas = parseInt(formData.num_parcelas, 10)
+              const parcelaInicial = Math.max(1, parseInt(formData.parcela_inicial, 10) || 1)
+              const numParcelasRestantes = numParcelas - parcelaInicial + 1
               const valorNum = parseFloat(formData.valor)
               const valorParcela = formData.parcelado && numParcelas >= 2 && valorNum > 0
                 ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -383,20 +385,36 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                     {formData.parcelado && (
                       <div className="rec-sub-opts slide-down">
                         {!formData.prazo_indeterminado && (
-                          <div className="rec-vezes-row">
-                            <label htmlFor="tx-num-parcelas" className="rec-vezes-row__label">
-                              Número de parcelas
-                            </label>
-                            <input
-                              id="tx-num-parcelas"
-                              type="number"
-                              min="2"
-                              max="120"
-                              value={formData.num_parcelas}
-                              onChange={(e) => setFormData((prev) => ({ ...prev, num_parcelas: e.target.value }))}
-                              className="input-premium rec-vezes-row__input"
-                            />
-                          </div>
+                          <>
+                            <div className="rec-vezes-row">
+                              <label htmlFor="tx-num-parcelas" className="rec-vezes-row__label">
+                                Total de parcelas
+                              </label>
+                              <input
+                                id="tx-num-parcelas"
+                                type="number"
+                                min="2"
+                                max="120"
+                                value={formData.num_parcelas}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, num_parcelas: e.target.value, parcela_inicial: '1' }))}
+                                className="input-premium rec-vezes-row__input"
+                              />
+                            </div>
+                            <div className="rec-vezes-row">
+                              <label htmlFor="tx-parcela-inicial" className="rec-vezes-row__label">
+                                Começa na parcela
+                              </label>
+                              <input
+                                id="tx-parcela-inicial"
+                                type="number"
+                                min="1"
+                                max={Math.max(1, numParcelas - 1)}
+                                value={formData.parcela_inicial}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, parcela_inicial: e.target.value }))}
+                                className="input-premium rec-vezes-row__input"
+                              />
+                            </div>
+                          </>
                         )}
                         <label htmlFor="tx-prazo-indeterminado" className="rec-vezes-row rec-vezes-row--toggle">
                           <span className="rec-vezes-row__label">Prazo indeterminado</span>
@@ -410,7 +428,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                         </label>
                         <div className="rec-vezes-row">
                           <label htmlFor="tx-data-pagamento" className="rec-vezes-row__label">
-                            Data de pagamento
+                            {parcelaInicial > 1 ? `Vencimento da ${parcelaInicial}ª parcela` : 'Data de pagamento'}
                           </label>
                           <input
                             id="tx-data-pagamento"
@@ -423,7 +441,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                         <p className="parcelamento-preview parcelamento-preview--hint">
                           {formData.prazo_indeterminado
                             ? 'Assinatura/stream sem fim: desconta esse valor todo mês até cancelar.'
-                            : 'Vencimento da 1ª parcela. Se vazio, usa a data da transação.'}
+                            : parcelaInicial > 1
+                              ? `As parcelas 1 a ${parcelaInicial - 1} já foram pagas e não serão lançadas.`
+                              : 'Vencimento da 1ª parcela. Se vazio, usa a data da transação.'}
                         </p>
                         {formData.prazo_indeterminado && valorNum > 0 && (
                           <p className="parcelamento-preview">
@@ -432,7 +452,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                         )}
                         {!formData.prazo_indeterminado && valorParcela && (
                           <p className="parcelamento-preview">
-                            {numParcelas}x de {valorParcela} · total {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valorNum)}
+                            {parcelaInicial > 1
+                              ? `${numParcelasRestantes} parcelas (${parcelaInicial}/${numParcelas} a ${numParcelas}/${numParcelas}) · ${valorParcela} cada`
+                              : `${numParcelas}x de ${valorParcela} · total ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valorNum)}`}
                           </p>
                         )}
                       </div>
