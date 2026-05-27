@@ -493,3 +493,16 @@ export async function deletarTransacao(id, usuarioId) {
   if (error) throw error
   return true
 }
+
+export async function deletarGrupoParcelado(grupoId, usuarioId) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const uid = String(usuarioId || '').trim()
+  const { error } = await supabaseAdmin
+    .from('transacoes')
+    .delete()
+    .eq('recorrente_grupo_id', grupoId)
+    .eq('usuario_id', uid)
+
+  if (error) throw error
+  return true
+}

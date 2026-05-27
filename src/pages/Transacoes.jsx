@@ -325,10 +325,10 @@ export default function Transacoes() {
   const deleteTransacao = async (id) => {
     const session = readHorizonteUser()
     if (!session?.id) return
-    
+
     // Otimista
     setTransacoes(prev => prev.filter(t => t.id !== id))
-    
+
     try {
       const res = await fetch(apiUrl(`/api/transacoes/${id}`), {
         method: 'DELETE',
@@ -336,9 +336,8 @@ export default function Transacoes() {
       })
       if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
       if (res.ok) {
-        syncGlobalCache({ silent: true }) // Atualiza o Dashboard também
+        syncGlobalCache({ silent: true })
       } else {
-        // Se falhar, reverte buscando do servidor
         fetchTransacoes()
       }
     } catch (err) {
@@ -347,7 +346,40 @@ export default function Transacoes() {
     }
   }
 
+  const deleteGrupoParcelado = async (grupoId) => {
+    const session = readHorizonteUser()
+    if (!session?.id) return
+
+    // Otimista: remove todas as parcelas do grupo do estado local
+    setTransacoes(prev => prev.filter(t => t.recorrente_grupo_id !== grupoId))
+
+    try {
+      const res = await fetch(apiUrl(`/api/transacoes/grupo/${grupoId}`), {
+        method: 'DELETE',
+        headers: horizonteApiAuthHeaders(),
+      })
+      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (res.ok) {
+        syncGlobalCache({ silent: true })
+      } else {
+        fetchTransacoes()
+      }
+    } catch (err) {
+      console.error('[Transacoes] deleteGrupoParcelado:', err)
+      fetchTransacoes()
+    }
+  }
+
   const handleDelete = (transacao) => {
+    if (transacao.recorrente_grupo_id) {
+      setConfirmDialog({
+        title: 'Excluir compra parcelada?',
+        message: `Todas as parcelas de "${transacao.descricao?.replace(/\s*\(\d+\/\d+\)\s*$/, '').trim() || 'sem descrição'}" serão removidas.`,
+        confirmLabel: 'Excluir tudo',
+        onConfirm: () => deleteGrupoParcelado(transacao.recorrente_grupo_id),
+      })
+      return
+    }
     setConfirmDialog({
       title: 'Excluir transação?',
       message: `A transação "${transacao.descricao || 'sem descrição'}" será removida da sua lista.`,

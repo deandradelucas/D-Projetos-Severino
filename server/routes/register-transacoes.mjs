@@ -5,6 +5,7 @@ import {
   getTransacoes,
   atualizarTransacao,
   deletarTransacao,
+  deletarGrupoParcelado,
 } from '../lib/transacoes.mjs'
 import {
   assertCronSecret,
@@ -223,6 +224,29 @@ export function registerTransacoesRoutes(app) {
     } catch (error) {
       log.error('update transaction failed', error)
       return c.json({ message: 'Erro ao atualizar transação.' }, 500)
+    }
+  })
+
+  app.delete('/api/transacoes/grupo/:grupoId', async (c) => {
+    try {
+      const grupoId = c.req.param('grupoId')
+      const usuarioId = resolveRequestUserId(c)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+
+      if (!isUuidString(grupoId)) {
+        return c.json({ message: 'ID de grupo inválido.' }, 400)
+      }
+
+      if (!await rateLimitTake(`tx-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 90, 60_000)) {
+        return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
+      }
+
+      await deletarGrupoParcelado(grupoId, parsed.dataUsuarioId)
+      return c.json({ message: 'Compra parcelada excluída com sucesso.' })
+    } catch (error) {
+      log.error('delete grupo parcelado failed', error)
+      return c.json({ message: 'Erro ao excluir compra parcelada.' }, 500)
     }
   })
 
