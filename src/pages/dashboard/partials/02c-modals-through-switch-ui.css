@@ -791,16 +791,17 @@ body[data-theme='light'] .rec-vezes-row__label {
   color: #0f172a;
 }
 
-.type-btn.active.despesa {
-  background: #ef4444;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+/* Nova transação — tipo ativo com vermelho/verde suaves (só este modal usa type-toggle) */
+.modal-content--nova-tx .type-btn.active.despesa {
+  background: rgba(239, 68, 68, 0.14);
+  color: #b91c1c;
+  box-shadow: none;
 }
 
-.type-btn.active.receita {
-  background: #22c55e;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+.modal-content--nova-tx .type-btn.active.receita {
+  background: rgba(34, 197, 94, 0.14);
+  color: #15803d;
+  box-shadow: none;
 }
 
 .modal-form input,
@@ -2264,9 +2265,18 @@ body[data-theme='dark'] .modal-content--nova-tx .type-btn {
   color: var(--text-secondary);
 }
 
-body[data-theme='dark'] .modal-content--nova-tx .type-btn.active {
-  background: var(--bg-card-elevated, #0a0a0a) !important;
-  color: var(--text-primary) !important;
+body[data-theme='dark'] .modal-content--nova-tx .type-btn.active.despesa {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #fca5a5 !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(239, 68, 68, 0.32);
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .type-btn.active.receita {
+  background: rgba(34, 197, 94, 0.2) !important;
+  color: #86efac !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(34, 197, 94, 0.32);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .close-btn {

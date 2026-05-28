@@ -682,7 +682,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
               <button type="button" className="btn-secondary" onClick={onClose} disabled={submitting}>
                 Cancelar
               </button>
-              <button type="submit" className="btn-secondary" disabled={submitting}>
+              <button type="submit" className="btn-primary" disabled={submitting}>
                 {submitting ? 'A guardar…' : editando ? 'Guardar' : 'Adicionar'}
               </button>
             </div>
