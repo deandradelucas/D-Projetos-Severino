@@ -314,6 +314,32 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
   const TUTORIAL_RE =
     /^(tutorial|como\s+funciona(r|isso)?|como\s+usar|como\s+te\s+usar|como\s+uso|o\s+que\s+(voc[êe]\s+)?(faz|sabe|pode|consegue)|me\s+(ensina|explica|mostra|ajuda)|explica\s+(ai|a[ií]|pra\s+mim)?|comandos|instru[cç][oõ]es|manual|guia|dicas|o\s+que\s+posso\s+(fazer|pedir|falar)|quais\s+(s[aã]o\s+)?(os\s+)?comandos|come[cç]ar|come[cç]ando|iniciar|primeiro\s+uso|nunca\s+usei|n[aã]o\s+sei\s+(usar|como)|t[oô]\s+perdido|perdido|n[aã]o\s+entendi|como\s+registro|como\s+(lan[cç]o|cadastro)|como\s+lembro|lembrete)[\s!?.,]*$/i
   if (BOA_VINDAS_RE.test(msgNorm) || TUTORIAL_RE.test(msgNorm)) {
+    // 1.9: Boas-vindas personalizadas para membro de conta familiar
+    if (familiaEscopo.isMembroConta) {
+      const nome = usuario.nome ? `, ${usuario.nome.split(' ')[0]}` : ''
+      let titularNome = ''
+      try {
+        const supabase = getSupabaseAdmin()
+        const { data: titular } = await supabase
+          .from('usuarios')
+          .select('nome')
+          .eq('id', dataUsuarioId)
+          .maybeSingle()
+        titularNome = titular?.nome ? titular.nome.split(' ')[0] : ''
+      } catch { /* ignora */ }
+      const papelLabel = familiaEscopo.familiaPapel === 'VIEWER'
+        ? 'consultar as finanças'
+        : 'registrar e consultar as finanças'
+      return {
+        ok: true,
+        reply:
+          `👋 *Olá${nome}! Bem-vindo ao Severino!*\n\n` +
+          `Você está na conta familiar${titularNome ? ` de *${titularNome}*` : ''}.\n\n` +
+          `Aqui você pode ${papelLabel} da família pelo WhatsApp:\n\n` +
+          `💸 "gastei 50 no mercado"\n✅ "recebi 500 de freelance"\n📊 "meu saldo"\n📋 "extrato do dia"\n\n` +
+          `Digite *ajuda* para ver todos os comandos.`,
+      }
+    }
     const nome = usuario.nome ? `, ${usuario.nome.split(' ')[0]}` : ''
     return { ok: true, reply: buildTutorialBoasVindas(nome) }
   }
@@ -511,11 +537,21 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
         update.descricao = novoValorRaw
       }
       await atualizarTransacao(ultima.id, dataUsuarioId, update)
+      // 1.8: Confirmação de correção com antes → depois
       const cats2 = await getCategorias(dataUsuarioId)
-      const catNome = update.categoria_id ? cats2.find(c => c.id === update.categoria_id)?.nome : null
+      let mudancaTexto
+      if (campoRaw === 'valor') {
+        mudancaTexto = `💰 ${fmt(Number(ultima.valor))} → *${fmt(update.valor)}*`
+      } else if (campoRaw === 'categoria') {
+        const catAntes = cats2.find(c => c.id === ultima.categoria_id)?.nome || 'sem categoria'
+        const catDepois = cats2.find(c => c.id === update.categoria_id)?.nome || '-'
+        mudancaTexto = `🏷️ ${catAntes} → *${catDepois}*`
+      } else {
+        mudancaTexto = `📝 "${ultima.descricao || '-'}" → *"${update.descricao}"*`
+      }
       return {
         ok: true,
-        reply: `✅ *Última transação corrigida!*\n\n💰 Valor: ${fmt(update.valor)}\n📝 ${update.descricao || '-'}${catNome ? `\n🏷️ Categoria: ${catNome}` : ''}`,
+        reply: `✅ *Correção aplicada!*\n\n${mudancaTexto}`,
       }
     } catch (e) {
       log.error('[whatsapp-bot] corrigirTransacao error', e)
@@ -554,7 +590,7 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
     return { ok: false, reply: '⚠️ Não consegui processar sua mensagem agora. Tente novamente.' }
   }
 
-  // 4. Conversa — para áudio usa resposta direta da IA (não há texto transcrito disponível)
+  // 4. Conversa
   if (parsed.tipo === 'CHAT') {
     if (!options.audioBytes) {
       try {
@@ -563,9 +599,17 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
       } catch (e) {
         log.warn('[whatsapp-bot] askHorizon (WhatsApp CHAT)', e?.message || e)
       }
+      return { ok: true, reply: formatAssistantReplyForWhatsApp(parsed.resposta || AJUDA) }
     }
-    const resposta = parsed.resposta || AJUDA
-    return { ok: true, reply: formatAssistantReplyForWhatsApp(resposta) }
+    // 1.7: Áudio classificado como CHAT — fallback claro se a IA não entendeu
+    const respostaIA = String(parsed.resposta || '').trim()
+    if (!respostaIA || /n[aã]o\s*(entendi|consegui|identifiquei)/i.test(respostaIA)) {
+      return {
+        ok: true,
+        reply: '🎙️ Não consegui entender o áudio.\n\nTente novamente falando mais devagar, ou envie como texto. 😊',
+      }
+    }
+    return { ok: true, reply: formatAssistantReplyForWhatsApp(respostaIA) }
   }
 
   // 5. Validação mínima
