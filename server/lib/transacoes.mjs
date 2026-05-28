@@ -98,6 +98,7 @@ export const DEFAULT_CATEGORIES = [
   // FINANCEIROS
   { nome: 'Despesas Financeiras', tipo: 'DESPESA', cor: '#64748b', subcategorias: ['Parcela de Empréstimo', 'Pagamento de Fatura (Não Categorizado)', 'Taxas e Tarifas Bancárias', 'Seguros Variados', 'Juros e Multas', 'Taxa de Corretagem', 'Contabilidade', 'Juros Cartão de Crédito', 'PIX e TEDs Pagos', 'IOF', 'Anuidade de Cartão', 'Renegociação de Dívida', 'Cheque Especial', 'Consórcio', 'Taxas de Investimento', 'Tarifa de Conta PJ'] },
   { nome: 'Investimentos e Patrimônio', tipo: 'DESPESA', cor: '#0ea5e9', subcategorias: ['Aporte em Investimentos', 'Compra de Ações / FIIs', 'Tesouro Direto', 'CDB / Renda Fixa', 'Criptomoedas', 'Previdência Privada', 'Reserva de Emergência', 'Compra de Imóvel', 'Compra de Veículo', 'Seguro de Vida', 'Consórcio / Carta de Crédito'] },
+  { nome: 'Outros', tipo: 'DESPESA', cor: '#94a3b8', subcategorias: ['Outros'] },
 
   // RECEITAS
   { nome: 'Saldo', tipo: 'RECEITA', cor: '#d4a84b', subcategorias: ['Saldo Atual'] },
@@ -105,7 +106,8 @@ export const DEFAULT_CATEGORIES = [
   { nome: 'Rendas PJ / Empresa', tipo: 'RECEITA', cor: '#15803d', subcategorias: ['Pró-labore', 'Distribuição de Lucros', 'Reembolso de Despesas Empresariais', 'Vendas Corporativas', 'Serviços Prestados', 'Consultoria', 'Contrato Mensal', 'Royalties / Licenciamento', 'Comissão de Vendas PJ'] },
   { nome: 'Renda Extra', tipo: 'RECEITA', cor: '#10b981', subcategorias: ['Freelance / Serviços Extras', 'Vendas e Comissionamentos', 'Aluguéis Recebidos', 'Restituição de Imposto', 'Venda de Bens/Ativos Usados', 'Bicos / Diárias', 'Afiliados', 'Aulas Particulares', 'Conteúdo Digital', 'Cashback Recebido', 'Reembolso Pessoal'] },
   { nome: 'Rendimentos e Benefícios', tipo: 'RECEITA', cor: '#059669', subcategorias: ['Rendimento de Investimentos', 'Dividendos (Ações e FIIs)', 'Juros Recebidos', 'Resgate de Benefício (Previdência)', 'Auxílios Governamentais', 'FGTS', 'Seguro-Desemprego', 'Abono Salarial', 'Mesada Recebida', 'Rendimento de Cripto', 'Rendimento de CDB', 'Tesouro Direto', 'Juros sobre Capital Próprio'] },
-  { nome: 'Receitas Eventuais', tipo: 'RECEITA', cor: '#84cc16', subcategorias: ['Presente Recebido', 'Sorteio / Prêmio', 'Herança', 'Indenização', 'Seguro Recebido', 'Devolução / Estorno', 'Venda de Garagem', 'Vaquinha Recebida', 'Ajuda Familiar Recebida'] }
+  { nome: 'Receitas Eventuais', tipo: 'RECEITA', cor: '#84cc16', subcategorias: ['Presente Recebido', 'Sorteio / Prêmio', 'Herança', 'Indenização', 'Seguro Recebido', 'Devolução / Estorno', 'Venda de Garagem', 'Vaquinha Recebida', 'Ajuda Familiar Recebida'] },
+  { nome: 'Outros', tipo: 'RECEITA', cor: '#94a3b8', subcategorias: ['Outros'] },
 ]
 
 async function _seedCategoriesForUser(usuario_id, supabaseAdmin) {
