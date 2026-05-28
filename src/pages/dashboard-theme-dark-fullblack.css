@@ -346,6 +346,74 @@ body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section + .nova-tx-sect
   border-top-color: rgba(255, 255, 255, 0.08);
 }
 
+/* Nova transação — sheet preto + parcelamento (detalhes em 02c-modals; vence espelho azul) */
+body[data-theme='dark'] .modal-content.modal-content--nova-tx {
+  background: var(--bg-card) !important;
+  background-image: none !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-xl, 16px) !important;
+  box-shadow: var(--shadow-md) !important;
+  color: var(--text-primary);
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .modal-header h3 {
+  color: var(--text-primary);
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia label.modal-recorrencia-toggle-row {
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: #000000 !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia-on label.modal-recorrencia-toggle-row {
+  border-color: rgba(212, 168, 75, 0.45) !important;
+  background: rgba(212, 168, 75, 0.1) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__iconWrap {
+  background: rgba(212, 168, 75, 0.16) !important;
+  color: #d4a84b !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox {
+  accent-color: #d4a84b !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row {
+  background: var(--bg-secondary) !important;
+  border: 1.5px solid var(--border-color) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row__label {
+  color: var(--text-secondary) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row.rec-vezes-row--toggle .rec-vezes-row__label {
+  color: var(--text-primary) !important;
+  font-weight: 600;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row__input,
+body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row__input--date {
+  background: var(--bg-secondary) !important;
+  border: 1.5px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  color-scheme: dark;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row .modal-recorrencia-toggle-row__checkbox {
+  accent-color: #d4a84b !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview {
+  color: #d4a84b !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview.parcelamento-preview--hint {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
 body[data-theme='dark'] .relatorios-empty-msg {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, #0a0a0a 100%);
   color: #d4d4d4;

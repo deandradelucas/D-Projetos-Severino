@@ -2194,4 +2194,150 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
 
 /* switch-apple — ver 10-page-configuracoes.css */
 
+/* ---------------------------------------------------------------------------
+   Nova transação — tema escuro (padrão modal Nova lista / Nova agenda)
+   Carrega após fullblack; vence blur do backdrop genérico.
+   --------------------------------------------------------------------------- */
+body[data-theme='dark'] .modal-backdrop:has(.modal-content--nova-tx) {
+  background: rgba(0, 0, 0, 0.55) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body[data-theme='dark'] .modal-content.modal-content--nova-tx {
+  background: var(--bg-card) !important;
+  background-image: none !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-xl, 16px) !important;
+  box-shadow: var(--shadow-md) !important;
+  color: var(--text-primary) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section__title {
+  color: var(--text-secondary) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section + .nova-tx-section {
+  border-top-color: var(--border-color) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .modal-form label {
+  color: var(--text-secondary);
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .input-premium,
+body[data-theme='dark'] .modal-content--nova-tx .modal-form input:not([type='checkbox']):not([type='radio']),
+body[data-theme='dark'] .modal-content--nova-tx .modal-form select,
+body[data-theme='dark'] .modal-content--nova-tx .modal-form textarea,
+body[data-theme='dark'] .modal-content--nova-tx .custom-select-trigger,
+body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input {
+  background: var(--bg-secondary) !important;
+  border: 1.5px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  color-scheme: dark;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .input-premium:focus,
+body[data-theme='dark'] .modal-content--nova-tx .modal-form input:not([type='checkbox']):not([type='radio']):focus,
+body[data-theme='dark'] .modal-content--nova-tx .modal-form select:focus,
+body[data-theme='dark'] .modal-content--nova-tx .modal-form textarea:focus,
+body[data-theme='dark'] .modal-content--nova-tx .custom-select-trigger:hover,
+body[data-theme='dark'] .modal-content--nova-tx .custom-select.open .custom-select-trigger,
+body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .custom-select-dropdown {
+  background: var(--bg-card) !important;
+  background-image: none !important;
+  border-color: var(--border-color) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .type-toggle {
+  background: var(--bg-secondary) !important;
+  border: 1.5px solid var(--border-color) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .type-btn {
+  color: var(--text-secondary);
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .type-btn.active {
+  background: var(--bg-card-elevated, #0a0a0a) !important;
+  color: var(--text-primary) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .close-btn {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .close-btn:hover {
+  border-color: var(--accent) !important;
+  color: var(--text-primary) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-secondary {
+  background: transparent !important;
+  border: 1.5px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-secondary:hover:not(:disabled) {
+  border-color: var(--accent) !important;
+  color: var(--text-primary) !important;
+  background: transparent !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .date-shortcut-btn {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .date-shortcut-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: rgba(212, 168, 75, 0.1);
+}
+
+/* Parcelamento — toggle e linhas (vence mirror azul) */
+body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia label.modal-recorrencia-toggle-row {
+  color: var(--text-primary) !important;
+  border: 1.5px solid var(--border-color) !important;
+  background: var(--bg-secondary) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia-on label.modal-recorrencia-toggle-row {
+  border-color: rgba(212, 168, 75, 0.45) !important;
+  background: rgba(212, 168, 75, 0.1) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__iconWrap {
+  background: rgba(212, 168, 75, 0.16) !important;
+  color: var(--accent) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox,
+body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row .modal-recorrencia-toggle-row__checkbox {
+  accent-color: var(--accent) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview {
+  color: var(--accent) !important;
+}
+
+body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview.parcelamento-preview--hint {
+  color: var(--text-secondary) !important;
+}
+
+@media (max-width: 768px) {
+  body[data-theme='dark'] .modal-content--nova-tx {
+    box-shadow: var(--shadow-md) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+}
+
 
