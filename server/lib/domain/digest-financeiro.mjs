@@ -25,6 +25,12 @@ function daysAgoIso(n) {
   return d.toISOString().split('T')[0]
 }
 
+function dayAfterIso(iso) {
+  const d = new Date(iso + 'T00:00:00Z')
+  d.setUTCDate(d.getUTCDate() + 1)
+  return d.toISOString().split('T')[0]
+}
+
 function lastWeekRange() {
   return { start: daysAgoIso(7), end: daysAgoIso(1) }
 }
@@ -67,7 +73,7 @@ async function getResumoFinanceiro(usuarioId, dataInicio, dataFim) {
     .eq('usuario_id', usuarioId)
     .eq('status', 'EFETIVADA')
     .gte('data_transacao', dataInicio)
-    .lte('data_transacao', dataFim)
+    .lt('data_transacao', dayAfterIso(dataFim))
 
   if (error) throw error
 
