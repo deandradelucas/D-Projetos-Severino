@@ -84,18 +84,18 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.app-horizon-shell {
     0 0 0 3px var(--tx-nova-btn-ring) !important;
 }
 
-/* Dark — vence fullblack (gradiente) e shell preto em .dashboard-page */
+/* Dark — dourado direto (hardcoded para vencer qualquer override de variável ou gradiente) */
 body[data-theme='dark']
   .dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell
   .dashboard-hub__btn--primary,
 body[data-theme='dark']
   .dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell
   .dashboard-hub__btn--primary:hover {
-  background: var(--tx-nova-btn-bg) !important;
+  background: #c4a052 !important;
   background-image: none !important;
-  color: var(--tx-nova-btn-fg) !important;
-  border: 1px solid var(--tx-nova-btn-border) !important;
-  box-shadow: var(--tx-nova-btn-shadow) !important;
+  color: #111111 !important;
+  border: 1px solid rgba(0, 0, 0, 0.22) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
   transform: none !important;
 }
 
@@ -104,32 +104,32 @@ body[data-theme='dark']
   .dashboard-hub__btn--primary:focus-visible {
   outline: none !important;
   box-shadow:
-    var(--tx-nova-btn-shadow),
-    0 0 0 3px var(--tx-nova-btn-ring) !important;
+    0 4px 16px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(212, 177, 98, 0.48) !important;
 }
 
-/* Mobile — FAB «Nova transação»: pill dourado (FAB fica fora de .dashboard-container — usar :has) */
+/* Mobile — FAB «Nova transação»: pill dourado hardcoded */
 body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell) .dashboard-mobile-tx-fab,
 body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell) .dashboard-mobile-tx-fab:hover {
-  border: 1px solid var(--tx-nova-btn-border) !important;
-  background: var(--tx-nova-btn-bg) !important;
+  border: 1px solid rgba(0, 0, 0, 0.22) !important;
+  background: #c4a052 !important;
   background-image: none !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
-  box-shadow: var(--tx-nova-btn-shadow) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
 }
 
 body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell) .dashboard-mobile-tx-fab__icon {
   background: rgba(0, 0, 0, 0.1) !important;
-  color: var(--tx-nova-btn-fg) !important;
+  color: #111111 !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
     inset 0 -1px 0 rgba(0, 0, 0, 0.08) !important;
 }
 
 body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell) .dashboard-mobile-tx-fab__label {
-  color: var(--tx-nova-btn-fg) !important;
-  -webkit-text-fill-color: var(--tx-nova-btn-fg) !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
   background: none !important;
   background-image: none !important;
   -webkit-background-clip: unset !important;
@@ -140,8 +140,8 @@ body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.a
 body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell) .dashboard-mobile-tx-fab:focus-visible {
   outline: none !important;
   box-shadow:
-    var(--tx-nova-btn-shadow),
-    0 0 0 3px var(--tx-nova-btn-ring) !important;
+    0 4px 16px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(212, 177, 98, 0.48) !important;
 }
 
 /* Mobile: FAB fixo substitui o «+ Nova transação» no hero (evita duplicar; 07 usa inline-flex !important acima) */
