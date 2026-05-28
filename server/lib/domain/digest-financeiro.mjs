@@ -144,7 +144,7 @@ export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {})
 
   const { data: usuarios, error } = await supabase
     .from('usuarios')
-    .select('id, nome, telefone, whatsapp_id')
+    .select('id, nome, telefone, whatsapp_id, vinculo_conta_principal_id')
     .limit(Math.min(Math.max(Number(limit) || 500, 1), 500))
 
   if (error) throw error
@@ -161,6 +161,9 @@ export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {})
     }
 
     try {
+      // Membros de conta familiar usam os dados financeiros do titular
+      const dataUserId = usuario.vinculo_conta_principal_id || usuario.id
+
       let message
       let hasActivity
 
@@ -168,8 +171,8 @@ export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {})
         const range = lastWeekRange()
         const prevRange = prevWeekRange()
         const [semana, anterior] = await Promise.all([
-          getResumoFinanceiro(usuario.id, range.start, range.end),
-          getResumoFinanceiro(usuario.id, prevRange.start, prevRange.end),
+          getResumoFinanceiro(dataUserId, range.start, range.end),
+          getResumoFinanceiro(dataUserId, prevRange.start, prevRange.end),
         ])
         hasActivity = semana.count > 0
         message = formatWeeklyMessage(semana, anterior, range)
@@ -177,8 +180,8 @@ export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {})
         const range = lastMonthRange()
         const prevRange = prevMonthRange()
         const [mes, anterior] = await Promise.all([
-          getResumoFinanceiro(usuario.id, range.start, range.end),
-          getResumoFinanceiro(usuario.id, prevRange.start, prevRange.end),
+          getResumoFinanceiro(dataUserId, range.start, range.end),
+          getResumoFinanceiro(dataUserId, prevRange.start, prevRange.end),
         ])
         hasActivity = mes.count > 0
         message = formatMonthlyMessage(mes, anterior, { month: range.month, year: range.year })
