@@ -383,8 +383,17 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
   let parsed
   try {
     if (options.audioBytes) {
-      // Combinado: áudio → JSON em um único call (sem transcrição separada)
+      // Combinado: áudio → JSON em um único call (transcrição + classificação de intent)
       parsed = await parseWhatsAppAudioDirectWithAI(options.audioBytes, options.mimeHint || '', categorias)
+
+      // Agenda detectada no áudio — rota para processador de agenda com transcrição + título da IA
+      if (parsed?.tipo === 'AGENDA' && parsed?.transcricao) {
+        const aiTitulo = typeof parsed.titulo === 'string' && parsed.titulo.trim().length >= 2
+          ? parsed.titulo.trim()
+          : null
+        log.info('[whatsapp-bot] audio: agenda intent detectado', { transcLen: String(parsed.transcricao).length, aiTitulo })
+        return processarMensagemAgenda(usuarioBot, phone, parsed.transcricao, aiTitulo)
+      }
     } else {
       parsed = await parseWhatsAppMessageWithAI(message, categorias)
     }
