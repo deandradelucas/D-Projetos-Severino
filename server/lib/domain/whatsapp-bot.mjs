@@ -7,6 +7,7 @@ import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
 import { isListaComprasMessage, processarMensagemListaCompras } from './lista-compras-whatsapp.mjs'
 import { detectExtratoPedido, montarRespostaExtratoWhatsApp } from './whatsapp-extrato.mjs'
 import { resolveEscopoUsuario, assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
+import { computeAssinaturaFlags } from '../assinatura-flags.mjs'
 import { dispararAlertasTransacao, upsertLimiteOrcamento, listarLimitesOrcamento } from './alertas-financeiros.mjs'
 import { listarInvestimentosUsuario } from '../investimentos.mjs'
 import {
@@ -304,6 +305,37 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
   }
   const dataUsuarioId = familiaEscopo.dataUsuarioId
   const usuarioBot = { ...usuario, dataUsuarioId, familiaEscopo }
+
+  // Gate de acesso: trial expirado sem assinatura → bloqueio com mensagem de conversão
+  try {
+    const supabase = getSupabaseAdmin()
+    const { data: titularFlags } = await supabase
+      .from('usuarios')
+      .select('email, isento_pagamento, trial_ends_at, assinatura_paga, assinatura_asaas_status')
+      .eq('id', dataUsuarioId)
+      .maybeSingle()
+    if (titularFlags) {
+      const flags = computeAssinaturaFlags(titularFlags)
+      if (!flags.acesso_app_liberado) {
+        const LINK = process.env.APP_URL
+          ? `${process.env.APP_URL}/pagamento`
+          : 'https://severino.mestredamente.com/pagamento'
+        const nomeUser = usuario.nome ? `, ${usuario.nome.split(' ')[0]}` : ''
+        return {
+          ok: false,
+          reply:
+            `⏰ *Seu período de teste encerrou${nomeUser}.*\n\n` +
+            `Suas finanças estão salvas e esperando você voltar!\n\n` +
+            `Assine o Severino por menos de R$ 1/dia e volte a registrar tudo pelo WhatsApp:\n` +
+            `👉 ${LINK}\n\n` +
+            `_Rápido, fácil, sem fidelidade._ 🙌`,
+        }
+      }
+    }
+  } catch (e) {
+    log.warn('[whatsapp-bot] gate trial error', e?.message)
+    // falha silenciosa — não bloqueia usuário por erro de verificação
+  }
 
   if (/^(ajuda|help|menu)$/i.test(message.replace(/\s+/g, ' ').trim())) {
     return { ok: true, reply: AJUDA }
