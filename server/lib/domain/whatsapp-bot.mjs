@@ -1,6 +1,6 @@
 import { log } from '../logger.mjs'
 import { buscarUsuarioPorTelefone } from '../usuarios.mjs'
-import { getCategorias, inserirTransacao } from '../transacoes.mjs'
+import { getCategorias, inserirTransacao, atualizarTransacao } from '../transacoes.mjs'
 import { askHorizon, parseWhatsAppMessageWithAI, parseWhatsAppAudioDirectWithAI } from '../ai.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
@@ -210,7 +210,7 @@ function formatDataTransacaoReplyPtBr(iso) {
 }
 
 const AJUDA =
-  '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n📈 *Investimentos:* "meus investimentos", "quanto tenho investido"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n🛒 *Lista de compras:* "adiciona 2kg de arroz na lista Mercado" ou "ver lista Mercado"\n\nDigite *ajuda* para ver isto de novo.'
+  '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n📈 *Investimentos:* "meus investimentos", "quanto tenho investido"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n🛒 *Lista de compras:* "adiciona 2kg de arroz na lista Mercado" ou "ver lista Mercado"\n✏️ *Corrigir:* "corrigir valor 50", "corrigir categoria alimentação"\n\nDigite *ajuda* para ver isto de novo.'
 
 // Detecta saudações isoladas: "Olá", "Oi", "Bom dia", "Salve", "Opa", etc.
 const BOA_VINDAS_RE =
@@ -356,16 +356,37 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
     }
   }
 
-  // Consulta de saldo
+  // Consulta de saldo + últimas 3 transações do mês
   if (isSaldoQuery(message)) {
     try {
-      const { saldo, receitas, despesas, periodo } = await calcularSaldo(dataUsuarioId)
+      const supabase = getSupabaseAdmin()
+      const now = new Date()
+      const mesInicio = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+      const [saldoData, { data: ultimas }] = await Promise.all([
+        calcularSaldo(dataUsuarioId),
+        supabase
+          .from('transacoes')
+          .select('tipo, valor, descricao, data_transacao, categorias(nome)')
+          .eq('usuario_id', dataUsuarioId)
+          .eq('status', 'EFETIVADA')
+          .gte('data_transacao', mesInicio)
+          .order('data_transacao', { ascending: false })
+          .limit(3),
+      ])
+      const { saldo, receitas, despesas, periodo } = saldoData
       const nome = usuario.nome ? ` ${usuario.nome.split(' ')[0]}` : ''
       const mesLabel = fmtPeriodo(periodo.inicio)
-      return {
-        ok: true,
-        reply: `📊 *Resumo de ${mesLabel}${nome}:*\n\n✅ Receitas: ${fmt(receitas)}\n❌ Despesas: ${fmt(despesas)}\n\n💰 *Saldo do mês: ${fmt(saldo)}*`,
+      let reply = `📊 *Resumo de ${mesLabel}${nome}:*\n\n✅ Receitas: ${fmt(receitas)}\n❌ Despesas: ${fmt(despesas)}\n\n💰 *Saldo do mês: ${fmt(saldo)}*`
+      if (ultimas?.length) {
+        const linhas = ultimas.map(t => {
+          const emoji = t.tipo === 'RECEITA' ? '✅' : '💸'
+          const cat = t.categorias?.nome ? ` (${t.categorias.nome})` : ''
+          const data = new Date(t.data_transacao + 'T00:00:00Z').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })
+          return `${emoji} ${fmt(t.valor)} — ${t.descricao || '-'}${cat} · ${data}`
+        })
+        reply += `\n\n📋 *Últimas transações do mês:*\n${linhas.join('\n')}`
       }
+      return { ok: true, reply }
     } catch (e) {
       log.error('[whatsapp-bot] calcularSaldo error', e)
       return { ok: false, reply: '❌ Erro ao calcular saldo. Tente novamente.' }
@@ -410,6 +431,64 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
     } catch (e) {
       log.error('[whatsapp-bot] listarLimitesOrcamento error', e)
       return { ok: false, reply: '❌ Erro ao buscar limites. Tente novamente.' }
+    }
+  }
+
+  // Comando: "corrigir [campo] [novo valor]" — corrige a última transação do usuário
+  const CORRIGIR_RE = /^corrigir\s+(valor|categoria|descri[cç][aã]o)\s+(.+)$/i
+  const corrigirMatch = message.replace(/\s+/g, ' ').trim().match(CORRIGIR_RE)
+  if (corrigirMatch) {
+    const campoRaw = corrigirMatch[1].toLowerCase()
+    const novoValorRaw = corrigirMatch[2].trim()
+    try {
+      const supabase = getSupabaseAdmin()
+      const { data: ultima } = await supabase
+        .from('transacoes')
+        .select('id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id')
+        .eq('usuario_id', dataUsuarioId)
+        .order('data_transacao', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (!ultima) {
+        return { ok: true, reply: '❌ Nenhuma transação encontrada para corrigir.' }
+      }
+      const update = {
+        tipo: ultima.tipo,
+        valor: Number(ultima.valor),
+        descricao: ultima.descricao || '',
+        data_transacao: ultima.data_transacao,
+        status: ultima.status || 'EFETIVADA',
+        categoria_id: ultima.categoria_id || null,
+        subcategoria_id: ultima.subcategoria_id || null,
+      }
+      if (campoRaw === 'valor') {
+        const v = parseFloat(novoValorRaw.replace(',', '.'))
+        if (!v || v <= 0) return { ok: true, reply: '❌ Valor inválido.' }
+        update.valor = v
+      } else if (campoRaw === 'categoria') {
+        const cats = await getCategorias(dataUsuarioId)
+        const cat =
+          cats.find(c => c.tipo === ultima.tipo && c.nome.toLowerCase().includes(novoValorRaw.toLowerCase())) ||
+          cats.find(c => c.nome.toLowerCase().includes(novoValorRaw.toLowerCase()))
+        if (!cat) {
+          const nomes = cats.map(c => c.nome).join(', ')
+          return { ok: true, reply: `❌ Categoria não encontrada. Disponíveis:\n${nomes}` }
+        }
+        update.categoria_id = cat.id
+        update.subcategoria_id = null
+      } else {
+        update.descricao = novoValorRaw
+      }
+      await atualizarTransacao(ultima.id, dataUsuarioId, update)
+      const cats2 = await getCategorias(dataUsuarioId)
+      const catNome = update.categoria_id ? cats2.find(c => c.id === update.categoria_id)?.nome : null
+      return {
+        ok: true,
+        reply: `✅ *Última transação corrigida!*\n\n💰 Valor: ${fmt(update.valor)}\n📝 ${update.descricao || '-'}${catNome ? `\n🏷️ Categoria: ${catNome}` : ''}`,
+      }
+    } catch (e) {
+      log.error('[whatsapp-bot] corrigirTransacao error', e)
+      return { ok: false, reply: '❌ Erro ao corrigir transação. Tente novamente.' }
     }
   }
 
