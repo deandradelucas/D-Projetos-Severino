@@ -216,20 +216,20 @@ export default function Agenda() {
   async function saveEvent(e) {
     e.preventDefault()
     if (!usuarioId || savingRef.current) return
-
-    const eventoEmEdicao = editingRef.current ?? editing
-    const eventoId = eventoEmEdicao?.id ? String(eventoEmEdicao.id).trim() : ''
-    const isEdit = Boolean(eventoId)
-
-    const inicioIso = localToIso(form.inicio)
-    if (!inicioIso) {
-      showToast('Informe uma data e hora válidas.', 'error')
-      return
-    }
-
+    // Bloqueia re-entrada imediatamente (antes de qualquer await ou render)
     savingRef.current = true
     setSaving(true)
     try {
+      const eventoEmEdicao = editingRef.current ?? editing
+      const eventoId = eventoEmEdicao?.id ? String(eventoEmEdicao.id).trim() : ''
+      const isEdit = Boolean(eventoId)
+
+      const inicioIso = localToIso(form.inicio)
+      if (!inicioIso) {
+        showToast('Informe uma data e hora válidas.', 'error')
+        return
+      }
+
       const payload = {
         titulo: form.titulo.trim(),
         inicio: inicioIso,
