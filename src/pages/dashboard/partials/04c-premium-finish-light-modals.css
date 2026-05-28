@@ -2052,8 +2052,10 @@ body[data-theme='dark'] .agenda-secondary-btn {
 }
 
 body[data-theme='dark'] .agenda-modal {
-  border-color: rgba(148, 163, 184, 0.2);
-  background: rgba(15, 23, 42, 0.96);
+  border-color: var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
 }
 
 .agenda-modal__header,
@@ -2120,7 +2122,9 @@ body[data-theme='dark'] .agenda-modal {
 body[data-theme='dark'] .agenda-field input,
 body[data-theme='dark'] .agenda-field textarea,
 body[data-theme='dark'] .agenda-field select {
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
 }
 
 .agenda-field input:focus-visible,
@@ -3106,29 +3110,28 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focu
   box-shadow: none !important;
 }
 
-/* Nova transação — Salvar igual ao Cancelar (só tema escuro) */
+/* Nova transação — Salvar no dourado (igual modal Nova lista) */
 body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary,
 body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary.loading {
-  background: rgba(255, 255, 255, 0.055) !important;
+  background: var(--accent) !important;
   background-image: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.11) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
+  border: none !important;
+  color: #111111 !important;
   box-shadow: none !important;
   transform: none !important;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary:hover:not(:disabled),
 body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary:active:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: var(--accent-hover, #c49535) !important;
   background-image: none !important;
-  border-color: rgba(212, 168, 75, 0.35) !important;
-  color: #ffffff !important;
+  color: #111111 !important;
   box-shadow: none !important;
   transform: none !important;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(212, 168, 75, 0.28) !important;
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.28) !important;
 }
 

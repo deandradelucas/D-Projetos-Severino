@@ -72,6 +72,94 @@
   overscroll-behavior: contain;
 }
 
+/* Portal em body — tema escuro: mesmo padrão do modal Nova lista (var(--bg-card) = #000) */
+body[data-theme='dark'] .agenda-modal-backdrop.modal-backdrop {
+  background: rgba(0, 0, 0, 0.55) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal {
+  background: var(--bg-card) !important;
+  background-image: none !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-xl, 16px) !important;
+  box-shadow: var(--shadow-md) !important;
+  color: var(--text-primary) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal h2 {
+  color: var(--text-primary);
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal .agenda-section-eyebrow,
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-field span,
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-toggle span {
+  color: var(--text-secondary);
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-field input,
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-field textarea,
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-field select {
+  background: var(--bg-secondary) !important;
+  border: 1.5px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  color-scheme: dark;
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-field input:focus-visible,
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-field textarea:focus-visible,
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-field select:focus-visible {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15);
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-toggle {
+  background: var(--bg-secondary) !important;
+  border: 1.5px solid var(--border-color) !important;
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-toggle input {
+  accent-color: var(--accent);
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__close {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-muted, var(--text-secondary)) !important;
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__close:hover {
+  border-color: var(--accent) !important;
+  color: var(--text-primary) !important;
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__close:focus-visible {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15);
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-secondary-btn {
+  background: transparent !important;
+  border: 1.5px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-secondary-btn:hover {
+  border-color: var(--accent) !important;
+  color: var(--text-primary) !important;
+}
+
+body[data-theme='dark'] .agenda-modal-backdrop .agenda-secondary-btn:focus-visible {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15);
+}
+
 body:has(.agenda-modal-backdrop) .mobile-bottom-nav,
 body:has(.agenda-modal-backdrop) .dashboard-mobile-tx-fab,
 body:has(.agenda-modal-backdrop) .horizon-chat-fab,
@@ -1509,7 +1597,7 @@ body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-ho
 }
 
 body[data-theme='dark']
-  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-investimentos)
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell
   .dashboard-hub__btn--primary,
 body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
 body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
