@@ -1,6 +1,6 @@
 import { log } from '../logger.mjs'
 import { buscarUsuarioPorTelefone } from '../usuarios.mjs'
-import { getCategorias, inserirTransacao, atualizarTransacao } from '../transacoes.mjs'
+import { getCategorias, inserirTransacao, atualizarTransacao, deletarTransacao } from '../transacoes.mjs'
 import { askHorizon, parseWhatsAppMessageWithAI, parseWhatsAppAudioDirectWithAI } from '../ai.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
@@ -210,7 +210,7 @@ function formatDataTransacaoReplyPtBr(iso) {
 }
 
 const AJUDA =
-  '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n📈 *Investimentos:* "meus investimentos", "quanto tenho investido"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n🛒 *Lista de compras:* "adiciona 2kg de arroz na lista Mercado" ou "ver lista Mercado"\n✏️ *Corrigir:* "corrigir valor 50", "corrigir categoria alimentação"\n\nDigite *ajuda* para ver isto de novo.'
+  '🤖 *Severino*\n\n💬 Pergunte sobre suas finanças ou agenda — uso seus dados do app.\n\nTambém registro:\n\n💸 *Despesa:* "gastei 50 no mercado"\n✅ *Receita:* "recebi 2000 de salário"\n📊 *Saldo:* "meu saldo"\n📋 *Extrato:* "histórico do dia", "extrato do mês"\n📈 *Investimentos:* "meus investimentos", "quanto tenho investido"\n🗓️ *Agenda:* "marcar reunião amanhã às 15h" ou "agenda hoje"\n🛒 *Lista de compras:* "adiciona 2kg de arroz na lista Mercado" ou "ver lista Mercado"\n✏️ *Corrigir:* "corrigir valor 50", "corrigir categoria alimentação"\n🗑️ *Desfazer:* "desfazer" — remove a última transação\n\nDigite *ajuda* para ver isto de novo.'
 
 // Detecta saudações isoladas: "Olá", "Oi", "Bom dia", "Salve", "Opa", etc.
 const BOA_VINDAS_RE =
@@ -431,6 +431,37 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
     } catch (e) {
       log.error('[whatsapp-bot] listarLimitesOrcamento error', e)
       return { ok: false, reply: '❌ Erro ao buscar limites. Tente novamente.' }
+    }
+  }
+
+  // Comando: "desfazer" — remove a última transação do usuário
+  const DESFAZER_RE =
+    /^(?:desfaz(?:er?|a)?(?:\s+[uúu]ltim[\w]*)?|apagar?\s+[uúu]ltim[\w]*|remover?\s+[uúu]ltim[\w]*|excluir?\s+[uúu]ltim[\w]*|deletar?\s+[uúu]ltim[\w]*)(?:\s+(?:transa[cç][aã]o|lan[cç]amento|gasto|despesa|receita|registro))?[\s!.?]*$/i
+  if (DESFAZER_RE.test(message.replace(/\s+/g, ' ').trim())) {
+    try {
+      const supabase = getSupabaseAdmin()
+      const { data: ultima } = await supabase
+        .from('transacoes')
+        .select('id, tipo, valor, descricao, data_transacao, categoria_id')
+        .eq('usuario_id', dataUsuarioId)
+        .order('data_transacao', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (!ultima) {
+        return { ok: true, reply: '❌ Nenhuma transação encontrada para desfazer.' }
+      }
+      const cats = await getCategorias(dataUsuarioId)
+      const catNome = ultima.categoria_id ? cats.find(c => c.id === ultima.categoria_id)?.nome : null
+      const data = new Date(ultima.data_transacao + 'T00:00:00Z').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' })
+      await deletarTransacao(ultima.id, dataUsuarioId)
+      const emoji = ultima.tipo === 'RECEITA' ? '✅' : '💸'
+      return {
+        ok: true,
+        reply: `🗑️ *Última transação removida!*\n\n${emoji} ${fmt(ultima.valor)} — ${ultima.descricao || '-'}${catNome ? ` (${catNome})` : ''} · ${data}\n\n_Se foi engano, registre novamente._`,
+      }
+    } catch (e) {
+      log.error('[whatsapp-bot] desfazerTransacao error', e)
+      return { ok: false, reply: '❌ Erro ao desfazer transação. Tente novamente.' }
     }
   }
 
