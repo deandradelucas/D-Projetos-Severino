@@ -381,7 +381,7 @@ body[data-theme='dark']:has(
     0 4px 16px rgba(0, 0, 0, 0.35) !important;
 }
 
-/* Dark — Investimentos: FAB vidro + rótulo dourado (Transações: pill sólido em 07-page-transacoes.css) */
+/* Dark — Investimentos: FAB vidro + rótulo dourado (Transações: mesmo padrão em 07-page-transacoes.css) */
 body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab {
   border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 52%, rgba(255, 255, 255, 0.12)) !important;
   background:
