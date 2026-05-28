@@ -13,6 +13,7 @@ import { registerTaxaSelicRoutes } from './register-taxa-selic.mjs'
 import { registerTaxaCdiRoutes } from './register-taxa-cdi.mjs'
 import { registerListaComprasRoutes } from './register-lista-compras.mjs'
 import { registerDigestRoutes } from './register-digest.mjs'
+import { registerTrialRoutes } from './register-trial.mjs'
 
 /** Regista todas as rotas `/api/*` (exceto health, montado em app.mjs). */
 export function registerApiDomainRoutes(app) {
@@ -31,4 +32,5 @@ export function registerApiDomainRoutes(app) {
   registerInvestimentosRoutes(app)
   registerListaComprasRoutes(app)
   registerDigestRoutes(app)
+  registerTrialRoutes(app)
 }
