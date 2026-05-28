@@ -7,6 +7,7 @@ import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
 import { isListaComprasMessage, processarMensagemListaCompras } from './lista-compras-whatsapp.mjs'
 import { detectExtratoPedido, montarRespostaExtratoWhatsApp } from './whatsapp-extrato.mjs'
 import { resolveEscopoUsuario, assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
+import { dispararAlertasTransacao, upsertLimiteOrcamento, listarLimitesOrcamento } from './alertas-financeiros.mjs'
 import { listarInvestimentosUsuario } from '../investimentos.mjs'
 import {
   buscarTaxaCdiAa,
@@ -371,6 +372,47 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
     }
   }
 
+  // Comando: "limite [categoria] [valor]" ou "orcamento [categoria] [valor]"
+  const LIMITE_RE = /^(?:limite|or[çc]amento)(?:\s+de)?\s+(.+?)\s+([\d]+(?:[.,]\d{1,2})?)$/i
+  const limiteMatch = message.replace(/\s+/g, ' ').trim().match(LIMITE_RE)
+  if (limiteMatch) {
+    try {
+      const cats = await getCategorias(dataUsuarioId)
+      const nomeBuscado = limiteMatch[1].trim().toLowerCase()
+      const cat = cats.find(c => c.tipo === 'DESPESA' && c.nome.toLowerCase().includes(nomeBuscado))
+      if (!cat) {
+        const nomes = cats.filter(c => c.tipo === 'DESPESA').map(c => c.nome).join(', ')
+        return { ok: true, reply: `❌ Categoria não encontrada. Categorias disponíveis:\n${nomes}` }
+      }
+      const valor = parseFloat(limiteMatch[2].replace(',', '.'))
+      if (!valor || valor <= 0) return { ok: true, reply: '❌ Valor inválido para o limite.' }
+      await upsertLimiteOrcamento(dataUsuarioId, cat.id, valor)
+      return { ok: true, reply: `✅ Limite de *${cat.nome}* definido em ${fmt(valor)}/mês.\n\nVocê receberá alertas ao atingir 80% e 100% desse valor.` }
+    } catch (e) {
+      log.error('[whatsapp-bot] upsertLimiteOrcamento error', e)
+      return { ok: false, reply: '❌ Erro ao definir limite. Tente novamente.' }
+    }
+  }
+
+  // Comando: "limites" ou "meus limites"
+  if (/^(meus\s+)?limites?(\s+de\s+or[çc]amento)?$/i.test(message.replace(/\s+/g, ' ').trim())) {
+    try {
+      const cats = await getCategorias(dataUsuarioId)
+      const limites = await listarLimitesOrcamento(dataUsuarioId)
+      if (!limites.length) {
+        return { ok: true, reply: '📋 Você ainda não definiu nenhum limite.\n\nEnvie *limite [categoria] [valor]* para definir. Ex: _limite alimentação 800_' }
+      }
+      const linhas = limites.map(l => {
+        const cat = cats.find(c => c.id === l.categoria_id)
+        return `• ${cat?.nome ?? l.categoria_id}: ${fmt(l.limite_mensal)}/mês`
+      })
+      return { ok: true, reply: `📋 *Seus limites mensais:*\n\n${linhas.join('\n')}` }
+    } catch (e) {
+      log.error('[whatsapp-bot] listarLimitesOrcamento error', e)
+      return { ok: false, reply: '❌ Erro ao buscar limites. Tente novamente.' }
+    }
+  }
+
   // 3. Parse de transação via IA
   let categorias
   try {
@@ -447,7 +489,7 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
     const actorUid = usuario?.id ? String(usuario.id).trim() : ''
     const lancadoPor =
       actorUid && actorUid !== String(dataUsuarioId || '').trim() ? actorUid : undefined
-    await inserirTransacao({
+    const transacaoInserida = await inserirTransacao({
       usuario_id: dataUsuarioId,
       tipo: parsed.tipo,
       valor: parsed.valor,
@@ -458,6 +500,20 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
       subcategoria_id: finalSubcategoriaId || undefined,
       ...(lancadoPor ? { lancado_por_usuario_id: lancadoPor } : {}),
     })
+
+    // Alertas pós-insert (gasto alto + orçamento) — fire-and-forget, não bloqueia resposta
+    if (parsed.tipo === 'DESPESA' && finalCategoriaId && transacaoInserida?.id) {
+      const nomeCategoria = categorias.find(c => c.id === finalCategoriaId)?.nome
+      dispararAlertasTransacao({
+        usuarioId: dataUsuarioId,
+        categoriaId: finalCategoriaId,
+        nomeCategoria,
+        valorAtual: parsed.valor,
+        transacaoId: transacaoInserida.id,
+        phone,
+        instance: process.env.EVOLUTION_INSTANCE,
+      }).catch(e => log.warn('[alertas] dispararAlertasTransacao error', e?.message))
+    }
   } catch (e) {
     log.error('[whatsapp-bot] inserirTransacao error', e)
     return { ok: false, reply: '❌ Erro ao salvar a transação. Tente novamente.' }
