@@ -94,6 +94,16 @@ function stripAccents(value) {
 function normalizeTypos(text) {
   let t = String(text || '')
 
+  // Fillers de fala \u2014 comuns em transcri\u00e7\u00f5es de \u00e1udio (remover antes de qualquer outro parsing)
+  t = t.replace(/\bn\u00e9[?!.,]?\b/gi, ' ')                   // "n\u00e9?" \u2014 filler universal BR
+  t = t.replace(/\bhmm?\b[.,]?\s*/gi, ' ')                 // "hm", "hmm" \u2014 hesita\u00e7\u00e3o
+  t = t.replace(/\bah\u00e3\b[.,]?\s*/gi, ' ')                  // "ah\u00e3" \u2014 confirma\u00e7\u00e3o oral
+  t = t.replace(/\bpor\s+favor\b/gi, '')                   // cortesia em fala
+  t = t.replace(/\btipo\s+(?:assim|isso)\b/gi, '')         // "tipo assim", "tipo isso"
+  t = t.replace(/\bt\u00e1\s+(?:bom|certo|\u00f3timo|ok)\b/gi, '')  // "t\u00e1 bom" filler de confirma\u00e7\u00e3o
+  t = t.replace(/\bvoc\u00ea\s+pode\b/gi, '')                   // "voc\u00ea pode marcar" \u2192 "marcar"
+  t = t.replace(/\bpra\b/gi, 'para')                       // "pra" \u2192 "para" (normaliza)
+
   // Abrevia\u00e7\u00f5es de m\u00f3vel BR
   t = t.replace(/\bhj\b/gi, 'hoje')
   t = t.replace(/\btb\b|\btbm\b|\ttamb[e\u00e9]m?\b/gi, 'tamb\u00e9m')
@@ -173,15 +183,16 @@ function normalizeWordTime(text) {
   r(/\bvinte\b/gi, '20')
 
   // Amb\u00edguos (1-10): somente com preposi\u00e7\u00e3o (\u00e0s/as/pelas) OU seguidos de "horas"
+  // Usa (?<!\w) em vez de \b antes de "\u00e0s" porque "\u00e0" \u00e9 char n\u00e3o-ASCII \u2014 \b nunca casa.
   for (const [pat, val] of [
     ['dez', 10], ['nove', 9], ['oito', 8], ['sete', 7],
     ['seis', 6], ['cinco', 5], ['quatro', 4], ['tr[e\u00ea]s', 3],
     ['dois|duas', 2],
   ]) {
-    r(new RegExp(`(\\b(?:\u00e0s|as|pelas?)\\s+)(?:${pat})\\b`, 'gi'), `$1${val}`)
+    r(new RegExp(`((?<!\\w)(?:\u00e0s|as|pelas?)\\s+)(?:${pat})(?!\\w)`, 'gi'), `$1${val}`)
     r(new RegExp(`\\b(?:${pat})(?=\\s+horas?\\b)`, 'gi'), String(val))
   }
-  r(/((?:\u00e0s|as|pelas?)\s+)uma\b/gi, '$11')
+  r(/((?<!\w)(?:\u00e0s|as|pelas?)\s+)uma(?!\w)/gi, '$11')
   r(/\buma\s+hora\b/gi, '1h')
 
   // Minutos por extenso ap\u00f3s d\u00edgito (maiores combina\u00e7\u00f5es primeiro)
@@ -284,15 +295,15 @@ export function parseAgendaDateTime(message, base = new Date()) {
     return d
   }
 
-  if (!time) return null
-
   let parts = saoPauloParts(base)
   /** Só horário no texto → assume calendário “hoje” em SP; se esse instante já passou, usa o dia seguinte. */
   let bumpDayIfPast = true
+  let hasExplicitDate = false
 
   const explicitDate = text.match(/\b(\d{1,2})[/-](\d{1,2})(?:[/-](\d{2,4}))?\b/)
   if (explicitDate) {
     bumpDayIfPast = false
+    hasExplicitDate = true
     const day = Number.parseInt(explicitDate[1], 10)
     const month = Number.parseInt(explicitDate[2], 10)
     let year = explicitDate[3] ? Number.parseInt(explicitDate[3], 10) : parts.year
@@ -300,31 +311,35 @@ export function parseAgendaDateTime(message, base = new Date()) {
     parts = { year, month, day }
   } else if (text.includes('depois de amanha')) {
     bumpDayIfPast = false
+    hasExplicitDate = true
     parts = saoPauloParts(addDays(startOfToday(), 2))
   } else if (text.includes('amanha')) {
     bumpDayIfPast = false
+    hasExplicitDate = true
     parts = saoPauloParts(addDays(startOfToday(), 1))
   } else if (text.includes('hoje')) {
-    // "hoje" é explícito — nunca empurra para amanhã mesmo se horário passou
     bumpDayIfPast = false
+    hasExplicitDate = true
     parts = saoPauloParts(startOfToday())
   } else {
-    let weekdayMatched = false
     for (const [name, weekday] of WEEKDAY_MAP.entries()) {
-      // Abreviações (≤3 chars) usam \b para não casar dentro de palavras maiores
       const matched = name.length <= 3
         ? new RegExp(`\\b${name}\\b`).test(text)
         : text.includes(name)
       if (matched) {
         parts = saoPauloParts(nextWeekday(weekday))
-        weekdayMatched = true
+        hasExplicitDate = true
+        bumpDayIfPast = false
         break
       }
     }
-    if (weekdayMatched) bumpDayIfPast = false
   }
 
-  let result = saoPauloDateFromParts({ ...parts, hour: time.hour, minute: time.minute })
+  // Se não há horário: usa 09:00 quando uma data/dia foi informado; sem data E sem hora → null
+  const resolvedTime = time ?? (hasExplicitDate ? { hour: 9, minute: 0 } : null)
+  if (!resolvedTime) return null
+
+  let result = saoPauloDateFromParts({ ...parts, hour: resolvedTime.hour, minute: resolvedTime.minute })
   if (bumpDayIfPast && result.getTime() < base.getTime()) {
     result = addDays(result, 1)
   }
@@ -379,7 +394,7 @@ function stripDateTime(text) {
   t = t.replace(/\b\d{1,2}\s+e\s+meia\b/gi, '')
   t = t.replace(/\b\d{1,2}\s+horas?\b/gi, '')
   t = t.replace(/\b\d{1,2}h\b/gi, '')
-  t = t.replace(/\b(?:da|de|pela)\s+(?:manh[aã]|tarde|noite)\b/gi, '')
+  t = t.replace(/\b(?:da|de|pela)\s+(?:manh[aã]|tarde|noite)(?!\w)/gi, '')
   t = t.replace(/\b(?:pr[oó]xim[ao]s?)\b/gi, '')
   return t
 }
@@ -403,11 +418,18 @@ function lightExtractTitle(message) {
   const schedMatch = text.match(schedVerb)
   if (schedMatch && schedMatch.index > 0) text = text.slice(schedMatch.index)
 
-  // Remove verbo de agendamento no início + conector opcional (exige espaço após conector para não cortar palavras como "dentista")
+  // Remove verbo de agendamento no início + conector opcional
   text = text.replace(
-    /^(?:me\s+)?(?:marcar|marque|agendar|agende|agenda|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|coloca|bota|salva|registra|registrar|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|preciso|precisa|lembrete)\s+(?:(?:de|para|um|uma|o|a|ir\s+ao?|ir\s+na?)\s+)*/i,
+    /^(?:me\s+)?(?:marcar|marca(?=\s)|marque|agendar|agende|agenda|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|coloca|bota|salva|registra|registrar|inclui|incluir|inclua|avis[ae]?|avisar|alert[ae]?|alertar|lembra|lembrar|lembre|tenho|terei|preciso|precisa|lembrete|vou\s+(?:ter\s+)?|vou(?=\s))\s*(?:(?:de|da|do|para|um|uma|o|a|mim|ir\s+ao?|ir\s+na?)\s+)*/i,
     ''
   )
+  // Preambles de fala remanescentes
+  text = text.replace(/^(?:mim|me)\s+/i, '')
+  text = text.replace(/^na\s+agenda\s*/i, '')
+  text = text.replace(/^(?:minha|meu|nossa|nosso)\s+/i, '')
+  text = text.replace(/^tem\s+(?:um|uma)\s+/i, '')
+  text = text.replace(/^quando\s+chegar\s+(?:[oa]\s+)?/i, '')
+  text = text.replace(/^(?:um|uma)\s+/i, '')
 
   // Remove frases de lembrete ao final
   text = text.replace(/[\s,]+\b(?:me\s+)?(?:avise|avisar|alerte|alerta|alertar|lembre|lembrar|lembra)\b.*$/i, '')
@@ -445,7 +467,11 @@ function extractTitle(message) {
     text = text.replace(/^.*?\bseverino\b[,!\s]*/i, '')
   }
 
-  // 3. Localiza verbo de agendamento em QUALQUER posição; salta preamble conversacional
+  // 3. Remove frases de lembrete/aviso ao FINAL antes de buscar o verbo de agendamento,
+  //    para evitar que "lembre/avisa" no fim seja confundido com o verbo de criação
+  text = text.replace(/[\s,]+\b(?:me\s+)?(?:avise|avisar|alerte|alerta|alertar|lembre|lembrar|lembra)\b.*$/i, '')
+
+  // 4. Localiza verbo de agendamento em QUALQUER posição; salta preamble conversacional
   const schedVerb =
     /\b(?:me\s+)?(?:marqu[ae]|agend[ae]|agenda(?=\s)|cri[ae](?=\s)|adicione?|anote?(?=\s)|coloque?|coloca(?=\s)|bota(?=\s)|salva(?=\s)|registra(?=\s)|inclua?|lembr[ae](?:\s+(?:de|que|disso))?|avis[ae](?:\s+(?:de|me))?|alert[ae](?:\s+(?:de|me))?|lembrete\s+de|marcar?\s|agendar?\s)/i
   const schedMatch = text.match(schedVerb)
@@ -453,19 +479,27 @@ function extractTitle(message) {
     text = text.slice(schedMatch.index)
   }
 
-  // 4. Remove verbos de agendamento no início (infinitivo + imperativo)
-  // Conector com espaço obrigatório evita cortar palavras como "dentista" (não absorver "de" de "de+ntista")
+  // 5. Remove verbos de agendamento no início (infinitivo + imperativo + fala)
+  // \s* em vez de \s+ para cobrir "vou ter " que já consome o espaço no grupo opcional
+  // Conectores incluem da/do para cobrir "avisa da consulta", "fala do médico"
   text = text.replace(
-    /^(?:me\s+)?(?:marcar|marque|agendar|agende|agenda|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|coloca|bota|salva|registra|registrar|inclui|incluir|inclua|avise?|avisar|alerte?|alertar|lembra|lembrar|lembre|tenho|terei|preciso|precisa|lembrete)\s+(?:(?:de|para|um|uma|o|a|ir\s+ao?|ir\s+na?)\s+)*/i,
+    /^(?:me\s+)?(?:marcar|marca(?=\s)|marque|agendar|agende|agenda|criar|crie|adicionar|adicione|anotar|anote|anota|colocar|coloque|coloca|bota|salva|registra|registrar|inclui|incluir|inclua|avis[ae]?|avisar|alert[ae]?|alertar|lembra|lembrar|lembre|tenho|terei|preciso|precisa|lembrete|vou\s+(?:ter\s+)?|vou(?=\s))\s*(?:(?:de|da|do|para|um|uma|o|a|mim|ir\s+ao?|ir\s+na?)\s+)*/i,
     ''
   )
   text = text.replace(/^(?:um|uma|o|a)\s+(?:compromisso|lembrete|evento)\s+(?:de|para)?\s*/i, '')
 
-  // 5. Remove frases de lembrete ao final
-  text = text.replace(/[\s,]+\b(?:me\s+)?(?:avise|avisar|alerte|alerta|alertar|lembre|lembrar|lembra)\b.*$/i, '')
+  // 5b. Preambles de fala que sobram após o corte do verbo (padrões comuns em áudio)
+  text = text.replace(/^(?:mim|me)\s+/i, '')
+  text = text.replace(/^na\s+agenda\s*/i, '')
+  text = text.replace(/^(?:minha|meu|nossa|nosso)\s+/i, '')
+  text = text.replace(/^tem\s+(?:um|uma)\s+/i, '')
+  text = text.replace(/^quando\s+chegar\s+(?:[oa]\s+)?/i, '')
+  text = text.replace(/^(?:um|uma)\s+/i, '')
 
   // 6. Remove marcadores de data/hora em QUALQUER posição
   text = stripDateTime(text)
+  // Remove "é" isolado que sobra quando "X é [data]" tem a data extraída ("dentista é sexta" → "dentista é")
+  text = text.replace(/\s+é\s*$/i, '')
 
   // 7. Limpa e mede resultado
   const cleaned = stripTrailingStopwords(text.replace(/\s+/g, ' ').replace(/^[\s,;:?!.]+|[\s,;:?!.]+$/g, '').trim())
@@ -586,7 +620,7 @@ export function isAgendaMessage(message) {
   return hasCreateIntent(raw) && Boolean(parseAgendaDateTime(raw))
 }
 
-export async function processarMensagemAgenda(usuario, phone, rawMessage) {
+export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitulo = null) {
   const message = normalizeTypos(String(rawMessage || '').trim())
   if (!isAgendaMessage(message)) return null
 
@@ -710,8 +744,9 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage) {
       }
       const explicitReminder = parseReminderMinutes(message)
       const reminderCreate = isReminderCreateMessage(message)
+      const tituloFinal = aiTitulo || titleForCreate(message)
       const data = await criarAgendaEvento(uid, {
-        titulo: titleForCreate(message),
+        titulo: tituloFinal,
         descricao: reminderCreate ? 'Notificação criada pelo WhatsApp.' : undefined,
         inicio: inicio.toISOString(),
         lembrar_minutos_antes: explicitReminder !== null ? explicitReminder : 15,
