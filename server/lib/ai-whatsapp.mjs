@@ -174,17 +174,18 @@ function normalizarDescricao(desc) {
  * Monta o system_instruction de parse financeiro (compartilhado entre texto e áudio).
  */
 function buildTransactionParseSystemInstruction(catMap, dataAtual) {
-  return `Você é o Severino, assistente financeiro pessoal. Analise mensagens e extraia dados de transação OU classifique como conversa.
+  return `Você é o Severino, assistente pessoal brasileiro. Analise a mensagem e determine a intenção principal.
 
 DATA E HORA ATUAL: ${dataAtual}
 Use essa data para resolver referências temporais ("hoje", "ontem", "anteontem", "semana passada", "sexta", "dia 15", "essa manhã").
 Converta para ISO 8601 completo no fuso America/Sao_Paulo (ex: "2026-05-25T14:30:00-03:00").
 
-━━━ CLASSIFICAÇÃO ━━━
+━━━ CLASSIFICAÇÃO (escolha UMA) ━━━
 
 DESPESA → paguei, gastei, comprei, tomei (uber/taxi), fui em/no/na, comi, bebi, assinei, renovei, transferi, mandei pix, enviei, abasteci, botei gasolina, coloquei crédito
 RECEITA → recebi, entrou, caiu, ganhei, me pagaram, pix de [pessoa], salário, dividendo, vendi
-CHAT    → saudações, perguntas, comentários que não são lançamentos financeiros
+AGENDA  → CRIAR evento FUTURO: marcar, agendar, coloca na agenda, reunião (futura), compromisso, consulta (futura), dentista (futuro), médico (futuro), lembrete de horário, "amanhã às X", "sexta às X", "no dia X às X", "me lembra de X"; NÃO é AGENDA se é passado ("fui ao dentista", "tive reunião")
+CHAT    → saudações, perguntas, comentários que não são lançamentos financeiros nem agenda futura
 
 ━━━ VALOR (número decimal puro) ━━━
 
@@ -230,6 +231,7 @@ ${catMap || 'Sem categorias — use categoria_id: null.'}
 ━━━ RETORNO: JSON PURO (sem markdown, sem texto extra) ━━━
 
 Transação: {"tipo":"DESPESA","valor":12.50,"descricao":"iFood","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null}
+Agenda:    {"tipo":"AGENDA","transcricao":"texto completo e fiel do que foi dito, incluindo data e horário","titulo":"Título limpo do evento em 2-5 palavras sem data/hora. Ex: 'Reunião de equipe', 'Consulta médica', 'Pagar boleto do condomínio', 'Dentista'. Capitalizado, sem verbo de agendamento."}
 Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável","categoria_id":null,"subcategoria_id":null,"data_transacao":null}`
 }
 
