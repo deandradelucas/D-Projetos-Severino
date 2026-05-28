@@ -428,6 +428,21 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
   }
 
   const { iso: dataTransacaoIso, explicit: dataExplicita } = resolveDataTransacaoParaBot(parsed)
+
+  // Fallback: categoria/subcategoria não identificadas → "Outros"
+  let finalCategoriaId = parsed.categoria_id || null
+  let finalSubcategoriaId = parsed.subcategoria_id || null
+  if (!finalCategoriaId && categorias?.length) {
+    const catOutros = categorias.find(
+      (c) => c.tipo === parsed.tipo && c.nome.toLowerCase() === 'outros'
+    )
+    if (catOutros) {
+      finalCategoriaId = catOutros.id
+      const subOutros = catOutros.subcategorias?.find((s) => s.nome.toLowerCase() === 'outros')
+      if (subOutros) finalSubcategoriaId = subOutros.id
+    }
+  }
+
   try {
     const actorUid = usuario?.id ? String(usuario.id).trim() : ''
     const lancadoPor =
@@ -439,8 +454,8 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
       descricao: parsed.descricao || message.slice(0, 100),
       data_transacao: dataTransacaoIso,
       status: 'EFETIVADA',
-      categoria_id: parsed.categoria_id || undefined,
-      subcategoria_id: parsed.subcategoria_id || undefined,
+      categoria_id: finalCategoriaId || undefined,
+      subcategoria_id: finalSubcategoriaId || undefined,
       ...(lancadoPor ? { lancado_por_usuario_id: lancadoPor } : {}),
     })
   } catch (e) {
