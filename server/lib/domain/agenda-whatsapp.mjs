@@ -586,7 +586,7 @@ function formatLista(eventos, titulo = 'Agenda') {
     const local = ev.local ? `\n   📍 ${ev.local}` : ''
     return `${idx + 1}. *${ev.titulo}*\n   ${formatAgendaDateTime(ev.inicio, ev.timezone || AGENDA_TZ)}${local}`
   })
-  return `🗓️ *${titulo}*\n\n${lines.join('\n\n')}\n\n_Para gerenciar: *confirmar 1*, *cancelar 2*, *reagendar 1 amanhã 10h*_`
+  return `🗓️ *${titulo}*\n\n${lines.join('\n\n')}`
 }
 
 async function listarProximos(usuarioId, onlyToday = false) {
