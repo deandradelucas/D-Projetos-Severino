@@ -1589,6 +1589,16 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
+
+  /* Dashboard home: hero usa var(--bg-card) para combinar com os outros cards (#141618) */
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    background: var(--bg-card) !important;
+    background-image: none !important;
+    border: 1px solid rgba(148, 163, 184, 0.15) !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
 }
 
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip.ref-kpi-row,
@@ -2348,9 +2358,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   /* Card do hero: superfície sólida (sem vidro), borda legível — alinha ao mock mobile */
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
-    background: #0a0a0a !important;
+    background: var(--bg-card) !important;
     background-image: none !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(148, 163, 184, 0.15) !important;
     box-shadow: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
