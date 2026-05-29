@@ -15,6 +15,7 @@ import {
   enriquecerCategoriaPorTexto,
   fallbackParseMensagemSimples,
 } from './domain/transaction-heuristics.mjs'
+import { grokChatCompletion } from './ai/grok-client.mjs'
 
 const MAX_WHATSAPP_AUDIO_BYTES = 20 * 1024 * 1024
 
@@ -288,6 +289,28 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
         descricao: 'Conversa',
         resposta: 'Entendi o que você disse, mas não identifiquei uma transação financeira. Se quiser lançar um gasto, tente: "gastei 50 no mercado".',
       }
+    }
+  }
+
+  // Fallback Grok — tenta quando todos os modelos Gemini falharam por erro HTTP
+  const grokKey = process.env.GROK_API_KEY
+  if (grokKey) {
+    try {
+      const grokText = await grokChatCompletion({
+        apiKey: grokKey,
+        systemPrompt: systemInstruction,
+        userMessage,
+      })
+      const grokParsed = tryParseJsonBlock(grokText)
+      if (grokParsed && grokParsed.tipo) {
+        log.info('[ai-whatsapp] grok fallback ok', { tipo: grokParsed.tipo })
+        if (grokParsed.descricao) grokParsed.descricao = normalizarDescricao(grokParsed.descricao)
+        const sanitized = sanitizeTransacaoExtraidaIA(grokParsed, categoriasUsuario)
+        const textoEnriq = [message, grokParsed?.descricao].filter(Boolean).join(' ')
+        return enriquecerCategoriaPorTexto(textoEnriq, sanitized, categoriasUsuario)
+      }
+    } catch (e) {
+      log.warn('[ai-whatsapp] grok fallback error', e?.message)
     }
   }
 
