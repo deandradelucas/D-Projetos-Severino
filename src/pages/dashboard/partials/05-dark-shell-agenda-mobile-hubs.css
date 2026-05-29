@@ -1700,6 +1700,10 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     padding: 0 0 calc(144px + var(--safe-bottom));
   }
 
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    padding-top: 10px !important;
+  }
+
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
