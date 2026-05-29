@@ -573,20 +573,20 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
 }
 
 body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-  -webkit-backdrop-filter: blur(16px) saturate(1.06);
-  backdrop-filter: blur(16px) saturate(1.06);
-  background: rgba(22, 28, 38, 0.55);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: var(--bg-card);
   background-image: none;
-  border-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(148, 163, 184, 0.15);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
     0 14px 40px -24px rgba(0, 0, 0, 0.45);
 }
 
 /* Dashboard inicial: barra do hero mais baixa (menos padding vertical que outras páginas hub) */
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
   margin: 0;
-  padding: 6px 12px 7px;
+  padding: 12px 12px 7px;
 }
 
 /* Com rolagem: blur(1px) — mesmo “grão” do fundo do shell (index.css .app-routes-grow). */
@@ -657,7 +657,7 @@ body[data-theme='dark']
 @media (min-width: 769px) {
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
     margin-bottom: 0;
-    padding: 5px 12px 7px;
+    padding: 12px 12px 7px;
   }
 
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
