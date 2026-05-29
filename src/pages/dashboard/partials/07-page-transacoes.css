@@ -1491,27 +1491,33 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 }
 
 /* ---------------------------------------------------------------------------
-   Footer fixo com totais (acima do bottom-nav e do FAB de nova transação) */
+   Footer com totais — no fluxo da lista (logo abaixo das parcelas) */
+.page-transacoes-ref-table--parceladas {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-transacoes-ref-table--parceladas .ref-tx-list {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .page-transacoes-parcelados-footer {
-  position: fixed;
-  /* Mobile: 24px de margem de cada lado — fica visivelmente dentro do container */
-  left: 24px;
-  right: 24px;
-  z-index: 75;
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: stretch;
   gap: 0;
+  width: 100%;
+  margin-top: 12px;
   padding: 10px 16px;
   background: var(--bg-card, #fff);
   border: 1px solid var(--border-accent, rgba(15, 23, 42, 0.08));
   border-radius: 16px;
   box-shadow: 0 -4px 16px -8px rgba(0, 0, 0, 0.12);
-  /* Logo acima do FAB "Nova transação" do mobile (que fica em ~78px) */
-  bottom: max(140px, calc(132px + var(--safe-bottom, 0px)));
   animation: parcelados-footer-in 0.22s ease;
   box-sizing: border-box;
-  /* Hard cap: nunca ultrapassa o viewport */
-  max-width: calc(100vw - 48px);
+  flex-shrink: 0;
 }
 
 @keyframes parcelados-footer-in {
@@ -1581,19 +1587,11 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   }
 
   .page-transacoes-parcelados-footer {
-    position: relative;
-    bottom: auto;
-    left: auto;
-    right: auto;
-    width: 100%;
-    max-width: 100%;
-    margin-top: auto;
-    flex-shrink: 0;
-    align-self: stretch;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 0;
+    margin-top: 16px;
     /* Reserva à direita para o FAB Severino (56px + 28px + folga) */
     padding: 12px 96px 14px 24px;
   }
@@ -1608,15 +1606,22 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   }
 }
 
-/* Espaço extra no fim da lista para que os últimos itens não fiquem
-   escondidos atrás do footer fixo + FAB de nova transação. */
+/* Folga no painel para o FAB + bottom-nav (footer já está no fluxo) */
+.page-transacoes-ref-table--parceladas {
+  padding-bottom: max(108px, calc(96px + var(--safe-bottom, 0px)));
+}
+
 .page-transacoes-ref-table--parceladas .page-transacoes-parcelados-list {
-  padding-bottom: max(220px, calc(200px + var(--safe-bottom, 0px)));
+  padding-bottom: 4px;
 }
 
 @media (min-width: 769px) {
-  .page-transacoes-ref-table--parceladas .page-transacoes-parcelados-list {
+  .page-transacoes-ref-table--parceladas {
     padding-bottom: 16px;
+  }
+
+  .page-transacoes-ref-table--parceladas .page-transacoes-parcelados-list {
+    padding-bottom: 4px;
   }
 }
 
