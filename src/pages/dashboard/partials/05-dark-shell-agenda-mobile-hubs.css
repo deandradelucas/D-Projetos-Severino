@@ -2337,8 +2337,8 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
-    background: #000000;
-    border: 0.5px solid #0b0b0b;
+    background: var(--bg-card);
+    border: 1px solid rgba(148, 163, 184, 0.15);
   }
 
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card__icon,
