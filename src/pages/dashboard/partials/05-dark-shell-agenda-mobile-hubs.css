@@ -1525,6 +1525,10 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
     border-radius: 0 !important;
   }
 
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    padding-top: 10px !important;
+  }
+
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
@@ -2514,6 +2518,10 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     -webkit-overflow-scrolling: touch !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+  }
+
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    padding-top: 10px !important;
   }
 
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:is(.dashboard-page, .page-configuracoes, .page-relatorios, .page-pagamento) .ref-dashboard-scroll {
