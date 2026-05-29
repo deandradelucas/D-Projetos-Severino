@@ -127,13 +127,13 @@ export async function authenticateUser(email, password) {
   if (!match) return null
 
   const nowIso = new Date().toISOString()
-  try {
-    await supabaseAdmin
-      .from('usuarios')
-      .update({ last_login_at: nowIso })
-      .eq('id', raw.id)
-  } catch {
-    // logging opcional; não bloqueia login
+  const { error: loginErr } = await supabaseAdmin
+    .from('usuarios')
+    .update({ last_login_at: nowIso })
+    .eq('id', raw.id)
+  if (loginErr) {
+    // não bloqueia login, mas precisa aparecer nos logs
+    console.warn('[authenticateUser] last_login_at update failed:', loginErr.message ?? loginErr)
   }
 
   const safe = normalizeUsuarioRow(stripSenha(raw))

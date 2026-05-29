@@ -904,27 +904,26 @@ export default function Transacoes() {
               </>
             )}
           </div>
+          {filtroParceladasAtivo && totaisParcelados ? (
+            <div className="page-transacoes-parcelados-footer" role="status" aria-live="polite">
+              <div className="page-transacoes-parcelados-footer__item">
+                <span className="page-transacoes-parcelados-footer__label">Mês atual</span>
+                <strong className={`page-transacoes-parcelados-footer__value ${privacyMode ? 'privacy-blur' : ''}`}>
+                  {formatCurrencyBRL(totaisParcelados.totalMes)}
+                </strong>
+              </div>
+              <div className="page-transacoes-parcelados-footer__divider" aria-hidden />
+              <div className="page-transacoes-parcelados-footer__item">
+                <span className="page-transacoes-parcelados-footer__label">Total parcelado</span>
+                <strong className={`page-transacoes-parcelados-footer__value ${privacyMode ? 'privacy-blur' : ''}`}>
+                  {formatCurrencyBRL(totaisParcelados.totalGeral)}
+                </strong>
+              </div>
+            </div>
+          ) : null}
         </article>
         </section>
         </RefDashboardScroll>
-
-        {filtroParceladasAtivo && totaisParcelados && (
-          <div className="page-transacoes-parcelados-footer" role="status" aria-live="polite">
-            <div className="page-transacoes-parcelados-footer__item">
-              <span className="page-transacoes-parcelados-footer__label">Mês atual</span>
-              <strong className={`page-transacoes-parcelados-footer__value ${privacyMode ? 'privacy-blur' : ''}`}>
-                {formatCurrencyBRL(totaisParcelados.totalMes)}
-              </strong>
-            </div>
-            <div className="page-transacoes-parcelados-footer__divider" aria-hidden />
-            <div className="page-transacoes-parcelados-footer__item">
-              <span className="page-transacoes-parcelados-footer__label">Total parcelado</span>
-              <strong className={`page-transacoes-parcelados-footer__value ${privacyMode ? 'privacy-blur' : ''}`}>
-                {formatCurrencyBRL(totaisParcelados.totalGeral)}
-              </strong>
-            </div>
-          </div>
-        )}
         </div>
       </main>
       </div>

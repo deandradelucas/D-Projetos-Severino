@@ -65,10 +65,14 @@ export function registerAuthRoutes(app) {
       }
 
       const nowIso = new Date().toISOString()
-      try {
-        await getSupabaseAdmin().from('usuarios').update({ last_login_at: nowIso }).eq('id', user.id)
-        user = { ...user, last_login_at: nowIso }
-      } catch { /* ignore — login não falha por isso */ }
+      const { error: lastLoginErr } = await getSupabaseAdmin()
+        .from('usuarios')
+        .update({ last_login_at: nowIso })
+        .eq('id', user.id)
+      if (lastLoginErr) {
+        log.warn('[login] last_login_at update failed', { userId: user.id, error: lastLoginErr.message ?? lastLoginErr })
+      }
+      user = { ...user, last_login_at: nowIso }
 
       let payloadUser = { ...user }
       try {
@@ -292,6 +296,16 @@ export function registerAuthRoutes(app) {
           message: 'Conta criada. Confirme seus dados para continuar.',
         })
       }
+
+      const regNowIso = new Date().toISOString()
+      const { error: regLoginErr } = await getSupabaseAdmin()
+        .from('usuarios')
+        .update({ last_login_at: regNowIso })
+        .eq('id', newUser.id)
+      if (regLoginErr) {
+        log.warn('[register] last_login_at update failed', { userId: newUser.id, error: regLoginErr.message ?? regLoginErr })
+      }
+      payloadUser = { ...payloadUser, last_login_at: regNowIso }
 
       const [accessToken, refreshToken] = await Promise.all([
         signAccessToken(newUser.id),
