@@ -9,6 +9,7 @@ import {
   AGENDA_TZ,
 } from './agenda.mjs'
 import { assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
+import { grokChatCompletion } from '../ai/grok-client.mjs'
 
 const AGENDA_KEYWORD_RE =
   /\b(agenda|compromisso|compromissos|reuni[aã]o|reuniao|evento|consulta|consult[óo]rio|dentista|m[eé]dico|exame[s]?|vacina[s]?|anivers[aá]rio|viagem|voo|aula[s]?|treino|academia|apresenta[cç][aã]o|entrevista|cirurgia|check.?in|pagar|pagamento|boleto|conta|agendar|marcar|anotar|anota|cancelar|desmarcar|reagendar|remarcar|confirmar|concluir|finalizar|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar|buscar|pegar|levar|tomar|ligar)\b/i
@@ -580,6 +581,37 @@ export function draftAgendaFromTextHeuristic(message, base = new Date()) {
   }
 }
 
+async function extractTituloComGrok(apiKey, message) {
+  try {
+    const text = await grokChatCompletion({
+      apiKey,
+      systemPrompt:
+        'Você extrai o título limpo de um compromisso de agenda a partir de mensagem de WhatsApp em português. ' +
+        'Retorne APENAS o título, sem explicação, sem aspas, capitalizado, máximo 60 caracteres. ' +
+        'Exemplos: "Dentista", "Reunião de equipe", "Pagar boleto do condomínio", "Exame de sangue", "Consulta cardiologista".',
+      userMessage: `MENSAGEM: "${message}"`,
+      maxTokens: 60,
+      temperature: 0.1,
+    })
+    const titulo = String(text || '').trim().replace(/^["'`]|["'`]$/g, '').trim()
+    return titulo.length >= 2 && titulo.length <= 80 ? titulo : null
+  } catch {
+    return null
+  }
+}
+
+async function verificarConflitosAgenda(usuarioId, inicio) {
+  const janela = 60 * 60000 // ±1h
+  try {
+    return await listarAgendaEventos(usuarioId, {
+      from: new Date(inicio.getTime() - janela).toISOString(),
+      to: new Date(inicio.getTime() + janela).toISOString(),
+    })
+  } catch {
+    return []
+  }
+}
+
 function formatLista(eventos, titulo = 'Agenda') {
   if (!eventos.length) return `🗓️ *${titulo}*\n\nNenhum compromisso encontrado.`
   const lines = eventos.slice(0, 8).map((ev, idx) => {
@@ -742,9 +774,22 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
         reply = '🗓️ Para criar na agenda, envie algo como: *marcar reunião amanhã às 15h* ou *me lembra de pagar a luz sexta 9h*.'
         return { ok: true, reply }
       }
+      let tituloFinal = aiTitulo
+      if (!tituloFinal) {
+        const grokKey = process.env.GROK_API_KEY
+        if (grokKey) {
+          tituloFinal = await extractTituloComGrok(grokKey, message)
+        }
+        if (!tituloFinal) tituloFinal = titleForCreate(message)
+      }
+
+      const conflitos = await verificarConflitosAgenda(uid, inicio)
+      const avisoConflito = conflitos.length > 0
+        ? `\n\n⚠️ Já existe *${conflitos[0].titulo}* próximo desse horário.`
+        : ''
+
       const explicitReminder = parseReminderMinutes(message)
       const reminderCreate = isReminderCreateMessage(message)
-      const tituloFinal = aiTitulo || titleForCreate(message)
       const data = await criarAgendaEvento(uid, {
         titulo: tituloFinal,
         descricao: reminderCreate ? 'Notificação criada pelo WhatsApp.' : undefined,
@@ -754,7 +799,7 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
       })
 
       if (explicitReminder !== null) {
-        reply = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}`
+        reply = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}${avisoConflito}`
         return { ok: true, reply }
       }
 
@@ -762,7 +807,7 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
       const label = reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'
       return {
         ok: true,
-        reply: `✅ ${label}\n*${data.titulo}*\n${quando}\n\nQuando quer ser avisado? Responda com:\n*1* – Na hora\n*2* – 5 min antes\n*3* – 10 min antes\n*4* – 30 min antes\n*5* – 1 hora antes`,
+        reply: `✅ ${label}\n*${data.titulo}*\n${quando}${avisoConflito}\n\nQuando quer ser avisado? Responda com:\n*1* – Na hora\n*2* – 5 min antes\n*3* – 10 min antes\n*4* – 30 min antes\n*5* – 1 hora antes`,
       }
     }
 
