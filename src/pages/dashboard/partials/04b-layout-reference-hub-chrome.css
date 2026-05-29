@@ -447,6 +447,22 @@ body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-h
   color: #0b0b0b;
 }
 
+/* Dashboard home — cards Saída e Entrada: conteúdo centralizado (coluna + centro) */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--expense,
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--income {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--expense .ref-kpi-card__body,
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--income .ref-kpi-card__body {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
 /* Transações: uma linha; título com prioridade (ellipsis se não couber) */
 .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
   flex-wrap: nowrap;
