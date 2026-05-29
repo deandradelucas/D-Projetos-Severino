@@ -198,6 +198,7 @@ body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-h
 /* Home: espaço uniforme entre hero, KPIs e Transações (só `gap`; margens verticais extra nos filhos foram removidas). */
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
   gap: 12px;
+  padding-top: 10px;
 }
 
 /* Conteúdo abaixo do hero: mesma pilha — z-index explícito para o vidro sticky ficar por cima ao rolar */
