@@ -1616,8 +1616,9 @@ body[data-theme='dark']
 body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
 body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary,
 body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
-  background: #000000 !important;
+  background: var(--bg-card) !important;
   background-image: none !important;
+  border: 1px solid rgba(148, 163, 184, 0.15) !important;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
