@@ -259,12 +259,12 @@ function parseTime(message) {
   }
 
   const match = text.match(
-    /\b(?:às|as|pelas?)\s*(\d{1,2})(?:[:h](\d{2}))?\b|\bpara\s+as\s+(\d{1,2})(?:[:h](\d{2}))?\b|\b(?:a|para)\s+(\d{1,2})(?:[:h](\d{2}))?\b|\b(\d{1,2})[:h](\d{2})\b|\b(\d{1,2})h\b|\b(\d{1,2})\s+horas?\b/i
+    /\b(?:às|as|pelas?)\s*(\d{1,2})(?:[:h](\d{2}))?\b|\bpara\s+as\s+(\d{1,2})(?:[:h](\d{2}))?\b|\b(?:a|para)\s+(\d{1,2})(?:[:h](\d{2}))?\b|\b(\d{1,2})[:h](\d{2})\b|\b(\d{1,2})h\b|\b(\d{1,2})\s+horas?\b|\b(\d{1,2})\s+h(?!\w)/i
   )
   if (!match) return null
 
-  // índices: às/as/pelas → 1,2 | para as → 3,4 | a/para → 5,6 | HH:mm → 7,8 | HHh → 9 | N horas → 10
-  let hour = Number.parseInt(match[1] || match[3] || match[5] || match[7] || match[9] || match[10], 10)
+  // índices: às/as/pelas → 1,2 | para as → 3,4 | a/para → 5,6 | HH:mm → 7,8 | HHh → 9 | N horas → 10 | N h → 11
+  let hour = Number.parseInt(match[1] || match[3] || match[5] || match[7] || match[9] || match[10] || match[11], 10)
   const minute = Number.parseInt(match[2] || match[4] || match[6] || match[8] || '0', 10)
 
   if (!Number.isFinite(hour)) return null
@@ -388,13 +388,14 @@ function stripDateTime(text) {
   t = t.replace(/\b(?:segunda(?:-feira)?|ter[cç]a(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|s[aá]bado|domingo|seg|ter|qua|qui|sex|sab|dom)\.?(?!\w)/gi, '')
   t = t.replace(/\b(?:daqui\s+a|em)\s+\d{1,3}\s*(?:min|minuto|minutos|hora|horas|h|dia|dias|semana|semanas)\b/gi, '')
   t = t.replace(/\b(?:dia\s+)?\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b/gi, '')
-  t = t.replace(/(?<!\w)(?:às|as|pelas?)\s*\d{1,2}(?:h\d{2}|:\d{2}|\s+horas?\s+e\s+meia|\s+horas?|h)?(?=\s|$|[^\w])/gi, '')
-  t = t.replace(/\bpara\s+(?:as|às)\s+\d{1,2}(?:[:h]\d{2}|\s+horas?\s+e\s+meia|\s+horas?)?\b/gi, '')
+  t = t.replace(/(?<!\w)(?:às|as|pelas?)\s*\d{1,2}(?:h\d{2}|:\d{2}|\s+horas?\s+e\s+meia|\s+horas?|\s+h(?!\w)|h)?(?=\s|$|[^\w])/gi, '')
+  t = t.replace(/\bpara\s+(?:as|às)\s+\d{1,2}(?:[:h]\d{2}|\s+horas?\s+e\s+meia|\s+horas?|\s+h(?!\w))?\b/gi, '')
   t = t.replace(/\b\d{1,2}[:h]\d{2}\b/gi, '')
   t = t.replace(/\b\d{1,2}\s+horas?\s+e\s+meia\b/gi, '')
   t = t.replace(/\b\d{1,2}\s+e\s+meia\b/gi, '')
   t = t.replace(/\b\d{1,2}\s+horas?\b/gi, '')
   t = t.replace(/\b\d{1,2}h\b/gi, '')
+  t = t.replace(/\b\d{1,2}\s+h(?!\w)/gi, '')
   t = t.replace(/\b(?:da|de|pela)\s+(?:manh[aã]|tarde|noite)(?!\w)/gi, '')
   t = t.replace(/\b(?:pr[oó]xim[ao]s?)\b/gi, '')
   return t
