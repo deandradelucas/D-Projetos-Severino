@@ -230,10 +230,11 @@ export async function parseExcelTransactions(buffer, mimeType) {
     return { error: 'NENHUMA_TRANSACAO', message: 'Nenhuma transação válida encontrada. Verifique se as datas e valores estão no formato correto.' }
   }
 
-  // Detecta banco varrendo as primeiras linhas da planilha (cabeçalho + até 5 linhas)
+  // Detecta banco apenas no cabeçalho real (máx 2 linhas) e no nome da aba — evita falso
+  // positivo de "PIX BANCO DO BRASIL" dentro de descrições de transações
   let banco = null
-  const scanText = allRows.slice(0, 6).flat().filter(Boolean).map(String).join(' ')
-  banco = detectBankByName(scanText)
+  const headerText = allRows.slice(0, 2).flat().filter(Boolean).map(String).join(' ')
+  banco = detectBankByName(headerText)
   if (!banco) banco = detectBankByName(sheetName)
 
   log.info('[excel-parser] concluído', { validas: rows.length, total: dataRows.length, banco: banco?.nome || null })

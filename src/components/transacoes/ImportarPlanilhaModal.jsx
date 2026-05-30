@@ -90,7 +90,6 @@ export function ImportarPlanilhaModal({ onClose, onSuccess }) {
         setServerError(json.message || 'Erro ao processar o arquivo.')
       } else {
         setResult(json)
-        onSuccess?.()
       }
     } catch {
       setServerError('Erro de conexão. Verifique sua internet e tente novamente.')
@@ -171,7 +170,7 @@ export function ImportarPlanilhaModal({ onClose, onSuccess }) {
                 {!resumoLines.length && <p>Nenhuma transação nova encontrada.</p>}
               </div>
               <div className="modal-actions">
-                <button className="btn-primary" onClick={onClose}>Fechar</button>
+                <button className="btn-primary" onClick={() => { onSuccess?.(); onClose() }}>Fechar</button>
               </div>
             </div>
           )}
