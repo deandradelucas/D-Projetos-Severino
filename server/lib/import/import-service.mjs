@@ -2,9 +2,7 @@ import { createHash } from 'crypto'
 import { log } from '../logger.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { getCategorias, inserirTransacao } from '../transacoes.mjs'
-import { suggestCategoryForTransaction } from '../ai-category.mjs'
-
-const BATCH_SIZE = 10
+import { suggestCategoriesBatch } from '../ai-category.mjs'
 
 function buildHashes(usuarioId, rows) {
   const counter = new Map()
@@ -34,17 +32,6 @@ async function fetchExistingHashes(supabase, usuarioId, hashes) {
   return new Set((data || []).map((r) => r.origem_hash).filter(Boolean))
 }
 
-async function categorizarBatch(rows, categorias) {
-  const results = []
-  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
-    const chunk = rows.slice(i, i + BATCH_SIZE)
-    const resolved = await Promise.all(
-      chunk.map((row) => suggestCategoryForTransaction(row.descricao, row.tipo, categorias).catch(() => ({ categoria_id: null, subcategoria_id: null })))
-    )
-    results.push(...resolved)
-  }
-  return results
-}
 
 function resolveFallbackCategoria(categorias, tipo) {
   const outros = (categorias || []).find((c) => c.tipo === tipo && c.nome.toLowerCase() === 'outros')
@@ -86,7 +73,11 @@ export async function importarTransacoes(usuarioId, rows, options = {}) {
   }
 
   const categorias = await getCategorias(uid)
-  const cats = await categorizarBatch(novos.map((x) => x.row), categorias)
+  const cats = await suggestCategoriesBatch(novos.map((x) => x.row), categorias)
+
+  const datasImportadas = novos.map((x) => x.row.data).sort()
+  const periodoInicio = datasImportadas[0] || null
+  const periodoFim = datasImportadas[datasImportadas.length - 1] || null
 
   let importadas = 0, erros = 0, despesas = 0, receitas = 0, semCategoria = 0
 
@@ -127,7 +118,7 @@ export async function importarTransacoes(usuarioId, rows, options = {}) {
     }
   }
 
-  const resumo = { importadas, ignoradas, erros, despesas, receitas, semCategoria }
+  const resumo = { importadas, ignoradas, erros, despesas, receitas, semCategoria, periodoInicio, periodoFim }
   log.info('[import] concluído', resumo)
   return resumo
 }

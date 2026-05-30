@@ -1814,6 +1814,41 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
   color: var(--text-primary, #111);
 }
 
+/* Loading state */
+.import-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.import-loading-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-top-color: var(--accent, #6366f1);
+  border-radius: 50%;
+  animation: importSpin 0.8s linear infinite;
+}
+
+@keyframes importSpin {
+  to { transform: rotate(360deg); }
+}
+
+.import-loading-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #64748b);
+}
+
+/* Período */
+.import-period {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--text-secondary, #64748b);
+  font-variant-numeric: tabular-nums;
+}
+
 /* Banco detectado */
 .import-bank-detected {
   display: flex;
