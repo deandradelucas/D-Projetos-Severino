@@ -25,6 +25,7 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import { getWhatsappContactUrl } from '../lib/whatsappContactUrl.js'
 import { TransacaoRow } from '../components/transacoes/TransacaoRow'
 import { TransacoesFiltrosPanel } from '../components/transacoes/TransacoesFiltrosPanel'
+import { ImportarPlanilhaModal } from '../components/transacoes/ImportarPlanilhaModal'
 import './dashboard.css'
 
 /** Itens por requisição — menos DOM inicial; “Carregar mais” busca o restante. */
@@ -76,6 +77,7 @@ export default function Transacoes() {
   const [filtrosAbertos, setFiltrosAbertos] = useState(false)
   const [recorrencias, setRecorrencias] = useState([])
   const [confirmDialog, setConfirmDialog] = useState(null)
+  const [importModalOpen, setImportModalOpen] = useState(false)
   // Grupos expandidos no modo "Parceladas" (Set de recorrente_grupo_id)
   const [parceladosExpandidos, setParceladosExpandidos] = useState(() => new Set())
 
@@ -551,6 +553,14 @@ export default function Transacoes() {
               >
                 + Nova transação
               </button>
+              <button
+                type="button"
+                className="dashboard-hub__btn dashboard-hub__btn--secondary"
+                onClick={() => setImportModalOpen(true)}
+                title="Importar planilha ou extrato bancário"
+              >
+                📊 Importar
+              </button>
               <a
                 href={whatsappContactUrl}
                 target="_blank"
@@ -975,6 +985,15 @@ export default function Transacoes() {
       onConfirm={confirmDialog?.onConfirm}
       onClose={() => setConfirmDialog(null)}
     />
+    {importModalOpen && (
+      <ImportarPlanilhaModal
+        onClose={() => setImportModalOpen(false)}
+        onSuccess={() => {
+          setImportModalOpen(false)
+          fetchTransacoesRef.current?.()
+        }}
+      />
+    )}
     </>
   )
 }
