@@ -1,4 +1,5 @@
 import { log } from '../logger.mjs'
+import { detectBankFromOfxText } from './bank-detector.mjs'
 
 const SIZE_LIMIT = 10 * 1024 * 1024
 
@@ -144,6 +145,7 @@ export async function parseOfxTransactions(buffer) {
     return { error: 'NENHUMA_TRANSACAO', message: 'Transações encontradas mas nenhuma com dados válidos (data, valor e descrição).' }
   }
 
-  log.info('[ofx-parser] concluído', { version, blocos: blocks.length, validas: rows.length })
-  return rows
+  const banco = detectBankFromOfxText(text)
+  log.info('[ofx-parser] concluído', { version, blocos: blocks.length, validas: rows.length, banco: banco?.nome || null })
+  return { rows, banco }
 }

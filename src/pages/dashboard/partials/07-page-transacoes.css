@@ -1648,5 +1648,227 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
   border-color: rgba(148, 163, 184, 0.22);
 }
 
+/* ── Modal de Importação ──────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
 
+.modal-box {
+  background: var(--bg-card, #fff);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.modal-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary, #111);
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-secondary, #64748b);
+  padding: 4px 8px;
+  border-radius: 8px;
+  line-height: 1;
+  transition: background 0.15s;
+}
+
+.modal-close-btn:hover {
+  background: rgba(148, 163, 184, 0.15);
+}
+
+.modal-body {
+  padding: 20px 24px 24px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.import-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #64748b);
+  margin: 0 0 16px;
+}
+
+.import-dropzone {
+  border: 2px dashed rgba(148, 163, 184, 0.4);
+  border-radius: 14px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: transparent;
+}
+
+.import-dropzone:hover,
+.import-dropzone.dragging {
+  border-color: var(--accent, #6366f1);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.import-dropzone.has-file {
+  border-color: rgba(99, 102, 241, 0.5);
+  border-style: solid;
+}
+
+.import-dropzone-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #64748b);
+}
+
+.import-drop-icon {
+  font-size: 1.75rem;
+  margin-bottom: 4px;
+}
+
+.import-formats {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
+.import-banks-hint {
+  font-size: 0.72rem;
+  opacity: 0.55;
+}
+
+.import-file-selected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--text-primary, #111);
+}
+
+.import-file-icon {
+  font-size: 1.4rem;
+}
+
+.import-file-size {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #64748b);
+}
+
+.import-error {
+  font-size: 0.82rem;
+  color: #ef4444;
+  margin: 10px 0 0;
+}
+
+/* Resultado */
+.import-result {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.import-result-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.import-result-lines p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary, #111);
+}
+
+/* Banco detectado */
+.import-bank-detected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(148, 163, 184, 0.08);
+  border-radius: 10px;
+  font-size: 0.82rem;
+}
+
+.import-bank-label {
+  color: var(--text-secondary, #64748b);
+  font-size: 0.78rem;
+}
+
+.import-bank-name {
+  color: var(--text-primary, #111);
+  font-weight: 500;
+}
+
+/* Badge do banco */
+.bank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+/* Dark mode */
+body[data-theme='dark'] .modal-box {
+  background: var(--bg-card, #141618);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+body[data-theme='dark'] .modal-header {
+  border-color: rgba(148, 163, 184, 0.12);
+}
+
+body[data-theme='dark'] .modal-header h2 {
+  color: #f1f5f9;
+}
+
+body[data-theme='dark'] .import-subtitle,
+body[data-theme='dark'] .import-dropzone-hint,
+body[data-theme='dark'] .import-file-size,
+body[data-theme='dark'] .import-bank-label {
+  color: #94a3b8;
+}
+
+body[data-theme='dark'] .import-file-selected,
+body[data-theme='dark'] .import-result-lines p,
+body[data-theme='dark'] .import-bank-name {
+  color: #f1f5f9;
+}
+
+body[data-theme='dark'] .import-bank-detected {
+  background: rgba(148, 163, 184, 0.07);
+}
 
