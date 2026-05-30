@@ -12,6 +12,7 @@ import { assertAgendaCronSecret } from '../lib/http/agenda-route-auth.mjs'
 import { processAgendaReminderCron } from '../lib/domain/agenda-reminder-cron.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
+import { logTituloEditado } from '../lib/domain/agenda-title-logger.mjs'
 
 const AGENDA_ALLOWED_FIELDS = ['titulo', 'descricao', 'local', 'inicio', 'fim', 'status', 'lembrar_minutos_antes', 'whatsapp_notificar']
 
@@ -94,6 +95,12 @@ export function registerAgendaRoutes(app) {
       }
 
       const data = await atualizarAgendaEvento(id, parsed.actorId, sanitizeAgendaBody(body))
+
+      // Sinal de edição para o @aprendizdaagenda — título mudado = título ruim
+      if (typeof body.titulo === 'string') {
+        logTituloEditado(id, body.titulo).catch(() => {})
+      }
+
       return c.json({ message: 'Compromisso atualizado.', data })
     } catch (error) {
       log.error('atualizar agenda', error)
