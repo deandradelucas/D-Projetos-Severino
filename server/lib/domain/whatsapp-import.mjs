@@ -110,21 +110,21 @@ export async function processarImportacaoDocumento(phone, documentBuffer, mimeTy
     }
   }
 
-  let rows
+  let parserResult
   try {
     if (format === 'excel') {
-      rows = await parseExcelTransactions(documentBuffer, mimeType)
+      parserResult = await parseExcelTransactions(documentBuffer, mimeType)
     } else if (format === 'pdf') {
-      rows = await parsePdfTransactions(documentBuffer)
+      parserResult = await parsePdfTransactions(documentBuffer)
     } else {
-      rows = await parseOfxTransactions(documentBuffer)
+      parserResult = await parseOfxTransactions(documentBuffer)
     }
   } catch (e) {
     log.warn('[whatsapp-import] erro inesperado no parser', { format, detail: String(e?.message || e).slice(0, 200) })
     return { ok: false, reply: '❌ Erro ao processar o arquivo. Tente novamente.' }
   }
 
-  if (rows?.error) {
+  if (parserResult?.error) {
     const msgs = {
       FORMATO_INVALIDO: '❌ Arquivo corrompido ou formato inválido. Tente exportar novamente pelo seu banco.',
       ARQUIVO_MUITO_GRANDE: '📄 Arquivo muito grande. Tente um extrato com menos meses.',
@@ -133,10 +133,11 @@ export async function processarImportacaoDocumento(phone, documentBuffer, mimeTy
       COLUNAS_NAO_IDENTIFICADAS: '📊 Não consegui identificar as colunas da planilha. Tente exportar no formato OFX pelo seu banco.',
       FALHA_IA: '⏳ Serviço de IA temporariamente indisponível. Tente novamente em alguns minutos.',
     }
-    return { ok: false, reply: msgs[rows.error] || '❌ Não consegui processar o arquivo.' }
+    return { ok: false, reply: msgs[parserResult.error] || '❌ Não consegui processar o arquivo.' }
   }
 
-  if (!Array.isArray(rows) || !rows.length) {
+  const rows = Array.isArray(parserResult) ? parserResult : (parserResult?.rows || [])
+  if (!rows.length) {
     return { ok: false, reply: '🔍 Não encontrei transações válidas no arquivo.' }
   }
 

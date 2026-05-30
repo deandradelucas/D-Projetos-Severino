@@ -5,16 +5,20 @@ import {
   resolveGeminiModelCandidates,
 } from '../ai/gemini-client.mjs'
 import { tryParseJsonBlock } from '../ai/parsers.mjs'
+import { detectBankByName } from './bank-detector.mjs'
 
 const SIZE_LIMIT = 20 * 1024 * 1024
 
 const PDF_PROMPT = `Você é um extrator de transações financeiras. Analise este extrato bancário e extraia TODAS as transações.
 
-Retorne APENAS um array JSON válido (sem markdown, sem explicação) no formato:
-[
-  {"data":"2024-01-15","descricao":"MERCADO EXTRA","valor":87.50,"tipo":"DESPESA"},
-  {"data":"2024-01-20","descricao":"SALARIO EMPRESA XYZ","valor":3500.00,"tipo":"RECEITA"}
-]
+Retorne APENAS um objeto JSON válido (sem markdown, sem explicação) no formato:
+{
+  "banco": "Nome do banco emissor (ex: Nubank, Itaú, Bradesco) ou null se não identificado",
+  "transacoes": [
+    {"data":"2024-01-15","descricao":"MERCADO EXTRA","valor":87.50,"tipo":"DESPESA"},
+    {"data":"2024-01-20","descricao":"SALARIO EMPRESA XYZ","valor":3500.00,"tipo":"RECEITA"}
+  ]
+}
 
 Regras:
 - Ignore totais, saldos, cabeçalhos, rodapés e linhas sem valor
@@ -22,7 +26,7 @@ Regras:
 - tipo: "DESPESA" para saídas/débitos/pagamentos, "RECEITA" para entradas/créditos/depósitos
 - data: formato YYYY-MM-DD obrigatório
 - descricao: texto limpo sem quebras de linha, máximo 255 caracteres
-- Se não encontrar transações, retorne []`
+- Se não encontrar transações, transacoes deve ser []`
 
 function isValidRow(row) {
   if (!row || typeof row !== 'object') return false
@@ -100,13 +104,16 @@ export async function parsePdfTransactions(buffer) {
         }
       }
 
-      const rows = normalizeRows(parsed)
+      const bancoNome = parsed?.banco || null
+      const banco = bancoNome ? detectBankByName(bancoNome) : null
+      const rawRows = Array.isArray(parsed) ? parsed : (parsed?.transacoes || [])
+      const rows = normalizeRows(rawRows)
       if (!rows.length) {
         return { error: 'NENHUMA_TRANSACAO', message: 'Não encontrei transações válidas no PDF. Verifique se é um extrato bancário padrão.' }
       }
 
-      log.info('[pdf-parser] concluído', { model: mid, transacoes: rows.length })
-      return rows
+      log.info('[pdf-parser] concluído', { model: mid, transacoes: rows.length, banco: banco?.nome || null })
+      return { rows, banco }
     } catch (e) {
       log.warn('[pdf-parser] erro no modelo', { model: mid, detail: String(e?.message || e).slice(0, 200) })
     }

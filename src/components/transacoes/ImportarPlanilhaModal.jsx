@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { readHorizonteUser } from '../../lib/horizonteSession'
+import { BankBadge } from './BankBadge'
 
 const ACCEPT = '.xlsx,.xls,.csv,.pdf,.ofx,.qfx'
 const MAX_EXCEL_MB = 10
@@ -158,6 +159,13 @@ export function ImportarPlanilhaModal({ onClose, onSuccess }) {
             </>
           ) : (
             <div className="import-result">
+              {result.banco && (
+                <div className="import-bank-detected">
+                  <span className="import-bank-label">Banco detectado:</span>
+                  <BankBadge banco={result.banco} />
+                  <span className="import-bank-name">{result.banco.nome}</span>
+                </div>
+              )}
               <div className="import-result-lines">
                 {resumoLines.map((line, i) => <p key={i}>{line}</p>)}
                 {!resumoLines.length && <p>Nenhuma transação nova encontrada.</p>}

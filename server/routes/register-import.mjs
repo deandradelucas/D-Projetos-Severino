@@ -70,16 +70,16 @@ export function registerImportRoutes(app) {
 
       const buffer = Buffer.from(await file.arrayBuffer())
 
-      let rows
+      let parserResult
       if (format === 'excel') {
-        rows = await parseExcelTransactions(buffer, mimeType)
+        parserResult = await parseExcelTransactions(buffer, mimeType)
       } else if (format === 'pdf') {
-        rows = await parsePdfTransactions(buffer)
+        parserResult = await parsePdfTransactions(buffer)
       } else {
-        rows = await parseOfxTransactions(buffer)
+        parserResult = await parseOfxTransactions(buffer)
       }
 
-      if (rows?.error) {
+      if (parserResult?.error) {
         const msgs = {
           FORMATO_INVALIDO: 'Arquivo corrompido ou formato inválido.',
           ARQUIVO_MUITO_GRANDE: 'Arquivo muito grande.',
@@ -88,17 +88,20 @@ export function registerImportRoutes(app) {
           COLUNAS_NAO_IDENTIFICADAS: 'Não foi possível identificar as colunas da planilha. Tente o formato OFX.',
           FALHA_IA: 'Serviço de IA indisponível. Tente novamente.',
         }
-        return c.json({ message: msgs[rows.error] || 'Erro ao processar o arquivo.', code: rows.error }, 422)
+        return c.json({ message: msgs[parserResult.error] || 'Erro ao processar o arquivo.', code: parserResult.error }, 422)
       }
 
-      if (!Array.isArray(rows) || !rows.length) {
+      const rows = Array.isArray(parserResult) ? parserResult : (parserResult?.rows || [])
+      const banco = Array.isArray(parserResult) ? null : (parserResult?.banco || null)
+
+      if (!rows.length) {
         return c.json({ message: 'Nenhuma transação válida encontrada.', code: 'NENHUMA_TRANSACAO' }, 422)
       }
 
       const resumo = await importarTransacoes(parsed.dataUsuarioId, rows, { fontePlanilha: `web:${format}` })
 
-      log.info('[import-route] concluído', { usuarioId: parsed.dataUsuarioId, format, ...resumo })
-      return c.json({ ok: true, ...resumo })
+      log.info('[import-route] concluído', { usuarioId: parsed.dataUsuarioId, format, banco: banco?.nome || null, ...resumo })
+      return c.json({ ok: true, banco, ...resumo })
     } catch (error) {
       log.error('[import-route] erro inesperado', error)
       return c.json({ message: 'Erro interno ao processar importação.' }, 500)

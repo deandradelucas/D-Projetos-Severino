@@ -6,6 +6,7 @@ import {
   resolveGeminiModelCandidates,
 } from '../ai/gemini-client.mjs'
 import { tryParseJsonBlock } from '../ai/parsers.mjs'
+import { detectBankByName } from './bank-detector.mjs'
 
 const SIZE_LIMIT = 10 * 1024 * 1024
 const ROW_LIMIT = 2000
@@ -229,6 +230,12 @@ export async function parseExcelTransactions(buffer, mimeType) {
     return { error: 'NENHUMA_TRANSACAO', message: 'Nenhuma transação válida encontrada. Verifique se as datas e valores estão no formato correto.' }
   }
 
-  log.info('[excel-parser] concluído', { validas: rows.length, total: dataRows.length })
-  return rows
+  // Detecta banco varrendo as primeiras linhas da planilha (cabeçalho + até 5 linhas)
+  let banco = null
+  const scanText = allRows.slice(0, 6).flat().filter(Boolean).map(String).join(' ')
+  banco = detectBankByName(scanText)
+  if (!banco) banco = detectBankByName(sheetName)
+
+  log.info('[excel-parser] concluído', { validas: rows.length, total: dataRows.length, banco: banco?.nome || null })
+  return { rows, banco }
 }
