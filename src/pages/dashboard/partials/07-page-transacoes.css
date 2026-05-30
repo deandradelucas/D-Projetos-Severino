@@ -1763,6 +1763,14 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
   opacity: 0.55;
 }
 
+.import-file-name {
+  font-weight: 500;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .import-file-selected {
   display: flex;
   align-items: center;

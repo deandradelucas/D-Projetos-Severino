@@ -6,12 +6,18 @@ import { suggestCategoryForTransaction } from '../ai-category.mjs'
 
 const BATCH_SIZE = 10
 
-function buildHash(usuarioId, row) {
-  if (row.fitid) {
-    return createHash('sha256').update(`${usuarioId}:ofx:${row.fitid}`).digest('hex')
-  }
-  const key = `${usuarioId}:${row.data}:${String(row.descricao).toLowerCase().trim()}:${row.valor}`
-  return createHash('sha256').update(key).digest('hex')
+function buildHashes(usuarioId, rows) {
+  const counter = new Map()
+  return rows.map((row) => {
+    if (row.fitid) {
+      return createHash('sha256').update(`${usuarioId}:ofx:${row.fitid}`).digest('hex')
+    }
+    const base = `${usuarioId}:${row.data}:${String(row.descricao).toLowerCase().trim()}:${row.valor}`
+    const n = counter.get(base) || 0
+    counter.set(base, n + 1)
+    const key = n === 0 ? base : `${base}:${n}`
+    return createHash('sha256').update(key).digest('hex')
+  })
 }
 
 async function fetchExistingHashes(supabase, usuarioId, hashes) {
@@ -66,7 +72,7 @@ export async function importarTransacoes(usuarioId, rows, options = {}) {
 
   const supabase = getSupabaseAdmin()
 
-  const hashes = rows.map((r) => buildHash(uid, r))
+  const hashes = buildHashes(uid, rows)
   const existingHashes = await fetchExistingHashes(supabase, uid, hashes)
 
   const toProcess = rows.map((row, i) => ({ row, hash: hashes[i], duplicate: existingHashes.has(hashes[i]) }))
