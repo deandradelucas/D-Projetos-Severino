@@ -205,6 +205,7 @@ export async function inserirTransacao({
   status,
   recorrencia,
   lancado_por_usuario_id,
+  origem_hash,
 }) {
   const supabaseAdmin = getSupabaseAdmin()
   const valNum = parseFloat(valor)
@@ -226,6 +227,8 @@ export async function inserirTransacao({
   if (subcategoria_id) basePayload.subcategoria_id = subcategoria_id
   const lp = lancado_por_usuario_id ? String(lancado_por_usuario_id).trim() : ''
   if (lp) basePayload.lancado_por_usuario_id = lp
+  const oh = origem_hash ? String(origem_hash).trim() : ''
+  if (oh) basePayload.origem_hash = oh
 
   const payloads = []
   

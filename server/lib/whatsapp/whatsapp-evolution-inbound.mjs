@@ -3,8 +3,20 @@ import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { sendEvolutionText } from '../evolution-send.mjs'
 // transcribeWhatsAppAudioWithGemini removido — áudio vai direto para parseWhatsAppAudioDirectWithAI via processarMensagemBot
 import { processarMensagemBot } from '../domain/whatsapp-bot.mjs'
+import { processarImportacaoDocumento } from '../domain/whatsapp-import.mjs'
 import { atualizarWhatsappId, buscarUsuarioPorTelefone } from '../usuarios.mjs'
 import { Alerts } from '../notify-telegram.mjs'
+
+const SUPPORTED_DOC_MIMES = new Set([
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-excel',
+  'text/csv',
+  'application/pdf',
+  'application/x-ofx',
+  'application/ofx',
+  'application/x-qfx',
+])
+const SUPPORTED_DOC_EXTS = new Set(['.xlsx', '.xls', '.csv', '.pdf', '.ofx', '.qfx'])
 
 function parseJsonEnv(value) {
   try {
@@ -338,8 +350,11 @@ export async function processWhatsappBotBody(body, options = {}) {
   let message = String(body?.message || body?.text || body?.transcription || '').trim()
   let inputType = 'text'
 
+  const wantsDocument = Boolean(body?.documentMessageId)
+
   const wantsAudio = Boolean(
     !message &&
+      !wantsDocument &&
       (body?.audioBase64 ||
         body?.base64 ||
         body?.mediaBase64 ||
@@ -348,6 +363,39 @@ export async function processWhatsappBotBody(body, options = {}) {
         body?.url ||
         body?.messageId)
   )
+
+  /* Documento (Excel/PDF/OFX): baixar e processar antes do claim */
+  if (wantsDocument) {
+    if (!phone) return { status: 400, response: { message: 'phone obrigatório.' } }
+
+    const claimed = await claimWhatsAppInboundMessage(body, phone)
+    if (!claimed) {
+      return { status: 200, response: { ok: true, duplicate: true, reply: '' } }
+    }
+
+    let docBuffer = null
+    try {
+      docBuffer = await audioBufferFromEvolutionMedia(body)
+    } catch (e) {
+      log.warn('[whatsapp] falha ao baixar documento', { detail: String(e?.message || e).slice(0, 300) })
+    }
+
+    if (!docBuffer?.length) {
+      return {
+        status: 200,
+        response: { ok: false, reply: '📄 Não consegui receber o arquivo. Tente enviar novamente.' },
+      }
+    }
+
+    const result = await processarImportacaoDocumento(
+      phone,
+      docBuffer,
+      body.documentMimeType || '',
+      body.documentFileName || '',
+    )
+
+    return { status: 200, response: { ...result, inputType: 'document' } }
+  }
 
   /* Áudio: baixar ANTES do claim — senão a Evolution retenta, o insert único bloqueia e o utilizador fica sem resposta.
    * Parse combinado (áudio → JSON direto) acontece dentro de processarMensagemBot para evitar 2 calls sequenciais. */
@@ -413,6 +461,7 @@ function buildBotBodyFromEvolutionSingle(data, payload) {
   const msgRaw = data.message || {}
   const msg = unwrapInnerMessage(msgRaw)
   const audio = msg.audioMessage || msg.pttMessage || {}
+  const doc = msg.documentMessage || {}
   const listRowId = msg.listResponseMessage?.singleSelectReply?.selectedRowId
   const buttonId = firstString(msg.buttonsResponseMessage?.selectedButtonId, msg.buttonsResponseMessage?.selectedDisplayText)
   const text = firstString(
@@ -441,7 +490,16 @@ function buildBotBodyFromEvolutionSingle(data, payload) {
       (messageId && (msg.audioMessage || msg.pttMessage))
   )
 
-  if (!text && !hasAudio) return null
+  const docMime = String(doc.mimetype || '').toLowerCase().split(';')[0].trim()
+  const docFileName = String(doc.fileName || doc.filename || '').trim()
+  const docExt = docFileName ? `.${docFileName.split('.').pop().toLowerCase()}` : ''
+  const hasDocument = Boolean(
+    messageId &&
+      msg.documentMessage &&
+      (SUPPORTED_DOC_MIMES.has(docMime) || SUPPORTED_DOC_EXTS.has(docExt))
+  )
+
+  if (!text && !hasAudio && !hasDocument) return null
 
   const phoneDigits =
     remoteJid.endsWith('@lid') && remoteJidAlt
@@ -459,6 +517,7 @@ function buildBotBodyFromEvolutionSingle(data, payload) {
     messageId,
     evolutionInstance: firstString(data.instance, payload?.instance, payload?.body?.instance),
     rawEvolutionData: { data },
+    ...(hasDocument ? { documentMessageId: messageId, documentMimeType: docMime, documentFileName: docFileName } : {}),
   }
 }
 
