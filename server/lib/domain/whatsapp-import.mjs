@@ -33,14 +33,34 @@ function resolveFormatFromMimeAndName(mimeType, fileName) {
   return null
 }
 
-function formatResumo(resumo) {
-  const { importadas, ignoradas, erros, despesas, receitas, semCategoria } = resumo
+function fmtMesAno(iso) {
+  if (!iso) return null
+  const [y, m] = iso.split('-')
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+  return `${meses[parseInt(m, 10) - 1]}/${y}`
+}
+
+function formatResumo(resumo, banco) {
+  const { importadas, ignoradas, erros, despesas, receitas, semCategoria, periodoInicio, periodoFim } = resumo
 
   if (!importadas && !ignoradas) {
     return '📄 Não encontrei transações válidas no arquivo. Verifique se é um extrato bancário padrão.'
   }
 
-  const linhas = [`✅ Importei *${importadas} transação${importadas !== 1 ? 'ões' : ''}* com sucesso!`, '']
+  const linhas = []
+
+  if (banco) linhas.push(`🏦 *${banco.nome}*`)
+
+  const periodo = periodoInicio
+    ? periodoInicio === periodoFim
+      ? fmtMesAno(periodoInicio)
+      : `${fmtMesAno(periodoInicio)} – ${fmtMesAno(periodoFim)}`
+    : null
+  if (periodo) linhas.push(`📅 ${periodo}`)
+
+  if (banco || periodo) linhas.push('')
+
+  linhas.push(`✅ Importei *${importadas} transação${importadas !== 1 ? 'ões' : ''}* com sucesso!`, '')
 
   if (despesas || receitas) {
     const partes = []
@@ -49,17 +69,9 @@ function formatResumo(resumo) {
     linhas.push(partes.join(' · '))
   }
 
-  if (semCategoria > 0) {
-    linhas.push(`⚠️ ${semCategoria} sem categoria — aparecem como "Outros"`)
-  }
-
-  if (ignoradas > 0) {
-    linhas.push(`↩️ ${ignoradas} já existiam (ignoradas)`)
-  }
-
-  if (erros > 0) {
-    linhas.push(`❌ ${erros} com erro ao salvar`)
-  }
+  if (semCategoria > 0) linhas.push(`⚠️ ${semCategoria} sem categoria — aparecem como "Outros"`)
+  if (ignoradas > 0) linhas.push(`↩️ ${ignoradas} já existiam (ignoradas)`)
+  if (erros > 0) linhas.push(`❌ ${erros} com erro ao salvar`)
 
   linhas.push('')
   linhas.push('Abra o app para conferir e ajustar as categorias. 📱')
@@ -149,6 +161,7 @@ export async function processarImportacaoDocumento(phone, documentBuffer, mimeTy
     return { ok: false, reply: '❌ Erro ao salvar as transações. Tente novamente.' }
   }
 
-  log.info('[whatsapp-import] concluído', { phone, format, ...resumo })
-  return { ok: true, reply: formatResumo(resumo) }
+  const banco = Array.isArray(parserResult) ? null : (parserResult?.banco || null)
+  log.info('[whatsapp-import] concluído', { phone, format, banco: banco?.nome || null, ...resumo })
+  return { ok: true, reply: formatResumo(resumo, banco) }
 }

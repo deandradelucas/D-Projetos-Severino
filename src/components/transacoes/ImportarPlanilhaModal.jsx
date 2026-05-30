@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { readHorizonteUser } from '../../lib/horizonteSession'
 import { BankBadge } from './BankBadge'
 
@@ -15,6 +15,15 @@ const FORMAT_LABELS = {
   qfx: 'QFX',
 }
 
+const LOADING_STAGES = [
+  'Lendo arquivo…',
+  'Identificando transações…',
+  'Categorizando com IA…',
+  'Quase pronto…',
+]
+
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+
 function getExt(name) {
   return String(name || '').split('.').pop().toLowerCase()
 }
@@ -28,6 +37,19 @@ function fileSizeError(file) {
     return `Arquivo muito grande. Máximo: ${maxMb}MB para ${FORMAT_LABELS[ext] || ext.toUpperCase()}.`
   }
   return null
+}
+
+function fmtMesAno(iso) {
+  if (!iso) return null
+  const [y, m] = iso.split('-')
+  return `${MESES[parseInt(m, 10) - 1]}/${y}`
+}
+
+function formatPeriodo(inicio, fim) {
+  if (!inicio) return null
+  const a = fmtMesAno(inicio)
+  const b = fmtMesAno(fim)
+  return a === b ? a : `${a} – ${b}`
 }
 
 function formatResumo(data) {
@@ -46,8 +68,18 @@ export function ImportarPlanilhaModal({ onClose, onSuccess }) {
   const [file, setFile] = useState(null)
   const [clientError, setClientError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [loadingStage, setLoadingStage] = useState(0)
   const [result, setResult] = useState(null)
   const [serverError, setServerError] = useState(null)
+
+  useEffect(() => {
+    if (!loading) { setLoadingStage(0); return }
+    const delays = [2000, 4000, 8000]
+    const timers = delays.map((d, i) =>
+      setTimeout(() => setLoadingStage(i + 1), d)
+    )
+    return () => timers.forEach(clearTimeout)
+  }, [loading])
 
   function handleFile(f) {
     if (!f) return
@@ -63,6 +95,14 @@ export function ImportarPlanilhaModal({ onClose, onSuccess }) {
     setServerError(null)
     setResult(null)
     setFile(f)
+  }
+
+  function handleReset() {
+    setResult(null)
+    setFile(null)
+    setServerError(null)
+    setClientError(null)
+    if (inputRef.current) inputRef.current.value = ''
   }
 
   function onInputChange(e) { handleFile(e.target.files?.[0]) }
@@ -99,6 +139,7 @@ export function ImportarPlanilhaModal({ onClose, onSuccess }) {
   }
 
   const resumoLines = result ? formatResumo(result) : []
+  const periodo = result ? formatPeriodo(result.periodoInicio, result.periodoFim) : null
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -120,13 +161,18 @@ export function ImportarPlanilhaModal({ onClose, onSuccess }) {
                 onDrop={onDrop}
                 onDragOver={onDragOver}
                 onDragLeave={onDragLeave}
-                onClick={() => inputRef.current?.click()}
+                onClick={() => !loading && inputRef.current?.click()}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.click()}
+                onKeyDown={(e) => e.key === 'Enter' && !loading && inputRef.current?.click()}
               >
                 <input ref={inputRef} type="file" accept={ACCEPT} onChange={onInputChange} style={{ display: 'none' }} />
-                {file ? (
+                {loading ? (
+                  <div className="import-loading-state">
+                    <span className="import-loading-spinner" />
+                    <span className="import-loading-text">{LOADING_STAGES[loadingStage]}</span>
+                  </div>
+                ) : file ? (
                   <div className="import-file-selected">
                     <span className="import-file-icon">📄</span>
                     <span className="import-file-name">{file.name}</span>
@@ -152,17 +198,21 @@ export function ImportarPlanilhaModal({ onClose, onSuccess }) {
                   onClick={handleSubmit}
                   disabled={!file || loading}
                 >
-                  {loading ? 'Importando…' : 'Importar'}
+                  {loading ? LOADING_STAGES[loadingStage] : 'Importar'}
                 </button>
               </div>
             </>
           ) : (
             <div className="import-result">
-              {result.banco && (
+              {(result.banco || periodo) && (
                 <div className="import-bank-detected">
-                  <span className="import-bank-label">Banco detectado:</span>
-                  <BankBadge banco={result.banco} />
-                  <span className="import-bank-name">{result.banco.nome}</span>
+                  {result.banco && (
+                    <>
+                      <BankBadge banco={result.banco} />
+                      <span className="import-bank-name">{result.banco.nome}</span>
+                    </>
+                  )}
+                  {periodo && <span className="import-period">{periodo}</span>}
                 </div>
               )}
               <div className="import-result-lines">
@@ -170,6 +220,7 @@ export function ImportarPlanilhaModal({ onClose, onSuccess }) {
                 {!resumoLines.length && <p>Nenhuma transação nova encontrada.</p>}
               </div>
               <div className="modal-actions">
+                <button className="btn-secondary" onClick={handleReset}>← Importar outro</button>
                 <button className="btn-primary" onClick={() => { onSuccess?.(); onClose() }}>Fechar</button>
               </div>
             </div>
