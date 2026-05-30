@@ -10,6 +10,7 @@ import {
 } from './agenda.mjs'
 import { assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 import { grokChatCompletion } from '../ai/grok-client.mjs'
+import { logTituloExtracao } from './agenda-title-logger.mjs'
 
 const AGENDA_KEYWORD_RE =
   /\b(agenda|compromisso|compromissos|reuni[aã]o|reuniao|evento|consulta|consult[óo]rio|dentista|m[eé]dico|exame[s]?|vacina[s]?|anivers[aá]rio|viagem|voo|aula[s]?|treino|academia|apresenta[cç][aã]o|entrevista|cirurgia|check.?in|pagar|pagamento|boleto|conta|agendar|marcar|anotar|anota|cancelar|desmarcar|reagendar|remarcar|confirmar|concluir|finalizar|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar|buscar|pegar|levar|tomar|ligar)\b/i
@@ -776,12 +777,17 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
         return { ok: true, reply }
       }
       let tituloFinal = aiTitulo
+      let tituloFonte = aiTitulo ? 'gemini' : null
       if (!tituloFinal) {
         const grokKey = process.env.GROK_API_KEY
         if (grokKey) {
           tituloFinal = await extractTituloComGrok(grokKey, message)
+          if (tituloFinal) tituloFonte = 'grok'
         }
-        if (!tituloFinal) tituloFinal = titleForCreate(message)
+        if (!tituloFinal) {
+          tituloFinal = titleForCreate(message)
+          tituloFonte = 'heuristico'
+        }
       }
 
       const conflitos = await verificarConflitosAgenda(uid, inicio)
@@ -798,6 +804,9 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
         lembrar_minutos_antes: explicitReminder !== null ? explicitReminder : 15,
         whatsapp_notificar: true,
       })
+
+      // Log para o @aprendizdaagenda analisar à noite — fire-and-forget
+      logTituloExtracao(uid, rawMessage, data.titulo, tituloFonte, data.id).catch(() => {})
 
       if (explicitReminder !== null) {
         reply = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}${avisoConflito}`

@@ -1,4 +1,5 @@
 import { registerAdminRoutes } from './register-admin.mjs'
+import { registerFrameworkRoutes } from './register-framework.mjs'
 import { registerAuthRoutes } from './register-auth.mjs'
 import { registerAssinaturaRoutes } from './register-assinatura.mjs'
 import { registerUsuarioPerfilRoutes } from './register-usuario-perfil.mjs'
@@ -20,6 +21,7 @@ export function registerApiDomainRoutes(app) {
   registerTaxaSelicRoutes(app)
   registerTaxaCdiRoutes(app)
   registerAdminRoutes(app)
+  registerFrameworkRoutes(app)
   registerAuthRoutes(app)
   registerAssinaturaRoutes(app)
   registerUsuarioPerfilRoutes(app)

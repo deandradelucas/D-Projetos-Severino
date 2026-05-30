@@ -1,0 +1,385 @@
+/* ===== AdminFramework — Agentes Severino ===== */
+
+/* Card de agentes */
+.framework-agents-card {
+  margin-bottom: 16px;
+}
+
+.framework-agents-list {
+  padding: 4px 0 8px;
+}
+
+.framework-agent-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px;
+}
+
+.framework-agent-avatar {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.framework-agent-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.framework-agent-handle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary, #f1f5f9);
+  font-family: monospace;
+}
+
+.framework-agent-desc {
+  font-size: 13px;
+  color: var(--text-secondary, #94a3b8);
+  line-height: 1.5;
+}
+
+.framework-agent-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted, #64748b);
+  margin-top: 4px;
+}
+
+/* Badges */
+.framework-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.badge-ativo {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.badge-pendente {
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+.badge-aprovado {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  text-transform: none;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-rejeitado {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  text-transform: none;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-prompt {
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  margin-top: 8px;
+}
+
+.badge-regex {
+  background: rgba(249, 115, 22, 0.12);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  margin-top: 8px;
+}
+
+.badge-treino {
+  background: rgba(20, 184, 166, 0.12);
+  color: #2dd4bf;
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  margin-top: 8px;
+}
+
+/* Tabs */
+.framework-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  padding: 0 20px;
+}
+
+.framework-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.framework-tab:hover {
+  color: var(--text-primary, #f1f5f9);
+}
+
+.framework-tab.active {
+  color: var(--text-primary, #f1f5f9);
+  border-bottom-color: var(--accent, #6366f1);
+}
+
+.framework-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: rgba(234, 179, 8, 0.2);
+  color: #facc15;
+  border-radius: 9px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Tabela */
+.framework-table-wrap {
+  overflow-x: auto;
+}
+
+.framework-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.framework-th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #64748b);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  white-space: nowrap;
+}
+
+.framework-th--agente { width: 140px; }
+.framework-th--alteracao { min-width: 320px; }
+.framework-th--aprovacao { width: 160px; }
+
+.framework-row {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.07);
+  transition: background 0.1s;
+}
+
+.framework-row:hover {
+  background: rgba(148, 163, 184, 0.04);
+}
+
+.framework-cell {
+  padding: 16px;
+  vertical-align: top;
+  font-size: 13px;
+  color: var(--text-primary, #f1f5f9);
+}
+
+/* Célula Agente */
+.framework-cell--agente {
+  vertical-align: middle;
+}
+
+.framework-agente-chip {
+  display: block;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #818cf8;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 6px;
+  padding: 3px 8px;
+  width: fit-content;
+  margin-bottom: 6px;
+}
+
+.framework-date {
+  font-size: 11px;
+  color: var(--text-muted, #64748b);
+}
+
+/* Célula Alteração */
+.framework-alteracao-titulo {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary, #f1f5f9);
+  margin-bottom: 6px;
+}
+
+.framework-alteracao-desc {
+  font-size: 13px;
+  color: var(--text-secondary, #94a3b8);
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+
+.framework-diff {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.framework-diff-before {
+  color: #f87171;
+}
+
+.framework-diff-after {
+  color: #4ade80;
+}
+
+/* Exemplos ruins */
+.framework-exemplos {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.framework-exemplo-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 10px;
+  background: rgba(239, 68, 68, 0.05);
+  border-left: 2px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0 4px 4px 0;
+}
+
+.framework-exemplo-ruim {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f87171;
+}
+
+.framework-exemplo-transcricao {
+  font-size: 11px;
+  color: var(--text-muted, #64748b);
+  font-style: italic;
+}
+
+/* Célula Aprovação */
+.framework-cell--aprovacao {
+  vertical-align: middle;
+}
+
+.framework-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.framework-btn {
+  padding: 7px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity 0.15s, transform 0.1s;
+  width: 100%;
+}
+
+.framework-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.framework-btn:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+.framework-btn--sim {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.framework-btn--sim:not(:disabled):hover {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+.framework-btn--nao {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.framework-btn--nao:not(:disabled):hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.framework-aplicado-chip {
+  display: block;
+  font-size: 11px;
+  color: #4ade80;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* Estado vazio */
+.framework-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted, #64748b);
+  font-size: 14px;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .framework-table-wrap {
+    font-size: 12px;
+  }
+
+  .framework-th--agente { width: 100px; }
+
+  .framework-cell {
+    padding: 12px 10px;
+  }
+
+  .framework-actions {
+    flex-direction: row;
+  }
+
+  .framework-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
