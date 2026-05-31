@@ -543,6 +543,14 @@ body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__actions .dashboard
   -webkit-backdrop-filter: blur(0.5px);
 }
 
+/* Tema escuro: painéis calendário e lista — card #141618 */
+body[data-theme='dark'] .agenda-page .agenda-calendar-panel,
+body[data-theme='dark'] .agenda-page .agenda-list-panel--daily {
+  background: var(--bg-card, #141618) !important;
+  border: 1px solid rgba(148, 163, 184, 0.15) !important;
+  box-shadow: none !important;
+}
+
 /* Tema escuro: calendário sobre fundo #000 — texto claro + FAB ouro */
 body[data-theme='dark'] .agenda-page .agenda-calendar-head strong {
   color: #fafafa !important;
@@ -897,6 +905,11 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
     padding: 20px 22px 24px !important;
     border: 1px solid rgba(15, 23, 42, 0.06) !important;
     border-radius: 28px !important;
+  }
+
+  body[data-theme='dark'] .agenda-page .agenda-calendar-panel,
+  body[data-theme='dark'] .agenda-page .agenda-list-panel--daily {
+    border-color: rgba(148, 163, 184, 0.15) !important;
   }
 
   .agenda-page .agenda-calendar-grid {
@@ -1447,12 +1460,19 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
   }
 
   .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__btn--primary,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__btn--primary,
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__btn--primary {
     background: #ffffff !important;
     border-color: rgba(255, 255, 255, 0.86) !important;
     color: #050505 !important;
     box-shadow: 0 18px 28px -24px rgba(255, 255, 255, 0.7) !important;
+  }
+
+  /* Dark mode: card-style em vez de branco */
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__btn--primary {
+    background: var(--bg-card, #141618) !important;
+    border-color: rgba(148, 163, 184, 0.15) !important;
+    color: #e2e8f0 !important;
+    box-shadow: none !important;
   }
 }
 
@@ -1618,6 +1638,7 @@ body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.ap
 body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
   background: var(--bg-card) !important;
   background-image: none !important;
+  color: #e2e8f0 !important;
   border: 1px solid rgba(148, 163, 184, 0.15) !important;
 }
 
