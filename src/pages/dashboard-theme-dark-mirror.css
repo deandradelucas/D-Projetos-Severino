@@ -1342,21 +1342,21 @@ body[data-theme='dark'] .tx-parceladas-chip {
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
-  border: 1.5px solid var(--border);
+  border: 1.5px solid rgba(148, 163, 184, 0.35);
   background: transparent;
-  color: #000;
+  color: #e2e8f0;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   white-space: nowrap;
 }
 body[data-theme='dark'] .tx-parceladas-chip:hover {
   border-color: var(--accent);
-  color: #000;
+  color: var(--accent);
 }
 body[data-theme='dark'] .tx-parceladas-chip--active {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: #0a0a0a;
 }
 
 body[data-theme='dark'] .ref-tx-pendente-chip {
