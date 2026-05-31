@@ -531,9 +531,9 @@
 
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel,
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel--daily {
-    background: #000000 !important;
+    background: var(--bg-card, #141618) !important;
     background-image: none !important;
-    border: 0.5px solid rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(148, 163, 184, 0.15) !important;
     box-shadow: none !important;
     border-radius: 18px !important;
     -webkit-backdrop-filter: none !important;
