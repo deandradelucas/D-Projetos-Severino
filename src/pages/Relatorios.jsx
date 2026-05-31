@@ -94,7 +94,7 @@ export default function Relatorios() {
 
       const res = await fetchWithRetry(apiUrl(`/api/transacoes?${params.toString()}`), {
         cache: 'no-store',
-      })
+      }, { fetchImpl: apiFetch })
       if (redirectSe401(res)) return
       if (res.ok) {
         const data = await res.json()
