@@ -2526,6 +2526,22 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     background: #f3f4f7 !important;
   }
 
+  /* Agenda: container fixo como os outros hubs — sem isso o ref-dashboard-scroll não fica
+     constrangido e o documento inteiro cresce (sem scroll interno). */
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100svh !important;
+    max-height: 100svh !important;
+    min-height: 100svh !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+  }
+
   .dashboard-container.ref-dashboard.app-horizon-shell:is(.dashboard-page, .page-configuracoes, .page-relatorios, .page-pagamento) .app-horizon-inner,
   .dashboard-container.ref-dashboard.app-horizon-shell:is(.dashboard-page, .page-configuracoes, .page-relatorios, .page-pagamento) .main-content.ref-dashboard-main,
   .dashboard-container.ref-dashboard.app-horizon-shell:is(.dashboard-page, .page-configuracoes, .page-relatorios, .page-pagamento) .ref-dashboard-inner.dashboard-hub {
