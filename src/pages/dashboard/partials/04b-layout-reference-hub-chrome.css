@@ -1961,6 +1961,7 @@ body[data-theme='light'] .tx-parceladas-chip {
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   white-space: nowrap;
+  flex: 0 0 auto;
 }
 body[data-theme='light'] .tx-parceladas-chip:hover {
   border-color: var(--accent);
