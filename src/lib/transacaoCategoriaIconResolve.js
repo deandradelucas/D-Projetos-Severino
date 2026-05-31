@@ -124,6 +124,7 @@ export function getTransacaoCategoriaIconKey(categoriaNome, subcategoriaNome) {
   if (c === 'tecnologia e gadgets') return 'tecnologiaGadgetsPng'
   if (c === 'trabalho e negocios') return 'trabalhoNegociosPng'
   if (c === 'viagens' || c === 'viagem') return 'viagensPng'
+  if (c === 'pix') return 'pixPng'
   return key
 }
 
@@ -216,6 +217,9 @@ export const RECEITAS_EVENTUAIS_CATEGORIA_ICON_SRC =
 export const RENDAS_PJ_CATEGORIA_ICON_SRC =
   '/images/icons/' + encodeURIComponent('Rendas PJ.png')
 
+/** Ícone raster — «Pix» (despesas e receitas via Pix). */
+export const PIX_CATEGORIA_ICON_SRC = '/images/icons/Pix.png'
+
 /** Chaves que renderizam `<img>` em `TransacaoCategoriaIcon`. */
 export const RASTER_CATEGORIA_ICON_SRC_BY_KEY = {
   saldoPng: SALDO_CATEGORIA_ICON_SRC,
@@ -241,6 +245,7 @@ export const RASTER_CATEGORIA_ICON_SRC_BY_KEY = {
   tecnologiaGadgetsPng: TECNOLOGIA_E_GADGETS_CATEGORIA_ICON_SRC,
   trabalhoNegociosPng: TRABALHO_E_NEGOCIOS_CATEGORIA_ICON_SRC,
   viagensPng: VIAGENS_CATEGORIA_ICON_SRC,
+  pixPng: PIX_CATEGORIA_ICON_SRC,
 }
 
 /**

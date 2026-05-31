@@ -41,9 +41,9 @@ export const SEED_CAT_NOMES = new Set(DEFAULT_CATEGORIES.map((c) => c.nome))
  */
 export const DESPESA_RULES = [
   // ── Alimentação ───────────────────────────────────────────────────────────
-  { re: /atacad|assai|atacadao|makro/i, categoriaNome: 'Alimentação', subLabels: ['Atacadista', 'Supermercado'] },
+  { re: /atacad|assai|atacadao|makro|fort\s*atac|tenda\s*atac/i, categoriaNome: 'Alimentação', subLabels: ['Atacadista', 'Supermercado'] },
   { re: /feira|sacolao|sacolão|hortifrut|hortifruti|verdur/i, categoriaNome: 'Alimentação', subLabels: ['Feira e Sacolão', 'Hortifruti', 'Supermercado'] },
-  { re: /mercado|supermercado|carrefour|walmart|hiper|pao de acucar|pão de açúcar/i, categoriaNome: 'Alimentação', subLabels: ['Supermercado', 'Atacadista'] },
+  { re: /mercado|supermercado|carrefour|walmart|hiper|pao de acucar|pão de açúcar|zaffari|bistek|prezunic|bretas/i, categoriaNome: 'Alimentação', subLabels: ['Supermercado', 'Atacadista'] },
   { re: /padaria|pao|pão|cafeteria|cafe\b|café/i, categoriaNome: 'Alimentação', subLabels: ['Padaria e Cafeteira'] },
   { re: /açougue|acougue|peixaria|peixe\b/i, categoriaNome: 'Alimentação', subLabels: ['Açougue e Peixaria'] },
   { re: /bebida|cerveja|vinho|refrigerante/i, categoriaNome: 'Alimentação', subLabels: ['Bebidas'] },
@@ -56,7 +56,7 @@ export const DESPESA_RULES = [
   { re: /mercearia|emporio\b|minimercado|conveniencia\b|conveniência\b/i, categoriaNome: 'Alimentação', subLabels: ['Mercearia', 'Conveniência'] },
   { re: /cesta\s*basica|cesta\s*básica/i, categoriaNome: 'Alimentação', subLabels: ['Cesta Básica', 'Supermercado'] },
   // ── Transporte ────────────────────────────────────────────────────────────
-  { re: /combust|gasolina|etanol|posto|diesel|shell|ipiranga|petrobras|abasteci|botei\s*gasolina|coloquei\s*gasolina|coloquei\s*combust/i, categoriaNome: 'Transporte', subLabels: ['Combustível'] },
+  { re: /combust|gasolina|etanol|posto|diesel|shell|ipiranga|petrobras|abasteci|botei\s*gasolina|coloquei\s*gasolina|coloquei\s*combust|raizen|vibra\s*energ|br\s*distribu|auto\s*posto/i, categoriaNome: 'Transporte', subLabels: ['Combustível'] },
   { re: /\buber\b|\b99\b(?!\s*food)|taxi|táxi|cabify|indriver|bolt\b|99pop/i, categoriaNome: 'Transporte', subLabels: ['App de Transporte (Uber, 99)', 'Táxi'] },
   { re: /onibus|ônibus|metro|metrô|vlt|bilhete unico|integracao/i, categoriaNome: 'Transporte', subLabels: ['Transporte Público'] },
   { re: /estaciona|zona azul/i, categoriaNome: 'Transporte', subLabels: ['Estacionamento'] },
@@ -218,6 +218,8 @@ export const DESPESA_RULES = [
   { re: /taxa\s*de\s*corretagem|corretagem\b/i, categoriaNome: 'Despesas Financeiras', subLabels: ['Taxa de Corretagem'] },
   { re: /renegociacao\b|renegociação\b|acordo.*divida|divida\b.*acordo/i, categoriaNome: 'Despesas Financeiras', subLabels: ['Renegociação de Dívida'] },
   { re: /cheque\s*especial|limite.*negativo|negativo.*banco/i, categoriaNome: 'Despesas Financeiras', subLabels: ['Cheque Especial'] },
+  // ── Pix ──────────────────────────────────────────────────────────────────
+  { re: /\bpix\b|pixout/i, categoriaNome: 'Pix', subLabels: ['Gastos com Pix'] },
 ]
 
 export const RECEITA_RULES = [
@@ -252,6 +254,8 @@ export const RECEITA_RULES = [
   { re: /cripto.*rendimento|bitcoin.*rendimento|eth\b.*rendimento|rendimento.*cripto/i, categoriaNome: 'Rendimentos e Benefícios', subLabels: ['Rendimento de Cripto'] },
   // ── Receitas Eventuais ────────────────────────────────────────────────────
   { re: /presente.*receb|premio|prêmio|sorteio|heranca|herança|indenizacao|indenização|seguro.*receb|estorno|devolucao|devolução|vaquinha.*receb|ajuda.*familiar/i, categoriaNome: 'Receitas Eventuais', subLabels: ['Presente Recebido', 'Sorteio / Prêmio', 'Herança', 'Indenização', 'Seguro Recebido', 'Devolução / Estorno', 'Vaquinha Recebida', 'Ajuda Familiar Recebida'] },
+  // ── Pix ──────────────────────────────────────────────────────────────────
+  { re: /\bpix\b|pixin/i, categoriaNome: 'Pix', subLabels: ['Ganhos com Pix'] },
 ]
 
 export function rulesForTipo(tipo) {
@@ -297,6 +301,12 @@ export function enriquecerCategoriaPorTexto(message, extractedData, categoriasUs
     if (sub) {
       extractedData.categoria_id = cat.id
       extractedData.subcategoria_id = sub.id
+      return extractedData
+    }
+    // Subcategoria não encontrada no DB do usuário mas a categoria bate — define só a categoria
+    // (melhor que cair em Outros) quando nenhuma categoria foi definida ainda
+    if (!extractedData.categoria_id) {
+      extractedData.categoria_id = cat.id
       return extractedData
     }
   }
