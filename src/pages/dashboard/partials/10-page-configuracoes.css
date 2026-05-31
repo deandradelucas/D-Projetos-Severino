@@ -111,25 +111,22 @@ body[data-theme='light'] .config-card:hover {
   box-shadow: var(--shadow-sm), 0 16px 40px -24px rgba(15, 23, 42, 0.14);
 }
 
-/* Dark — shell preto */
+/* Dark — shell */
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card {
-  background: #000000;
+  background: var(--bg-card, #141618);
   background-image: none;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 20px 48px -28px rgba(0, 0, 0, 0.65),
-    0 6px 16px -10px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(148, 163, 184, 0.28);
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card {
-  background: #000000;
+  background: var(--bg-card, #141618);
   background-image: none;
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(148, 163, 184, 0.15);
 }
 
 /* Dark — sem halo roxo */
@@ -945,18 +942,14 @@ body[data-theme='light'] .page-configuracoes.app-horizon-shell .config-card--pre
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: #000000;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 12px 32px -20px rgba(0, 0, 0, 0.65);
+  border-color: rgba(148, 163, 184, 0.15);
+  background: var(--bg-card, #141618);
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences:hover {
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 16px 40px -22px rgba(0, 0, 0, 0.75);
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-preference-list {
@@ -970,11 +963,9 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--pref
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card {
-  background: #0a0a0a;
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 12px 32px -18px rgba(0, 0, 0, 0.8);
+  background: var(--bg-card, #141618);
+  border-color: rgba(148, 163, 184, 0.15);
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card:hover {
@@ -1099,11 +1090,9 @@ body[data-theme='dark'] .config-toast {
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-select-custom__menu {
-  background: #0a0a0a;
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 24px 56px -20px rgba(0, 0, 0, 0.85);
+  background: var(--bg-card, #141618);
+  border-color: rgba(148, 163, 184, 0.15);
+  box-shadow: 0 24px 56px -20px rgba(0, 0, 0, 0.85);
 }
 
 body[data-theme='light'] .page-configuracoes.app-horizon-shell .config-select-custom__menu {

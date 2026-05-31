@@ -45,13 +45,10 @@ body[data-theme='dark'] .relatorios-chart-card,
 body[data-theme='dark'] .config-card,
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card,
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card {
-  background: #000000;
+  background: var(--bg-card, #141618);
   background-image: none;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 20px 48px -28px rgba(0, 0, 0, 0.65),
-    0 6px 16px -10px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: none;
 }
 
 /* Relatórios: pseudo-camada roxa do layout base (02c) — remover no escuro */
@@ -60,7 +57,7 @@ body[data-theme='dark'] .page-relatorios .relatorios-chart-card::before {
 }
 
 body[data-theme='dark'] .config-card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(148, 163, 184, 0.28);
 }
 
 /* Tabelas */
@@ -139,21 +136,17 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
 
 /* KPIs e painéis */
 body[data-theme='dark'] .ref-kpi-card {
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: #000000;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: var(--bg-card, #141618);
   background-image: none;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 18px 44px -30px rgba(0, 0, 0, 0.72);
+  box-shadow: none;
 }
 
 @media (min-width: 769px) {
   body[data-theme='dark'] .ref-kpi-card {
-    background: #000000;
+    background: var(--bg-card, #141618);
     background-image: none;
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.06) inset,
-      0 22px 50px -32px rgba(0, 0, 0, 0.75);
+    box-shadow: none;
   }
 }
 
@@ -185,21 +178,17 @@ body[data-theme='dark'] .ref-kpi-card__label {
 }
 
 body[data-theme='dark'] .ref-panel {
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: #000000;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: var(--bg-card, #141618);
   background-image: none;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 22px 52px -32px rgba(0, 0, 0, 0.72);
+  box-shadow: none;
 }
 
 @media (min-width: 769px) {
   body[data-theme='dark'] .ref-panel {
-    background: #000000;
+    background: var(--bg-card, #141618);
     background-image: none;
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.06) inset,
-      0 26px 56px -34px rgba(0, 0, 0, 0.78);
+    box-shadow: none;
   }
 }
 
@@ -267,13 +256,13 @@ body[data-theme='dark'] .modal-backdrop {
 }
 
 body[data-theme='dark'] .modal-content {
-  background: linear-gradient(180deg, #121212 0%, #0a0a0a 100%);
+  background: var(--bg-card, #141618);
+  background-image: none;
   color: #f0f0f0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.15);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 40px 80px -32px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgba(0, 0, 0, 0.45);
+    0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
 body[data-theme='dark'] .modal-actions .btn-secondary {
@@ -319,8 +308,9 @@ body[data-theme='dark'] .custom-select.open .custom-select-trigger {
 }
 
 body[data-theme='dark'] .custom-select-dropdown {
-  background: linear-gradient(180deg, #141414 0%, #0c0c0c 100%);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--bg-card, #141618);
+  background-image: none;
+  border-color: rgba(148, 163, 184, 0.15);
 }
 
 body[data-theme='dark'] .custom-select-search {
@@ -449,11 +439,10 @@ body[data-theme='dark'] .horizon-chat-fab {
 }
 
 body[data-theme='dark'] .horizon-chat-window {
-  background: linear-gradient(180deg, rgba(14, 14, 14, 0.97) 0%, rgba(6, 6, 6, 0.98) 100%);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 28px 72px rgba(0, 0, 0, 0.65);
+  background: var(--bg-card, #141618);
+  background-image: none;
+  border-color: rgba(148, 163, 184, 0.15);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.65);
 }
 
 body[data-theme='dark'] .horizon-chat-header {
@@ -524,13 +513,12 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-men
 }
 
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip {
-  --rel-tooltip-bg: #121212;
-  background: linear-gradient(180deg, #141414 0%, #0c0c0c 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  --rel-tooltip-bg: #141618;
+  background: var(--bg-card, #141618);
+  background-image: none;
+  border: 1px solid rgba(148, 163, 184, 0.15);
   color: #f0f0f0;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 16px 40px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
 }
 
 body[data-theme='dark'] .relatorios-chart-card .recharts-cartesian-grid-horizontal line,
@@ -849,9 +837,9 @@ body[data-theme='dark'] .custom-select-dropdown,
 body[data-theme='dark'] .modal-content,
 body[data-theme='dark'] .horizon-chat-window,
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip {
-  background: #000000;
+  background: var(--bg-card, #141618);
   background-image: none;
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(148, 163, 184, 0.15);
 }
 
 body[data-theme='dark'] .custom-select-option.selected {
