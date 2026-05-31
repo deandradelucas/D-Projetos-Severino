@@ -157,13 +157,20 @@ export async function calcularSaldo(usuarioId, { inicio = null, fim = null } = {
     fim ??
     `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(ultimoDia).padStart(2, '0')}`
 
+  // lte contra 'YYYY-MM-DD' corta às 00h do dia — usar lt no dia seguinte para incluir o dia inteiro
+  const mesFimNext = (() => {
+    const d = new Date(mesFim + 'T00:00:00Z')
+    d.setUTCDate(d.getUTCDate() + 1)
+    return d.toISOString().split('T')[0]
+  })()
+
   const { data, error } = await supabase
     .from('transacoes')
     .select('tipo, valor')
     .eq('usuario_id', usuarioId)
     .eq('status', 'EFETIVADA')
     .gte('data_transacao', mesInicio)
-    .lte('data_transacao', mesFim)
+    .lt('data_transacao', mesFimNext)
   if (error) throw error
 
   let receitas = 0

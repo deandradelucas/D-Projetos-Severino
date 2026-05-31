@@ -376,7 +376,12 @@ export async function getTransacoes(usuarioId, filters = {}) {
   const applyFilters = (q) => {
     let query = q.eq('usuario_id', uid)
     if (dataInicio) query = query.gte('data_transacao', dataInicio)
-    if (dataFim) query = query.lte('data_transacao', dataFim)
+    if (dataFim) {
+      // lte contra 'YYYY-MM-DD' corta às 00h — usar lt no dia seguinte para incluir o dia inteiro
+      const d = new Date(dataFim + 'T00:00:00Z')
+      d.setUTCDate(d.getUTCDate() + 1)
+      query = query.lt('data_transacao', d.toISOString().split('T')[0])
+    }
     if (tipo) query = query.eq('tipo', tipo)
     if (categoria_id) query = query.eq('categoria_id', categoria_id)
     if (status) query = query.eq('status', status)
