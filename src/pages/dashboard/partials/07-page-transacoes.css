@@ -1625,8 +1625,8 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 
 /* Tema escuro — footer e card seguem a paleta dark */
 body[data-theme='dark'] .page-transacoes-parcelado-grupo {
-  background: rgba(15, 23, 42, 0.6);
-  border-color: rgba(148, 163, 184, 0.18);
+  background: var(--bg-card, #141618);
+  border-color: rgba(148, 163, 184, 0.15);
 }
 
 body[data-theme='dark'] .page-transacoes-parcelado-grupo--open {
@@ -1642,8 +1642,8 @@ body[data-theme='dark'] .page-transacoes-parcelado-parcela__valor {
 }
 
 body[data-theme='dark'] .page-transacoes-parcelados-footer {
-  background: rgba(15, 23, 42, 0.96);
-  border-color: rgba(148, 163, 184, 0.22);
+  background: var(--bg-card, #141618);
+  border-color: rgba(148, 163, 184, 0.15);
 }
 
 /* ── Modal de Importação ──────────────────────────────────────────── */
