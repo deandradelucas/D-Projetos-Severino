@@ -621,6 +621,18 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
         log.info('[whatsapp-bot] audio: agenda intent detectado', { transcLen: String(parsed.transcricao).length, aiTitulo })
         return processarMensagemAgenda(usuarioBot, phone, parsed.transcricao, aiTitulo)
       }
+
+      // Lista de compras detectada no áudio — áudio bypassa os checks de texto acima
+      if (parsed?.transcricao && isListaComprasMessage(parsed.transcricao)) {
+        log.info('[whatsapp-bot] audio: lista de compras detectada na transcrição')
+        try {
+          const resultado = await processarMensagemListaCompras(dataUsuarioId, parsed.transcricao)
+          if (resultado !== null) return resultado
+        } catch (e) {
+          log.error('[whatsapp-bot] audio: processarMensagemListaCompras error', e)
+          return { ok: false, reply: '❌ Erro ao processar lista de compras. Tente novamente.' }
+        }
+      }
     } else {
       parsed = await parseWhatsAppMessageWithAI(message, categorias)
     }
