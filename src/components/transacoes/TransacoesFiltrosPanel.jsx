@@ -18,6 +18,7 @@ export function TransacoesFiltrosPanel({
   onToggle,
   onChange,
   onClearFilters,
+  onDeleteAll,
   filtroParceladasAtivo,
   onToggleParceladas,
 }) {
@@ -127,6 +128,11 @@ export function TransacoesFiltrosPanel({
             <label htmlFor="tx-fim">Fim</label>
             <input id="tx-fim" type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={onChange} />
           </div>
+        </div>
+        <div className="transacoes-filter-delete-row">
+          <button type="button" className="transacoes-filter-delete-all-btn" onClick={onDeleteAll}>
+            Apagar tudo
+          </button>
         </div>
       </div>
     </article>

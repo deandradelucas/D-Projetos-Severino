@@ -6,6 +6,7 @@ import {
   atualizarTransacao,
   deletarTransacao,
   deletarGrupoParcelado,
+  deletarTodasTransacoes,
 } from '../lib/transacoes.mjs'
 import {
   assertCronSecret,
@@ -247,6 +248,24 @@ export function registerTransacoesRoutes(app) {
     } catch (error) {
       log.error('delete grupo parcelado failed', error)
       return c.json({ message: 'Erro ao excluir compra parcelada.' }, 500)
+    }
+  })
+
+  app.delete('/api/transacoes', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+
+      if (!await rateLimitTake(`tx-del-all:${parsed.actorId}:${clientKeyFromHono(c)}`, 3, 60_000)) {
+        return c.json({ message: 'Muitas solicitações. Aguarde um momento.' }, 429)
+      }
+
+      await deletarTodasTransacoes(parsed.dataUsuarioId)
+      return c.json({ message: 'Todas as transações foram excluídas.' })
+    } catch (error) {
+      log.error('delete all transactions failed', error)
+      return c.json({ message: 'Erro ao excluir transações.' }, 500)
     }
   })
 

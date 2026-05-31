@@ -397,6 +397,26 @@ export default function Transacoes() {
       lancamentos: '',
     })
 
+  const handleDeleteAll = () => {
+    setConfirmDialog({
+      title: 'Apagar todas as transações?',
+      message: 'Todas as suas transações serão excluídas permanentemente. Essa ação não pode ser desfeita.',
+      confirmLabel: 'Apagar tudo',
+      onConfirm: async () => {
+        try {
+          const session = readHorizonteUser()
+          if (!session?.id) return
+          const res = await apiFetch(apiUrl('/api/transacoes'), { method: 'DELETE' })
+          if (!res.ok) throw new Error('Falha ao apagar transações')
+          setTransacoes([])
+          syncGlobalCache({ silent: true })
+        } catch (err) {
+          console.error('[Transacoes] deleteAll:', err)
+        }
+      },
+    })
+  }
+
   const filtroRecorrentesAtivo = filters.lancamentos === 'recorrentes'
   const filtroParceladasAtivo = filters.lancamentos === 'parceladas'
 
@@ -607,6 +627,7 @@ export default function Transacoes() {
           onToggle={() => setFiltrosAbertos((open) => !open)}
           onChange={handleFilterChange}
           onClearFilters={clearFilters}
+          onDeleteAll={handleDeleteAll}
           filtroParceladasAtivo={filtroParceladasAtivo}
           onToggleParceladas={toggleParceladas}
         />
