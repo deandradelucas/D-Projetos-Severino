@@ -2595,6 +2595,12 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     padding-bottom: calc(130px + var(--safe-bottom)) !important;
   }
 
+  /* Agenda: padding-bottom generoso — garante overflow com 0 ou 1 evento (hero+calendário
+     já ocupa ~560px; sem isso a diferença para 100svh impede o scroll de engajar). */
+  body .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    padding-bottom: calc(300px + var(--safe-bottom)) !important;
+  }
+
   .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__hero,
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__hero,
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__hero,
