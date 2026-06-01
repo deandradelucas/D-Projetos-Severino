@@ -18,46 +18,33 @@ export default function ConfigAparenciaCard({ theme, setTheme, privacyMode, togg
           onClick={() => setTheme('light')}
           aria-pressed={theme === 'light'}
         >
-          <div className="config-theme-preview config-theme-preview--light" aria-hidden>
-            <span className="config-theme-mock">
-              <span className="config-theme-mock__traffic" aria-hidden>
-                <i />
-                <i />
-                <i />
-              </span>
-              <span className="config-theme-mock__surface">
-                <span className="config-theme-mock__line" />
-                <span className="config-theme-mock__line config-theme-mock__line--short" />
-              </span>
+          <div className="config-theme-preview config-theme-preview--light" aria-hidden="true">
+            <span className="config-theme-icon">
+              <i className="la la-sun" aria-hidden="true" />
             </span>
           </div>
           <div className="config-theme-body">
             <h4>Claro</h4>
             <p>Visual leve para o dia.</p>
+            <span className="config-theme-status">Ativo</span>
           </div>
         </button>
+
         <button
           type="button"
           className={`config-theme-card config-theme-card--dark ${theme === 'dark' ? 'is-active' : ''}`}
           onClick={() => setTheme('dark')}
           aria-pressed={theme === 'dark'}
         >
-          <div className="config-theme-preview config-theme-preview--dark" aria-hidden>
-            <span className="config-theme-mock">
-              <span className="config-theme-mock__traffic" aria-hidden>
-                <i />
-                <i />
-                <i />
-              </span>
-              <span className="config-theme-mock__surface">
-                <span className="config-theme-mock__line" />
-                <span className="config-theme-mock__line config-theme-mock__line--short" />
-              </span>
+          <div className="config-theme-preview config-theme-preview--dark" aria-hidden="true">
+            <span className="config-theme-icon">
+              <i className="la la-moon" aria-hidden="true" />
             </span>
           </div>
           <div className="config-theme-body">
             <h4>Escuro</h4>
             <p>Menos brilho à noite.</p>
+            <span className="config-theme-status">Ativo</span>
           </div>
         </button>
       </div>
@@ -68,7 +55,13 @@ export default function ConfigAparenciaCard({ theme, setTheme, privacyMode, togg
             <strong>Modo privacidade</strong>
             <span>Oculta valores sensíveis nas telas principais.</span>
           </span>
-          <input type="checkbox" className="switch-apple" checked={privacyMode} onChange={togglePrivacy} aria-label="Modo privacidade" />
+          <input
+            type="checkbox"
+            className="switch-apple"
+            checked={privacyMode}
+            onChange={togglePrivacy}
+            aria-label="Modo privacidade"
+          />
         </label>
       </div>
     </section>
