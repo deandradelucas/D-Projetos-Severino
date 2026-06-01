@@ -25,7 +25,6 @@ export default function ConfigAparenciaCard({ theme, setTheme, privacyMode, togg
           </div>
           <div className="config-theme-body">
             <h4>Claro</h4>
-            <p>Visual leve para o dia.</p>
             <span className="config-theme-status">Ativo</span>
           </div>
         </button>
@@ -43,7 +42,6 @@ export default function ConfigAparenciaCard({ theme, setTheme, privacyMode, togg
           </div>
           <div className="config-theme-body">
             <h4>Escuro</h4>
-            <p>Menos brilho à noite.</p>
             <span className="config-theme-status">Ativo</span>
           </div>
         </button>
