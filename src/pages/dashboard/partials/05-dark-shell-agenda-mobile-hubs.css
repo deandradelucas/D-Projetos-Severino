@@ -2816,16 +2816,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo,
-  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .sidebar .brand-logo {
-    width: min(100%, 244px);
-    max-width: 100%;
-    height: auto;
-    min-height: 0;
-    max-height: none;
-    object-fit: contain;
-  }
-
 }
 
 /* Painéis ref — padding e raio alinhados ao claro */

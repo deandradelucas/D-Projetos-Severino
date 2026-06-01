@@ -1,11 +1,3 @@
-/* Dark Mode — premium (obsidiana, camadas, ouro) */
-
-/* Cyberpunk — néon ciano / magenta sobre violeta escuro */
-
-/* Off-white — noir monocromático (hierarquia só por luminância, sem croma) */
-
-/* Dark premium — modais, filtros e controles com cores “light-only” no base */
-
 .dashboard-container {
   font-family: var(--font-family-sans);
   background-color: var(--bg-primary);

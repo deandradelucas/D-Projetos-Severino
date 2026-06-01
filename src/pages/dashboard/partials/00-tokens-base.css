@@ -84,7 +84,6 @@
   --transacoes-balance-pos: #2563eb;
 
   /* Tipografia */
-  --font-family:         'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
   --font-numeric-features: "tnum" 1, "ss01" 1;
 
   /* Transições */
@@ -180,6 +179,6 @@ body[data-theme='dark'] {
 
 @media (max-width: 768px) {
   .desktop-only {
-    display: none !important;
+    display: none;
   }
 }

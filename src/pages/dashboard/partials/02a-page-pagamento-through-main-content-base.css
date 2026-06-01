@@ -594,16 +594,6 @@ body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-ho
   line-height: 1.4;
 }
 
-.brand-logo {
-  width: 250px; /* Logo aumentada conforme pedido */
-  height: auto;
-  transition: transform 0.3s ease;
-}
-
-.brand-logo:hover {
-  transform: scale(1.05); /* Micro-interação premium */
-}
-
 .nav-menu {
   list-style: none;
   display: flex;

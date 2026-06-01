@@ -35,12 +35,6 @@ body[data-theme='light'] .brand-wrapper {
   margin-bottom: 20px;
 }
 
-body[data-theme='light'] .brand-logo {
-  width: 170px;
-  filter: saturate(0.72) brightness(0.9);
-  opacity: 0.88;
-}
-
 body[data-theme='light'] .nav-menu {
   gap: 6px;
 }
@@ -152,10 +146,6 @@ body[data-theme='light'] .brand-wrapper {
   margin-bottom: 18px;
 }
 
-body[data-theme='light'] .brand-logo {
-  width: 180px;
-}
-
 body[data-theme='light'] .nav-item {
   border-radius: 14px;
   padding-top: 12px;
@@ -175,7 +165,6 @@ body[data-theme='light'] .sidebar {
   box-shadow: 0 10px 30px -22px rgba(15, 23, 42, 0.28);
 }
 body[data-theme='light'] .brand-wrapper { margin-bottom: 10px; }
-body[data-theme='light'] .brand-logo { width: 136px; }
 body[data-theme='light'] .nav-menu { gap: 6px; }
 body[data-theme='light'] .nav-item { gap: 12px; min-height: 40px; padding: 10px 12px; border-radius: 12px; }
 body[data-theme='light'] .icon-wrap { width: 28px; height: 28px; border-radius: 9px; }

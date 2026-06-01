@@ -1,25 +1,6 @@
 /* --------------------------------------------------------------------------
    Layout referência (screenshot — sidebar clara, banner IA, 4 KPIs, 3 colunas)
    -------------------------------------------------------------------------- */
-body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .sidebar .brand-logo {
-  display: block;
-  grid-area: 1 / 1;
-  /* ~85% × scale(1.18) ≈ 100% da coluna: evita corte com overflow-x do menu */
-  width: 85%;
-  max-width: 440px;
-  height: auto;
-  margin: 0;
-  justify-self: center;
-  align-self: center;
-  object-fit: contain;
-  filter: none;
-  opacity: 1;
-  transform: scale(1.18);
-  /* Eixo X no meio = marca central; Y no topo = não “sobe” cortando o padding do menu */
-  transform-origin: 50% 0;
-  pointer-events: auto;
-}
-
 body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .sidebar .brand-wrapper {
   display: grid;
   grid-template-columns: 1fr;

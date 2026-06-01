@@ -626,22 +626,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
 
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    width: min(100%, 244px);
-    max-width: 100%;
-    height: auto;
-    min-height: 0;
-    max-height: none;
-    object-fit: contain;
-    object-position: left center;
-    transform: none;
-    transform-origin: 50% 50%;
-    filter: none;
-    opacity: 1;
-    margin: 0;
-  }
-
-  /* Escuro / vidro: mesma régua claro (sobrepõe .sidebar .brand-wrapper do mirror) */
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
     display: flex;
     flex-direction: row;
@@ -653,22 +637,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     min-height: 0;
     gap: clamp(9px, 0.7vw + 7px, 11px);
   }
-
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    width: min(100%, 244px);
-    max-width: 100%;
-    height: auto;
-    min-height: 0;
-    max-height: none;
-    object-fit: contain;
-    object-position: left center;
-    transform: none;
-    transform-origin: 50% 50%;
-    filter: none;
-    opacity: 1;
-    margin: 0;
-  }
-
 
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .app-horizon-inner .sidebar .nav-menu {
     gap: clamp(5px, 0.45vw + 4px, 8px);
@@ -947,21 +915,6 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn svg {
     width: 17px;
     height: 17px;
-  }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-logo,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-logo {
-    flex: none;
-    display: block;
-    min-width: 0;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    min-height: 0;
-    max-height: none;
-    margin: 0 auto;
-    object-fit: contain;
-    object-position: center center;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu,

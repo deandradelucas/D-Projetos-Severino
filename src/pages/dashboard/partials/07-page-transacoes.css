@@ -1884,11 +1884,6 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
   font-size: 0.82rem;
 }
 
-.import-bank-label {
-  color: var(--text-secondary, #64748b);
-  font-size: 0.78rem;
-}
-
 .import-bank-name {
   color: var(--text-primary, #111);
   font-weight: 500;
@@ -1924,8 +1919,7 @@ body[data-theme='dark'] .modal-header h2 {
 
 body[data-theme='dark'] .import-subtitle,
 body[data-theme='dark'] .import-dropzone-hint,
-body[data-theme='dark'] .import-file-size,
-body[data-theme='dark'] .import-bank-label {
+body[data-theme='dark'] .import-file-size {
   color: #94a3b8;
 }
 
