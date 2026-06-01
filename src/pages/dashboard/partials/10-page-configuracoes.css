@@ -47,6 +47,11 @@
   .config-layout > .config-card--full {
     grid-column: 1 / -1;
   }
+
+  .page-configuracoes.app-horizon-shell .config-layout--clean {
+    gap: 22px;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  }
 }
 
 /* Clean layout */
@@ -56,13 +61,6 @@
   max-width: min(1080px, 100%);
   margin-inline: auto;
   padding-bottom: max(28px, env(safe-area-inset-bottom, 0px));
-}
-
-@media (min-width: 1024px) {
-  .page-configuracoes.app-horizon-shell .config-layout--clean {
-    gap: 22px;
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  }
 }
 
 /* ——— Card base ——— */
@@ -233,7 +231,7 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-familia-co
   display: inline-flex;
   width: fit-content;
   color: var(--text-secondary);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 850;
   letter-spacing: 0.1em;
   line-height: 1;
@@ -1050,6 +1048,13 @@ body[data-theme='dark'] .config-toast {
 
 /* ——— Select custom ——— */
 .config-select-custom__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  -webkit-appearance: none;
+  appearance: none;
   width: 100%;
   box-sizing: border-box;
   margin-top: 6px;
@@ -1064,16 +1069,6 @@ body[data-theme='dark'] .config-toast {
   line-height: 1.35;
   cursor: pointer;
   outline: none;
-}
-
-.config-select-custom__trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  text-align: left;
-  -webkit-appearance: none;
-  appearance: none;
 }
 
 .config-select-custom__value {
@@ -1619,13 +1614,21 @@ body[data-theme='dark'] .switch-apple:checked {
 
 @media (prefers-reduced-motion: reduce) {
   .config-action-btn,
-  .config-theme-card {
+  .config-theme-card,
+  .switch-apple,
+  .switch-apple::after,
+  .config-select-custom__chevron {
     transition: none;
   }
 
   .config-action-btn:hover:not(:disabled),
   .config-theme-card:hover {
     transform: none;
+  }
+
+  .config-select-custom--open .config-select-custom__chevron {
+    transform: rotate(180deg);
+    transition: none;
   }
 
   .page-configuracoes.app-horizon-shell .config-card--preferences .config-pref-row--clean,
