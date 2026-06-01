@@ -422,9 +422,19 @@ export default function Configuracoes() {
             </div>
 
             <div className="config-field-grid config-field-grid--single" aria-label="Dados do perfil">
-              <div className="config-field">
+              <div className="config-field config-field--with-action">
                 <span>Telefone</span>
-                <strong>{telefoneLabel}</strong>
+                <div className="config-field__value-row">
+                  <strong>{telefoneLabel}</strong>
+                  <button
+                    type="button"
+                    className="config-action-btn config-action-btn--inline"
+                    onClick={abrirEditarTelefone}
+                    disabled={!usuarioIdHeader}
+                  >
+                    {perfil.telefone ? 'Alterar' : 'Cadastrar'}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -488,11 +498,6 @@ export default function Configuracoes() {
               </div>
             ) : null}
 
-            <div className="config-quick-actions">
-              <button type="button" className="config-action-btn" onClick={abrirEditarTelefone} disabled={!usuarioIdHeader}>
-                {perfil.telefone ? 'Alterar telefone' : 'Cadastrar telefone'}
-              </button>
-            </div>
           </section>
 
           <ConfigAparenciaCard
