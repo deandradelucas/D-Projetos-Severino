@@ -29,6 +29,15 @@
   padding-bottom: 0.5rem;
 }
 
+/* Hero desktop — mesma largura e centramento dos cards */
+@media (min-width: 769px) {
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    align-self: center !important;
+    width: 100% !important;
+    max-width: min(1080px, 100%) !important;
+  }
+}
+
 .page-configuracoes.app-horizon-shell .page-configuracoes__hero .dashboard-hub__hero-text {
   flex: 1 1 auto;
   min-width: 0;
@@ -105,13 +114,32 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-hero-name 
   }
 }
 
-/* Clean layout */
+/* Clean layout — max-width centrado; align-self: center sobrescreve align-items: stretch do pai */
 .page-configuracoes.app-horizon-shell .config-layout--clean {
   gap: 18px;
+  align-self: center;
   width: 100%;
   max-width: min(1080px, 100%);
-  margin-inline: auto;
   padding-bottom: max(28px, env(safe-area-inset-bottom, 0px));
+}
+
+/* Hero dark — glass vitrificado alinhado ao padrão 09b (cobre ≥769px) */
+@media (min-width: 769px) {
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+    background-color: var(--bg-card, #141618) !important;
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.025) 0%,
+      transparent 55%
+    ) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.065),
+      0 1px 4px rgba(0, 0, 0, 0.4) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
 }
 
 /* ——— Card base ——— */
@@ -160,22 +188,17 @@ body[data-theme='light'] .config-card:hover {
   box-shadow: var(--shadow-sm), 0 16px 40px -24px rgba(15, 23, 42, 0.14);
 }
 
-/* Dark — shell */
+/* Dark — shell (glass vitrificado via 09b, apenas overrides de layout) */
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card {
-  background: var(--bg-card, #141618);
-  background-image: none;
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  box-shadow: none;
+  /* Background e border gerenciados pelo 09b-dark-glass-cards.css */
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card:hover {
-  border-color: rgba(148, 163, 184, 0.28);
+  /* Hover glass gerenciado pelo 09b */
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card {
-  background: var(--bg-card, #141618);
-  background-image: none;
-  border-color: rgba(148, 163, 184, 0.15);
+  /* Glass gerenciado pelo 09b */
 }
 
 /* Dark — sem halo roxo */
@@ -189,14 +212,8 @@ body[data-theme='dark'] .config-layout {
 }
 
 body[data-theme='dark'] .config-card {
-  border-color: var(--border-default);
-  box-shadow: var(--shadow-sm);
   transition: box-shadow 0.25s ease, border-color 0.2s ease;
-}
-
-body[data-theme='dark'] .config-card:hover {
-  border-color: rgba(148, 163, 184, 0.25);
-  box-shadow: var(--shadow-sm), 0 16px 40px -24px rgba(0, 0, 0, 0.35);
+  /* Border/background/shadow gerenciados pelo 09b-dark-glass-cards.css */
 }
 
 /* ——— Card horizon-shell (posicionamento e radii) ——— */
@@ -1001,14 +1018,11 @@ body[data-theme='light'] .page-configuracoes.app-horizon-shell .config-card--pre
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences {
-  border-color: rgba(148, 163, 184, 0.15);
-  background: var(--bg-card, #141618);
-  box-shadow: none;
+  /* Background/border/shadow glass via 09b */
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences:hover {
-  border-color: rgba(148, 163, 184, 0.28);
-  box-shadow: none;
+  /* Hover glass via 09b */
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-preference-list {

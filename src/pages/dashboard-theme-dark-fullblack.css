@@ -40,14 +40,15 @@ body[data-theme='dark'] .btn-primary:focus-visible {
     0 14px 32px -18px rgba(0, 0, 0, 0.55);
 }
 
-/* Cartões de relatório / config — preto (.ref-kpi-card e .ref-panel ficam no bloco “KPIs e painéis” abaixo) */
+/* Cartões de relatório / config — glass via 09b-dark-glass-cards.css */
+/* (mantido como fallback para var(--bg-card) caso 09b não carregue) */
 body[data-theme='dark'] .relatorios-chart-card,
 body[data-theme='dark'] .config-card,
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card,
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card {
   background: var(--bg-card, #141618);
   background-image: none;
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: none;
 }
 
@@ -134,9 +135,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
 
 /* Sidebar shell — estados de nav consolidados no bloco neo abaixo (evita bordas / roxo duplicado). */
 
-/* KPIs e painéis */
+/* KPIs e painéis — glass via 09b-dark-glass-cards.css */
 body[data-theme='dark'] .ref-kpi-card {
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   background: var(--bg-card, #141618);
   background-image: none;
   box-shadow: none;
@@ -178,7 +179,7 @@ body[data-theme='dark'] .ref-kpi-card__label {
 }
 
 body[data-theme='dark'] .ref-panel {
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   background: var(--bg-card, #141618);
   background-image: none;
   box-shadow: none;
