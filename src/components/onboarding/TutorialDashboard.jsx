@@ -98,7 +98,7 @@ function SpotlightBox({ t, l, r, b }) {
   )
 }
 
-const FONT = "'Poppins', 'Inter', system-ui, sans-serif"
+const FONT = "'Plus Jakarta Sans Variable', 'Inter Variable', system-ui, sans-serif"
 
 function TooltipCard({ rect, badge, title, body, ctaLabel, onCta, onSkip, skipLabel = 'Pular', showArrow = true, forceAbove = false }) {
   const vw         = typeof window !== 'undefined' ? window.innerWidth  : 800

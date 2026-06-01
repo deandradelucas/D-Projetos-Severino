@@ -2,8 +2,8 @@
 
 @theme {
   /* ── Tipografia — família ────────────────────────────────── */
-  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
-  --font-family-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif; /* compat */
+  --font-sans: 'Plus Jakarta Sans Variable', 'Inter Variable', system-ui, -apple-system, sans-serif;
+  --font-family-sans: 'Plus Jakarta Sans Variable', 'Inter Variable', system-ui, -apple-system, sans-serif; /* compat */
 
   /* ── Tipografia — tamanhos ───────────────────────────────── */
   --font-size-xs:   0.6875rem;
@@ -37,13 +37,10 @@
   --tracking-eyebrow:  0.14em;
 
   /* ── Tipografia — fonte de marketing (auth/bem-vindo) ────── */
-  --font-marketing: 'Poppins', var(--font-family-sans);
+  --font-marketing: 'Plus Jakarta Sans Variable', var(--font-family-sans);
 
-  /* ── Tipografia — fonte premium das páginas autenticadas ──
-     Mobile (≤768px) = Poppins. Desktop (≥769px) sobrescreve para
-     Plus Jakarta Sans Variable (ver bloco @media adiante). Centralizado
-     aqui para evitar a redeclaração em cada partial de página. */
-  --tx-dir-font: 'Poppins', var(--font-family-sans);
+  /* ── Tipografia — fonte premium das páginas autenticadas ── */
+  --tx-dir-font: 'Plus Jakarta Sans Variable', var(--font-family-sans);
 
   /* ── Border radius ───────────────────────────────────────── */
   --radius-sm:   6px;
@@ -141,21 +138,6 @@
   --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
 }
 
-/*
- * Desktop premium typography (≥769px): Plus Jakarta Sans Variable substitui
- * Poppins/Inter em todos os tokens canônicos. O woff2 só é baixado em telas
- * que efetivamente usam (mobile não dispara request graças à media query).
- * Stack final preserva Inter Variable + system-ui como fallback metric-matched.
- */
-@media (min-width: 769px) {
-  :root {
-    --font-sans:          'Plus Jakarta Sans Variable', 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
-    --font-family-sans:   'Plus Jakarta Sans Variable', 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
-    --font-marketing:     'Plus Jakarta Sans Variable', 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
-    --tx-dir-font:        'Plus Jakarta Sans Variable', 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
-  }
-}
-
 html {
   min-height: 100%;
   height: 100%;
@@ -194,20 +176,14 @@ html:has(.bem-vindo-page) .horizon-chat-window {
   display: none !important;
 }
 
-/* Bem-vindo assinatura — mesma tipografia que Transações (Poppins + fallbacks) */
 .bem-vindo-page {
-  --font-marketing: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
-
   font-family: var(--font-marketing);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* Trial expirado — mesma tipografia que Transações (Poppins + fallbacks) */
 .trial-expirado-page {
-  --font-marketing: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
-
   font-family: var(--font-marketing);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -239,10 +215,7 @@ body {
   isolation: isolate;
 }
 
-/* Login/Cadastro — mesma tipografia que Transações (Poppins + fallbacks) */
 .auth-shell-glass {
-  --font-marketing: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
-
   font-family: var(--font-marketing);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -300,7 +273,7 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
 .auth-shell-copy-column {
   background-color: #000000;
   color: #f1f5f9;
-  font-family: var(--font-marketing, 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif)));
+  font-family: var(--font-marketing);
 }
 
 .auth-login-copy {

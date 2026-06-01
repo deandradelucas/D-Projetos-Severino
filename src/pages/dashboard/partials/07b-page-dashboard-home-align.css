@@ -7,7 +7,7 @@
    ============================================================================= */
 
 .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(.page-investimentos) {
-  font-family: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif));
+  font-family: var(--font-family-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -38,7 +38,7 @@ body[data-theme='dark']
   align-items: center !important;
   justify-content: center !important;
   gap: 6px !important;
-  font-family: 'Poppins', var(--font-family-sans, var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif)) !important;
+  font-family: var(--font-family-sans) !important;
   font-size: 0.875rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.02em !important;
