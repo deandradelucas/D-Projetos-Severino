@@ -27,6 +27,8 @@ import './dashboard.css'
 import {
   BarChart,
   Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -39,7 +41,8 @@ import {
 } from 'recharts'
 
 export default function Relatorios() {
-  const { privacyMode } = useTheme()
+  const { privacyMode, theme } = useTheme()
+  const isDark = theme === 'dark'
   const chartMono = false
   const [usuario] = useState(() => readHorizonteUserProfile())
 
@@ -477,6 +480,102 @@ export default function Relatorios() {
           <p className="relatorios-empty-msg">Nenhuma transação efetivada neste período.</p>
         ) : (
           <div className={`relatorios-charts${refreshing ? ' relatorios-charts--refreshing' : ''}`} aria-busy={refreshing}>
+
+            {/* ── NEON LINE CHART ───────────────────────────────────────────────── */}
+            <section className="relatorios-charts__section" aria-labelledby="rel-fluxo-heading">
+              <h3 id="rel-fluxo-heading" className="relatorios-charts__section-title">Fluxo</h3>
+              <div className="relatorios-charts__section-grid">
+                <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide relatorios-neon-card">
+                  <div className="ref-panel__head">
+                    <div>
+                      <h2 className="ref-panel__title">Fluxo do período</h2>
+                      <p className="ref-panel__subtitle">Evolução de receitas e despesas</p>
+                    </div>
+                  </div>
+                  <div className="relatorios-chart-card__body">
+                    {chartDataPorMes.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
+                        <AreaChart data={chartDataPorMes} margin={{ top: 16, right: 8, left: 0, bottom: 4 }}>
+                          <defs>
+                            {isDark && (
+                              <filter id="neonLineGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                <feGaussianBlur stdDeviation="3" result="blur" />
+                                <feMerge>
+                                  <feMergeNode in="blur" />
+                                  <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                              </filter>
+                            )}
+                            <linearGradient id="neonAreaRec" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor={isDark ? '#00e5a0' : '#22c55e'} stopOpacity={isDark ? 0.22 : 0.35} />
+                              <stop offset="95%" stopColor={isDark ? '#00e5a0' : '#22c55e'} stopOpacity={0} />
+                            </linearGradient>
+                            <linearGradient id="neonAreaDes" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor={isDark ? '#ff4d8d' : '#f43f5e'} stopOpacity={isDark ? 0.18 : 0.30} />
+                              <stop offset="95%" stopColor={isDark ? '#ff4d8d' : '#f43f5e'} stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid
+                            strokeDasharray="3 8"
+                            stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'}
+                            vertical={false}
+                          />
+                          <XAxis
+                            dataKey="name"
+                            stroke="transparent"
+                            fontSize={isMobile ? 10 : 11}
+                            tickMargin={8}
+                            tick={{ fill: isDark ? 'rgba(255,255,255,0.35)' : chart.tickFill }}
+                            axisLine={false}
+                            tickLine={false}
+                            interval={0}
+                            angle={isMobile ? -35 : 0}
+                            textAnchor={isMobile ? 'end' : 'middle'}
+                            height={isMobile ? 56 : 32}
+                          />
+                          <YAxis
+                            stroke="transparent"
+                            fontSize={isMobile ? 10 : 11}
+                            tickLine={false}
+                            axisLine={false}
+                            tick={{ fill: isDark ? 'rgba(255,255,255,0.35)' : chart.tickFill }}
+                            tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)}
+                            width={isMobile ? 56 : 64}
+                          />
+                          <Tooltip
+                            content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />}
+                            cursor={{ stroke: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)', strokeWidth: 1, strokeDasharray: '4 4' }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="Receitas"
+                            stroke={isDark ? '#00e5a0' : '#22c55e'}
+                            strokeWidth={2.5}
+                            fill="url(#neonAreaRec)"
+                            dot={false}
+                            activeDot={{ r: 5, fill: isDark ? '#00e5a0' : '#22c55e', strokeWidth: 0 }}
+                            filter={isDark ? 'url(#neonLineGlow)' : undefined}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="Despesas"
+                            stroke={isDark ? '#ff4d8d' : '#f43f5e'}
+                            strokeWidth={2.5}
+                            fill="url(#neonAreaDes)"
+                            dot={false}
+                            activeDot={{ r: 5, fill: isDark ? '#ff4d8d' : '#f43f5e', strokeWidth: 0 }}
+                            filter={isDark ? 'url(#neonLineGlow)' : undefined}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="relatorios-chart-empty">Sem dados mensais no período.</div>
+                    )}
+                  </div>
+                </article>
+              </div>
+            </section>
+
             <section className="relatorios-charts__section" aria-labelledby="rel-month-heading">
               <h3 id="rel-month-heading" className="relatorios-charts__section-title">
                 Mensal
