@@ -399,8 +399,15 @@ export default function Configuracoes() {
         <section className="dashboard-hub__hero page-configuracoes__hero" aria-label="Ajustes">
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} aria-label="Abrir menu" />
-            <div className="dashboard-hub__hero-text">
+            <div className="dashboard-hub__hero-text config-hero-text">
               <h1 className="dashboard-hub__title">Ajustes</h1>
+              {(perfil.nome || perfil.email) && (
+                <p className="config-hero-subtitle">
+                  {perfil.nome && <span className="config-hero-name">{perfil.nome}</span>}
+                  {perfil.nome && perfil.email && <span className="config-hero-sep" aria-hidden="true"> · </span>}
+                  {perfil.email && <span className="config-hero-email">{perfil.email}</span>}
+                </p>
+              )}
             </div>
           </div>
         </section>
