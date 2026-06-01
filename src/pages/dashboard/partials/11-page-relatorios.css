@@ -152,6 +152,30 @@ body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-h
   font-variant-numeric: tabular-nums;
 }
 
+/* ─── TOOLTIP DARK MODE — texto visível sobre fundo #141618 ────────────────── */
+/* 02c define cores hardcoded para light (color: #0f172a, #64748b) que não herdam
+   o color: #f0f0f0 do container. Sobrescrevemos cada elemento filho aqui. */
+
+body[data-theme='dark'] .page-relatorios .relatorios-tooltip__label {
+  color: rgba(255, 255, 255, 0.42) !important;
+}
+
+body[data-theme='dark'] .page-relatorios .relatorios-tooltip__row {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+body[data-theme='dark'] .page-relatorios .relatorios-tooltip__name {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+body[data-theme='dark'] .page-relatorios .relatorios-tooltip__val {
+  color: #ffffff !important;
+}
+
+body[data-theme='dark'] .page-relatorios .relatorios-tooltip__pct {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
 /* ─── NEON LINE CARD ────────────────────────────────────────────────────────── */
 
 body[data-theme='dark'] .relatorios-neon-card {
