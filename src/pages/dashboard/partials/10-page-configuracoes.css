@@ -319,6 +319,31 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-familia-co
   width: 100%;
 }
 
+.config-field--with-action {
+  gap: 6px;
+}
+
+.config-field__value-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.config-field__value-row strong {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.config-action-btn--inline {
+  flex-shrink: 0;
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 0.75rem;
+  border-radius: 10px;
+}
+
 .config-input {
   width: 100%;
   min-height: 42px;
@@ -433,7 +458,7 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-familia-co
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 @media (hover: hover) {
