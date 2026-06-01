@@ -56,29 +56,34 @@ export function computeAssinaturaFlags({
   const trialActive = trialEnd != null && !Number.isNaN(trialEnd.getTime()) && trialEnd > new Date()
   const gwBloqueia = asaasSubscriptionBloqueiaAcesso(assinatura_asaas_status)
   const pagoHistorico = assinatura_paga === true
-  const pagoEfetivo = pagoHistorico && !gwBloqueia
+
+  // INACTIVE subscription with confirmed payment = subscription still in setup/initial phase.
+  // Only EXPIRED should override payment history.
+  const sLower = String(assinatura_asaas_status || '').trim().toLowerCase()
+  const gwBloqueiaEfetivo = gwBloqueia && (sLower === 'expired' || !pagoHistorico)
+  const pagoEfetivo = pagoHistorico && !gwBloqueiaEfetivo
 
   let acesso = pagoEfetivo || trialActive
-  if (gwBloqueia && !trialActive) acesso = false
+  if (gwBloqueiaEfetivo && !trialActive) acesso = false
 
   const mostrarBemVindo =
-    acesso && !bem_vindo_pagamento_visto_at && !pagoEfetivo && !gwBloqueia
+    acesso && !bem_vindo_pagamento_visto_at && !pagoEfetivo && !gwBloqueiaEfetivo
 
   const motivoBloqueio =
-    !acesso && gwBloqueia && !trialActive ? mensagemBloqueioAssinaturaAsaas(assinatura_asaas_status) : null
+    !acesso && gwBloqueiaEfetivo && !trialActive ? mensagemBloqueioAssinaturaAsaas(assinatura_asaas_status) : null
 
   const situacao = situacaoAssinatura({
     trialActive,
     assinatura_paga_efetiva: pagoEfetivo,
     assinatura_asaas_status,
-    gwBloqueia,
+    gwBloqueia: gwBloqueiaEfetivo,
   })
 
   return {
     assinatura_paga: pagoEfetivo,
     acesso_app_liberado: acesso,
     mostrar_bem_vindo_assinatura: mostrarBemVindo,
-    assinatura_asaas_bloqueada: gwBloqueia && !trialActive,
+    assinatura_asaas_bloqueada: gwBloqueiaEfetivo && !trialActive,
     motivo_bloqueio_acesso: motivoBloqueio,
     assinatura_situacao: situacao,
   }
