@@ -26,12 +26,63 @@
 }
 
 .page-configuracoes.app-horizon-shell .page-configuracoes__hero {
-  padding-bottom: 0.35rem;
+  padding-bottom: 0.5rem;
 }
 
 .page-configuracoes.app-horizon-shell .page-configuracoes__hero .dashboard-hub__hero-text {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.dashboard-container.page-configuracoes.app-horizon-shell .dashboard-hub__hero-text {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.page-configuracoes.app-horizon-shell .config-hero-subtitle {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body[data-theme='light'] .page-configuracoes.app-horizon-shell .config-hero-subtitle {
+  color: #64748b;
+}
+
+body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-hero-subtitle {
+  color: rgba(203, 213, 225, 0.7);
+}
+
+.page-configuracoes.app-horizon-shell .config-hero-name {
+  font-weight: 500;
+}
+
+body[data-theme='light'] .page-configuracoes.app-horizon-shell .config-hero-name {
+  color: #334155;
+}
+
+body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-hero-name {
+  color: rgba(226, 232, 240, 0.9);
+}
+
+.page-configuracoes.app-horizon-shell .config-hero-sep {
+  color: inherit;
+  opacity: 0.5;
+}
+
+.page-configuracoes.app-horizon-shell .config-hero-email {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #config-secao-convite-familia {
