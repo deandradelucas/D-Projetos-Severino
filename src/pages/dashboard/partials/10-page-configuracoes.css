@@ -123,23 +123,24 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-hero-name 
   padding-bottom: max(28px, env(safe-area-inset-bottom, 0px));
 }
 
-/* Hero dark — glass vitrificado alinhado ao padrão 09b (cobre ≥769px) */
-@media (min-width: 769px) {
-  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
-  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
-    background-color: var(--bg-card, #141618) !important;
-    background-image: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.025) 0%,
-      transparent 55%
-    ) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.065),
-      0 1px 4px rgba(0, 0, 0, 0.4) !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
+/* Hero dark — glass vitrificado alinhado ao padrão 09b (todas as larguras) */
+body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
+body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
+  background-color: var(--bg-card, #141618) !important;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.025) 0%,
+    transparent 55%
+  ) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.065),
+    0 1px 4px rgba(0, 0, 0, 0.4) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  isolation: auto !important;
+  -webkit-transform: none !important;
+  transform: none !important;
 }
 
 /* ——— Card base ——— */
