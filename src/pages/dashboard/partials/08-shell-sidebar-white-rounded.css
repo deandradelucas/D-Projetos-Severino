@@ -185,9 +185,11 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
   font-weight: 600 !important;
-  color: #fafafa !important;
+  color: var(--shell-nav-nova-gold) !important;
   background: rgba(255, 255, 255, 0.07) !important;
-  border-color: var(--shell-nav-nova-gold-item-border) !important;
+  border-color: transparent !important;
+  border-left-color: var(--shell-nav-nova-gold) !important;
+  border-left-width: 3px !important;
   box-shadow:
     0 0 0 1px var(--shell-nav-nova-gold-inset) inset,
     0 12px 28px -18px rgba(0, 0, 0, 0.55) !important;
