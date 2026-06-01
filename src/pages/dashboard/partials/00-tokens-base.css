@@ -142,11 +142,16 @@ body[data-theme='dark'] {
 
   /* Bordas dark */
   --border-subtle:  rgba(255, 255, 255, 0.04);
-  --border-default: #232830;
-  --border-strong:  #3a4250;
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-strong:  rgba(255, 255, 255, 0.15);
   --border-accent:  rgba(212, 168, 75, 0.35);
-  --border-color:   rgba(255, 255, 255, 0.04); /* compat */
-  --content-border-color: rgba(255, 255, 255, 0.07); /* compat */
+  --border-color:   rgba(255, 255, 255, 0.08); /* compat */
+  --content-border-color: rgba(255, 255, 255, 0.08); /* compat */
+
+  /* Glass vitrificado — superfícies obsidiana com especular */
+  --glass-specular: rgba(255, 255, 255, 0.028);
+  --glass-border:   rgba(255, 255, 255, 0.08);
+  --glass-inset:    rgba(255, 255, 255, 0.07);
 
   /* Sidebar dark */
   --sidebar-bg:               #070910;
