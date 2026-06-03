@@ -486,9 +486,11 @@ body:has(.sidebar.open) .horizon-chat-window {
     position: fixed;
     left: 0;
     right: 0;
-    /* html/body/root travados em 100svh (= altura_física - safe-area no iOS).
-       Negativo empurra o container até o fundo físico sem alterar os layouts. */
-    bottom: calc(-1.5 * env(safe-area-inset-bottom, 0px));
+    /* status-bar-style black-translucent + viewport-fit=cover: o viewport agora
+       inclui o safe-area, então o nav encosta no fundo físico com bottom:0 e o
+       padding-bottom levanta a barra acima do home indicator (sem hack negativo,
+       que era calibrado para o viewport antigo e deixava uma faixa no rodapé). */
+    bottom: 0;
     z-index: 70;
     padding-bottom: env(safe-area-inset-bottom, 0px);
     background: rgba(6, 6, 8, 0.99);
