@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import { randomUUID, timingSafeEqual } from 'node:crypto'
 import { log } from '../lib/logger.mjs'
 import { getRequestOrigin } from '../lib/password-reset.mjs'
 import { getPerfilUsuario } from '../lib/usuarios.mjs'
@@ -314,7 +314,10 @@ export function registerPagamentosRoutes(app) {
     if (!headerTok && queryTok) {
       log.warn('[asaas webhook] token via query string (deprecado) — mover para header asaas-access-token')
     }
-    if (tok !== secret) {
+    /* Comparação timing-safe do token do webhook (evita leak por timing). */
+    const tokBuf = Buffer.from(tok, 'utf8')
+    const secretBuf = Buffer.from(secret, 'utf8')
+    if (tokBuf.length !== secretBuf.length || !timingSafeEqual(tokBuf, secretBuf)) {
       return c.json({ message: 'Forbidden.' }, 403)
     }
 
