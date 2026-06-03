@@ -152,6 +152,16 @@ html:has(body[data-theme='light']) {
   background-color: #ffffff;
 }
 
+/* Espelho direto do tema no <html> (setado via JS em ThemeContext) — caminho
+   SEM :has() que o iOS WebKit repinta de forma confiável no safe-area/status bar
+   do PWA ao trocar de tema em runtime (o :has() só repintava no relaunch). */
+html[data-theme='light'] {
+  background-color: #ffffff;
+}
+html[data-theme='dark'] {
+  background-color: #080a0c;
+}
+
 /* BemVindoAssinatura — pinta TODO o viewport de preto (Background.jsx, html, body, #root)
    para evitar que o safe-area bottom do iPhone mostre fundo branco do tema claro */
 html:has(.bem-vindo-page),

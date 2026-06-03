@@ -12,6 +12,14 @@ const THEME_COLOR_META = {
   dark: '#000000',
 }
 
+/** Fundo aplicado imperativamente no <html> — DEVE espelhar o CSS `html {}` /
+ *  `html:has(body[data-theme='light'])` para que o safe-area (status bar no PWA)
+ *  fique idêntico ao estado correto pós-relaunch, sem emenda de cor. */
+const ROOT_BG = {
+  light: '#ffffff',
+  dark: '#080a0c',
+}
+
 /** Remove valores legados (temas antigos não suportados). */
 function purgeLegacyThemeStorage() {
   try {
@@ -35,18 +43,47 @@ function readStoredTheme() {
   return 'light'
 }
 
+/**
+ * Recria a meta theme-color do zero. Em alguns WebKit (iOS PWA standalone),
+ * apenas mudar o `content` não força a UI do sistema a reavaliar a cor — remover
+ * e reinserir o elemento nudga o repaint da barra de status.
+ */
+function refreshThemeColorMeta(color) {
+  const head = document.head
+  if (!head) return
+  const old = head.querySelector('meta[name="theme-color"]')
+  if (old) old.remove()
+  const meta = document.createElement('meta')
+  meta.setAttribute('name', 'theme-color')
+  meta.setAttribute('content', color)
+  head.appendChild(meta)
+}
+
 function applyThemeToDocument(theme) {
   if (typeof document === 'undefined') return
+  const root = document.documentElement
+  const color = THEME_COLOR_META[theme] ?? THEME_COLOR_META.light
+
   document.body.setAttribute('data-theme', theme)
+  // Espelha o tema no <html> para permitir seletores diretos (html[data-theme])
+  // sem depender de :has() — o iOS não repinta o safe-area quando o fundo do root
+  // muda só por cascata :has() em runtime (corrige apenas no relaunch).
+  root.setAttribute('data-theme', theme)
+
   try {
     localStorage.setItem(STORAGE_KEY, theme)
   } catch {
     /* ignore */
   }
-  const meta = document.querySelector('meta[name="theme-color"]')
-  if (meta) {
-    meta.setAttribute('content', THEME_COLOR_META[theme] ?? THEME_COLOR_META.light)
-  }
+
+  refreshThemeColorMeta(color)
+
+  // iOS PWA: pinta o <html> imperativamente (fundo do safe-area/status bar) e
+  // força um reflow síncrono para o WebKit repintar o topo na hora da troca,
+  // em vez de só no próximo relaunch do app.
+  // (O `!important` da rota BemVindoAssinatura continua prevalecendo sobre este inline.)
+  root.style.backgroundColor = ROOT_BG[theme] ?? ROOT_BG.light
+  void root.offsetHeight
 }
 
 export function ThemeProvider({ children }) {
