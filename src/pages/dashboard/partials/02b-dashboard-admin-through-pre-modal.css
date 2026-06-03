@@ -486,13 +486,14 @@ body:has(.sidebar.open) .horizon-chat-window {
     position: fixed;
     left: 0;
     right: 0;
-    /* status-bar-style black-translucent + viewport-fit=cover: o viewport agora
-       inclui o safe-area, então o nav encosta no fundo físico com bottom:0 e o
-       padding-bottom levanta a barra acima do home indicator (sem hack negativo,
-       que era calibrado para o viewport antigo e deixava uma faixa no rodapé). */
+    /* status-bar-style black-translucent + viewport-fit=cover: o viewport inclui
+       o safe-area, então o nav encosta no fundo físico com bottom:0. O safe-area
+       do home indicator é tratado APENAS pela .mobile-bottom-nav__bar (padding
+       inferior) — sem padding-bottom aqui no container, senão soma em dobro e a
+       barra fica alta demais. (O hack 'bottom: -1.5*env' antigo escondia esse
+       dobro empurrando o excedente pra fora da tela no viewport antigo.) */
     bottom: 0;
     z-index: 70;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
     background: rgba(6, 6, 8, 0.99);
     pointer-events: none;
   }
