@@ -7,6 +7,7 @@ import RoutePageFallback from './components/RoutePageFallback'
 import SuperAdminOutlet from './components/SuperAdminOutlet'
 import AppSessionOutlet from './components/AppSessionOutlet'
 import Background from './components/Background'
+import StatusBarScrim from './components/StatusBarScrim'
 import PwaInstallPrompt from './components/PwaInstallPrompt'
 import HorizonChat from './components/HorizonChat'
 import ShellStickyHeaderScroll from './components/ShellStickyHeaderScroll'
@@ -46,6 +47,7 @@ function App() {
         <ToastContainer />
         <div className="app-layout-shell">
           <Background />
+          <StatusBarScrim />
           <PwaInstallPrompt />
           <HorizonChat />
           <div className="app-routes-grow" id="app-main" tabIndex={-1}>

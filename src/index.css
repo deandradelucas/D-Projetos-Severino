@@ -162,6 +162,27 @@ html[data-theme='dark'] {
   background-color: #080a0c;
 }
 
+/* Faixa do safe-area do topo (área da status bar no iOS PWA) — pintada
+   reativamente por StatusBarScrim.jsx (inline style por tema). Elemento DOM
+   simples, sem contain/transform, para o WebKit recompor na hora ao trocar de
+   tema (o fundo do <html> e a camada app-background-root z-index:-1 só repintavam
+   no relaunch). z-index 9700: acima dos fundos e headers sticky (<=9600), abaixo
+   dos modais (>=10000), que pintam o topo por conta própria quando abertos. */
+.status-bar-scrim {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 9700;
+  pointer-events: none;
+}
+
+/* Páginas marketing full-black (BemVindoAssinatura) — a faixa acompanha o preto. */
+html:has(.bem-vindo-page) .status-bar-scrim {
+  background-color: #000000 !important;
+}
+
 /* BemVindoAssinatura — pinta TODO o viewport de preto (Background.jsx, html, body, #root)
    para evitar que o safe-area bottom do iPhone mostre fundo branco do tema claro */
 html:has(.bem-vindo-page),
