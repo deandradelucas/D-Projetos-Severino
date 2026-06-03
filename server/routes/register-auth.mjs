@@ -139,6 +139,13 @@ export function registerAuthRoutes(app) {
       if (senha.length < 6) {
         return c.json({ message: 'A senha deve ter pelo menos 6 caracteres.' }, 400)
       }
+      /* LGPD: consentimento explícito à Política de Privacidade/Termos é obrigatório. */
+      if (body?.consentimento !== true) {
+        return c.json({
+          field: 'consentimento',
+          message: 'É necessário aceitar a Política de Privacidade e os Termos de Uso para criar a conta.',
+        }, 400)
+      }
 
       let telefoneLimpo = null
       if (telefone) {
@@ -215,7 +222,15 @@ export function registerAuthRoutes(app) {
 
       const { data: newUser, error: insertError } = await supabaseAdmin
         .from('usuarios')
-        .insert({ nome, email, telefone: telefoneLimpo, senha: senhaHash })
+        .insert({
+          nome,
+          email,
+          telefone: telefoneLimpo,
+          senha: senhaHash,
+          /* LGPD: registra o aceite (versão do documento + timestamp). */
+          consentimento_aceito_em: new Date().toISOString(),
+          consentimento_versao: '2026-06-03',
+        })
         .select('*')
         .single()
 

@@ -31,6 +31,8 @@ import {
   Pagamento,
   BemVindoAssinatura,
   TrialExpirado,
+  PoliticaPrivacidade,
+  TermosUso,
 } from './lazyRoutes'
 
 function App() {
@@ -53,6 +55,8 @@ function App() {
               <Routes>
                 <Route path="/cadastro" element={<Cadastro />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
+                <Route path="/termos" element={<TermosUso />} />
                 <Route element={<AppSessionOutlet requireAppAccess={false} />}>
                   <Route path="/bem-vindo-assinatura" element={<BemVindoAssinatura />} />
                   <Route path="/pagamento" element={<Pagamento />} />

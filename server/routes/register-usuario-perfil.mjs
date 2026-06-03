@@ -197,6 +197,9 @@ export function registerUsuarioPerfilRoutes(app) {
       await solicitarExclusaoConta(usuarioId)
       return c.json({ message: 'Conta desativada. Sentiremos sua falta.' })
     } catch (error) {
+      if (error?.statusCode) {
+        return c.json({ message: error.message }, error.statusCode)
+      }
       log.error('excluir conta failed', error)
       return c.json({ message: 'Erro ao excluir conta.' }, 500)
     }

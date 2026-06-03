@@ -190,6 +190,14 @@ html:has(.bem-vindo-page) .horizon-chat-window {
   text-rendering: optimizeLegibility;
 }
 
+/* Documentos legais (Política de Privacidade / Termos) */
+.legal-doc-body h2 { font-size: 1.1rem; font-weight: 700; color: #111827; margin-top: 1.75rem; margin-bottom: 0.35rem; }
+.legal-doc-body p { margin: 0.5rem 0; }
+.legal-doc-body ul { list-style: disc; padding-left: 1.25rem; margin: 0.4rem 0; }
+.legal-doc-body li { margin: 0.25rem 0; }
+.legal-doc-body a { color: #b45309; text-decoration: underline; }
+.legal-doc-body strong { color: #111827; }
+
 body,
 #root {
   min-height: 100%;

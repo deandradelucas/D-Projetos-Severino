@@ -117,9 +117,24 @@ export async function exportarDadosUsuario(usuarioId) {
   return out
 }
 
-/** Solicita exclusão de conta (LGPD): desativa, marca data e revoga sessões. */
+/** Solicita exclusão de conta (LGPD): desativa, marca data e revoga sessões.
+ *  Bloqueia se o usuário for titular de uma conta familiar com membros vinculados
+ *  — apagar seus dados destruiria os dados compartilhados da família. */
 export async function solicitarExclusaoConta(usuarioId) {
   const sb = getSupabaseAdmin()
+
+  const { data: membros, error: membrosErr } = await sb
+    .from('usuarios')
+    .select('id')
+    .eq('vinculo_conta_principal_id', usuarioId)
+    .limit(1)
+  if (membrosErr) throw membrosErr
+  if (membros && membros.length > 0) {
+    const e = new Error('Você é titular de uma conta familiar com membros vinculados. Remova os membros (ou transfira a titularidade) antes de excluir sua conta.')
+    e.statusCode = 409
+    throw e
+  }
+
   const { error } = await sb
     .from('usuarios')
     .update({ is_active: false, conta_exclusao_solicitada_em: new Date().toISOString() })

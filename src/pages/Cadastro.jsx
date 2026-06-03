@@ -35,6 +35,7 @@ export default function Cadastro() {
   const [telefone, setTelefone] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
+  const [consentimento, setConsentimento] = useState(false)
   const [loading, setLoading] = useState(false)
   const [showSenha, setShowSenha] = useState(false)
   const [errors, setErrors] = useState({})
@@ -67,6 +68,7 @@ export default function Cadastro() {
     const newErrors = {}
     if (!validateEmail(email.trim())) newErrors.email = 'E-mail inválido'
     if (senha.length < 6) newErrors.senha = 'Mínimo 6 caracteres'
+    if (!consentimento) newErrors.consentimento = 'É necessário aceitar a Política de Privacidade e os Termos de Uso.'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -110,6 +112,7 @@ export default function Cadastro() {
           telefone,
           email: email.trim().toLowerCase(),
           senha,
+          consentimento,
         }),
       })
 
@@ -121,6 +124,8 @@ export default function Cadastro() {
           setErrors({ telefone: msg })
           setSubmitError('')
           setStep(1)
+        } else if (data.field === 'consentimento') {
+          setErrors({ consentimento: msg })
         } else if (data.field === 'email' || response.status === 409) {
           setErrors({ email: msg })
         } else {
@@ -528,6 +533,32 @@ export default function Cadastro() {
               )}
               {errors.senha && <p role="alert" className={AUTH_SHELL_FIELD_ERROR_CLASS}>{errors.senha}</p>}
             </label>
+
+            <div>
+              <label htmlFor="consentimento" className="flex cursor-pointer items-start gap-2.5">
+                <input
+                  id="consentimento"
+                  type="checkbox"
+                  checked={consentimento}
+                  onChange={(e) => {
+                    setConsentimento(e.target.checked)
+                    if (errors.consentimento) setErrors((p) => ({ ...p, consentimento: undefined }))
+                  }}
+                  className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-[var(--accent)]"
+                />
+                <span className="text-[11px] leading-snug text-neutral-600">
+                  Li e aceito a{' '}
+                  <Link to="/politica-de-privacidade" target="_blank" className="font-semibold text-[var(--accent)] underline-offset-2 hover:underline">
+                    Política de Privacidade
+                  </Link>{' '}
+                  e os{' '}
+                  <Link to="/termos" target="_blank" className="font-semibold text-[var(--accent)] underline-offset-2 hover:underline">
+                    Termos de Uso
+                  </Link>.
+                </span>
+              </label>
+              {errors.consentimento && <p role="alert" className={AUTH_SHELL_FIELD_ERROR_CLASS}>{errors.consentimento}</p>}
+            </div>
 
             <div className="flex gap-3 pt-1">
               <button

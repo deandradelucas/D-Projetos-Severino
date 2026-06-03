@@ -4,6 +4,7 @@ import app from './app.mjs'
 import { log } from './lib/logger.mjs'
 import { Alerts } from './lib/notify-telegram.mjs'
 import { pruneExpiredWebAuthnChallenges } from './lib/webauthn.mjs'
+import { purgeAccountsForDeletion } from './lib/lgpd-purge.mjs'
 
 const port = Number(process.env.API_PORT || 3001)
 /** Sem hostname o Node pode escutar em :: (IPv6); o scripts/dev.mjs testa 127.0.0.1 e acharia a porta “livre” com EADDRINUSE só no IPv6. */
@@ -35,3 +36,15 @@ setInterval(async () => {
     log.warn('webauthn challenge prune failed', err?.message)
   }
 }, 60 * 60 * 1000)
+
+/* LGPD: hard-delete de contas com exclusão solicitada há +30 dias (diário).
+   Roda 1x no arranque (após 1 min) e a cada 24h. */
+async function runLgpdPurge() {
+  try {
+    await purgeAccountsForDeletion()
+  } catch (err) {
+    log.error('lgpd purge failed', err?.message)
+  }
+}
+setTimeout(runLgpdPurge, 60 * 1000)
+setInterval(runLgpdPurge, 24 * 60 * 60 * 1000)

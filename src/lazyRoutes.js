@@ -57,6 +57,12 @@ export const BemVindoAssinatura = lazy(loadBemVindoAssinatura)
 const loadTrialExpirado = () => import('./pages/TrialExpirado.jsx')
 export const TrialExpirado = lazy(loadTrialExpirado)
 
+const loadPoliticaPrivacidade = () => import('./pages/PoliticaPrivacidade.jsx')
+export const PoliticaPrivacidade = lazy(loadPoliticaPrivacidade)
+
+const loadTermosUso = () => import('./pages/TermosUso.jsx')
+export const TermosUso = lazy(loadTermosUso)
+
 const ROUTE_PREFETCH = {
   '/': loadLogin,
   '/login': loadLogin,
