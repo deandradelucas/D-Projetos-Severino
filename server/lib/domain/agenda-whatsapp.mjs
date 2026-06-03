@@ -9,7 +9,7 @@ import {
   AGENDA_TZ,
 } from './agenda.mjs'
 import { assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
-import { grokChatCompletion } from '../ai/grok-client.mjs'
+import { groqChatCompletion } from '../ai/groq-client.mjs'
 import { logTituloExtracao } from './agenda-title-logger.mjs'
 
 const AGENDA_KEYWORD_RE =
@@ -583,9 +583,9 @@ export function draftAgendaFromTextHeuristic(message, base = new Date()) {
   }
 }
 
-async function extractTituloComGrok(apiKey, message) {
+async function extractTituloComGroq(apiKey, message) {
   try {
-    const text = await grokChatCompletion({
+    const text = await groqChatCompletion({
       apiKey,
       systemPrompt:
         'Você extrai o título limpo de um compromisso de agenda a partir de mensagem de WhatsApp em português. ' +
@@ -779,10 +779,10 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
       let tituloFinal = aiTitulo
       let tituloFonte = aiTitulo ? 'gemini' : null
       if (!tituloFinal) {
-        const grokKey = process.env.GROK_API_KEY
-        if (grokKey) {
-          tituloFinal = await extractTituloComGrok(grokKey, message)
-          if (tituloFinal) tituloFonte = 'grok'
+        const groqKey = process.env.GROQ_API_KEY
+        if (groqKey) {
+          tituloFinal = await extractTituloComGroq(groqKey, message)
+          if (tituloFinal) tituloFonte = 'groq'
         }
         if (!tituloFinal) {
           tituloFinal = titleForCreate(message)

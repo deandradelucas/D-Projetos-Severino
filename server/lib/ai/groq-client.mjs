@@ -1,18 +1,18 @@
-const GROK_BASE_URL = 'https://api.x.ai/v1'
-// Modelos atuais da xAI (jun/2026). NOTA: fallback de texto apenas — Grok não transcreve áudio.
-// Requer GROK_API_KEY válida (a chave atual em produção estava inválida em jun/2026).
-const GROK_MODELS = ['grok-3-mini', 'grok-3']
+const GROQ_BASE_URL = 'https://api.groq.com/openai/v1'
+// Modelos open hospedados no Groq (inferência grátis, OpenAI-compatible). Jun/2026.
+// Fallback de TEXTO apenas — quando o Gemini falha por erro HTTP.
+const GROQ_MODELS = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant']
 
 /**
- * Chama a API do Grok (OpenAI-compatible) e retorna o texto bruto da resposta.
+ * Chama a API do Groq (OpenAI-compatible) e retorna o texto bruto da resposta.
  * Tenta modelos em ordem até um funcionar.
  */
-export async function grokChatCompletion({ apiKey, systemPrompt, userMessage, maxTokens = 700, temperature = 0.15 }) {
+export async function groqChatCompletion({ apiKey, systemPrompt, userMessage, maxTokens = 700, temperature = 0.15 }) {
   let lastErr = null
 
-  for (const model of GROK_MODELS) {
+  for (const model of GROQ_MODELS) {
     try {
-      const res = await fetch(`${GROK_BASE_URL}/chat/completions`, {
+      const res = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ export async function grokChatCompletion({ apiKey, systemPrompt, userMessage, ma
 
       if (!res.ok) {
         const t = await res.text()
-        lastErr = new Error(`Grok ${model} ${res.status}: ${t.slice(0, 200)}`)
+        lastErr = new Error(`Groq ${model} ${res.status}: ${t.slice(0, 200)}`)
         if (res.status === 401) throw lastErr
         continue
       }
@@ -44,5 +44,5 @@ export async function grokChatCompletion({ apiKey, systemPrompt, userMessage, ma
     }
   }
 
-  throw lastErr || new Error('Grok: todos os modelos falharam')
+  throw lastErr || new Error('Groq: todos os modelos falharam')
 }
