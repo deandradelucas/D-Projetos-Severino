@@ -1,6 +1,6 @@
 import LegalDocLayout from '../components/LegalDocLayout'
 
-const CONTROLADOR = '[CONTROLADOR — preencher: razão social e CNPJ, ou nome completo e CPF do responsável]'
+const CONTROLADOR = 'RF EMPREENDIMENTOS LTDA, inscrita no CNPJ sob o nº 19.215.140/0001-05'
 const CONTATO_EMAIL = 'privacidade@mestredamente.com'
 const VERSAO = '2026-06-03'
 
