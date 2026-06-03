@@ -1,16 +1,18 @@
 import '../load-env.mjs'
 
 /**
- * Ordem: 2.5 primeiro (chaves novas); 2.0 só para contas legadas.
- * Em 2.5+ use buildGeminiGenerationConfig (thinkingBudget: 0) — senão a resposta pode vir vazia.
+ * Apenas modelos atuais com cota free tier ativa (verificado jun/2026).
+ * Removidos: gemini-2.0-flash (limit 0 em contas free novas) e gemini-1.5-flash (404, descontinuado).
+ * Todos suportam entrada de áudio (necessário para transcrição via WhatsApp).
+ * Em 2.5+/flash-latest use buildGeminiGenerationConfig (thinkingBudget: 0) — senão a resposta pode vir vazia.
  */
-const GEMINI_MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash']
-const DEFAULT_MODEL = 'gemini-2.0-flash'
+const GEMINI_MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-latest']
+const DEFAULT_MODEL = 'gemini-2.5-flash'
 
 /** Modelos com thinking ativo por defeito (tokens de raciocínio contam no orçamento de saída). */
 export function modelUsesThinkingBudget(modelId) {
   const id = String(modelId || '').toLowerCase()
-  return /gemini-2\.5|gemini-3|thinking/.test(id)
+  return /gemini-2\.5|gemini-3|flash-latest|thinking/.test(id)
 }
 
 /**

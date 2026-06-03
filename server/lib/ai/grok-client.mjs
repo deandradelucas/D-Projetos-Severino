@@ -1,5 +1,7 @@
 const GROK_BASE_URL = 'https://api.x.ai/v1'
-const GROK_MODELS = ['grok-3-mini-fast', 'grok-3-mini', 'grok-2-1212']
+// Modelos atuais da xAI (jun/2026). NOTA: fallback de texto apenas — Grok não transcreve áudio.
+// Requer GROK_API_KEY válida (a chave atual em produção estava inválida em jun/2026).
+const GROK_MODELS = ['grok-3-mini', 'grok-3']
 
 /**
  * Chama a API do Grok (OpenAI-compatible) e retorna o texto bruto da resposta.
