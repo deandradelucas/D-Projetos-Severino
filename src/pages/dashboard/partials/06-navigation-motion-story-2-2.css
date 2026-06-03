@@ -154,12 +154,7 @@
   }
 }
 
-/* --- PWA install prompt: slide-up on appear ---- */
-@media (prefers-reduced-motion: no-preference) {
-  .pwa-install-sheet {
-    animation: hz-slide-up 300ms var(--ease-decelerate, cubic-bezier(0, 0, 0.2, 1)) both;
-  }
-}
+/* PWA install prompt slide-up: ver src/components/PwaInstallPrompt.css */
 
 /* --- Nav active indicator: fade-in on selection ---- */
 @media (prefers-reduced-motion: no-preference) {

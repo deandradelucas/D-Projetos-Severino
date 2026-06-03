@@ -20,6 +20,19 @@ function labelTipo(key) {
   return INVESTIMENTOS_PRESETS_LIST.find((p) => p.key === k)?.label ?? k
 }
 
+const TIPO_COLORS = {
+  LCA: '#10b981', LCI: '#3b82f6', CDB: '#d4a84b', CRI: '#8b5cf6',
+  CRA: '#06b6d4', CDI: '#f59e0b', DEBENTURE: '#ef4444', TESOURO_SELIC: '#22c55e', POUPANCA: '#a3e635',
+}
+
+function calcDiasAteVencimento(ymd) {
+  if (!ymd) return null
+  const target = new Date(`${ymd}T12:00:00`)
+  const hoje = new Date()
+  hoje.setHours(12, 0, 0, 0)
+  return Math.round((target - hoje) / (1000 * 60 * 60 * 24))
+}
+
 export default function InvestimentosResumo({ lista, cdiAa, cdiLoading }) {
   const [projecaoYmd, setProjecaoYmd] = useState('')
   const cdiDisponivel = !cdiLoading && cdiAa != null && Number.isFinite(cdiAa) && cdiAa > 0
@@ -114,12 +127,69 @@ export default function InvestimentosResumo({ lista, cdiAa, cdiLoading }) {
   const hojeYmdInput = ymdLocalFromDate()
   const maxYmdInput = ymdMaxProjecaoLocal()
 
+  // Alertas de vencimento próximo (≤30 dias)
+  const alertasVencimento = useMemo(() => {
+    if (!lista) return []
+    return lista
+      .filter((r) => r.data_vencimento)
+      .map((r) => ({ nome: r.nome || r.instituicao_nome, dias: calcDiasAteVencimento(r.data_vencimento) }))
+      .filter((a) => a.dias !== null && a.dias <= 30)
+      .sort((a, b) => a.dias - b.dias)
+  }, [lista])
+
+  // Diversificação por tipo (% de cada tipo no total investido)
+  const diversificacao = useMemo(() => {
+    if (!lista || lista.length === 0) return []
+    const total = lista.reduce((s, r) => s + (Number(r.valor_investido) || 0), 0)
+    if (total === 0) return []
+    const map = new Map()
+    for (const r of lista) {
+      const v = Number(r.valor_investido) || 0
+      const k = r.tipo_preset || 'Personalizado'
+      map.set(k, (map.get(k) ?? 0) + v)
+    }
+    return Array.from(map.entries())
+      .map(([key, val]) => ({ key, label: labelTipo(key), pct: (val / total) * 100, valor: val }))
+      .sort((a, b) => b.pct - a.pct)
+  }, [lista])
+
+  // Meta da carteira (pega do primeiro item que tiver, ou null)
+  const metaCarteira = useMemo(() => {
+    if (!lista) return null
+    for (const r of lista) {
+      if (r.meta_carteira_valor && Number.isFinite(Number(r.meta_carteira_valor)) && Number(r.meta_carteira_valor) > 0) {
+        return Number(r.meta_carteira_valor)
+      }
+    }
+    return null
+  }, [lista])
+
   if (!lista || lista.length === 0 || !stats) return null
 
   const sufixoData =
     stats.simulacaoAtiva && stats.simulacaoYmd ? ` até ${formatYmdPtBr(stats.simulacaoYmd)}` : ''
 
+  const totalInvestidoAtual = stats.totalInvestido
+
   return (
+    <>
+    {alertasVencimento.length > 0 && (
+      <div className="page-investimentos-alertas" role="alert" aria-live="polite">
+        {alertasVencimento.map((a, i) => (
+          <div key={i} className={`page-investimentos-alerta${a.dias <= 0 ? ' page-investimentos-alerta--vencido' : a.dias <= 7 ? ' page-investimentos-alerta--urgente' : ''}`}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span>
+              <strong>{a.nome}</strong>
+              {a.dias < 0 ? ` — vencido há ${Math.abs(a.dias)} dia${Math.abs(a.dias) !== 1 ? 's' : ''}` :
+               a.dias === 0 ? ' — vence hoje!' :
+               ` — vence em ${a.dias} dia${a.dias !== 1 ? 's' : ''}`}
+            </span>
+          </div>
+        ))}
+      </div>
+    )}
     <article className="ref-panel page-investimentos-resumo" aria-labelledby="inv-resumo-title">
       <div className="ref-panel__head page-investimentos-resumo__head">
         <h2 id="inv-resumo-title" className="ref-panel__title">
@@ -222,6 +292,58 @@ export default function InvestimentosResumo({ lista, cdiAa, cdiLoading }) {
           </div>
         )}
       </div>
+
+      {/* Barra de diversificação */}
+      {diversificacao.length > 1 && (
+        <div className="page-investimentos-resumo__diversificacao">
+          <p className="page-investimentos-resumo__div-title">Diversificação</p>
+          <div className="page-investimentos-resumo__div-bar" aria-label="Barra de diversificação por tipo">
+            {diversificacao.map((d) => (
+              <div
+                key={d.key}
+                className="page-investimentos-resumo__div-bar-segment"
+                style={{ width: `${d.pct.toFixed(2)}%`, background: TIPO_COLORS[d.key] ?? '#d4a84b' }}
+                title={`${d.label}: ${d.pct.toFixed(1)}%`}
+              />
+            ))}
+          </div>
+          <div className="page-investimentos-resumo__div-legend">
+            {diversificacao.map((d) => (
+              <div key={d.key} className="page-investimentos-resumo__div-legend-item">
+                <span className="page-investimentos-resumo__div-dot" style={{ background: TIPO_COLORS[d.key] ?? '#d4a84b' }} />
+                <span className="page-investimentos-resumo__div-label">{d.label}</span>
+                <span className="page-investimentos-resumo__div-pct">{d.pct.toFixed(1)}%</span>
+                {d.pct > 60 && <span className="page-investimentos-resumo__div-warn" title="Concentração alta">⚠</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Barra de meta da carteira */}
+      {metaCarteira && totalInvestidoAtual > 0 && (
+        <div className="page-investimentos-resumo__meta">
+          <div className="page-investimentos-resumo__meta-head">
+            <p className="page-investimentos-resumo__meta-title">Meta da carteira</p>
+            <p className="page-investimentos-resumo__meta-values">
+              <span>{formatCurrencyBRL(totalInvestidoAtual)}</span>
+              <span className="page-investimentos-resumo__meta-sep">/</span>
+              <span>{formatCurrencyBRL(metaCarteira)}</span>
+              <span className="page-investimentos-resumo__meta-pct">
+                ({Math.min((totalInvestidoAtual / metaCarteira) * 100, 100).toFixed(1)}%)
+              </span>
+            </p>
+          </div>
+          <div className="page-investimentos-resumo__meta-bar">
+            <div
+              className="page-investimentos-resumo__meta-fill"
+              style={{ width: `${Math.min((totalInvestidoAtual / metaCarteira) * 100, 100).toFixed(2)}%` }}
+            />
+          </div>
+        </div>
+      )}
+
     </article>
+    </>
   )
 }

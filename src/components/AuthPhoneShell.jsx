@@ -152,7 +152,7 @@ export default function AuthPhoneShell({
 
             {subtitle ? (
               <p
-                className={`mx-auto max-w-[280px] text-center text-[13px] leading-snug text-neutral-500 sm:text-[14px] ${showBodyLogo ? 'mt-3' : 'mt-2'}`}
+                className={`mx-auto max-w-[280px] text-center text-[13px] leading-snug text-neutral-600 sm:text-[14px] ${showBodyLogo ? 'mt-3' : 'mt-2'}`}
               >
                 {subtitle}
               </p>

@@ -1,7 +1,10 @@
 import React, { useId } from 'react'
+import { createPortal } from 'react-dom'
 
 /**
  * Modal com QR Code Pix (Asaas) + copia e cola.
+ * Renderizado via portal no document.body para abrir como overlay centralizado
+ * em qualquer dispositivo (escapa do scroll container da página).
  */
 export default function PagamentoPixQrModal({
   open,
@@ -22,7 +25,7 @@ export default function PagamentoPixQrModal({
       ? `data:image/png;base64,${String(pixData.encoded_image).trim()}`
       : ''
 
-  return (
+  return createPortal(
     <div className="pagamento-pix-modal-overlay" role="presentation" onClick={onClose}>
       <div
         className="pagamento-pix-modal"
@@ -102,6 +105,7 @@ export default function PagamentoPixQrModal({
           </div>
         ) : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

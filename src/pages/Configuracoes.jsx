@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
@@ -17,6 +18,35 @@ import { redirectSe401 } from '../lib/authRedirect'
 import { montarTextoConviteFamiliaComPwa } from '../lib/familiaConviteMensagemCompartilhavel'
 import { getPublicAppOriginForConvites } from '../lib/publicAppOrigin'
 import { formatPhoneBRDisplay, maskPhoneBRMobile, validatePhoneBRMobile } from '../lib/formatPhoneBR'
+import { logoutHorizonte } from '../lib/logout'
+
+const SUPORTE_WA = 'https://wa.me/5554996994482'
+
+/** Lê um arquivo de imagem, recorta no centro (quadrado) e redimensiona p/ 256px JPEG. */
+async function fileToAvatarDataUrl(file) {
+  const dataUrl = await new Promise((resolve, reject) => {
+    const r = new FileReader()
+    r.onload = () => resolve(r.result)
+    r.onerror = reject
+    r.readAsDataURL(file)
+  })
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image()
+    i.onload = () => resolve(i)
+    i.onerror = reject
+    i.src = dataUrl
+  })
+  const size = 256
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  const min = Math.min(img.width, img.height)
+  const sx = (img.width - min) / 2
+  const sy = (img.height - min) / 2
+  ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size)
+  return canvas.toDataURL('image/jpeg', 0.82)
+}
 
 const PAPEL_CONVITE_OPCOES = [
   { value: 'MEMBER', label: 'Membro — pode lançar e editar (exceto pagamento do titular)' },
@@ -54,6 +84,192 @@ export default function Configuracoes() {
   const [telefoneEditando, setTelefoneEditando] = useState(false)
   const [telefoneInput, setTelefoneInput] = useState('')
   const [telefoneSaving, setTelefoneSaving] = useState(false)
+  const [nomeEditando, setNomeEditando] = useState(false)
+  const [nomeInput, setNomeInput] = useState('')
+  const [nomeSaving, setNomeSaving] = useState(false)
+  const fileInputRef = useRef(null)
+  const [avatarSaving, setAvatarSaving] = useState(false)
+  const [prefsSaving, setPrefsSaving] = useState('')
+  const [sessoesTotal, setSessoesTotal] = useState(null)
+  const [sessoesBusy, setSessoesBusy] = useState(false)
+  const [exportBusy, setExportBusy] = useState(false)
+  const [excluirModalOpen, setExcluirModalOpen] = useState(false)
+  const [excluirInput, setExcluirInput] = useState('')
+  const [excluirBusy, setExcluirBusy] = useState(false)
+
+  const PREF_NOTIF = [
+    { key: 'notif_lembretes', label: 'Lembretes de agenda', desc: 'Avisos de compromissos no WhatsApp' },
+    { key: 'notif_alertas', label: 'Alertas financeiros', desc: 'Gasto alto e estouro de orçamento' },
+    { key: 'notif_digest', label: 'Resumo semanal/mensal', desc: 'Digest das suas finanças' },
+    { key: 'notif_novidades', label: 'Novidades e dicas', desc: 'Comunicados do Severino' },
+  ]
+  const prefs = (perfil && typeof perfil.preferencias === 'object' && perfil.preferencias) || {}
+  const prefVal = (k) => prefs[k] !== false // default: ativado
+
+  const salvarPreferencia = useCallback(async (key, value) => {
+    setPrefsSaving(key)
+    setPerfil((p) => ({ ...p, preferencias: { ...(p.preferencias || {}), [key]: value } }))
+    try {
+      const res = await apiFetch(apiUrl('/api/usuarios/perfil/preferencias'), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preferencias: { [key]: value } }),
+      })
+      if (redirectSe401(res)) return
+      if (!res.ok) throw new Error()
+      setToast('Preferência salva.')
+    } catch {
+      setToast('Erro ao salvar preferência.')
+      setPerfil((p) => ({ ...p, preferencias: { ...(p.preferencias || {}), [key]: !value } }))
+    } finally {
+      setPrefsSaving('')
+    }
+  }, [])
+
+  const handleAvatarFile = useCallback(async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (!file.type.startsWith('image/')) { setToast('Selecione um arquivo de imagem.'); return }
+    setAvatarSaving(true)
+    try {
+      const dataUrl = await fileToAvatarDataUrl(file)
+      const res = await apiFetch(apiUrl('/api/usuarios/perfil/avatar'), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar_url: dataUrl }),
+      })
+      if (redirectSe401(res)) return
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) { setToast(data.message || 'Erro ao salvar foto.'); return }
+      const novo = data?.perfil?.avatar_url ?? dataUrl
+      setPerfil((p) => {
+        const upd = { ...p, avatar_url: novo }
+        try { localStorage.setItem('horizonte_user', JSON.stringify(upd)) } catch { /* ignore */ }
+        return upd
+      })
+      window.dispatchEvent(new Event('horizonte-session-refresh'))
+      setToast('Foto atualizada!')
+    } catch {
+      setToast('Não consegui processar a imagem.')
+    } finally {
+      setAvatarSaving(false)
+    }
+  }, [])
+
+  const removerFoto = useCallback(async () => {
+    setAvatarSaving(true)
+    try {
+      const res = await apiFetch(apiUrl('/api/usuarios/perfil/avatar'), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar_url: null }),
+      })
+      if (redirectSe401(res)) return
+      if (!res.ok) { const d = await res.json().catch(() => ({})); setToast(d.message || 'Erro ao remover foto.'); return }
+      setPerfil((p) => {
+        const upd = { ...p, avatar_url: null }
+        try { localStorage.setItem('horizonte_user', JSON.stringify(upd)) } catch { /* ignore */ }
+        return upd
+      })
+      window.dispatchEvent(new Event('horizonte-session-refresh'))
+      setToast('Foto removida.')
+    } catch {
+      setToast('Erro ao remover foto.')
+    } finally {
+      setAvatarSaving(false)
+    }
+  }, [])
+
+  const salvarNome = useCallback(async () => {
+    const nome = nomeInput.trim()
+    if (nome.length < 2) { setToast('Nome muito curto.'); return }
+    setNomeSaving(true)
+    try {
+      const res = await apiFetch(apiUrl('/api/usuarios/perfil/nome'), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (redirectSe401(res)) return
+      if (!res.ok) throw new Error(data.message || 'Erro.')
+      setPerfil((p) => ({ ...p, nome }))
+      const u = { ...JSON.parse(localStorage.getItem('horizonte_user') || '{}'), nome }
+      localStorage.setItem('horizonte_user', JSON.stringify(u))
+      window.dispatchEvent(new Event('horizonte-session-refresh'))
+      setNomeEditando(false)
+      setToast('Nome atualizado.')
+    } catch (e) {
+      setToast(e.message || 'Erro ao atualizar nome.')
+    } finally {
+      setNomeSaving(false)
+    }
+  }, [nomeInput])
+
+  const exportarDados = useCallback(async () => {
+    setExportBusy(true)
+    try {
+      const res = await apiFetch(apiUrl('/api/usuarios/exportar'))
+      if (redirectSe401(res)) return
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'severino-meus-dados.json'
+      a.click()
+      URL.revokeObjectURL(url)
+      setToast('Download iniciado.')
+    } catch {
+      setToast('Erro ao exportar dados.')
+    } finally {
+      setExportBusy(false)
+    }
+  }, [])
+
+  const encerrarSessoes = useCallback(async () => {
+    setSessoesBusy(true)
+    try {
+      const res = await apiFetch(apiUrl('/api/usuarios/sessoes/encerrar'), { method: 'POST' })
+      if (redirectSe401(res)) return
+      if (!res.ok) throw new Error()
+      setSessoesTotal(1)
+      setToast('Outras sessões encerradas.')
+    } catch {
+      setToast('Erro ao encerrar sessões.')
+    } finally {
+      setSessoesBusy(false)
+    }
+  }, [])
+
+  const excluirConta = useCallback(async () => {
+    if (excluirInput.trim().toUpperCase() !== 'EXCLUIR') return
+    setExcluirBusy(true)
+    try {
+      const res = await apiFetch(apiUrl('/api/usuarios/excluir-conta'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmacao: 'EXCLUIR' }),
+      })
+      if (!res.ok && res.status !== 401) throw new Error()
+      logoutHorizonte()
+    } catch {
+      setToast('Erro ao excluir conta.')
+      setExcluirBusy(false)
+    }
+  }, [excluirInput])
+
+  // Carrega contagem de sessões ativas
+  useEffect(() => {
+    let cancel = false
+    apiFetch(apiUrl('/api/usuarios/sessoes'))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancel && d && typeof d.total === 'number') setSessoesTotal(d.total) })
+      .catch(() => {})
+    return () => { cancel = true }
+  }, [])
   const usuarioIdHeader = String(perfil?.id ?? '').trim()
 
   const toastTimerRef = useRef(0)
@@ -252,6 +468,16 @@ export default function Configuracoes() {
     if (x === 'VIEWER') return 'Só leitura'
     return 'Membro'
   }
+  const papelTone = (p) => {
+    const x = String(p || '').toUpperCase()
+    if (x === 'ADMIN') return 'admin'
+    if (x === 'VIEWER') return 'viewer'
+    return 'member'
+  }
+  const inicial = (nome, email) => {
+    const base = String(nome || email || '?').trim()
+    return base.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?'
+  }
 
   /** Alinhado ao servidor: 5 pessoas no total = titular + até 4 (membros + convites pendentes válidos). */
   const FAMILIA_MAX_VINCULADOS_UI = 4
@@ -273,6 +499,37 @@ export default function Configuracoes() {
       titularNome: perfil?.nome,
     })
   }, [ultimoTokenConvite, perfil?.nome, convitePublicOrigin])
+
+  // QR Code do link de convite (gerado localmente, sem serviço externo)
+  const [conviteQr, setConviteQr] = useState('')
+  useEffect(() => {
+    if (!loginConviteHref) { setConviteQr(''); return }
+    let cancel = false
+    import('qrcode')
+      .then((m) => (m.default || m).toDataURL(loginConviteHref, { margin: 1, width: 320, errorCorrectionLevel: 'M' }))
+      .then((url) => { if (!cancel) setConviteQr(url) })
+      .catch(() => { if (!cancel) setConviteQr('') })
+    return () => { cancel = true }
+  }, [loginConviteHref])
+
+  // Compartilhar no WhatsApp (prioritário) — abre o app com a mensagem pronta
+  const compartilharWhatsApp = useCallback(() => {
+    const msg = textoConviteCompletoComPwa || loginConviteHref
+    if (!msg) return
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener')
+  }, [textoConviteCompletoComPwa, loginConviteHref])
+
+  // Compartilhamento nativo (Web Share) quando disponível
+  const compartilharNativo = useCallback(async () => {
+    const text = textoConviteCompletoComPwa || ''
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: 'Convite familiar — Severino', text, url: loginConviteHref || undefined })
+      } catch { /* cancelado */ }
+    } else {
+      compartilharWhatsApp()
+    }
+  }, [textoConviteCompletoComPwa, loginConviteHref, compartilharWhatsApp])
 
   const criarConviteFamilia = async () => {
     if (!usuarioIdHeader || familiaBusy) return
@@ -403,6 +660,27 @@ export default function Configuracoes() {
               <h1 className="dashboard-hub__title">Ajustes</h1>
             </div>
           </div>
+          <nav className="config-section-nav" aria-label="Seções de ajustes">
+            {[
+              { id: 'config-secao-conta', label: 'Conta' },
+              { id: 'config-secao-aparencia', label: 'Aparência' },
+              { id: 'config-secao-familia', label: 'Família' },
+              { id: 'config-secao-seguranca', label: 'Segurança' },
+              { id: 'config-secao-privacidade', label: 'Privacidade' },
+            ].map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                className="config-section-nav__pill"
+                onClick={() => {
+                  const el = document.getElementById(s.id)
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }}
+              >
+                {s.label}
+              </button>
+            ))}
+          </nav>
         </section>
 
         {toast ? (
@@ -412,12 +690,87 @@ export default function Configuracoes() {
         ) : null}
 
         <div className="config-layout config-layout--clean">
-          <section className="config-card config-profile-card">
+          <section className="config-card config-profile-card" id="config-secao-conta">
             <div className="config-profile-main">
+              <div className="config-profile-avatar-wrap">
+                <button
+                  type="button"
+                  className="config-profile-avatar config-profile-avatar--btn"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={avatarSaving}
+                  aria-label="Alterar foto de perfil"
+                  title="Alterar foto de perfil"
+                >
+                  {perfil.avatar_url ? (
+                    <img src={perfil.avatar_url} alt="" className="config-profile-avatar__img" />
+                  ) : (
+                    <span className="config-profile-avatar__initials">
+                      {String(perfil.nome || 'U').trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase()}
+                    </span>
+                  )}
+                  <span className="config-profile-avatar__cam" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  </span>
+                </button>
+                {perfil.avatar_url && (
+                  <button type="button" className="config-profile-avatar__remove" onClick={removerFoto} disabled={avatarSaving}>
+                    Remover
+                  </button>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handleAvatarFile} />
+              </div>
               <div className="config-profile-copy">
                 <span className="config-card-kicker">Conta</span>
-                <h2 className="config-profile-name">{perfil.nome || 'Usuário'}</h2>
+                {nomeEditando ? (
+                  <div className="config-nome-edit">
+                    <input
+                      className="config-input"
+                      value={nomeInput}
+                      onChange={(e) => setNomeInput(e.target.value)}
+                      maxLength={80}
+                      placeholder="Seu nome"
+                      disabled={nomeSaving}
+                      autoFocus
+                    />
+                    <button type="button" className="config-action-btn config-action-btn--primary" onClick={() => void salvarNome()} disabled={nomeSaving}>
+                      {nomeSaving ? '…' : 'Salvar'}
+                    </button>
+                    <button type="button" className="config-action-btn" onClick={() => setNomeEditando(false)} disabled={nomeSaving}>
+                      Cancelar
+                    </button>
+                  </div>
+                ) : (
+                  <h2 className="config-profile-name">
+                    {perfil.nome || 'Usuário'}
+                    <button
+                      type="button"
+                      className="config-nome-edit-btn"
+                      onClick={() => { setNomeInput(perfil.nome || ''); setNomeEditando(true) }}
+                      aria-label="Editar nome"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    </button>
+                  </h2>
+                )}
                 <p className="config-profile-email">{perfil.email || 'E-mail não informado'}</p>
+                <div className="config-verif-chips">
+                  <span className={`config-verif-chip${perfil.email_verificado ? ' config-verif-chip--ok' : ''}`}>
+                    {perfil.email_verificado ? (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5"/></svg>
+                    ) : (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+                    )}
+                    E-mail {perfil.email_verificado ? 'verificado' : 'não verificado'}
+                  </span>
+                  <span className={`config-verif-chip${perfil.telefone_verificado ? ' config-verif-chip--ok' : ''}`}>
+                    {perfil.telefone_verificado ? (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5"/></svg>
+                    ) : (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+                    )}
+                    Telefone {perfil.telefone_verificado ? 'verificado' : 'não verificado'}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -501,21 +854,47 @@ export default function Configuracoes() {
           </section>
 
           <ConfigAparenciaCard
+            id="config-secao-aparencia"
             theme={theme}
             setTheme={setTheme}
             privacyMode={privacyMode}
             togglePrivacy={togglePrivacy}
           />
 
-          <div className="config-familia-group config-layout__full-span">
+          {/* Central de notificações */}
+          <section className="config-card config-card--full" id="config-secao-notificacoes">
+            <div className="config-card-head">
+              <span className="config-card-kicker">Notificações</span>
+              <h2 className="config-card-title-clean">O que você recebe no WhatsApp</h2>
+              <p className="config-card-subtitle">Escolha quais mensagens o Severino envia para você.</p>
+            </div>
+            <div className="config-preference-list">
+              {PREF_NOTIF.map((p) => (
+                <label key={p.key} className="config-pref-row config-pref-row--clean">
+                  <span className="config-pref-label">
+                    {p.label}
+                    <small className="config-pref-desc">{p.desc}</small>
+                  </span>
+                  <input
+                    type="checkbox"
+                    className="switch-apple"
+                    checked={prefVal(p.key)}
+                    disabled={prefsSaving === p.key}
+                    onChange={(e) => void salvarPreferencia(p.key, e.target.checked)}
+                  />
+                </label>
+              ))}
+            </div>
+          </section>
+
+          <div className="config-familia-group config-layout__full-span" id="config-secao-familia">
             {Boolean(usuarioIdHeader) && !perfil.conta_familiar_membro && familiaTitular !== true ? (
               <section className="config-card config-card--full" id="config-secao-convite-familia">
                 <div className="config-card-head">
                   <span className="config-card-kicker">Família</span>
                   <h2 className="config-card-title-clean">Código de convite familiar</h2>
                   <p className="config-card-subtitle config-familia-intro">
-                    Cole o <strong>link</strong> ou o <strong>código</strong> que o titular enviou. Quando aparecer convite válido, toque em{' '}
-                    <strong>Vincular à esta conta</strong>.
+                    Cole o link ou código que o titular enviou.
                   </p>
                 </div>
                 <FamiliaConviteColarBlock
@@ -538,17 +917,15 @@ export default function Configuracoes() {
                 <span className="config-card-kicker">Família</span>
                 <h2 className="config-card-title-clean">Conta familiar</h2>
                 <p className="config-card-subtitle config-familia-intro">
-                  Convide por link ou código. Cada familiar com login próprio; só o <strong>titular</strong> gere convites e membros aqui.{' '}
-                  <strong>Até 5</strong> (titular + 4) — pendentes contam na vaga até aceitar ou expirar.
+                  Convide até <strong>4 familiares</strong> (5 com você). Cada um entra com login próprio.
                 </p>
               </div>
 
               {!perfil.conta_familiar_membro ? (
                 <div className="config-subsection config-familia-convite-interno" id="config-secao-convite-familia">
-                  <h3 className="config-subsection__title">Código de convite familiar</h3>
+                  <h3 className="config-subsection__title">Entrar em outra família</h3>
                   <p className="config-card-subtitle config-familia-intro">
-                    Recebeu convite de outra família? Cole o <strong>link</strong> ou o <strong>código</strong> e confirme em{' '}
-                    <strong>Vincular à esta conta</strong>.
+                    Recebeu um convite? Cole o link ou código aqui.
                   </p>
                   <FamiliaConviteColarBlock
                     idPrefix="config-familia-convite-titular"
@@ -597,52 +974,45 @@ export default function Configuracoes() {
 
               {familiaLimiteConvitesAtingido ? (
                 <p className="config-empty-note config-familia-limite-note">
-                  Limite de <strong>5 pessoas</strong> atingido ({familiaVagasOcupadas} vaga(s) em uso entre membros e convites pendentes). Remova um convite
-                  pendente ou um membro para poder gerar outro convite.
+                  Limite de <strong>5 pessoas</strong> atingido. Remova um membro ou convite para gerar outro.
                 </p>
               ) : null}
 
               {ultimoTokenConvite ? (
                 <div className="config-invite-panel">
-                  <p className="config-card-subtitle config-invite-panel__lead">
-                    <strong>Guarde agora:</strong> o código só aparece uma vez. Quem receber pode usar o link, colar o código no cadastro ou, já com conta, em{' '}
-                    <strong>Ajustes → Código de convite familiar</strong>. Envie a mensagem abaixo por WhatsApp ou e-mail — inclui o link, o código e como instalar o app na tela inicial.
-                  </p>
-                  <div className="config-invite-token" aria-label="Código do convite">
-                    {ultimoTokenConvite}
-                  </div>
-                  <div className="config-invite-actions">
-                    <button type="button" className="config-action-btn" onClick={() => copiarConviteFamilia(ultimoTokenConvite)}>
-                      Copiar código
-                    </button>
-                    {loginConviteHref ? (
-                      <button type="button" className="config-action-btn" onClick={() => copiarConviteFamilia(loginConviteHref)}>
-                        Copiar link
-                      </button>
+                  <div className="config-invite-grid">
+                    {/* QR Code do link */}
+                    {conviteQr ? (
+                      <div className="config-invite-qr" aria-label="QR Code do convite">
+                        <img src={conviteQr} alt="QR Code para entrar na família" width={140} height={140} />
+                        <span className="config-invite-qr__hint">Aponte a câmera</span>
+                      </div>
                     ) : null}
-                    {textoConviteCompletoComPwa ? (
-                      <button
-                        type="button"
-                        className="config-action-btn"
-                        onClick={() => copiarConviteFamilia(textoConviteCompletoComPwa)}
-                      >
-                        Copiar mensagem completa
+
+                    <div className="config-invite-share">
+                      {/* WhatsApp — ação principal */}
+                      <button type="button" className="config-share-wa" onClick={compartilharWhatsApp}>
+                        <svg viewBox="0 0 32 32" width="20" height="20" fill="currentColor" aria-hidden style={{ flexShrink: 0 }}>
+                          <path d="M16.003 2.667C8.637 2.667 2.667 8.637 2.667 16c0 2.363.637 4.573 1.748 6.484L2.667 29.333l7.06-1.727A13.27 13.27 0 0 0 16.003 29.333C23.363 29.333 29.333 23.363 29.333 16S23.363 2.667 16.003 2.667Zm0 2.4c6.044 0 10.93 4.887 10.93 10.933 0 6.044-4.886 10.933-10.93 10.933a10.9 10.9 0 0 1-5.564-1.524l-.397-.24-4.19 1.025 1.063-3.99-.267-.413A10.9 10.9 0 0 1 5.073 16c0-6.046 4.886-10.933 10.93-10.933Zm-3.56 5.6c-.22 0-.577.083-.88.41-.303.328-1.156 1.13-1.156 2.754s1.183 3.196 1.348 3.418c.165.222 2.31 3.664 5.673 4.993 2.802 1.105 3.37.885 3.977.83.606-.055 1.954-.8 2.23-1.573.276-.772.276-1.434.193-1.572-.083-.138-.303-.22-.634-.386-.33-.165-1.954-.964-2.257-1.074-.303-.11-.524-.165-.744.165-.22.33-.855 1.074-1.047 1.295-.193.22-.386.248-.716.083-.33-.165-1.393-.514-2.654-1.637-.98-.875-1.642-1.956-1.835-2.287-.193-.33-.02-.51.145-.674.148-.148.33-.386.496-.578.165-.193.22-.33.33-.55.11-.22.055-.413-.028-.578-.083-.165-.73-1.8-1.018-2.463-.258-.613-.528-.556-.744-.566-.193-.01-.413-.01-.634-.01Z"/>
+                        </svg>
+                        Enviar pelo WhatsApp
                       </button>
-                    ) : null}
-                  </div>
-                  {textoConviteCompletoComPwa ? (
-                    <div className="config-invite-preview-field">
-                      <span id="config-familia-convite-mensagem-pwa-label">Pré-visualização da mensagem</span>
-                      <textarea
-                        id="config-familia-convite-mensagem-pwa"
-                        readOnly
-                        rows={14}
-                        value={textoConviteCompletoComPwa}
-                        className="config-invite-message-preview"
-                        aria-labelledby="config-familia-convite-mensagem-pwa-label"
-                      />
+
+                      <div className="config-invite-secondary">
+                        {typeof navigator !== 'undefined' && navigator.share ? (
+                          <button type="button" className="config-action-btn" onClick={() => void compartilharNativo()}>Compartilhar…</button>
+                        ) : null}
+                        {loginConviteHref ? (
+                          <button type="button" className="config-action-btn" onClick={() => copiarConviteFamilia(loginConviteHref)}>Copiar link</button>
+                        ) : null}
+                        <button type="button" className="config-action-btn" onClick={() => copiarConviteFamilia(ultimoTokenConvite)}>Copiar código</button>
+                      </div>
+
+                      <p className="config-invite-code-line">
+                        Código: <code>{ultimoTokenConvite}</code> · <span className="config-invite-code-warn">só aparece uma vez</span>
+                      </p>
                     </div>
-                  ) : null}
+                  </div>
                   <p
                     className={`config-invite-copiado${conviteCopiadoVisivel ? ' config-invite-copiado--visible' : ''}`}
                     role="status"
@@ -696,15 +1066,20 @@ export default function Configuracoes() {
               {familiaMembros.length === 0 ? (
                 <p className="config-empty-note">Nenhum familiar vinculado ainda.</p>
               ) : (
-                <ul className="config-bio-list">
+                <ul className="config-bio-list config-familia-membros">
                   {familiaMembros.map((mem) => (
-                    <li key={mem.id} className="config-bio-item">
-                      <span>
-                        <strong>{mem.nome || mem.email || mem.id}</strong>
-                        <small>
-                          {mem.email ? `${mem.email} · ` : ''}
-                          {papelFamiliaLabel(mem.familia_papel)}
-                        </small>
+                    <li key={mem.id} className="config-bio-item config-familia-membro">
+                      <span className="config-familia-membro__id">
+                        <span className="config-familia-membro__avatar" aria-hidden>{inicial(mem.nome, mem.email)}</span>
+                        <span className="config-familia-membro__txt">
+                          <strong>
+                            {mem.nome || mem.email || mem.id}
+                            <span className={`config-papel-chip config-papel-chip--${papelTone(mem.familia_papel)}`}>
+                              {papelFamiliaLabel(mem.familia_papel)}
+                            </span>
+                          </strong>
+                          {mem.email ? <small>{mem.email}</small> : null}
+                        </span>
                       </span>
                       <div className="config-bio-item__actions">
                         {alterarPapelMembro?.usuarioId === mem.id ? (
@@ -765,6 +1140,7 @@ export default function Configuracoes() {
           </div>
 
           <ConfigBiometriaCard
+            id="config-secao-seguranca"
             usuarioIdHeader={usuarioIdHeader}
             webauthnList={webauthnList}
             webauthnLoading={webauthnLoading}
@@ -774,6 +1150,57 @@ export default function Configuracoes() {
             setConfirmBiometricRemoval={setConfirmBiometricRemoval}
             loadWebAuthn={loadWebAuthn}
           />
+
+          {/* Senha + sessões */}
+          <section className="config-card config-card--full">
+            <div className="config-card-head">
+              <span className="config-card-kicker">Segurança</span>
+              <h2 className="config-card-title-clean">Senha e sessões</h2>
+              <p className="config-card-subtitle">
+                Sessões ativas: <strong>{sessoesTotal == null ? '…' : sessoesTotal}</strong>{' '}
+                {sessoesTotal != null && sessoesTotal > 1 ? '(este e outros dispositivos)' : '(este dispositivo)'}
+              </p>
+            </div>
+            <div className="config-quick-actions">
+              <a
+                href={`${SUPORTE_WA}?text=${encodeURIComponent('Olá, quero trocar a senha da minha conta Severino.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="config-action-btn"
+              >
+                Trocar minha senha
+              </a>
+              <button
+                type="button"
+                className="config-action-btn"
+                onClick={() => void encerrarSessoes()}
+                disabled={sessoesBusy || (sessoesTotal != null && sessoesTotal <= 1)}
+              >
+                {sessoesBusy ? 'Encerrando…' : 'Sair de outros dispositivos'}
+              </button>
+            </div>
+          </section>
+
+          {/* Privacidade e dados (LGPD) */}
+          <section className="config-card config-card--full" id="config-secao-privacidade">
+            <div className="config-card-head">
+              <span className="config-card-kicker">Privacidade</span>
+              <h2 className="config-card-title-clean">Seus dados e privacidade</h2>
+              <p className="config-card-subtitle">Você tem controle sobre seus dados. Exporte ou exclua quando quiser.</p>
+            </div>
+            <div className="config-quick-actions">
+              <button type="button" className="config-action-btn" onClick={() => void exportarDados()} disabled={exportBusy}>
+                {exportBusy ? 'Gerando…' : 'Exportar meus dados'}
+              </button>
+              <button
+                type="button"
+                className="config-action-btn config-action-btn--danger"
+                onClick={() => { setExcluirInput(''); setExcluirModalOpen(true) }}
+              >
+                Excluir minha conta
+              </button>
+            </div>
+          </section>
 
           <section className="config-card config-card--full">
             <div className="config-card-head">
@@ -815,12 +1242,61 @@ export default function Configuracoes() {
               </div>
             </section>
           )}
+
+          <div className="config-layout__full-span config-logout-zone">
+            <button type="button" className="config-logout-btn" onClick={logoutHorizonte}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+              Sair da conta
+            </button>
+          </div>
         </div>
 
         </RefDashboardScroll>
         </div>
       </main>
       </div>
+
+      {excluirModalOpen && createPortal(
+        <div className="config-excluir-overlay" role="dialog" aria-modal="true" aria-labelledby="excluir-title" onMouseDown={(e) => { if (e.target === e.currentTarget && !excluirBusy) setExcluirModalOpen(false) }}>
+          <div className="config-excluir-modal">
+            <span className="config-excluir-icon" aria-hidden>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </span>
+            <h2 id="excluir-title" className="config-excluir-title">Excluir sua conta?</h2>
+            <p className="config-excluir-body">
+              Sua conta será desativada e o acesso encerrado em todos os dispositivos. Esta ação é <strong>irreversível</strong> —
+              para recuperar, você precisará falar com o suporte dentro do prazo legal.
+            </p>
+            <label className="config-excluir-label" htmlFor="excluir-confirm">
+              Digite <strong>EXCLUIR</strong> para confirmar
+            </label>
+            <input
+              id="excluir-confirm"
+              className="config-input config-excluir-input"
+              value={excluirInput}
+              onChange={(e) => setExcluirInput(e.target.value)}
+              placeholder="EXCLUIR"
+              autoComplete="off"
+              disabled={excluirBusy}
+            />
+            <div className="config-excluir-actions">
+              <button type="button" className="config-action-btn config-action-btn--primary" onClick={() => setExcluirModalOpen(false)} disabled={excluirBusy}>
+                Manter minha conta
+              </button>
+              <button
+                type="button"
+                className="config-action-btn config-action-btn--danger-solid"
+                onClick={() => void excluirConta()}
+                disabled={excluirBusy || excluirInput.trim().toUpperCase() !== 'EXCLUIR'}
+              >
+                {excluirBusy ? 'Excluindo…' : 'Excluir definitivamente'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
+
       <ConfirmDialog
         open={Boolean(confirmBiometricRemoval)}
         title="Remover biometria?"

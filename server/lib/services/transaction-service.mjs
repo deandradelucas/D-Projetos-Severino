@@ -73,6 +73,7 @@ export const TransactionService = {
     const descricaoBase = String(payload.descricao || '').trim()
     const categoriaId = payload.categoria_id || null
     const subcategoriaId = payload.subcategoria_id || null
+    const cartaoId = payload.cartao_id || null
     const status = String(payload.status || 'EFETIVADA').trim().toUpperCase()
 
     const agora = new Date()
@@ -114,6 +115,7 @@ export const TransactionService = {
         recorrente_index: i,
         recorrente_total: n,
       }
+      if (cartaoId) row.cartao_id = cartaoId
       if (lp) row.lancado_por_usuario_id = lp
       rows.push(row)
     }

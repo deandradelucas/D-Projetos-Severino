@@ -200,6 +200,7 @@ export async function inserirTransacao({
   conta_id,
   categoria_id,
   subcategoria_id,
+  cartao_id,
   tipo,
   valor,
   descricao,
@@ -227,6 +228,7 @@ export async function inserirTransacao({
   if (conta_id) basePayload.conta_id = conta_id
   if (categoria_id) basePayload.categoria_id = categoria_id
   if (subcategoria_id) basePayload.subcategoria_id = subcategoria_id
+  if (cartao_id) basePayload.cartao_id = cartao_id
   const lp = lancado_por_usuario_id ? String(lancado_por_usuario_id).trim() : ''
   if (lp) basePayload.lancado_por_usuario_id = lp
   const oh = origem_hash ? String(origem_hash).trim() : ''
@@ -406,6 +408,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
 
   const selectComEmbed = `
       id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id,
+      cartao_id,
       recorrente_grupo_id, recorrente_index, recorrente_total, recorrencia_mensal_id,
       lancado_por_usuario_id,
       categorias(nome, cor),
@@ -449,7 +452,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
   if (error) {
     log.warn('[getTransacoes] embed falhou, fallback sem join:', error.message || error)
     const baseCols =
-      'id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id, recorrente_grupo_id, recorrente_index, recorrente_total, lancado_por_usuario_id'
+      'id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id, cartao_id, recorrente_grupo_id, recorrente_index, recorrente_total, lancado_por_usuario_id'
 
     let qFlat = applyFilters(
       supabaseAdmin.from('transacoes').select(`${baseCols}, recorrencia_mensal_id`)
@@ -505,6 +508,8 @@ export async function atualizarTransacao(id, usuarioId, body) {
     categoria_id: body.categoria_id || null,
     subcategoria_id: body.subcategoria_id || null,
   }
+  // Só altera o cartão se o campo veio no body (evita desvincular sem querer).
+  if ('cartao_id' in body) update.cartao_id = body.cartao_id || null
 
   // Permite alterar o índice da parcela (ex.: 1/10 → 2/10)
   const ri = body.recorrente_index != null ? parseInt(body.recorrente_index, 10) : null

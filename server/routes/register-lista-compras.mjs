@@ -11,6 +11,7 @@ import {
   toggleChecked,
   removerItem,
   listarHistoricoNomes,
+  listarHistoricoPrecos,
   listarListasArquivadas,
 } from '../lib/lista-compras.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
@@ -57,6 +58,21 @@ export function registerListaComprasRoutes(app) {
     } catch (error) {
       log.error('historico nomes lista compras', error)
       return c.json({ message: error.message || 'Erro ao buscar histórico.' }, 500)
+    }
+  })
+
+  // GET /api/lista-compras/historico-precos — mapa nome→último preço (antes das rotas /:id)
+  app.get('/api/lista-compras/historico-precos', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+
+      const mapa = await listarHistoricoPrecos(resolveListaDataId(parsed, c))
+      return c.json(mapa)
+    } catch (error) {
+      log.error('historico precos lista compras', error)
+      return c.json({ message: error.message || 'Erro ao buscar histórico de preços.' }, 500)
     }
   })
 
@@ -279,7 +295,7 @@ export function registerListaComprasRoutes(app) {
         return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
       }
 
-      const data = await toggleChecked(itemId, id, resolveListaDataId(parsed, c))
+      const data = await toggleChecked(itemId, id, resolveListaDataId(parsed, c), parsed.actorId)
       return c.json(data)
     } catch (error) {
       log.error('toggle item lista compras', error)

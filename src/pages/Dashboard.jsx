@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
+import DashboardInsightsStrip from '../components/DashboardInsightsStrip'
+import OnboardingChecklist from '../components/OnboardingChecklist'
 import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
@@ -15,6 +17,8 @@ import {
 } from '../lib/horizonteSession'
 import { primeiroNomeExibicao } from '../lib/primeiroNomeExibicao'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
+import { apiUrl } from '../lib/apiUrl'
+import { apiFetch } from '../lib/apiFetch'
 import { formatTransacaoListDateTime } from '../lib/transacaoDateDisplay'
 import { getSaudacao } from '../lib/getSaudacao'
 import { getWhatsappContactUrl } from '../lib/whatsappContactUrl.js'
@@ -34,6 +38,7 @@ export default function Dashboard() {
   const [usuario, setUsuario] = useState(() => readHorizonteUserPainelState())
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [proximoCompromisso, setProximoCompromisso] = useState(null)
   const [showTutorial, setShowTutorial] = useState(() => !tutorialDashboardFoiVisto())
 
   // Consome a store de cache compartilhada — sem fetch local duplicado
@@ -61,6 +66,29 @@ export default function Dashboard() {
     const u = readHorizonteUser()
     if (u?.id) queueMicrotask(() => void fetchTransacoes())
   }, [fetchTransacoes, usuario.id])
+
+  // Próximo compromisso da agenda (próximos 60 dias)
+  useEffect(() => {
+    if (!usuario?.id) return undefined
+    let cancelled = false
+    ;(async () => {
+      try {
+        const from = new Date()
+        const to = new Date(from)
+        to.setDate(to.getDate() + 60)
+        const params = new URLSearchParams({ from: from.toISOString(), to: to.toISOString() })
+        const res = await apiFetch(apiUrl(`/api/agenda?${params.toString()}`), { cache: 'no-store' })
+        if (cancelled || !res.ok) return
+        const data = await res.json().catch(() => [])
+        const agora = Date.now() - 3600000 // tolerância de 1h (compromisso em andamento)
+        const prox = (Array.isArray(data) ? data : [])
+          .filter((e) => e?.inicio && new Date(e.inicio).getTime() >= agora)
+          .sort((a, b) => new Date(a.inicio) - new Date(b.inicio))[0] || null
+        if (!cancelled) setProximoCompromisso(prox)
+      } catch { /* silencioso — feature opcional */ }
+    })()
+    return () => { cancelled = true }
+  }, [usuario?.id])
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -112,13 +140,52 @@ export default function Dashboard() {
 
   const txRecentes = useMemo(() => transacoes.slice(0, 8), [transacoes])
 
+  // Despesas por categoria (top 5) para o mini-gráfico de barras
+  const despesasPorCategoria = useMemo(() => {
+    const map = {}
+    for (const t of transacoes) {
+      if (t.tipo !== 'DESPESA') continue
+      const nome = (t.categorias?.nome && String(t.categorias.nome).trim()) || 'Sem categoria'
+      map[nome] = (map[nome] || 0) + Math.abs(parseFloat(t.valor) || 0)
+    }
+    const rows = Object.entries(map).map(([nome, valor]) => ({ nome, valor })).sort((a, b) => b.valor - a.valor)
+    const max = rows[0]?.valor || 1
+    return rows.slice(0, 5).map((r) => ({ ...r, pct: Math.max(4, Math.round((r.valor / max) * 100)) }))
+  }, [transacoes])
+
   const nomeExibicao = useMemo(() => primeiroNomeExibicao(usuario), [usuario])
+  const iniciaisAvatar = useMemo(
+    () => String(usuario?.nome || nomeExibicao || 'U').trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase(),
+    [usuario, nomeExibicao],
+  )
 
   const mostrarQuemLancou = useMemo(() => familiaMostrarQuemLancouNaUi(usuario), [usuario])
 
   const whatsappContactUrl = useMemo(() => getWhatsappContactUrl(), [])
 
   const formatCurrency = formatCurrencyBRL
+
+  const fmtCompromisso = (iso) => {
+    const d = new Date(iso)
+    if (Number.isNaN(d.getTime())) return ''
+    const data = d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })
+    const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    return `${data} · ${hora}`
+  }
+
+  const dataHojeFormatada = useMemo(() => {
+    const fmt = new Intl.DateTimeFormat('pt-BR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'short',
+    })
+    const partes = fmt.formatToParts(new Date())
+    const weekday = partes.find((p) => p.type === 'weekday')?.value || ''
+    const day = partes.find((p) => p.type === 'day')?.value || ''
+    const month = partes.find((p) => p.type === 'month')?.value?.replace('.', '') || ''
+    const weekdayCap = weekday.charAt(0).toUpperCase() + weekday.slice(1)
+    return `${weekdayCap}, ${day} ${month}`
+  }, [])
 
   const saldoValorClass =
     saldoTotal > 0
@@ -145,6 +212,9 @@ export default function Dashboard() {
                   <h1 className="dashboard-hub__title">
                     {getSaudacao()}, <span className={privacyMode ? 'privacy-blur' : ''}>{nomeExibicao}</span>
                   </h1>
+                  <time className="dashboard-hub__date" dateTime={new Date().toISOString().slice(0, 10)}>
+                    {dataHojeFormatada}
+                  </time>
                 </div>
                 <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos do painel">
                   <button type="button" data-tutorial-id="nova-transacao-btn" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={() => setIsModalOpen(true)}>
@@ -190,17 +260,38 @@ export default function Dashboard() {
                       </svg>
                     )}
                   </button>
+                  <button
+                    type="button"
+                    className="dashboard-hub__avatar"
+                    onClick={() => navigate('/configuracoes')}
+                    aria-label="Sua conta"
+                    title="Sua conta"
+                  >
+                    {usuario?.avatar_url ? (
+                      <img src={usuario.avatar_url} alt="" className="dashboard-hub__avatar-img" />
+                    ) : (
+                      <span className="dashboard-hub__avatar-initials">{iniciaisAvatar}</span>
+                    )}
+                  </button>
                 </div>
               </div>
-              <div className="dashboard-hub__balance-line" aria-label="Saldo disponível no painel">
-                <span className="dashboard-hub__balance-line-label">Saldo disponível:</span>
+              <div className="dashboard-hub__balance-line dashboard-hub__balance-line--hero" aria-label="Saldo disponível no painel">
+                <span className="dashboard-hub__balance-line-label">Saldo disponível</span>
                 <strong className={[privacyMode ? 'privacy-blur' : '', saldoValorClass].filter(Boolean).join(' ')}>
                   {formatCurrency(saldoTotal)}
                 </strong>
+                <span className="dashboard-hub__balance-delta dashboard-hub__balance-delta--placeholder" aria-hidden>
+                  <span className="dashboard-hub__balance-delta-shimmer" />
+                </span>
               </div>
             </div>
           </div>
         </section>
+
+        <OnboardingChecklist
+          onRegistrarGasto={() => setIsModalOpen(true)}
+          refreshSignal={transacoes.length}
+        />
 
         {isMobile && <PwaInstallBanner />}
 
@@ -230,6 +321,12 @@ export default function Dashboard() {
                 <div className="ref-kpi-card__body">
                   <p className="ref-kpi-card__label">Saída</p>
                   <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(totalDespesas)}</p>
+                  <span className="ref-kpi-card__delta ref-kpi-card__delta--placeholder" aria-hidden>
+                    <span className="ref-kpi-card__delta-shimmer" />
+                  </span>
+                </div>
+                <div className="ref-kpi-card__spark ref-kpi-card__spark--placeholder" aria-hidden>
+                  <span /><span /><span /><span /><span /><span /><span />
                 </div>
               </article>
               <article className="ref-kpi-card ref-kpi-card--income">
@@ -246,6 +343,12 @@ export default function Dashboard() {
                 <div className="ref-kpi-card__body">
                   <p className="ref-kpi-card__label">Entrada</p>
                   <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(totalReceitas)}</p>
+                  <span className="ref-kpi-card__delta ref-kpi-card__delta--placeholder" aria-hidden>
+                    <span className="ref-kpi-card__delta-shimmer" />
+                  </span>
+                </div>
+                <div className="ref-kpi-card__spark ref-kpi-card__spark--placeholder" aria-hidden>
+                  <span /><span /><span /><span /><span /><span /><span />
                 </div>
               </article>
             </>
@@ -259,6 +362,62 @@ export default function Dashboard() {
               Tentar novamente
             </button>
           </div>
+        )}
+
+        <DashboardInsightsStrip />
+
+        {!loading && (
+          <section className="dashboard-hub__insights" aria-label="Próximo compromisso e despesas">
+            <article className="ref-panel dashboard-hub__insight-card">
+              <div className="ref-panel__head">
+                <h2 className="ref-panel__title">Próximo compromisso</h2>
+                <Link to="/agenda" className="ref-panel__link">
+                  <span>Agenda</span>
+                  <svg className="ref-panel__link-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m9 18 6-6-6-6" /></svg>
+                </Link>
+              </div>
+              {proximoCompromisso ? (
+                <Link to="/agenda" className="dashboard-hub__next">
+                  <span className="dashboard-hub__next-icon" aria-hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+                  </span>
+                  <span className="dashboard-hub__next-info">
+                    <span className="dashboard-hub__next-title">{proximoCompromisso.titulo}</span>
+                    <span className="dashboard-hub__next-when">
+                      {fmtCompromisso(proximoCompromisso.inicio)}{proximoCompromisso.local ? ` · ${proximoCompromisso.local}` : ''}
+                    </span>
+                  </span>
+                </Link>
+              ) : (
+                <p className="dashboard-hub__insight-empty">Nenhum compromisso à vista. 🎉</p>
+              )}
+            </article>
+
+            <article className="ref-panel dashboard-hub__insight-card">
+              <div className="ref-panel__head">
+                <h2 className="ref-panel__title">Despesas por categoria</h2>
+                <Link to="/relatorios" className="ref-panel__link">
+                  <span>Relatórios</span>
+                  <svg className="ref-panel__link-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m9 18 6-6-6-6" /></svg>
+                </Link>
+              </div>
+              {despesasPorCategoria.length > 0 ? (
+                <ul className="dashboard-hub__bars">
+                  {despesasPorCategoria.map((d) => (
+                    <li key={d.nome} className="dashboard-hub__bar-row">
+                      <span className="dashboard-hub__bar-label" title={d.nome}>{d.nome}</span>
+                      <span className="dashboard-hub__bar-track" aria-hidden>
+                        <span className="dashboard-hub__bar-fill" style={{ width: `${d.pct}%` }} />
+                      </span>
+                      <span className={`dashboard-hub__bar-val ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(d.valor)}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="dashboard-hub__insight-empty">Sem despesas no período.</p>
+              )}
+            </article>
+          </section>
         )}
 
         <section

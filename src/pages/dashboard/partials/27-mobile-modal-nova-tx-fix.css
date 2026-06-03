@@ -1,0 +1,716 @@
+/* =============================================================================
+   27 — MOBILE · Modal Nova/Editar Transação (≤ 768px)
+   =============================================================================
+   O partial 16 (estética premium do modal) é DESKTOP-ONLY (@media min-width:769).
+   No mobile o sheet (partial 24) dava só a casca → o interior ficava chapado,
+   o título sumia (sr-only) deixando o × solto, e o checkbox de "Compra parcelada"
+   aparecia como um círculo branco gigante (não escondido).
+
+   Aqui portamos toda a linguagem visual para o mobile com tokens --m-* e
+   corrigimos: header com título visível, switch real escondido + track/thumb,
+   e rodapé (Cancelar/Salvar) sticky com safe-area. Carrega após o 24 → vence.
+   ============================================================================= */
+
+@keyframes ntxSpinM { to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+
+  /* ───────────────────────── Sheet (o 02c já o faz flex-col + scroll) ───────────────────────── */
+  .modal-content.modal-content--nova-tx {
+    padding-top: 14px !important;
+    padding-bottom: calc(2px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow-x: hidden !important;            /* mata o deslize lateral */
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;  /* sem rubber-band / puxar */
+  }
+  /* Grabber acima do header, sem encostar no título (sticky herdado do partial 24) */
+  .modal-content--nova-tx::before {
+    margin: 0 auto 12px !important;
+  }
+
+  /* ───────────────────────── Header: título + × ───────────────────────── */
+  .modal-content--nova-tx .modal-header.modal-header--minimal {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin: 0 0 4px !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+  }
+  /* Revela o título (sr-only) só DESTE modal */
+  .modal-content--nova-tx .modal-header--minimal h3.sr-only,
+  .modal-content--nova-tx .modal-header--minimal .sr-only {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    clip: auto !important;
+    clip-path: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--m-text-hi) !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .modal-header--minimal .close-btn,
+  body[data-theme='light'] .modal-content--nova-tx .modal-header--minimal .close-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    flex-shrink: 0 !important;
+    border-radius: 50% !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-size: 1.3rem !important;
+    line-height: 0 !important;
+    padding: 2px 0 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+
+  /* ───────────────────────── Corpo (o 02c já define flex/scroll; aqui só padding) ───────────────────────── */
+  .modal-content--nova-tx .modal-body.modal-body--nova-tx {
+    padding: 2px 0 6px !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ───────────────────────── Seções ───────────────────────── */
+  .modal-content--nova-tx .nova-tx-section {
+    margin-bottom: 14px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .modal-content--nova-tx .nova-tx-section + .nova-tx-section { margin-top: 0 !important; }
+  .modal-content--nova-tx .nova-tx-section__title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 0 10px !important;
+    padding: 0 !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.16em !important;
+    color: var(--m-text-lo) !important;
+  }
+  .modal-content--nova-tx .nova-tx-section__title::after {
+    content: '' !important;
+    flex: 1 !important;
+    height: 1px !important;
+    background: linear-gradient(90deg, var(--m-edge-hi), transparent) !important;
+  }
+
+  /* ───────────────────────── Labels ───────────────────────── */
+  .modal-content--nova-tx .form-group { margin-bottom: 11px !important; }
+  .modal-content--nova-tx .form-group:last-child { margin-bottom: 0 !important; }
+  .modal-content--nova-tx .form-group > label {
+    display: block !important;
+    margin-bottom: 7px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    color: var(--m-text-mid) !important;
+    letter-spacing: 0.01em !important;
+    text-transform: none !important;
+  }
+  .modal-content--nova-tx .modal-label-optional {
+    color: var(--m-text-lo) !important;
+    font-weight: 500 !important;
+    margin-left: 4px;
+  }
+
+  /* ───────────────────────── Inputs (clay sunken) ───────────────────────── */
+  body[data-theme='dark'] .modal-content--nova-tx .input-premium,
+  body[data-theme='light'] .modal-content--nova-tx .input-premium,
+  body[data-theme='dark'] .modal-content--nova-tx input[type="text"],
+  body[data-theme='light'] .modal-content--nova-tx input[type="text"],
+  body[data-theme='dark'] .modal-content--nova-tx input[type="number"],
+  body[data-theme='light'] .modal-content--nova-tx input[type="number"],
+  body[data-theme='dark'] .modal-content--nova-tx input[type="date"],
+  body[data-theme='light'] .modal-content--nova-tx input[type="date"],
+  body[data-theme='dark'] .modal-content--nova-tx input[type="datetime-local"],
+  body[data-theme='light'] .modal-content--nova-tx input[type="datetime-local"] {
+    width: 100% !important;
+    padding: 13px 15px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-hi) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.005em !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .input-premium:focus,
+  body[data-theme='light'] .modal-content--nova-tx .input-premium:focus,
+  .modal-content--nova-tx input[type="text"]:focus,
+  .modal-content--nova-tx input[type="number"]:focus,
+  .modal-content--nova-tx input[type="date"]:focus,
+  .modal-content--nova-tx input[type="datetime-local"]:focus {
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light), 0 0 0 2px var(--m-accent-glow) !important;
+  }
+  .modal-content--nova-tx input::placeholder { color: var(--m-text-lo) !important; }
+
+  /* ───────────────────────── Seletor de categoria (custom-select) ───────────────────────── */
+  body[data-theme='dark'] .modal-content--nova-tx .custom-select-trigger,
+  body[data-theme='light'] .modal-content--nova-tx .custom-select-trigger {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    width: 100% !important;
+    padding: 13px 15px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 16px !important;
+    color: var(--m-text-hi) !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+  }
+  .modal-content--nova-tx .custom-select-trigger .text-placeholder { color: var(--m-text-lo) !important; }
+  .modal-content--nova-tx .custom-select-trigger .text-white { color: var(--m-text-hi) !important; }
+  .modal-content--nova-tx .custom-select .chevron { color: var(--m-text-lo) !important; flex-shrink: 0 !important; transition: transform 200ms ease !important; }
+  .modal-content--nova-tx .custom-select .chevron.rotate { transform: rotate(180deg) !important; }
+  body[data-theme='dark'] .modal-content--nova-tx .custom-select-dropdown,
+  body[data-theme='light'] .modal-content--nova-tx .custom-select-dropdown {
+    background: linear-gradient(180deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 14px 40px -10px var(--m-shadow) !important;
+    overflow: hidden !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .custom-select-option,
+  body[data-theme='light'] .modal-content--nova-tx .custom-select-option {
+    padding: 12px 14px !important;
+    font-size: 15px !important;
+    color: var(--m-text-mid) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+  }
+  .modal-content--nova-tx .custom-select-option.selected { color: var(--m-accent) !important; background: var(--m-accent-glow) !important; }
+  body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input,
+  body[data-theme='light'] .modal-content--nova-tx .custom-select-search input {
+    font-size: 16px !important;
+  }
+
+  /* ───────────────────────── Valor (hero number) ───────────────────────── */
+  body[data-theme='dark'] .modal-content--nova-tx input.input-valor-novo-tx,
+  body[data-theme='light'] .modal-content--nova-tx input.input-valor-novo-tx {
+    padding: 12px 16px !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
+    text-align: center !important;
+    font-variant-numeric: tabular-nums !important;
+    color: var(--m-text-hi) !important;
+  }
+  .modal-content--nova-tx .modal-body--nova-tx:has(.type-btn.receita.active) input.input-valor-novo-tx { color: var(--m-pos) !important; }
+  .modal-content--nova-tx .modal-body--nova-tx:has(.type-btn.despesa.active) input.input-valor-novo-tx { color: var(--m-neg) !important; }
+
+  /* Linha de label do Valor + botão calculadora */
+  .modal-content--nova-tx .ntx-valor-label-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    margin-bottom: 7px !important;
+  }
+  .modal-content--nova-tx .ntx-valor-label-row label { margin-bottom: 0 !important; }
+  body[data-theme='dark'] .modal-content--nova-tx .ntx-calc-toggle,
+  body[data-theme='light'] .modal-content--nova-tx .ntx-calc-toggle {
+    width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    border-radius: 9px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+  }
+  .modal-content--nova-tx .ntx-calc-toggle--open { color: var(--m-accent) !important; box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), 0 0 0 1px var(--m-accent-glow) !important; }
+  .modal-content--nova-tx .ntx-calc-panel {
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 9px !important;
+  }
+  .modal-content--nova-tx .ntx-calc-input { flex: 1 1 auto !important; }
+  body[data-theme='dark'] .modal-content--nova-tx .ntx-calc-eq,
+  body[data-theme='light'] .modal-content--nova-tx .ntx-calc-eq {
+    flex-shrink: 0 !important;
+    width: 48px !important;
+    border-radius: 11px !important;
+    background: linear-gradient(155deg, var(--m-accent) 0%, color-mix(in srgb, var(--m-accent) 80%, black 20%) 100%) !important;
+    border: 1px solid var(--m-accent) !important;
+    color: var(--m-accent-fg) !important;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+  }
+
+  /* ───────────────────────── Toggle Despesa/Receita ───────────────────────── */
+  body[data-theme='dark'] .modal-content--nova-tx .type-toggle,
+  body[data-theme='light'] .modal-content--nova-tx .type-toggle {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+    padding: 5px !important;
+    border-radius: 14px !important;
+    background: var(--m-sunken) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .type-btn,
+  body[data-theme='light'] .modal-content--nova-tx .type-btn {
+    padding: 12px 16px !important;
+    min-height: 46px !important;
+    border-radius: 10px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--m-text-mid) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 200ms ease !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .type-btn.despesa.active,
+  body[data-theme='light'] .modal-content--nova-tx .type-btn.despesa.active {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    color: var(--m-neg) !important;
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-neg-glow) !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .type-btn.receita.active,
+  body[data-theme='light'] .modal-content--nova-tx .type-btn.receita.active {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    color: var(--m-pos) !important;
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-pos-glow) !important;
+  }
+
+  /* ───────────────────────── Data + atalhos Hoje/Ontem ───────────────────────── */
+  .modal-content--nova-tx .modal-date-toolbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin-bottom: 7px !important;
+  }
+  .modal-content--nova-tx .modal-date-toolbar label { margin-bottom: 0 !important; }
+  .modal-content--nova-tx .date-shortcuts { display: inline-flex !important; gap: 6px !important; }
+  body[data-theme='dark'] .modal-content--nova-tx .date-shortcut-btn,
+  body[data-theme='light'] .modal-content--nova-tx .date-shortcut-btn {
+    padding: 7px 14px !important;
+    min-height: 0 !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+
+  /* ───────────────────────── Compra parcelada (linha + switch) ───────────────────────── */
+  /* O checkbox real fica escondido — o label inteiro alterna o estado */
+  .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox,
+  .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox--hidden {
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 1px !important;
+    height: 1px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row,
+  body[data-theme='light'] .modal-content--nova-tx .modal-recorrencia-toggle-row,
+  body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia label.modal-recorrencia-toggle-row,
+  body[data-theme='light'] .modal-content--nova-tx .form-group--recorrencia label.modal-recorrencia-toggle-row {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    column-gap: 12px !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    cursor: pointer !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia-on .modal-recorrencia-toggle-row,
+  body[data-theme='light'] .modal-content--nova-tx .form-group--recorrencia-on .modal-recorrencia-toggle-row {
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__iconWrap,
+  body[data-theme='light'] .modal-content--nova-tx .modal-recorrencia-toggle-row__iconWrap {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: var(--m-base) !important;
+    color: var(--m-accent) !important;
+    box-shadow: 2px 2px 5px var(--m-shadow-soft), -1px -1px 3px var(--m-light) !important;
+    flex-shrink: 0 !important;
+  }
+  .modal-content--nova-tx .modal-recorrencia-toggle-row__text {
+    min-width: 0 !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    color: var(--m-text-hi) !important;
+  }
+
+  /* Switch track + thumb */
+  body[data-theme='dark'] .modal-content--nova-tx .ntx-switch,
+  body[data-theme='light'] .modal-content--nova-tx .ntx-switch {
+    position: relative !important;
+    display: inline-block !important;
+    width: 46px !important;
+    height: 26px !important;
+    min-width: 46px !important;
+    min-height: 26px !important;
+    border-radius: 999px !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow), inset -1px -1px 2px var(--m-light) !important;
+    flex-shrink: 0 !important;
+    justify-self: end !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transition: background 220ms ease, border-color 220ms ease, box-shadow 220ms ease !important;
+  }
+  body[data-theme='light'] .modal-content--nova-tx .ntx-switch { background: #c8d0db !important; border-color: rgba(140,156,178,0.45) !important; }
+  body[data-theme='dark'] .modal-content--nova-tx .ntx-switch { background: #06080c !important; }
+  .modal-content--nova-tx .ntx-switch__thumb {
+    position: absolute !important;
+    top: 2px !important;
+    left: 2px !important;
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(155deg, #ffffff 0%, #e4e8ee 100%) !important;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.25), -1px -1px 2px rgba(255,255,255,0.8) !important;
+    transition: transform 220ms ease !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .ntx-switch--on,
+  body[data-theme='light'] .modal-content--nova-tx .ntx-switch--on {
+    background: linear-gradient(155deg, var(--m-accent) 0%, color-mix(in srgb, var(--m-accent) 75%, black 25%) 100%) !important;
+    border-color: var(--m-accent) !important;
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.30), 0 0 14px var(--m-accent-glow) !important;
+  }
+  .modal-content--nova-tx .ntx-switch--on .ntx-switch__thumb { transform: translateX(20px) !important; }
+
+  /* ───────────────────────── Sub-opções de parcelamento ───────────────────────── */
+  .modal-content--nova-tx .rec-sub-opts { margin-top: 11px !important; display: flex !important; flex-direction: column !important; gap: 11px !important; }
+  .modal-content--nova-tx .rec-vezes-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin-bottom: 0 !important;
+  }
+  /* Label do campo — sentence case, sem caps, ocupa o espaço livre à esquerda */
+  body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row .rec-vezes-row__label,
+  body[data-theme='light'] .modal-content--nova-tx .rec-vezes-row .rec-vezes-row__label {
+    margin-bottom: 0 !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0.01em !important;
+    color: var(--m-text-mid) !important;
+  }
+  /* Input numérico compacto e fixo à direita (vence o .input-premium width:100%) */
+  body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row .rec-vezes-row__input,
+  body[data-theme='light'] .modal-content--nova-tx .rec-vezes-row .rec-vezes-row__input {
+    width: 84px !important;
+    min-width: 0 !important;
+    flex: 0 0 84px !important;
+    text-align: center !important;
+    padding: 11px 10px !important;
+  }
+  /* Linha da DATA: empilha (label em cima, campo full-width embaixo) — fica visível */
+  .modal-content--nova-tx .rec-vezes-row:has(.rec-vezes-row__input--date) {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row:has(.rec-vezes-row__input--date) .rec-vezes-row__label,
+  body[data-theme='light'] .modal-content--nova-tx .rec-vezes-row:has(.rec-vezes-row__input--date) .rec-vezes-row__label {
+    flex: none !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row .rec-vezes-row__input--date,
+  body[data-theme='light'] .modal-content--nova-tx .rec-vezes-row .rec-vezes-row__input--date {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    text-align: left !important;
+    min-height: 46px !important;
+    color: var(--m-text-hi) !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row--toggle,
+  body[data-theme='light'] .modal-content--nova-tx .rec-vezes-row--toggle {
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    cursor: pointer !important;
+  }
+
+  /* Preview "10× R$ 250 = R$ 2.500" */
+  body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-preview,
+  body[data-theme='light'] .modal-content--nova-tx .ntx-parc-preview {
+    display: flex !important;
+    align-items: baseline !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-top: 12px !important;
+    padding: 11px 14px !important;
+    border-radius: 12px !important;
+    background: var(--m-base) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  .modal-content--nova-tx .ntx-parc-preview__count { font-weight: 700 !important; color: var(--m-accent) !important; }
+  .modal-content--nova-tx .ntx-parc-preview__value,
+  .modal-content--nova-tx .ntx-parc-preview__total { font-weight: 700 !important; color: var(--m-text-hi) !important; }
+  .modal-content--nova-tx .ntx-parc-preview__sep { color: var(--m-text-lo) !important; }
+
+  /* Calendário das parcelas */
+  .modal-content--nova-tx .ntx-parc-calendar {
+    display: flex !important;
+    gap: 7px !important;
+    margin-top: 12px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding-bottom: 4px !important;
+  }
+  .modal-content--nova-tx .ntx-parc-calendar::-webkit-scrollbar { display: none !important; }
+  body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-cell,
+  body[data-theme='light'] .modal-content--nova-tx .ntx-parc-cell {
+    flex-shrink: 0 !important;
+    min-width: 50px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 1px !important;
+    padding: 8px 9px !important;
+    border-radius: 11px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft) !important;
+  }
+  .modal-content--nova-tx .ntx-parc-cell__idx { font-size: 0.6875rem !important; font-weight: 700 !important; color: var(--m-accent) !important; }
+  .modal-content--nova-tx .ntx-parc-cell__month { font-size: 0.6875rem !important; color: var(--m-text-mid) !important; text-transform: uppercase !important; }
+  .modal-content--nova-tx .ntx-parc-cell__year { font-size: 0.625rem !important; color: var(--m-text-lo) !important; }
+  .modal-content--nova-tx .ntx-parc-cell--overflow { justify-content: center !important; color: var(--m-text-mid) !important; font-weight: 700 !important; }
+
+  /* Hints de parcelamento */
+  .modal-content--nova-tx .parcelamento-preview {
+    font-size: 0.8125rem !important;
+    color: var(--m-text-mid) !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+  }
+  .modal-content--nova-tx .parcelamento-preview--hint { color: var(--m-text-lo) !important; }
+
+  /* ───────────────────────── Templates rápidos + IA chip ───────────────────────── */
+  .modal-content--nova-tx .ntx-templates {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 7px !important;
+    margin-bottom: 16px !important;
+  }
+  .modal-content--nova-tx .ntx-templates__label { font-size: 0.6875rem !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.1em !important; color: var(--m-text-lo) !important; }
+  body[data-theme='dark'] .modal-content--nova-tx .ntx-template-chip,
+  body[data-theme='light'] .modal-content--nova-tx .ntx-template-chip {
+    padding: 7px 13px !important;
+    min-height: 0 !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft) !important;
+    cursor: pointer !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .ntx-ai-chip,
+  body[data-theme='light'] .modal-content--nova-tx .ntx-ai-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    margin-top: 8px !important;
+    padding: 4px 10px !important;
+    border-radius: 999px !important;
+    background: var(--m-accent-glow) !important;
+    color: var(--m-accent) !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+  }
+  .modal-content--nova-tx .spinner { animation: ntxSpinM 800ms linear infinite !important; transform-origin: center !important; color: var(--m-accent) !important; }
+
+  /* ───────────────────────── Rodapé sticky (Cancelar / Salvar) ───────────────────────── */
+  .modal-content--nova-tx .modal-actions {
+    position: sticky !important;
+    bottom: calc(-1 * env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 5 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 4px 0 0 !important;
+    padding: 11px 0 calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    border-top: 1px solid var(--m-edge-hi) !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .modal-actions {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--m-base) 60%, transparent) 0%, var(--m-base) 35%) !important;
+  }
+  body[data-theme='light'] .modal-content--nova-tx .modal-actions {
+    background: linear-gradient(180deg, rgba(245,247,250,0.6) 0%, #f5f7fa 35%) !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-secondary,
+  body[data-theme='light'] .modal-content--nova-tx .modal-actions .btn-secondary {
+    flex: 0 0 auto !important;
+    padding: 12px 18px !important;
+    min-height: 46px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    cursor: pointer !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary,
+  body[data-theme='light'] .modal-content--nova-tx .modal-actions .btn-primary {
+    flex: 1 1 auto !important;
+    padding: 12px 22px !important;
+    min-height: 46px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(155deg, var(--m-accent) 0%, color-mix(in srgb, var(--m-accent) 80%, black 20%) 100%) !important;
+    border: 1px solid var(--m-accent) !important;
+    color: var(--m-accent-fg) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.005em !important;
+    box-shadow: 5px 5px 14px var(--m-shadow-soft), -3px -3px 8px var(--m-light), 0 0 16px var(--m-accent-glow) !important;
+    cursor: pointer !important;
+  }
+  .modal-content--nova-tx .modal-actions .btn-primary:disabled { opacity: 0.6 !important; }
+  body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary.loading,
+  body[data-theme='light'] .modal-content--nova-tx .modal-actions .btn-primary.loading {
+    background: var(--m-sunken) !important;
+    color: var(--m-text-mid) !important;
+    box-shadow: inset 3px 3px 7px var(--m-shadow-soft), inset -2px -2px 5px var(--m-light) !important;
+  }
+}
+
+/* ═══════════════ Fix iOS: datetime-local/date com texto invisível (color-scheme do sistema != tema app) ═══════════════ */
+@media (max-width: 768px) {
+  body[data-theme='light'] .modal-content--nova-tx input[type="datetime-local"],
+  body[data-theme='light'] .modal-content--nova-tx input[type="date"] {
+    color-scheme: light !important;
+    color: var(--m-text-hi) !important;
+    -webkit-text-fill-color: var(--m-text-hi) !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx input[type="datetime-local"],
+  body[data-theme='dark'] .modal-content--nova-tx input[type="date"] {
+    color-scheme: dark !important;
+    color: var(--m-text-hi) !important;
+    -webkit-text-fill-color: var(--m-text-hi) !important;
+  }
+}
+
+/* ═══════════════ Drag-to-close (arrastar sheet pra baixo) ═══════════════ */
+@media (max-width: 768px) {
+  .modal-content--nova-tx.ntx-dragging {
+    animation: none !important;
+    transition: none !important;
+    transform: translateY(var(--ntx-drag, 0px)) !important;
+  }
+  .modal-content--nova-tx.ntx-closing {
+    animation: none !important;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    transform: translateY(var(--ntx-drag, 0px)) !important;
+  }
+
+  /* ═══════════════ Compactação extra ═══════════════ */
+  .modal-content--nova-tx .modal-body.modal-body--nova-tx { padding: 0 0 4px !important; }
+  .modal-content--nova-tx .modal-header.modal-header--minimal { margin: 0 0 2px !important; }
+  .modal-content--nova-tx .nova-tx-section { margin-bottom: 10px !important; }
+  .modal-content--nova-tx .nova-tx-section__title { margin: 0 0 7px !important; }
+  .modal-content--nova-tx .form-group { margin-bottom: 8px !important; }
+  .modal-content--nova-tx .form-group > label { margin-bottom: 5px !important; }
+  .modal-content--nova-tx .ntx-valor-label-row { margin-bottom: 5px !important; }
+  .modal-content--nova-tx .modal-date-toolbar { margin-bottom: 5px !important; }
+
+  body[data-theme='dark'] .modal-content--nova-tx .input-premium,
+  body[data-theme='light'] .modal-content--nova-tx .input-premium,
+  body[data-theme='dark'] .modal-content--nova-tx input[type="text"],
+  body[data-theme='light'] .modal-content--nova-tx input[type="text"],
+  body[data-theme='dark'] .modal-content--nova-tx input[type="number"],
+  body[data-theme='light'] .modal-content--nova-tx input[type="number"],
+  body[data-theme='dark'] .modal-content--nova-tx input[type="date"],
+  body[data-theme='light'] .modal-content--nova-tx input[type="date"],
+  body[data-theme='dark'] .modal-content--nova-tx input[type="datetime-local"],
+  body[data-theme='light'] .modal-content--nova-tx input[type="datetime-local"],
+  body[data-theme='dark'] .modal-content--nova-tx .custom-select-trigger,
+  body[data-theme='light'] .modal-content--nova-tx .custom-select-trigger {
+    padding: 11px 14px !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx input.input-valor-novo-tx,
+  body[data-theme='light'] .modal-content--nova-tx input.input-valor-novo-tx {
+    padding: 10px 14px !important;
+    font-size: 1.5rem !important;
+  }
+  body[data-theme='dark'] .modal-content--nova-tx .type-btn,
+  body[data-theme='light'] .modal-content--nova-tx .type-btn {
+    padding: 10px 14px !important;
+    min-height: 42px !important;
+  }
+  .modal-content--nova-tx .modal-actions { padding-top: 9px !important; }
+  body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-secondary,
+  body[data-theme='light'] .modal-content--nova-tx .modal-actions .btn-secondary,
+  body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary,
+  body[data-theme='light'] .modal-content--nova-tx .modal-actions .btn-primary {
+    min-height: 44px !important;
+  }
+}

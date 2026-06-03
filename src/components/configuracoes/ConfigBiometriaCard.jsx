@@ -10,11 +10,12 @@ export default function ConfigBiometriaCard({
   handleRegisterBiometric,
   setConfirmBiometricRemoval,
   loadWebAuthn,
+  id,
 }) {
   const biometricSupported = webAuthnSupported()
 
   return (
-    <section className="config-card config-card--full config-security-card">
+    <section id={id} className="config-card config-card--full config-security-card">
       <div className="config-card-head config-card-head--row">
         <div>
           <span className="config-card-kicker">Segurança</span>

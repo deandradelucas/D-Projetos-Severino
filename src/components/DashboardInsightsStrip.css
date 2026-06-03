@@ -1,0 +1,87 @@
+/* =============================================================================
+   Severino IA — faixa de insights proativos no Dashboard. Vars de tema (light/dark).
+   ============================================================================= */
+
+.ai-insights {
+  margin: 0 0 16px;
+}
+
+.ai-insights__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ai-insights__spark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  color: var(--accent-foreground, #1a1200);
+  background: var(--accent, #d4a84b);
+  box-shadow: var(--shadow-accent, 0 2px 8px rgba(212, 168, 75, 0.35));
+}
+.ai-insights__title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+.ai-insights__sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.ai-insights__track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+.ai-insights__track::-webkit-scrollbar { height: 6px; }
+.ai-insights__track::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 999px; }
+
+.ai-insight {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: 280px;
+  max-width: 80vw;
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-left: 3px solid var(--ai-accent, var(--accent));
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+}
+.ai-insight--alerta { --ai-accent: #ef4444; }
+.ai-insight--positivo { --ai-accent: #22c55e; }
+.ai-insight--neutro { --ai-accent: var(--accent, #d4a84b); }
+.ai-insight--destaque { --ai-accent: #8b5cf6; }
+
+.ai-insight__icon {
+  flex-shrink: 0;
+  font-size: 1.3rem;
+  line-height: 1.4;
+}
+.ai-insight__body { min-width: 0; }
+.ai-insight__title {
+  margin: 0 0 3px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+.ai-insight__text {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .ai-insight { width: 240px; }
+}

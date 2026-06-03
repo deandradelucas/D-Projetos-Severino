@@ -1,6 +1,9 @@
 /**
- * Coluna de copy do login (desktop ≥1024px).
+ * Coluna de copy das telas de auth (desktop ≥1024px), compartilhada por Login e Cadastro.
+ * O conteúdo de texto vem por `copy` (ver authCopyContent.js); os benefícios do produto
+ * são os mesmos nas duas telas.
  */
+import { LOGIN_COPY } from './authCopyContent'
 
 const BENEFITS = [
   {
@@ -60,17 +63,15 @@ function WhatsAppIcon() {
   )
 }
 
-export default function LoginCopyPanel() {
+export default function AuthCopyPanel({ copy = LOGIN_COPY }) {
   return (
     <div className="auth-login-copy">
       <h2 className="auth-login-copy__headline">
-        Veja para onde vai cada real —{' '}
-        <span className="auth-login-copy__headline-accent">antes do mês acabar</span>.
+        {copy.headline}{' '}
+        <span className="auth-login-copy__headline-accent">{copy.headlineAccent}</span>.
       </h2>
 
-      <p className="auth-login-copy__lead">
-        Planilhas que não fecham. Lembretes soltos. Contas que só aparecem quando o boleto vence.
-      </p>
+      <p className="auth-login-copy__lead">{copy.lead}</p>
 
       <p className="auth-login-copy__solution">
         O <strong>Severino</strong> une finanças, agenda, WhatsApp e assistente com os seus dados reais.
@@ -97,11 +98,9 @@ export default function LoginCopyPanel() {
         ))}
       </ul>
 
-      <p className="auth-login-copy__proof">
-        Clareza no bolso e na rotina — sem virar especialista em planilha.
-      </p>
+      <p className="auth-login-copy__proof">{copy.proof}</p>
 
-      <p className="auth-login-copy__cta-hint">Entre na sua conta e retome o controle em minutos.</p>
+      <p className="auth-login-copy__cta-hint">{copy.ctaHint}</p>
     </div>
   )
 }

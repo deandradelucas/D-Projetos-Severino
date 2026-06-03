@@ -1,0 +1,244 @@
+/* =============================================================================
+   32 — MOBILE · Modais da Lista (Nova lista, Novo item, Registrar gasto)
+   =============================================================================
+   Deixa o interior neumórfico (igual nova-tx/investimentos). A casca de bottom
+   sheet vem do partial 24. Classes globais (modal portado) → body[data-theme] + !important.
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  /* Sobe o sheet acima do teclado (vence o `padding:0 !important` do partial 24).
+     --lista-kb é setado inline pelo componente (= altura do teclado). */
+  .page-lista-compras__modal-overlay {
+    padding-bottom: var(--lista-kb, 0px) !important;
+  }
+
+  /* Header */
+  .page-lista-compras__modal .page-lista-compras__modal-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin-bottom: 4px !important;
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid var(--m-edge-hi) !important;
+  }
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-title,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--m-text-hi) !important;
+  }
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-close,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-close {
+    width: 36px !important; height: 36px !important; min-height: 36px !important; flex-shrink: 0 !important;
+    border-radius: 50% !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+
+  /* Campos + labels */
+  .page-lista-compras__modal .page-lista-compras__modal-field { margin-bottom: 12px !important; }
+  .page-lista-compras__modal .page-lista-compras__modal-row {
+    display: flex !important;
+    gap: 10px !important;
+  }
+  .page-lista-compras__modal .page-lista-compras__modal-row > .page-lista-compras__modal-field { flex: 1 1 0 !important; min-width: 0 !important; }
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-label,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-label {
+    display: block !important;
+    margin-bottom: 6px !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--m-text-lo) !important;
+  }
+  .page-lista-compras__modal .page-lista-compras__modal-label--optional {
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-weight: 500 !important;
+    color: var(--m-text-lo) !important;
+  }
+
+  /* Inputs / selects afundados, 16px */
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-input,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-input,
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-select,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-select {
+    width: 100% !important;
+    padding: 13px 15px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+  }
+  .page-lista-compras__modal .page-lista-compras__modal-input:focus,
+  .page-lista-compras__modal .page-lista-compras__modal-select:focus {
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light), 0 0 0 2px var(--m-accent-glow) !important;
+  }
+  .page-lista-compras__modal .page-lista-compras__modal-input::placeholder { color: var(--m-text-lo) !important; }
+  /* Select com seta custom */
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-select,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-select {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    padding-right: 30px !important;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--m-text-lo) 50%),
+      linear-gradient(135deg, var(--m-text-lo) 50%, transparent 50%) !important;
+    background-position: calc(100% - 17px) 52%, calc(100% - 12px) 52% !important;
+    background-size: 5px 5px, 5px 5px !important;
+    background-repeat: no-repeat !important;
+  }
+
+  /* Toggle de tipo (Compras | Tarefas) — neumórfico */
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__tipo-toggle,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__tipo-toggle {
+    gap: 8px !important;
+    padding: 5px !important;
+    border-radius: 14px !important;
+    background: var(--m-sunken) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    margin-top: 6px !important;
+  }
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__tipo-btn,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__tipo-btn {
+    padding: 11px 10px !important;
+    border-radius: 10px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--m-text-mid) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+  }
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__tipo-btn--active,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__tipo-btn--active {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    color: var(--m-accent) !important;
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+  }
+  .page-lista-compras__modal .page-lista-compras__tipo-hint {
+    color: var(--m-text-lo) !important;
+    font-size: 0.78rem !important;
+  }
+
+  /* Autocomplete de itens */
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__autocomplete,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__autocomplete {
+    background: linear-gradient(180deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 32px -10px var(--m-shadow) !important;
+    overflow: hidden !important;
+  }
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__autocomplete-item,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__autocomplete-item {
+    color: var(--m-text-hi) !important;
+    font-size: 15px !important;
+  }
+
+  /* Resumo do item */
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-resumo,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-resumo {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    background: var(--m-base) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+  }
+  .page-lista-compras__modal .page-lista-compras__modal-resumo-nome {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 600 !important;
+    color: var(--m-text-hi) !important;
+  }
+  .page-lista-compras__modal .page-lista-compras__modal-resumo-meta { color: var(--m-text-lo) !important; font-size: 0.8125rem !important; }
+  .page-lista-compras__modal .page-lista-compras__modal-resumo-total {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    color: var(--m-accent) !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  .page-lista-compras__modal .page-lista-compras__modal-resumo-placeholder { color: var(--m-text-lo) !important; font-size: 0.8125rem !important; }
+  .page-lista-compras__modal .page-lista-compras__modal-subhint { color: var(--m-text-lo) !important; font-size: 0.78rem !important; }
+  .page-lista-compras__modal .page-lista-compras__modal-subhint--warn { color: var(--m-accent) !important; }
+
+  /* Registrar gasto — total */
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-total-display,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-total-display {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
+    color: var(--m-text-hi) !important;
+    font-variant-numeric: tabular-nums !important;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    text-align: center !important;
+  }
+
+  /* Footer: Cancelar (sunken) + Confirmar/Criar (dourado) */
+  .page-lista-compras__modal .page-lista-compras__modal-actions {
+    display: flex !important;
+    gap: 10px !important;
+    margin-top: 16px !important;
+    padding-bottom: calc(2px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-cancel,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-cancel {
+    flex: 0 0 auto !important;
+    padding: 12px 18px !important;
+    min-height: 46px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-confirm,
+  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-confirm {
+    flex: 1 1 auto !important;
+    padding: 12px 22px !important;
+    min-height: 46px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(155deg, var(--m-accent) 0%, color-mix(in srgb, var(--m-accent) 80%, black 20%) 100%) !important;
+    border: 1px solid var(--m-accent) !important;
+    color: var(--m-accent-fg) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 700 !important;
+    box-shadow: 5px 5px 14px var(--m-shadow-soft), -3px -3px 8px var(--m-light), 0 0 16px var(--m-accent-glow) !important;
+  }
+  .page-lista-compras__modal .page-lista-compras__modal-confirm:disabled,
+  .page-lista-compras__modal .page-lista-compras__modal-cancel:disabled { opacity: 0.6 !important; }
+}
+
+/* ═══════════════ Footer "solo" (só Novo item, ex: lista vazia/Tarefas) — sem card branco ═══════════════ */
+@media (max-width: 768px) {
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer--solo,
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer--solo {
+    background: transparent !important;
+    border-top: none !important;
+    box-shadow: none !important;
+  }
+}

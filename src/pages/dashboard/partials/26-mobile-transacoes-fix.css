@@ -1,0 +1,777 @@
+/* =============================================================================
+   26 — MOBILE · Transações (≤ 768px) — correção estrutural + polimento
+   =============================================================================
+   PROBLEMA: o partial 07 estiliza a linha de transação no mobile para um DOM
+   ANTIGO (.ref-tx-cat-cell / .ref-tx-sub-cell / .ref-tx-meta-cell /
+   .ref-tx-val-act-wrap). O TransacaoRow.jsx atual usa .ref-tx-content-cell /
+   .ref-tx-val-cell / .ref-tx-actions-cell → as células caíam em posições
+   erradas (categoria empilhava palavra a palavra, valor colidia com as ações).
+
+   Este partial redefine a linha para o DOM real, estiliza a busca rápida,
+   os chips de filtro (Hoje / 7 dias / …) e os divisores de dia, tudo com os
+   tokens --m-* do partial 22. Carregado por ÚLTIMO → vence o partial 07.
+   ============================================================================= */
+
+@media (max-width: 768px) {
+
+  /* ═══════════════════════ Cabeçalho do painel ═══════════════════════ */
+  /* Empilha título + busca (estavam sobrepostos) */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-tx-panel-head {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 13px !important;
+  }
+
+  /* ─── Busca rápida ─── */
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search {
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    width: 100% !important;
+    padding: 11px 14px !important;
+    border-radius: 13px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search svg,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search svg {
+    color: var(--m-text-lo) !important;
+    flex-shrink: 0 !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search input,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search input {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: var(--m-text-hi) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 16px !important; /* anti-zoom iOS */
+    padding: 0 !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search input::placeholder,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search input::placeholder {
+    color: var(--m-text-lo) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search__clear,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search__clear {
+    flex-shrink: 0 !important;
+    width: 22px !important;
+    height: 22px !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: var(--m-base) !important;
+    color: var(--m-text-mid) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    box-shadow: inset 1px 1px 2px var(--m-shadow-soft) !important;
+  }
+
+  /* ═══════════════════════ Chips de filtro rápido ═══════════════════════ */
+  /* Scroll horizontal — 5 chips não cabem lado a lado em telas estreitas */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    margin: 14px 0 2px !important;
+    padding: 2px 2px 8px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters::-webkit-scrollbar {
+    display: none !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip {
+    flex-shrink: 0 !important;
+    padding: 8px 15px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.005em !important;
+    white-space: nowrap !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    cursor: pointer !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip--active,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip--active {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    color: var(--m-accent) !important;
+    font-weight: 600 !important;
+    box-shadow: 4px 4px 10px var(--m-shadow-soft), -2px -2px 6px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip--reset,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip--reset {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    color: var(--m-text-lo) !important;
+  }
+
+  /* ═══════════════ Esconde o cabeçalho de tabela (desktop only) ═══════════════ */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-list-head {
+    display: none !important;
+  }
+
+  /* ═══════════════════════ Divisor de dia (Hoje, 10 jun…) ═══════════════════════ */
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider {
+    display: flex !important;
+    align-items: baseline !important;
+    flex-wrap: wrap !important;
+    gap: 4px 8px !important;
+    padding: 4px 2px 2px !important;
+    margin: 6px 0 2px !important;
+    background: transparent !important;
+    border: none !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__label,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__label {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.8125rem !important;
+    letter-spacing: 0.01em !important;
+    color: var(--m-text-mid) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__meta,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__meta {
+    font-size: 0.6875rem !important;
+    color: var(--m-text-lo) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__totals,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__totals {
+    margin-left: auto !important;
+    display: flex !important;
+    gap: 8px !important;
+    font-size: 0.6875rem !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__total--pos { color: var(--m-pos) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__total--neg { color: var(--m-neg) !important; }
+
+  /* ═══════════════════════ LINHA DE TRANSAÇÃO (DOM novo) ═══════════════════════ */
+  /* 7 classes + --v2 vence o partial 07 (6 classes) e carrega depois.
+     Grid 2 linhas: [ícone | conteúdo | valor] / [           | ações] */
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton),
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) auto !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas: none !important;
+    column-gap: 12px !important;
+    row-gap: 7px !important;
+    align-items: center !important;
+    min-height: 0 !important;
+    padding: 13px 15px !important;
+    margin: 0 !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    box-shadow: 5px 5px 14px var(--m-shadow-soft), -3px -3px 10px var(--m-light), inset 1px 1px 1px var(--m-edge-hi) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* ─── Ícone (col 1, centralizado nas 2 linhas) ─── */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) > .ref-tx-icon-cell {
+    grid-column: 1 !important;
+    grid-row: 1 / span 2 !important;
+    justify-self: center !important;
+    align-self: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+  }
+
+  /* ─── Conteúdo: título + meta empilhados (col 2, centralizado) ─── */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) > .ref-tx-content-cell {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    align-self: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-align: left !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__primary {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    flex-wrap: nowrap !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell .ref-tx-title,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell .ref-tx-title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.9375rem !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.01em !important;
+    color: var(--m-text-hi) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-width: 0 !important;
+    flex: 0 1 auto !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell .ref-tx-rec-badge,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell .ref-tx-rec-badge {
+    flex-shrink: 0 !important;
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    padding: 2px 7px !important;
+    border-radius: 999px !important;
+    background: var(--m-accent-glow) !important;
+    color: var(--m-accent) !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell .ref-tx-recorrencia-ico-wrap,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell .ref-tx-recorrencia-ico-wrap {
+    flex-shrink: 0 !important;
+    color: var(--m-text-lo) !important;
+    display: inline-flex !important;
+  }
+  /* Meta empilhada: data em cima, categoria › sub na linha de baixo (só mobile) */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+  /* Esconde o separador "·" (não faz sentido com as linhas empilhadas) */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta .ref-tx-meta-sep {
+    display: none !important;
+  }
+  /* Categoria ocupa a linha inteira abaixo da data, com ellipsis */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta .ref-tx-cat-inline {
+    max-width: 100% !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta .ref-tx-date,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta .ref-tx-date,
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta .ref-tx-meta-sep,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta .ref-tx-meta-sep {
+    font-size: 0.75rem !important;
+    color: var(--m-text-lo) !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta .ref-tx-cat-inline,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta .ref-tx-cat-inline {
+    font-size: 0.75rem !important;
+    color: var(--m-text-lo) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-width: 0 !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta .ref-tx-lancador,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-content-cell__meta .ref-tx-lancador {
+    font-size: 0.75rem !important;
+    color: var(--m-text-lo) !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* ─── Valor (col 3, linha 1) ─── */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) > .ref-tx-val-cell {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 4px !important;
+    justify-self: end !important;
+    align-self: center !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-val-cell .ref-tx-val,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-val-cell .ref-tx-val {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.9375rem !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-val-cell .ref-tx-val--pos,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-val-cell .ref-tx-val--pos {
+    color: var(--m-pos) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-val-cell .ref-tx-val--neg,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-val-cell .ref-tx-val--neg {
+    color: var(--m-neg) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-val-cell .ref-tx-pendente-pill,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-val-cell .ref-tx-pendente-pill {
+    font-size: 0.625rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    padding: 2px 8px !important;
+    border-radius: 999px !important;
+    background: var(--m-accent-glow) !important;
+    color: var(--m-accent) !important;
+    white-space: nowrap !important;
+    line-height: 1.4 !important;
+  }
+
+  /* ─── Ações (col 3, linha 2) — sempre visíveis no mobile ─── */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) > .ref-tx-actions-cell {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
+    justify-self: end !important;
+    align-self: center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-actions-cell .transacoes-actions {
+    display: flex !important;
+    gap: 6px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-actions-cell .btn-edit,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-actions-cell .btn-edit,
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-actions-cell .btn-delete,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-actions-cell .btn-delete {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 9px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    box-shadow: inset 1px 1px 2px var(--m-shadow-soft), inset -1px -1px 1px var(--m-light) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-actions-cell .btn-delete,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-actions-cell .btn-delete {
+    color: var(--m-neg) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-actions-cell .btn-edit svg,
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-actions-cell .btn-delete svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  /* Checkbox de seleção (quando ativo) não rouba espaço do ícone */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-icon-cell .ref-tx-select {
+    display: none !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-row--selection-mode .ref-tx-icon-cell .ref-tx-select {
+    display: inline-flex !important;
+  }
+
+  /* ═══════════════ #1 — Fade nas bordas dos chips (sinaliza scroll) ═══════════════ */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%) !important;
+    mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%) !important;
+  }
+
+  /* ═══════════════ #2 — Busca + chips fixos (sticky) ao rolar ═══════════════ */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-tx-panel-head {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 6 !important;
+    padding-top: 4px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-tx-panel-head {
+    background: linear-gradient(180deg, var(--m-raised) 78%, transparent 100%) !important;
+  }
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-tx-panel-head {
+    background: linear-gradient(180deg, #ffffff 78%, transparent 100%) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters {
+    position: sticky !important;
+    top: 92px !important;          /* abaixo do head (título + busca) */
+    z-index: 5 !important;
+    margin-top: 0 !important;
+    padding-top: 8px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters {
+    background: linear-gradient(180deg, var(--m-raised) 82%, transparent 100%) !important;
+  }
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters {
+    background: linear-gradient(180deg, #ffffff 82%, transparent 100%) !important;
+  }
+
+  /* ═══════════════ #4 — Botão Importar só ícone (economiza espaço) ═══════════════ */
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary {
+    width: 44px !important;
+    min-width: 44px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0 !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary .dashboard-hub__btn-label {
+    display: none !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary .dashboard-hub__btn-ico {
+    width: 18px !important; height: 18px !important;
+  }
+
+  /* ═══════════════ #5 — Fundir cards Filtros + Transações ═══════════════ */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-panels {
+    gap: 10px !important;
+  }
+  /* Painel de filtros mais enxuto e conectado ao de transações */
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-filters,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-filters {
+    margin-bottom: 0 !important;
+  }
+
+  /* ═══════════════ #7 — Resumo (entradas/saídas/saldo) no topo da lista ═══════════════ */
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 8px !important;
+    margin: 4px 0 12px !important;
+    padding: 12px !important;
+    border-radius: 14px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+    text-align: center !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__label {
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.625rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--m-text-lo) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__value {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    font-variant-numeric: tabular-nums !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    color: var(--m-text-hi) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__value--in { color: var(--m-pos) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__value--out { color: var(--m-neg) !important; }
+}
+
+/* ═══════════════ #8 — Indicador de pull-to-refresh (fora do @media: keyframe) ═══════════════ */
+@keyframes txPtrSpin { to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+  .tx-ptr {
+    position: fixed !important;
+    top: 0 !important;
+    left: 50% !important;
+    z-index: 60 !important;
+    width: 40px !important;
+    height: 40px !important;
+    margin-top: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    pointer-events: none !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    box-shadow: 0 8px 20px -8px var(--m-shadow) !important;
+    color: var(--m-accent) !important;
+  }
+  .tx-ptr__spin--active { animation: txPtrSpin 700ms linear infinite !important; }
+}
+
+/* ═══════════════ #6 — Swipe-to-reveal (deslizar p/ esquerda → Editar/Excluir) ═══════════════ */
+@media (max-width: 768px) {
+  /* Linha vira contêiner de swipe: só pan vertical nativo; horizontal é nosso */
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton),
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) {
+    position: relative !important;
+    overflow: hidden !important;
+    grid-template-rows: auto !important;
+    touch-action: pan-y !important;
+  }
+  /* Camada da frente (ícone + conteúdo + valor) desliza */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) > .ref-tx-icon-cell,
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) > .ref-tx-content-cell,
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) > .ref-tx-val-cell {
+    grid-row: 1 !important;
+    transform: translateX(var(--tx-swipe, 0px)) !important;
+    transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  }
+  /* Painel de ações: absoluto, entra deslizando pela direita */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) > .ref-tx-actions-cell {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 84px !important;
+    grid-row: auto !important;
+    grid-column: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    transform: translateX(calc(100% + var(--tx-swipe, 0px))) !important;
+    transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  }
+  /* Durante o arraste: sem transição (segue o dedo) */
+  .ref-tx-row--v2.ref-tx-row--swiping > .ref-tx-icon-cell,
+  .ref-tx-row--v2.ref-tx-row--swiping > .ref-tx-content-cell,
+  .ref-tx-row--v2.ref-tx-row--swiping > .ref-tx-val-cell,
+  .ref-tx-row--v2.ref-tx-row--swiping > .ref-tx-actions-cell {
+    transition: none !important;
+  }
+
+  /* Pegador fixo: chevron discreto na borda direita indicando que dá pra deslizar.
+     Vence o `::after { display:none }` do partial 07 (mais classes + !important). */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton) {
+    padding-right: 22px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton)::after,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2:not(.ref-tx-row--skeleton)::after {
+    content: '\2039' !important;       /* ‹ */
+    display: block !important;
+    position: absolute !important;
+    right: 8px !important;
+    top: 50% !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+    font-family: system-ui, sans-serif !important;
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    color: var(--m-text-lo) !important;
+    opacity: 0.42 !important;
+    pointer-events: none !important;
+    z-index: 3 !important;
+    transition: opacity 0.2s ease !important;
+    background: none !important;       /* anula qualquer ::after decorativo antigo */
+    border: none !important;
+    width: auto !important;
+    height: auto !important;
+  }
+  /* Some quando a linha está aberta ou sendo arrastada (as ações assumem).
+     Cadeia completa + classe de estado → especificidade maior que a regra-base. */
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2.ref-tx-row--revealed:not(.ref-tx-row--skeleton)::after,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2.ref-tx-row--revealed:not(.ref-tx-row--skeleton)::after,
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2.ref-tx-row--swiping:not(.ref-tx-row--skeleton)::after,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-row--v2.ref-tx-row--swiping:not(.ref-tx-row--skeleton)::after {
+    opacity: 0 !important;
+  }
+}
+
+/* ═══════════════ Parceladas/Assinaturas — mobile (jun/2026) ═══════════════
+   Os elementos internos do card (progresso, pago/restante, chip de próxima,
+   status badges) só tinham estilo no partial 15 (desktop). Portados aqui. */
+@media (max-width: 768px) {
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-parcelado-grupo__main {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-grupo-title-row {
+    display: flex !important; align-items: center !important; gap: 8px !important; flex-wrap: wrap !important; min-width: 0 !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-parcelado-grupo__desc {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.95rem !important; font-weight: 700 !important; color: var(--m-text-hi) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-parcelado-grupo__meta {
+    font-size: 0.72rem !important; color: var(--m-text-lo) !important; line-height: 1.35 !important;
+  }
+
+  /* Status badges */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-badge {
+    display: inline-flex !important; align-items: center !important; gap: 4px !important;
+    padding: 2px 9px !important; border-radius: 999px !important; font-size: 0.66rem !important; font-weight: 700 !important; flex-shrink: 0 !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-badge--concluida { background: var(--m-pos-soft) !important; color: var(--m-pos) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-badge--atrasada { background: var(--m-neg-soft) !important; color: var(--m-neg) !important; }
+
+  /* Barra de progresso */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-progress {
+    position: relative !important; height: 6px !important; margin: 10px 0 2px !important;
+    border-radius: 999px !important; background: var(--m-sunken) !important;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-progress__bar {
+    height: 100% !important; border-radius: 999px !important;
+    background: linear-gradient(90deg, var(--m-accent), #c49535) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-grupo--concluida .parc-progress__bar { background: linear-gradient(90deg, var(--m-pos), #15803d) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-progress__label {
+    position: absolute !important; right: 0 !important; top: -15px !important;
+    font-size: 0.62rem !important; font-weight: 700 !important; color: var(--m-text-lo) !important;
+  }
+
+  /* Pago / restante */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante {
+    display: inline-flex !important; align-items: center !important; gap: 6px !important; font-size: 0.75rem !important; font-weight: 600 !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante__pago { color: var(--m-pos) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante__restante { color: var(--m-text-mid) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante__sep { color: var(--m-text-lo) !important; opacity: 0.6 !important; }
+
+  /* Chip "Próxima parcela" */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-proxima-chip {
+    display: inline-flex !important; align-items: center !important; gap: 5px !important;
+    padding: 4px 10px !important; border-radius: 999px !important; align-self: flex-start !important;
+    background: var(--m-accent-glow) !important; color: var(--m-accent) !important;
+    font-size: 0.7rem !important; font-weight: 600 !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-proxima-chip svg { flex-shrink: 0 !important; }
+
+  /* Valor + chevron à direita (topo) */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-parcelado-grupo__right {
+    display: flex !important; align-items: flex-start !important; gap: 6px !important; flex-shrink: 0 !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-parcelado-grupo__valor {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 1rem !important; font-weight: 700 !important; color: var(--m-neg) !important;
+    font-variant-numeric: tabular-nums !important; white-space: nowrap !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-parcelado-grupo__valor--rec { color: var(--m-pos) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-parcelado-grupo__valor-suf {
+    font-size: 0.66rem !important; color: var(--m-text-lo) !important; font-weight: 500 !important; margin-left: 2px !important;
+  }
+
+  /* ── Footer de totais: 2×2 (era 4 colunas cortadas) ── */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-parcelados-footer.parc-footer-4 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    padding: 14px 16px calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__divider { display: none !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__item {
+    flex: unset !important; align-items: flex-start !important; gap: 2px !important;
+    padding: 10px 12px !important; border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__label {
+    font-size: 0.62rem !important; color: var(--m-text-lo) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__value {
+    font-size: 0.95rem !important; font-weight: 700 !important; color: var(--m-text-hi) !important;
+    font-variant-numeric: tabular-nums !important; white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__value--warning { color: var(--m-accent, #c49535) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__value--pos { color: var(--m-pos) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__value--neg { color: var(--m-neg) !important; }
+}
+
+/* ═══════════════ Parceladas — controles + filtros rápidos (mobile, jun/2026) ═══════════════
+   .parc-controls / .parc-sort / .parc-expand-all / .parc-status-chips só tinham
+   estilo no partial 15 (desktop). No mobile o select e o botão vinham crus e
+   grudados; os chips quebravam em 2 linhas. Portado aqui. */
+@media (max-width: 768px) {
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-controls {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 0 12px !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-controls .tx-quick-search {
+    flex: 1 1 100% !important;
+  }
+  /* "Mais recente" (select) e "Expandir todas" lado a lado, com respiro */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-sort {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding: 10px 14px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-expand-all {
+    flex: 0 0 auto !important;
+    padding: 10px 16px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important;
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-expand-all:active { color: var(--m-accent) !important; }
+
+  /* Filtros rápidos numa única linha rolável (eram 2 linhas) */
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-chips {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    margin: 0 0 14px !important;
+    padding-bottom: 2px !important;
+    -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, #000 92%, transparent);
+  }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-chips::-webkit-scrollbar { display: none !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-chips .tx-quick-chip {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+  }
+}

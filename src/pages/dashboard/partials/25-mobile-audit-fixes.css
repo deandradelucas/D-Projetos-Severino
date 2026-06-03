@@ -1,0 +1,175 @@
+/* =============================================================================
+   25 — MOBILE · correções da auditoria (≤ 768px)
+   =============================================================================
+   Aplica as correções do relatório de auditoria sobre os partials 22-24.
+   Carregado por último → vence empates de especificidade.
+   ============================================================================= */
+
+/* P2 — @keyframes do bottom sheet FORA de @media (Safari ≤14 não suporta dentro) */
+@keyframes mSheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+
+  /* ═══ C4/C5 — Modal de agenda vira bottom sheet (seletores compostos vencem o 05) ═══ */
+  .agenda-modal-backdrop.modal-backdrop,
+  .agenda-modal-backdrop {
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+  }
+  .agenda-modal-backdrop .agenda-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92vh !important;
+    margin: 0 !important;
+    border-radius: 26px 26px 0 0 !important;
+    animation: mSheetUp 320ms cubic-bezier(0.22, 1, 0.36, 1) both !important;
+  }
+  body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal {
+    background: linear-gradient(180deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-bottom: none !important;
+  }
+  body[data-theme='light'] .agenda-modal-backdrop .agenda-modal {
+    background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-bottom: none !important;
+  }
+
+  /* ═══ C7 — Home: gradiente no scroll vence o #fff do partial 06 ═══ */
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    background:
+      radial-gradient(ellipse 700px 500px at 10% -6%, rgba(212,168,75,0.040), transparent 60%),
+      var(--m-base) !important;
+    background-image:
+      radial-gradient(ellipse 700px 500px at 10% -6%, rgba(212,168,75,0.040), transparent 60%) !important;
+  }
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    background:
+      radial-gradient(ellipse 700px 500px at 10% -6%, rgba(212,168,75,0.060), transparent 60%),
+      var(--m-base) !important;
+    background-image:
+      radial-gradient(ellipse 700px 500px at 10% -6%, rgba(212,168,75,0.060), transparent 60%) !important;
+  }
+
+  /* ═══ C2 — Sidebar drawer: especificidade reforçada (independe de ordem) ═══ */
+  body[data-theme='dark'] .dashboard-container.app-horizon-shell.ref-dashboard .sidebar {
+    background: linear-gradient(160deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    background-image: linear-gradient(160deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+  }
+  body[data-theme='light'] .dashboard-container.app-horizon-shell.ref-dashboard .sidebar {
+    background: linear-gradient(160deg, #ffffff 0%, #f5f7fa 100%) !important;
+    background-image: linear-gradient(160deg, #ffffff 0%, #f5f7fa 100%) !important;
+  }
+
+  /* ═══ I9 — Botão hamburguer neumórfico (visível no mobile) ═══ */
+  body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .mobile-menu-btn,
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .mobile-menu-btn {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; color: var(--m-text-hi) !important;
+    box-shadow: 4px 4px 10px var(--m-shadow-soft), -2px -2px 7px var(--m-light), inset 1px 1px 1px var(--m-edge-hi) !important;
+  }
+
+  /* ═══ I1 — Footer da Lista de Compras com tema dark/light ═══ */
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer {
+    background: linear-gradient(180deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border-top: 1px solid var(--m-edge-hi) !important;
+    box-shadow: 0 -8px 24px -6px rgba(0,0,0,0.55), inset 0 1px 0 var(--m-edge-hi) !important;
+  }
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer {
+    background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%) !important;
+    border-top: 1px solid var(--m-edge-hi) !important;
+    box-shadow: 0 -8px 24px -12px var(--m-shadow), inset 0 1px 0 var(--m-edge-hi) !important;
+  }
+
+  /* ═══ I2 — Checkbox desmarcado da lista ═══ */
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-check,
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-check {
+    background: var(--m-sunken) !important; border: 1px solid var(--m-edge-hi) !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+
+  /* ═══ I3 — Filtros de Transações ═══ */
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-filters,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-filters {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-radius: 18px !important;
+    box-shadow: 6px 6px 16px var(--m-shadow-soft), -4px -4px 12px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-parceladas-chip,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-parceladas-chip,
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-filters-toggle,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-filters-toggle {
+    color: var(--m-text-mid) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-parceladas-chip--active,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-parceladas-chip--active {
+    color: var(--m-accent) !important; box-shadow: 0 0 0 1px var(--m-accent-glow) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .filter-input,
+  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .filter-input {
+    background: var(--m-sunken) !important; border: 1px solid var(--m-edge-hi) !important; color: var(--m-text-hi) !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important; border-radius: 10px !important; font-size: 16px !important;
+  }
+
+  /* ═══ I8 — Inputs/selects da página Config com 16px (anti-zoom iOS) ═══ */
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell input,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell select,
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell textarea,
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell input,
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell input,
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell input {
+    font-size: 16px !important;
+  }
+
+  /* ═══ I6 — Ações do card de investimento: cor de texto ═══ */
+  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__actions,
+  body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__actions {
+    color: var(--m-text-mid) !important;
+  }
+
+  /* ═══ I5 — week-day com sombra dupla ═══ */
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day {
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+
+  /* ═══ I4 — Dias da semana do calendário (light) com token ═══ */
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-weekdays span {
+    color: var(--m-text-lo) !important;
+  }
+
+  /* ═══ I7 — Trial/urgência de pagamento ═══ */
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-accent-glow) !important; border-radius: 18px !important;
+    box-shadow: 6px 6px 16px var(--m-shadow-soft), -4px -4px 12px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__dias-box,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__dias-box {
+    background: var(--m-sunken) !important; box-shadow: inset 3px 3px 6px var(--m-shadow-soft), inset -2px -2px 4px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+  }
+
+  /* ═══ P3 — Bordas internas do insights ═══ */
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item:nth-child(even) { border-right: none !important; }
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item:last-child { border-bottom: none !important; }
+
+  /* ═══ P4 — FAB com dimensões fixas ═══ */
+  body[data-theme='dark'] .dashboard-mobile-tx-fab,
+  body[data-theme='light'] .dashboard-mobile-tx-fab {
+    min-height: 52px !important; border-radius: 999px !important;
+  }
+
+  /* ═══ P5 — Tab desabilitado ═══ */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab:disabled { opacity: 0.45 !important; cursor: not-allowed !important; }
+
+  /* ═══ P7 — Bottom nav: fundo semi-transparente p/ o blur funcionar ═══ */
+  body[data-theme='dark'] .mobile-bottom-nav__bar {
+    background: linear-gradient(180deg, rgba(19,22,29,0.90) 0%, rgba(11,14,19,0.94) 100%) !important;
+  }
+  body[data-theme='light'] .mobile-bottom-nav__bar {
+    background: linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(245,247,250,0.94) 100%) !important;
+  }
+}

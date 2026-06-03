@@ -10,6 +10,7 @@ import { apiFetch } from '../lib/apiFetch'
 import { redirectSe401 } from '../lib/authRedirect'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { showToast } from '../lib/toastStore'
+import { useSheetDragClose } from '../hooks/useSheetDragClose'
 import {
   SAO_PAULO_OFFSET,
   saoPauloDateKey,
@@ -23,6 +24,7 @@ import {
   monthKeyToDate,
   addMonths,
   buildMonthCalendar,
+  buildWeekDays,
   getWeekRange,
   agendaItemKind,
 } from '../lib/agendaDateUtils'
@@ -56,12 +58,17 @@ export default function Agenda() {
   const [saving, setSaving] = useState(false)
   const savingRef = useRef(false)
   const editingRef = useRef(null)
+  const agendaSheetRef = useRef(null)
+  const closeAgendaSheet = useCallback(() => { if (!savingRef.current) setModalOpen(false) }, [])
+  useSheetDragClose(agendaSheetRef, { open: modalOpen, onClose: closeAgendaSheet })
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   /** Exclusão direta na lista do dia (confirmação em `ConfirmDialog`). */
   const [pendingDelete, setPendingDelete] = useState(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [selectedDateKey, setSelectedDateKey] = useState(() => saoPauloDateKey(new Date()))
   const [calendarMonthKey, setCalendarMonthKey] = useState(() => saoPauloDateKey(new Date()).slice(0, 7))
+  const [calendarView, setCalendarView] = useState('month')
+  const [draggingEvent, setDraggingEvent] = useState(null)
 
   const usuarioId = usuario?.id ? String(usuario.id).trim() : ''
 
@@ -173,6 +180,53 @@ export default function Agenda() {
     () => activeEventos.find((ev) => ev.status !== 'CONCLUIDO' && new Date(ev.inicio) >= new Date()) || null,
     [activeEventos]
   )
+
+  // Mini-agenda da semana (feature 1) + visão semanal (feature 10)
+  const weekDays = useMemo(() => buildWeekDays(selectedDateKey), [selectedDateKey])
+  const weekDaysComContagem = useMemo(
+    () =>
+      weekDays.map((d) => ({
+        ...d,
+        count: (eventosByDate.get(d.key) || []).filter((ev) => ev.status !== 'CONCLUIDO').length,
+        selected: d.key === selectedDateKey,
+      })),
+    [weekDays, eventosByDate, selectedDateKey]
+  )
+
+  // Reagendar via drag-and-drop (feature 9): mantém o horário, troca a data.
+  async function rescheduleEvent(evento, newDateKey) {
+    if (!usuarioId || !evento?.id) return
+    if (saoPauloDateKey(evento.inicio) === newDateKey) return
+    const localOld = toDatetimeLocal(evento.inicio)
+    const time = localOld.slice(11) || '09:00'
+    const newIso = localToIso(`${newDateKey}T${time}`)
+    if (!newIso) return
+    // Atualização otimista
+    setEventos((prev) => prev.map((ev) => (ev.id === evento.id ? { ...ev, inicio: newIso } : ev)))
+    try {
+      const payload = {
+        titulo: evento.titulo,
+        inicio: newIso,
+        lembrar_minutos_antes: evento.lembrar_minutos_antes ?? 15,
+        whatsapp_notificar: evento.whatsapp_notificar !== false,
+      }
+      const res = await apiFetch(apiUrl(`/api/agenda/${evento.id}`), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (redirectSe401(res)) return
+      if (!res.ok) throw new Error(data.message || 'Falha ao reagendar.')
+      showToast('Item reagendado.', 'success')
+      await loadAgenda()
+    } catch (err) {
+      showToast(err.message || 'Falha ao reagendar.', 'error')
+      await loadAgenda()
+    } finally {
+      setDraggingEvent(null)
+    }
+  }
 
   function goToMonth(amount) {
     setCalendarMonthKey((currentMonth) => {
@@ -358,16 +412,50 @@ export default function Agenda() {
                     <p>Sem próximos compromissos ativos.</p>
                   )}
                 </div>
+
+                {/* Mini-agenda da semana (feature 1) */}
+                <div className="agenda-hero__week" role="group" aria-label="Resumo da semana">
+                  {weekDaysComContagem.map((d) => (
+                    <button
+                      key={d.key}
+                      type="button"
+                      className={[
+                        'agenda-hero__week-day',
+                        d.selected ? 'agenda-hero__week-day--selected' : '',
+                        d.isToday ? 'agenda-hero__week-day--today' : '',
+                        d.count > 0 ? 'agenda-hero__week-day--has' : '',
+                      ].filter(Boolean).join(' ')}
+                      onClick={() => {
+                        setSelectedDateKey(d.key)
+                        setCalendarMonthKey(dateKeyToMonthKey(d.key))
+                      }}
+                      aria-pressed={d.selected}
+                      aria-label={`${d.weekday} dia ${d.day}, ${d.count} ${d.count === 1 ? 'item' : 'itens'}`}
+                    >
+                      <span className="agenda-hero__week-wd">{d.weekday}</span>
+                      <span className="agenda-hero__week-num">{d.day}</span>
+                      <span className="agenda-hero__week-count">{d.count > 0 ? d.count : ''}</span>
+                    </button>
+                  ))}
+                </div>
               </section>
 
               <AgendaCalendarPanel
                 calendarDays={calendarDays}
+                weekDays={weekDaysComContagem}
+                view={calendarView}
+                onChangeView={setCalendarView}
                 selectedDateKey={selectedDateKey}
+                eventsByDate={eventosByDate}
                 eventDateKeys={eventDateKeys}
                 eventDateKinds={eventDateKinds}
                 calendarMonthKey={calendarMonthKey}
                 statsToday={stats.today}
                 statsReminders={stats.reminders}
+                draggingEvent={draggingEvent}
+                onDropDay={(dateKey) => {
+                  if (draggingEvent) rescheduleEvent(draggingEvent, dateKey)
+                }}
                 onSelectDay={(dateKey) => {
                   setSelectedDateKey(dateKey)
                   setCalendarMonthKey(dateKeyToMonthKey(dateKey))
@@ -384,6 +472,8 @@ export default function Agenda() {
                 onEdit={openEdit}
                 onSetStatus={setStatus}
                 onDelete={setPendingDelete}
+                onDragStartEvent={setDraggingEvent}
+                onDragEndEvent={() => setDraggingEvent(null)}
               />
             </RefDashboardScroll>
           </div>
@@ -400,6 +490,7 @@ export default function Agenda() {
         >
           <form
             className="agenda-modal"
+            ref={agendaSheetRef}
             role="dialog"
             aria-modal="true"
             aria-label={editing ? 'Editar item da agenda' : 'Novo item da agenda'}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BRAND_ASSETS } from '../lib/brandAssets'
+import './PwaInstallPrompt.css'
 
 const DISMISS_KEY = 'horizonte_pwa_install_dismissed_at'
 const DISMISS_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
@@ -87,8 +88,8 @@ export default function PwaInstallPrompt() {
           src={BRAND_ASSETS.appIconPng || BRAND_ASSETS.appIcon}
           alt=""
           className="pwa-install-sheet__icon"
-          width={56}
-          height={56}
+          width={46}
+          height={46}
           decoding="async"
         />
 

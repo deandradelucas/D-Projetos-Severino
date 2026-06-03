@@ -22,3 +22,31 @@
 @import './dashboard/partials/11-page-relatorios.css';
 @import './dashboard/partials/07b-page-dashboard-home-align.css';
 @import './dashboard/partials/12-page-lista-compras.css';
+
+/* v1.0.1 — Neo-skeumorphism overlay (desktop only, dashboard home) */
+@import './dashboard/partials/13-dashboard-neumorphic-desktop.css';
+@import './dashboard/partials/14-sidebar-neumorphic-desktop.css';
+@import './dashboard/partials/15-transacoes-neumorphic-desktop.css';
+@import './dashboard/partials/16-investimentos-neumorphic-desktop.css';
+@import './dashboard/partials/17-relatorios-neumorphic-desktop.css';
+@import './dashboard/partials/18-agenda-neumorphic-desktop.css';
+@import './dashboard/partials/19-lista-compras-neumorphic-desktop.css';
+@import './dashboard/partials/20-pagamento-neumorphic-desktop.css';
+@import './dashboard/partials/21-configuracoes-neumorphic-desktop.css';
+
+/* v1.0.1 — Mobile neumorphic (≤768px) */
+@import './dashboard/partials/22-mobile-foundation-neumorphic.css';
+@import './dashboard/partials/23-mobile-pages-neumorphic.css';
+@import './dashboard/partials/24-mobile-bottom-sheets.css';
+@import './dashboard/partials/25-mobile-audit-fixes.css';
+@import './dashboard/partials/26-mobile-transacoes-fix.css';
+@import './dashboard/partials/27-mobile-modal-nova-tx-fix.css';
+@import './dashboard/partials/28-tx-detalhe-modal.css';
+@import './dashboard/partials/29-investimentos-comparador-mobile.css';
+@import './dashboard/partials/30-investimentos-modal-mobile.css';
+@import './dashboard/partials/31-sheet-drag-close.css';
+@import './dashboard/partials/32-lista-modal-mobile.css';
+@import './dashboard/partials/33-pagamento-mobile.css';
+@import './dashboard/partials/34-lista-modo-comprando.css';
+@import './dashboard/partials/16-modal-nova-tx-neumorphic-desktop.css';
+@import './dashboard/partials/17-investimentos-neumorphic-desktop.css';

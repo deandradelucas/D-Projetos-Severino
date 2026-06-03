@@ -4,7 +4,7 @@
    ============================================================================= */
 
 .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell {
-  font-family: var(--tx-dir-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  font-family: var(--font-family-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -264,6 +264,11 @@
 .page-lista-compras__lista-gasto-tag svg {
   flex-shrink: 0;
   color: var(--accent-hover, #c49535);
+}
+
+/* Tarefas: identidade roxa (distinta do dourado de compras) */
+.page-lista-compras__lista-gasto-tag--tarefas svg {
+  color: #8b5cf6;
 }
 
 /* ---------------------------------------------------------------------------
@@ -544,7 +549,7 @@
   min-height: 42px;
   max-width: calc(100vw - 104px);
   padding: 0 16px 0 10px;
-  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 62%, rgba(255, 255, 255, 0.38));
+  border: none;
   border-radius: 999px;
   background: linear-gradient(
     175deg,
@@ -783,6 +788,9 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 /* Sem preço: só "+ Novo item", mesma barra centralizada */
 .page-lista-compras__footer--solo {
   padding: 12px 16px;
+  background: transparent;
+  border-top: none;
+  box-shadow: none;
 }
 
 .page-lista-compras__footer .page-lista-compras__total {
@@ -1628,4 +1636,244 @@ body[data-theme='dark'] .page-lista-compras__footer-actions {
 body[data-theme='light'] .page-lista-compras__footer .page-lista-compras__novo-item-fab,
 body[data-theme='dark'] .page-lista-compras__footer .page-lista-compras__novo-item-fab {
   margin-inline: auto;
+}
+
+/* ═══════════════ Toggle de TIPO no modal Nova lista (Compras | Tarefas) ═══════════════ */
+.page-lista-compras__tipo-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+.page-lista-compras__tipo-btn {
+  padding: 12px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.07);
+  color: #64748b;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+.page-lista-compras__tipo-btn--active {
+  border-color: #d4a84b;
+  background: rgba(212, 168, 75, 0.14);
+  color: #b45309;
+  box-shadow: 0 0 0 1px rgba(212, 168, 75, 0.45);
+}
+.page-lista-compras__tipo-hint {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #64748b;
+}
+body[data-theme='dark'] .page-lista-compras__tipo-btn {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+}
+body[data-theme='dark'] .page-lista-compras__tipo-btn--active {
+  border-color: #d4a84b;
+  background: rgba(212, 168, 75, 0.18);
+  color: #e4bc6a;
+}
+
+/* Opções de recorrência (modal) — pilha vertical no estilo do tipo-toggle */
+.page-lista-compras__recorrencia-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+.page-lista-compras__recorrencia-opt {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.07);
+  color: #64748b;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+.page-lista-compras__recorrencia-opt--active {
+  border-color: #d4a84b;
+  background: rgba(212, 168, 75, 0.14);
+  color: #b45309;
+  box-shadow: 0 0 0 1px rgba(212, 168, 75, 0.45);
+}
+body[data-theme='dark'] .page-lista-compras__recorrencia-opt {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+}
+body[data-theme='dark'] .page-lista-compras__recorrencia-opt--active {
+  border-color: #d4a84b;
+  background: rgba(212, 168, 75, 0.18);
+  color: #e4bc6a;
+}
+body[data-theme='dark'] .page-lista-compras__tipo-hint {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ═══════════════ Stepper de unidades (+/−) no item ═══════════════ */
+.page-lista-compras__item-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.page-lista-compras__item-step {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.08);
+  color: #b45309;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.page-lista-compras__item-step:active { background: rgba(212, 168, 75, 0.18); }
+.page-lista-compras__item-step:disabled { opacity: 0.4; cursor: not-allowed; }
+body[data-theme='dark'] .page-lista-compras__item-step {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e4bc6a;
+}
+
+/* ═══════════════ #6 Hint de preço sugerido ═══════════════ */
+.page-lista-compras__preco-hint {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+.page-lista-compras__preco-hint--btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--accent, #d4a84b);
+  text-align: left;
+}
+.page-lista-compras__preco-hint--btn:active { opacity: 0.7; }
+
+/* ═══════════════ #7 Barra de orçamento ═══════════════ */
+.page-lista-compras__orcamento {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.07);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+.page-lista-compras__orcamento--excedido {
+  background: rgba(224, 86, 79, 0.08);
+  border-color: rgba(224, 86, 79, 0.35);
+}
+.page-lista-compras__orcamento-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.page-lista-compras__orcamento-label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.page-lista-compras__orcamento--excedido .page-lista-compras__orcamento-label {
+  color: #e0564f;
+}
+.page-lista-compras__orcamento-valor {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.page-lista-compras__orcamento-bar {
+  position: relative;
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(148, 163, 184, 0.18);
+  overflow: hidden;
+}
+.page-lista-compras__orcamento-fill {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--accent, #d4a84b);
+  transition: width 280ms ease;
+}
+.page-lista-compras__orcamento--excedido .page-lista-compras__orcamento-fill {
+  background: #e0564f;
+}
+.page-lista-compras__orcamento-restante {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.page-lista-compras__orcamento--excedido .page-lista-compras__orcamento-restante {
+  color: #e0564f;
+}
+
+/* Item de menu em destaque (Modo comprando) */
+.page-lista-compras__list-dropdown-item--accent {
+  color: var(--accent, #d4a84b);
+  font-weight: 600;
+}
+
+/* ═══════════════ #10 Prazo (badge) + #12 autor de quem marcou ═══════════════ */
+.page-lista-compras__item-prazo {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent, #d4a84b);
+  background: rgba(212, 168, 75, 0.12);
+  padding: 2px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.page-lista-compras__item-autor {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Fix iOS: texto do datetime-local segue o color-scheme do app, não do sistema */
+body[data-theme='dark'] .page-lista-compras__modal-input--datetime { color-scheme: dark; }
+body[data-theme='light'] .page-lista-compras__modal-input--datetime { color-scheme: light; }
+
+/* ═══════════════ #11 Badge de recorrência ═══════════════ */
+.page-lista-compras__recorrencia-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent, #d4a84b);
+  background: rgba(212, 168, 75, 0.12);
+  padding: 3px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
 }

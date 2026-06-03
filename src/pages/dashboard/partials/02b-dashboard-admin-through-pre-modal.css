@@ -75,144 +75,19 @@
   display: none;
 }
 
-.pwa-install-sheet {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
-  z-index: 88;
-  width: min(360px, calc(100vw - 32px));
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 24px;
-  background:
-    linear-gradient(180deg, rgba(18, 18, 20, 0.9), rgba(5, 5, 7, 0.94)),
-    rgba(5, 5, 7, 0.92);
-  color: #f8fafc;
-  box-shadow:
-    0 28px 70px -34px rgba(0, 0, 0, 0.9),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  -webkit-backdrop-filter: blur(24px) saturate(1.18);
-  backdrop-filter: blur(24px) saturate(1.18);
-}
-
-.pwa-install-sheet__glow {
-  position: absolute;
-  inset: -42% -20% auto auto;
-  width: 180px;
-  height: 180px;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(212, 168, 75, 0.24), transparent 68%);
-  pointer-events: none;
-}
-
-.pwa-install-sheet__content {
-  position: relative;
-  display: flex;
-  gap: 13px;
-  align-items: flex-start;
-  padding: 16px 16px 0;
-}
-
-.pwa-install-sheet__icon {
-  flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-  padding: 8px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 16px 32px -22px rgba(0, 0, 0, 0.85);
-}
-
-.pwa-install-sheet__body {
-  min-width: 0;
-}
-
-.pwa-install-sheet__eyebrow,
-.pwa-install-sheet__title,
-.pwa-install-sheet__text {
-  margin: 0;
-}
-
-.pwa-install-sheet__eyebrow {
-  color: #d4a84b;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.pwa-install-sheet__title {
-  margin-top: 5px;
-  font-size: 17px;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.12;
-}
-
-.pwa-install-sheet__text {
-  margin-top: 5px;
-  color: rgba(226, 232, 240, 0.78);
-  font-size: 12px;
-  font-weight: 550;
-  line-height: 1.42;
-}
-
-.pwa-install-sheet__actions {
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 14px 16px 16px;
-}
-
-.pwa-install-sheet__btn {
-  min-height: 42px;
-  min-width: 92px;
-  border-radius: 15px;
-  padding: 0 14px;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 850;
-  cursor: pointer;
-  touch-action: manipulation;
-  transition:
-    transform 0.16s ease,
-    background 0.18s ease,
-    border-color 0.18s ease;
-}
-
-.pwa-install-sheet__btn:active {
-  transform: scale(0.97);
-}
-
-.pwa-install-sheet__btn:focus-visible {
-  outline: 2px solid #d4a84b;
-  outline-offset: 2px;
-}
-
-.pwa-install-sheet__btn--ghost {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(226, 232, 240, 0.84);
-}
-
-.pwa-install-sheet__btn--primary {
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.36), transparent 48%),
-    linear-gradient(180deg, #efd184 0%, #d4a84b 100%);
-  color: #111827;
-  box-shadow: 0 14px 30px -20px rgba(212, 168, 75, 0.9);
-}
-
 body:has(.modal-backdrop) .mobile-bottom-nav,
 body:has(.modal-backdrop) .dashboard-mobile-tx-fab,
 body:has(.modal-backdrop) .horizon-chat-fab,
 body:has(.modal-backdrop) .horizon-chat-window,
 body:has(.modal-backdrop) .pwa-install-sheet {
+  display: none !important;
+}
+
+/* Modais da Lista usam overlay próprio (.page-lista-compras__modal-overlay) — esconder nav/FAB tb */
+body:has(.page-lista-compras__modal-overlay) .mobile-bottom-nav,
+body:has(.page-lista-compras__modal-overlay) .dashboard-mobile-tx-fab,
+body:has(.page-lista-compras__modal-overlay) .dashboard-mobile-fabs,
+body:has(.page-lista-compras__modal-overlay) .horizon-chat-fab {
   display: none !important;
 }
 
@@ -748,26 +623,6 @@ body:has(.sidebar.open) .horizon-chat-window {
     backdrop-filter: blur(12px) saturate(1.08);
   }
 
-  .pwa-install-sheet {
-    left: max(12px, var(--safe-left));
-    right: max(12px, var(--safe-right));
-    bottom: calc(102px + var(--safe-bottom));
-    width: auto;
-    border-radius: 28px;
-  }
-
-  .pwa-install-sheet__content {
-    padding: 18px 18px 0;
-  }
-
-  .pwa-install-sheet__actions {
-    padding: 15px 18px 18px;
-  }
-
-  body:has(.dashboard-mobile-tx-fab) .pwa-install-sheet {
-    bottom: calc(128px + var(--safe-bottom));
-  }
-
   .dashboard-mobile-tx-fab {
     position: fixed;
     left: 0;
@@ -877,11 +732,6 @@ body:has(.sidebar.open) .horizon-chat-window {
   .mobile-bottom-nav__item,
   .dashboard-mobile-tx-fab {
     animation: none;
-    transition: none;
-  }
-
-  .pwa-install-sheet,
-  .pwa-install-sheet__btn {
     transition: none;
   }
 }

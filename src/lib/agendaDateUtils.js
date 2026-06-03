@@ -211,3 +211,39 @@ export const AGENDA_KIND_META = {
   milestone: { label: 'Marco', icon: 'flag', tone: 'milestone' },
   done: { label: 'Concluído', icon: 'check', tone: 'done' },
 }
+
+/** Badge visual de status (feature 8). */
+export const AGENDA_STATUS_BADGE = {
+  AGENDADO: { label: 'Agendado', tone: 'scheduled' },
+  CONFIRMADO: { label: 'Confirmado', tone: 'confirmed' },
+  CONCLUIDO: { label: 'Concluído', tone: 'done' },
+  CANCELADO: { label: 'Cancelado', tone: 'cancelled' },
+}
+
+/** Período do dia a partir do horário SP (feature 7). */
+export function agendaPeriodoDoDia(iso) {
+  const { hour } = saoPauloParts(new Date(iso))
+  const h = Number(hour)
+  if (Number.isNaN(h)) return { key: 'dia', label: 'Dia', order: 1 }
+  if (h < 12) return { key: 'manha', label: 'Manhã', order: 0 }
+  if (h < 18) return { key: 'tarde', label: 'Tarde', order: 1 }
+  return { key: 'noite', label: 'Noite', order: 2 }
+}
+
+/** 7 dias da semana (Seg→Dom) que contém dateKey (features 1 e 10). */
+export function buildWeekDays(dateKey) {
+  const { start } = getWeekRange(dateKey)
+  const todayKey = saoPauloDateKey(new Date())
+  const WEEKDAYS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(start)
+    d.setDate(start.getDate() + i)
+    const key = saoPauloDateKey(d)
+    return {
+      key,
+      day: d.getDate(),
+      weekday: WEEKDAYS[i],
+      isToday: key === todayKey,
+    }
+  })
+}

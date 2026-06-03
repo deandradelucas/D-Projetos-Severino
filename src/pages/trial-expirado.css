@@ -1,0 +1,139 @@
+/* =============================================================================
+   Trial expirado — tela de fim do período gratuito (LIGHT, padrão do sistema).
+   Mesma identidade do card de bem-vindo: card branco, acentos dourados,
+   contraste WCAG. Layout/sizing em utilitários Tailwind no JSX.
+   ============================================================================= */
+
+.trial-screen {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -8%, rgba(212, 168, 75, 0.12) 0%, transparent 62%),
+    linear-gradient(180deg, #ffffff 0%, #eef1f6 100%);
+}
+
+.trial-topline {
+  background: linear-gradient(90deg, transparent, rgba(212, 168, 75, 0.55), transparent);
+}
+
+.trial-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 2px 8px rgba(15, 23, 42, 0.04),
+    0 28px 64px -28px rgba(15, 23, 42, 0.18);
+}
+
+/* ─── Badge "Período encerrado" ─── */
+.trial-badge {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  color: #dc2626;
+}
+
+.trial-badge-dot {
+  background: #ef4444;
+}
+
+/* ─── Headline ─── */
+.trial-title {
+  color: #0f172a;
+}
+
+.trial-title-accent {
+  color: #b8832a;
+}
+
+.trial-subtitle {
+  color: #475569;
+}
+
+.trial-subtitle-strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.trial-divider {
+  background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.08), transparent);
+}
+
+/* ─── Lista de perda ─── */
+.trial-loss-label {
+  color: #b8832a;
+}
+
+.trial-loss-item {
+  color: #334155;
+}
+
+.trial-loss-icon {
+  background: rgba(212, 168, 75, 0.14);
+  border: 1px solid rgba(212, 168, 75, 0.32);
+}
+
+/* ─── Bloco de urgência ─── */
+.trial-urgency {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.trial-urgency-text {
+  color: #475569;
+}
+
+.trial-urgency-strong {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+/* ─── CTA principal (botão dourado do sistema) ─── */
+.trial-cta {
+  background: var(--accent, #d4a84b);
+  color: var(--accent-foreground, #1a1200);
+  box-shadow: var(--shadow-accent, 0 4px 16px rgba(212, 168, 75, 0.32));
+}
+
+/* ─── CTA secundário (outline) ─── */
+.trial-cta-2 {
+  background: transparent;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #475569;
+}
+
+.trial-cta-2:hover {
+  background: rgba(15, 23, 42, 0.03);
+  color: #1e293b;
+}
+
+/* ─── Botão de suporte (WhatsApp) ─── */
+.trial-support {
+  background: rgba(37, 211, 102, 0.07);
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  color: #0f766e;
+}
+
+.trial-support:hover {
+  background: rgba(37, 211, 102, 0.12);
+  color: #115e59;
+}
+
+.trial-support-icon {
+  color: #25d366;
+}
+
+/* ─── Rodapé ─── */
+.trial-trust-icon {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.trial-trust-text {
+  color: #94a3b8;
+}
+
+.trial-logout {
+  color: #94a3b8;
+}
+
+.trial-logout:hover {
+  color: #475569;
+}

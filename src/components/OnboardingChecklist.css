@@ -1,0 +1,96 @@
+/* =============================================================================
+   Onboarding de ativação — checklist de primeiros passos no Dashboard.
+   Vars de tema (light/dark).
+   ============================================================================= */
+
+.onboarding {
+  margin: 0 0 16px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-left: 3px solid var(--accent);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+}
+
+.onboarding__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.onboarding__title { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+.onboarding__sub { margin: 2px 0 0; font-size: 0.8rem; color: var(--text-secondary); }
+.onboarding__dismiss {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.onboarding__dismiss:hover { color: var(--text-secondary); text-decoration: underline; }
+
+.onboarding__bar {
+  height: 7px;
+  margin: 12px 0 14px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+.onboarding__bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.onboarding__steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.onboarding__step { display: flex; align-items: center; gap: 11px; }
+.onboarding__check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--border-default);
+  color: #fff;
+  background: transparent;
+}
+.onboarding__step--done .onboarding__check {
+  border-color: #22c55e;
+  background: #22c55e;
+}
+.onboarding__step-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+.onboarding__step--done .onboarding__step-label {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+.onboarding__step-cta {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: var(--accent-foreground, #1a1200);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-accent, 0 3px 10px rgba(212, 168, 75, 0.28));
+}
+.onboarding__step-cta:hover { filter: brightness(1.04); }
+
+.onboarding__tip {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-default);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
