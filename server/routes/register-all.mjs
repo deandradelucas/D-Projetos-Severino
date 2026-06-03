@@ -13,6 +13,10 @@ import { registerInvestimentosRoutes } from './register-investimentos.mjs'
 import { registerTaxaSelicRoutes } from './register-taxa-selic.mjs'
 import { registerTaxaCdiRoutes } from './register-taxa-cdi.mjs'
 import { registerListaComprasRoutes } from './register-lista-compras.mjs'
+import { registerMetasRoutes } from './register-metas.mjs'
+import { registerCartoesRoutes } from './register-cartoes.mjs'
+import { registerInsightsRoutes } from './register-insights.mjs'
+import { registerOnboardingRoutes } from './register-onboarding.mjs'
 import { registerDigestRoutes } from './register-digest.mjs'
 import { registerTrialRoutes } from './register-trial.mjs'
 import { registerImportRoutes } from './register-import.mjs'
@@ -34,6 +38,10 @@ export function registerApiDomainRoutes(app) {
   registerFamiliaRoutes(app)
   registerInvestimentosRoutes(app)
   registerListaComprasRoutes(app)
+  registerMetasRoutes(app)
+  registerCartoesRoutes(app)
+  registerInsightsRoutes(app)
+  registerOnboardingRoutes(app)
   registerDigestRoutes(app)
   registerTrialRoutes(app)
   registerImportRoutes(app)

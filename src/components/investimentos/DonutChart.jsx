@@ -98,6 +98,43 @@ export default function DonutChart({ data, colors, formatValue, legendStyle }) {
             />
           ))
         )}
+
+        {/* Valor central no donut */}
+        {hovered ? (
+          <g aria-hidden="true">
+            <text
+              x={CENTER} y={CENTER - 6}
+              textAnchor="middle" dominantBaseline="middle"
+              className="page-investimentos-resumo__donut-center-label"
+            >
+              {hovered.pct.toFixed(1)}%
+            </text>
+            <text
+              x={CENTER} y={CENTER + 13}
+              textAnchor="middle" dominantBaseline="middle"
+              className="page-investimentos-resumo__donut-center-name"
+            >
+              {hovered.name.length > 8 ? hovered.name.slice(0, 8) + '…' : hovered.name}
+            </text>
+          </g>
+        ) : (
+          <g aria-hidden="true">
+            <text
+              x={CENTER} y={CENTER - 7}
+              textAnchor="middle" dominantBaseline="middle"
+              className="page-investimentos-resumo__donut-center-total"
+            >
+              {slices.items.length}
+            </text>
+            <text
+              x={CENTER} y={CENTER + 11}
+              textAnchor="middle" dominantBaseline="middle"
+              className="page-investimentos-resumo__donut-center-sublabel"
+            >
+              {slices.items.length === 1 ? 'ativo' : 'ativos'}
+            </text>
+          </g>
+        )}
       </svg>
 
       {hovered ? (

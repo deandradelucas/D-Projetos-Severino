@@ -1,0 +1,137 @@
+/* =============================================================================
+   Bem-vindo / Assinatura — tela pós-cadastro (LIGHT, alinhada ao padrão do auth).
+   Card branco, acentos dourados (--accent), tipografia Plus Jakarta (herdada do
+   body), contraste WCAG. Layout/sizing em utilitários Tailwind no JSX.
+   ============================================================================= */
+
+.bemvindo-screen {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -8%, rgba(212, 168, 75, 0.12) 0%, transparent 62%),
+    linear-gradient(180deg, #ffffff 0%, #eef1f6 100%);
+}
+
+.bemvindo-topline {
+  background: linear-gradient(90deg, transparent, rgba(212, 168, 75, 0.55), transparent);
+}
+
+.bemvindo-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 2px 8px rgba(15, 23, 42, 0.04),
+    0 28px 64px -28px rgba(15, 23, 42, 0.18);
+}
+
+/* ─── Badge "Conta criada" ─── */
+.bemvindo-badge {
+  background: rgba(212, 168, 75, 0.12);
+  border: 1px solid rgba(212, 168, 75, 0.34);
+  color: #9a6c16;
+}
+
+.bemvindo-badge-ping,
+.bemvindo-badge-dot {
+  background: #d4a84b;
+}
+
+/* ─── Headline ─── */
+.bemvindo-title {
+  color: #0f172a;
+}
+
+.bemvindo-title-accent {
+  color: #b8832a;
+}
+
+.bemvindo-subtitle {
+  color: #475569;
+}
+
+.bemvindo-subtitle-accent {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* ─── Bullets ─── */
+.bemvindo-bullets-label {
+  color: #b8832a;
+}
+
+.bemvindo-bullet {
+  color: #334155;
+}
+
+.bemvindo-bullet-icon {
+  background: rgba(212, 168, 75, 0.14);
+  border: 1px solid rgba(212, 168, 75, 0.32);
+}
+
+/* ─── Box de trial ─── */
+.bemvindo-trial {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.28);
+}
+
+.bemvindo-trial-title {
+  color: #15803d;
+}
+
+.bemvindo-trial-text {
+  color: #475569;
+}
+
+.bemvindo-trial-strong {
+  color: #1e293b;
+}
+
+.bemvindo-error {
+  color: #dc2626;
+}
+
+/* ─── CTA principal (mesmo padrão dos botões dourados do sistema) ─── */
+.bemvindo-cta {
+  background: var(--accent, #d4a84b);
+  color: var(--accent-foreground, #1a1200);
+  box-shadow: var(--shadow-accent, 0 4px 16px rgba(212, 168, 75, 0.32));
+}
+
+.bemvindo-cta-hint {
+  color: #64748b;
+}
+
+.bemvindo-skip {
+  background: transparent;
+  border: none;
+  color: #64748b;
+}
+
+.bemvindo-skip:hover {
+  color: #334155;
+}
+
+/* ─── Botão de suporte (WhatsApp) ─── */
+.bemvindo-support {
+  background: rgba(37, 211, 102, 0.07);
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  color: #0f766e;
+}
+
+.bemvindo-support:hover {
+  background: rgba(37, 211, 102, 0.12);
+  color: #115e59;
+}
+
+.bemvindo-support-icon {
+  color: #25d366;
+}
+
+/* ─── Rodapé de confiança ─── */
+.bemvindo-trust-icon {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.bemvindo-trust-text {
+  color: #94a3b8;
+}

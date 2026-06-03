@@ -1,0 +1,1393 @@
+/* =============================================================================
+   23 — MOBILE · páginas específicas (≤ 768px)
+   =============================================================================
+   Usa tokens --m-* do partial 22. Ajusta layouts (grids empilham), calendário,
+   cards de investimento, charts, lista de compras, pagamento, configurações.
+   ============================================================================= */
+
+@media (max-width: 768px) {
+
+  /* ═══════════ RELATÓRIOS ═══════════ */
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-row--3col,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-row--3col {
+    display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo {
+    grid-column: 1 / -1 !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights {
+    display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 0 !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-radius: 18px !important;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important; overflow: hidden !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item {
+    padding: 14px 16px !important; border-right: 1px solid var(--m-edge-lo) !important; border-bottom: 1px solid var(--m-edge-lo) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item--wide,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item--wide {
+    grid-column: 1 / -1 !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__pair,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__pair {
+    display: flex !important; flex-direction: column !important; gap: 12px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts {
+    display: flex !important; flex-direction: column !important; gap: 14px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-chart-card,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-chart-card {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-radius: 20px !important; padding: 16px !important;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__section-title,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__section-title {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.625rem !important; font-weight: 700 !important;
+    text-transform: uppercase !important; letter-spacing: 0.18em !important; color: var(--m-text-lo) !important;
+  }
+  /* Botões export CSV/PDF */
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-btn-export,
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-btn-export {
+    border-radius: 999px !important; background: var(--m-sunken) !important; border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important; box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important;
+  }
+
+  /* ═══════════ INVESTIMENTOS ═══════════ */
+  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card,
+  body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-radius: 18px !important;
+    box-shadow: 6px 6px 16px var(--m-shadow-soft), -4px -4px 12px var(--m-light) !important; overflow: hidden !important;
+    margin-bottom: 12px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo,
+  body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-radius: 20px !important; padding: 18px 16px !important;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat,
+  body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat {
+    background: var(--m-sunken) !important; border-radius: 14px !important; padding: 14px !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat-value,
+  body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat-value {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; color: var(--m-text-hi) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__bank-avatar,
+  body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__bank-avatar {
+    background: var(--m-sunken) !important; box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important; color: var(--m-accent) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-chip--tipo,
+  body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-chip--tipo {
+    background: var(--m-accent-glow) !important; color: var(--m-accent) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__actions,
+  body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__actions {
+    background: var(--m-sunken) !important; border-top: 1px solid var(--m-edge-lo) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-alerta,
+  body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-alerta {
+    padding: 0 14px !important;
+  }
+
+  /* ═══════════ AGENDA ═══════════ */
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel,
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-radius: 20px !important; padding: 16px !important;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day {
+    color: var(--m-text-mid) !important; border-radius: 10px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--today,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--today { color: var(--m-accent) !important; font-weight: 700 !important; }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected .agenda-calendar-day__num,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected .agenda-calendar-day__num,
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected > span,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected > span {
+    display: grid !important; place-items: center !important; width: 30px !important; height: 30px !important; border-radius: 50% !important;
+    background: linear-gradient(155deg, var(--m-accent), #c49535) !important; color: var(--m-accent-fg) !important;
+    -webkit-text-fill-color: var(--m-accent-fg) !important; font-weight: 700 !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item {
+    background: var(--m-sunken) !important; border-radius: 14px !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item h3,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item h3 { color: var(--m-text-hi) !important; }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day {
+    background: var(--m-sunken) !important; box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important; border-radius: 12px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-num,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-num { color: var(--m-text-hi) !important; }
+
+  /* ═══════════ LISTA DE COMPRAS ═══════════ */
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__category-group,
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__category-group {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-radius: 18px !important; padding: 14px !important;
+    box-shadow: 6px 6px 16px var(--m-shadow-soft), -4px -4px 12px var(--m-light) !important; margin-bottom: 12px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab,
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab {
+    background: var(--m-sunken) !important; border: 1px solid var(--m-edge-hi) !important; color: var(--m-text-mid) !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important; border-radius: 999px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab--active,
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab--active {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important; color: var(--m-accent) !important;
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), 0 0 0 1px var(--m-accent-glow) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-check--checked,
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-check--checked {
+    background: linear-gradient(155deg, var(--m-accent), #c49535) !important; color: var(--m-accent-fg) !important; border-color: transparent !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__cta-btn,
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__cta-btn {
+    background: linear-gradient(155deg, var(--m-accent), #c49535) !important; color: var(--m-accent-fg) !important; border: none !important;
+    border-radius: 999px !important; font-weight: 700 !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__total-value,
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__total-value {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; color: var(--m-text-hi) !important;
+  }
+
+  /* ═══════════ PAGAMENTO ═══════════ */
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-panel,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-panel,
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-radius: 20px !important;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__grid,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__grid {
+    grid-template-columns: 1fr !important; gap: 12px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option {
+    background: var(--m-sunken) !important; border: 1px solid var(--m-edge-hi) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft) !important; border-radius: 16px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option--active,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option--active {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    box-shadow: 4px 4px 10px var(--m-shadow-soft), 0 0 0 2px var(--m-accent-glow) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__list,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__list {
+    grid-template-columns: 1fr !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-primary,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-primary {
+    background: linear-gradient(155deg, var(--m-accent), #c49535) !important; color: var(--m-accent-fg) !important; border: none !important; border-radius: 999px !important; font-weight: 700 !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-pix-cta,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-pix-cta {
+    background: var(--m-pos-soft) !important; border: 1px solid var(--m-pos-glow) !important; color: var(--m-pos) !important; border-radius: 999px !important;
+  }
+
+  /* ═══════════ CONFIGURAÇÕES ═══════════ */
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important; border-radius: 20px !important; padding: 18px 16px !important;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-title-clean,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-title-clean {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; color: var(--m-text-hi) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-kicker,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-kicker { color: var(--m-accent) !important; }
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-section-nav__pill,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-section-nav__pill,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-action-btn,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-action-btn {
+    background: var(--m-sunken) !important; border: 1px solid var(--m-edge-hi) !important; color: var(--m-text-mid) !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important; border-radius: 999px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-action-btn--primary,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-action-btn--primary {
+    background: linear-gradient(155deg, var(--m-accent), #c49535) !important; color: var(--m-accent-fg) !important; border: none !important; box-shadow: 0 6px 14px -5px var(--m-accent-glow) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar {
+    background: linear-gradient(155deg, var(--m-accent), #c49535) !important; color: var(--m-accent-fg) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-card,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-card,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-pref-row,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-pref-row,
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-field,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-field {
+    background: var(--m-sunken) !important; box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light) !important; border-radius: 14px !important;
+  }
+  /* WhatsApp share do convite */
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-share-wa,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-share-wa {
+    background: linear-gradient(155deg, #25d366, #1ba34e) !important; color: #fff !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-grid,
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-grid {
+    flex-direction: column !important; align-items: center !important;
+  }
+}
+
+/* ═══════════════ Hero Investimentos — compacto + taxas claras (jun/2026) ═══════════════ */
+@media (max-width: 768px) {
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
+    padding: 14px 14px !important;
+    margin: 10px 0 4px !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
+    align-items: center !important;
+    gap: 10px !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+    font-size: 1.3rem !important;
+    line-height: 1.15 !important;
+    margin: 0 !important;
+  }
+  /* Comparar: so icone (44px) - libera largura pras taxas */
+  body[data-theme="dark"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary,
+  body[data-theme="light"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary {
+    width: 44px !important; min-width: 44px !important; padding: 0 !important; flex: 0 0 auto !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0 !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary .dashboard-hub__btn-label { display: none !important; }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary .dashboard-hub__btn-ico { width: 18px !important; height: 18px !important; }
+
+  /* Taxas SELIC/CDI: 2 pills compactos empilhados (label em cima, valor embaixo), full-width abaixo do titulo */
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-hero__rates-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 7px !important;
+    width: 100% !important;
+    margin: 12px 0 0 !important;
+  }
+  body[data-theme="dark"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-selic-badge--hero,
+  body[data-theme="light"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-selic-badge--hero,
+  body[data-theme="dark"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-cdi-badge--hero,
+  body[data-theme="light"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-cdi-badge--hero {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+    gap: 1px !important;
+    padding: 8px 12px !important;
+    border-radius: 13px !important;
+    min-width: 0 !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-selic-badge__k,
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-cdi-badge__k {
+    font-size: 0.5625rem !important;
+    letter-spacing: 0.06em !important;
+    color: var(--m-text-lo) !important;
+    white-space: nowrap !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-selic-badge__pill,
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-cdi-badge__pill {
+    font-size: 0.8125rem !important;
+    color: var(--m-text-hi) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ═══════════════ Fix: modais de investimentos invisiveis no mobile (opacity:0 herdado do 02c; sheet do 24 nao corrige) ═══════════════ */
+@media (max-width: 768px) {
+  .modal-content.page-investimentos-modal { opacity: 1 !important; }
+}
+
+/* ═══════════════ Fix iOS: input[type=date] invisível quando color-scheme do sistema != tema do app ═══════════════ */
+@media (max-width: 768px) {
+  body[data-theme='light'] .page-investimentos-resumo__projecao-input,
+  body[data-theme='light'] .page-investimentos-comparador input[type="date"],
+  body[data-theme='light'] .page-investimentos input[type="date"] {
+    color-scheme: light !important;
+    color: var(--m-text-hi) !important;
+    -webkit-text-fill-color: var(--m-text-hi) !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    font-size: 16px !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft) !important;
+  }
+  body[data-theme='dark'] .page-investimentos-resumo__projecao-input,
+  body[data-theme='dark'] .page-investimentos-comparador input[type="date"],
+  body[data-theme='dark'] .page-investimentos input[type="date"] {
+    color-scheme: dark !important;
+    color: var(--m-text-hi) !important;
+    -webkit-text-fill-color: var(--m-text-hi) !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    font-size: 16px !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft) !important;
+  }
+}
+
+/* ═══════════════ Resumo da carteira (Investimentos) — mais compacto no mobile ═══════════════ */
+@media (max-width: 768px) {
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo.ref-panel {
+    padding: 14px 14px !important;
+    min-height: 0 !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__head {
+    margin-bottom: 8px !important;
+    padding-bottom: 8px !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__projecao {
+    margin: 8px 0 !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__projecao-row {
+    gap: 8px !important;
+    align-items: center !important;
+  }
+  /* Stats: 2 colunas compactas (corta a altura) */
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stats {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat {
+    padding: 10px 12px !important;
+    gap: 2px !important;
+    border-radius: 13px !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat-label {
+    font-size: 0.56rem !important;
+    letter-spacing: 0.05em !important;
+  }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat-value {
+    font-size: 1.02rem !important;
+    line-height: 1.1 !important;
+  }
+  /* Stat "muted" (CDI indisponível) ocupa as 2 colunas */
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat--muted {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+/* ═══════════════ Agenda — hero (tira da semana + toggle) no mobile (jun/2026) ═══════════════ */
+@media (max-width: 768px) {
+  /* Tira da semana: 7 colunas (estava tudo grudado "Seg11Ter2...") */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 5px !important;
+    margin-top: 12px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2px !important;
+    padding: 7px 1px !important;
+    border-radius: 11px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid transparent !important;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    cursor: pointer !important;
+    min-width: 0 !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-wd {
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.5rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: var(--m-text-lo) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-num {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 700 !important;
+    color: var(--m-text-hi) !important;
+    line-height: 1 !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-count {
+    min-height: 14px !important;
+    min-width: 14px !important;
+    padding: 0 3px !important;
+    border-radius: 999px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.5rem !important;
+    font-weight: 700 !important;
+    line-height: 14px !important;
+    color: transparent !important;
+    background: transparent !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day--has .agenda-hero__week-count {
+    color: var(--m-accent-fg) !important;
+    background: var(--m-accent) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day--today {
+    border-color: var(--m-accent-glow) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day--today .agenda-hero__week-num {
+    color: var(--m-accent) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day--selected,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day--selected {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+  }
+
+  /* Resumo "Sem próximos compromissos" — fonte do sistema */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__summary p {
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.8125rem !important;
+    color: var(--m-text-mid) !important;
+    margin: 10px 0 0 !important;
+  }
+
+  /* Stats Hoje/Semana — pills compactos */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stats {
+    display: flex !important;
+    gap: 7px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stat,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stat {
+    display: inline-flex !important;
+    align-items: baseline !important;
+    gap: 6px !important;
+    padding: 5px 11px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stat span {
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.625rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: var(--m-text-lo) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stat strong {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 700 !important;
+    color: var(--m-accent) !important;
+  }
+
+  /* Toggle Mês/Semana (estava "MêsSemana" grudado) */
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle {
+    display: inline-flex !important;
+    gap: 4px !important;
+    padding: 4px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle__btn,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle__btn {
+    padding: 6px 13px !important;
+    border-radius: 9px !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--m-text-mid) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle__btn--active,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle__btn--active {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    color: var(--m-accent) !important;
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+  }
+}
+
+/* ═══════════════ Modal Nova/Editar Agenda — neumórfico no mobile (jun/2026) ═══════════════ */
+@media (max-width: 768px) {
+  /* Header */
+  .agenda-modal .agenda-modal__header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid var(--m-edge-hi) !important;
+  }
+  .agenda-modal .agenda-section-eyebrow {
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.625rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    color: var(--m-text-lo) !important;
+  }
+  .agenda-modal .agenda-modal__header h2 {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--m-text-hi) !important;
+    margin: 2px 0 0 !important;
+  }
+  body[data-theme='dark'] .agenda-modal .agenda-modal__close,
+  body[data-theme='light'] .agenda-modal .agenda-modal__close {
+    width: 36px !important; height: 36px !important; min-height: 36px !important; flex-shrink: 0 !important;
+    border-radius: 50% !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-size: 1.3rem !important; line-height: 0 !important; padding: 2px 0 0 !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+  }
+
+  /* Campos */
+  .agenda-modal .agenda-field {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    margin-bottom: 12px !important;
+  }
+  .agenda-modal .agenda-field > span {
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--m-text-lo) !important;
+  }
+  body[data-theme='dark'] .agenda-modal .agenda-field input,
+  body[data-theme='light'] .agenda-modal .agenda-field input,
+  body[data-theme='dark'] .agenda-modal .agenda-field select,
+  body[data-theme='light'] .agenda-modal .agenda-field select {
+    width: 100% !important;
+    padding: 13px 15px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-hi) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  }
+  .agenda-modal .agenda-field input:focus,
+  .agenda-modal .agenda-field select:focus {
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light), 0 0 0 2px var(--m-accent-glow) !important;
+  }
+  /* Seta do select */
+  .agenda-modal .agenda-field select {
+    padding-right: 30px !important;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--m-text-lo) 50%),
+      linear-gradient(135deg, var(--m-text-lo) 50%, transparent 50%) !important;
+    background-position: calc(100% - 17px) 52%, calc(100% - 12px) 52% !important;
+    background-size: 5px 5px, 5px 5px !important;
+    background-repeat: no-repeat !important;
+  }
+  /* iOS: datetime-local visível conforme tema */
+  body[data-theme='light'] .agenda-modal input[type="datetime-local"] {
+    color-scheme: light !important; color: var(--m-text-hi) !important; -webkit-text-fill-color: var(--m-text-hi) !important;
+  }
+  body[data-theme='dark'] .agenda-modal input[type="datetime-local"] {
+    color-scheme: dark !important; color: var(--m-text-hi) !important; -webkit-text-fill-color: var(--m-text-hi) !important;
+  }
+
+  /* Grid (Aviso + toggle) empilha */
+  .agenda-modal .agenda-modal__grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  /* Toggle WhatsApp */
+  body[data-theme='dark'] .agenda-modal .agenda-toggle,
+  body[data-theme='light'] .agenda-modal .agenda-toggle {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    cursor: pointer !important;
+  }
+  .agenda-modal .agenda-toggle input[type="checkbox"] {
+    width: 20px !important; height: 20px !important;
+    accent-color: var(--m-accent) !important;
+    flex-shrink: 0 !important;
+  }
+  .agenda-modal .agenda-toggle span {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    color: var(--m-text-hi) !important;
+  }
+
+  /* Ações */
+  .agenda-modal .agenda-modal__actions {
+    margin-top: 6px !important;
+    padding-top: 12px !important;
+    border-top: 1px solid var(--m-edge-hi) !important;
+  }
+  .agenda-modal .agenda-modal__actions-main {
+    display: flex !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+  body[data-theme='dark'] .agenda-modal .agenda-secondary-btn,
+  body[data-theme='light'] .agenda-modal .agenda-secondary-btn {
+    flex: 0 0 auto !important;
+    padding: 12px 18px !important;
+    min-height: 46px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    cursor: pointer !important;
+  }
+  body[data-theme='dark'] .agenda-modal .agenda-modal__actions-main .dashboard-hub__btn--primary,
+  body[data-theme='light'] .agenda-modal .agenda-modal__actions-main .dashboard-hub__btn--primary {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 1 auto !important;
+    padding: 12px 22px !important;
+    min-height: 46px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(155deg, var(--m-accent) 0%, color-mix(in srgb, var(--m-accent) 80%, black 20%) 100%) !important;
+    border: 1px solid var(--m-accent) !important;
+    color: var(--m-accent-fg) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 700 !important;
+    box-shadow: 5px 5px 14px var(--m-shadow-soft), -3px -3px 8px var(--m-light), 0 0 16px var(--m-accent-glow) !important;
+    cursor: pointer !important;
+  }
+}
+
+/* ═══════════════ Agenda — view "Semana" no mobile (estava empilhada vertical) ═══════════════ */
+@media (max-width: 768px) {
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-week-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 5px !important;
+    margin-top: 10px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 60px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    padding: 8px 2px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid transparent !important;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    min-width: 0 !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week .agenda-calendar-day__weekday {
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.5rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: var(--m-text-lo) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week .agenda-calendar-day__num {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: var(--m-text-hi) !important;
+    font-variant-numeric: tabular-nums !important;
+    line-height: 1 !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week .agenda-calendar-day__count {
+    min-width: 14px !important;
+    padding: 0 4px !important;
+    border-radius: 999px !important;
+    background: var(--m-accent) !important;
+    color: var(--m-accent-fg) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.5rem !important;
+    font-weight: 700 !important;
+    line-height: 14px !important;
+  }
+  /* Hoje / selecionado */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week.agenda-calendar-day--today {
+    border-color: var(--m-accent-glow) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week.agenda-calendar-day--today .agenda-calendar-day__num {
+    color: var(--m-accent) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week.agenda-calendar-day--selected,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week.agenda-calendar-day--selected {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week.agenda-calendar-day--selected .agenda-calendar-day__num {
+    color: var(--m-accent) !important;
+  }
+}
+
+/* ═══════════════ Fix scroll Agenda mobile: desfaz height:100% do 04c que quebra o flex-scroll ═══════════════ */
+@media (max-width: 768px) {
+  .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    flex: 1 1 0% !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  /* Painéis não encolhem (mantêm altura natural) → o scroller rola */
+  .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > .agenda-calendar-panel,
+  .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > .agenda-list-panel--daily,
+  .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > .agenda-hero {
+    flex: 0 0 auto !important;
+  }
+}
+
+/* ═══════════════ Agenda — lista do dia (filtros + períodos) + espaçamento (jun/2026) ═══════════════ */
+@media (max-width: 768px) {
+  /* Filtros Tudo / Compromissos (estavam grudados "Tudo1Compromissos1") */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pills {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 7px !important;
+    margin-bottom: 14px !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    padding: 7px 13px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    cursor: pointer !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill--active,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill--active {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    color: var(--m-accent) !important;
+    box-shadow: 4px 4px 10px var(--m-shadow-soft), -2px -2px 6px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill__count {
+    min-width: 18px !important;
+    height: 18px !important;
+    padding: 0 5px !important;
+    border-radius: 999px !important;
+    background: var(--m-base) !important;
+    color: inherit !important;
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    line-height: 18px !important;
+    text-align: center !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+
+  /* Grupos por período (Manhã/Tarde/Noite) — estavam grudados "Tarde1" */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-groups {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__head {
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    margin-bottom: 10px !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__icon {
+    display: inline-flex !important;
+    color: var(--m-accent) !important;
+    flex-shrink: 0 !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__label {
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.625rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.14em !important;
+    color: var(--m-text-lo) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__count {
+    min-width: 16px !important;
+    height: 16px !important;
+    padding: 0 5px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    color: var(--m-text-mid) !important;
+    font-size: 0.625rem !important;
+    font-weight: 700 !important;
+    line-height: 16px !important;
+    text-align: center !important;
+    box-shadow: inset 1px 1px 2px var(--m-shadow-soft) !important;
+    flex-shrink: 0 !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__head::after {
+    content: '' !important;
+    flex: 1 !important;
+    height: 1px !important;
+    background: linear-gradient(90deg, var(--m-edge-hi), transparent) !important;
+  }
+
+  /* Reduz o espaço vazio abaixo da lista (era 300px pra forçar scroll; agora rola por flex) */
+  body .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    padding-bottom: calc(118px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* ═══════════════ Agenda view "Semana" — cards compactos (não esticar / sem círculo dourado herdado) ═══════════════ */
+@media (max-width: 768px) {
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-week-grid {
+    align-items: start !important;
+  }
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week,
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week {
+    min-height: 62px !important;
+    height: auto !important;
+    max-height: none !important;
+    justify-content: center !important;
+  }
+  /* Mata o círculo dourado herdado do dia selecionado nos spans da view semana */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week .agenda-calendar-day__weekday,
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week .agenda-calendar-day__num {
+    background: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+}
+
+/* ═══════════════ Agenda mobile — TRAVA a cadeia flex p/ o scroll engatar (Mês e Semana) ═══════════════ */
+@media (max-width: 768px) {
+  .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+  .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .app-horizon-inner {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+  .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+  .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* ═══════════════ Agenda — hora DENTRO do card + timeline externa escondida (mobile) ═══════════════ */
+@media (max-width: 768px) {
+  /* Item da timeline vira bloco simples (card full-width) */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item {
+    display: block !important;
+  }
+  /* Esconde a hora solta e o track (dot/linha) — a hora vai pra dentro do card */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__time,
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__track {
+    display: none !important;
+  }
+  /* Card full-width */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  /* Top do card: hora + tipo + status */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__top {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__time {
+    display: inline-flex !important;
+    align-items: center !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+    color: var(--m-accent) !important;
+    font-variant-numeric: tabular-nums !important;
+    padding: 2px 9px !important;
+    border-radius: 999px !important;
+    background: var(--m-accent-glow) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__type {
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: var(--m-text-lo) !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge {
+    margin-left: auto !important;
+  }
+}
+
+/* ═══════════════ Agenda — card da lista do dia: padding lateral (ícone/lixeira não encostam) ═══════════════ */
+@media (max-width: 768px) {
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item {
+    padding: 14px !important;
+    gap: 10px 12px !important;
+  }
+  /* Ações (Editar/Concluir/Excluir) com respiro e sem encostar */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__actions {
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+  }
+}
+
+/* ═══════════════ Hero da Lista — card neumórfico (igual aos outros heros) ═══════════════ */
+@media (max-width: 768px) {
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header,
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin: 12px 0 10px !important;
+    padding: 16px 16px !important;
+    border-radius: 22px !important;
+    border: 1px solid var(--m-edge-hi) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header {
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    box-shadow: 0 10px 26px -12px rgba(0,0,0,0.7), inset 1px 1px 1px var(--m-edge-hi) !important;
+  }
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header {
+    background: linear-gradient(155deg, #ffffff 0%, #f5f7fa 100%) !important;
+    box-shadow: 0 10px 26px -14px var(--m-shadow), inset 1px 1px 1px var(--m-edge-hi) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    min-width: 0 !important;
+  }
+  /* Revela o título "Listas" (estava sr-only) */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header .page-lista-compras__title {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    clip: auto !important;
+    clip-path: none !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.025em !important;
+    color: var(--m-text-hi) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header-icon {
+    display: inline-flex !important;
+    color: var(--m-accent) !important;
+    flex-shrink: 0 !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header-icon svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+}
+
+/* ═══════════════ Configurações — fixes de layout mobile (jun/2026) ═══════════════ */
+@media (max-width: 768px) {
+  /* Nav de seções: pills numa linha rolável (estavam grudadas) */
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-section-nav {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    margin-top: 12px !important;
+    padding-bottom: 2px !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-section-nav::-webkit-scrollbar {
+    display: none !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-section-nav__pill {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  /* Chips de verificação: ícone inline com o texto (não empilhado) */
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-verif-chips {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin-top: 10px !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-verif-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 4px 11px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    color: var(--m-text-lo) !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-verif-chip svg {
+    flex-shrink: 0 !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-verif-chip--ok {
+    background: var(--m-pos-soft) !important;
+    color: var(--m-pos) !important;
+  }
+}
+
+/* ═══════════════ Configurações — logout + danger (mobile, jun/2026) ═══════════════ */
+@media (max-width: 768px) {
+  /* "Excluir minha conta" — afordância de perigo (estava neutro) */
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-action-btn--danger {
+    background: var(--m-neg-soft) !important;
+    border: 1px solid var(--m-neg-glow) !important;
+    color: var(--m-neg) !important;
+    box-shadow: none !important;
+  }
+
+  /* "Sair da conta" — ícone junto do texto, centralizado num pill (ícone vinha solto à esquerda) */
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-logout-zone {
+    display: flex !important;
+    justify-content: center !important;
+    padding: 14px 0 6px !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-logout-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 9px !important;
+    padding: 12px 26px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    box-shadow: 5px 5px 14px var(--m-shadow-soft), -3px -3px 10px var(--m-light) !important;
+    cursor: pointer !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-logout-btn svg {
+    flex-shrink: 0 !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-logout-btn:active {
+    color: var(--m-neg) !important;
+  }
+}
+
+/* ═══════════════ Relatórios — filtros/atalhos neumórficos + fix iOS date (jun/2026) ═══════════════ */
+@media (max-width: 768px) {
+  /* Inputs de filtro (data/select) — afundados, 16px anti-zoom */
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input {
+    font-size: 16px !important;
+    border-radius: 12px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-hi) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light) !important;
+  }
+  /* iOS: texto do type=date segue o color-scheme do app (senão fica invisível) */
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input { color-scheme: dark !important; }
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input { color-scheme: light !important; }
+
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-group label {
+    color: var(--m-text-lo) !important;
+    font-weight: 600 !important;
+  }
+
+  /* Atalhos de período — pills neumórficos preenchendo a linha */
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-shortcuts-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-shortcut-btn {
+    flex: 1 1 auto !important;
+    padding: 9px 14px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    border: 1px solid var(--m-edge-hi) !important;
+    color: var(--m-text-mid) !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important;
+  }
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-shortcut-btn:active {
+    color: var(--m-accent) !important;
+  }
+}
+
+/* Relatórios — linha de KPIs com 2 cards (Saldo do período removido, redundante c/ hero) */
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-row--2col {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+/* Relatórios — badge de variação vs período anterior (R1) + cores projeção (R2/R4) */
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 5px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-delta--good {
+  color: var(--m-pos, #15803d);
+  background: var(--m-pos-soft, rgba(22, 163, 74, 0.12));
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-delta--bad {
+  color: var(--m-neg, #c0392b);
+  background: var(--m-neg-soft, rgba(224, 86, 79, 0.12));
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__value--pos { color: var(--m-pos, #15803d) !important; }
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__value--neg { color: var(--m-neg, #c0392b) !important; }
+
+/* Relatórios — Top 5 despesas (R7) */
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-top5 {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-top5__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--m-edge-lo, rgba(148,163,184,0.12));
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-top5__item:last-child { border-bottom: none; }
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-top5__rank {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--m-accent, #c49535);
+  background: var(--m-accent-glow, rgba(212,168,75,0.14));
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-top5__info {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-top5__desc {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--m-text-hi);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-top5__cat {
+  font-size: 0.72rem;
+  color: var(--m-text-lo);
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-top5__val {
+  flex-shrink: 0;
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--m-text-hi);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Relatórios — empty state (R12) */
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 40px 24px;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-empty__icon { font-size: 2.6rem; opacity: 0.9; }
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-empty__title {
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 1.1rem; font-weight: 700; color: var(--m-text-hi, #0d1117); margin: 0;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-empty__text {
+  font-size: 0.88rem; color: var(--m-text-mid, #4a5568); max-width: 420px; margin: 0; line-height: 1.45;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-empty__btn {
+  margin-top: 8px; padding: 10px 22px; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(155deg, var(--m-accent, #d4a84b), #c49535); color: var(--m-accent-fg, #fff);
+  border: none; font-weight: 700; font-size: 0.88rem;
+  box-shadow: 0 6px 16px -6px var(--m-accent-glow, rgba(212,168,75,0.4));
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-empty__btn:active { transform: scale(0.97); }
+
+/* Relatórios — Orçado vs Real (R3) */
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado {
+  display: flex; flex-direction: column; gap: 14px; padding: 6px 2px 2px;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__top {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__cat {
+  font-size: 0.88rem; font-weight: 600; color: var(--m-text-hi);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__vals {
+  flex-shrink: 0; font-size: 0.85rem; font-weight: 700; color: var(--m-text-hi);
+  font-variant-numeric: tabular-nums;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__limite { color: var(--m-text-lo); font-weight: 600; }
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__bar {
+  height: 7px; border-radius: 99px; background: var(--m-sunken, rgba(148,163,184,0.18));
+  box-shadow: inset 1px 1px 3px var(--m-shadow-soft); overflow: hidden;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__fill {
+  display: block; height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--m-accent, #d4a84b), #c49535); transition: width 320ms ease;
+}
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__row--over .relatorios-orcado__fill { background: var(--m-neg, #e0564f); }
+.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__row--over .relatorios-orcado__vals { color: var(--m-neg, #e0564f); }
+
+/* Configurações — foto de perfil (upload via câmera/galeria/PC) */
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0;
+}
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar--btn {
+  position: relative; padding: 0; border: none; cursor: pointer; overflow: visible;
+  display: inline-flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar--btn:disabled { opacity: 0.6; cursor: default; }
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar__img {
+  width: 100%; height: 100%; border-radius: inherit; object-fit: cover; display: block;
+}
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar__cam {
+  position: absolute; right: -3px; bottom: -3px;
+  width: 22px; height: 22px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--m-accent, #d4a84b); color: var(--m-accent-fg, #1a1205);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 2px solid var(--m-base, #ffffff);
+}
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar__remove {
+  background: none; border: none; cursor: pointer; padding: 2px 4px;
+  font-size: 0.7rem; font-weight: 600; color: var(--m-text-lo, #8896a5);
+}
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar__remove:active { color: var(--m-neg, #e0564f); }
+
+/* Configurações — avatar menor e redondo (a pedido do CEO) */
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  font-size: 1.15rem !important;
+}
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar__img { border-radius: 50% !important; }
+.dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-avatar__cam {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Agenda — esconde o hover-preview no mobile (vazava cru pela célula ao tocar o dia;
+   no mobile a lista do dia já aparece embaixo ao selecionar). */
+@media (max-width: 768px) {
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview {
+    display: none !important;
+  }
+}

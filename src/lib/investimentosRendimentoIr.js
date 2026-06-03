@@ -1,6 +1,7 @@
 /**
  * Estimativas de rendimento diário ligadas ao CDI e IR regressivo sobre o rendimento (PF).
- * Convenção: pro rata linear em 252 dias úteis sobre taxa efetiva (% CDI contratada × CDI a.a.).
+ * Convenção: pro rata composta (juros compostos) em 252 dias úteis sobre taxa efetiva
+ *   (% CDI contratada × CDI a.a.), i.e. taxa_diária = (1 + taxa_aa)^(1/252) − 1.
  * CDI incide em dias úteis (não há rendimento em fins de semana — feriados nacionais vedam pregão).
  * O rendimento **acumulado** conta apenas a partir do **primeiro pregão depois** da data de aquisição (D+1 útil).
  */
@@ -76,7 +77,9 @@ function feriadosNacionaisBrKeysParaAno(year) {
   addMd(9, 12) // Nossa Senhora Aparecida
   addMd(10, 2) // Finados
   addMd(10, 15) // Proclamação da República
-  addMd(10, 20) // Consciência Negra
+  // Consciência Negra: feriado nacional federal somente a partir de 2023 (Lei 14.759/2023).
+  // Antes de 2023 era feriado estadual/municipal em alguns estados, mas BACEN/B3 não suspendiam o pregão.
+  if (year >= 2023) addMd(10, 20) // Consciência Negra
   addMd(11, 25) // Natal
 
   const pascoa = domingoPascoalGregorian(year)

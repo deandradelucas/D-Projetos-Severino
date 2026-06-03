@@ -31,6 +31,20 @@ export const MAIN_NAV_ITEMS = [
     ),
   },
   {
+    to: '/cartoes',
+    label: 'Cartões',
+    end: true,
+    mobileHide: true,
+    title: 'Cartões de crédito — faturas, fechamento e vencimento',
+    icon: (props) => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden {...props}>
+        <rect x="2" y="5" width="20" height="14" rx="2.5" />
+        <path d="M2 10h20" />
+        <path d="M6 15h4" />
+      </svg>
+    ),
+  },
+  {
     to: '/investimentos',
     label: 'Investimentos',
     end: true,
@@ -39,6 +53,20 @@ export const MAIN_NAV_ITEMS = [
         <path d="M3 3v18h18" />
         <path d="m19 9-5 5-4-4-3 3" />
         <path d="M14 9h5v5" />
+      </svg>
+    ),
+  },
+  {
+    to: '/metas',
+    label: 'Metas',
+    end: true,
+    mobileHide: true,
+    title: 'Objetivos financeiros — junte dinheiro e acompanhe o progresso',
+    icon: (props) => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden {...props}>
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="5" />
+        <circle cx="12" cy="12" r="1" />
       </svg>
     ),
   },
@@ -78,10 +106,10 @@ export const MAIN_NAV_ITEMS = [
   },
   {
     to: '/lista-de-compras',
-    label: 'Lista de compras',
-    mobileLabel: 'Compras',
+    label: 'Listas',
+    mobileLabel: 'Listas',
     end: true,
-    title: 'Itens a comprar — pessoal ou da família',
+    title: 'Suas listas — compras e tarefas',
     icon: (props) => (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden {...props}>
         <circle cx="9" cy="21" r="1" />

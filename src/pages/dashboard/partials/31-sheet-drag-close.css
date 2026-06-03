@@ -1,0 +1,22 @@
+/* =============================================================================
+   31 — MOBILE · Drag-to-close genérico p/ modais bottom-sheet
+   =============================================================================
+   Usado pelo hook useSheetDragClose. As classes vão no elemento `.modal-content`.
+   `transform !important` vence a animação `mSheetUp` (partial 24, que tem !important
+   e "fixaria" o transform). Só atua ≤768px.
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .modal-content.sheet-dragging,
+  .agenda-modal.sheet-dragging {
+    animation: none !important;
+    transition: none !important;
+    transform: translateY(var(--sheet-drag, 0px)) !important;
+  }
+  .modal-content.sheet-closing,
+  .agenda-modal.sheet-closing {
+    animation: none !important;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    transform: translateY(var(--sheet-drag, 0px)) !important;
+  }
+}

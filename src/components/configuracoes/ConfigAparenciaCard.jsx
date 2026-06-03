@@ -1,8 +1,8 @@
 import React from 'react'
 
-export default function ConfigAparenciaCard({ theme, setTheme, privacyMode, togglePrivacy }) {
+export default function ConfigAparenciaCard({ theme, setTheme, privacyMode, togglePrivacy, id }) {
   return (
-    <section className="config-card config-card--preferences" aria-labelledby="config-preferencias-heading">
+    <section id={id} className="config-card config-card--preferences" aria-labelledby="config-preferencias-heading">
       <div className="config-card-head">
         <span className="config-card-kicker">Preferências</span>
         <h2 id="config-preferencias-heading" className="config-card-title-clean">

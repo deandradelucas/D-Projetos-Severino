@@ -1,0 +1,193 @@
+/* =============================================================================
+   Pagamento — mobile (≤768px)
+   As regras de layout (flex/chips inline) viviam só no partial 20 (desktop,
+   min-width:769px). No mobile caíam para block → "Aceitamos" e a lista de
+   benefícios empilhavam quebrados. Este partial porta o layout + visual
+   neumórfico (tokens --m-*) para o mobile.
+   ============================================================================= */
+@media (max-width: 768px) {
+  /* Escopo curto via variável de legibilidade */
+  /* ---- Status chip no hero (Assinatura ativa / Teste / etc) ---- */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    margin-top: 6px !important;
+    padding: 5px 13px !important;
+    border-radius: 999px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip__dot {
+    width: 7px !important;
+    height: 7px !important;
+    border-radius: 50% !important;
+    background: currentColor !important;
+    box-shadow: 0 0 8px currentColor !important;
+    flex-shrink: 0 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip--ativo {
+    background: var(--m-pos-soft) !important; color: var(--m-pos) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip--trial {
+    background: var(--m-accent-glow) !important; color: var(--m-accent) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip--aviso {
+    background: var(--m-accent-glow) !important; color: var(--m-accent) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip--expirado {
+    background: var(--m-neg-soft) !important; color: var(--m-neg) !important;
+  }
+
+  /* ---- Meios de pagamento "Aceitamos" — chips inline (eram empilhados) ---- */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__meios {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-top: 14px !important;
+    padding-top: 14px !important;
+    border-top: 1px solid var(--m-edge-hi) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__meios-label {
+    flex-basis: 100% !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.12em !important;
+    color: var(--m-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-meio {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 13px !important;
+    border-radius: 999px !important;
+    background: var(--m-sunken) !important;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    color: var(--m-text-mid) !important;
+    white-space: nowrap !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-meio svg {
+    flex-shrink: 0 !important;
+    color: var(--m-accent) !important;
+  }
+
+  /* ---- Value stack "Tudo isto incluso" — ✓ inline com o texto ---- */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    color: var(--m-text-hi) !important;
+    margin: 0 0 14px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 11px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 0.9rem !important;
+    line-height: 1.3 !important;
+    color: var(--m-text-mid) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__check {
+    flex-shrink: 0 !important;
+    width: 14px !important;
+    height: 14px !important;
+    padding: 3px !important;
+    box-sizing: content-box !important;
+    border-radius: 50% !important;
+    background: var(--m-pos-soft) !important;
+    color: var(--m-pos) !important;
+  }
+
+  /* ---- Selos de confiança ---- */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-trust {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px 16px !important;
+    margin-top: 16px !important;
+    padding-top: 14px !important;
+    border-top: 1px solid var(--m-edge-hi) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-trust__item {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: var(--m-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-trust__item svg {
+    flex-shrink: 0 !important;
+    color: var(--m-pos) !important;
+  }
+
+  /* ---- Legenda "Escolha o plano" ---- */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__legend {
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.14em !important;
+    color: var(--m-text-lo) !important;
+    margin: 0 0 12px !important;
+  }
+
+  /* ---- CTA "Pagar à vista no Pix" — ícone ao lado + economia em linha própria ---- */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-pix-cta {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    padding: 12px 20px !important;
+    border-radius: 999px !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.25 !important;
+    text-align: center !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-pix-cta svg {
+    flex-shrink: 0 !important;
+  }
+  /* badge "economia de R$ X" desce pra linha de baixo (evita "Pixeconomia") */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-pix-cta__save {
+    display: block !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    opacity: 0.85 !important;
+    margin-top: 2px !important;
+  }
+
+  /* ---- Botão "Cancelar assinatura" no rodapé — ghost discreto ---- */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cancelar-zona {
+    display: flex !important;
+    justify-content: center !important;
+    padding: 16px 0 8px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-danger-ghost,
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cancelar-btn {
+    padding: 11px 22px !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    border: 1px solid var(--m-neg-glow) !important;
+    color: var(--m-neg) !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    cursor: pointer !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-danger-ghost:active,
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cancelar-btn:active {
+    background: var(--m-neg-soft) !important;
+  }
+}

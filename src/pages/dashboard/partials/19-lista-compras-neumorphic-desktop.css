@@ -1,0 +1,781 @@
+/* =============================================================================
+   19 — LISTA DE COMPRAS · NEO-SKEUMORPHISM (Desktop ≥ 769px)
+   =============================================================================
+   Aplica o mesmo visual neumórfico do site: full-bleed, tokens, Plus Jakarta,
+   superfícies táteis. Cobre header, toggle escopo, tabs, categorias, itens,
+   seção marcados, footer, onboarding/empty, modais.
+   ============================================================================= */
+
+@media (min-width: 769px) {
+
+  /* ─── Tokens ─── */
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell {
+    --lc-base: #0e1117;
+    --lc-raised: #11141a;
+    --lc-sunken: #07090d;
+    --lc-light: rgba(255, 255, 255, 0.040);
+    --lc-shadow: rgba(0, 0, 0, 0.70);
+    --lc-shadow-soft: rgba(0, 0, 0, 0.45);
+    --lc-edge-hi: rgba(255, 255, 255, 0.055);
+    --lc-edge-lo: rgba(0, 0, 0, 0.50);
+    --lc-text-hi: #f3f5f8;
+    --lc-text-mid: #98a4b5;
+    --lc-text-lo: #5a6878;
+    --lc-accent: #d4a84b;
+    --lc-accent-glow: rgba(212, 168, 75, 0.20);
+    --lc-pos: #4ade80;
+    --lc-pos-glow: rgba(74, 222, 128, 0.16);
+    --lc-neg: #f87171;
+    --lc-neg-glow: rgba(248, 113, 113, 0.16);
+    --lc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --lc-r: 22px;
+  }
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell {
+    --lc-base: #eef1f6;
+    --lc-raised: #ffffff;
+    --lc-sunken: #e4e8ee;
+    --lc-light: rgba(255, 255, 255, 0.90);
+    --lc-shadow: rgba(166, 180, 200, 0.45);
+    --lc-shadow-soft: rgba(166, 180, 200, 0.28);
+    --lc-edge-hi: rgba(255, 255, 255, 0.95);
+    --lc-edge-lo: rgba(140, 156, 178, 0.20);
+    --lc-text-hi: #0d1117;
+    --lc-text-mid: #4a5568;
+    --lc-text-lo: #8896a5;
+    --lc-accent: #b8832a;
+    --lc-accent-glow: rgba(184, 131, 42, 0.18);
+    --lc-pos: #15803d;
+    --lc-pos-glow: rgba(22, 163, 74, 0.14);
+    --lc-neg: #b91c1c;
+    --lc-neg-glow: rgba(220, 38, 38, 0.12);
+    --lc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --lc-r: 22px;
+  }
+
+  /* ─── Full-bleed + atmosphere + cadeia flex travada ─── */
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+  }
+  /* Fundo herdado do partial 13 (.dashboard-page) — mesmo de todas as telas hub.
+     Removido o override próprio que deixava o fundo levemente diferente (verde/mais fraco). */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .app-horizon-inner {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    gap: 20px !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+    overflow: hidden !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-top: 28px !important;
+    padding-right: 20px !important;
+    padding-bottom: 0 !important;
+  }
+  /* Coluna de conteúdo centralizada e legível — 1200px como as demais telas */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras-wrap {
+    width: 100% !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 0 20px !important;
+  }
+
+  /* ─── Header como card de hero (idêntico aos outros heros — ver partial 13) ─── */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    width: 100% !important;
+    padding: 26px 32px 28px !important;
+    margin: 0 0 16px !important;
+    border: 1px solid var(--neu-edge-hi) !important;
+    border-radius: var(--neu-r-card) !important;
+    animation: neuHeroFadeIn 500ms var(--neu-ease) both !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header {
+    background: #0e1117 !important;
+    background-image: linear-gradient(180deg, #11141a 0%, #0e1117 100%) !important;
+    box-shadow:
+      0 14px 36px -14px rgba(0, 0, 0, 0.85),
+      inset 1px 1px 1px var(--neu-edge-hi),
+      inset -1px -1px 1px var(--neu-edge-lo) !important;
+  }
+  body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header {
+    background: #f5f7fa !important;
+    background-image: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%) !important;
+    box-shadow:
+      0 14px 36px -16px rgba(166, 180, 200, 0.55),
+      inset 1px 1px 1px var(--neu-edge-hi),
+      inset -1px -1px 1px var(--neu-edge-lo) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-width: 0 !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header-icon {
+    display: inline-flex !important;
+    color: var(--neu-accent) !important;
+    flex-shrink: 0 !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header-icon svg {
+    width: 26px !important;
+    height: 26px !important;
+  }
+  /* Revela o título "Listas" (estava sr-only), igual ao mobile */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header .page-lista-compras__title {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    clip: auto !important;
+    clip-path: none !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: clamp(1.5rem, 1.6vw + 0.8rem, 2rem) !important;
+    letter-spacing: -0.025em !important;
+    color: var(--neu-text-hi) !important;
+  }
+  /* "+ Nova lista": botão dourado, igual ao "+ Nova transação" dos outros heros
+     (light #b58d3d / dark #c4a052, texto escuro) */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__nova-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    min-height: 42px !important;
+    padding: 0 22px !important;
+    border-radius: 999px !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.9375rem !important;
+    letter-spacing: 0.01em !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    color: #111111 !important;
+    background: #b58d3d !important;
+    border: 1px solid rgba(0, 0, 0, 0.14) !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14) !important;
+    cursor: pointer !important;
+    transition: background 200ms var(--lc-ease), transform 200ms var(--lc-ease), box-shadow 200ms var(--lc-ease) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__nova-btn {
+    background: #c4a052 !important;
+    border-color: rgba(0, 0, 0, 0.22) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__nova-btn:hover {
+    transform: translateY(-1px) !important;
+    background: #c69d4d !important;
+    box-shadow: 0 8px 22px -6px rgba(181, 141, 61, 0.5) !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__nova-btn:hover {
+    background: #d1ae62 !important;
+  }
+
+  /* ─── Toggle escopo (Família / Pessoal) ─── */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__escopo-toggle {
+    display: inline-flex !important;
+    gap: 4px !important;
+    padding: 4px !important;
+    margin-bottom: 16px !important;
+    border-radius: 999px !important;
+    background: var(--lc-sunken) !important;
+    box-shadow: inset 2px 2px 5px var(--lc-shadow-soft), inset -1px -1px 3px var(--lc-light) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__escopo-btn {
+    padding: 8px 16px !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--lc-text-mid) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 200ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__escopo-btn--active {
+    background: linear-gradient(155deg, var(--lc-raised) 0%, var(--lc-base) 100%) !important;
+    color: var(--lc-accent) !important;
+    box-shadow: 3px 3px 7px var(--lc-shadow-soft), -2px -2px 5px var(--lc-light) !important;
+  }
+
+  /* ─── Tabs de listas ─── */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tabs {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin-bottom: 18px !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 9px 16px !important;
+    border-radius: 999px !important;
+    background: var(--lc-sunken) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    color: var(--lc-text-mid) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
+    transition: all 200ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab:hover {
+    color: var(--lc-text-hi) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab--active {
+    background: linear-gradient(155deg, var(--lc-raised) 0%, var(--lc-base) 100%) !important;
+    color: var(--lc-accent) !important;
+    box-shadow: 4px 4px 10px var(--lc-shadow-soft), -2px -2px 6px var(--lc-light), 0 0 0 1px var(--lc-accent-glow) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab-count {
+    min-width: 20px !important;
+    height: 20px !important;
+    padding: 0 6px !important;
+    border-radius: 999px !important;
+    background: var(--lc-accent) !important;
+    color: #1a1200 !important;
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    line-height: 20px !important;
+    text-align: center !important;
+    box-shadow: 0 0 8px var(--lc-accent-glow) !important;
+  }
+
+  /* ─── Tag de gasto + menu da lista ─── */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__lista-gasto-tag {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    padding: 6px 14px !important;
+    border-radius: 999px !important;
+    background: var(--lc-accent-glow) !important;
+    color: var(--lc-accent) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+  }
+  /* Tarefas: pill roxa (distinta do dourado de compras) */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__lista-gasto-tag--tarefas {
+    background: rgba(139, 92, 246, 0.12) !important;
+    color: #8b5cf6 !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__lista-gasto-tag--tarefas svg {
+    color: #8b5cf6 !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__list-menu-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: var(--lc-sunken) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    color: var(--lc-text-mid) !important;
+    cursor: pointer !important;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
+    transition: color 200ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__list-menu-btn:hover {
+    color: var(--lc-accent) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__list-dropdown {
+    background: linear-gradient(155deg, var(--lc-raised) 0%, var(--lc-base) 100%) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    border-radius: 14px !important;
+    box-shadow: 10px 14px 32px var(--lc-shadow), -4px -4px 12px var(--lc-light) !important;
+    padding: 6px !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__list-dropdown-item {
+    border-radius: 9px !important;
+    color: var(--lc-text-mid) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.875rem !important;
+    transition: background 180ms var(--lc-ease), color 180ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__list-dropdown-item:hover {
+    background: var(--lc-sunken) !important;
+    color: var(--lc-text-hi) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__list-dropdown-item--danger:hover {
+    color: var(--lc-neg) !important;
+  }
+
+  /* ─── Grupos de categoria ─── */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__category-group {
+    background: linear-gradient(155deg, var(--lc-raised) 0%, var(--lc-base) 100%) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    border-radius: var(--lc-r) !important;
+    padding: 16px 20px !important;
+    margin-bottom: 16px !important;
+    box-shadow: 10px 10px 24px var(--lc-shadow-soft), -8px -8px 22px var(--lc-light), inset 1px 1px 1px var(--lc-edge-hi), inset -1px -1px 1px var(--lc-edge-lo) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__category-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 12px !important;
+    border-bottom: 1px solid var(--lc-edge-lo) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+    color: var(--lc-text-hi) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__category-icon {
+    width: 34px !important;
+    height: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 10px !important;
+    background: var(--lc-sunken) !important;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
+    font-size: 1rem !important;
+  }
+
+  /* ─── Itens ─── */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 12px 8px !important;
+    border-radius: 12px !important;
+    margin: 2px 0 !important;
+    transition: background 200ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item:hover {
+    background: var(--lc-sunken) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-check {
+    width: 26px !important;
+    height: 26px !important;
+    flex-shrink: 0 !important;
+    border-radius: 8px !important;
+    background: var(--lc-sunken) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    color: transparent !important;
+    cursor: pointer !important;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
+    transition: all 200ms var(--lc-ease) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-check--checked {
+    background: linear-gradient(155deg, var(--lc-accent) 0%, #c49535 100%) !important;
+    border-color: transparent !important;
+    color: #1a1200 !important;
+    box-shadow: 0 4px 10px var(--lc-accent-glow) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-body {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-name {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 500 !important;
+    color: var(--lc-text-hi) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-qty,
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-units {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.8125rem !important;
+    color: var(--lc-text-lo) !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-price {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 700 !important;
+    color: var(--lc-accent) !important;
+    font-variant-numeric: tabular-nums !important;
+    margin-left: auto !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item--checked .page-lista-compras__item-name {
+    text-decoration: line-through !important;
+    color: var(--lc-text-lo) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-actions {
+    display: flex !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-edit,
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-delete {
+    width: 32px !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    background: var(--lc-sunken) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    color: var(--lc-text-lo) !important;
+    cursor: pointer !important;
+    box-shadow: inset 1px 1px 2px var(--lc-shadow-soft), inset -1px -1px 1px var(--lc-light) !important;
+    transition: color 200ms var(--lc-ease), background 200ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-edit:hover {
+    color: var(--lc-accent) !important;
+    background: var(--lc-accent-glow) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-delete:hover {
+    color: var(--lc-neg) !important;
+    background: var(--lc-neg-glow) !important;
+  }
+
+  /* ─── Seção marcados ─── */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__checked-section {
+    background: var(--lc-sunken) !important;
+    border-radius: var(--lc-r) !important;
+    padding: 14px 20px !important;
+    margin-bottom: 16px !important;
+    box-shadow: inset 2px 2px 5px var(--lc-shadow-soft), inset -1px -1px 3px var(--lc-light) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__checked-toggle {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--lc-text-mid) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__checked-chevron {
+    color: var(--lc-text-lo) !important;
+    transition: transform 280ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__checked-chevron--open {
+    transform: rotate(180deg) !important;
+  }
+
+  /* ─── Footer ─── */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer {
+    /* Desktop: footer no fluxo normal (logo após a lista). O base é uma barra
+       position:fixed full-width pro mobile — aqui resetamos tudo pra não virar
+       aquela faixa solta atravessando a tela. */
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: auto !important;
+    width: 100% !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+    padding: 16px 0 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    flex-wrap: wrap !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer-main {
+    flex: 1 1 auto !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer-total-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 18px !important;
+    flex-wrap: wrap !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__total {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+    margin: 0 !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__total-label {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.16em !important;
+    color: var(--lc-text-lo) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__total-value {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    color: var(--lc-text-hi) !important;
+    font-variant-numeric: tabular-nums !important;
+    letter-spacing: -0.025em !important;
+  }
+  /* Novo item — clay raised */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__novo-item-fab {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 11px 20px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(155deg, var(--lc-raised) 0%, var(--lc-base) 100%) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    color: var(--lc-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    box-shadow: 6px 6px 14px var(--lc-shadow-soft), -4px -4px 12px var(--lc-light), inset 1px 1px 1px var(--lc-edge-hi) !important;
+    transition: all 220ms var(--lc-ease) !important;
+    position: static !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__novo-item-fab:hover {
+    transform: translateY(-2px) !important;
+    color: var(--lc-accent) !important;
+    box-shadow: 8px 10px 20px var(--lc-shadow), -5px -5px 14px var(--lc-light), 0 0 0 1px var(--lc-accent-glow), inset 1px 1px 1px var(--lc-edge-hi) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer-actions {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__wa-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 11px 18px !important;
+    border-radius: 999px !important;
+    background: var(--lc-sunken) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    color: var(--lc-text-mid) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
+    transition: color 200ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__wa-btn:hover {
+    color: var(--lc-pos) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__cta-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 12px 22px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(155deg, var(--lc-accent) 0%, #c49535 100%) !important;
+    border: 1px solid var(--lc-accent-glow) !important;
+    color: #1a1200 !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    box-shadow: 6px 8px 18px -6px var(--lc-accent-glow), inset 0 1px 0 rgba(255,255,255,0.25) !important;
+    transition: all 220ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__cta-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 8px 12px 24px -6px var(--lc-accent-glow), inset 0 1px 0 rgba(255,255,255,0.3) !important;
+  }
+
+  /* ─── Onboarding / empty ─── */
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__onboarding,
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__empty {
+    background: linear-gradient(155deg, var(--lc-raised) 0%, var(--lc-base) 100%) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    border-radius: var(--lc-r) !important;
+    padding: 48px 28px !important;
+    text-align: center !important;
+    box-shadow: 10px 10px 24px var(--lc-shadow-soft), -8px -8px 22px var(--lc-light), inset 1px 1px 1px var(--lc-edge-hi) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__onboarding-icon,
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__empty-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: 24px !important;
+    background: var(--lc-sunken) !important;
+    box-shadow: inset 3px 3px 7px var(--lc-shadow-soft), inset -2px -2px 5px var(--lc-light) !important;
+    font-size: 2.25rem !important;
+    margin-bottom: 16px !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__onboarding-title,
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__empty-title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+    color: var(--lc-text-hi) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__onboarding-desc,
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__empty-desc {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.875rem !important;
+    color: var(--lc-text-mid) !important;
+    max-width: 420px !important;
+    margin: 6px auto 0 !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__onboarding-btn {
+    margin-top: 18px !important;
+    padding: 12px 24px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(155deg, var(--lc-accent) 0%, #c49535 100%) !important;
+    border: none !important;
+    color: #1a1200 !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.9375rem !important;
+    cursor: pointer !important;
+    box-shadow: 6px 8px 18px -6px var(--lc-accent-glow) !important;
+    transition: transform 200ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__onboarding-btn:hover {
+    transform: translateY(-2px) !important;
+  }
+
+  /* ─── Modais ─── */
+  .page-lista-compras .page-lista-compras__modal,
+  body[data-theme='dark'] .page-lista-compras__modal,
+  body[data-theme='light'] .page-lista-compras__modal {
+    background: linear-gradient(155deg, var(--lc-raised, #fff) 0%, var(--lc-base, #eef1f6) 100%) !important;
+    border: 1px solid var(--lc-edge-hi, rgba(255,255,255,0.9)) !important;
+    border-radius: 24px !important;
+    box-shadow: 16px 16px 40px var(--lc-shadow, rgba(166,180,200,0.45)), -12px -12px 32px var(--lc-light, rgba(255,255,255,0.9)), inset 1px 1px 1px var(--lc-edge-hi, rgba(255,255,255,0.9)) !important;
+    padding: 28px !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+    letter-spacing: -0.02em !important;
+    color: var(--lc-text-hi) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-close {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: var(--lc-sunken) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    color: var(--lc-text-mid) !important;
+    cursor: pointer !important;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
+    transition: color 200ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-close:hover {
+    color: var(--lc-neg) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-label {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.12em !important;
+    color: var(--lc-text-lo) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-input,
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-select {
+    padding: 11px 14px !important;
+    border-radius: 12px !important;
+    background: var(--lc-sunken) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    color: var(--lc-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 0.9375rem !important;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-input:focus,
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-select:focus {
+    outline: 2px solid var(--lc-accent) !important;
+    outline-offset: 2px !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-total-display {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: var(--lc-accent) !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-cancel {
+    padding: 10px 18px !important;
+    border-radius: 999px !important;
+    background: var(--lc-sunken) !important;
+    border: 1px solid var(--lc-edge-hi) !important;
+    color: var(--lc-text-mid) !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-confirm {
+    padding: 10px 20px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(155deg, var(--lc-accent) 0%, #c49535 100%) !important;
+    border: none !important;
+    color: #1a1200 !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    box-shadow: 5px 7px 16px -5px var(--lc-accent-glow) !important;
+    transition: transform 200ms var(--lc-ease) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-confirm:hover:not(:disabled) {
+    transform: translateY(-1px) !important;
+  }
+  .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-confirm:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+  }
+
+  /* Reduce motion */
+  @media (prefers-reduced-motion: reduce) {
+    body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell *,
+    body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+}

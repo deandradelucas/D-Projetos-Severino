@@ -103,4 +103,48 @@ describe('ehDiaUtilComPregaoCdi', () => {
   it('Sexta-feira Santa retorna false', () => {
     expect(ehDiaUtilComPregaoCdi(new Date('2025-04-18T12:00:00'))).toBe(false)
   })
+
+  it('20/nov/2023 (Consciência Negra, 1.º ano federal) retorna false', () => {
+    expect(ehDiaUtilComPregaoCdi(new Date('2023-11-20T12:00:00'))).toBe(false)
+  })
+
+  it('20/nov/2020 (sexta — antes de ser feriado federal) retorna true — pregão normal', () => {
+    // 20/nov/2020 é sexta-feira; lei 14.759/2023 não existia → não era feriado CDI
+    expect(ehDiaUtilComPregaoCdi(new Date('2020-11-20T12:00:00'))).toBe(true)
+  })
+
+  it('20/nov/2024 retorna false (feriado federal mantido)', () => {
+    expect(ehDiaUtilComPregaoCdi(new Date('2024-11-20T12:00:00'))).toBe(false)
+  })
+})
+
+describe('contarDiasUteisComJurosDesdeIso — Consciência Negra', () => {
+  it('20/nov/2020 (sexta) conta como dia útil — pré-2023', () => {
+    // Aquisição 19/nov/2020 (qui), D+1 = 20/nov (sex) que NÃO era feriado federal
+    const du = contarDiasUteisComJurosAteYmd('2020-11-19', '2020-11-20')
+    expect(du).toBe(1)
+  })
+
+  it('aquisição 19/nov/2023 (dom): D+1=seg 20/nov é feriado → 1.º pregão = ter 21/nov', () => {
+    // D+1 do domingo = segunda 20/nov/2023 = FERIADO federal em 2023 → skip
+    // Próximo dia útil com pregão = terça 21/nov/2023
+    // contarDiasUteisComJurosAteYmd até 21/nov/2023 = 1 dia útil
+    const du = contarDiasUteisComJurosAteYmd('2023-11-19', '2023-11-21')
+    expect(du).toBe(1)
+  })
+
+  it('período 17-24/nov/2023: semana inclui feriado 20/nov → 4 dias úteis (não 5)', () => {
+    // D+1 de 17/nov/2023 (sex) = sáb 18 → próximo útil = seg 20 (FERIADO) → ter 21
+    // Dias úteis: 21, 22, 23, 24 = 4
+    const du2023 = contarDiasUteisComJurosAteYmd('2023-11-17', '2023-11-24')
+    expect(du2023).toBe(4)
+  })
+
+  it('período equivalente em 2020: semana 20/nov sexta conta → 5 dias úteis', () => {
+    // D+1 de 17/nov/2020 (ter) = qua 18
+    // Dias úteis 18, 19, 20, 23, 24 = 5 (19=qui, 20=sex conta pois não era feriado federal)
+    // 17/nov=ter, D+1=18/nov(qua), período até 24/nov(ter): 18,19,20,23,24 = 5
+    const du2020 = contarDiasUteisComJurosAteYmd('2020-11-17', '2020-11-24')
+    expect(du2020).toBe(5)
+  })
 })

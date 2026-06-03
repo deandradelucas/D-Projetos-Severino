@@ -8,6 +8,7 @@ import InvestimentoAporteModal from '../components/investimentos/InvestimentoApo
 import InvestimentoAportesDetalheModal from '../components/investimentos/InvestimentoAportesDetalheModal.jsx'
 import InvestimentosResumo from '../components/investimentos/InvestimentosResumo.jsx'
 import InvestimentoCard from '../components/investimentos/InvestimentoCard.jsx'
+import InvestimentoComparadorModal from '../components/investimentos/InvestimentoComparadorModal.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import TaxaSelicBadge from '../components/TaxaSelicBadge.jsx'
 import TaxaCdiBadge from '../components/TaxaCdiBadge.jsx'
@@ -64,6 +65,7 @@ export default function Investimentos() {
   const [aporteSubmitting, setAporteSubmitting] = useState(false)
   const [aporteDetalheTarget, setAporteDetalheTarget] = useState(null)
   const [removendoAporteId, setRemovendoAporteId] = useState(null)
+  const [comparadorOpen, setComparadorOpen] = useState(false)
 
   const session = readHorizonteUser()
   const uid = session?.id ? String(session.id).trim() : ''
@@ -280,6 +282,32 @@ export default function Investimentos() {
                       <TaxaSelicBadge variant="hero" />
                       <TaxaCdiBadge variant="hero" />
                     </div>
+                  </div>
+                  <div className="dashboard-hub__hero-actions" role="toolbar">
+                    <button
+                      type="button"
+                      className="dashboard-hub__btn dashboard-hub__btn--primary"
+                      onClick={() => { setEditTarget(null); setModalResetKey((k) => k + 1); setModalOpen(true) }}
+                      disabled={!uid}
+                    >
+                      + Novo
+                    </button>
+                    <button
+                      type="button"
+                      className="dashboard-hub__btn dashboard-hub__btn--secondary"
+                      onClick={() => setComparadorOpen(true)}
+                      aria-label="Comparar investimentos"
+                      title="Comparar investimentos"
+                    >
+                      <svg className="dashboard-hub__btn-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M12 3v18" />
+                        <path d="M5 7h14" />
+                        <path d="M5 7 2 13a3 3 0 0 0 6 0z" />
+                        <path d="M19 7l-3 6a3 3 0 0 0 6 0z" />
+                        <path d="M8 21h8" />
+                      </svg>
+                      <span className="dashboard-hub__btn-label">Comparar</span>
+                    </button>
                   </div>
                 </div>
               </section>
@@ -539,6 +567,12 @@ export default function Investimentos() {
         onSubmit={handleAportar}
         submitting={aporteSubmitting}
         investimentoNome={aporteTarget?.nome ?? ''}
+      />
+
+      <InvestimentoComparadorModal
+        open={comparadorOpen}
+        onClose={() => setComparadorOpen(false)}
+        cdiAa={cdiAa}
       />
 
       <InvestimentoAportesDetalheModal

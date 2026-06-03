@@ -19,7 +19,7 @@ export const INVESTIMENTO_PRESETS = Object.freeze({
 const PRESET_KEYS = new Set(Object.keys(INVESTIMENTO_PRESETS))
 
 const SELECT_COLS =
-  'id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, data_vencimento, criado_em, tipo_indexador, aportes:investimento_aportes(id, valor, data_aquisicao, criado_em)'
+  'id, usuario_id, tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, data_vencimento, criado_em, tipo_indexador, notas, meta_carteira_valor, aportes:investimento_aportes(id, valor, data_aquisicao, criado_em)'
 
 function cleanNomeCustom(value) {
   return String(value ?? '').trim().slice(0, 120)
@@ -257,6 +257,8 @@ function rowToApi(row) {
     data_vencimento: extrairDataYyyyMmDdInvestimento(row.data_vencimento),
     criado_em: row.criado_em,
     tipo_indexador: row.tipo_indexador ?? 'CDI',
+    notas: row.notas ?? null,
+    meta_carteira_valor: row.meta_carteira_valor != null ? Number(row.meta_carteira_valor) : null,
     aportes,
   }
 }
@@ -343,19 +345,29 @@ export async function removerInvestimentoUsuario(id, usuarioId) {
 export async function atualizarInvestimentoUsuario(id, usuarioId, body) {
   const { tipo_preset, nome, instituicao_nome, valor_investido, percentual_cdi, data_aquisicao, tipo_indexador, data_vencimento } =
     parseInvestimentoCreateBody(body)
+
+  const notas = body?.notas !== undefined
+    ? (body.notas === null || String(body.notas).trim() === '' ? null : String(body.notas).trim().slice(0, 500))
+    : undefined
+
+  const meta_carteira_valor = body?.meta_carteira_valor !== undefined
+    ? (body.meta_carteira_valor === null || body.meta_carteira_valor === '' ? null : (() => {
+        const v = Number(body.meta_carteira_valor)
+        return Number.isFinite(v) && v > 0 ? Math.round(v * 100) / 100 : null
+      })())
+    : undefined
+
+  const updatePayload = {
+    tipo_preset, nome, instituicao_nome, valor_investido,
+    percentual_cdi, data_aquisicao, tipo_indexador, data_vencimento,
+    ...(notas !== undefined && { notas }),
+    ...(meta_carteira_valor !== undefined && { meta_carteira_valor }),
+  }
+
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
     .from('investimentos_usuario')
-    .update({
-      tipo_preset,
-      nome,
-      instituicao_nome,
-      valor_investido,
-      percentual_cdi,
-      data_aquisicao,
-      tipo_indexador,
-      data_vencimento,
-    })
+    .update(updatePayload)
     .eq('id', id)
     .eq('usuario_id', usuarioId)
     .select(SELECT_COLS)

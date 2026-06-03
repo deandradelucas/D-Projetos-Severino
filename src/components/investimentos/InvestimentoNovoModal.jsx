@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useSheetDragClose } from '../../hooks/useSheetDragClose'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../../lib/currencyMaskBr'
 import DatePickerBrPopover from './DatePickerBrPopover'
 import { maskDateBrInput, parseDdMmYyyyStrict, ymdToDdMmYyyy } from '../../lib/dateInputBr'
@@ -90,6 +91,8 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
   const listRef = useRef(null)
   const btnCalAquisicaoRef = useRef(null)
   const btnCalVencimentoRef = useRef(null)
+  const sheetRef = useRef(null)
+  useSheetDragClose(sheetRef, { open, onClose })
 
   const [instQuery, setInstQuery] = useState(() => String(initialEdit?.instituicao_nome ?? '').trim())
   const [instChosen, setInstChosen] = useState(() => {
@@ -129,6 +132,12 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
   )
   const [pickerAquisicaoOpen, setPickerAquisicaoOpen] = useState(false)
   const [pickerVencimentoOpen, setPickerVencimentoOpen] = useState(false)
+  const [notas, setNotas] = useState(() => String(initialEdit?.notas ?? '').trim())
+  const [metaInput, setMetaInput] = useState(() =>
+    initialEdit?.meta_carteira_valor != null && Number.isFinite(Number(initialEdit.meta_carteira_valor))
+      ? valorToMaskedBRL(Number(initialEdit.meta_carteira_valor))
+      : '',
+  )
 
   const instituicoesFiltradas = useMemo(() => filtrarInstituicoesFinanceiras(instQuery), [instQuery])
 
@@ -195,6 +204,12 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
       setTipoIndexador(initialEdit?.tipo_indexador === 'PREFIXADO' ? 'PREFIXADO' : 'CDI')
       setNomePersonalizadoExpandido(
         Boolean(initialEdit?.id) && !initialEdit?.tipo_preset && String(initialEdit?.nome ?? '').trim().length > 0,
+      )
+      setNotas(String(initialEdit?.notas ?? '').trim())
+      setMetaInput(
+        initialEdit?.meta_carteira_valor != null && Number.isFinite(Number(initialEdit.meta_carteira_valor))
+          ? valorToMaskedBRL(Number(initialEdit.meta_carteira_valor))
+          : '',
       )
       setFormError('')
     })
@@ -289,6 +304,9 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
       }
       vencimentoStr = vy
     }
+    const metaVal = metaInput.trim() ? parseCurrencyBRLMasked(metaInput) : null
+    const notasVal = notas.trim() || null
+
     const trimmed = customNome.trim()
     if (trimmed.length >= 2) {
       await onSubmit({
@@ -299,6 +317,8 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         data_aquisicao: dataStr,
         tipo_indexador: tipoIndexador,
         data_vencimento: vencimentoStr,
+        notas: notasVal,
+        meta_carteira_valor: metaVal,
       })
       return
     }
@@ -311,6 +331,8 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         data_aquisicao: dataStr,
         tipo_indexador: tipoIndexador,
         data_vencimento: vencimentoStr,
+        notas: notasVal,
+        meta_carteira_valor: metaVal,
       })
       return
     }
@@ -332,6 +354,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
     <div className="modal-backdrop page-investimentos-modal-backdrop" role="presentation" onMouseDown={handleBackdropDown}>
       <div
         className="modal-content page-investimentos-modal"
+        ref={sheetRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -668,14 +691,46 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
               ) : null}
             </div>
 
+            {/* Notas e meta — seção extra */}
+            <div className="page-investimentos-modal__section page-investimentos-modal__section--extras">
+              <p className="page-investimentos-modal__section-label">Notas (opcional)</p>
+              <textarea
+                className="page-investimentos-modal__input page-investimentos-modal__input--textarea"
+                placeholder="Ex.: renovar quando vencer, fundos de emergência…"
+                maxLength={500}
+                rows={3}
+                disabled={submitting}
+                value={notas}
+                onChange={(e) => setNotas(e.target.value)}
+              />
+              <p className="page-investimentos-modal__char-count">{notas.length}/500</p>
             </div>
+
+            <div className="page-investimentos-modal__section">
+              <label className="page-investimentos-modal__section-label">Meta da carteira (opcional)</label>
+              <div className="page-investimentos-modal__perc-input-wrap">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  className="page-investimentos-modal__input"
+                  placeholder="R$ 0,00"
+                  disabled={submitting}
+                  value={metaInput}
+                  onChange={(e) => setMetaInput(maskCurrencyBRLInput(e.target.value))}
+                />
+              </div>
+              <p className="page-investimentos-modal__hint">Valor total que deseja atingir na carteira.</p>
+            </div>
+
+            </div>{/* /surface */}
 
             {formError ? (
               <p className="page-investimentos-modal__error" role="alert">
                 {formError}
               </p>
             ) : null}
-          </div>
+          </div>{/* /modal-body */}
           <div className="page-investimentos-modal__footer">
             <p className="page-investimentos-modal__footer-hint">Os dados ficam só na sua conta.</p>
             <div className="page-investimentos-modal__footer-actions">

@@ -23,6 +23,7 @@ src/lib/supabase_config.js
 # Local tooling artifacts
 .agent/
 .agents/
+.playwright-mcp/
 skills-lock.json
 nul
 

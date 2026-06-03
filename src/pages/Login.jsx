@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthPasswordToggleButton from '../components/AuthPasswordToggleButton'
 import AuthPhoneShell from '../components/AuthPhoneShell'
-import LoginCopyPanel from '../components/auth/LoginCopyPanel'
+import AuthCopyPanel from '../components/auth/AuthCopyPanel'
+import { LOGIN_COPY } from '../components/auth/authCopyContent'
 import { apiUrl, severinoProdApiMisconfigured } from '../lib/apiUrl'
 import {
   clearConviteTokenSession,
@@ -14,7 +15,7 @@ import { BRAND_ASSETS, BRAND_LOGO_PIXEL_SIZE } from '../lib/brandAssets'
 import { prefetchRoute } from '../lazyRoutes'
 import { showToast } from '../lib/toastStore'
 import { webAuthnSupported, fetchWebAuthnStatus, loginWithWebAuthn } from '../lib/webauthnBrowser'
-import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
+import { AUTH_SHELL_INPUT_CLASS, AUTH_SHELL_ERROR_BOX_CLASS } from '../lib/authFormClasses'
 import { validateEmail } from '../lib/validateEmail'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { writeHorizonteAccessToken, writeHorizonteRefreshToken } from '../lib/horizonteAccessToken'
@@ -349,7 +350,7 @@ export default function Login() {
       bodyLogoIntrinsicSize={BRAND_LOGO_PIXEL_SIZE.severinoTemaClaro}
       bodyLogoAlt="Severino"
       subtitle="Seu financeiro pessoal, organizado"
-      asidePanel={<LoginCopyPanel />}
+      asidePanel={<AuthCopyPanel copy={LOGIN_COPY} />}
       compact={!showRecovery && !(webAuthnSupported() && hasWebAuthn)}
       footer={
         <>
@@ -415,7 +416,7 @@ export default function Login() {
               required
               minLength={6}
               autoComplete="current-password"
-              className={`${AUTH_SHELL_INPUT_CLASS} pr-11 placeholder:text-neutral-300 sm:pr-12`}
+              className={`${AUTH_SHELL_INPUT_CLASS} pr-11 sm:pr-12`}
             />
             <AuthPasswordToggleButton passwordVisible={showSenha} onToggle={() => setShowSenha((v) => !v)} />
           </div>
@@ -528,11 +529,7 @@ export default function Login() {
         )}
 
         {formError ? (
-          <div
-            role="alert"
-            aria-live="polite"
-            className="rounded-[12px] border border-error/35 bg-error/10 p-3 text-center text-[11px] text-red-700 sm:text-[12px]"
-          >
+          <div role="alert" aria-live="polite" className={AUTH_SHELL_ERROR_BOX_CLASS}>
             {formError}
           </div>
         ) : null}
@@ -557,7 +554,7 @@ export default function Login() {
         )}
       </form>
 
-      <p className="mt-4 flex items-center justify-center gap-1.5 text-[10px] text-neutral-400">
+      <p className="mt-4 flex items-center justify-center gap-1.5 text-[10px] text-neutral-600">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3 shrink-0" aria-hidden="true">
           <path fillRule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5V4.5a2 2 0 1 0-4 0V6h4Z" clipRule="evenodd" />
         </svg>

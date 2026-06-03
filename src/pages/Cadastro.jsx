@@ -2,8 +2,11 @@ import { useState, useMemo, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthPasswordToggleButton from '../components/AuthPasswordToggleButton'
 import AuthPhoneShell from '../components/AuthPhoneShell'
+import AuthCopyPanel from '../components/auth/AuthCopyPanel'
+import { CADASTRO_COPY } from '../components/auth/authCopyContent'
 import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
-import { AUTH_SHELL_INPUT_CLASS } from '../lib/authFormClasses'
+import { AUTH_SHELL_INPUT_CLASS, AUTH_SHELL_ERROR_BOX_CLASS, AUTH_SHELL_FIELD_ERROR_CLASS } from '../lib/authFormClasses'
+import { BRAND_ASSETS, BRAND_LOGO_PIXEL_SIZE } from '../lib/brandAssets'
 import { apiUrl } from '../lib/apiUrl'
 import { writeHorizonteAccessToken, writeHorizonteRefreshToken } from '../lib/horizonteAccessToken'
 import { showToast } from '../lib/toastStore'
@@ -277,8 +280,13 @@ export default function Cadastro() {
 
   return (
     <AuthPhoneShell
-      title="Criar conta"
+      visuallyHiddenTitle="Criar conta"
+      showBodyLogo
+      bodyLogoSrc={BRAND_ASSETS.loginSeverinoLight}
+      bodyLogoIntrinsicSize={BRAND_LOGO_PIXEL_SIZE.severinoTemaClaro}
+      bodyLogoAlt="Severino"
       subtitle="Seu dinheiro organizado em 2 minutos."
+      asidePanel={<AuthCopyPanel copy={CADASTRO_COPY} />}
       compact={step === 1}
       footer={
         <>
@@ -299,10 +307,10 @@ export default function Cadastro() {
       )}
       <div className="mb-5">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-500">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-600">
             Passo {step} de {totalSteps ?? 3}
           </span>
-          <span className="text-[10px] text-neutral-400">
+          <span className="text-[10px] font-medium text-neutral-600">
             {step === 1 ? 'Dados pessoais' : step === 2 ? 'Segurança' : step === 3 ? 'WhatsApp' : 'E-mail'}
           </span>
         </div>
@@ -341,7 +349,7 @@ export default function Cadastro() {
                 className={AUTH_SHELL_INPUT_CLASS + ' tracking-[0.3em] text-center text-[20px]'}
               />
               {otpError && (
-                <p role="alert" className="mt-1 text-[10px] text-red-600">{otpError}</p>
+                <p role="alert" className={AUTH_SHELL_FIELD_ERROR_CLASS}>{otpError}</p>
               )}
             </label>
 
@@ -398,7 +406,7 @@ export default function Cadastro() {
                 className={AUTH_SHELL_INPUT_CLASS + ' tracking-[0.3em] text-center text-[20px]'}
               />
               {emailOtpError && (
-                <p role="alert" className="mt-1 text-[10px] text-red-600">{emailOtpError}</p>
+                <p role="alert" className={AUTH_SHELL_FIELD_ERROR_CLASS}>{emailOtpError}</p>
               )}
             </label>
 
@@ -443,7 +451,7 @@ export default function Cadastro() {
                 autoComplete="name"
                 className={AUTH_SHELL_INPUT_CLASS}
               />
-              {errors.nome && <p role="alert" className="mt-1 text-[10px] text-red-600">{errors.nome}</p>}
+              {errors.nome && <p role="alert" className={AUTH_SHELL_FIELD_ERROR_CLASS}>{errors.nome}</p>}
             </label>
 
             <label className="block" htmlFor="telefone">
@@ -460,7 +468,7 @@ export default function Cadastro() {
                 className={AUTH_SHELL_INPUT_CLASS}
               />
               <p className="mt-1 text-[10px] text-neutral-400">Usado para recuperar sua senha via WhatsApp</p>
-              {errors.telefone && <p role="alert" className="mt-1 text-[10px] text-red-600">{errors.telefone}</p>}
+              {errors.telefone && <p role="alert" className={AUTH_SHELL_FIELD_ERROR_CLASS}>{errors.telefone}</p>}
             </label>
 
             <button
@@ -487,7 +495,7 @@ export default function Cadastro() {
                 autoComplete="email"
                 className={AUTH_SHELL_INPUT_CLASS}
               />
-              {errors.email && <p role="alert" className="mt-1 text-[10px] text-red-600">{errors.email}</p>}
+              {errors.email && <p role="alert" className={AUTH_SHELL_FIELD_ERROR_CLASS}>{errors.email}</p>}
             </label>
 
             <label className="block" htmlFor="senha">
@@ -518,7 +526,7 @@ export default function Cadastro() {
                   <p className="mt-1 text-[10px] text-neutral-400">{FORCA_LABEL[forca]}</p>
                 </div>
               )}
-              {errors.senha && <p role="alert" className="mt-1 text-[10px] text-red-600">{errors.senha}</p>}
+              {errors.senha && <p role="alert" className={AUTH_SHELL_FIELD_ERROR_CLASS}>{errors.senha}</p>}
             </label>
 
             <div className="flex gap-3 pt-1">
@@ -539,13 +547,20 @@ export default function Cadastro() {
             </div>
 
             {submitError && (
-              <div role="alert" className="rounded-[10px] border border-red-200 bg-red-50 px-3 py-2.5 text-[12px] text-red-700">
+              <div role="alert" aria-live="polite" className={AUTH_SHELL_ERROR_BOX_CLASS}>
                 {submitError}
               </div>
             )}
           </div>
         )}
       </form>
+
+      <p className="mt-4 flex items-center justify-center gap-1.5 text-[10px] text-neutral-600">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3 shrink-0" aria-hidden="true">
+          <path fillRule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5V4.5a2 2 0 1 0-4 0V6h4Z" clipRule="evenodd" />
+        </svg>
+        Dados criptografados e seguros
+      </p>
     </AuthPhoneShell>
   )
 }

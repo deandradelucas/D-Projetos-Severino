@@ -1,0 +1,280 @@
+/* ─────────────────────────────────────────────────────────────
+   PwaInstallPrompt — fonte única de verdade do convite de instalação.
+   Co-locado ao componente: carrega sempre junto, em qualquer rota
+   (login ou app autenticado), sem depender da ordem dos partials.
+   Versão compacta + tipografia do sistema (Plus Jakarta / Inter).
+   ───────────────────────────────────────────────────────────── */
+
+.pwa-install-sheet {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: max(16px, calc(env(safe-area-inset-bottom, 0px) + 16px));
+  z-index: 9800;
+  width: min(340px, calc(100vw - 32px));
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  overflow: hidden;
+  color: #f8fafc;
+  font-family: var(--font-family-sans);
+  background:
+    linear-gradient(135deg, rgba(19, 25, 36, 0.92), rgba(6, 9, 15, 0.9)),
+    rgba(5, 6, 7, 0.92);
+  box-shadow:
+    0 24px 60px -32px rgba(0, 0, 0, 0.9),
+    0 16px 38px -26px rgba(91, 33, 182, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pwa-install-sheet {
+    animation: hz-slide-up 300ms var(--ease-decelerate, cubic-bezier(0, 0, 0.2, 1)) both;
+  }
+}
+
+.pwa-install-sheet__glow {
+  position: absolute;
+  inset: -45% -18% auto;
+  height: 150px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(132, 226, 111, 0.24), transparent 34%),
+    radial-gradient(circle at 72% 24%, rgba(212, 168, 75, 0.22), transparent 36%),
+    radial-gradient(circle at 48% 4%, rgba(124, 58, 237, 0.22), transparent 40%);
+  filter: blur(2px);
+}
+
+.pwa-install-sheet__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(248, 250, 252, 0.78);
+  font-family: var(--font-family-sans);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pwa-install-sheet__close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.pwa-install-sheet__close:focus-visible,
+.pwa-install-sheet__btn:focus-visible {
+  outline: 2px solid #d4a84b;
+  outline-offset: 3px;
+}
+
+.pwa-install-sheet__content {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-right: 26px;
+}
+
+.pwa-install-sheet__icon {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: #050607;
+  box-shadow:
+    0 14px 30px -22px rgba(0, 0, 0, 0.88),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.pwa-install-sheet__body {
+  min-width: 0;
+}
+
+.pwa-install-sheet__eyebrow {
+  margin: 0 0 4px;
+  color: #d4a84b;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.pwa-install-sheet__title {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(0.98rem, 1vw + 0.82rem, 1.18rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.pwa-install-sheet__text {
+  margin: 5px 0 0;
+  color: rgba(226, 232, 240, 0.76);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.pwa-install-sheet__benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 9px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pwa-install-sheet__benefits li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  color: rgba(248, 250, 252, 0.82);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.pwa-install-sheet__actions {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.pwa-install-sheet__btn {
+  min-height: 38px;
+  padding: 0 13px;
+  border-radius: 12px;
+  font-family: var(--font-family-sans);
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.pwa-install-sheet__btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.pwa-install-sheet__btn--ghost {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(226, 232, 240, 0.82);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.pwa-install-sheet__btn--ghost:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.pwa-install-sheet__btn--primary {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #0a0a0a;
+  background: linear-gradient(135deg, #f1d28b, #d4a84b 55%, #b8923f);
+  box-shadow: 0 14px 30px -20px rgba(212, 168, 75, 0.85);
+}
+
+.pwa-install-sheet__btn--primary:hover {
+  box-shadow: 0 16px 34px -18px rgba(212, 168, 75, 0.88);
+}
+
+/* ─── Tema claro ─── */
+body[data-theme='light'] .pwa-install-sheet {
+  border-color: rgba(15, 23, 42, 0.08);
+  color: #111827;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.9)),
+    rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 24px 60px -34px rgba(15, 23, 42, 0.5),
+    0 16px 38px -30px rgba(91, 33, 182, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+body[data-theme='light'] .pwa-install-sheet__title {
+  color: #111827;
+}
+
+body[data-theme='light'] .pwa-install-sheet__text {
+  color: #64748b;
+}
+
+body[data-theme='light'] .pwa-install-sheet__close,
+body[data-theme='light'] .pwa-install-sheet__benefits li,
+body[data-theme='light'] .pwa-install-sheet__btn--ghost {
+  border-color: rgba(15, 23, 42, 0.08);
+  color: #475569;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+/* ─── Orquestração: esconder o convite quando há modal aberto,
+       e esconder FAB/chat enquanto o convite está visível ─── */
+body:has(.modal-backdrop) .pwa-install-sheet,
+body:has(.pwa-install-sheet) .dashboard-mobile-tx-fab,
+body:has(.pwa-install-sheet) .horizon-chat-fab,
+body:has(.pwa-install-sheet) .horizon-chat-window {
+  display: none !important;
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 768px) {
+  .pwa-install-sheet {
+    right: max(10px, env(safe-area-inset-right, 0px));
+    left: max(10px, env(safe-area-inset-left, 0px));
+    bottom: max(10px, calc(env(safe-area-inset-bottom, 0px) + 10px));
+    width: auto;
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  body:has(.mobile-bottom-nav) .pwa-install-sheet {
+    bottom: calc(104px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .pwa-install-sheet__content {
+    gap: 11px;
+    padding-right: 30px;
+  }
+
+  .pwa-install-sheet__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+  }
+
+  .pwa-install-sheet__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pwa-install-sheet__btn {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pwa-install-sheet__btn {
+    transition: none;
+  }
+}

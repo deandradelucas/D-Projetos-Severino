@@ -1,0 +1,601 @@
+/* =============================================================================
+   20 — PAGAMENTO · NEO-SKEUMORPHISM (Desktop ≥ 769px)
+   =============================================================================
+   Hero, layout 2-col (primary + aside), planos, checkout, detalhes,
+   histórico, banners, trial urgência, modais (cancelar + Pix). CSS-only.
+   ============================================================================= */
+
+/* Tokens dos modais (Pix + cancelar) — definidos no body porque os modais são
+   renderizados via portal fora do .dashboard-container. Válidos em qualquer
+   largura (mobile/tablet/desktop). */
+body[data-theme='dark'] {
+  --pg-base: #0e1117; --pg-raised: #11141a; --pg-sunken: #07090d;
+  --pg-light: rgba(255,255,255,0.040); --pg-shadow: rgba(0,0,0,0.70); --pg-shadow-soft: rgba(0,0,0,0.45);
+  --pg-edge-hi: rgba(255,255,255,0.055);
+  --pg-text-hi: #f3f5f8; --pg-text-mid: #98a4b5; --pg-text-lo: #5a6878;
+  --pg-accent: #d4a84b; --pg-accent-glow: rgba(212,168,75,0.20);
+  --pg-pos: #4ade80; --pg-pos-soft: rgba(74,222,128,0.12); --pg-neg: #f87171; --pg-neg-soft: rgba(248,113,113,0.12);
+}
+body[data-theme='light'] {
+  --pg-base: #eef1f6; --pg-raised: #ffffff; --pg-sunken: #e4e8ee;
+  --pg-light: rgba(255,255,255,0.90); --pg-shadow: rgba(166,180,200,0.45); --pg-shadow-soft: rgba(166,180,200,0.28);
+  --pg-edge-hi: rgba(255,255,255,0.95);
+  --pg-text-hi: #0d1117; --pg-text-mid: #4a5568; --pg-text-lo: #8896a5;
+  --pg-accent: #b8832a; --pg-accent-glow: rgba(184,131,42,0.18);
+  --pg-pos: #15803d; --pg-pos-soft: rgba(22,163,74,0.08); --pg-neg: #b91c1c; --pg-neg-soft: rgba(220,38,38,0.06);
+}
+
+/* Modais Pix + cancelar: estilo neumórfico em TODAS as larguras (portal no body) */
+body[data-theme='dark'] .pagamento-modal, body[data-theme='light'] .pagamento-modal,
+body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagamento-pix-modal {
+  background: linear-gradient(155deg, var(--pg-raised) 0%, var(--pg-base) 100%) !important;
+  border: 1px solid var(--pg-edge-hi) !important; border-radius: 24px !important;
+  box-shadow: 16px 16px 40px var(--pg-shadow), -12px -12px 32px var(--pg-light), inset 1px 1px 1px var(--pg-edge-hi) !important;
+  padding: 26px !important;
+}
+.pagamento-modal__title, .pagamento-pix-modal__title {
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; font-size: 1.25rem !important;
+  letter-spacing: -0.02em !important; color: var(--pg-text-hi) !important;
+}
+.pagamento-modal__body, .pagamento-pix-modal__intro {
+  font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; color: var(--pg-text-mid) !important;
+}
+.pagamento-modal__error, .pagamento-pix-modal__error { color: var(--pg-neg) !important; font-size: 0.8125rem !important; }
+.pagamento-pix-modal__input, .pagamento-pix-modal__textarea, .pagamento-modal__select {
+  padding: 11px 14px !important; border-radius: 12px !important; background: var(--pg-sunken) !important;
+  border: 1px solid var(--pg-edge-hi) !important; color: var(--pg-text-hi) !important;
+  font-family: 'Inter Variable', system-ui, sans-serif !important; box-shadow: inset 2px 2px 4px var(--pg-shadow-soft) !important; width: 100% !important; box-sizing: border-box !important;
+}
+.pagamento-pix-modal__close {
+  width: 36px !important; height: 36px !important; border-radius: 50% !important; background: var(--pg-sunken) !important;
+  border: 1px solid var(--pg-edge-hi) !important; color: var(--pg-text-mid) !important; cursor: pointer !important;
+}
+.pagamento-pix-modal__qr {
+  border-radius: 16px !important; padding: 12px !important; background: #ffffff !important; box-shadow: 6px 6px 16px var(--pg-shadow-soft) !important;
+}
+.pagamento-modal__field { margin-bottom: 16px !important; }
+.pagamento-modal__label {
+  display: block !important; margin-bottom: 6px !important;
+  font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; font-weight: 600 !important;
+  text-transform: uppercase !important; letter-spacing: 0.1em !important; color: var(--pg-text-lo) !important;
+}
+.pagamento-retencao {
+  border-radius: 16px !important; padding: 16px 18px !important; margin: 4px 0 16px !important;
+  background: var(--pg-sunken) !important; box-shadow: inset 2px 2px 5px var(--pg-shadow-soft) !important;
+}
+.pagamento-retencao__lead {
+  font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; font-weight: 700 !important;
+  text-transform: uppercase !important; letter-spacing: 0.1em !important; color: var(--pg-text-lo) !important; margin: 0 0 10px !important;
+}
+.pagamento-retencao__list { list-style: none !important; padding: 0 !important; margin: 0 !important; display: flex !important; flex-direction: column !important; gap: 7px !important; }
+.pagamento-retencao__list li {
+  display: flex !important; align-items: center !important; gap: 9px !important;
+  font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; color: var(--pg-text-mid) !important;
+}
+.pagamento-retencao__list li svg { color: var(--pg-neg) !important; flex-shrink: 0 !important; }
+.pagamento-retencao__nota {
+  margin: 12px 0 0 !important; font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.8125rem !important;
+  color: var(--pg-pos) !important; font-weight: 500 !important;
+}
+
+@media (min-width: 769px) {
+
+  /* ─── Tokens ─── */
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
+    --pg-base: #0e1117; --pg-raised: #11141a; --pg-sunken: #07090d;
+    --pg-light: rgba(255,255,255,0.040); --pg-shadow: rgba(0,0,0,0.70); --pg-shadow-soft: rgba(0,0,0,0.45);
+    --pg-edge-hi: rgba(255,255,255,0.055); --pg-edge-lo: rgba(0,0,0,0.50);
+    --pg-text-hi: #f3f5f8; --pg-text-mid: #98a4b5; --pg-text-lo: #5a6878;
+    --pg-accent: #d4a84b; --pg-accent-glow: rgba(212,168,75,0.20);
+    --pg-pos: #4ade80; --pg-pos-glow: rgba(74,222,128,0.16); --pg-pos-soft: rgba(74,222,128,0.10);
+    --pg-neg: #f87171; --pg-neg-glow: rgba(248,113,113,0.16); --pg-neg-soft: rgba(248,113,113,0.10);
+    --pg-warn: #fbbf24; --pg-warn-soft: rgba(245,158,11,0.12);
+    --pg-ease: cubic-bezier(0.22,1,0.36,1); --pg-r: 22px;
+  }
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
+    --pg-base: #eef1f6; --pg-raised: #ffffff; --pg-sunken: #e4e8ee;
+    --pg-light: rgba(255,255,255,0.90); --pg-shadow: rgba(166,180,200,0.45); --pg-shadow-soft: rgba(166,180,200,0.28);
+    --pg-edge-hi: rgba(255,255,255,0.95); --pg-edge-lo: rgba(140,156,178,0.20);
+    --pg-text-hi: #0d1117; --pg-text-mid: #4a5568; --pg-text-lo: #8896a5;
+    --pg-accent: #b8832a; --pg-accent-glow: rgba(184,131,42,0.18);
+    --pg-pos: #15803d; --pg-pos-glow: rgba(22,163,74,0.14); --pg-pos-soft: rgba(22,163,74,0.08);
+    --pg-neg: #b91c1c; --pg-neg-glow: rgba(220,38,38,0.12); --pg-neg-soft: rgba(220,38,38,0.06);
+    --pg-warn: #b45309; --pg-warn-soft: rgba(217,119,6,0.10);
+    --pg-ease: cubic-bezier(0.22,1,0.36,1); --pg-r: 22px;
+  }
+
+  /* ─── Full-bleed + atmosphere + cadeia flex ─── */
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
+    width: 100% !important; max-width: 100% !important; height: 100vh !important; max-height: 100vh !important;
+    margin: 0 !important; padding: 0 !important; border: none !important; border-radius: 0 !important; overflow: hidden !important;
+  }
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
+    background: radial-gradient(ellipse 1100px 750px at 18% -8%, rgba(212,168,75,0.030), transparent 58%), radial-gradient(ellipse 850px 650px at 86% 108%, rgba(74,222,128,0.016), transparent 52%), var(--pg-base) !important;
+  }
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
+    background: radial-gradient(ellipse 1100px 750px at 18% -8%, rgba(212,168,75,0.045), transparent 58%), radial-gradient(ellipse 850px 650px at 86% 108%, rgba(22,163,74,0.018), transparent 52%), var(--pg-base) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .app-horizon-inner {
+    height: 100% !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; overflow: hidden !important; display: flex !important; gap: 20px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
+    overflow: hidden !important; min-height: 0 !important; height: 100% !important; padding: 0 !important; margin: 0 !important; display: flex !important; flex-direction: column !important;
+    background: transparent !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
+    flex: 1 1 auto !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; margin: 0 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
+    flex: 1 1 auto !important; min-height: 0 !important; overflow-y: auto !important; overflow-x: hidden !important;
+    padding: 28px 20px 24px 0 !important;
+  }
+  /* Hero + layout numa coluna central */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-header,
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-layout {
+    width: 100% !important; max-width: 1120px !important; margin-left: auto !important; margin-right: auto !important;
+  }
+
+  /* ─── Hero ─── */
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-header,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-header {
+    position: relative !important; flex-shrink: 0 !important;
+    padding: 24px 28px !important; margin-bottom: 20px !important;
+    border-radius: var(--pg-r) !important; border: 1px solid var(--pg-edge-hi) !important;
+    background: linear-gradient(155deg, var(--pg-raised) 0%, var(--pg-base) 100%) !important;
+    box-shadow: 0 14px 36px -16px var(--pg-shadow), inset 1px 1px 1px var(--pg-edge-hi), inset -1px -1px 1px var(--pg-edge-lo) !important;
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-header .dashboard-hub__title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-weight: 700 !important; font-size: clamp(1.5rem, 1.6vw + 0.8rem, 2rem) !important;
+    letter-spacing: -0.025em !important; color: var(--pg-text-hi) !important;
+  }
+
+  /* ─── Painéis genéricos (.ref-panel) ─── */
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-panel,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-panel {
+    background: linear-gradient(155deg, var(--pg-raised) 0%, var(--pg-base) 100%) !important;
+    border: 1px solid var(--pg-edge-hi) !important; border-radius: var(--pg-r) !important; padding: 24px 26px !important;
+    box-shadow: 10px 10px 24px var(--pg-shadow-soft), -8px -8px 22px var(--pg-light), inset 1px 1px 1px var(--pg-edge-hi), inset -1px -1px 1px var(--pg-edge-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-panel__title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important;
+    font-size: 1.125rem !important; letter-spacing: -0.02em !important; color: var(--pg-text-hi) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-panel__subtitle {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.8125rem !important; color: var(--pg-text-lo) !important; margin-top: 2px !important;
+  }
+
+  /* ─── Planos (mensal/anual) ─── */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__legend {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.6875rem !important; font-weight: 600 !important;
+    text-transform: uppercase !important; letter-spacing: 0.16em !important; color: var(--pg-text-lo) !important; margin-bottom: 14px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__grid {
+    display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 14px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option {
+    display: flex !important; flex-direction: column !important; gap: 4px !important; align-items: flex-start !important;
+    padding: 18px 20px !important; border-radius: 16px !important; cursor: pointer !important;
+    background: var(--pg-sunken) !important; border: 1px solid var(--pg-edge-hi) !important;
+    box-shadow: inset 2px 2px 5px var(--pg-shadow-soft), inset -1px -1px 3px var(--pg-light) !important;
+    transition: all 220ms var(--pg-ease) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option:hover {
+    transform: translateY(-2px) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option--active {
+    background: linear-gradient(155deg, var(--pg-raised) 0%, var(--pg-base) 100%) !important;
+    box-shadow: 6px 6px 14px var(--pg-shadow-soft), -4px -4px 10px var(--pg-light), 0 0 0 2px var(--pg-accent-glow) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option-title {
+    display: inline-flex !important; align-items: center !important; gap: 8px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.6875rem !important; font-weight: 600 !important;
+    text-transform: uppercase !important; letter-spacing: 0.14em !important; color: var(--pg-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option--active .page-pagamento-planos__option-title {
+    color: var(--pg-accent) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option-price {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-size: 1.375rem !important; font-weight: 700 !important;
+    color: var(--pg-text-hi) !important; font-variant-numeric: tabular-nums !important; letter-spacing: -0.02em !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option-hint {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; color: var(--pg-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__badge {
+    padding: 2px 8px !important; border-radius: 999px !important; background: var(--pg-pos-soft) !important; color: var(--pg-pos) !important;
+    font-size: 0.625rem !important; font-weight: 700 !important; letter-spacing: 0 !important;
+  }
+
+  /* ─── Checkout panel ─── */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__lead-title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; font-size: 1.125rem !important; color: var(--pg-text-hi) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__lead-text {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; color: var(--pg-text-mid) !important; margin-top: 4px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__label {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; font-weight: 600 !important;
+    text-transform: uppercase !important; letter-spacing: 0.12em !important; color: var(--pg-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__label-req { color: var(--pg-neg) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__input {
+    padding: 12px 14px !important; border-radius: 12px !important; background: var(--pg-sunken) !important;
+    border: 1px solid var(--pg-edge-hi) !important; color: var(--pg-text-hi) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.9375rem !important; width: 100% !important; box-sizing: border-box !important;
+    box-shadow: inset 2px 2px 4px var(--pg-shadow-soft), inset -1px -1px 2px var(--pg-light) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__input:focus {
+    outline: 2px solid var(--pg-accent) !important; outline-offset: 2px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__hint {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; color: var(--pg-text-lo) !important; margin-top: 4px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__error {
+    font-size: 0.8125rem !important; color: var(--pg-neg) !important; font-weight: 500 !important;
+  }
+
+  /* ─── Botões (primary/secondary/danger) ─── */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-primary,
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__btn-full.btn-primary {
+    padding: 13px 24px !important; border-radius: 999px !important;
+    background: linear-gradient(155deg, var(--pg-accent) 0%, #c49535 100%) !important; border: 1px solid var(--pg-accent-glow) !important;
+    color: #1a1200 !important; font-family: 'Inter Variable', system-ui, sans-serif !important; font-weight: 700 !important; font-size: 0.9375rem !important;
+    cursor: pointer !important; box-shadow: 6px 8px 18px -6px var(--pg-accent-glow), inset 0 1px 0 rgba(255,255,255,0.25) !important;
+    transition: all 220ms var(--pg-ease) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px) !important; box-shadow: 8px 12px 24px -6px var(--pg-accent-glow), inset 0 1px 0 rgba(255,255,255,0.3) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-secondary {
+    padding: 12px 22px !important; border-radius: 999px !important;
+    background: var(--pg-sunken) !important; border: 1px solid var(--pg-edge-hi) !important; color: var(--pg-text-mid) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-weight: 500 !important; font-size: 0.9375rem !important; cursor: pointer !important;
+    box-shadow: inset 2px 2px 4px var(--pg-shadow-soft), inset -1px -1px 2px var(--pg-light) !important;
+    transition: color 200ms var(--pg-ease) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-secondary:hover:not(:disabled) { color: var(--pg-text-hi) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-primary:disabled,
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-secondary:disabled { opacity: 0.5 !important; cursor: not-allowed !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__btn-full {
+    width: 100% !important; justify-content: center !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-danger {
+    padding: 12px 22px !important; border-radius: 999px !important; background: var(--pg-neg) !important; border: none !important;
+    color: #fff !important; font-weight: 700 !important; cursor: pointer !important; box-shadow: 5px 7px 16px -5px var(--pg-neg-glow) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-danger-ghost,
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cancelar-btn {
+    padding: 10px 18px !important; border-radius: 999px !important; background: transparent !important;
+    border: 1px solid var(--pg-neg-glow) !important; color: var(--pg-neg) !important; cursor: pointer !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-weight: 500 !important; font-size: 0.875rem !important;
+    transition: background 200ms var(--pg-ease) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-danger-ghost:hover,
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cancelar-btn:hover { background: var(--pg-neg-soft) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cancelar-zona {
+    display: flex !important; justify-content: center !important; padding: 8px 0 !important;
+  }
+
+  /* ─── Trial urgência ─── */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia {
+    display: flex !important; align-items: center !important; gap: 16px !important; padding: 18px 22px !important; border-radius: var(--pg-r) !important;
+    background: linear-gradient(155deg, var(--pg-raised) 0%, var(--pg-base) 100%) !important; border: 1px solid var(--pg-accent-glow) !important;
+    box-shadow: 8px 8px 20px var(--pg-shadow-soft), -6px -6px 18px var(--pg-light), 0 0 0 1px var(--pg-accent-glow) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__dias-box {
+    flex-shrink: 0 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
+    width: 64px !important; height: 64px !important; border-radius: 16px !important; background: var(--pg-sunken) !important;
+    box-shadow: inset 3px 3px 6px var(--pg-shadow-soft), inset -2px -2px 4px var(--pg-light), 0 0 0 1px var(--pg-accent-glow) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__num {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-size: 1.75rem !important; font-weight: 700 !important;
+    color: var(--pg-accent) !important; line-height: 1 !important; font-variant-numeric: tabular-nums !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__label {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.625rem !important; font-weight: 600 !important;
+    text-transform: uppercase !important; letter-spacing: 0.12em !important; color: var(--pg-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__body { flex: 1 1 auto !important; min-width: 0 !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-size: 1rem !important; font-weight: 700 !important; color: var(--pg-text-hi) !important; margin: 0 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__text {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.8125rem !important; color: var(--pg-text-mid) !important; margin: 2px 0 0 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__cta {
+    flex-shrink: 0 !important; display: inline-flex !important; align-items: center !important; gap: 6px !important;
+    padding: 11px 18px !important; border-radius: 999px !important; background: linear-gradient(155deg, var(--pg-accent) 0%, #c49535 100%) !important;
+    color: #1a1200 !important; font-family: 'Inter Variable', system-ui, sans-serif !important; font-weight: 700 !important; font-size: 0.875rem !important;
+    text-decoration: none !important; box-shadow: 6px 8px 18px -6px var(--pg-accent-glow) !important; transition: transform 200ms var(--pg-ease) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__cta:hover { transform: translateY(-2px) !important; }
+
+  /* ─── Banners ─── */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner {
+    padding: 16px 20px !important; border-radius: 16px !important; border: 1px solid var(--pg-edge-hi) !important;
+    background: var(--pg-sunken) !important; box-shadow: inset 2px 2px 5px var(--pg-shadow-soft), inset -1px -1px 3px var(--pg-light) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner__title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; font-size: 0.9375rem !important; color: var(--pg-text-hi) !important; margin: 0 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner__text {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.8125rem !important; color: var(--pg-text-mid) !important; margin: 4px 0 0 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner__link { color: var(--pg-accent) !important; font-weight: 600 !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner--danger { border-color: var(--pg-neg-glow) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner--danger .pagamento-banner__title { color: var(--pg-neg) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner--warning .pagamento-banner__title { color: var(--pg-warn) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner--success { border-color: var(--pg-pos-glow) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner--success .pagamento-banner__title { color: var(--pg-pos) !important; }
+
+  /* ─── Detalhes / definição list ─── */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-detalhes-dl__row {
+    display: flex !important; align-items: baseline !important; justify-content: space-between !important; gap: 12px !important;
+    padding: 10px 0 !important; border-bottom: 1px solid var(--pg-edge-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; color: var(--pg-text-hi) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-detalhes-dl__row > :first-child { color: var(--pg-text-lo) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-detalhes-dl__muted { color: var(--pg-text-lo) !important; }
+
+  /* ─── Aside (painel lateral) ─── */
+  body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside,
+  body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside {
+    background: linear-gradient(155deg, var(--pg-raised) 0%, var(--pg-base) 100%) !important;
+    border: 1px solid var(--pg-edge-hi) !important; border-radius: var(--pg-r) !important; padding: 24px 24px !important;
+    box-shadow: 10px 10px 24px var(--pg-shadow-soft), -8px -8px 22px var(--pg-light), inset 1px 1px 1px var(--pg-edge-hi) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-orientacao__title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; font-size: 1rem !important; color: var(--pg-text-hi) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-orientacao__body {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; color: var(--pg-text-mid) !important;
+  }
+
+  /* ─── Histórico ─── */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-hist-heading {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; font-size: 1.125rem !important; color: var(--pg-text-hi) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-hist-card {
+    background: var(--pg-sunken) !important; border-radius: 14px !important; padding: 14px 16px !important; margin-bottom: 10px !important;
+    box-shadow: inset 2px 2px 5px var(--pg-shadow-soft), inset -1px -1px 3px var(--pg-light) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-hist-card__row {
+    display: flex !important; align-items: baseline !important; justify-content: space-between !important; gap: 12px !important; padding: 3px 0 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-hist-card__label {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; color: var(--pg-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-hist-card__val {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; color: var(--pg-text-hi) !important; font-variant-numeric: tabular-nums !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-hist-badge {
+    padding: 3px 10px !important; border-radius: 999px !important; font-size: 0.6875rem !important; font-weight: 700 !important;
+    text-transform: uppercase !important; letter-spacing: 0.06em !important; background: var(--pg-pos-soft) !important; color: var(--pg-pos) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-empty-state {
+    text-align: center !important; padding: 28px !important; border-radius: 16px !important; background: var(--pg-sunken) !important;
+    box-shadow: inset 2px 2px 5px var(--pg-shadow-soft), inset -1px -1px 3px var(--pg-light) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-empty-state__title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; color: var(--pg-text-hi) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-empty-state__text {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.8125rem !important; color: var(--pg-text-lo) !important;
+  }
+
+  /* (Modais movidos para o nível body — portal — no topo deste arquivo) */
+
+  /* ═══════════════════ MELHORIAS DE CONVERSÃO/UX (features 1-13) ═══════════════════ */
+
+  /* Feature 10 — Badge de status no hero */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-header .dashboard-hub__hero-text {
+    display: flex !important; align-items: center !important; gap: 14px !important; flex-wrap: wrap !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip {
+    display: inline-flex !important; align-items: center !important; gap: 7px !important;
+    padding: 5px 13px !important; border-radius: 999px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; font-weight: 600 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip__dot {
+    width: 7px !important; height: 7px !important; border-radius: 50% !important; background: currentColor !important;
+    box-shadow: 0 0 8px currentColor !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip--ativo { background: var(--pg-pos-soft) !important; color: var(--pg-pos) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip--trial { background: var(--pg-accent-glow) !important; color: var(--pg-accent) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip--aviso { background: var(--pg-warn-soft) !important; color: var(--pg-warn) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-status-chip--expirado { background: var(--pg-neg-soft) !important; color: var(--pg-neg) !important; }
+
+  /* Feature 9 — Barra de progresso do trial */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__progress {
+    height: 6px !important; border-radius: 999px !important; margin-top: 10px !important; overflow: hidden !important;
+    background: var(--pg-sunken) !important; box-shadow: inset 1px 1px 2px var(--pg-shadow-soft) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__progress-fill {
+    height: 100% !important; border-radius: 999px !important;
+    background: linear-gradient(90deg, var(--pg-accent), #e8c878) !important; box-shadow: 0 0 8px var(--pg-accent-glow) !important;
+    transition: width 800ms var(--pg-ease) !important;
+  }
+
+  /* Feature 1+2 — Plano anual recomendado, ribbon, economia */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option--anual {
+    position: relative !important; overflow: visible !important; padding-top: 24px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__ribbon {
+    position: absolute !important; top: -11px !important; left: 18px !important;
+    padding: 3px 12px !important; border-radius: 999px !important;
+    background: linear-gradient(155deg, var(--pg-accent) 0%, #c49535 100%) !important; color: #1a1200 !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.625rem !important; font-weight: 800 !important;
+    text-transform: uppercase !important; letter-spacing: 0.08em !important; white-space: nowrap !important;
+    box-shadow: 0 4px 12px var(--pg-accent-glow) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option-ciclo {
+    font-size: 0.8125rem !important; font-weight: 500 !important; color: var(--pg-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__eq {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.8125rem !important; color: var(--pg-text-mid) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__eq strong { color: var(--pg-accent) !important; font-weight: 700 !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__economia {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; font-weight: 600 !important; color: var(--pg-pos) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__economia s { color: var(--pg-text-lo) !important; font-weight: 400 !important; }
+
+  /* Feature 11 — Meios de pagamento */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__meios {
+    display: flex !important; align-items: center !important; gap: 12px !important; margin-top: 16px !important; padding-top: 16px !important;
+    border-top: 1px solid var(--pg-edge-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__meios-label {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.6875rem !important; font-weight: 600 !important;
+    text-transform: uppercase !important; letter-spacing: 0.14em !important; color: var(--pg-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-meio {
+    display: inline-flex !important; align-items: center !important; gap: 6px !important;
+    padding: 5px 12px !important; border-radius: 999px !important; background: var(--pg-sunken) !important;
+    box-shadow: inset 2px 2px 4px var(--pg-shadow-soft), inset -1px -1px 2px var(--pg-light) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; font-weight: 600 !important; color: var(--pg-text-mid) !important;
+  }
+
+  /* Feature 3 — Value stack */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__title {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; font-size: 1.0625rem !important;
+    color: var(--pg-text-hi) !important; margin-bottom: 14px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__list {
+    list-style: none !important; padding: 0 !important; margin: 0 !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px 18px !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__item {
+    display: flex !important; align-items: center !important; gap: 10px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; color: var(--pg-text-mid) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__check {
+    flex-shrink: 0 !important; color: var(--pg-pos) !important;
+    padding: 3px !important; border-radius: 50% !important; background: var(--pg-pos-soft) !important; box-sizing: content-box !important;
+    width: 14px !important; height: 14px !important;
+  }
+
+  /* Feature 4 — Selos de confiança */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-trust {
+    display: flex !important; flex-wrap: wrap !important; gap: 10px 18px !important; margin-top: 18px !important; padding-top: 16px !important;
+    border-top: 1px solid var(--pg-edge-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-trust__item {
+    display: inline-flex !important; align-items: center !important; gap: 7px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; font-weight: 500 !important; color: var(--pg-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-trust__item svg { color: var(--pg-pos) !important; }
+
+  /* Feature 6 — Resumo do pedido */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-resumo {
+    border-radius: 16px !important; padding: 16px 18px !important; margin-bottom: 4px !important;
+    background: var(--pg-sunken) !important; box-shadow: inset 2px 2px 5px var(--pg-shadow-soft), inset -1px -1px 3px var(--pg-light) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-resumo__row {
+    display: flex !important; align-items: baseline !important; justify-content: space-between !important; gap: 12px !important; padding: 4px 0 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-resumo__row--total {
+    margin-top: 6px !important; padding-top: 10px !important; border-top: 1px solid var(--pg-edge-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-resumo__label {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; font-weight: 600 !important;
+    text-transform: uppercase !important; letter-spacing: 0.1em !important; color: var(--pg-text-lo) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-resumo__plan {
+    display: inline-flex !important; align-items: center !important; gap: 8px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.9375rem !important; font-weight: 600 !important; color: var(--pg-text-hi) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-resumo__save {
+    padding: 1px 7px !important; border-radius: 999px !important; background: var(--pg-pos-soft) !important; color: var(--pg-pos) !important;
+    font-size: 0.625rem !important; font-weight: 700 !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-resumo__total {
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-size: 1.5rem !important; font-weight: 700 !important;
+    color: var(--pg-text-hi) !important; font-variant-numeric: tabular-nums !important; letter-spacing: -0.02em !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-resumo__ciclo { font-size: 0.875rem !important; font-weight: 500 !important; color: var(--pg-text-lo) !important; }
+
+  /* Feature 8 — Validação inline do CPF */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cpf-wrap { position: relative !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cpf-wrap .pagamento-checkout-panel__input { padding-right: 42px !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cpf-wrap--ok .pagamento-checkout-panel__input { box-shadow: inset 2px 2px 4px var(--pg-shadow-soft), inset -1px -1px 2px var(--pg-light), 0 0 0 1px var(--pg-pos-glow) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cpf-wrap--err .pagamento-checkout-panel__input { box-shadow: inset 2px 2px 4px var(--pg-shadow-soft), inset -1px -1px 2px var(--pg-light), 0 0 0 1px var(--pg-neg-glow) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cpf-icon {
+    position: absolute !important; right: 14px !important; top: 50% !important; transform: translateY(-50%) !important; display: inline-flex !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cpf-icon--ok { color: var(--pg-pos) !important; }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-cpf-icon--err { color: var(--pg-neg) !important; }
+
+  /* Feature 5 — Pix CTA em destaque */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-pix-cta {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important; width: 100% !important;
+    padding: 13px 22px !important; border-radius: 999px !important; cursor: pointer !important;
+    background: var(--pg-pos-soft) !important; border: 1px solid var(--pg-pos-glow) !important; color: var(--pg-pos) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-weight: 700 !important; font-size: 0.9375rem !important;
+    transition: all 200ms var(--pg-ease) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-pix-cta:hover:not(:disabled) {
+    transform: translateY(-2px) !important; box-shadow: 0 8px 20px -6px var(--pg-pos-glow) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-pix-cta__save {
+    display: block !important; font-size: 0.6875rem !important; font-weight: 600 !important; opacity: 0.85 !important; margin-top: 1px !important;
+  }
+
+  /* Feature 12 — Animação de sucesso */
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-banner--celebrate {
+    display: flex !important; align-items: center !important; gap: 14px !important;
+    border-color: var(--pg-pos-glow) !important;
+  }
+  .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-success-check {
+    flex-shrink: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    width: 44px !important; height: 44px !important; border-radius: 50% !important;
+    background: var(--pg-pos) !important; color: #fff !important;
+    box-shadow: 0 0 0 6px var(--pg-pos-soft) !important;
+    animation: pgSuccessPop 500ms var(--pg-ease) both !important;
+  }
+  @keyframes pgSuccessPop {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Feature 13 — Retenção no cancelamento */
+  .pagamento-retencao {
+    border-radius: 16px !important; padding: 16px 18px !important; margin: 4px 0 16px !important;
+    background: var(--pg-sunken, #e4e8ee) !important; box-shadow: inset 2px 2px 5px var(--pg-shadow-soft, rgba(166,180,200,0.28)) !important;
+  }
+  .pagamento-retencao__lead {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; font-weight: 700 !important;
+    text-transform: uppercase !important; letter-spacing: 0.1em !important; color: var(--pg-text-lo, #8896a5) !important; margin: 0 0 10px !important;
+  }
+  .pagamento-retencao__list { list-style: none !important; padding: 0 !important; margin: 0 !important; display: flex !important; flex-direction: column !important; gap: 7px !important; }
+  .pagamento-retencao__list li {
+    display: flex !important; align-items: center !important; gap: 9px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; color: var(--pg-text-mid, #4a5568) !important;
+  }
+  .pagamento-retencao__list li svg { color: var(--pg-neg, #b91c1c) !important; flex-shrink: 0 !important; }
+  .pagamento-retencao__nota {
+    margin: 12px 0 0 !important; font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.8125rem !important;
+    color: var(--pg-pos, #15803d) !important; font-weight: 500 !important;
+  }
+  .pagamento-modal__field { margin-bottom: 16px !important; }
+  .pagamento-modal__label {
+    display: block !important; margin-bottom: 6px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; font-weight: 600 !important;
+    text-transform: uppercase !important; letter-spacing: 0.1em !important; color: var(--pg-text-lo, #8896a5) !important;
+  }
+  .pagamento-modal__select {
+    width: 100% !important; padding: 11px 14px !important; border-radius: 12px !important;
+    background: var(--pg-sunken, #e4e8ee) !important; border: 1px solid var(--pg-edge-hi, rgba(255,255,255,0.9)) !important;
+    color: var(--pg-text-hi, #0d1117) !important; font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.9375rem !important;
+    box-shadow: inset 2px 2px 4px var(--pg-shadow-soft, rgba(166,180,200,0.28)) !important;
+  }
+
+  /* Reduce motion */
+  @media (prefers-reduced-motion: reduce) {
+    body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell *,
+    body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell * { transition: none !important; animation: none !important; }
+  }
+}

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useSearchParams } from 'react-router-dom'
 import Sidebar from '@components/Sidebar'
 import MobileMenuButton from '@components/MobileMenuButton'
@@ -46,7 +47,8 @@ export default function Pagamento() {
     isento_pagamento: false,
   })
   const [precosCatalogo, setPrecosCatalogo] = useState({ mensal: 10, anual: 100 })
-  const [planoCheckout, setPlanoCheckout] = useState(() => /** @type {'mensal' | 'anual'} */ ('mensal'))
+  const [planoCheckout, setPlanoCheckout] = useState(() => /** @type {'mensal' | 'anual'} */ ('anual'))
+  const [cancelMotivo, setCancelMotivo] = useState('')
   const [historico, setHistorico] = useState([])
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(false)
@@ -355,6 +357,19 @@ export default function Pagamento() {
     }
   }
 
+  // Gera o QR Code Pix automaticamente ao abrir o modal (sem segundo clique).
+  // Se ainda não houver CPF/CNPJ, mostra o campo direto.
+  useEffect(() => {
+    if (!pixModalOpen) return
+    if (pixData || pixLoading || pixError || pixNeedsCpf) return
+    if (pixCpfCnpj && pixCpfCnpj.replace(/\D/g, '').length >= 11) {
+      void handleGerarPixQrAnual()
+    } else {
+      setPixNeedsCpf(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pixModalOpen])
+
   const limparStatusUrl = () => {
     searchParams.delete('status')
     setSearchParams(searchParams, { replace: true })
@@ -437,6 +452,48 @@ export default function Pagamento() {
   const valorCicloSelecionado = planoCheckout === 'anual' ? precosCatalogo.anual : precosCatalogo.mensal
   const unidadeCiclo = planoCheckout === 'anual' ? 'ano' : 'mês'
 
+  // Economia e equivalência do plano anual (feature 2)
+  const economiaAnual = useMemo(
+    () => Math.max(0, precosCatalogo.mensal * 12 - precosCatalogo.anual),
+    [precosCatalogo],
+  )
+  const mensalEquivalenteAnual = useMemo(() => precosCatalogo.anual / 12, [precosCatalogo])
+
+  // Validação inline do CPF/CNPJ (feature 8)
+  const cpfDigitos = cpfCnpj.replace(/\D/g, '')
+  const cpfValido = cpfDigitos.length > 0 && validateCpfCnpj(cpfDigitos)
+  const cpfTocado = cpfDigitos.length >= 11
+
+  // Progresso do trial (feature 9) — trial padrão de 7 dias
+  const TRIAL_DIAS_TOTAL = 7
+  const trialProgresso =
+    diasRestantesTrial == null
+      ? 0
+      : Math.min(100, Math.max(6, ((TRIAL_DIAS_TOTAL - diasRestantesTrial) / TRIAL_DIAS_TOTAL) * 100))
+
+  // Badge de status no hero (feature 10)
+  const statusBadge = useMemo(() => {
+    const s = painelAssinatura.situacao
+    if (s === 'ativo' && painelAssinatura.paga) return { tone: 'ativo', label: 'Assinatura ativa' }
+    if (s === 'trial') return { tone: 'trial', label: 'Período de teste' }
+    if (s === 'admin') return { tone: 'ativo', label: 'Administrador' }
+    if (config.isento_pagamento) return { tone: 'ativo', label: 'Conta isenta' }
+    if (s === 'pausada') return { tone: 'aviso', label: 'Pausada' }
+    if (s === 'cancelada' || s === 'inativa' || expirado) return { tone: 'expirado', label: 'Inativa' }
+    return null
+  }, [painelAssinatura.situacao, painelAssinatura.paga, config.isento_pagamento, expirado])
+
+  // Itens inclusos na assinatura (feature 3)
+  const FEATURES_INCLUSAS = [
+    'Dashboard financeiro completo',
+    'Transações ilimitadas + importação de extratos',
+    'Relatórios e gráficos avançados',
+    'Carteira de investimentos com rendimento',
+    'Agenda e lembretes via WhatsApp',
+    'Lista de compras inteligente',
+    'Bot do WhatsApp com IA',
+  ]
+
   const assinarLabelCheckout =
     planoCheckout === 'anual'
       ? `Pagar ${formatCurrency(precosCatalogo.anual)} / ano com cartão`
@@ -462,12 +519,18 @@ export default function Pagamento() {
                 <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                 <div className="dashboard-hub__hero-text">
                   <h1 className="dashboard-hub__title">Pagamento</h1>
+                  {statusBadge && (
+                    <span className={`pagamento-status-chip pagamento-status-chip--${statusBadge.tone}`}>
+                      <span className="pagamento-status-chip__dot" aria-hidden />
+                      {statusBadge.label}
+                    </span>
+                  )}
                 </div>
               </div>
             </section>
 
             <div
-              className={`page-pagamento-layout${isentaOrientacaoAbaixoHistorico || painelAssinatura.situacao === 'trial' ? ' page-pagamento-layout--sem-lateral' : ''}`}
+              className={`page-pagamento-layout${isentaOrientacaoAbaixoHistorico || painelAssinatura.situacao === 'trial' || (painelAssinatura.situacao === 'ativo' && painelAssinatura.paga) ? ' page-pagamento-layout--sem-lateral' : ''}`}
             >
               <div className="page-pagamento-layout__primary">
                 {diasRestantesTrial !== null && trialUrgenciaVariant && (
@@ -489,6 +552,12 @@ export default function Pagamento() {
                             : `${diasRestantesTrial} dias restantes de período gratuito`}
                       </p>
                       <p className="pagamento-trial-urgencia__text">{trialUrgenciaMsg}</p>
+                      <div className="pagamento-trial-urgencia__progress" aria-hidden>
+                        <div
+                          className="pagamento-trial-urgencia__progress-fill"
+                          style={{ width: `${trialProgresso.toFixed(0)}%` }}
+                        />
+                      </div>
                     </div>
                     <a href="#pagamento-checkout" className="pagamento-trial-urgencia__cta">
                       Assinar agora
@@ -536,7 +605,12 @@ export default function Pagamento() {
                 ) : null}
 
                 {statusUrl ? (
-                  <div className={pagamentoStatusBannerClass(statusUrl)} role="status">
+                  <div className={`${pagamentoStatusBannerClass(statusUrl)}${statusUrl === 'success' ? ' pagamento-banner--celebrate' : ''}`} role="status">
+                    {statusUrl === 'success' && (
+                      <span className="pagamento-success-check" aria-hidden>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                      </span>
+                    )}
                     <p className="pagamento-banner__title">
                       {statusUrl === 'success'
                         ? 'Pagamento recebido — o status atualiza em instantes no histórico.'
@@ -580,31 +654,85 @@ export default function Pagamento() {
                     <div className="page-pagamento-planos__grid">
                       <button
                         type="button"
-                        className={`page-pagamento-planos__option${planoCheckout === 'mensal' ? ' page-pagamento-planos__option--active' : ''}`}
-                        role="radio"
-                        aria-checked={planoCheckout === 'mensal'}
-                        onClick={() => setPlanoCheckout('mensal')}
-                      >
-                        <span className="page-pagamento-planos__option-title">Mensal</span>
-                        <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.mensal)} / mês</span>
-                        <span className="page-pagamento-planos__option-hint">Cobrança mensal no cartão</span>
-                      </button>
-                      <button
-                        type="button"
-                        className={`page-pagamento-planos__option${planoCheckout === 'anual' ? ' page-pagamento-planos__option--active' : ''}`}
+                        className={`page-pagamento-planos__option page-pagamento-planos__option--anual${planoCheckout === 'anual' ? ' page-pagamento-planos__option--active' : ''}`}
                         role="radio"
                         aria-checked={planoCheckout === 'anual'}
                         onClick={() => setPlanoCheckout('anual')}
                       >
+                        <span className="page-pagamento-planos__ribbon">★ Mais popular</span>
                         <span className="page-pagamento-planos__option-title">
                           Anual
                           {descontoAnual > 0 ? (
                             <span className="page-pagamento-planos__badge">-{descontoAnual}%</span>
                           ) : null}
                         </span>
-                        <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.anual)} / ano</span>
-                        <span className="page-pagamento-planos__option-hint">Cobrança anual no cartão</span>
+                        <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.anual)} <span className="page-pagamento-planos__option-ciclo">/ ano</span></span>
+                        {economiaAnual > 0 ? (
+                          <span className="page-pagamento-planos__eq">
+                            equivale a <strong>{formatCurrency(mensalEquivalenteAnual)}/mês</strong>
+                          </span>
+                        ) : null}
+                        {economiaAnual > 0 ? (
+                          <span className="page-pagamento-planos__economia">
+                            <s>{formatCurrency(precosCatalogo.mensal * 12)}</s> · economize {formatCurrency(economiaAnual)}/ano
+                          </span>
+                        ) : (
+                          <span className="page-pagamento-planos__option-hint">Cobrança anual no cartão ou Pix</span>
+                        )}
                       </button>
+                      <button
+                        type="button"
+                        className={`page-pagamento-planos__option${planoCheckout === 'mensal' ? ' page-pagamento-planos__option--active' : ''}`}
+                        role="radio"
+                        aria-checked={planoCheckout === 'mensal'}
+                        onClick={() => setPlanoCheckout('mensal')}
+                      >
+                        <span className="page-pagamento-planos__option-title">Mensal</span>
+                        <span className="page-pagamento-planos__option-price">{formatCurrency(precosCatalogo.mensal)} <span className="page-pagamento-planos__option-ciclo">/ mês</span></span>
+                        <span className="page-pagamento-planos__option-hint">Cobrança mensal no cartão · flexível</span>
+                      </button>
+                    </div>
+
+                    {/* Meios de pagamento aceitos (feature 11) */}
+                    <div className="page-pagamento-planos__meios" aria-label="Meios de pagamento aceitos">
+                      <span className="page-pagamento-planos__meios-label">Aceitamos</span>
+                      <span className="page-pagamento-meio" title="Cartão de crédito">
+                        <svg width="22" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                        Cartão
+                      </span>
+                      <span className="page-pagamento-meio" title="Pix">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2 2 12l10 10 10-10z"/></svg>
+                        Pix
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* Value stack + selos de confiança (features 3 e 4) */}
+                {!config.isento_pagamento && !loading ? (
+                  <div className="ref-panel page-pagamento-valor">
+                    <p className="page-pagamento-valor__title">Tudo isto incluso na sua assinatura</p>
+                    <ul className="page-pagamento-valor__list">
+                      {FEATURES_INCLUSAS.map((f) => (
+                        <li key={f} className="page-pagamento-valor__item">
+                          <svg className="page-pagamento-valor__check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5"/></svg>
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="page-pagamento-trust" aria-label="Garantias">
+                      <span className="page-pagamento-trust__item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Pagamento seguro via Asaas
+                      </span>
+                      <span className="page-pagamento-trust__item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M18 6 6 18M6 6l12 12"/></svg>
+                        Cancele quando quiser
+                      </span>
+                      <span className="page-pagamento-trust__item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5"/></svg>
+                        Sem fidelidade
+                      </span>
                     </div>
                   </div>
                 ) : null}
@@ -618,22 +746,55 @@ export default function Pagamento() {
                       </p>
                     </div>
 
+                    {/* Resumo do pedido (feature 6) */}
+                    <div className="pagamento-resumo">
+                      <div className="pagamento-resumo__row">
+                        <span className="pagamento-resumo__label">Plano selecionado</span>
+                        <span className="pagamento-resumo__plan">
+                          {planoCheckout === 'anual' ? 'Anual' : 'Mensal'}
+                          {planoCheckout === 'anual' && descontoAnual > 0 ? (
+                            <span className="pagamento-resumo__save">-{descontoAnual}%</span>
+                          ) : null}
+                        </span>
+                      </div>
+                      <div className="pagamento-resumo__row pagamento-resumo__row--total">
+                        <span className="pagamento-resumo__label">Total</span>
+                        <span className="pagamento-resumo__total">
+                          {formatCurrency(valorCicloSelecionado)}<span className="pagamento-resumo__ciclo">/{unidadeCiclo}</span>
+                        </span>
+                      </div>
+                    </div>
+
                     <div className="pagamento-checkout-panel__field">
                       <label htmlFor="cpf-checkout" className="pagamento-checkout-panel__label">
                         CPF ou CNPJ <span className="pagamento-checkout-panel__label-req">*</span>
                       </label>
-                      <input
-                        id="cpf-checkout"
-                        type="text"
-                        className="pagamento-checkout-panel__input"
-                        value={cpfCnpj}
-                        onChange={handleCpfChange}
-                        placeholder="000.000.000-00"
-                        maxLength={18}
-                        disabled={paying}
-                        autoComplete="off"
-                      />
-                      <p className="pagamento-checkout-panel__hint">Exigido pela Asaas para identificar o pagador.</p>
+                      <div className={`pagamento-cpf-wrap${cpfTocado ? (cpfValido ? ' pagamento-cpf-wrap--ok' : ' pagamento-cpf-wrap--err') : ''}`}>
+                        <input
+                          id="cpf-checkout"
+                          type="text"
+                          className="pagamento-checkout-panel__input"
+                          value={cpfCnpj}
+                          onChange={handleCpfChange}
+                          placeholder="000.000.000-00"
+                          maxLength={18}
+                          disabled={paying}
+                          autoComplete="off"
+                          aria-invalid={cpfTocado && !cpfValido}
+                        />
+                        {cpfTocado && (
+                          <span className={`pagamento-cpf-icon${cpfValido ? ' pagamento-cpf-icon--ok' : ' pagamento-cpf-icon--err'}`} aria-hidden>
+                            {cpfValido ? (
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            ) : (
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                            )}
+                          </span>
+                        )}
+                      </div>
+                      <p className="pagamento-checkout-panel__hint">
+                        {cpfTocado && !cpfValido ? 'CPF ou CNPJ inválido — confira os dígitos.' : 'Exigido pela Asaas para identificar o pagador.'}
+                      </p>
                     </div>
 
                     {error ? <p className="pagamento-checkout-panel__error">{error}</p> : null}
@@ -641,11 +802,31 @@ export default function Pagamento() {
                     <button
                       type="button"
                       className="btn-primary pagamento-checkout-panel__btn-full"
-                      disabled={disabledCheckout || paying}
+                      disabled={disabledCheckout || paying || !cpfValido}
                       onClick={handlePagarAsaas}
                     >
                       {paying ? 'Redirecionando para Asaas…' : assinarLabelCheckout}
                     </button>
+
+                    {planoCheckout === 'anual' ? (
+                      <button
+                        type="button"
+                        className="pagamento-pix-cta pagamento-checkout-panel__btn-full"
+                        disabled={paying || loading}
+                        onClick={() => {
+                          setPixCpfCnpj(cpfCnpj.replace(/\D/g, ''))
+                          setPixData(null)
+                          setPixError('')
+                          setPixNeedsCpf(false)
+                          setPixModalOpen(true)
+                        }}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 2 2 12l10 10 10-10z"/></svg>
+                        <span>Pagar à vista no Pix
+                          {economiaAnual > 0 ? <span className="pagamento-pix-cta__save">economia de {formatCurrency(economiaAnual)}</span> : null}
+                        </span>
+                      </button>
+                    ) : null}
 
                     <button
                       type="button"
@@ -655,20 +836,6 @@ export default function Pagamento() {
                     >
                       Atualizar status
                     </button>
-
-                    {planoCheckout === 'anual' ? (
-                      <button
-                        type="button"
-                        className="btn-secondary pagamento-checkout-panel__btn-full"
-                        disabled={paying || loading}
-                        onClick={() => {
-                          setPixCpfCnpj(cpfCnpj.replace(/\D/g, ''))
-                          setPixModalOpen(true)
-                        }}
-                      >
-                        Pagar com Pix (plano anual, à vista)
-                      </button>
-                    ) : null}
                   </div>
                 ) : null}
 
@@ -726,35 +893,67 @@ export default function Pagamento() {
                   </div>
                 ) : null}
 
-                {cancelModalOpen ? (
+                {cancelModalOpen ? createPortal(
                   <div className="pagamento-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title">
                     <div className="pagamento-modal">
-                      <h2 id="cancel-modal-title" className="pagamento-modal__title">Cancelar assinatura</h2>
-                      <p className="pagamento-modal__body">
-                        Tem certeza que deseja cancelar? Você perderá acesso ao app ao final do período atual.
-                        Esta ação não pode ser desfeita.
-                      </p>
+                      <h2 id="cancel-modal-title" className="pagamento-modal__title">Antes de cancelar…</h2>
+
+                      {/* Retenção: lembra o que perde + acesso até o fim do período (feature 13) */}
+                      <div className="pagamento-retencao">
+                        <p className="pagamento-retencao__lead">Ao cancelar, você perde:</p>
+                        <ul className="pagamento-retencao__list">
+                          {FEATURES_INCLUSAS.slice(0, 4).map((f) => (
+                            <li key={f}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M18 6 6 18M6 6l12 12"/></svg>
+                              {f}
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="pagamento-retencao__nota">
+                          Você continua com acesso até o fim do período já pago. Nada é cobrado de novo.
+                        </p>
+                      </div>
+
+                      <div className="pagamento-modal__field">
+                        <label htmlFor="cancel-motivo" className="pagamento-modal__label">Conta pra gente o motivo (opcional)</label>
+                        <select
+                          id="cancel-motivo"
+                          className="pagamento-modal__select"
+                          value={cancelMotivo}
+                          onChange={(e) => setCancelMotivo(e.target.value)}
+                          disabled={cancelLoading}
+                        >
+                          <option value="">Selecione…</option>
+                          <option value="caro">Achei caro</option>
+                          <option value="pouco_uso">Uso pouco</option>
+                          <option value="faltou_recurso">Faltou um recurso</option>
+                          <option value="problema_tecnico">Tive problemas técnicos</option>
+                          <option value="outro">Outro motivo</option>
+                        </select>
+                      </div>
+
                       {cancelError ? <p className="pagamento-modal__error">{cancelError}</p> : null}
                       <div className="pagamento-modal__actions">
                         <button
                           type="button"
-                          className="btn-secondary"
+                          className="btn-primary"
                           onClick={() => setCancelModalOpen(false)}
                           disabled={cancelLoading}
                         >
-                          Voltar
+                          Continuar assinante
                         </button>
                         <button
                           type="button"
-                          className="btn-danger"
+                          className="btn-danger-ghost"
                           onClick={handleCancelarAssinatura}
                           disabled={cancelLoading}
                         >
-                          {cancelLoading ? 'Cancelando…' : 'Sim, cancelar'}
+                          {cancelLoading ? 'Cancelando…' : 'Cancelar mesmo assim'}
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </div>,
+                  document.body,
                 ) : null}
 
                 {isentaOrientacaoAbaixoHistorico ? (
@@ -766,7 +965,11 @@ export default function Pagamento() {
                 ) : null}
               </div>
 
-              {!isentaOrientacaoAbaixoHistorico && painelAssinatura.situacao !== 'trial' ? <PagamentoPainelLateral orientacao={orientacao} /> : null}
+              {!isentaOrientacaoAbaixoHistorico &&
+              painelAssinatura.situacao !== 'trial' &&
+              !(painelAssinatura.situacao === 'ativo' && painelAssinatura.paga) ? (
+                <PagamentoPainelLateral orientacao={orientacao} />
+              ) : null}
             </div>
 
             <PagamentoPixQrModal

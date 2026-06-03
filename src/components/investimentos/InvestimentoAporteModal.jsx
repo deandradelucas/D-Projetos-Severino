@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from 'react'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked } from '../../lib/currencyMaskBr'
+import { useSheetDragClose } from '../../hooks/useSheetDragClose'
 
 function localDateToday() {
   const d = new Date()
@@ -11,6 +12,8 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
   const valorInputId = useId()
   const dataInputId = useId()
   const valorInputRef = useRef(null)
+  const sheetRef = useRef(null)
+  useSheetDragClose(sheetRef, { open, onClose })
 
   const [valorInput, setValorInput] = useState('')
   const [dataInput, setDataInput] = useState(localDateToday())
@@ -64,7 +67,7 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
       aria-labelledby={titleId}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="modal-content page-investimentos-modal page-investimentos-aporte-modal">
+      <div className="modal-content page-investimentos-modal page-investimentos-aporte-modal" ref={sheetRef}>
         <div className="modal-header">
           <h3 id={titleId} className="modal-title">
             Novo aporte{investimentoNome ? ` — ${investimentoNome}` : ''}
