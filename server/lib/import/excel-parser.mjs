@@ -41,7 +41,7 @@ function parseDateCell(raw) {
     return `${y}-${mo}-${d}`
   }
 
-  const brM = /^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/.exec(s)
+  const brM = /^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})/.exec(s)
   if (brM) {
     const d = brM[1].padStart(2, '0'), mo = brM[2].padStart(2, '0')
     const y = brM[3].length === 2 ? `20${brM[3]}` : brM[3]
@@ -60,7 +60,7 @@ function parseAmountCell(raw) {
   const normalized = hasCommaDecimal
     ? s.replace(/\./g, '').replace(',', '.')
     : s.replace(',', '')
-  const n = parseFloat(normalized.replace(/[^\d.\-]/g, ''))
+  const n = parseFloat(normalized.replace(/[^\d.-]/g, ''))
   return isNaN(n) ? null : n
 }
 
@@ -177,7 +177,7 @@ function normalizeRows(dataRows, colMap) {
   return rows
 }
 
-export async function parseExcelTransactions(buffer, mimeType) {
+export async function parseExcelTransactions(buffer) {
   if (!Buffer.isBuffer(buffer)) return { error: 'FORMATO_INVALIDO', message: 'Buffer inválido.' }
   if (buffer.length > SIZE_LIMIT) {
     return { error: 'ARQUIVO_MUITO_GRANDE', message: 'Planilha muito grande (máx. 10MB).' }

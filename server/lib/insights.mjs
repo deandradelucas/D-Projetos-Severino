@@ -62,7 +62,6 @@ export async function gerarInsights(usuarioId) {
 
   let gastoAtual = 0
   let gastoPassadoMesmoPeriodo = 0
-  let gastoPassadoTotal = 0
   const catAtual = new Map()
   const catPassado = new Map()
   let maiorGasto = null
@@ -77,7 +76,6 @@ export async function gerarInsights(usuarioId) {
       catAtual.set(nomeCat, (catAtual.get(nomeCat) || 0) + v)
       if (!maiorGasto || v > maiorGasto.valor) maiorGasto = { valor: v, descricao: t.descricao, categoria: nomeCat }
     } else {
-      gastoPassadoTotal += v
       catPassado.set(nomeCat, (catPassado.get(nomeCat) || 0) + v)
       if (data <= fimMesPassadoMesmoDia) gastoPassadoMesmoPeriodo += v
     }

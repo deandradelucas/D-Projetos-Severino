@@ -184,7 +184,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       // ignora — localStorage pode estar bloqueado
     }
     return handleSubmit(e)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleSubmit, formData, isEditMode])
 
   // (R) Templates rápidos — top 3 do localStorage
@@ -224,7 +223,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     // Converte vírgula → ponto (notação BR)
     const norm = expr.replace(/,/g, '.')
     try {
-      // eslint-disable-next-line no-new-func
       const fn = new Function(`"use strict"; return (${norm});`)
       const val = fn()
       if (typeof val !== 'number' || !Number.isFinite(val)) return null

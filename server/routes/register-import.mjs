@@ -1,5 +1,5 @@
 import { log } from '../lib/logger.mjs'
-import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
+import { rateLimitTake } from '../lib/rate-limit.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 import { parseExcelTransactions } from '../lib/import/excel-parser.mjs'
