@@ -103,7 +103,7 @@ export default function AuthPhoneShell({
       ) : null}
 
       <div
-        className={`auth-shell-glass-form-column relative z-[1] box-border flex min-h-0 w-full flex-1 flex-col justify-center px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 lg:min-h-dvh lg:px-10 xl:px-14 ${isSplit ? 'lg:w-1/2 lg:shrink-0 lg:flex-none' : ''}`}
+        className={`auth-shell-glass-form-column relative z-[1] box-border flex min-h-0 w-full flex-1 flex-col justify-center px-4 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 lg:min-h-dvh lg:px-10 xl:px-14 ${isSplit ? 'lg:w-1/2 lg:shrink-0 lg:flex-none' : ''}`}
       >
         <div
           className={`mx-auto w-full max-w-[400px] lg:max-w-[420px] xl:max-w-[440px] ${plainWhiteBackground || isSplit ? '' : 'auth-shell-glass-card-reflect'}`}

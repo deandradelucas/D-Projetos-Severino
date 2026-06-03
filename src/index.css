@@ -726,7 +726,10 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* iOS safe area: evita conteúdo sob notch / home indicator */
+  /* iOS safe area: evita conteúdo sob notch / status bar / home indicator.
+     O top é necessário com status-bar-style black-translucent (webview vai sob a
+     status bar); a StatusBarScrim pinta essa faixa com a cor do tema. */
+  padding-top: env(safe-area-inset-top, 0px);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);

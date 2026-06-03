@@ -9,7 +9,11 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#ffffff" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- black-translucent: o webview ocupa a região da status bar, tornando
+         env(safe-area-inset-top) > 0 — o conteúdo reserva esse topo via
+         .app-routes-grow e a StatusBarScrim pinta a faixa por tema (no modo
+         'default' o iOS pintava a faixa pelo fundo do body, cacheado no launch). -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Severino" />
     <title>Severino — Finanças e agenda</title>
     <!-- Fontes self-hosted via @fontsource — importadas em src/main.jsx -->

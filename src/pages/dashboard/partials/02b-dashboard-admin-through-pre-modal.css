@@ -129,7 +129,9 @@ body:has(.sidebar.open) .horizon-chat-window {
 /* Base Responsive adjustments */
 @media (max-width: 768px) {
   .dashboard-container {
-    padding: calc(4px + var(--safe-top)) calc(4px + var(--safe-right)) calc(4px + var(--safe-bottom))
+    /* top sem --safe-top: o inset do topo já é reservado por .app-routes-grow
+       (status-bar-style black-translucent) — evita padding dobrado no topo. */
+    padding: 4px calc(4px + var(--safe-right)) calc(4px + var(--safe-bottom))
       calc(4px + var(--safe-left));
     gap: 0;
     height: 100%;
