@@ -75,13 +75,45 @@ describe('computeAssinaturaFlags', () => {
     expect(f.acesso_app_liberado).toBe(true)
   })
 
-  it('Assaas inactive e trial encerrado: bloqueia acesso', () => {
+  // Regra atual (commit e2c248e): INACTIVE com pagamento confirmado = subscription
+  // em setup inicial no Asaas; só EXPIRED derruba o acesso de quem já pagou.
+  it('Asaas INACTIVE com pagamento confirmado: libera (setup inicial)', () => {
     const f = computeAssinaturaFlags({
       email: 'user@example.com',
       isento_pagamento: false,
       trial_ends_at: pastIso(),
       bem_vindo_pagamento_visto_at: null,
       assinatura_paga: true,
+      assinatura_asaas_status: 'INACTIVE',
+    })
+    expect(f.acesso_app_liberado).toBe(true)
+    expect(f.assinatura_situacao).toBe('ativo')
+    expect(f.assinatura_asaas_bloqueada).toBe(false)
+    expect(f.motivo_bloqueio_acesso).toBe(null)
+  })
+
+  it('Asaas EXPIRED sobrepõe pagamento histórico: bloqueia acesso', () => {
+    const f = computeAssinaturaFlags({
+      email: 'user@example.com',
+      isento_pagamento: false,
+      trial_ends_at: pastIso(),
+      bem_vindo_pagamento_visto_at: null,
+      assinatura_paga: true,
+      assinatura_asaas_status: 'EXPIRED',
+    })
+    expect(f.acesso_app_liberado).toBe(false)
+    expect(f.assinatura_situacao).toBe('cancelada')
+    expect(f.assinatura_asaas_bloqueada).toBe(true)
+    expect(f.motivo_bloqueio_acesso).toMatch(/encerrou/i)
+  })
+
+  it('Asaas INACTIVE sem pagamento e trial encerrado: bloqueia acesso', () => {
+    const f = computeAssinaturaFlags({
+      email: 'user@example.com',
+      isento_pagamento: false,
+      trial_ends_at: pastIso(),
+      bem_vindo_pagamento_visto_at: null,
+      assinatura_paga: false,
       assinatura_asaas_status: 'INACTIVE',
     })
     expect(f.acesso_app_liberado).toBe(false)
