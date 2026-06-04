@@ -1,6 +1,46 @@
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { log } from '../logger.mjs'
 import { sendEvolutionText } from '../evolution-send.mjs'
+import { groqChatCompletion } from '../ai/groq-client.mjs'
+
+/**
+ * Gera UM insight personalizado do Severino IA para o digest (tom caloroso+direto).
+ * Usa Groq (rápido, quota separada do Gemini) — só para usuários com atividade.
+ * Best-effort: retorna '' se indisponível, então o digest sai só com o template.
+ */
+async function gerarInsightDigest(resumo, anterior, tipo, nome) {
+  const groqKey = process.env.GROQ_API_KEY
+  if (!groqKey || !resumo) return ''
+  try {
+    const periodo = tipo === 'semanal' ? 'esta semana' : 'este mês'
+    const topCat = resumo.topCategorias?.[0]
+    const deltaPct = anterior && anterior.despesas > 0
+      ? Math.round(((resumo.despesas - anterior.despesas) / anterior.despesas) * 100)
+      : null
+    const dados = [
+      `período: ${periodo}`,
+      `receitas: ${formatBRL(resumo.receitas)}`,
+      `despesas: ${formatBRL(resumo.despesas)}`,
+      `saldo: ${formatBRL(resumo.saldo)}`,
+      topCat ? `categoria que mais pesou: ${topCat.nome} (${formatBRL(topCat.valor)})` : '',
+      deltaPct !== null ? `despesas variaram ${deltaPct}% vs o período anterior` : '',
+    ].filter(Boolean).join('; ')
+    const systemPrompt =
+      'Você é o Severino, assistente financeiro pessoal brasileiro. Escreva UMA frase curta (máx. 2 linhas) comentando o resumo, no tom CALOROSO e DIRETO, e termine com uma sugestão concreta e gentil. ' +
+      'Use o nome da pessoa quando fornecido. NÃO repita todos os números (eles já aparecem na mensagem) — foque no que importa: a variação, o saldo ou a categoria que pesou. No máximo 1 emoji. Sem saudação inicial.'
+    const text = await groqChatCompletion({
+      apiKey: groqKey,
+      systemPrompt,
+      userMessage: `${nome ? `Nome: ${nome}. ` : ''}Resumo: ${dados}`,
+      maxTokens: 120,
+      temperature: 0.6,
+    })
+    const insight = String(text || '').trim().replace(/^["'`]|["'`]$/g, '').trim()
+    return insight ? `\n\n💡 ${insight}` : ''
+  } catch {
+    return ''
+  }
+}
 
 const MONTHS_FULL_PT = [
   'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
@@ -172,6 +212,8 @@ export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {})
 
       let message
       let hasActivity
+      let resumoFinal = null
+      let anteriorFinal = null
 
       if (tipo === 'semanal') {
         const range = lastWeekRange()
@@ -182,6 +224,8 @@ export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {})
         ])
         hasActivity = semana.count > 0
         message = formatWeeklyMessage(semana, anterior, range)
+        resumoFinal = semana
+        anteriorFinal = anterior
       } else {
         const range = lastMonthRange()
         const prevRange = prevMonthRange()
@@ -191,12 +235,17 @@ export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {})
         ])
         hasActivity = mes.count > 0
         message = formatMonthlyMessage(mes, anterior, { month: range.month, year: range.year })
+        resumoFinal = mes
+        anteriorFinal = anterior
       }
 
       if (!hasActivity) {
         skipped.push(usuario.id)
         continue
       }
+
+      // Severino IA proativo: insight personalizado ao final do digest (só quem teve atividade)
+      message += await gerarInsightDigest(resumoFinal, anteriorFinal, tipo, usuario.nome)
 
       const ok = await sendEvolutionText({
         instance: process.env.EVOLUTION_INSTANCE,
