@@ -182,8 +182,9 @@ function buildTransactionParseSystemInstruction(catMap, dataAtual, tituloExemplo
       tituloExemplos.map((e) => `• "${e.transcricao}" → "${e.titulo}"`).join('\n')
     : ''
   const catFewShot = Array.isArray(categoriaExemplos) && categoriaExemplos.length
-    ? '\n\n━━━ CATEGORIAS QUE ESTE USUÁRIO JÁ CORRIGIU (priorize estes mapeamentos ao escolher categoria) ━━━\n' +
-      categoriaExemplos.map((e) => `• "${e.descricao}"${e.tipo ? ` (${e.tipo})` : ''} → categoria: "${e.categoria_nome}"`).join('\n')
+    ? '\n\n━━━ REGRA PRIORITÁRIA — CORREÇÕES DESTE USUÁRIO (SOBREPÕEM o guia geral acima) ━━━\n' +
+      'Se a descrição for igual ou muito parecida com um destes casos, use EXATAMENTE a categoria indicada, MESMO que o guia geral sugira outra. A escolha do usuário vale mais que a regra geral:\n' +
+      categoriaExemplos.map((e) => `• "${e.descricao}"${e.tipo ? ` (${e.tipo})` : ''} → use a categoria "${e.categoria_nome}"`).join('\n')
     : ''
   return `Você é o Severino, assistente pessoal brasileiro. Analise a mensagem e determine a intenção principal.
 
