@@ -7,6 +7,7 @@ import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
 import { isListaComprasMessage, processarMensagemListaCompras } from './lista-compras-whatsapp.mjs'
 import { detectExtratoPedido, montarRespostaExtratoWhatsApp } from './whatsapp-extrato.mjs'
 import { resolveEscopoUsuario, assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
+import { resolverCategoriaPorCorrecao } from './transacao-categoria-logger.mjs'
 import { computeAssinaturaFlags } from '../assinatura-flags.mjs'
 import { dispararAlertasTransacao, upsertLimiteOrcamento, listarLimitesOrcamento } from './alertas-financeiros.mjs'
 import { listarInvestimentosUsuario } from '../investimentos.mjs'
@@ -676,9 +677,22 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
 
   const { iso: dataTransacaoIso, explicit: dataExplicita } = resolveDataTransacaoParaBot(parsed)
 
-  // Fallback: categoria/subcategoria não identificadas → "Outros"
   let finalCategoriaId = parsed.categoria_id || null
   let finalSubcategoriaId = parsed.subcategoria_id || null
+
+  // Override determinístico: se o usuário já corrigiu a categoria desta descrição
+  // antes, a escolha dele vence o palpite do LLM (aprendizado garantido).
+  const correcao = await resolverCategoriaPorCorrecao(
+    usuarioBot.familiaEscopo?.actorId ?? usuarioBot.id,
+    parsed.descricao,
+    categorias,
+  )
+  if (correcao?.categoria_id) {
+    finalCategoriaId = correcao.categoria_id
+    finalSubcategoriaId = correcao.subcategoria_id ?? null
+  }
+
+  // Fallback: categoria/subcategoria não identificadas → "Outros"
   if (!finalCategoriaId && categorias?.length) {
     const catOutros = categorias.find(
       (c) => c.tipo === parsed.tipo && c.nome.toLowerCase() === 'outros'

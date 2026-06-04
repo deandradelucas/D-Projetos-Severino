@@ -38,6 +38,38 @@ export async function registrarCorrecaoCategoria(actorId, categoriaId, descricao
 }
 
 /**
+ * Override DETERMINÍSTICO: se a descrição bate (normalizada, exata) com uma
+ * correção recente do usuário, retorna a categoria que ele escolheu — garante o
+ * aprendizado mesmo quando o LLM resistiria à instrução. Retorna null sem match.
+ */
+export async function resolverCategoriaPorCorrecao(usuarioId, descricao, categoriasUsuario) {
+  try {
+    if (!usuarioId || !descricao) return null
+    const norm = (s) =>
+      String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim()
+    const alvo = norm(descricao)
+    if (alvo.length < 2) return null
+    const sb = getSupabaseAdmin()
+    const { data } = await sb
+      .from('transacao_categoria_log')
+      .select('descricao, categoria_nome')
+      .eq('usuario_id', usuarioId)
+      .order('created_at', { ascending: false })
+      .limit(50)
+    for (const r of data || []) {
+      if (norm(r.descricao) === alvo) {
+        const cat = (categoriasUsuario || []).find((c) => norm(c.nome) === norm(r.categoria_nome))
+        if (cat) return { categoria_id: cat.id, subcategoria_id: null }
+      }
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+/**
  * Busca correções recentes de categoria DESTE usuário (categorização é pessoal —
  * sem fallback global). Dedup por descrição, mais recente primeiro.
  * Retorna [] se não houver — o prompt cai no comportamento atual.
