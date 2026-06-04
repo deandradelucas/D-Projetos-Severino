@@ -45,9 +45,6 @@ export const AdminAuditoria = lazy(loadAdminAuditoria)
 const loadAdminMarketing = () => import('./pages/AdminMarketing.jsx')
 export const AdminMarketing = lazy(loadAdminMarketing)
 
-const loadAdminFramework = () => import('./pages/AdminFramework.jsx')
-export const AdminFramework = lazy(loadAdminFramework)
-
 const loadPagamento = () => import('./pages/Pagamento.jsx')
 export const Pagamento = lazy(loadPagamento)
 
@@ -80,7 +77,6 @@ const ROUTE_PREFETCH = {
   '/admin/pagamentos': loadAdminPagamentos,
   '/admin/auditoria': loadAdminAuditoria,
   '/admin/marketing': loadAdminMarketing,
-  '/admin/framework': loadAdminFramework,
   '/pagamento': loadPagamento,
   '/bem-vindo-assinatura': loadBemVindoAssinatura,
   '/trial-expirado': loadTrialExpirado,

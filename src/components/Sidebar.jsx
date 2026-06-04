@@ -294,23 +294,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   <span className="nav-item__label">Marketing</span>
                 </NavLink>
               </li>
-              <li>
-                <NavLink
-                  to="/admin/framework"
-                  end
-                  {...navPrefetchHandlers('/admin/framework')}
-                  className={({ isActive }) => mergeNavItemClass(isActive, '/admin/framework', pathname)}
-                  onClick={closeMenu}
-                >
-                  <span className="icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <circle cx="12" cy="12" r="3"/>
-                      <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
-                    </svg>
-                  </span>
-                  <span className="nav-item__label">Framework</span>
-                </NavLink>
-              </li>
             </>
           )}
         </ul>

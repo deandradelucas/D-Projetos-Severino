@@ -152,7 +152,14 @@
       "Bash(where python3.11)",
       "Bash(ls /c/Python*/python.exe)",
       "mcp__github__create_repository",
-      "Bash(bash scripts/deploy.sh)"
+      "Bash(bash scripts/deploy.sh)",
+      "Bash(sed -n '30,50p' server/routes/register-transacoes.mjs)",
+      "Bash(sed -n '303,320p' server/routes/register-pagamentos.mjs)",
+      "Bash(cd *)",
+      "Bash(PYTHONIOENCODING=utf-8 python -)",
+      "Bash(sed -n '228,240p' server/lib/ai-whatsapp.mjs)",
+      "Bash(sed -n '242,302p' server/lib/ai-whatsapp.mjs)",
+      "Bash(awk '/\\(async \\)?function extractTituloComGroq/{f=1} f{print NR\": \"$0} f&&/^}/{exit}' server/lib/domain/agenda-whatsapp.mjs)"
     ]
   }
 }

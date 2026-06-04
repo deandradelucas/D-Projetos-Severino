@@ -27,7 +27,6 @@ import {
   AdminPagamentos,
   AdminAuditoria,
   AdminMarketing,
-  AdminFramework,
   Pagamento,
   BemVindoAssinatura,
   TrialExpirado,
@@ -78,7 +77,6 @@ function App() {
                   <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
                   <Route path="/admin/auditoria" element={<AdminAuditoria />} />
                   <Route path="/admin/marketing" element={<AdminMarketing />} />
-                  <Route path="/admin/framework" element={<AdminFramework />} />
                 </Route>
                 <Route path="/" element={<Login />} />
               </Routes>

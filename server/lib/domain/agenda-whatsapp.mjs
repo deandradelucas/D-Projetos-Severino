@@ -10,6 +10,7 @@ import {
 } from './agenda.mjs'
 import { assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 import { groqChatCompletion } from '../ai/groq-client.mjs'
+import { geminiPostGenerateContent, resolveGeminiModelCandidates, buildGeminiGenerationConfig } from '../ai/gemini-client.mjs'
 import { logTituloExtracao, buscarExemplosFewShotTitulo } from './agenda-title-logger.mjs'
 
 const AGENDA_KEYWORD_RE =
@@ -607,6 +608,42 @@ async function extractTituloComGroq(apiKey, message, exemplos = []) {
   }
 }
 
+/**
+ * Fallback de título via Gemini Flash (texto). Substitui a heurística regex como
+ * caminho confiável quando o Groq não está disponível/falha. Com few-shot das
+ * correções do usuário. Best-effort: retorna null em qualquer falha.
+ */
+async function extractTituloComGeminiFlash(message, exemplos = []) {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) return null
+  try {
+    const fewShot = Array.isArray(exemplos) && exemplos.length
+      ? ' Títulos que ESTE usuário prefere (correções reais, imite o estilo): ' +
+        exemplos.map((e) => `"${e.transcricao}" → "${e.titulo}"`).join('; ') + '.'
+      : ''
+    const systemPrompt =
+      'Você extrai o título limpo de um compromisso de agenda a partir de mensagem em português. ' +
+      'Retorne APENAS o título, sem explicação, sem aspas, capitalizado, máximo 60 caracteres, sem data/hora nem verbo de agendamento. ' +
+      'Exemplos: "Dentista", "Reunião de equipe", "Pagar boleto do condomínio".' + fewShot
+    for (const mid of resolveGeminiModelCandidates().slice(0, 2)) {
+      const body = {
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: `MENSAGEM: "${message}"` }] }],
+        generationConfig: buildGeminiGenerationConfig(mid, { maxOutputTokens: 64, temperature: 0.1 }),
+      }
+      const resp = await geminiPostGenerateContent(mid, apiKey, body)
+      if (!resp.ok) continue
+      const json = await resp.json()
+      const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+      const titulo = String(text).trim().replace(/^["'`]|["'`]$/g, '').trim()
+      if (titulo.length >= 2 && titulo.length <= 80) return titulo
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 async function verificarConflitosAgenda(usuarioId, inicio) {
   const janela = 60 * 60000 // ±1h
   try {
@@ -789,6 +826,10 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
         if (groqKey) {
           tituloFinal = await extractTituloComGroq(groqKey, message, tituloExemplos)
           if (tituloFinal) tituloFonte = 'groq'
+        }
+        if (!tituloFinal) {
+          tituloFinal = await extractTituloComGeminiFlash(message, tituloExemplos)
+          if (tituloFinal) tituloFonte = 'gemini-flash'
         }
         if (!tituloFinal) {
           tituloFinal = titleForCreate(message)
