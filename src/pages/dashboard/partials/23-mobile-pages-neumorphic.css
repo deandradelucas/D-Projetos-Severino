@@ -237,14 +237,49 @@
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-field {
     background: var(--m-sunken) !important; box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light) !important; border-radius: 14px !important;
   }
-  /* WhatsApp share do convite */
+  /* Convite familiar: QR + WhatsApp — sem layout no mobile (partial 21 é desktop-only) */
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-grid {
+    display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 16px !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-qr {
+    align-self: center !important; flex-shrink: 0 !important;
+    display: flex !important; flex-direction: column !important; align-items: center !important; gap: 6px !important;
+    padding: 12px !important; border-radius: 16px !important; background: #ffffff !important;
+    box-shadow: 6px 6px 16px -4px var(--m-shadow-soft) !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-qr img {
+    display: block !important; width: 150px !important; height: 150px !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-qr__hint {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.625rem !important; font-weight: 700 !important;
+    color: #64748b !important; text-transform: uppercase !important; letter-spacing: 0.08em !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-share {
+    display: flex !important; flex-direction: column !important; gap: 12px !important; min-width: 0 !important;
+  }
+  /* Botão WhatsApp: pill full-width (estava como botão cru com fundo verde) */
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-share-wa {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important;
+    width: 100% !important; padding: 14px 20px !important; border-radius: 999px !important; border: none !important; cursor: pointer !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.9375rem !important; font-weight: 700 !important;
+    box-shadow: 0 8px 18px -6px rgba(37,211,102,0.5) !important;
+  }
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-share-wa,
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-share-wa {
     background: linear-gradient(155deg, #25d366, #1ba34e) !important; color: #fff !important;
   }
-  body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-grid,
-  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-grid {
-    flex-direction: column !important; align-items: center !important;
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-secondary {
+    display: flex !important; flex-wrap: wrap !important; gap: 8px !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-secondary .config-action-btn {
+    flex: 1 1 auto !important; justify-content: center !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-code-line {
+    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.75rem !important; color: var(--m-text-lo) !important;
+    margin: 0 !important; text-align: center !important; word-break: break-word !important;
+  }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-code-line code {
+    font-family: 'Plus Jakarta Sans Variable', monospace !important; font-weight: 700 !important; color: var(--m-text-hi) !important; letter-spacing: 0.04em !important;
   }
 }
 
@@ -571,6 +606,7 @@
     flex-direction: column !important;
     gap: 6px !important;
     margin-bottom: 12px !important;
+    min-width: 0 !important;
   }
   .agenda-modal .agenda-field > span {
     font-family: 'Inter Variable', system-ui, sans-serif !important;
@@ -585,6 +621,8 @@
   body[data-theme='dark'] .agenda-modal .agenda-field select,
   body[data-theme='light'] .agenda-modal .agenda-field select {
     width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     padding: 13px 15px !important;
     border-radius: 12px !important;
     background: var(--m-sunken) !important;
@@ -1094,6 +1132,11 @@
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-section-nav__pill {
     flex-shrink: 0 !important;
     white-space: nowrap !important;
+    padding: 8px 15px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
   }
 
   /* Chips de verificação: ícone inline com o texto (não empilhado) */
