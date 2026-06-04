@@ -72,7 +72,7 @@ export default function InvestimentoComparadorModal({ open, onClose, cdiAa }) {
       <div className="modal-content page-investimentos-modal page-investimentos-comparador" ref={sheetRef} role="dialog" aria-modal="true" aria-labelledby={titleId} onMouseDown={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3 id={titleId}>Comparador de investimentos</h3>
-          <button type="button" onClick={onClose} className="close-btn" aria-label="Fechar">×</button>
+          <button type="button" onClick={onClose} className="close-btn" aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
         <div className="modal-body page-investimentos-modal__body">
           <div className="page-investimentos-comparador__controls">

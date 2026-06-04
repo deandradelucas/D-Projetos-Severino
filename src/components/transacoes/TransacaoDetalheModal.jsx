@@ -59,7 +59,7 @@ export function TransacaoDetalheModal({ tx, onClose, onEdit, onDelete, privacyMo
           <span className={`tx-detalhe-modal__tipo ${isRec ? 'is-rec' : 'is-desp'}`}>
             {isRec ? 'Receita' : 'Despesa'}
           </span>
-          <button type="button" className="close-btn" onClick={onClose} aria-label="Fechar">&times;</button>
+          <button type="button" className="close-btn" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
 
         <div className="tx-detalhe-modal__hero">
