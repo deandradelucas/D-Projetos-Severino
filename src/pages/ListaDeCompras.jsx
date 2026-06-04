@@ -9,6 +9,7 @@ import { apiFetch } from '../lib/apiFetch'
 import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
 import ConfirmDialog from '../components/ConfirmDialog'
+import { useSheetDragClose } from '../hooks/useSheetDragClose'
 
 // ---------------------------------------------------------------------------
 // Constantes
@@ -285,6 +286,8 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
   const [orcamentoCentavos, setOrcamentoCentavos] = useState(0)
   const [salvando, setSalvando] = useState(false)
   const inputRef = useRef(null)
+  const sheetRef = useRef(null)
+  useSheetDragClose(sheetRef, { open: true, onClose })
   const keyboardH = useKeyboardOffset()
   /** Quando o teclado mobile abre, sobe o sheet via CSS var (--lista-kb lido no partial 32). */
   const overlayStyle = { '--lista-kb': keyboardH > 0 ? `${keyboardH + 8}px` : '0px' }
@@ -331,7 +334,7 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
 
   return (
     <div className="page-lista-compras__modal-overlay" style={overlayStyle} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-nova-lista-titulo">
+      <div ref={sheetRef} className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-nova-lista-titulo">
         <div className="page-lista-compras__modal-header">
           <h2 id="modal-nova-lista-titulo" className="page-lista-compras__modal-title">Nova lista</h2>
           <button type="button" className="page-lista-compras__modal-close" onClick={onClose} aria-label="Fechar">
