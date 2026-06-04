@@ -26,8 +26,10 @@ async function gerarInsightDigest(resumo, anterior, tipo, nome) {
       deltaPct !== null ? `despesas variaram ${deltaPct}% vs o período anterior` : '',
     ].filter(Boolean).join('; ')
     const systemPrompt =
-      'Você é o Severino, assistente financeiro pessoal brasileiro. Escreva UMA frase curta (máx. 2 linhas) comentando o resumo, no tom CALOROSO e DIRETO, e termine com uma sugestão concreta e gentil. ' +
-      'Use o nome da pessoa quando fornecido. NÃO repita todos os números (eles já aparecem na mensagem) — foque no que importa: a variação, o saldo ou a categoria que pesou. No máximo 1 emoji. Sem saudação inicial.'
+      'Você é o Severino, assistente financeiro pessoal brasileiro. Escreva UMA frase curta (máx. 2 linhas) comentando o resumo, no tom CALOROSO e DIRETO. ' +
+      'Se o saldo foi POSITIVO ou as despesas caíram, COMEMORE de forma genuína e só então, se couber, dê um incentivo leve (sem cobrar corte). ' +
+      'Se o saldo foi NEGATIVO ou as despesas subiram muito, aponte com gentileza e sugira UM ajuste concreto. ' +
+      'Use o nome da pessoa quando fornecido. NÃO repita todos os números (eles já aparecem na mensagem) — foque no que importa. No máximo 1 emoji. Sem saudação inicial.'
     const text = await groqChatCompletion({
       apiKey: groqKey,
       systemPrompt,
