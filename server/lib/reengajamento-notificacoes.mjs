@@ -61,8 +61,8 @@ export async function processarReengajamentoCron() {
   const { data: transacoesJanela, error: errJanela } = await supabase
     .from('transacoes')
     .select('usuario_id')
-    .gte('created_at', cutoff72h)
-    .lt('created_at', cutoff48h)
+    .gte('criado_em', cutoff72h)
+    .lt('criado_em', cutoff48h)
   if (errJanela) {
     log.warn('[reengajamento] query janela error', errJanela.message)
     return { ok: false, motivo: errJanela.message }
@@ -77,7 +77,7 @@ export async function processarReengajamentoCron() {
   const { data: transacoesRecentes } = await supabase
     .from('transacoes')
     .select('usuario_id')
-    .gte('created_at', cutoff48h)
+    .gte('criado_em', cutoff48h)
     .in('usuario_id', idsNaJanela)
   const idsRecentes = new Set((transacoesRecentes || []).map((t) => t.usuario_id))
 
