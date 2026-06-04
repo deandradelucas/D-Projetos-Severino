@@ -27,24 +27,57 @@ CLI (opcional, ambiente local): `npm install -g ./segunda-feira` a partir da rai
 - **Dados:** Supabase Postgres. Cliente admin no servidor: `server/lib/supabase-admin.mjs`. Cliente público (cadastro): `src/lib/supabase.js`.
 - **Migrations SQL:** `scripts/migrations/` — rodar no SQL Editor do Supabase na ordem numérica quando indicado.
 
-### Supabase e MCP (agente)
+### Supabase — banco, migrations e erros comuns
 
-- Regra Cursor **`.cursor/rules/supabase-mcp-agent.mdc`**: quando trabalhar em banco, usar o **MCP Supabase** (configuração no cliente Cursor, endpoint read-only) para alinhar schema/dados com o código — em conjunto com `scripts/migrations/`.
+- **Antes** de alterar queries em `server/lib/*.mjs`, confirmar que colunas/tabelas existem: usar o **MCP Supabase** (read-only, quando disponível no cliente) **ou** os ficheiros em `scripts/migrations/` (ordem numérica).
 - Servidor Node aceita **`VITE_SUPABASE_URL` ou `SUPABASE_URL`** + **`SUPABASE_SERVICE_ROLE_KEY`** (`server/lib/supabase-admin.mjs`).
+- **Nunca** colocar `SUPABASE_SERVICE_ROLE_KEY` ou segredos em regras, skills ou commits.
 
-### Cursor — skills por objetivo
+**Onde está a verdade no código:**
 
-Skills em `.agents/skills/` quando existirem no clone; regras em `.cursor/rules/` para este app.
+| O quê | Onde |
+|--------|------|
+| Cliente admin (service role) | `server/lib/supabase-admin.mjs` — URL: `VITE_SUPABASE_URL` **ou** `SUPABASE_URL` |
+| Listagem / filtros admin de usuários | `server/lib/usuarios.mjs` (`listUsuariosAdminPaged`, `applyUsuariosAdminFilters`) |
+| Mapeamento de erros úteis na API | `server/app.mjs` — `mapSupabaseOrNetworkError` |
 
-| Objetivo | O que usar |
-|----------|------------|
-| Rever arquitetura / fluxo / código legado | **code-archaeologist** ou **explorer-agent**. |
-| Implementar ou corrigir | **dev** ou **frontend-specialist** / **backend-specialist**. |
-| Bug / erro / causa raiz | **debugger**. |
-| Testes e cobertura | **test-engineer**; E2E → **qa-automation-engineer**. |
-| Segurança | **security-auditor**. |
-| Várias áreas ao mesmo tempo | **orchestrator**. |
-| UX (acessibilidade, fluxo, consistência sem quebrar o shell) | **frontend-specialist** + **`.cursor/rules/horizonte-ux.mdc`**. |
+**Erros comuns (cicatrizes de incidente):**
+
+- **URL só no front:** no Vercel/Serverless, definir também `VITE_SUPABASE_URL` ou `SUPABASE_URL` para as funções que usam `getSupabaseAdmin()`.
+- **Coluna/tabela em falta:** mensagens amigáveis após `mapSupabaseOrNetworkError`; aplicar SQL em `scripts/migrations/`.
+- **Busca admin com vírgula:** o filtro `.or()` do PostgREST separa condições por vírgula; a busca por texto sanitiza vírgulas (`sanitizeOrSearchText` em `usuarios.mjs`). Busca por **UUID** usa `id` direto.
+- **Timestamps dentro de `.or()`:** valores ISO têm `:` e precisam ir entre aspas (`postgrestOrFilterQuotedValue` em `usuarios.mjs`); sem isso o PostgREST responde **PGRST100** e a lista admin falha.
+
+### UX — acessibilidade e consistência com o shell
+
+Ao mexer em experiência de uso, acessibilidade, navegação ou feedback de carregamento/erro:
+
+1. **Respeitar o contrato do shell** (ver *Shell hub* abaixo): não alterar à-toa `dashboard.css` / hero / blur sem testar mobile e tema claro/escuro.
+2. **Teclado e leitores:** `focus-visible` em controlos interativos; não substituir `:focus-visible` por `:focus` onde o projeto já separa (sidebar shell).
+3. **Mobile:** áreas tocáveis ≥ 44px onde fizer sentido; menu lateral com backdrop semântico (`button`), fechar com **Escape** e por toque no fundo.
+4. **Movimento:** respeitar `prefers-reduced-motion` em animações novas.
+5. **Carregamento:** lazy routes com fallback `role="status"` + texto `.sr-only` + barra visível.
+
+| Tema | Ficheiros de referência |
+|------|-------------------------|
+| Skip link + `#app-main` | `src/App.jsx`, `.skip-to-main` em `src/index.css` |
+| Texto só leitor / fallback rota | `.sr-only`, `src/components/RoutePageFallback.jsx` |
+| Menu mobile | `src/components/Sidebar.jsx`, `.mobile-backdrop` em `src/pages/dashboard.css` |
+| Foco no login | `src/pages/Login.jsx` (`focus-visible:ring-*`) |
+
+### Agentes por objetivo (Segunda-feira)
+
+Personas em `segunda-feira/agents/` — ativar com `@nome`:
+
+| Objetivo | Agente |
+|----------|--------|
+| Rever arquitetura / fluxo / código legado | **@architect** |
+| Implementar ou corrigir | **@dev** |
+| Testes e cobertura | **@qa** (gate) / **@tester** (geração) |
+| Segurança | **@security-auditor** |
+| Banco de dados / migrations / RLS | **@data-engineer** |
+| Deploy / git push / CI | **@devops** (autoridade exclusiva) |
+| Orquestração multi-área | **@sf-master** |
 
 ## Comandos
 

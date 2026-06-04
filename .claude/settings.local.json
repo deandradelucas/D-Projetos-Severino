@@ -159,7 +159,14 @@
       "Bash(PYTHONIOENCODING=utf-8 python -)",
       "Bash(sed -n '228,240p' server/lib/ai-whatsapp.mjs)",
       "Bash(sed -n '242,302p' server/lib/ai-whatsapp.mjs)",
-      "Bash(awk '/\\(async \\)?function extractTituloComGroq/{f=1} f{print NR\": \"$0} f&&/^}/{exit}' server/lib/domain/agenda-whatsapp.mjs)"
+      "Bash(awk '/\\(async \\)?function extractTituloComGroq/{f=1} f{print NR\": \"$0} f&&/^}/{exit}' server/lib/domain/agenda-whatsapp.mjs)",
+      "Skill(schedule)",
+      "Bash(sed -n '343,360p' src/pages/dashboard/partials/02c-modals-through-switch-ui.css)",
+      "Bash(sed -n '553,575p' src/pages/dashboard/partials/02c-modals-through-switch-ui.css)",
+      "Bash(xargs -I{} sed -n '{},+8p' src/pages/dashboard/partials/27-mobile-modal-nova-tx-fix.css)",
+      "Bash(sed -n '333,340p' src/pages/ListaDeCompras.jsx)",
+      "Bash(sed -n '1,12p' src/pages/ListaDeCompras.jsx)",
+      "Bash(claude update *)"
     ]
   }
 }
