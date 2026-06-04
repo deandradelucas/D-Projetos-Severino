@@ -1,6 +1,7 @@
 import './load-env.mjs'
 import { log } from './logger.mjs'
 import { buscarExemplosFewShotTitulo } from './domain/agenda-title-logger.mjs'
+import { buscarExemplosCategoria } from './domain/transacao-categoria-logger.mjs'
 import {
   buildGeminiGenerationConfig,
   geminiPostGenerateContent,
@@ -175,10 +176,14 @@ function normalizarDescricao(desc) {
 /**
  * Monta o system_instruction de parse financeiro (compartilhado entre texto e áudio).
  */
-function buildTransactionParseSystemInstruction(catMap, dataAtual, tituloExemplos = []) {
+function buildTransactionParseSystemInstruction(catMap, dataAtual, tituloExemplos = [], categoriaExemplos = []) {
   const fewShot = Array.isArray(tituloExemplos) && tituloExemplos.length
     ? '\n\n━━━ TÍTULOS PREFERIDOS POR ESTE USUÁRIO (correções reais — imite ESTE estilo no campo "titulo" de AGENDA) ━━━\n' +
       tituloExemplos.map((e) => `• "${e.transcricao}" → "${e.titulo}"`).join('\n')
+    : ''
+  const catFewShot = Array.isArray(categoriaExemplos) && categoriaExemplos.length
+    ? '\n\n━━━ CATEGORIAS QUE ESTE USUÁRIO JÁ CORRIGIU (priorize estes mapeamentos ao escolher categoria) ━━━\n' +
+      categoriaExemplos.map((e) => `• "${e.descricao}"${e.tipo ? ` (${e.tipo})` : ''} → categoria: "${e.categoria_nome}"`).join('\n')
     : ''
   return `Você é o Severino, assistente pessoal brasileiro. Analise a mensagem e determine a intenção principal.
 
@@ -238,7 +243,7 @@ ${catMap || 'Sem categorias — use categoria_id: null.'}
 
 Transação: {"tipo":"DESPESA","valor":12.50,"descricao":"iFood","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null}
 Agenda:    {"tipo":"AGENDA","transcricao":"texto completo e fiel do que foi dito, incluindo data e horário","titulo":"Título limpo do evento em 2-5 palavras sem data/hora. Ex: 'Reunião de equipe', 'Consulta médica', 'Pagar boleto do condomínio', 'Dentista'. Capitalizado, sem verbo de agendamento."}
-Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável","categoria_id":null,"subcategoria_id":null,"data_transacao":null}${fewShot}`
+Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável","categoria_id":null,"subcategoria_id":null,"data_transacao":null}${fewShot}${catFewShot}`
 }
 
 /**
@@ -253,8 +258,11 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario, usu
     return `▸ ${c.tipo} | Categoria: "${c.nome}" → ID: ${c.id}\n${subs}`
   }).join('\n')
 
-  const tituloExemplos = await buscarExemplosFewShotTitulo(usuarioId)
-  const systemInstruction = buildTransactionParseSystemInstruction(catMap, dataHoraAtualSP(), tituloExemplos)
+  const [tituloExemplos, categoriaExemplos] = await Promise.all([
+    buscarExemplosFewShotTitulo(usuarioId),
+    buscarExemplosCategoria(usuarioId),
+  ])
+  const systemInstruction = buildTransactionParseSystemInstruction(catMap, dataHoraAtualSP(), tituloExemplos, categoriaExemplos)
   const userMessage = `MENSAGEM: "${message}"`
 
   const models = resolveGeminiModelCandidates()
@@ -350,8 +358,11 @@ export async function parseWhatsAppAudioDirectWithAI(audioBytes, mimeHint = '', 
     return `▸ ${c.tipo} | Categoria: "${c.nome}" → ID: ${c.id}\n${subs}`
   }).join('\n')
 
-  const tituloExemplos = await buscarExemplosFewShotTitulo(usuarioId)
-  const systemInstruction = buildTransactionParseSystemInstruction(catMap, dataHoraAtualSP(), tituloExemplos)
+  const [tituloExemplos, categoriaExemplos] = await Promise.all([
+    buscarExemplosFewShotTitulo(usuarioId),
+    buscarExemplosCategoria(usuarioId),
+  ])
+  const systemInstruction = buildTransactionParseSystemInstruction(catMap, dataHoraAtualSP(), tituloExemplos, categoriaExemplos)
 
   // WhatsApp envia sempre ogg/opus — limitar candidatos evita tentativas desnecessárias
   const sniffed = sniffAudioMimeFromBuffer(buf)

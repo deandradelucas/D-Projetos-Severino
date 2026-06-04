@@ -25,6 +25,8 @@ import {
 import { TransactionService } from '../lib/services/transaction-service.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
+import { getSupabaseAdmin } from '../lib/supabase-admin.mjs'
+import { registrarCorrecaoCategoria } from '../lib/domain/transacao-categoria-logger.mjs'
 
 export function registerTransacoesRoutes(app) {
   app.get('/api/categorias', async (c) => {
@@ -220,7 +222,24 @@ export function registerTransacoesRoutes(app) {
         return c.json({ message: vBody.message }, 400)
       }
 
+      // Estado anterior — para detectar correção de categoria (sinal de aprendizado)
+      let catAntiga = null, descAntiga = null, tipoTx = null
+      if (body.categoria_id) {
+        try {
+          const { data: old } = await getSupabaseAdmin()
+            .from('transacoes').select('categoria_id, descricao, tipo').eq('id', id).maybeSingle()
+          if (old) { catAntiga = old.categoria_id; descAntiga = old.descricao; tipoTx = old.tipo }
+        } catch { /* noop */ }
+      }
+
       await atualizarTransacao(id, parsed.dataUsuarioId, body)
+
+      // Categoria mudou → registra (descrição → categoria) para o few-shot dinâmico
+      if (body.categoria_id && catAntiga && body.categoria_id !== catAntiga) {
+        const desc = (typeof body.descricao === 'string' && body.descricao.trim()) ? body.descricao : descAntiga
+        registrarCorrecaoCategoria(parsed.actorId, body.categoria_id, desc, tipoTx).catch(() => {})
+      }
+
       return c.json({ message: 'Transação atualizada com sucesso.' })
     } catch (error) {
       log.error('update transaction failed', error)
