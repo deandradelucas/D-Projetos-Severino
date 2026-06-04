@@ -24,7 +24,23 @@ export function useSheetDragClose(sheetRef, { open, onClose, isDirty } = {}) {
     let active = false
     let decided = false
     let dy = 0
+    let scrollEl = sheet
     const THRESHOLD = 110
+
+    // O scroll pode estar num elemento INTERNO (ex.: .modal-body com overflow-y:auto),
+    // não no próprio sheet. Descobre o scroller real sob o toque para não confundir
+    // rolagem-de-volta-ao-topo com arraste-pra-fechar.
+    const scrollerFor = (target) => {
+      let el = target
+      while (el && el !== sheet.parentElement) {
+        if (el instanceof HTMLElement) {
+          const oy = window.getComputedStyle(el).overflowY
+          if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight) return el
+        }
+        el = el.parentElement
+      }
+      return sheet
+    }
 
     const setDrag = (px) => sheet.style.setProperty('--sheet-drag', `${px}px`)
     const animateTo = (target, after) => {
@@ -39,7 +55,8 @@ export function useSheetDragClose(sheetRef, { open, onClose, isDirty } = {}) {
     const onStart = (e) => {
       if (e.touches.length !== 1) return
       startY = e.touches[0].clientY
-      active = sheet.scrollTop <= 0
+      scrollEl = scrollerFor(e.target)
+      active = scrollEl.scrollTop <= 0
       decided = false
       dy = 0
     }
@@ -48,7 +65,7 @@ export function useSheetDragClose(sheetRef, { open, onClose, isDirty } = {}) {
       dy = e.touches[0].clientY - startY
       if (!decided) {
         if (Math.abs(dy) < 6) return
-        if (dy < 0 || sheet.scrollTop > 0) { active = false; return }
+        if (dy < 0 || scrollEl.scrollTop > 0) { active = false; return }
         decided = true
         sheet.classList.add('sheet-dragging')
       }
