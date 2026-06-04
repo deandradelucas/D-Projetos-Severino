@@ -1,4 +1,5 @@
 import { DEFAULT_CATEGORIES } from '../transacoes.mjs'
+import { registrarMudancaHeuristica } from './categoria-heuristica-log.mjs'
 
 /**
  * Normaliza texto para comparação (remove acentos e espaços).
@@ -266,6 +267,17 @@ export function rulesForTipo(tipo) {
  * Se a IA deixou categoria/subcategoria vazias, tenta casar palavras da mensagem com nomes reais do usuário.
  */
 export function enriquecerCategoriaPorTexto(message, extractedData, categoriasUsuario) {
+  const catAntes = extractedData?.categoria_id || null
+  const tipo = extractedData?.tipo
+  const out = aplicarRegrasCategoria(message, extractedData, categoriasUsuario)
+  // Instrumentação temporária (medição #3): heurística sobrepôs a categoria do LLM?
+  if (catAntes && out?.categoria_id && out.categoria_id !== catAntes && (tipo === 'DESPESA' || tipo === 'RECEITA')) {
+    registrarMudancaHeuristica(out.descricao, catAntes, out.categoria_id, tipo, categoriasUsuario).catch(() => {})
+  }
+  return out
+}
+
+function aplicarRegrasCategoria(message, extractedData, categoriasUsuario) {
   if (!extractedData || !categoriasUsuario?.length) return extractedData
 
   const tipo = extractedData.tipo
