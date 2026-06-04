@@ -501,7 +501,7 @@ export default function Agenda() {
                 <span className="agenda-section-eyebrow">{editing ? 'Editar item' : 'Novo item'}</span>
                 <h2>{editing ? 'Atualizar agenda' : 'Criar item na agenda'}</h2>
               </div>
-              <button type="button" className="agenda-modal__close" onClick={() => setModalOpen(false)} aria-label="Fechar">×</button>
+              <button type="button" className="agenda-modal__close" onClick={() => setModalOpen(false)} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
             </div>
 
             <label className="agenda-field">

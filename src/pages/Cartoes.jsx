@@ -80,7 +80,7 @@ function ModalCartao({ cartaoEdit, onClose, onSalvar, salvando }) {
       <div className="page-cartoes__modal" role="dialog" aria-modal="true" aria-labelledby="cartao-modal-title">
         <div className="page-cartoes__modal-head">
           <h2 id="cartao-modal-title" className="page-cartoes__modal-title">{editando ? 'Editar cartão' : 'Novo cartão'}</h2>
-          <button type="button" className="page-cartoes__modal-close" onClick={onClose} aria-label="Fechar">×</button>
+          <button type="button" className="page-cartoes__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
         <form onSubmit={handleSubmit} className="page-cartoes__modal-body">
           <label className="page-cartoes__field">
@@ -189,7 +189,7 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
       <div className="page-cartoes__modal page-cartoes__modal--fatura" role="dialog" aria-modal="true">
         <div className="page-cartoes__modal-head">
           <h2 className="page-cartoes__modal-title">{cartao.nome} · fatura</h2>
-          <button type="button" className="page-cartoes__modal-close" onClick={onClose} aria-label="Fechar">×</button>
+          <button type="button" className="page-cartoes__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
 
         <div className="page-cartoes__busca">

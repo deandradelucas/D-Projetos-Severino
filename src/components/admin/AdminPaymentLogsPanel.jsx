@@ -551,7 +551,7 @@ export default function AdminPaymentLogsPanel({
             <div className="page-admin-payment-logs-modal__head">
               <h3 id="payment-log-detail-title">Detalhe do pagamento</h3>
               <button type="button" className="page-admin-payment-logs-modal__close" onClick={() => setDetail(null)} aria-label="Fechar">
-                ×
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg>
               </button>
             </div>
             <div className="page-admin-payment-logs-modal__body">

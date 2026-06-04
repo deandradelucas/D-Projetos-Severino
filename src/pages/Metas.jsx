@@ -64,7 +64,7 @@ function ModalMeta({ onClose, onSalvar, salvando, metaEdit = null }) {
       <div className="page-metas__modal" role="dialog" aria-modal="true" aria-labelledby="meta-modal-title">
         <div className="page-metas__modal-head">
           <h2 id="meta-modal-title" className="page-metas__modal-title">{editando ? 'Editar meta' : 'Nova meta'}</h2>
-          <button type="button" className="page-metas__modal-close" onClick={onClose} aria-label="Fechar">×</button>
+          <button type="button" className="page-metas__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
         <form onSubmit={handleSubmit} className="page-metas__modal-body">
           <label className="page-metas__field">
@@ -167,7 +167,7 @@ function ModalAporte({ meta, onClose, onConfirmar, salvando }) {
       <div className="page-metas__modal page-metas__modal--sm" role="dialog" aria-modal="true" aria-labelledby="aporte-modal-title">
         <div className="page-metas__modal-head">
           <h2 id="aporte-modal-title" className="page-metas__modal-title">{meta.icone} {meta.nome}</h2>
-          <button type="button" className="page-metas__modal-close" onClick={onClose} aria-label="Fechar">×</button>
+          <button type="button" className="page-metas__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
         <form onSubmit={handleSubmit} className="page-metas__modal-body">
           <div className="page-metas__toggle">
