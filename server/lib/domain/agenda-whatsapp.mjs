@@ -10,7 +10,7 @@ import {
 } from './agenda.mjs'
 import { assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 import { groqChatCompletion } from '../ai/groq-client.mjs'
-import { logTituloExtracao } from './agenda-title-logger.mjs'
+import { logTituloExtracao, buscarExemplosFewShotTitulo } from './agenda-title-logger.mjs'
 
 const AGENDA_KEYWORD_RE =
   /\b(agenda|compromisso|compromissos|reuni[aã]o|reuniao|evento|consulta|consult[óo]rio|dentista|m[eé]dico|exame[s]?|vacina[s]?|anivers[aá]rio|viagem|voo|aula[s]?|treino|academia|apresenta[cç][aã]o|entrevista|cirurgia|check.?in|pagar|pagamento|boleto|conta|agendar|marcar|anotar|anota|cancelar|desmarcar|reagendar|remarcar|confirmar|concluir|finalizar|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar|buscar|pegar|levar|tomar|ligar)\b/i
@@ -583,14 +583,19 @@ export function draftAgendaFromTextHeuristic(message, base = new Date()) {
   }
 }
 
-async function extractTituloComGroq(apiKey, message) {
+async function extractTituloComGroq(apiKey, message, exemplos = []) {
   try {
+    const fewShot = Array.isArray(exemplos) && exemplos.length
+      ? ' Títulos que ESTE usuário prefere (correções reais, imite o estilo): ' +
+        exemplos.map((e) => `"${e.transcricao}" → "${e.titulo}"`).join('; ') + '.'
+      : ''
     const text = await groqChatCompletion({
       apiKey,
       systemPrompt:
         'Você extrai o título limpo de um compromisso de agenda a partir de mensagem de WhatsApp em português. ' +
         'Retorne APENAS o título, sem explicação, sem aspas, capitalizado, máximo 60 caracteres. ' +
-        'Exemplos: "Dentista", "Reunião de equipe", "Pagar boleto do condomínio", "Exame de sangue", "Consulta cardiologista".',
+        'Exemplos: "Dentista", "Reunião de equipe", "Pagar boleto do condomínio", "Exame de sangue", "Consulta cardiologista".' +
+        fewShot,
       userMessage: `MENSAGEM: "${message}"`,
       maxTokens: 60,
       temperature: 0.1,
@@ -779,9 +784,10 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
       let tituloFinal = aiTitulo
       let tituloFonte = aiTitulo ? 'gemini' : null
       if (!tituloFinal) {
+        const tituloExemplos = await buscarExemplosFewShotTitulo(uid)
         const groqKey = process.env.GROQ_API_KEY
         if (groqKey) {
-          tituloFinal = await extractTituloComGroq(groqKey, message)
+          tituloFinal = await extractTituloComGroq(groqKey, message, tituloExemplos)
           if (tituloFinal) tituloFonte = 'groq'
         }
         if (!tituloFinal) {

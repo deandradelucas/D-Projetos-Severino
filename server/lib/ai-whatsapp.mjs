@@ -1,5 +1,6 @@
 import './load-env.mjs'
 import { log } from './logger.mjs'
+import { buscarExemplosFewShotTitulo } from './domain/agenda-title-logger.mjs'
 import {
   buildGeminiGenerationConfig,
   geminiPostGenerateContent,
@@ -174,7 +175,11 @@ function normalizarDescricao(desc) {
 /**
  * Monta o system_instruction de parse financeiro (compartilhado entre texto e áudio).
  */
-function buildTransactionParseSystemInstruction(catMap, dataAtual) {
+function buildTransactionParseSystemInstruction(catMap, dataAtual, tituloExemplos = []) {
+  const fewShot = Array.isArray(tituloExemplos) && tituloExemplos.length
+    ? '\n\n━━━ TÍTULOS PREFERIDOS POR ESTE USUÁRIO (correções reais — imite ESTE estilo no campo "titulo" de AGENDA) ━━━\n' +
+      tituloExemplos.map((e) => `• "${e.transcricao}" → "${e.titulo}"`).join('\n')
+    : ''
   return `Você é o Severino, assistente pessoal brasileiro. Analise a mensagem e determine a intenção principal.
 
 DATA E HORA ATUAL: ${dataAtual}
@@ -233,13 +238,13 @@ ${catMap || 'Sem categorias — use categoria_id: null.'}
 
 Transação: {"tipo":"DESPESA","valor":12.50,"descricao":"iFood","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null}
 Agenda:    {"tipo":"AGENDA","transcricao":"texto completo e fiel do que foi dito, incluindo data e horário","titulo":"Título limpo do evento em 2-5 palavras sem data/hora. Ex: 'Reunião de equipe', 'Consulta médica', 'Pagar boleto do condomínio', 'Dentista'. Capitalizado, sem verbo de agendamento."}
-Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável","categoria_id":null,"subcategoria_id":null,"data_transacao":null}`
+Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável","categoria_id":null,"subcategoria_id":null,"data_transacao":null}${fewShot}`
 }
 
 /**
  * Interpreta mensagem de WhatsApp.
  */
-export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
+export async function parseWhatsAppMessageWithAI(message, categoriasUsuario, usuarioId) {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
 
@@ -248,7 +253,8 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
     return `▸ ${c.tipo} | Categoria: "${c.nome}" → ID: ${c.id}\n${subs}`
   }).join('\n')
 
-  const systemInstruction = buildTransactionParseSystemInstruction(catMap, dataHoraAtualSP())
+  const tituloExemplos = await buscarExemplosFewShotTitulo(usuarioId)
+  const systemInstruction = buildTransactionParseSystemInstruction(catMap, dataHoraAtualSP(), tituloExemplos)
   const userMessage = `MENSAGEM: "${message}"`
 
   const models = resolveGeminiModelCandidates()
@@ -324,7 +330,7 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario) {
  * Parse de nota de voz → JSON de transação em um único call Gemini.
  * Elimina a etapa separada de transcrição — corta latência pela metade para áudios.
  */
-export async function parseWhatsAppAudioDirectWithAI(audioBytes, mimeHint = '', categoriasUsuario) {
+export async function parseWhatsAppAudioDirectWithAI(audioBytes, mimeHint = '', categoriasUsuario, usuarioId) {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
 
@@ -344,7 +350,8 @@ export async function parseWhatsAppAudioDirectWithAI(audioBytes, mimeHint = '', 
     return `▸ ${c.tipo} | Categoria: "${c.nome}" → ID: ${c.id}\n${subs}`
   }).join('\n')
 
-  const systemInstruction = buildTransactionParseSystemInstruction(catMap, dataHoraAtualSP())
+  const tituloExemplos = await buscarExemplosFewShotTitulo(usuarioId)
+  const systemInstruction = buildTransactionParseSystemInstruction(catMap, dataHoraAtualSP(), tituloExemplos)
 
   // WhatsApp envia sempre ogg/opus — limitar candidatos evita tentativas desnecessárias
   const sniffed = sniffAudioMimeFromBuffer(buf)

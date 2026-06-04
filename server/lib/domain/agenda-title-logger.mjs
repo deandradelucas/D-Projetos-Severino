@@ -60,3 +60,55 @@ export async function logTituloEditado(eventoId, tituloNovo) {
     // best-effort
   }
 }
+
+/**
+ * Busca pares (transcrição → título corrigido pelo usuário) para few-shot dinâmico
+ * no prompt de geração de título. Prioriza as correções do PRÓPRIO usuário (aprende
+ * o estilo dele); completa com correções globais. Retorna [] se não houver dados
+ * — nesse caso o prompt cai nos exemplos estáticos (comportamento atual).
+ * Best-effort: nunca lança.
+ */
+export async function buscarExemplosFewShotTitulo(usuarioId, limit = 6) {
+  try {
+    const supabase = getSupabaseAdmin()
+    const exemplos = []
+    const seen = new Set()
+    const add = (transcricao, titulo) => {
+      const t = String(titulo || '').trim()
+      const tr = String(transcricao || '').trim()
+      if (!t || tr.length < 4) return
+      const key = tr.toLowerCase()
+      if (seen.has(key)) return
+      seen.add(key)
+      exemplos.push({ transcricao: tr.slice(0, 160), titulo: t })
+    }
+
+    if (usuarioId) {
+      const { data } = await supabase
+        .from('agenda_title_log')
+        .select('transcricao, titulo_editado')
+        .eq('usuario_id', usuarioId)
+        .eq('usuario_editou', true)
+        .order('created_at', { ascending: false })
+        .limit(limit)
+      for (const r of data || []) add(r.transcricao, r.titulo_editado)
+    }
+
+    if (exemplos.length < limit) {
+      const { data } = await supabase
+        .from('agenda_title_log')
+        .select('transcricao, titulo_editado')
+        .eq('usuario_editou', true)
+        .order('created_at', { ascending: false })
+        .limit(limit * 2)
+      for (const r of data || []) {
+        if (exemplos.length >= limit) break
+        add(r.transcricao, r.titulo_editado)
+      }
+    }
+
+    return exemplos.slice(0, limit)
+  } catch {
+    return []
+  }
+}

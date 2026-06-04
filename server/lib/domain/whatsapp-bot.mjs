@@ -611,7 +611,7 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
   try {
     if (options.audioBytes) {
       // Combinado: áudio → JSON em um único call (transcrição + classificação de intent)
-      parsed = await parseWhatsAppAudioDirectWithAI(options.audioBytes, options.mimeHint || '', categorias)
+      parsed = await parseWhatsAppAudioDirectWithAI(options.audioBytes, options.mimeHint || '', categorias, usuarioBot.familiaEscopo?.actorId ?? usuarioBot.id)
 
       // Agenda detectada no áudio — rota para processador de agenda com transcrição + título da IA
       if (parsed?.tipo === 'AGENDA' && parsed?.transcricao) {
@@ -634,7 +634,7 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
         }
       }
     } else {
-      parsed = await parseWhatsAppMessageWithAI(message, categorias)
+      parsed = await parseWhatsAppMessageWithAI(message, categorias, usuarioBot.familiaEscopo?.actorId ?? usuarioBot.id)
     }
   } catch (e) {
     log.error('[whatsapp-bot] parse IA error', e)
