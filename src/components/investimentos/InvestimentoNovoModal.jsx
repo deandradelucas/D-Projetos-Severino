@@ -363,7 +363,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
         <div className="modal-header">
           <h3 id={titleId}>{tituloModal}</h3>
           <button type="button" onClick={onClose} className="close-btn" aria-label="Fechar" disabled={submitting}>
-            ×
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg>
           </button>
         </div>
         <form onSubmit={handleSubmit} className="modal-form">
