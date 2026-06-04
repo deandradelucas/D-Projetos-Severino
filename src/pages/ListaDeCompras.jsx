@@ -645,6 +645,8 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
 
 function ModalNovoItem({ historico, historicoPrecos = {}, onClose, onSalvar, adicionando, itemEditando = null, permitePreco = true }) {
   const editando = !!itemEditando
+  const sheetRef = useRef(null)
+  useSheetDragClose(sheetRef, { open: true, onClose })
   const [nome, setNome] = useState(itemEditando?.nome ?? '')
   const [quantidade, setQuantidade] = useState(
     itemEditando?.quantidade != null ? Number(itemEditando.quantidade) : 1
@@ -736,7 +738,7 @@ function ModalNovoItem({ historico, historicoPrecos = {}, onClose, onSalvar, adi
 
   return (
     <div className="page-lista-compras__modal-overlay" style={overlayStyle} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-novo-item-titulo">
+      <div ref={sheetRef} className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-novo-item-titulo">
         <div className="page-lista-compras__modal-header">
           <h2 id="modal-novo-item-titulo" className="page-lista-compras__modal-title">
             {editando ? 'Editar item' : 'Novo item'}
