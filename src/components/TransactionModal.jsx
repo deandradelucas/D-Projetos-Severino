@@ -24,9 +24,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   const [activeSelect, setActiveSelect] = useState(null)
   const [aiSuggesting, setAiSuggesting] = useState(false)
   const [aiSuggestedCat, setAiSuggestedCat] = useState(false)
-  // Pacote 2 — validação visual + dirty tracking
+  // Pacote 2 — validação visual
   const [validationAttempted, setValidationAttempted] = useState(false)
-  const initialFormRef = useRef(null)
 
   const valorInputRef = useRef(null)
   const modalSheetRef = useRef(null)
@@ -86,7 +85,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     }
   }, [onClose, saving])
   const onCloseSafeRef = useRef(null)
-  const isDirtyRef = useRef(false)
 
   // Inicializa o formulário e busca categorias ao abrir
   useEffect(() => {
@@ -95,8 +93,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     initForm()
     setAiSuggestedCat(false)
     setValidationAttempted(false)
-    // Captura snapshot inicial para detectar dirty
-    initialFormRef.current = null
     // Auto-focus no valor após pequeno delay (deixa o modal renderizar)
     const focusTimer = setTimeout(() => {
       const el = valorInputRef.current
@@ -118,47 +114,14 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     return () => { cancel = true }
   }, [isOpen])
 
-  // Captura snapshot do form quando inicializado (primeira render após initForm)
-  useEffect(() => {
-    if (!isOpen) return
-    if (initialFormRef.current === null && formData) {
-      initialFormRef.current = JSON.stringify({
-        tipo: formData.tipo,
-        categoria_id: formData.categoria_id,
-        subcategoria_id: formData.subcategoria_id,
-        descricao: formData.descricao,
-        valor: formData.valor,
-        data_transacao: formData.data_transacao,
-      })
-    }
-  }, [isOpen, formData])
-
-  const isDirty = useMemo(() => {
-    if (!initialFormRef.current || !formData) return false
-    const snap = JSON.stringify({
-      tipo: formData.tipo,
-      categoria_id: formData.categoria_id,
-      subcategoria_id: formData.subcategoria_id,
-      descricao: formData.descricao,
-      valor: formData.valor,
-      data_transacao: formData.data_transacao,
-    })
-    return snap !== initialFormRef.current
-  }, [formData])
-
-  // Wrap onClose para confirmar descarte se dirty
+  // Fecha direto (sem confirmar descarte) — apenas bloqueia enquanto salva
   const onCloseSafe = useCallback(() => {
     if (saving) return
-    if (isDirty) {
-      const ok = window.confirm('Descartar as mudanças?')
-      if (!ok) return
-    }
     onClose()
-  }, [saving, isDirty, onClose])
+  }, [saving, onClose])
 
   // Mantém ref atualizada para o handleBackdropMouseDown
   useEffect(() => { onCloseSafeRef.current = onCloseSafe }, [onCloseSafe])
-  useEffect(() => { isDirtyRef.current = isDirty }, [isDirty])
 
   // Wrap handleSubmit para marcar validação visual + persistir template
   const handleSubmitWithValidation = useCallback((e) => {
@@ -315,14 +278,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       if (!active || !decided) { active = false; return }
       active = false
       if (dy > 110) {
-        if (isDirtyRef.current) {
-          // tem mudanças → confirma antes (sheet segura na posição); volta se cancelar
-          onCloseSafe()
-          animateTo(0, () => sheet.classList.remove('ntx-closing'))
-        } else {
-          // desliza pra fora e fecha
-          animateTo(window.innerHeight, () => onCloseSafe())
-        }
+        // passou do limite → desliza pra fora e fecha
+        animateTo(window.innerHeight, () => onCloseSafe())
       } else {
         // não passou do limite → volta suave
         animateTo(0, () => sheet.classList.remove('ntx-closing'))
