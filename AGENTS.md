@@ -90,6 +90,43 @@ Personas em `segunda-feira/agents/` — ativar com `@nome`:
 | `npm run audit:dashboard-css` | Lista classes em `dashboard.css` sem uso aparente em `src/` (há safelist para Recharts e previews de tema) |
 | `npm run n8n:push` | Atualiza o workflow WhatsApp no n8n via API (`scripts/push-n8n-whatsapp-bot-workflow.mjs` — mescla `.env` → `.env.local` → `.env.production` → `.env.production.local`) |
 
+## Definition of Done (Severino)
+
+Aplicação do processo Segunda-feira a este projeto. O peso é **proporcional ao risco** — não burocratizar tarefa trivial.
+
+### Quando exige story (`docs/stories/`) vs quando é direto
+
+| Tarefa | Processo |
+|--------|----------|
+| Fix de CSS, ajuste mobile, typo, rename, copy | **Direto.** Sem story. |
+| Feature nova, refactor, mudança em **pagamento / IA / auth / deploy / Supabase** | **Story** (`{epic}.{n}-nome.story.md`) → implementar → QA → push |
+| Bug com causa-raiz não óbvia | Consultar memória/heurística **antes**, depois corrigir |
+
+### Antes de marcar uma task como concluída
+
+> A Constituição manda `lint && typecheck`. **Este projeto é JS puro** (`jsconfig.json`, sem `tsconfig`) — **não existe `typecheck`**. O equivalente real é:
+
+```bash
+npm run lint && npm run test:unit && npm run build
+```
+
+Atalho equivalente: `npm run ci` (roda `test:unit + lint + build + audit:dashboard-css`).
+
+### Gate de deploy — só o @devops (autoridade exclusiva)
+
+`git push` e deploy na VPS são do **@devops**. Checklist obrigatório (cicatrizes de incidente):
+
+1. **`git push` ANTES de deployar** — `git pull` na VPS não pega commits locais não-publicados.
+2. **Env vars explícitas** — `--env-file` não funciona nos scripts da VPS; usar `grep .env` + prefixo no comando.
+3. **Commits atômicos** — não misturar limpeza/docs com feature; submódulo `segunda-feira/` fica fora dos commits do app.
+
+### Regras Segunda-feira que mais pesam aqui
+
+- **External API: SYNC > CACHE > REAL-TIME** — dashboard/relatório/listagem **nunca** chama Gemini/Asaas/Supabase direto no request. Sincronizar para o DB primeiro. (Foi a causa do rate limit do Gemini.)
+- **Story scope é lei** — implementar o AC, não inventar feature. Cuidado com "melhorar de passagem" (ver *Shell hub* abaixo — contrato estável).
+- **Consultar antes de criar** — as memórias do projeto (`~/.claude/.../memory/`) são o cérebro: deploy, regex não-ASCII, Supabase date-range, etc. já estão documentados.
+- **EROS veredito** em entrega relevante (feature/refactor): completude · precisão · sem regressão, antes de dizer "pronto".
+
 ## Rotas da API (Hono)
 
 Prefixo `/api`. Autenticação: login grava `horizonte_user` no `localStorage` (front); chamadas autenticadas enviam o que o backend espera (ver rotas em `server/app.mjs`).
