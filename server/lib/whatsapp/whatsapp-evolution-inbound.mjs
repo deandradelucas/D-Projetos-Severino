@@ -229,17 +229,32 @@ async function audioBufferFromEvolutionMedia(body) {
   const messagePayload = buildGetBase64MessagePayload(body)
   if (!messagePayload || !baseUrl || !instance || !apiKey) return null
 
-  const response = await fetch(`${baseUrl.replace(/\/+$/, '')}/chat/getBase64FromMediaMessage/${encodeURIComponent(instance)}`, {
-    method: 'POST',
-    headers: {
-      apikey: apiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      message: messagePayload,
-      convertToMp4: false,
-    }),
-  })
+  // Timeout para o download via Evolution (áudio e documento). Sem isto, um
+  // documento grande pode pendurar o handler indefinidamente (bug 7.4).
+  const controller = new AbortController()
+  const tid = setTimeout(() => controller.abort(), 60_000)
+  let response
+  try {
+    response = await fetch(`${baseUrl.replace(/\/+$/, '')}/chat/getBase64FromMediaMessage/${encodeURIComponent(instance)}`, {
+      method: 'POST',
+      headers: {
+        apikey: apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: messagePayload,
+        convertToMp4: false,
+      }),
+      signal: controller.signal,
+    })
+  } catch (e) {
+    if (e?.name === 'AbortError') {
+      throw new Error('Evolution getBase64 timeout (60s)')
+    }
+    throw e
+  } finally {
+    clearTimeout(tid)
+  }
 
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
