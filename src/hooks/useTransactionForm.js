@@ -96,7 +96,17 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
   const handleTypeChange = useCallback((newType) => {
     setFormData((prev) => {
       if (prev.tipo === newType) return prev
-      return { ...prev, tipo: newType, categoria_id: '', subcategoria_id: '' }
+      const next = { ...prev, tipo: newType, categoria_id: '', subcategoria_id: '' }
+      // Parcelamento e vínculo de cartão só existem em despesa. Ao virar receita,
+      // zera o estado residual para não vazar parcelamento no payload do submit.
+      if (newType === 'RECEITA') {
+        next.parcelado = false
+        next.cartao_id = ''
+        next.num_parcelas = '2'
+        next.parcela_inicial = '1'
+        next.prazo_indeterminado = false
+      }
+      return next
     })
   }, [])
 

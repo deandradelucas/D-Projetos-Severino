@@ -96,14 +96,10 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     initForm()
     setAiSuggestedCat(false)
     setValidationAttempted(false)
-    // Auto-focus no valor após pequeno delay (deixa o modal renderizar)
-    const focusTimer = setTimeout(() => {
-      const el = valorInputRef.current
-      if (el && typeof window !== 'undefined' && window.matchMedia('(min-width: 769px)').matches) {
-        try { el.focus({ preventScroll: false }) } catch { el.focus() }
-      }
-    }, 80)
-    return () => clearTimeout(focusTimer)
+    // Sem auto-focus no campo valor: o foco inicial fica no botão Fechar
+    // (via useModalA11y, que foca o primeiro elemento focável). Evita que o
+    // cursor caia direto no valor ao abrir o modal — mesmo comportamento no
+    // desktop e no mobile.
   }, [isOpen, usuarioId, editingTransaction?.id, fetchCategorias, initForm])
 
   // Cartões do usuário (para vincular despesa a uma fatura)
@@ -667,8 +663,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               </section>
             )}
 
-            {/* ── Seção: Parcelamento (só criação) ── */}
-            {!isEditMode && (() => {
+            {/* ── Seção: Parcelamento (só criação, e só despesa) ── */}
+            {!isEditMode && formData.tipo === 'DESPESA' && (() => {
               const numParcelas = parseInt(formData.num_parcelas, 10)
               const parcelaInicial = Math.max(1, parseInt(formData.parcela_inicial, 10) || 1)
               const numParcelasRestantes = numParcelas - parcelaInicial + 1
