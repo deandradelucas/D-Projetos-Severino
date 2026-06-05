@@ -35,7 +35,10 @@ export function TransacaoRow({
   selectionMode = false,
 }) {
   const isRec = t.tipo === 'RECEITA'
-  const { line: dateLine, dateTimeAttr } = formatTransacaoListDateTime(t.data_transacao)
+  // Em parcelas, a linha exibe a data da COMPRA (data_compra); o agrupamento por dia
+  // continua pelo vencimento (data_transacao), preservando o fluxo de caixa mensal.
+  const dataExibirLinha = t.recorrente_index && t.data_compra ? t.data_compra : t.data_transacao
+  const { line: dateLine, dateTimeAttr } = formatTransacaoListDateTime(dataExibirLinha)
   const catNome = (t.categorias?.nome && String(t.categorias.nome).trim()) || '—'
   const subRaw = t.subcategorias
   const subNome =

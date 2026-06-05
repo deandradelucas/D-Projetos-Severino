@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
 import CategorySelector from './transaction/CategorySelector'
+import { vencimentoCartaoParaData, calcularParcelaAtual } from '../lib/cartaoVencimento'
 import { useTransactionForm } from '../hooks/useTransactionForm'
 import { useModalA11y } from '../hooks/useModalA11y'
 
@@ -18,6 +20,7 @@ const ParcelamentoIcon = () => (
 )
 
 export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, editingTransaction = null }) {
+  const navigate = useNavigate()
   const [categorias, setCategorias] = useState([])
   const [cartoes, setCartoes] = useState([])
   const [loadingCats, setLoadingCats] = useState(false)
@@ -340,6 +343,19 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     }
   }, [formData.descricao, formData.tipo, formData.categoria_id, isOpen, isEditMode, usuarioId, setFormData])
 
+  // Com cartão + parcelamento: preenche a data de vencimento da 1ª parcela a partir
+  // da data da compra. O backend cria TODAS as parcelas; as já vencidas entram como
+  // pagas (histórico). Recalcula ao mudar a data da compra, o cartão ou ligar o
+  // parcelamento. Não mexe em parcela_inicial (lança todas por padrão). Só em criação.
+  useEffect(() => {
+    if (isEditMode || !formData.parcelado) return
+    const cartao = cartoes.find((c) => String(c.id) === String(formData.cartao_id))
+    if (!cartao) return
+    const venc1 = vencimentoCartaoParaData(formData.data_transacao, cartao.dia_vencimento, 0)
+    if (!venc1) return
+    setFormData((prev) => (prev.data_pagamento === venc1 ? prev : { ...prev, data_pagamento: venc1 }))
+  }, [formData.cartao_id, formData.parcelado, formData.data_transacao, cartoes, isEditMode, setFormData])
+
   // Reseta badge ao trocar tipo
   const handleTypeChangeWithReset = useCallback((newType) => {
     setAiSuggestedCat(false)
@@ -484,26 +500,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                 </div>
               )}
 
-              {formData.tipo === 'DESPESA' && cartoes.length > 0 && (
-                <div className="form-group">
-                  <label htmlFor="tx-cartao">
-                    Cartão de crédito <span className="modal-label-optional">(opcional)</span>
-                  </label>
-                  <select
-                    id="tx-cartao"
-                    name="cartao_id"
-                    value={formData.cartao_id || ''}
-                    onChange={handleChange}
-                    className="input-premium"
-                  >
-                    <option value="">À vista / sem cartão</option>
-                    {cartoes.map((c) => (
-                      <option key={c.id} value={c.id}>{c.nome}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
               <div className="form-group">
                 <label htmlFor="tx-descricao">
                   Descrição <span className="modal-label-optional">(opcional)</span>
@@ -519,10 +515,46 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   className="input-premium"
                 />
               </div>
-            </section>
 
-            {/* ── Seção: Valor e Data ── */}
-            <section className="nova-tx-section">
+              <div className="form-group form-group--data-nova-tx">
+                <div className="modal-date-toolbar">
+                  <label htmlFor="tx-data-transacao">
+                    {isEditMode && editingTransaction?.recorrente_index ? 'Data de vencimento' : 'Data e hora'}
+                  </label>
+                  <div className="date-shortcuts">
+                    <button
+                      type="button"
+                      className="date-shortcut-btn"
+                      onClick={() => setDateShortcut(0)}
+                    >
+                      Hoje
+                    </button>
+                    <button
+                      type="button"
+                      className="date-shortcut-btn"
+                      onClick={() => setDateShortcut(1)}
+                    >
+                      Ontem
+                    </button>
+                  </div>
+                </div>
+                <input
+                  id="tx-data-transacao"
+                  type="datetime-local"
+                  name="data_transacao"
+                  value={formData.data_transacao}
+                  onChange={handleChange}
+                  required
+                  className="input-premium input-data-novo-tx"
+                />
+                {isEditMode && editingTransaction?.recorrente_index && editingTransaction?.data_compra && (
+                  <p className="parcelamento-preview parcelamento-preview--hint">
+                    Compra original em {new Date(editingTransaction.data_compra).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                    {' · '}parcela {editingTransaction.recorrente_index}/{editingTransaction.recorrente_total}
+                  </p>
+                )}
+              </div>
+
               <div className="form-group">
                 <div className="ntx-valor-label-row">
                   <label htmlFor="tx-valor">Valor (R$)</label>
@@ -582,36 +614,31 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                 )}
               </div>
 
-              <div className="form-group form-group--data-nova-tx">
-                <div className="modal-date-toolbar">
-                  <label htmlFor="tx-data-transacao">Data e hora</label>
-                  <div className="date-shortcuts">
-                    <button
-                      type="button"
-                      className="date-shortcut-btn"
-                      onClick={() => setDateShortcut(0)}
-                    >
-                      Hoje
-                    </button>
-                    <button
-                      type="button"
-                      className="date-shortcut-btn"
-                      onClick={() => setDateShortcut(1)}
-                    >
-                      Ontem
-                    </button>
-                  </div>
+              {formData.tipo === 'DESPESA' && cartoes.length > 0 && (
+                <div className="form-group">
+                  <label>
+                    Cartão de crédito <span className="modal-label-optional">(opcional)</span>
+                  </label>
+                  <CategorySelector
+                    name="cartao_id"
+                    value={formData.cartao_id || ''}
+                    onChange={handleChange}
+                    options={[{ id: '', nome: 'À vista / sem cartão' }, ...cartoes]}
+                    placeholder="À vista / sem cartão"
+                    isOpen={activeSelect === 'cartao_id'}
+                    onToggle={setActiveSelect}
+                    required={false}
+                    zIndex={6}
+                    actionItem={{
+                      label: 'Cadastrar cartão',
+                      onClick: () => {
+                        onClose?.()
+                        navigate('/cartoes')
+                      },
+                    }}
+                  />
                 </div>
-                <input
-                  id="tx-data-transacao"
-                  type="datetime-local"
-                  name="data_transacao"
-                  value={formData.data_transacao}
-                  onChange={handleChange}
-                  required
-                  className="input-premium input-data-novo-tx"
-                />
-              </div>
+              )}
             </section>
 
             {/* ── Parcela atual (só edição de parceladas) ── */}
@@ -650,6 +677,11 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                 ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
                     .format(Math.floor((valorNum / numParcelas) * 100) / 100)
                 : null
+              const selectedCartao = cartoes.find((c) => String(c.id) === String(formData.cartao_id))
+              const parcelaInfo = selectedCartao && Number.isFinite(numParcelas) && numParcelas >= 2
+                ? calcularParcelaAtual(formData.data_transacao, selectedCartao.dia_vencimento, numParcelas)
+                : null
+              const parcelasJaPagas = parcelaInfo ? parcelaInfo.parcelaInicial - 1 : 0
 
               return (
                 <section
@@ -790,7 +822,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                         </label>
                         <div className="rec-vezes-row">
                           <label htmlFor="tx-data-pagamento" className="rec-vezes-row__label">
-                            {parcelaInicial > 1 ? `Vencimento da ${parcelaInicial}ª parcela` : 'Data de pagamento'}
+                            {parcelaInicial > 1 ? `Vencimento da ${parcelaInicial}ª parcela` : 'Data de vencimento'}
                           </label>
                           <input
                             id="tx-data-pagamento"
@@ -800,12 +832,19 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                             className="input-premium rec-vezes-row__input rec-vezes-row__input--date"
                           />
                         </div>
+                        {selectedCartao && (
+                          <p className="parcelamento-preview parcelamento-preview--cartao">
+                            {selectedCartao.nome} · vence todo dia {selectedCartao.dia_vencimento}
+                          </p>
+                        )}
                         <p className="parcelamento-preview parcelamento-preview--hint">
                           {formData.prazo_indeterminado
                             ? 'Assinatura/stream sem fim: desconta esse valor todo mês até cancelar.'
                             : parcelaInicial > 1
-                              ? `As parcelas 1 a ${parcelaInicial - 1} já foram pagas e não serão lançadas.`
-                              : 'Vencimento da 1ª parcela. Se vazio, usa a data da transação.'}
+                              ? `As parcelas 1 a ${parcelaInicial - 1} não serão lançadas (começa na ${parcelaInicial}ª).`
+                              : parcelasJaPagas > 0
+                                ? `${parcelasJaPagas} parcela(s) já vencida(s) entram como pagas; a próxima pendente é a ${parcelaInfo.parcelaInicial}ª.`
+                                : 'Vencimento da 1ª parcela. Se vazio, usa a data da transação.'}
                         </p>
                         {formData.prazo_indeterminado && valorNum > 0 && (
                           <p className="parcelamento-preview">

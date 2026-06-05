@@ -33,13 +33,23 @@ export function TransacaoDetalheModal({ tx, onClose, onEdit, onDelete, privacyMo
   const isRecorrente = !isParcela && Boolean(tx.recorrencia_mensal_id)
   const isPendente = tx.status === 'PENDENTE'
 
-  const dataFmt = (() => {
-    const d = new Date(tx.data_transacao)
+  const fmtDataHora = (v) => {
+    const d = new Date(v)
     if (Number.isNaN(d.getTime())) return '—'
     return d.toLocaleString('pt-BR', {
       day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
     })
-  })()
+  }
+  const fmtDataDia = (v) => {
+    const d = new Date(v)
+    if (Number.isNaN(d.getTime())) return '—'
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+  }
+  // Em parceladas, data_transacao é o vencimento da parcela e data_compra é a data
+  // original da compra. "Data e hora" mostra a compra; "Data Vencimento" mostra o vencimento.
+  const temDataCompra = Boolean(tx.data_compra)
+  const dataFmt = fmtDataHora(tx.data_compra || tx.data_transacao)
+  const dataVencimentoFmt = fmtDataDia(tx.data_transacao)
 
   return createPortal(
     <div
@@ -96,9 +106,15 @@ export function TransacaoDetalheModal({ tx, onClose, onEdit, onDelete, privacyMo
             </div>
           ) : null}
           <div className="tx-detalhe-modal__row">
-            <dt>Data e hora</dt>
+            <dt>{isParcela && temDataCompra ? 'Data da compra' : 'Data e hora'}</dt>
             <dd>{dataFmt}</dd>
           </div>
+          {isParcela && temDataCompra ? (
+            <div className="tx-detalhe-modal__row">
+              <dt>Data de vencimento</dt>
+              <dd>{dataVencimentoFmt}</dd>
+            </div>
+          ) : null}
           <div className="tx-detalhe-modal__row">
             <dt>Status</dt>
             <dd>

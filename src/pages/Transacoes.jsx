@@ -841,7 +841,9 @@ export default function Transacoes() {
     const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 
     for (const t of transacoesVisiveis) {
-      const raw = t.data_transacao
+      // Parcelas são agrupadas pela data da COMPRA (data_compra); demais pela data
+      // da transação. Mantém a linha e o cabeçalho do dia consistentes.
+      const raw = t.recorrente_index && t.data_compra ? t.data_compra : t.data_transacao
       if (!raw) continue
       const key = String(raw).slice(0, 10)
       let group = indexMap.get(key)
@@ -865,6 +867,9 @@ export default function Transacoes() {
         else group.totalDespesas += v
       }
     }
+    // Reordena os grupos por data exibida (desc) — parcelas reagrupadas pela data da
+    // compra precisam cair na posição cronológica certa, não na ordem do backend.
+    grupos.sort((a, b) => b.key.localeCompare(a.key))
     return grupos
   }, [transacoesVisiveis])
 

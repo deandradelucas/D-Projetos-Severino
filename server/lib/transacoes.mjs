@@ -332,6 +332,7 @@ async function enrichTransacoesComCategorias(supabaseAdmin, rows, titularFallbac
     valor: r.valor,
     descricao: r.descricao,
     data_transacao: r.data_transacao,
+    data_compra: r.data_compra ?? null,
     status: r.status,
     categoria_id: r.categoria_id,
     subcategoria_id: r.subcategoria_id,
@@ -407,7 +408,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
   }
 
   const selectComEmbed = `
-      id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id,
+      id, tipo, valor, descricao, data_transacao, data_compra, status, categoria_id, subcategoria_id,
       cartao_id,
       recorrente_grupo_id, recorrente_index, recorrente_total, recorrencia_mensal_id,
       lancado_por_usuario_id,
@@ -452,7 +453,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
   if (error) {
     log.warn('[getTransacoes] embed falhou, fallback sem join:', error.message || error)
     const baseCols =
-      'id, tipo, valor, descricao, data_transacao, status, categoria_id, subcategoria_id, cartao_id, recorrente_grupo_id, recorrente_index, recorrente_total, lancado_por_usuario_id'
+      'id, tipo, valor, descricao, data_transacao, data_compra, status, categoria_id, subcategoria_id, cartao_id, recorrente_grupo_id, recorrente_index, recorrente_total, lancado_por_usuario_id'
 
     let qFlat = applyFilters(
       supabaseAdmin.from('transacoes').select(`${baseCols}, recorrencia_mensal_id`)

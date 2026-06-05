@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
-const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen, onToggle, zIndex = 1 }) => {
+const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen, onToggle, zIndex = 1, required = true, actionItem = null }) => {
   const [search, setSearch]     = useState('')
   const containerRef            = useRef(null)
   const triggerRef              = useRef(null)
@@ -116,6 +116,29 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
               {opt.nome}
             </div>
           ))}
+          {actionItem && (
+            <div
+              className="custom-select-option custom-select-option--action"
+              onClick={() => {
+                onToggle(null)
+                setSearch('')
+                actionItem.onClick()
+              }}
+              style={{
+                color: 'var(--accent)',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              {actionItem.label}
+            </div>
+          )}
         </div>
       </div>
     </div>,
@@ -130,7 +153,7 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
           name={name}
           value={value}
           readOnly
-          required
+          required={required}
           className="sr-only"
           style={{ opacity: 0, position: 'absolute', zIndex: -1, width: '100%', height: '100%', bottom: 0, left: 0 }}
         />

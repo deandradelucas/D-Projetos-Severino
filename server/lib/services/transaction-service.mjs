@@ -2,6 +2,7 @@ import { log } from '../logger.mjs'
 import { inserirTransacao } from '../transacoes.mjs'
 import { criarRegraRecorrenciaDia1 } from '../recorrencias-mensais.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
+import { vencimentoCartaoParaData } from '../cartao-vencimento.mjs'
 
 /** Avança N meses mantendo o dia original; clampa para o último dia do mês quando necessário. */
 function addMonths(dateIso, months) {
@@ -79,26 +80,52 @@ export const TransactionService = {
     const agora = new Date()
     const hojeStr = agora.toISOString().slice(0, 10) // "YYYY-MM-DD" UTC
 
-    // Data-base das parcelas: usa data_pagamento (se informada) ou cai em data_transacao.
-    // data_pagamento representa o vencimento da 1ª parcela (ex.: fatura do cartão).
+    // Vencimento da 1ª parcela (base da série, índice 0). Fonte de verdade:
+    //  - com cartão: próximo vencimento a partir da data da compra (lógica unificada
+    //    com o front, server/lib/cartao-vencimento.mjs)
+    //  - sem cartão: data_pagamento informada; senão a própria data da compra
+    let vencimentoPrimeira = null
+    if (cartaoId) {
+      const { data: cartao } = await supabase
+        .from('cartoes')
+        .select('dia_vencimento')
+        .eq('id', cartaoId)
+        .maybeSingle()
+      if (cartao?.dia_vencimento) {
+        const v = vencimentoCartaoParaData(payload.data_transacao, cartao.dia_vencimento, 0)
+        if (v) vencimentoPrimeira = `${v}T12:00:00Z`
+      }
+    }
     const dataPagamentoRaw = payload.parcelamento && payload.parcelamento.data_pagamento
     const baseDataParcelas =
-      dataPagamentoRaw && !Number.isNaN(Date.parse(String(dataPagamentoRaw)))
+      vencimentoPrimeira ||
+      (dataPagamentoRaw && !Number.isNaN(Date.parse(String(dataPagamentoRaw)))
         ? String(dataPagamentoRaw)
-        : payload.data_transacao
+        : payload.data_transacao)
 
-    // Parcela inicial: permite criar série a partir de uma parcela específica
-    // (ex.: parcela_inicial=2 cria 2/10..10/10, pois 1/10 já foi paga)
+    // Parcela inicial: override manual para começar de uma parcela específica
+    // (ex.: parcela_inicial=3 não lança 1 e 2). Por padrão (1) lança TODAS as parcelas;
+    // as já vencidas entram como pagas (status abaixo), preservando o histórico.
     const parcelaInicial = Math.max(1, parseInt(payload.parcelamento.parcela_inicial || '1', 10) || 1)
+
+    // Data ORIGINAL da compra (igual para todas as parcelas). data_transacao guarda o
+    // vencimento de cada parcela; data_compra preserva quando a compra foi feita.
+    const dataCompraRaw = payload.data_transacao
+    const dataCompraIso =
+      dataCompraRaw && !Number.isNaN(Date.parse(String(dataCompraRaw)))
+        ? new Date(dataCompraRaw).toISOString()
+        : null
 
     const rows = []
     for (let i = parcelaInicial; i <= n; i++) {
-      const dataParcela = addMonths(baseDataParcelas, i - parcelaInicial)
+      // base = vencimento da 1ª parcela; parcela i vence base + (i-1) meses.
+      const dataParcela = addMonths(baseDataParcelas, i - 1)
       const dataIso = dataParcela.toISOString()
       const valor = i === n ? +(valorBase + ajuste).toFixed(2) : valorBase
       const descricao = descricaoBase ? `${descricaoBase} (${i}/${n})` : `Parcela ${i}/${n}`
 
-      // Parcelas com data anterior a hoje ficam com o status escolhido; hoje e futuro = PENDENTE
+      // Parcela já vencida (anterior a hoje) entra como paga (status escolhido);
+      // hoje e futuro = PENDENTE.
       const dataParcelaStr = dataIso.slice(0, 10)
       const statusParcela = dataParcelaStr < hojeStr ? status : 'PENDENTE'
 
@@ -115,6 +142,7 @@ export const TransactionService = {
         recorrente_index: i,
         recorrente_total: n,
       }
+      if (dataCompraIso) row.data_compra = dataCompraIso
       if (cartaoId) row.cartao_id = cartaoId
       if (lp) row.lancado_por_usuario_id = lp
       rows.push(row)
