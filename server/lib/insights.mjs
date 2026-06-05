@@ -50,7 +50,7 @@ export async function gerarInsights(usuarioId) {
   try {
     const { data, error } = await supabase
       .from('transacoes')
-      .select('valor, tipo, descricao, data_transacao, categoria_id, categorias(nome)')
+      .select('valor, tipo, descricao, data_transacao, categoria_id, recorrente_grupo_id, categorias(nome)')
       .eq('usuario_id', usuarioId)
       .gte('data_transacao', ymd(inicioMesPassado))
       .lt('data_transacao', ymd(diaSeguinte(hoje)))
@@ -65,6 +65,7 @@ export async function gerarInsights(usuarioId) {
   const catAtual = new Map()
   const catPassado = new Map()
   let maiorGasto = null
+  const gastosMesAtual = [] // { valor, isParcela } — base para projeção
 
   for (const t of txs) {
     if (!isDespesa(t)) continue
@@ -73,6 +74,7 @@ export async function gerarInsights(usuarioId) {
     const nomeCat = t.categorias?.nome || 'Outros'
     if (data >= inicioMesAtual) {
       gastoAtual += v
+      gastosMesAtual.push({ valor: v, isParcela: Boolean(t.recorrente_grupo_id) })
       catAtual.set(nomeCat, (catAtual.get(nomeCat) || 0) + v)
       if (!maiorGasto || v > maiorGasto.valor) maiorGasto = { valor: v, descricao: t.descricao, categoria: nomeCat }
     } else {
@@ -113,10 +115,21 @@ export async function gerarInsights(usuarioId) {
     })
   }
 
-  // 3) Projeção do mês (ritmo atual)
-  if (gastoAtual > 0 && diaHoje >= 3) {
+  // 3) Projeção do mês — extrapola APENAS o consumo variável.
+  // Gastos pontuais (parcelas e outliers grandes, ex.: pagamento de fatura) entram
+  // como valor fixo, sem multiplicar pelo ritmo diário — senão distorcem a projeção
+  // (uma fatura paga no dia 4 viraria "ritmo diário" × 30). Só projeta a partir do
+  // dia 5 para evitar multiplicadores absurdos no início do mês.
+  if (gastoAtual > 0 && diaHoje >= 5) {
     const diasNoMes = new Date(y, m + 1, 0).getDate()
-    const projecao = (gastoAtual / diaHoje) * diasNoMes
+    const LIMIAR_OUTLIER = 0.30 // gasto único >= 30% do total do mês = pontual
+    let pontual = 0
+    let variavel = 0
+    for (const g of gastosMesAtual) {
+      if (g.isParcela || g.valor >= gastoAtual * LIMIAR_OUTLIER) pontual += g.valor
+      else variavel += g.valor
+    }
+    const projecao = pontual + (variavel / diaHoje) * diasNoMes
     insights.push({
       id: 'projecao',
       icone: '🎯',
