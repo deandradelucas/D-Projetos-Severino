@@ -660,18 +660,20 @@
   }
 
   /* Grid (Aviso + toggle) empilha */
+  /* Aviso de notificação + toggle WhatsApp na MESMA linha (2 colunas) */
   .agenda-modal .agenda-modal__grid {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 10px !important;
+    align-items: stretch !important;
   }
   /* Toggle WhatsApp */
   body[data-theme='dark'] .agenda-modal .agenda-toggle,
   body[data-theme='light'] .agenda-modal .agenda-toggle {
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
-    padding: 12px 14px !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
     border-radius: 12px !important;
     background: var(--m-sunken) !important;
     box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
@@ -684,8 +686,9 @@
   }
   .agenda-modal .agenda-toggle span {
     font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
+    font-size: 0.75rem !important;
     font-weight: 600 !important;
+    line-height: 1.2 !important;
     color: var(--m-text-hi) !important;
   }
 
