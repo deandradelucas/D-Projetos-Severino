@@ -957,7 +957,10 @@ body[data-theme='light'] .rec-vezes-row__label {
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   background: #f8fafc;
-  font-size: 14px;
+  /* 16px evita o zoom automático do Safari iOS ao focar (font < 16px dispara zoom).
+     Este input é renderizado via portal em document.body, fora de .modal-content--nova-tx,
+     então as regras prefixadas com o modal não o alcançam — esta regra base é a efetiva. */
+  font-size: 16px;
   outline: none;
   transition: all 0.2s;
   color: #1a1a1a;

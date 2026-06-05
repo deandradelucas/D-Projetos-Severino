@@ -852,6 +852,44 @@ button {
   font: inherit;
 }
 
+/* Cursor de mãozinha em tudo que é clicável.
+   O default do browser para <button> e <select> é seta — esta regra padroniza
+   para pointer. Campos de texto (input text/textarea) mantêm o cursor I-beam.
+   Elementos clicáveis que são <div>/<span> (onClick no React) não são detectáveis
+   por seletor — usar role="button" ou a classe .clickable para herdar o pointer. */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+a[href],
+label[for],
+select:not(:disabled),
+summary,
+input[type='checkbox']:not(:disabled),
+input[type='radio']:not(:disabled),
+input[type='submit']:not(:disabled),
+input[type='button']:not(:disabled),
+input[type='reset']:not(:disabled),
+input[type='file']:not(:disabled),
+input[type='range'],
+input[type='color'],
+.clickable,
+[data-clickable] {
+  cursor: pointer;
+}
+
+/* :has() isolado — se o browser não suportar, descarta só esta regra (não a de cima) */
+label:has(input[type='checkbox']:not(:disabled)),
+label:has(input[type='radio']:not(:disabled)) {
+  cursor: pointer;
+}
+
+/* Elementos interativos desabilitados: cursor de bloqueado */
+button:disabled,
+select:disabled,
+[aria-disabled='true'],
+input:disabled {
+  cursor: not-allowed;
+}
+
 /* Skip link — teclado / leitores de ecrã (UX + WCAG 2.4.1) */
 .skip-to-main {
   position: absolute;
