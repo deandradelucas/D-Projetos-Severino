@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
@@ -43,18 +43,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const closeButtonRef = useRef(null)
   const openerRef = useRef(null)
   const closeMenu = useCallback(() => setMenuAberto(false), [setMenuAberto])
-
-  /* Rail colapsável (desktop): estado persistido em localStorage. */
-  const [collapsed, setCollapsed] = useState(() => {
-    try { return localStorage.getItem('sidebar_collapsed_v1') === '1' } catch { return false }
-  })
-  const toggleCollapsed = useCallback(() => {
-    setCollapsed((v) => {
-      const next = !v
-      try { localStorage.setItem('sidebar_collapsed_v1', next ? '1' : '0') } catch { /* noop */ }
-      return next
-    })
-  }, [])
 
   /* Mobile: espera a animação do drawer terminar antes de aquecer chunks. */
   useEffect(() => {
@@ -152,7 +140,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
 
       <aside
         ref={sidebarRef}
-        className={`sidebar ${menuAberto ? 'open' : ''} ${collapsed ? 'sidebar--collapsed' : ''}`}
+        className={`sidebar ${menuAberto ? 'open' : ''}`}
         role={menuAberto ? 'dialog' : undefined}
         aria-modal={menuAberto ? 'true' : undefined}
         aria-label="Menu principal"
@@ -176,16 +164,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             onClick={closeMenu}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-          </button>
-          <button
-            type="button"
-            className="sidebar-collapse-btn"
-            aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
-            aria-pressed={collapsed}
-            title={collapsed ? 'Expandir menu' : 'Recolher menu'}
-            onClick={toggleCollapsed}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m15 18-6-6 6-6"/></svg>
           </button>
         </div>
 
