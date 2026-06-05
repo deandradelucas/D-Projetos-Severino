@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
@@ -43,6 +43,18 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   const closeButtonRef = useRef(null)
   const openerRef = useRef(null)
   const closeMenu = useCallback(() => setMenuAberto(false), [setMenuAberto])
+
+  /* Rail colapsável (desktop): estado persistido em localStorage. */
+  const [collapsed, setCollapsed] = useState(() => {
+    try { return localStorage.getItem('sidebar_collapsed_v1') === '1' } catch { return false }
+  })
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((v) => {
+      const next = !v
+      try { localStorage.setItem('sidebar_collapsed_v1', next ? '1' : '0') } catch { /* noop */ }
+      return next
+    })
+  }, [])
 
   /* Mobile: espera a animação do drawer terminar antes de aquecer chunks. */
   useEffect(() => {
@@ -140,7 +152,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
 
       <aside
         ref={sidebarRef}
-        className={`sidebar ${menuAberto ? 'open' : ''}`}
+        className={`sidebar ${menuAberto ? 'open' : ''} ${collapsed ? 'sidebar--collapsed' : ''}`}
         role={menuAberto ? 'dialog' : undefined}
         aria-modal={menuAberto ? 'true' : undefined}
         aria-label="Menu principal"
@@ -165,6 +177,16 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
+          <button
+            type="button"
+            className="sidebar-collapse-btn"
+            aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
+            aria-pressed={collapsed}
+            title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+            onClick={toggleCollapsed}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m15 18-6-6 6-6"/></svg>
+          </button>
         </div>
 
         <ul className="nav-menu">
@@ -174,7 +196,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                 to={item.to}
                 end={item.end}
                 {...navPrefetchHandlers(item.to)}
-                title={item.title}
+                title={item.title || item.label}
                 className={({ isActive }) => mergeNavItemClass(isActive, item.to, pathname)}
                 onClick={closeMenu}
               >
@@ -189,7 +211,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               to="/pagamento"
               end
               {...navPrefetchHandlers('/pagamento')}
-              title="Assinatura mensal (Asaas)"
+              title="Pagamento — assinatura mensal (Asaas)"
               className={({ isActive }) => mergeNavItemClass(isActive, '/pagamento', pathname)}
               onClick={closeMenu}
             >
@@ -211,7 +233,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                 to={item.to}
                 end={item.end}
                 {...navPrefetchHandlers(item.to)}
-                title={item.title}
+                title={item.title || item.label}
                 className={({ isActive }) => mergeNavItemClass(isActive, item.to, pathname, item.sidebarClassName)}
                 onClick={closeMenu}
               >
@@ -231,6 +253,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   to="/admin/usuarios"
                   end
                   {...navPrefetchHandlers('/admin/usuarios')}
+                  title="Logs Usuários"
                   className={({ isActive }) => mergeNavItemClass(isActive, '/admin/usuarios', pathname)}
                   onClick={closeMenu}
                 >
@@ -250,6 +273,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   to="/admin/auditoria"
                   end
                   {...navPrefetchHandlers('/admin/auditoria')}
+                  title="Auditoria"
                   className={({ isActive }) => mergeNavItemClass(isActive, '/admin/auditoria', pathname)}
                   onClick={closeMenu}
                 >
@@ -266,6 +290,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   to="/admin/pagamentos"
                   end
                   {...navPrefetchHandlers('/admin/pagamentos')}
+                  title="Logs de Pagamentos"
                   className={({ isActive }) => mergeNavItemClass(isActive, '/admin/pagamentos', pathname)}
                   onClick={closeMenu}
                 >
@@ -283,6 +308,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                   to="/admin/marketing"
                   end
                   {...navPrefetchHandlers('/admin/marketing')}
+                  title="Marketing"
                   className={({ isActive }) => mergeNavItemClass(isActive, '/admin/marketing', pathname)}
                   onClick={closeMenu}
                 >
@@ -311,7 +337,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" x2="9" y1="12" y2="12" />
           </svg>
-          Sair
+          <span className="logout-btn__label">Sair</span>
         </button>
       </aside>
     </>
