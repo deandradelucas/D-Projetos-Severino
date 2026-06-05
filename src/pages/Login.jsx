@@ -11,7 +11,7 @@ import {
   FAMILIA_CONVITE_SESSION_KEY,
   persistConviteTokenSession,
 } from '../lib/familiaConviteColar'
-import { BRAND_ASSETS, BRAND_LOGO_PIXEL_SIZE } from '../lib/brandAssets'
+import SeverinoLogo from '../components/SeverinoLogo'
 import { prefetchRoute } from '../lazyRoutes'
 import { showToast } from '../lib/toastStore'
 import { webAuthnSupported, fetchWebAuthnStatus, loginWithWebAuthn } from '../lib/webauthnBrowser'
@@ -346,9 +346,7 @@ export default function Login() {
     <AuthPhoneShell
       visuallyHiddenTitle="Login"
       showBodyLogo
-      bodyLogoSrc={BRAND_ASSETS.loginSeverinoLight}
-      bodyLogoIntrinsicSize={BRAND_LOGO_PIXEL_SIZE.severinoTemaClaro}
-      bodyLogoAlt="Severino"
+      bodyLogoNode={<SeverinoLogo />}
       subtitle="Seu financeiro pessoal, organizado"
       asidePanel={<AuthCopyPanel copy={LOGIN_COPY} />}
       compact={!showRecovery && !(webAuthnSupported() && hasWebAuthn)}

@@ -1,12 +1,17 @@
 /**
  * Itens de navegação compartilhados entre Sidebar e MobileBottomNav.
  * Cada `icon` é uma função que aceita props SVG extras (strokeWidth, width, height).
+ *
+ * `section` agrupa os itens na Sidebar (desktop/drawer):
+ *   'principal' | 'financas' | 'organizacao' | 'conta'
+ * O MobileBottomNav ignora `section` (usa só to/end/icon/mobileLabel/mobileHide).
  */
 export const MAIN_NAV_ITEMS = [
   {
     to: '/dashboard',
     label: 'Dashboard',
     mobileLabel: 'Início',
+    section: 'principal',
     end: true,
     icon: (props) => (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden {...props}>
@@ -20,6 +25,7 @@ export const MAIN_NAV_ITEMS = [
   {
     to: '/transacoes',
     label: 'Transações',
+    section: 'financas',
     end: true,
     mobileClassName: 'mobile-bottom-nav__item--transactions',
     icon: (props) => (
@@ -33,6 +39,7 @@ export const MAIN_NAV_ITEMS = [
   {
     to: '/cartoes',
     label: 'Cartões',
+    section: 'financas',
     end: true,
     mobileHide: true,
     title: 'Cartões de crédito — faturas, fechamento e vencimento',
@@ -47,6 +54,7 @@ export const MAIN_NAV_ITEMS = [
   {
     to: '/investimentos',
     label: 'Investimentos',
+    section: 'financas',
     end: true,
     icon: (props) => (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden {...props}>
@@ -59,6 +67,7 @@ export const MAIN_NAV_ITEMS = [
   {
     to: '/metas',
     label: 'Metas',
+    section: 'financas',
     end: true,
     mobileHide: true,
     title: 'Objetivos financeiros — junte dinheiro e acompanhe o progresso',
@@ -73,6 +82,7 @@ export const MAIN_NAV_ITEMS = [
   {
     to: '/relatorios',
     label: 'Relatórios',
+    section: 'financas',
     end: true,
     mobileHide: true,
     title: 'Gráficos, resumo do período e exportação CSV ou PDF',
@@ -89,6 +99,7 @@ export const MAIN_NAV_ITEMS = [
   {
     to: '/agenda',
     label: 'Agenda',
+    section: 'organizacao',
     end: true,
     title: 'Compromissos, lembretes e interação via WhatsApp',
     icon: (props) => (
@@ -108,6 +119,7 @@ export const MAIN_NAV_ITEMS = [
     to: '/lista-de-compras',
     label: 'Listas',
     mobileLabel: 'Listas',
+    section: 'organizacao',
     end: true,
     title: 'Suas listas — compras e tarefas',
     icon: (props) => (
@@ -119,8 +131,23 @@ export const MAIN_NAV_ITEMS = [
     ),
   },
   {
+    to: '/pagamento',
+    label: 'Pagamento',
+    section: 'conta',
+    end: true,
+    mobileHide: true,
+    title: 'Pagamento — assinatura mensal (Asaas)',
+    icon: (props) => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden {...props}>
+        <rect width="20" height="14" x="2" y="5" rx="2" />
+        <line x1="2" x2="22" y1="10" y2="10" />
+      </svg>
+    ),
+  },
+  {
     to: '/configuracoes',
     label: 'Ajustes',
+    section: 'conta',
     end: true,
     mobileHide: true,
     title: 'Perfil, tema, biometria e dados',

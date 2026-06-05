@@ -6,7 +6,7 @@ import AuthCopyPanel from '../components/auth/AuthCopyPanel'
 import { CADASTRO_COPY } from '../components/auth/authCopyContent'
 import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
 import { AUTH_SHELL_INPUT_CLASS, AUTH_SHELL_ERROR_BOX_CLASS, AUTH_SHELL_FIELD_ERROR_CLASS } from '../lib/authFormClasses'
-import { BRAND_ASSETS, BRAND_LOGO_PIXEL_SIZE } from '../lib/brandAssets'
+import SeverinoLogo from '../components/SeverinoLogo'
 import { apiUrl } from '../lib/apiUrl'
 import { writeHorizonteAccessToken, writeHorizonteRefreshToken } from '../lib/horizonteAccessToken'
 import { showToast } from '../lib/toastStore'
@@ -287,9 +287,7 @@ export default function Cadastro() {
     <AuthPhoneShell
       visuallyHiddenTitle="Criar conta"
       showBodyLogo
-      bodyLogoSrc={BRAND_ASSETS.loginSeverinoLight}
-      bodyLogoIntrinsicSize={BRAND_LOGO_PIXEL_SIZE.severinoTemaClaro}
-      bodyLogoAlt="Severino"
+      bodyLogoNode={<SeverinoLogo />}
       subtitle="Seu dinheiro organizado em 2 minutos."
       asidePanel={<AuthCopyPanel copy={CADASTRO_COPY} />}
       compact={step === 1}

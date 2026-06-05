@@ -4,7 +4,7 @@ export const BRAND_LOGO_PIXEL_SIZE = {
 }
 
 export const BRAND_ASSETS = {
-  /** Wordmark Severino — login e superfícies claras (`public/images/Nova Logo/`) */
+  /** Wordmark Severino — superfícies claras (BemVindo/Trial). Login/cadastro usam <SeverinoLogo /> (vetor nativo). */
   loginSeverinoLight: '/images/Nova Logo/Severino Tema Claro.png',
   /** Menu lateral — claro (`public/images/Nova Logo/Severino Tema Claro.png`)
    *  Mantido como histórico; o tema claro hoje renderiza `sidebarMarkLight`

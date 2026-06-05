@@ -1,14 +1,21 @@
-import { useCallback, useEffect, useRef } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { Fragment, useCallback, useEffect, useRef } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
-import { BRAND_ASSETS } from '../lib/brandAssets'
-import { useTheme } from '../context/ThemeContext'
+import SeverinoMark from './SeverinoMark'
 import { logoutHorizonte } from '../lib/logout'
 import { MAIN_NAV_ITEMS } from '../lib/navItems'
 import { version } from '../../package.json'
 
 const SIDEBAR_ICON_PROPS = { strokeWidth: '1.5', width: '22', height: '22' }
+
+/* Seções da sidebar (na ordem de exibição). 'principal' (Dashboard) renderiza
+   sem label, acima das demais. */
+const SIDEBAR_SECTIONS = [
+  { key: 'financas', label: 'Finanças' },
+  { key: 'organizacao', label: 'Organização' },
+  { key: 'conta', label: 'Conta' },
+]
 
 function mergeNavItemClass(isActive, href, pathname, extraClass = '') {
   const on = Boolean(isActive) || pathname === href
@@ -34,10 +41,7 @@ function getFocusableElements(container) {
 }
 
 export default function Sidebar({ menuAberto, setMenuAberto }) {
-  const { theme } = useTheme()
   const { pathname } = useLocation()
-  const isLightTheme = theme !== 'dark'
-  const sidebarMarkSrc = isLightTheme ? BRAND_ASSETS.sidebarMarkLight : BRAND_ASSETS.sidebarMarkDark
   const showAdminNav = canAccessAdminPanelSession()
   const sidebarRef = useRef(null)
   const closeButtonRef = useRef(null)
@@ -126,6 +130,22 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
     }
   }, [menuAberto])
 
+  const renderNavItem = (item) => (
+    <li key={item.to}>
+      <NavLink
+        to={item.to}
+        end={item.end}
+        {...navPrefetchHandlers(item.to)}
+        title={item.title || item.label}
+        className={({ isActive }) => mergeNavItemClass(isActive, item.to, pathname, item.sidebarClassName)}
+        onClick={closeMenu}
+      >
+        <span className="icon-wrap">{item.icon(SIDEBAR_ICON_PROPS)}</span>
+        <span className="nav-item__label">{item.label}</span>
+      </NavLink>
+    </li>
+  )
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -146,16 +166,15 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
         aria-label="Menu principal"
       >
         <div className="brand-wrapper">
-          <span className="brand-stack" aria-label="Severino">
-            <img
-              src={sidebarMarkSrc}
-              alt=""
-              aria-hidden="true"
-              className="brand-mark"
-              decoding="sync"
-            />
+          <Link
+            to="/dashboard"
+            className="brand-stack"
+            aria-label="Severino — ir para o Dashboard"
+            onClick={closeMenu}
+          >
+            <SeverinoMark className="brand-mark" />
             <strong className="brand-wordmark">Severino</strong>
-          </span>
+          </Link>
           <button
             ref={closeButtonRef}
             type="button"
@@ -168,58 +187,22 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
         </div>
 
         <ul className="nav-menu">
-          {MAIN_NAV_ITEMS.filter((item) => item.to !== '/configuracoes').map((item) => (
-            <li key={item.to}>
-              <NavLink
-                to={item.to}
-                end={item.end}
-                {...navPrefetchHandlers(item.to)}
-                title={item.title || item.label}
-                className={({ isActive }) => mergeNavItemClass(isActive, item.to, pathname)}
-                onClick={closeMenu}
-              >
-                <span className="icon-wrap">{item.icon(SIDEBAR_ICON_PROPS)}</span>
-                <span className="nav-item__label">{item.label}</span>
-              </NavLink>
-            </li>
-          ))}
+          {/* Principal (Dashboard) — sem label de seção */}
+          {MAIN_NAV_ITEMS.filter((item) => item.section === 'principal').map(renderNavItem)}
 
-          <li>
-            <NavLink
-              to="/pagamento"
-              end
-              {...navPrefetchHandlers('/pagamento')}
-              title="Pagamento — assinatura mensal (Asaas)"
-              className={({ isActive }) => mergeNavItemClass(isActive, '/pagamento', pathname)}
-              onClick={closeMenu}
-            >
-              <span className="icon-wrap">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="20" height="14" x="2" y="5" rx="2" />
-                  <line x1="2" x2="22" y1="10" y2="10" />
-                </svg>
-              </span>
-              <span className="nav-item__label">Pagamento</span>
-            </NavLink>
-          </li>
-          <li className="nav-section-label nav-section-label--account">
-            <span className="nav-section-label__text">Conta</span>
-          </li>
-          {MAIN_NAV_ITEMS.filter((item) => item.to === '/configuracoes').map((item) => (
-            <li key={item.to}>
-              <NavLink
-                to={item.to}
-                end={item.end}
-                {...navPrefetchHandlers(item.to)}
-                title={item.title || item.label}
-                className={({ isActive }) => mergeNavItemClass(isActive, item.to, pathname, item.sidebarClassName)}
-                onClick={closeMenu}
-              >
-                <span className="icon-wrap">{item.icon(SIDEBAR_ICON_PROPS)}</span>
-                <span className="nav-item__label">{item.label}</span>
-              </NavLink>
-            </li>
-          ))}
+          {/* Demais seções com label */}
+          {SIDEBAR_SECTIONS.map((sec) => {
+            const items = MAIN_NAV_ITEMS.filter((item) => item.section === sec.key)
+            if (items.length === 0) return null
+            return (
+              <Fragment key={sec.key}>
+                <li className="nav-section-label">
+                  <span className="nav-section-label__text">{sec.label}</span>
+                </li>
+                {items.map(renderNavItem)}
+              </Fragment>
+            )
+          })}
 
           {showAdminNav && (
             <>
@@ -302,9 +285,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
           )}
         </ul>
 
-        <span style={{ display: 'block', textAlign: 'center', fontSize: '0.65rem', opacity: 0.35, marginBottom: '6px', letterSpacing: '0.05em' }}>
-          v{version}
-        </span>
+        <span className="sidebar-version">v{version}</span>
 
         <button
           className="logout-btn"

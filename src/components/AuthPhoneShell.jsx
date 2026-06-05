@@ -16,6 +16,8 @@ export default function AuthPhoneShell({
   footer,
   compact = false,
   showBodyLogo = false,
+  /** Nó React renderizado no lugar da imagem (logo vetorial nativa). Tem prioridade sobre `bodyLogoSrc`. */
+  bodyLogoNode,
   /** Se definido com `showBodyLogo`, exibe imagem larga (wordmark); senão mantém ícone quadrado. */
   bodyLogoSrc,
   /** Dimensões nativas do raster (`width`/`height` do PNG) — proporção correta e escalonamento mais limpo. */
@@ -131,7 +133,9 @@ export default function AuthPhoneShell({
 
             {showBodyLogo ? (
               <div className={`flex justify-center ${logoTopClass}`}>
-                {bodyLogoSrc ? (
+                {bodyLogoNode ? (
+                  bodyLogoNode
+                ) : bodyLogoSrc ? (
                   <div className="flex w-full max-w-[min(420px,96vw)] items-center justify-center sm:max-w-[min(440px,98vw)] lg:max-w-[min(560px,94vw)]">
                     <img
                       src={bodyLogoSrc}

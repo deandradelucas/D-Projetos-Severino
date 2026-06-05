@@ -114,6 +114,14 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-m
   opacity: 1;
 }
 
+/* Cor do símbolo (SVG via currentColor) — acompanha o wordmark por tema */
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
+  color: var(--color-text-primary, #0d1117);
+}
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
+  color: #ffffff;
+}
+
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
   font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', var(--tx-dir-font);

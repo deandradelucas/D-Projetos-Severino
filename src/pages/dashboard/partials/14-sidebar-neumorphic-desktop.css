@@ -100,15 +100,17 @@
   .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
     position: relative;
     z-index: 1;
-    margin-bottom: 28px !important;
+    margin-bottom: 18px !important;
     padding: 0 8px;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
-    width: 90px !important;
-    height: 90px !important;
+    width: 48px !important;
+    height: 48px !important;
+    color: var(--sb-text-hi) !important; /* alimenta o currentColor do "S" no SVG */
     filter: none !important;
+    transition: transform 240ms var(--sb-ease) !important;
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
@@ -118,11 +120,17 @@
   /* Brand stack: zero gap + margem negativa no wordmark pra colar de vez */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-stack,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-stack {
-    gap: 0 !important;
+    gap: 10px !important;
+    text-decoration: none !important;
+    cursor: pointer;
+  }
+  /* Microinteração: leve zoom no símbolo ao passar o mouse na marca */
+  .dashboard-container.app-horizon-shell .sidebar .brand-stack:hover .brand-mark {
+    transform: scale(1.05) !important;
   }
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-    margin-left: -10px !important;
+    margin-left: 0 !important;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
@@ -367,11 +375,16 @@
   }
 
   /* ─── Version stamp ─── */
-  .dashboard-container.app-horizon-shell .sidebar > span[style] {
+  .dashboard-container.app-horizon-shell .sidebar .sidebar-version {
     position: relative;
     z-index: 1;
+    display: block;
+    text-align: center;
+    margin-bottom: 6px;
+    opacity: 0.5;
     color: var(--sb-text-faint) !important;
     font-family: 'Inter Variable', system-ui, sans-serif !important;
+    font-size: 0.65rem !important;
     letter-spacing: 0.15em !important;
     text-transform: uppercase;
   }
