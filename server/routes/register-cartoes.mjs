@@ -6,6 +6,7 @@ import {
   excluirCartao,
   faturaDoCartao,
   buscarTransacoesCartao,
+  listarParceladasCartao,
 } from '../lib/cartoes.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { isUuidString } from '../lib/transacao-validate.mjs'
@@ -60,6 +61,22 @@ export function registerCartoesRoutes(app) {
     } catch (error) {
       log.error('buscar historico cartão', error)
       return c.json({ message: error.message || 'Erro ao buscar histórico.' }, 400)
+    }
+  })
+
+  // GET /api/cartoes/:id/parceladas — compras parceladas ativas do cartão
+  app.get('/api/cartoes/:id/parceladas', async (c) => {
+    try {
+      const id = c.req.param('id')
+      if (!isUuidString(id)) return c.json({ message: 'Cartão inválido.' }, 400)
+      const usuarioId = resolveRequestUserId(c)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+      const rows = await listarParceladasCartao(resolveCartaoDataId(parsed, c), id)
+      return c.json(rows)
+    } catch (error) {
+      log.error('listar parceladas cartão', error)
+      return c.json({ message: error.message || 'Erro ao buscar parceladas.' }, 400)
     }
   })
 

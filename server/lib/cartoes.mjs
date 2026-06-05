@@ -218,6 +218,80 @@ export async function buscarTransacoesCartao(usuarioId, cartaoId, termo, limite 
   return data || []
 }
 
+/** Remove o sufixo "(x/n)" da descrição de uma parcela. */
+function limparDescricaoParcela(desc) {
+  return String(desc || '').replace(/\s*\(\d+\/\d+\)\s*$/, '').trim()
+}
+
+/**
+ * Lista as compras PARCELADAS ativas (com parcelas pendentes) de um cartão,
+ * agrupadas por grupo de parcelamento, com progresso e valor restante.
+ */
+export async function listarParceladasCartao(usuarioId, cartaoId) {
+  const supabase = getSupabaseAdmin()
+  const { data: cartao, error: cErr } = await supabase
+    .from('cartoes')
+    .select('id')
+    .eq('id', cartaoId)
+    .eq('usuario_id', usuarioId)
+    .maybeSingle()
+  if (cErr) throw new Error(cErr.message || 'Erro ao buscar cartão.')
+  if (!cartao) throw new Error('Cartão não encontrado.')
+
+  const { data: txs, error } = await supabase
+    .from('transacoes')
+    .select('id, valor, descricao, data_transacao, data_compra, status, recorrente_grupo_id, recorrente_index, recorrente_total')
+    .eq('usuario_id', usuarioId)
+    .eq('cartao_id', cartaoId)
+    .not('recorrente_grupo_id', 'is', null)
+    .order('recorrente_index', { ascending: true })
+  if (error) {
+    log.error('listar parceladas cartao', error)
+    throw new Error(error.message || 'Erro ao buscar parceladas.')
+  }
+
+  const grupos = new Map()
+  for (const t of txs || []) {
+    const gid = t.recorrente_grupo_id
+    if (!grupos.has(gid)) {
+      grupos.set(gid, {
+        grupo_id: gid,
+        descricao: limparDescricaoParcela(t.descricao),
+        data_compra: t.data_compra || null,
+        total: t.recorrente_total || 0,
+        parcelas: [],
+      })
+    }
+    grupos.get(gid).parcelas.push(t)
+  }
+
+  const out = []
+  for (const g of grupos.values()) {
+    const pendentes = g.parcelas.filter((p) => p.status === 'PENDENTE')
+    if (pendentes.length === 0) continue // só ativas (com parcelas a pagar)
+    const total = g.total || g.parcelas.length
+    const valorRestante = pendentes.reduce((s, p) => s + (Number(p.valor) || 0), 0)
+    const proxima = pendentes.reduce(
+      (min, p) => (!min || (p.recorrente_index || Infinity) < (min.recorrente_index || Infinity) ? p : min),
+      null
+    )
+    out.push({
+      grupo_id: g.grupo_id,
+      descricao: g.descricao,
+      data_compra: g.data_compra,
+      total,
+      pendentes: pendentes.length,
+      pagas: Math.max(0, total - pendentes.length),
+      proxima_parcela: proxima?.recorrente_index ?? total - pendentes.length + 1,
+      proximo_vencimento: proxima?.data_transacao ?? null,
+      valor_parcela: Number(proxima?.valor) || 0,
+      valor_restante: valorRestante,
+    })
+  }
+  out.sort((a, b) => String(a.proximo_vencimento || '').localeCompare(String(b.proximo_vencimento || '')))
+  return out
+}
+
 /** Fatura detalhada de um cartão para uma referência (YYYY-MM = mês de fechamento). */
 export async function faturaDoCartao(usuarioId, cartaoId, ref) {
   const supabase = getSupabaseAdmin()

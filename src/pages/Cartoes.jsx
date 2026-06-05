@@ -146,6 +146,28 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
   const [resultados, setResultados] = useState(null) // null = não está buscando
   const [buscando, setBuscando] = useState(false)
   const buscaAtiva = busca.trim().length >= 2
+  const [aba, setAba] = useState('fatura') // 'fatura' | 'parceladas'
+  const [parceladas, setParceladas] = useState(null)
+  const [loadingParc, setLoadingParc] = useState(false)
+
+  // Compras parceladas ativas do cartão (aba Parceladas)
+  useEffect(() => {
+    if (aba !== 'parceladas') return undefined
+    let cancel = false
+    const load = async () => {
+      setLoadingParc(true)
+      const sep = pessoalParam ? '?pessoal=1' : ''
+      try {
+        const res = await apiFetch(apiUrl(`/api/cartoes/${cartao.id}/parceladas${sep}`), { cache: 'no-store' })
+        const data = res.ok ? await res.json() : []
+        if (!cancel) setParceladas(Array.isArray(data) ? data : [])
+      } catch { if (!cancel) setParceladas([]) } finally {
+        if (!cancel) setLoadingParc(false)
+      }
+    }
+    void load()
+    return () => { cancel = true }
+  }, [aba, cartao.id, pessoalParam])
 
   // Fatura do mês (quando não está buscando)
   useEffect(() => {
@@ -188,10 +210,43 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
     <div className="page-cartoes__modal-overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="page-cartoes__modal page-cartoes__modal--fatura" role="dialog" aria-modal="true">
         <div className="page-cartoes__modal-head">
-          <h2 className="page-cartoes__modal-title">{cartao.nome} · fatura</h2>
+          <h2 className="page-cartoes__modal-title">{cartao.nome}</h2>
           <button type="button" className="page-cartoes__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
 
+        <div className="page-cartoes__abas" role="tablist">
+          <button type="button" role="tab" aria-selected={aba === 'fatura'} className={`page-cartoes__aba${aba === 'fatura' ? ' is-ativa' : ''}`} onClick={() => setAba('fatura')}>Fatura</button>
+          <button type="button" role="tab" aria-selected={aba === 'parceladas'} className={`page-cartoes__aba${aba === 'parceladas' ? ' is-ativa' : ''}`} onClick={() => setAba('parceladas')}>Parceladas</button>
+        </div>
+
+        {aba === 'parceladas' ? (
+          <div className="page-cartoes__fatura-body">
+            {loadingParc ? (
+              <p className="page-cartoes__muted">Carregando…</p>
+            ) : !parceladas || parceladas.length === 0 ? (
+              <p className="page-cartoes__muted">Nenhuma compra parcelada em andamento neste cartão.</p>
+            ) : (
+              <ul className="page-cartoes__parc-list">
+                {parceladas.map((p) => (
+                  <li key={p.grupo_id} className="page-cartoes__parc">
+                    <div className="page-cartoes__parc-top">
+                      <span className="page-cartoes__parc-desc">{p.descricao || 'Compra parcelada'}</span>
+                      <span className="page-cartoes__parc-restante">{formatCurrencyBRL(p.valor_restante)}</span>
+                    </div>
+                    <div className="page-cartoes__parc-meta">
+                      <span>{p.pagas}/{p.total} pagas · {formatCurrencyBRL(p.valor_parcela)}/mês</span>
+                      {p.proximo_vencimento && <span>próx. {fmtDataCurta(p.proximo_vencimento)}</span>}
+                    </div>
+                    <div className="page-cartoes__parc-bar" aria-hidden>
+                      <div className="page-cartoes__parc-bar-fill" style={{ width: `${p.total ? Math.round((p.pagas / p.total) * 100) : 0}%` }} />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ) : (
+        <>
         <div className="page-cartoes__busca">
           <input
             type="search"
@@ -267,6 +322,8 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
             </ul>
           )}
         </div>
+        </>
+        )}
       </div>
     </div>
   )

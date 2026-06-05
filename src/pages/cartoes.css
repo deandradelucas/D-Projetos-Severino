@@ -330,6 +330,66 @@
 .page-cartoes__tx-valor { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .page-cartoes__tx-valor--in { color: #16a34a; }
 
+/* ── Abas (Fatura | Parceladas) no detalhe do cartão ── */
+.page-cartoes__abas {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 14px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+}
+.page-cartoes__aba {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.page-cartoes__aba.is-ativa {
+  background: var(--bg-card);
+  color: var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Lista de compras parceladas ── */
+.page-cartoes__parc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.page-cartoes__parc {
+  padding: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 14px;
+}
+.page-cartoes__parc-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.page-cartoes__parc-desc { font-weight: 600; color: var(--text-primary); }
+.page-cartoes__parc-restante { font-weight: 700; color: var(--accent); white-space: nowrap; }
+.page-cartoes__parc-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.page-cartoes__parc-bar {
+  margin-top: 10px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+.page-cartoes__parc-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
 @media (max-width: 768px) {
   .page-cartoes__grid { grid-template-columns: 1fr; }
   /* iOS: font-size < 16px dispara zoom automático ao focar — força 16px no mobile */
