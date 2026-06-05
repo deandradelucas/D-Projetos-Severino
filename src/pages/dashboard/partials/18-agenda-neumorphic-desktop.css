@@ -8,7 +8,11 @@
 @media (min-width: 769px) {
 
   /* ─── Tokens locais ─── */
-  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell {
+  /* O modal é renderizado via createPortal em document.body — fora do
+     .dashboard-container. Incluímos .agenda-modal-backdrop aqui para que os
+     tokens --ag-* fiquem disponíveis dentro do modal portaled. */
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell,
+  body[data-theme='dark'] .agenda-modal-backdrop {
     --ag-surface-base: #0e1117;
     --ag-surface-raised: #11141a;
     --ag-surface-sunken: #07090d;
@@ -33,7 +37,8 @@
     --ag-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --ag-r: 20px;
   }
-  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell {
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell,
+  body[data-theme='light'] .agenda-modal-backdrop {
     --ag-surface-base: #eef1f6;
     --ag-surface-raised: #ffffff;
     --ag-surface-sunken: #e4e8ee;
@@ -1210,6 +1215,17 @@
     transform: translateX(-50%) !important;
     border: 6px solid transparent !important;
     border-top-color: var(--ag-surface-raised) !important;
+  }
+  /* Primeira linha do calendário: preview abaixo da célula (não cobre o header) */
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview--below {
+    top: calc(100% + 8px) !important;
+    bottom: auto !important;
+  }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview--below::after {
+    top: auto !important;
+    bottom: 100% !important;
+    border-top-color: transparent !important;
+    border-bottom-color: var(--ag-surface-raised) !important;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__row {
     display: flex !important;

@@ -87,9 +87,11 @@ export function AgendaCalendarPanel({
           <span className="agenda-calendar-day__count">{dayEvents.length}</span>
         ) : null}
 
-        {/* Hover preview (feature 5) — só na visão mensal */}
+        {/* Hover preview (feature 5) — só na visão mensal.
+            Na primeira linha do grid o preview vai PARA BAIXO da célula
+            (--below) para não cobrir o cabeçalho do calendário. */}
         {!opts.week && hoverKey === day.key && dayEvents.length > 0 ? (
-          <span className="agenda-day-preview" role="tooltip">
+          <span className={`agenda-day-preview${opts.firstRow ? ' agenda-day-preview--below' : ''}`} role="tooltip">
             {dayEvents.slice(0, 4).map((ev) => {
               const meta = AGENDA_KIND_META[agendaItemKind(ev)]
               return (
@@ -157,7 +159,7 @@ export function AgendaCalendarPanel({
             ))}
           </div>
           <div className="agenda-calendar-grid">
-            {calendarDays.map((day) => renderDay(day))}
+            {calendarDays.map((day, i) => renderDay(day, { firstRow: i < 7 }))}
           </div>
         </>
       )}
