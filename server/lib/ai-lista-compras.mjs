@@ -13,14 +13,19 @@ Analise a mensagem e retorne APENAS um JSON com a estrutura abaixo — sem texto
 
 INTENTS possíveis:
 - "ADICIONAR_ITENS": usuário quer adicionar item(ns) a uma lista existente
-- "CRIAR_LISTA": usuário quer criar uma nova lista de compras
+- "CRIAR_LISTA": usuário quer criar uma nova lista de compras (PODE já incluir itens iniciais)
 - "VER_LISTA": usuário quer ver o conteúdo de uma lista
 - "CHAT": mensagem não é sobre lista de compras
 
 CAMPOS:
 - "intent": string (um dos 4 acima)
 - "lista_nome": nome da lista mencionada (null se não mencionou)
-- "itens": array de itens a adicionar (apenas para ADICIONAR_ITENS)
+- "itens": array de itens (para ADICIONAR_ITENS e também para CRIAR_LISTA quando o usuário já cita itens)
+
+REGRAS IMPORTANTES:
+- Os itens podem vir na mesma linha (separados por vírgula/"e") OU em linhas separadas (uma por linha). Capture TODOS.
+- Se o usuário NÃO mencionar o nome da lista, retorne "lista_nome": null — NÃO invente um nome.
+- Em CRIAR_LISTA, "lista_nome" é o nome da lista nova; os produtos citados vão em "itens".
 
 Cada item em "itens" deve ter:
 - "nome": string (nome do produto, sem quantidade/unidade)
@@ -46,11 +51,24 @@ Saída: {"intent":"ADICIONAR_ITENS","lista_nome":"Mercado","itens":[{"nome":"arr
 Entrada: "cria uma lista chamada Farmácia"
 Saída: {"intent":"CRIAR_LISTA","lista_nome":"Farmácia","itens":[]}
 
+Entrada: "cria a lista Feira com banana, maçã e 1kg de tomate"
+Saída: {"intent":"CRIAR_LISTA","lista_nome":"Feira","itens":[{"nome":"banana","quantidade":1,"unidade":"un"},{"nome":"maçã","quantidade":1,"unidade":"un"},{"nome":"tomate","quantidade":1,"unidade":"kg"}]}
+
 Entrada: "quero ver minha lista da feira"
 Saída: {"intent":"VER_LISTA","lista_nome":"feira","itens":[]}
 
 Entrada: "coloca 300g de queijo, 6 ovos e uma caixa de suco na lista Mercado"
 Saída: {"intent":"ADICIONAR_ITENS","lista_nome":"Mercado","itens":[{"nome":"queijo","quantidade":300,"unidade":"g"},{"nome":"ovos","quantidade":6,"unidade":"un"},{"nome":"suco","quantidade":1,"unidade":"cx"}]}
+
+Entrada (itens em linhas separadas):
+"adiciona na lista Mercado:
+arroz
+feijão
+2kg de açúcar"
+Saída: {"intent":"ADICIONAR_ITENS","lista_nome":"Mercado","itens":[{"nome":"arroz","quantidade":1,"unidade":"un"},{"nome":"feijão","quantidade":1,"unidade":"un"},{"nome":"açúcar","quantidade":2,"unidade":"kg"}]}
+
+Entrada (sem citar a lista): "adiciona leite e pão"
+Saída: {"intent":"ADICIONAR_ITENS","lista_nome":null,"itens":[{"nome":"leite","quantidade":1,"unidade":"un"},{"nome":"pão","quantidade":1,"unidade":"un"}]}
 
 Entrada: "não consigo dormir"
 Saída: {"intent":"CHAT","lista_nome":null,"itens":[]}
