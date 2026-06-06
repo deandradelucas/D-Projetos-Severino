@@ -149,6 +149,9 @@ function detectarCategoria(nome) {
 // Formatação BRL única do app (ver lib/formatCurrency.js)
 const formatarMoeda = formatCurrencyBRL
 
+// localStorage: id da última lista aberta/editada (para reabrir ao voltar à aba)
+const LISTA_ULTIMA_KEY = 'lista_compras_ultima'
+
 function dataHojeIso() {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -1164,16 +1167,30 @@ export default function ListaDeCompras() {
       if (!res.ok) return
       const data = await res.json()
       setListas(data)
-      // Landa na «visão geral» (sem auto-abrir): mostra as abas + o FAB «Nova lista» grande
-      // (padrão dos outros FABs). Usuário toca numa aba para abrir a lista.
-      setListaAtiva(null)
-      setItens([])
+      // Abre a ÚLTIMA lista que o usuário editou (id persistido em localStorage);
+      // fallback: a mais recente (data[0], que o server ordena por criada_em desc).
+      let alvoId = null
+      try {
+        const saved = localStorage.getItem(LISTA_ULTIMA_KEY)
+        if (saved && data.some((l) => String(l.id) === String(saved))) alvoId = saved
+      } catch { /* localStorage indisponível */ }
+      if (!alvoId && data.length > 0) alvoId = String(data[0].id)
+      const alvo = alvoId ? data.find((l) => String(l.id) === String(alvoId)) : null
+      setListaAtiva(alvo ? alvo.id : null)
+      setItens(alvo?.itens || [])
     } catch {
       // silencioso
     } finally {
       setLoading(false)
     }
   }, [])
+
+  // Persiste a lista ativa para reabri-la na próxima visita à aba (ver carregarListas).
+  useEffect(() => {
+    if (listaAtiva) {
+      try { localStorage.setItem(LISTA_ULTIMA_KEY, String(listaAtiva)) } catch { /* noop */ }
+    }
+  }, [listaAtiva])
 
   const carregarItens = useCallback(async (listaId, pp = '') => {
     if (!listaId) return
