@@ -690,35 +690,6 @@ export default function Relatorios() {
             </div>
         </header>
 
-        {/* Filtro rápido de período — chips sempre visíveis (estilo Transações) */}
-        <div className="rel-ed__quick" role="toolbar" aria-label="Filtro rápido de período">
-          {[
-            { id: 'thisMonth', label: 'Mês atual' },
-            { id: 'lastMonth', label: 'Mês passado' },
-            { id: 'last90', label: '90 dias' },
-            { id: 'thisYear', label: 'Ano' },
-          ].map((qf) => (
-            <button
-              key={qf.id}
-              type="button"
-              className={`rel-ed__quick-chip${activePeriodId === qf.id ? ' rel-ed__quick-chip--active' : ''}`}
-              aria-pressed={activePeriodId === qf.id}
-              onClick={() => setPeriodShortcut(qf.id)}
-            >
-              {qf.label}
-            </button>
-          ))}
-          {filters.categoria_id && (
-            <button
-              type="button"
-              className="rel-ed__quick-chip rel-ed__quick-chip--reset"
-              onClick={() => setFilters((p) => ({ ...p, categoria_id: '' }))}
-            >
-              {selectedCategoryName} ✕
-            </button>
-          )}
-        </div>
-
         {/* Insights strip */}
         {!loading && transacoes.length > 0 && (() => {
           const taxaPoupanca = summary.receitas > 0 ? Math.max(0, (summary.saldo / summary.receitas) * 100) : 0
@@ -972,6 +943,35 @@ export default function Relatorios() {
             </div>
           </div>
         </article>
+
+        {/* Filtro rápido de período — chips, abaixo do painel de Filtros */}
+        <div className="rel-ed__quick" role="toolbar" aria-label="Filtro rápido de período">
+          {[
+            { id: 'thisMonth', label: 'Mês atual' },
+            { id: 'lastMonth', label: 'Mês passado' },
+            { id: 'last90', label: '90 dias' },
+            { id: 'thisYear', label: 'Ano' },
+          ].map((qf) => (
+            <button
+              key={qf.id}
+              type="button"
+              className={`rel-ed__quick-chip${activePeriodId === qf.id ? ' rel-ed__quick-chip--active' : ''}`}
+              aria-pressed={activePeriodId === qf.id}
+              onClick={() => setPeriodShortcut(qf.id)}
+            >
+              {qf.label}
+            </button>
+          ))}
+          {filters.categoria_id && (
+            <button
+              type="button"
+              className="rel-ed__quick-chip rel-ed__quick-chip--reset"
+              onClick={() => setFilters((p) => ({ ...p, categoria_id: '' }))}
+            >
+              {selectedCategoryName} ✕
+            </button>
+          )}
+        </div>
 
         {loading ? (
           <RelatoriosChartsLoadingShell />
