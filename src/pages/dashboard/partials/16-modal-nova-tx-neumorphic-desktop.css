@@ -150,6 +150,9 @@
   body[data-theme='light'] .modal-content--nova-tx .close-btn:hover {
     color: var(--ntx-neg) !important;
     background: var(--ntx-neg-soft) !important;
+    /* Sem o rotate(90deg) herdado: o X usa SVG e tem padding-top de 2px, então
+       girar fazia o glifo "deslizar" pra esquerda. Hover limpo só com cor/fundo. */
+    transform: none !important;
   }
 
   /* Modal body padding */
