@@ -1,5 +1,6 @@
 import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
+import { fimDoDiaBrtIso } from './date-brt.mjs'
 
 /**
  * Ativa parcelas de parcelamentos cujo vencimento já chegou.
@@ -10,10 +11,9 @@ import { getSupabaseAdmin } from './supabase-admin.mjs'
  */
 export async function processarParcelasPendentes() {
   const supabase = getSupabaseAdmin()
-  // Ativa tudo com data <= fim do dia de hoje (UTC), para cobrir qualquer horário salvo
-  const hoje = new Date()
-  const hojeStr = hoje.toISOString().slice(0, 10)
-  const fimDoDia = `${hojeStr}T23:59:59.999Z`
+  // Ativa tudo com vencimento <= fim do dia de HOJE em BRT (não UTC: às 21h BRT o
+  // UTC já é o dia seguinte, o que ativava parcelas um dia cedo).
+  const fimDoDia = fimDoDiaBrtIso()
 
   const { data, error } = await supabase
     .from('transacoes')

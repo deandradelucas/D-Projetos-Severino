@@ -9,6 +9,7 @@ import { detectExtratoPedido, montarRespostaExtratoWhatsApp } from './whatsapp-e
 import { resolveEscopoUsuario, assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 import { resolverCategoriaPorCorrecao } from './transacao-categoria-logger.mjs'
 import { computeAssinaturaFlags } from '../assinatura-flags.mjs'
+import { hojeYmdBrt } from '../date-brt.mjs'
 import { dispararAlertasTransacao, upsertLimiteOrcamento, listarLimitesOrcamento } from './alertas-financeiros.mjs'
 import { listarInvestimentosUsuario } from '../investimentos.mjs'
 import {
@@ -197,11 +198,15 @@ function fmt(v) {
 export function resolveDataTransacaoParaBot(parsed) {
   const raw = parsed?.data_transacao
   if (raw == null || raw === '') {
-    return { iso: new Date().toISOString(), explicit: false }
+    // Sem data explícita: usa HOJE em BRT ao meio-dia (evita gravar no dia seguinte
+    // quando a mensagem chega após 21h BRT, quando o UTC já virou o dia).
+    return { iso: `${hojeYmdBrt()}T12:00:00-03:00`, explicit: false }
   }
   const d = new Date(raw)
   if (Number.isNaN(d.getTime())) {
-    return { iso: new Date().toISOString(), explicit: false }
+    // Sem data explícita: usa HOJE em BRT ao meio-dia (evita gravar no dia seguinte
+    // quando a mensagem chega após 21h BRT, quando o UTC já virou o dia).
+    return { iso: `${hojeYmdBrt()}T12:00:00-03:00`, explicit: false }
   }
   return { iso: d.toISOString(), explicit: true }
 }

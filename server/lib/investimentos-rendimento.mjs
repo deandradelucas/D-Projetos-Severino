@@ -50,7 +50,10 @@ function feriadosBr(year) {
   const s = new Set()
   const add = (mo, day) => s.add(ymd(new Date(year, mo, day)))
   add(0, 1); add(3, 21); add(4, 1); add(8, 7); add(9, 12)
-  add(10, 2); add(10, 15); add(10, 20); add(11, 25)
+  add(10, 2); add(10, 15); add(11, 25)
+  // Consciência Negra é feriado federal só a partir de 2023 (Lei 14.759/2023).
+  // Antes disso havia pregão CDI normal — manter alinhado com o front (investimentosRendimentoIr.js).
+  if (year >= 2023) add(10, 20)
   const p = pascoa(year)
   const shift = (base, d) => { const x = new Date(base); x.setDate(x.getDate() + d); return x }
   s.add(ymd(shift(p, -48))); s.add(ymd(shift(p, -47)))
@@ -73,16 +76,25 @@ function parseDateLocal(iso) {
   return Number.isNaN(d.getTime()) ? null : d
 }
 
+function ehDiaUtil(d) {
+  const dow = d.getDay()
+  return dow >= 1 && dow <= 5 && !feriados(d.getFullYear()).has(ymd(d))
+}
+
 export function contarDiasUteis(isoInicio, dataFim = new Date()) {
-  const start = parseDateLocal(isoInicio)
-  if (!start) return 0
+  const aquis = parseDateLocal(isoInicio)
+  if (!aquis) return 0
+  // CDI rende a partir do 1º pregão DEPOIS da aquisição (D+1 útil), não no dia da
+  // aplicação. Alinha com o front (dataLocalInicioRendimentoCdiApartirDeIso).
+  const start = new Date(aquis.getFullYear(), aquis.getMonth(), aquis.getDate())
+  start.setDate(start.getDate() + 1)
+  while (!ehDiaUtil(start)) start.setDate(start.getDate() + 1)
   const end = new Date(dataFim.getFullYear(), dataFim.getMonth(), dataFim.getDate())
   if (end < start) return 0
   let n = 0
   const walk = new Date(start)
   while (walk <= end) {
-    const dow = walk.getDay()
-    if (dow >= 1 && dow <= 5 && !feriados(walk.getFullYear()).has(ymd(walk))) n++
+    if (ehDiaUtil(walk)) n++
     walk.setDate(walk.getDate() + 1)
   }
   return n
@@ -170,7 +182,7 @@ export function calcularRendimentoInvestimento(inv, cdiAa) {
 
   let bruto = 0, liquido = 0, brutoAcum = 0, liquidoAcum = 0
   let duTotal = 0, dcTotal = 0
-  let aliquota = 0, isento = false
+  let isento = false
 
   for (const ap of aportesList) {
     const r = calcAporte(Number(ap.valor), percentual_cdi, cdiAa, tipo_indexador, tipo_preset, ap.data_aquisicao)
@@ -180,9 +192,13 @@ export function calcularRendimentoInvestimento(inv, cdiAa) {
     liquidoAcum += r.liquidoAcum
     duTotal = Math.max(duTotal, r.diasUteis)
     dcTotal = Math.max(dcTotal, r.diasCorr)
-    aliquota = r.aliquota
     isento = r.isento
   }
+
+  // Alíquota efetiva ponderada (IR total / rendimento bruto acumulado). Antes
+  // retornava a alíquota do ÚLTIMO aporte iterado — enganoso quando os aportes
+  // têm datas distintas (faixas regressivas diferentes).
+  const aliquota = brutoAcum > 0 ? (brutoAcum - liquidoAcum) / brutoAcum : 0
 
   return { bruto, liquido, brutoAcum, liquidoAcum, aliquota, isento, diasUteis: duTotal, diasCorr: dcTotal }
 }

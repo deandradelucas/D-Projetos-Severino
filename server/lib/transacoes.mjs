@@ -1,6 +1,11 @@
 import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 
+/** Escapa curingas do LIKE (% e _) e a barra de escape, evitando wildcard injection na busca livre. */
+function escapeIlike(s) {
+  return String(s || '').replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')
+}
+
 /** Normaliza `tipo` vindo do banco ou do front para o CHECK da tabela (`DESPESA` | `RECEITA`). */
 export function normalizeTipoCategoria(t) {
   const u = String(t ?? '').trim().toUpperCase()
@@ -388,7 +393,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
     if (tipo) query = query.eq('tipo', tipo)
     if (categoria_id) query = query.eq('categoria_id', categoria_id)
     if (status) query = query.eq('status', status)
-    if (busca) query = query.ilike('descricao', `%${busca}%`)
+    if (busca) query = query.ilike('descricao', `%${escapeIlike(busca)}%`)
 
     if (somenteParceladas) {
       /* Filtro explícito: parcelas de compras parceladas + recorrências
@@ -428,7 +433,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
       .eq('status', 'PENDENTE')
     if (tipo) q = q.eq('tipo', tipo)
     if (categoria_id) q = q.eq('categoria_id', categoria_id)
-    if (busca) q = q.ilike('descricao', `%${busca}%`)
+    if (busca) q = q.ilike('descricao', `%${escapeIlike(busca)}%`)
     const { data: parcelasData } = await q
       .order('recorrente_grupo_id', { ascending: true })
       .order('recorrente_index', { ascending: true })

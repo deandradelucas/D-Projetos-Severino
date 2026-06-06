@@ -86,7 +86,7 @@ export function registerCartoesRoutes(app) {
       const usuarioId = resolveRequestUserId(c)
       const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
-      if (!rateLimitTake(`cartoes-create:${clientKeyFromHono(c)}`, 30, 60_000)) {
+      if (!await rateLimitTake(`cartoes-create:${clientKeyFromHono(c)}`, 30, 60_000)) {
         return c.json({ message: 'Muitas tentativas. Aguarde um instante.' }, 429)
       }
       const body = await c.req.json().catch(() => ({}))

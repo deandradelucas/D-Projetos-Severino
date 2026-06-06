@@ -1,18 +1,21 @@
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { log } from '../logger.mjs'
 import { sendEvolutionText } from '../evolution-send.mjs'
+import { partesBrt } from '../date-brt.mjs'
 
 function fmt(v) {
   return 'R$ ' + (Number(v) || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
 function mesAtualRange() {
-  const now = new Date()
-  const y = now.getUTCFullYear()
-  const m = now.getUTCMonth()
+  // Mês corrente em BRT (não UTC: nas últimas 3h do mês, o UTC já é o mês seguinte).
+  const { ano, mes } = partesBrt() // mes 1-12
+  const pad = (n) => String(n).padStart(2, '0')
+  const proxAno = mes === 12 ? ano + 1 : ano
+  const proxMes = mes === 12 ? 1 : mes + 1
   return {
-    inicio: new Date(Date.UTC(y, m, 1)).toISOString().split('T')[0],
-    fimExclusivo: new Date(Date.UTC(y, m + 1, 1)).toISOString().split('T')[0],
+    inicio: `${ano}-${pad(mes)}-01`,
+    fimExclusivo: `${proxAno}-${pad(proxMes)}-01`,
   }
 }
 

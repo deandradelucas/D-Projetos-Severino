@@ -38,6 +38,12 @@ export function registerAuthRoutes(app) {
         return c.json({ message: 'Informe um e-mail válido.' }, 400)
       }
 
+      // Rate-limit por EMAIL (além do por IP): trava brute-force num alvo específico
+      // mesmo que o atacante rotacione IPs (proxy/Tor).
+      if (!await rateLimitTake(`login-email:${email}`, 10, 15 * 60_000)) {
+        return c.json({ message: 'Muitas tentativas para este e-mail. Aguarde alguns minutos.' }, 429)
+      }
+
       if (!password) {
         return c.json({ message: 'Preencha a senha.' }, 400)
       }

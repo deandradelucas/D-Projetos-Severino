@@ -1,5 +1,6 @@
 import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
+import { safeEqualStr } from './safe-equal.mjs'
 
 const TZ = 'America/Sao_Paulo'
 
@@ -251,7 +252,7 @@ export function assertCronSecret(c) {
   const auth = c.req.header('authorization') || ''
   const bearer = auth.startsWith('Bearer ') ? auth.slice(7).trim() : ''
   const header = c.req.header('x-cron-secret') || ''
-  if (bearer === expected || header === expected) {
+  if (safeEqualStr(bearer, expected) || safeEqualStr(header, expected)) {
     return { ok: true }
   }
   return { ok: false, status: 401, message: 'Não autorizado.' }

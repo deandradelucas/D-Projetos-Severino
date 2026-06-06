@@ -24,6 +24,13 @@ import { AsaasPixPrecisaCpfError, criarPixAnualComQrCode } from '../lib/asaas-pi
 import { assertAgendaCronSecret } from '../lib/http/agenda-route-auth.mjs'
 import { processExtratoRenovacaoCron } from '../lib/extrato-renovacao.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
+import { isValidCpfCnpj } from '../lib/cpf-cnpj.mjs'
+
+// Throttle do sync Asaas no GET /pagamentos/minhas: evita martelar a API externa a
+// cada abertura da tela (regra SYNC>CACHE). O webhook cobre updates em tempo real;
+// aqui basta uma sincronização eventual (cooldown por usuário). Em memória (worker único PM2).
+const _ultimoSyncPagamentos = new Map() // billingId -> epoch ms
+const SYNC_PAGAMENTOS_COOLDOWN_MS = 5 * 60_000
 
 async function buscarUidPorSubscriptionId(sid) {
   if (!sid) return null
@@ -77,8 +84,13 @@ export function registerPagamentosRoutes(app) {
       } catch {
         /* mantém usuarioId */
       }
-      await sincronizarPagamentosPendentesDoUsuario(billingId)
-      await sincronizarSubscriptionUsuario(billingId).catch(() => {})
+      const agora = Date.now()
+      if (agora - (_ultimoSyncPagamentos.get(billingId) || 0) > SYNC_PAGAMENTOS_COOLDOWN_MS) {
+        _ultimoSyncPagamentos.set(billingId, agora)
+        // Best-effort: se o Asaas falhar/estiver em rate-limit, servimos do DB mesmo assim.
+        await sincronizarPagamentosPendentesDoUsuario(billingId).catch(() => {})
+        await sincronizarSubscriptionUsuario(billingId).catch(() => {})
+      }
       const rows = await listPagamentosUsuario(billingId)
       return c.json(rows)
     } catch (error) {
@@ -120,6 +132,9 @@ export function registerPagamentosRoutes(app) {
       const cpfCnpj = String(body?.cpf_cnpj || '').replace(/\D/g, '').slice(0, 14)
       if (!cpfCnpj) {
         return c.json({ message: 'Informe seu CPF ou CNPJ para continuar.' }, 400)
+      }
+      if (!isValidCpfCnpj(cpfCnpj)) {
+        return c.json({ message: 'CPF ou CNPJ inválido. Confira os números.' }, 400)
       }
 
       const precoMensalCfg = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')

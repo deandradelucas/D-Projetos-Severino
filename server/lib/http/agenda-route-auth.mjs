@@ -1,4 +1,5 @@
 import { log } from '../logger.mjs'
+import { safeEqualStr } from '../safe-equal.mjs'
 
 export function assertAgendaCronSecret(c) {
   const allowed = [
@@ -19,7 +20,7 @@ export function assertAgendaCronSecret(c) {
   const headers = [bearer, c.req.header('x-cron-secret'), c.req.header('x-agenda-reminder-secret')]
     .map((value) => String(value || '').trim())
     .filter(Boolean)
-  if (headers.some((value) => allowed.includes(value))) return { ok: true }
+  if (headers.some((h) => allowed.some((a) => safeEqualStr(h, a)))) return { ok: true }
 
   return { ok: false, status: 401, message: 'Não autorizado.' }
 }
