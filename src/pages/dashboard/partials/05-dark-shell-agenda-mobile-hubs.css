@@ -269,7 +269,7 @@ body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__actions .dashboard
 
 .agenda-page .agenda-hero__title-row > strong {
   color: #ffffff;
-  font-size: clamp(1.9rem, 4.4vw, 2.7rem);
+  /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
   font-weight: 820;
   letter-spacing: -0.06em;
   line-height: 1.15;
@@ -1807,9 +1807,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
     line-height: 1.06;
   }
 
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
-    font-size: clamp(0.86rem, 3.15vw, 1rem);
-  }
+  /* título de Transações: tamanho via token --page-title-size (partial 38) */
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
     flex-direction: row;
@@ -2714,7 +2712,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
-    font-size: clamp(0.84rem, 3.1vw, 0.98rem) !important;
+    /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
     line-height: 1.12 !important;
   }
 

@@ -161,7 +161,7 @@ body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.a
 }
 
 .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__title {
-  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.2;

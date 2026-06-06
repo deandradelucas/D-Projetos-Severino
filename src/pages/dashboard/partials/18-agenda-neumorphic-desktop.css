@@ -196,7 +196,7 @@
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title > .agenda-hero__title-row > strong {
     font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
     font-weight: 700 !important;
-    font-size: clamp(1.5rem, 1.6vw + 0.8rem, 2rem) !important;
+    /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
     letter-spacing: -0.025em !important;
     color: var(--ag-text-hi) !important;
   }

@@ -111,7 +111,7 @@
     clip: auto !important;
     clip-path: none !important;
     white-space: nowrap !important;
-    font-size: clamp(1.9rem, 4.4vw, 2.7rem);
+    /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.2;
@@ -120,7 +120,7 @@
 
 .page-lista-compras__title {
   margin: 0;
-  font-size: clamp(1.9rem, 4.4vw, 2.7rem);
+  /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
