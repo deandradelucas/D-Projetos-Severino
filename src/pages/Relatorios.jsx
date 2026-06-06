@@ -247,6 +247,22 @@ export default function Relatorios() {
     showToast('Período atualizado')
   }
 
+  // Qual atalho de período corresponde ao filtro atual (para destacar o chip ativo).
+  const activePeriodId = useMemo(() => {
+    const today = new Date()
+    const presets = {
+      thisMonth: [getFirstDayOfMonth(today), getLastDayOfMonth(today)],
+      lastMonth: [new Date(today.getFullYear(), today.getMonth() - 1, 1), new Date(today.getFullYear(), today.getMonth(), 0)],
+      thisYear: [new Date(today.getFullYear(), 0, 1), new Date(today.getFullYear(), 11, 31)],
+    }
+    for (const [id, [s, e]] of Object.entries(presets)) {
+      if (filters.dataInicio === formatLocalDateISO(s) && filters.dataFim === formatLocalDateISO(e)) return id
+    }
+    const s90 = new Date(); s90.setDate(today.getDate() - 90)
+    if (filters.dataInicio === formatLocalDateISO(s90) && filters.dataFim === formatLocalDateISO(today)) return 'last90'
+    return null
+  }, [filters.dataInicio, filters.dataFim])
+
   // Lista de meses 'YYYY-MM' dentro do período filtrado — usada como base para
   // a projeção das recorrências ativas no gráfico de Recorrentes.
   const periodoMeses = useMemo(() => {
@@ -673,6 +689,35 @@ export default function Relatorios() {
               )}
             </div>
         </header>
+
+        {/* Filtro rápido de período — chips sempre visíveis (estilo Transações) */}
+        <div className="rel-ed__quick" role="toolbar" aria-label="Filtro rápido de período">
+          {[
+            { id: 'thisMonth', label: 'Mês atual' },
+            { id: 'lastMonth', label: 'Mês passado' },
+            { id: 'last90', label: '90 dias' },
+            { id: 'thisYear', label: 'Ano' },
+          ].map((qf) => (
+            <button
+              key={qf.id}
+              type="button"
+              className={`rel-ed__quick-chip${activePeriodId === qf.id ? ' rel-ed__quick-chip--active' : ''}`}
+              aria-pressed={activePeriodId === qf.id}
+              onClick={() => setPeriodShortcut(qf.id)}
+            >
+              {qf.label}
+            </button>
+          ))}
+          {filters.categoria_id && (
+            <button
+              type="button"
+              className="rel-ed__quick-chip rel-ed__quick-chip--reset"
+              onClick={() => setFilters((p) => ({ ...p, categoria_id: '' }))}
+            >
+              {selectedCategoryName} ✕
+            </button>
+          )}
+        </div>
 
         {/* Insights strip */}
         {!loading && transacoes.length > 0 && (() => {
