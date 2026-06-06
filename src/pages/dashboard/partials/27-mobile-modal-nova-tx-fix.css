@@ -21,9 +21,9 @@
     /* safe-area é tratada só no footer (.modal-actions). Aqui fica 0 para não
        duplicar e criar a faixa branca abaixo dos botões no iPhone. */
     padding-bottom: 0 !important;
-    /* bordas laterais mais justas no celular (era 18px herdado do partial 24) */
-    padding-left: 12px !important;
-    padding-right: 12px !important;
+    /* bordas laterais com mais respiro no celular */
+    padding-left: 16px !important;
+    padding-right: 16px !important;
     overflow-x: hidden !important;            /* mata o deslize lateral */
     overscroll-behavior: contain !important;  /* sem rubber-band / puxar */
   }
@@ -138,13 +138,13 @@
   }
 
   /* ───────────────────────── Labels ───────────────────────── */
-  .modal-content--nova-tx .form-group { margin-bottom: 7px !important; }
+  .modal-content--nova-tx .form-group { margin-bottom: 6px !important; }
   .modal-content--nova-tx .form-group:last-child { margin-bottom: 0 !important; }
   .modal-content--nova-tx .form-group > label {
     display: block !important;
-    margin-bottom: 7px !important;
+    margin-bottom: 3px !important;
     font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
+    font-size: 0.72rem !important;
     font-weight: 600 !important;
     color: var(--m-text-mid) !important;
     letter-spacing: 0.01em !important;
@@ -168,7 +168,7 @@
   body[data-theme='dark'] .modal-content--nova-tx input[type="datetime-local"],
   body[data-theme='light'] .modal-content--nova-tx input[type="datetime-local"] {
     width: 100% !important;
-    padding: 11px 14px !important;
+    padding: 9px 14px !important;
     border-radius: 12px !important;
     background: var(--m-sunken) !important;
     border: 1px solid var(--m-edge-hi) !important;
@@ -199,7 +199,7 @@
     justify-content: space-between !important;
     gap: 10px !important;
     width: 100% !important;
-    padding: 11px 14px !important;
+    padding: 9px 14px !important;
     border-radius: 12px !important;
     background: var(--m-sunken) !important;
     border: 1px solid var(--m-edge-hi) !important;
@@ -523,7 +523,7 @@
     flex-wrap: wrap !important;
     gap: 6px !important;
     margin-top: 12px !important;
-    padding: 11px 14px !important;
+    padding: 9px 14px !important;
     border-radius: 12px !important;
     background: var(--m-base) !important;
     border: 1px solid var(--m-edge-hi) !important;
@@ -705,7 +705,9 @@
   .modal-content--nova-tx .modal-body.modal-body--nova-tx { padding: 0 0 4px !important; }
   .modal-content--nova-tx .modal-header.modal-header--minimal { margin: 0 0 2px !important; }
   .modal-content--nova-tx .nova-tx-section { margin-bottom: 10px !important; }
-  .modal-content--nova-tx .nova-tx-section__title { margin: 0 0 7px !important; }
+  /* Modal mais curto/enxuto: esconde os cabeçalhos de seção no celular
+     (CLASSIFICAÇÃO / PARCELAMENTO) — os campos já são autoexplicativos. */
+  .modal-content--nova-tx .nova-tx-section__title { display: none !important; }
   .modal-content--nova-tx .form-group { margin-bottom: 8px !important; }
   .modal-content--nova-tx .form-group > label { margin-bottom: 5px !important; }
   .modal-content--nova-tx .ntx-valor-label-row { margin-bottom: 5px !important; }
@@ -723,7 +725,7 @@
   body[data-theme='light'] .modal-content--nova-tx input[type="datetime-local"],
   body[data-theme='dark'] .modal-content--nova-tx .custom-select-trigger,
   body[data-theme='light'] .modal-content--nova-tx .custom-select-trigger {
-    padding: 11px 14px !important;
+    padding: 9px 14px !important;
   }
   body[data-theme='dark'] .modal-content--nova-tx input.input-valor-novo-tx,
   body[data-theme='light'] .modal-content--nova-tx input.input-valor-novo-tx {
