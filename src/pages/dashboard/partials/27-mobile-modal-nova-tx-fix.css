@@ -18,9 +18,10 @@
   /* ───────────────────────── Sheet (o 02c já o faz flex-col + scroll) ───────────────────────── */
   .modal-content.modal-content--nova-tx {
     padding-top: 14px !important;
-    padding-bottom: calc(2px + env(safe-area-inset-bottom, 0px)) !important;
+    /* safe-area é tratada só no footer (.modal-actions). Aqui fica 0 para não
+       duplicar e criar a faixa branca abaixo dos botões no iPhone. */
+    padding-bottom: 0 !important;
     overflow-x: hidden !important;            /* mata o deslize lateral */
-    overflow-y: auto !important;
     overscroll-behavior: contain !important;  /* sem rubber-band / puxar */
   }
   /* Grabber acima do header, sem encostar no título (sticky herdado do partial 24) */
@@ -606,10 +607,12 @@
   }
   .modal-content--nova-tx .spinner { animation: ntxSpinM 800ms linear infinite !important; transform-origin: center !important; color: var(--m-accent) !important; }
 
-  /* ───────────────────────── Rodapé sticky (Cancelar / Salvar) ───────────────────────── */
+  /* ───────────────────────── Rodapé fixo (Cancelar / Salvar) ───────────────────────── */
+  /* Layout flex já fixa o footer no fundo; não precisa mais ser sticky. O
+     padding-bottom abaixo (8px + safe-area) é a ÚNICA fonte de safe-area. */
   .modal-content--nova-tx .modal-actions {
-    position: sticky !important;
-    bottom: calc(-1 * env(safe-area-inset-bottom, 0px)) !important;
+    position: static !important;
+    bottom: auto !important;
     z-index: 5 !important;
     display: flex !important;
     align-items: center !important;
