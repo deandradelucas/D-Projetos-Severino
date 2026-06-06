@@ -1551,17 +1551,24 @@ input:disabled {
 }
 
 /* Ícone de calendário (datetime-local) do modal de transação em dourado da marca.
-   Em vez de tingir o ícone NATIVO via filter (some no iOS), desenhamos um SVG
-   dourado como background e escondemos o indicador nativo — funciona no iOS tb. */
+   Nem filter nem background-image pegam no iOS (Safari pinta o controle nativo).
+   Solução robusta: um SVG REAL no DOM sobreposto (.ntx-date-cal) + esconde o
+   indicador nativo. O ícone é pointer-events:none → tocar abre o picker normal. */
+.ntx-date-field { position: relative; }
+.ntx-date-field .ntx-date-cal {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
+  color: #d4a84b;
+  display: inline-flex;
+}
 body[data-theme='dark'] .modal-content--nova-tx input[type="datetime-local"].input-data-novo-tx,
 body[data-theme='light'] .modal-content--nova-tx input[type="datetime-local"].input-data-novo-tx {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23d4a84b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 2v4M16 2v4M3 10h18'/%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: right 14px center !important;
-  background-size: 18px 18px !important;
-  padding-right: 42px !important;
+  padding-right: 42px !important; /* espaço pro ícone custom */
 }
 .modal-content--nova-tx input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  opacity: 0 !important;   /* esconde o nativo mas mantém a área clicável (abre o picker) */
-  cursor: pointer;
+  opacity: 0 !important;   /* esconde o nativo; o SVG dourado fica por cima */
 }

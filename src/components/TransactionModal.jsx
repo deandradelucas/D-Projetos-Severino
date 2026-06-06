@@ -644,15 +644,23 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                     </button>
                   </div>
                 </div>
-                <input
-                  id="tx-data-transacao"
-                  type="datetime-local"
-                  name="data_transacao"
-                  value={formData.data_transacao}
-                  onChange={handleChange}
-                  required
-                  className="input-premium input-data-novo-tx"
-                />
+                <div className="ntx-date-field">
+                  <input
+                    id="tx-data-transacao"
+                    type="datetime-local"
+                    name="data_transacao"
+                    value={formData.data_transacao}
+                    onChange={handleChange}
+                    required
+                    className="input-premium input-data-novo-tx"
+                  />
+                  <span className="ntx-date-cal" aria-hidden>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M8 2v4M16 2v4M3 10h18" />
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                    </svg>
+                  </span>
+                </div>
                 {isEditMode && editingTransaction?.recorrente_index && editingTransaction?.data_compra && (
                   <p className="parcelamento-preview parcelamento-preview--hint">
                     Compra original em {new Date(editingTransaction.data_compra).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
