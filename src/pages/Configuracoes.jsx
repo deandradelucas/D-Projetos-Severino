@@ -1111,6 +1111,7 @@ export default function Configuracoes() {
                             <button
                               type="button"
                               className="config-action-btn"
+                              aria-label={`Remover ${mem.nome || mem.email} da família`}
                               onClick={() => setFamiliaConfirm({ type: 'remove', usuarioId: mem.id })}
                             >
                               Remover

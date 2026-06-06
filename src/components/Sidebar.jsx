@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation, useMatch, useResolvedPath } from 'react-router-dom'
 import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
 import SeverinoMark from './SeverinoMark'
@@ -21,6 +21,47 @@ function mergeNavItemClass(isActive, href, pathname, extraClass = '') {
   const on = Boolean(isActive) || pathname === href
   const base = extraClass ? `nav-item ${extraClass}` : 'nav-item'
   return on ? `${base} active` : base
+}
+
+function SidebarNavItem({ item, pathname, closeMenu }) {
+  const resolved = useResolvedPath(item.to)
+  const match = useMatch({ path: resolved.pathname, end: item.end ?? false })
+  const isActive = Boolean(match)
+  return (
+    <li>
+      <NavLink
+        to={item.to}
+        end={item.end}
+        {...navPrefetchHandlers(item.to)}
+        title={item.title || item.label}
+        aria-current={isActive ? 'page' : undefined}
+        className={mergeNavItemClass(isActive, item.to, pathname, item.sidebarClassName)}
+        onClick={closeMenu}
+      >
+        <span className="icon-wrap">{item.icon(SIDEBAR_ICON_PROPS)}</span>
+        <span className="nav-item__label">{item.label}</span>
+      </NavLink>
+    </li>
+  )
+}
+
+function SidebarAdminNavLink({ to, title, children, pathname, closeMenu }) {
+  const resolved = useResolvedPath(to)
+  const match = useMatch({ path: resolved.pathname, end: true })
+  const isActive = Boolean(match)
+  return (
+    <NavLink
+      to={to}
+      end
+      {...navPrefetchHandlers(to)}
+      title={title}
+      aria-current={isActive ? 'page' : undefined}
+      className={mergeNavItemClass(isActive, to, pathname)}
+      onClick={closeMenu}
+    >
+      {children}
+    </NavLink>
+  )
 }
 
 const FOCUSABLE_SELECTOR = [
@@ -131,19 +172,7 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
   }, [menuAberto])
 
   const renderNavItem = (item) => (
-    <li key={item.to}>
-      <NavLink
-        to={item.to}
-        end={item.end}
-        {...navPrefetchHandlers(item.to)}
-        title={item.title || item.label}
-        className={({ isActive }) => mergeNavItemClass(isActive, item.to, pathname, item.sidebarClassName)}
-        onClick={closeMenu}
-      >
-        <span className="icon-wrap">{item.icon(SIDEBAR_ICON_PROPS)}</span>
-        <span className="nav-item__label">{item.label}</span>
-      </NavLink>
-    </li>
+    <SidebarNavItem key={item.to} item={item} pathname={pathname} closeMenu={closeMenu} />
   )
 
   return (
@@ -210,16 +239,9 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                 <span className="nav-section-label__text">Administração</span>
               </li>
               <li>
-                <NavLink
-                  to="/admin/usuarios"
-                  end
-                  {...navPrefetchHandlers('/admin/usuarios')}
-                  title="Logs Usuários"
-                  className={({ isActive }) => mergeNavItemClass(isActive, '/admin/usuarios', pathname)}
-                  onClick={closeMenu}
-                >
+                <SidebarAdminNavLink to="/admin/usuarios" title="Logs Usuários" pathname={pathname} closeMenu={closeMenu}>
                   <span className="icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                       <circle cx="9" cy="7" r="4" />
                       <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
@@ -227,59 +249,38 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
                     </svg>
                   </span>
                   <span className="nav-item__label">Logs Usuários</span>
-                </NavLink>
+                </SidebarAdminNavLink>
               </li>
               <li>
-                <NavLink
-                  to="/admin/auditoria"
-                  end
-                  {...navPrefetchHandlers('/admin/auditoria')}
-                  title="Auditoria"
-                  className={({ isActive }) => mergeNavItemClass(isActive, '/admin/auditoria', pathname)}
-                  onClick={closeMenu}
-                >
+                <SidebarAdminNavLink to="/admin/auditoria" title="Auditoria" pathname={pathname} closeMenu={closeMenu}>
                   <span className="icon-wrap">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
                     </svg>
                   </span>
                   <span className="nav-item__label">Auditoria</span>
-                </NavLink>
+                </SidebarAdminNavLink>
               </li>
               <li>
-                <NavLink
-                  to="/admin/pagamentos"
-                  end
-                  {...navPrefetchHandlers('/admin/pagamentos')}
-                  title="Logs de Pagamentos"
-                  className={({ isActive }) => mergeNavItemClass(isActive, '/admin/pagamentos', pathname)}
-                  onClick={closeMenu}
-                >
+                <SidebarAdminNavLink to="/admin/pagamentos" title="Logs de Pagamentos" pathname={pathname} closeMenu={closeMenu}>
                   <span className="icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <rect width="20" height="14" x="2" y="5" rx="2" />
                       <line x1="2" x2="22" y1="10" y2="10" />
                     </svg>
                   </span>
                   <span className="nav-item__label">Logs de Pagamentos</span>
-                </NavLink>
+                </SidebarAdminNavLink>
               </li>
               <li>
-                <NavLink
-                  to="/admin/marketing"
-                  end
-                  {...navPrefetchHandlers('/admin/marketing')}
-                  title="Marketing"
-                  className={({ isActive }) => mergeNavItemClass(isActive, '/admin/marketing', pathname)}
-                  onClick={closeMenu}
-                >
+                <SidebarAdminNavLink to="/admin/marketing" title="Marketing" pathname={pathname} closeMenu={closeMenu}>
                   <span className="icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                     </svg>
                   </span>
                   <span className="nav-item__label">Marketing</span>
-                </NavLink>
+                </SidebarAdminNavLink>
               </li>
             </>
           )}
@@ -288,7 +289,9 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
         <span className="sidebar-version">v{version}</span>
 
         <button
+          type="button"
           className="logout-btn"
+          aria-label="Sair da conta"
           onClick={logoutHorizonte}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

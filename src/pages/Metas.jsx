@@ -13,6 +13,11 @@ import { showToast } from '../lib/toastStore'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../lib/currencyMaskBr'
 
+function IconUsers() { return (<svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>) }
+function IconUser() { return (<svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>) }
+function IconMoreVertical() { return (<svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>) }
+function IconTarget() { return (<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" strokeWidth="1.6" fill="none"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>) }
+
 const ICONES = ['🎯', '✈️', '🏠', '🚗', '💍', '🎓', '🏖️', '💻', '🛡️', '🎁', '👶', '💰']
 const CORES = ['gold', 'green', 'blue', 'purple', 'red', 'teal']
 
@@ -167,7 +172,7 @@ function ModalAporte({ meta, onClose, onConfirmar, salvando }) {
     <div className="page-metas__modal-overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="page-metas__modal page-metas__modal--sm" role="dialog" aria-modal="true" aria-labelledby="aporte-modal-title">
         <div className="page-metas__modal-head">
-          <h2 id="aporte-modal-title" className="page-metas__modal-title">{meta.icone} {meta.nome}</h2>
+          <h2 id="aporte-modal-title" className="page-metas__modal-title"><span aria-hidden="true">{meta.icone}</span> {meta.nome}</h2>
           <button type="button" className="page-metas__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
         <form onSubmit={handleSubmit} className="page-metas__modal-body">
@@ -224,7 +229,7 @@ function MetaCard({ meta, onGuardar, onEditar, onExcluir }) {
           {meta.prazo && <span className="page-metas__card-prazo">até {formatPrazoBr(meta.prazo)}</span>}
         </div>
         <div className="page-metas__card-menu-wrap">
-          <button type="button" className="page-metas__card-menu-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="Opções">⋯</button>
+          <button type="button" className="page-metas__card-menu-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="Opções">{<IconMoreVertical />}</button>
           {menuOpen && (
             <>
               <div className="page-metas__menu-backdrop" onClick={() => setMenuOpen(false)} />
@@ -414,8 +419,8 @@ export default function Metas() {
               <section className="ref-bottom-grid ref-bottom-grid--single page-metas-panel" aria-label="Suas metas">
                 {isMembroConta && (
                   <div className="page-metas__escopo">
-                    <button type="button" className={`page-metas__escopo-btn${escopo === 'familia' ? ' page-metas__escopo-btn--active' : ''}`} onClick={() => setEscopo('familia')}>👨‍👩‍👧 Família</button>
-                    <button type="button" className={`page-metas__escopo-btn${escopo === 'pessoal' ? ' page-metas__escopo-btn--active' : ''}`} onClick={() => setEscopo('pessoal')}>👤 Pessoal</button>
+                    <button type="button" className={`page-metas__escopo-btn${escopo === 'familia' ? ' page-metas__escopo-btn--active' : ''}`} onClick={() => setEscopo('familia')}><IconUsers /> Família</button>
+                    <button type="button" className={`page-metas__escopo-btn${escopo === 'pessoal' ? ' page-metas__escopo-btn--active' : ''}`} onClick={() => setEscopo('pessoal')}><IconUser /> Pessoal</button>
                   </div>
                 )}
 
@@ -423,7 +428,7 @@ export default function Metas() {
                   <p className="page-metas__loading">Carregando suas metas…</p>
                 ) : metas.length === 0 ? (
                   <div className="page-metas__empty">
-                    <span className="page-metas__empty-icon">🎯</span>
+                    <span className="page-metas__empty-icon"><IconTarget /></span>
                     <h2 className="page-metas__empty-title">Crie sua primeira meta</h2>
                     <p className="page-metas__empty-desc">Junte dinheiro pra uma viagem, uma reserva de emergência ou aquele sonho. Acompanhe o progresso e guarde no seu ritmo.</p>
                     <button type="button" className="page-metas__empty-btn" onClick={() => { setMetaEdit(null); setModalMeta(true) }}>+ Criar meta</button>

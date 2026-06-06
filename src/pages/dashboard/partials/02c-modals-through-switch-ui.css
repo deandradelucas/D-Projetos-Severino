@@ -2133,6 +2133,8 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
   background: transparent;
   width: 32px;
   height: 32px;
+  min-width: 44px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2154,6 +2156,8 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
   background: transparent;
   width: 32px;
   height: 32px;
+  min-width: 44px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;

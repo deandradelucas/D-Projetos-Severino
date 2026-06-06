@@ -725,6 +725,7 @@ export default function InvestimentoCard({ row, cdiAa, cdiLoading, pregaoCdiHoje
           className="page-investimentos-card__edit"
           onClick={() => onEdit(row)}
           disabled={!uid}
+          aria-label={`Editar ${row.nome || row.instituicao_nome || 'investimento'}`}
         >
           Editar
         </button>
@@ -733,6 +734,7 @@ export default function InvestimentoCard({ row, cdiAa, cdiLoading, pregaoCdiHoje
           className="page-investimentos-card__aporte"
           onClick={() => onAportar?.(row)}
           disabled={!uid}
+          aria-label={`Aportar em ${row.nome || row.instituicao_nome || 'investimento'}`}
         >
           + Aportar
         </button>
@@ -740,6 +742,7 @@ export default function InvestimentoCard({ row, cdiAa, cdiLoading, pregaoCdiHoje
           type="button"
           className="page-investimentos-card__remove"
           onClick={() => onRemove({ id: row.id, nome: row.nome })}
+          aria-label={`Remover ${row.nome || row.instituicao_nome || 'investimento'}`}
         >
           Remover
         </button>

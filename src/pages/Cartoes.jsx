@@ -14,6 +14,13 @@ import { showToast } from '../lib/toastStore'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../lib/currencyMaskBr'
 
+function IconUsers() { return (<svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>) }
+function IconUser() { return (<svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>) }
+function IconMoreVertical() { return (<svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>) }
+function IconChevronLeft() { return (<svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>) }
+function IconChevronRight() { return (<svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>) }
+function IconCard() { return (<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>) }
+
 const BANDEIRAS = [
   { v: 'visa', l: 'Visa' },
   { v: 'master', l: 'Mastercard' },
@@ -267,9 +274,9 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
         {!buscaAtiva && (
           <>
             <div className="page-cartoes__fatura-nav">
-              <button type="button" onClick={() => setRef((r) => shiftRef(r, -1))} aria-label="Mês anterior">‹</button>
+              <button type="button" onClick={() => setRef((r) => shiftRef(r, -1))} aria-label="Mês anterior"><IconChevronLeft /></button>
               <span className="page-cartoes__fatura-mes">{refLabel(ref)}</span>
-              <button type="button" onClick={() => setRef((r) => shiftRef(r, 1))} aria-label="Próximo mês">›</button>
+              <button type="button" onClick={() => setRef((r) => shiftRef(r, 1))} aria-label="Próximo mês"><IconChevronRight /></button>
             </div>
             <div className="page-cartoes__fatura-resumo">
               <div>
@@ -353,7 +360,7 @@ function CartaoCard({ cartao, onVerFatura, onEditar, onExcluir }) {
           <span className="page-cartoes__card-nome">{cartao.nome}</span>
         </div>
         <div className="page-cartoes__card-menu-wrap">
-          <button type="button" className="page-cartoes__card-menu-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="Opções">⋯</button>
+          <button type="button" className="page-cartoes__card-menu-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="Opções">{<IconMoreVertical />}</button>
           {menuOpen && (
             <>
               <div className="page-cartoes__menu-backdrop" onClick={() => setMenuOpen(false)} />
@@ -490,8 +497,8 @@ export default function Cartoes() {
               <section className="ref-bottom-grid ref-bottom-grid--single page-cartoes-panel" aria-label="Seus cartões">
                 {isMembroConta && (
                   <div className="page-cartoes__escopo">
-                    <button type="button" className={`page-cartoes__escopo-btn${escopo === 'familia' ? ' page-cartoes__escopo-btn--active' : ''}`} onClick={() => setEscopo('familia')}>👨‍👩‍👧 Família</button>
-                    <button type="button" className={`page-cartoes__escopo-btn${escopo === 'pessoal' ? ' page-cartoes__escopo-btn--active' : ''}`} onClick={() => setEscopo('pessoal')}>👤 Pessoal</button>
+                    <button type="button" className={`page-cartoes__escopo-btn${escopo === 'familia' ? ' page-cartoes__escopo-btn--active' : ''}`} onClick={() => setEscopo('familia')}><IconUsers /> Família</button>
+                    <button type="button" className={`page-cartoes__escopo-btn${escopo === 'pessoal' ? ' page-cartoes__escopo-btn--active' : ''}`} onClick={() => setEscopo('pessoal')}><IconUser /> Pessoal</button>
                   </div>
                 )}
 
@@ -499,7 +506,7 @@ export default function Cartoes() {
                   <p className="page-cartoes__muted">Carregando seus cartões…</p>
                 ) : cartoes.length === 0 ? (
                   <div className="page-cartoes__empty">
-                    <span className="page-cartoes__empty-icon">💳</span>
+                    <span className="page-cartoes__empty-icon"><IconCard /></span>
                     <h2 className="page-cartoes__empty-title">Cadastre seu primeiro cartão</h2>
                     <p className="page-cartoes__empty-desc">Acompanhe a fatura de cada cartão em tempo real, com data de fechamento e vencimento. As despesas que você marca como do cartão entram na fatura certa automaticamente.</p>
                     <button type="button" className="page-cartoes__empty-btn" onClick={() => { setCartaoEdit(null); setModalCartao(true) }}>+ Adicionar cartão</button>

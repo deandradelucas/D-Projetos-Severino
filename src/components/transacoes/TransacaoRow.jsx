@@ -136,8 +136,16 @@ export function TransacaoRow({
     <div
       key={t.id}
       ref={rowRef}
+      role="button"
+      tabIndex={selectionMode ? -1 : 0}
       onClickCapture={handleClickCapture}
       onClick={handleRowClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleRowClick(e)
+        }
+      }}
       className={`ref-tx-row ref-tx-row--v2${selected ? ' ref-tx-row--selected' : ''}${selectionMode ? ' ref-tx-row--selection-mode' : ''}`}
     >
       <div className="ref-tx-icon-cell">

@@ -429,7 +429,8 @@ body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-ho
 }
 
 body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full:focus-visible {
-  outline: none;
+  outline: 2px solid var(--success, #22c55e);
+  outline-offset: 2px;
   box-shadow:
     0 0 0 3px color-mix(in srgb, var(--success, #22c55e) 38%, transparent),
     0 0 18px color-mix(in srgb, var(--success, #22c55e) 36%, transparent) !important;

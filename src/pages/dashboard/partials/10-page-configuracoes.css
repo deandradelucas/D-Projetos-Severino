@@ -1119,7 +1119,6 @@ body[data-theme='dark'] .config-toast {
   font-weight: 650;
   line-height: 1.35;
   cursor: pointer;
-  outline: none;
 }
 
 .config-select-custom__value {

@@ -63,6 +63,8 @@
     flex-shrink: 0 !important;
     width: 22px !important;
     height: 22px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
     border: none !important;
     border-radius: 50% !important;
     background: var(--m-base) !important;

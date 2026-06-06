@@ -393,7 +393,7 @@ export default function Dashboard() {
                   </span>
                 </Link>
               ) : (
-                <p className="dashboard-hub__insight-empty">Nenhum compromisso à vista. 🎉</p>
+                <p className="dashboard-hub__insight-empty">Nenhum compromisso à vista. <span aria-hidden="true">🎉</span></p>
               )}
             </article>
 

@@ -1496,8 +1496,12 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 .page-transacoes-parcelado-parcela__acoes .btn-delete {
   width: 30px;
   height: 30px;
+  min-width: 44px !important;
+  min-height: 44px !important;
   padding: 0;
 }
+
+.ref-tx-row--v2 { cursor: pointer; }
 
 @media (max-width: 540px) {
   .page-transacoes-parcelado-parcela {

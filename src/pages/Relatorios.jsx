@@ -513,8 +513,11 @@ export default function Relatorios() {
                   <p className="ref-kpi-card__label">Receitas</p>
                   <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(summary.receitas)}</p>
                   {deltaReceitas != null && (
-                    <span className={`relatorios-kpi-delta ${deltaReceitas >= 0 ? 'relatorios-kpi-delta--good' : 'relatorios-kpi-delta--bad'}`} title="vs período anterior">
-                      {deltaReceitas >= 0 ? '▲' : '▼'} {Math.abs(deltaReceitas).toFixed(0)}% vs anterior
+                    <span
+                      className={`relatorios-kpi-delta ${deltaReceitas >= 0 ? 'relatorios-kpi-delta--good' : 'relatorios-kpi-delta--bad'}`}
+                      aria-label={`${deltaReceitas >= 0 ? 'Alta de' : 'Queda de'} ${Math.abs(deltaReceitas).toFixed(0)}% vs período anterior`}
+                    >
+                      <span aria-hidden="true">{deltaReceitas >= 0 ? '▲' : '▼'}</span>{' '}{Math.abs(deltaReceitas).toFixed(0)}% vs anterior
                     </span>
                   )}
                 </div>
@@ -537,8 +540,11 @@ export default function Relatorios() {
                     {formatCurrency(summary.despesas)}
                   </p>
                   {deltaDespesas != null && (
-                    <span className={`relatorios-kpi-delta ${deltaDespesas > 0 ? 'relatorios-kpi-delta--bad' : 'relatorios-kpi-delta--good'}`} title="vs período anterior">
-                      {deltaDespesas >= 0 ? '▲' : '▼'} {Math.abs(deltaDespesas).toFixed(0)}% vs anterior
+                    <span
+                      className={`relatorios-kpi-delta ${deltaDespesas > 0 ? 'relatorios-kpi-delta--bad' : 'relatorios-kpi-delta--good'}`}
+                      aria-label={`${deltaDespesas >= 0 ? 'Alta de' : 'Queda de'} ${Math.abs(deltaDespesas).toFixed(0)}% vs período anterior`}
+                    >
+                      <span aria-hidden="true">{deltaDespesas >= 0 ? '▲' : '▼'}</span>{' '}{Math.abs(deltaDespesas).toFixed(0)}% vs anterior
                     </span>
                   )}
                 </div>
@@ -719,7 +725,7 @@ export default function Relatorios() {
           <RelatoriosChartsLoadingShell />
         ) : transacoes.length === 0 ? (
           <div className="relatorios-empty">
-            <span className="relatorios-empty__icon" aria-hidden>📊</span>
+            <svg className="relatorios-empty__icon" aria-hidden="true" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
             <h2 className="relatorios-empty__title">Nada por aqui neste período</h2>
             <p className="relatorios-empty__text">
               Não há transações efetivadas em {periodLabel}
