@@ -33,6 +33,11 @@ export function getFocusableElements(container) {
 export function useModalA11y({ open, onClose, containerRef, blockClose = false }) {
   const titleId = useId()
 
+  // Scroll-lock + foco inicial. Depende SÓ de `open` — assim o foco é dado
+  // uma única vez por abertura. Antes, ter `onClose`/`blockClose` nas deps fazia
+  // o effect re-rodar a cada re-render do pai (onClose inline = nova referência)
+  // e re-focar o 1º elemento, roubando o foco do input → no mobile o teclado
+  // fechava sozinho.
   useEffect(() => {
     if (!open) return undefined
 
@@ -44,6 +49,18 @@ export function useModalA11y({ open, onClose, containerRef, blockClose = false }
       const focusable = getFocusableElements(containerRef.current)
       focusable[0]?.focus()
     }, 0)
+
+    return () => {
+      window.clearTimeout(focusTimer)
+      document.body.style.overflow = previousOverflow
+      document.body.classList.remove('horizon-modal-open')
+    }
+  }, [open, containerRef])
+
+  // Listener de teclado (Escape + focus-trap no Tab). Pode re-bindar quando
+  // `onClose`/`blockClose` mudam — é inofensivo, não mexe no foco atual.
+  useEffect(() => {
+    if (!open) return undefined
 
     const onKeyDown = (event) => {
       if (event.key === 'Escape') {
@@ -78,13 +95,7 @@ export function useModalA11y({ open, onClose, containerRef, blockClose = false }
     }
 
     window.addEventListener('keydown', onKeyDown)
-
-    return () => {
-      window.clearTimeout(focusTimer)
-      document.body.style.overflow = previousOverflow
-      document.body.classList.remove('horizon-modal-open')
-      window.removeEventListener('keydown', onKeyDown)
-    }
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [open, onClose, blockClose, containerRef])
 
   return { titleId }
