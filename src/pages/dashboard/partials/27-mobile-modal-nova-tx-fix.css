@@ -693,12 +693,23 @@
   .modal-content--nova-tx.ntx-dragging {
     animation: none !important;
     transition: none !important;
-    transform: translateY(var(--ntx-drag, 0px)) !important;
+    transform: translate3d(0, var(--ntx-drag, 0px), 0) !important;
+    will-change: transform;
   }
   .modal-content--nova-tx.ntx-closing {
     animation: none !important;
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
-    transform: translateY(var(--ntx-drag, 0px)) !important;
+    transform: translate3d(0, var(--ntx-drag, 0px), 0) !important;
+    will-change: transform;
+  }
+
+  /* Durante o gesto, desliga o blur de tela cheia do backdrop — recalcular o
+     blur a cada frame enquanto o sheet desliza é o que travava. Mantém só o
+     escurecido (rgba) por trás. O blur volta ao soltar (snap-back) ou some no fechar. */
+  .modal-backdrop:has(.ntx-dragging),
+  .modal-backdrop:has(.ntx-closing) {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
 
   /* ═══════════════ Compactação extra ═══════════════ */

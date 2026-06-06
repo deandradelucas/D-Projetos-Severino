@@ -281,7 +281,13 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     let active = false
     let decided = false
     let dy = 0
-    const setDrag = (px) => sheet.style.setProperty('--ntx-drag', `${px}px`)
+    let rafId = 0
+    let pendingDrag = 0
+    const writeDrag = () => { rafId = 0; sheet.style.setProperty('--ntx-drag', `${pendingDrag}px`) }
+    const setDrag = (px) => {
+      pendingDrag = px
+      if (!rafId) rafId = requestAnimationFrame(writeDrag)
+    }
     const onStart = (e) => {
       if (e.touches.length !== 1) return
       startY = e.touches[0].clientY
@@ -329,6 +335,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     sheet.addEventListener('touchend', finish, { passive: true })
     sheet.addEventListener('touchcancel', finish, { passive: true })
     return () => {
+      if (rafId) cancelAnimationFrame(rafId)
       sheet.removeEventListener('touchstart', onStart)
       sheet.removeEventListener('touchmove', onMove)
       sheet.removeEventListener('touchend', finish)
