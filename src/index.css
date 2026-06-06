@@ -1550,12 +1550,31 @@ input:disabled {
   to   { transform: translateY(0); }
 }
 
-/* Ícone de calendário (datetime-local) do modal de transação em dourado da marca.
-   Nem filter nem background-image pegam no iOS (Safari pinta o controle nativo).
-   Solução robusta: um SVG REAL no DOM sobreposto (.ntx-date-cal) + esconde o
-   indicador nativo. O ícone é pointer-events:none → tocar abre o picker normal. */
-.ntx-date-field { position: relative; }
-.ntx-date-field .ntx-date-cal {
+/* Campo de data do modal de transação: gatilho custom (abre o calendário do
+   sistema — DatePickerBrPopover) + campo de hora separado. Ícone dourado da marca. */
+.ntx-datetime-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.ntx-date-trigger {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  padding-right: 42px !important; /* espaço pro ícone dourado */
+}
+.ntx-date-trigger__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ntx-date-trigger .ntx-date-cal {
   position: absolute;
   right: 14px;
   top: 50%;
@@ -1565,10 +1584,48 @@ input:disabled {
   color: #d4a84b;
   display: inline-flex;
 }
-body[data-theme='dark'] .modal-content--nova-tx input[type="datetime-local"].input-data-novo-tx,
-body[data-theme='light'] .modal-content--nova-tx input[type="datetime-local"].input-data-novo-tx {
-  padding-right: 42px !important; /* espaço pro ícone custom */
+.ntx-time-field {
+  flex: 0 0 auto;
+  width: 104px;
+  text-align: center;
 }
-.modal-content--nova-tx input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  opacity: 0 !important;   /* esconde o nativo; o SVG dourado fica por cima */
+.modal-content--nova-tx input[type="time"].ntx-time-field::-webkit-calendar-picker-indicator {
+  filter: invert(72%) sepia(38%) saturate(560%) hue-rotate(2deg) brightness(92%);
+  cursor: pointer;
 }
+
+/* ─── Calculadora (teclado) do campo Valor — modal de transação ─── */
+.ntx-calc { margin-top: 8px; animation: ntxCalcIn 180ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes ntxCalcIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.ntx-calc__display {
+  text-align: right;
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 1.15rem; font-weight: 700; letter-spacing: -0.01em;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 10px 14px; margin-bottom: 8px; min-height: 24px;
+  overflow-x: auto; white-space: nowrap;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.ntx-calc__pad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+.ntx-calc__key {
+  padding: 13px 0; border-radius: 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-card); color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 1.1rem; font-weight: 600; cursor: pointer;
+  transition: transform 80ms ease, background 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.ntx-calc__key:active { transform: scale(0.95); background: var(--bg-secondary); }
+.ntx-calc__key--op { color: var(--accent); font-weight: 700; }
+.ntx-calc__key--del { color: var(--text-secondary); }
+.ntx-calc__key--clear { color: var(--error); font-weight: 700; }
+.ntx-calc__key--eq {
+  grid-column: span 3;
+  background: var(--accent); border-color: var(--accent);
+  color: var(--accent-foreground, #1a1200); font-weight: 800;
+}
+.ntx-calc__key--eq:active { background: var(--accent-hover); }

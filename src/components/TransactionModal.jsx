@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
 import CategorySelector from './transaction/CategorySelector'
+import DatePickerBrPopover from './investimentos/DatePickerBrPopover'
+import { ymdToDdMmYyyy, todayYmdLocal } from '../lib/dateInputBr'
 import { vencimentoCartaoParaData, calcularParcelaAtual } from '../lib/cartaoVencimento'
 import { useTransactionForm } from '../hooks/useTransactionForm'
 import { useModalA11y } from '../hooks/useModalA11y'
@@ -178,18 +180,37 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     setTimeout(() => valorInputRef.current?.focus(), 60)
   }, [setFormData])
 
-  // (Q) Calculadora inline
+  // Calendário customizado (visual do sistema) + campo de hora separado
+  const [dateCalOpen, setDateCalOpen] = useState(false)
+  const dateAnchorRef = useRef(null)
+  const setDatePart = useCallback((ymd) => {
+    setFormData((prev) => {
+      const time = (prev.data_transacao || '').slice(11, 16) || '00:00'
+      return { ...prev, data_transacao: `${ymd}T${time}` }
+    })
+  }, [setFormData])
+  const setTimePart = useCallback((e) => {
+    const time = e.target.value || '00:00'
+    setFormData((prev) => {
+      const ymd = (prev.data_transacao || '').slice(0, 10) || todayYmdLocal()
+      return { ...prev, data_transacao: `${ymd}T${time}` }
+    })
+  }, [setFormData])
+
+  // (Q) Calculadora inline (teclado)
   const [calcOpen, setCalcOpen] = useState(false)
   const [calcExpr, setCalcExpr] = useState('')
-  const calcInputRef = useRef(null)
-  useEffect(() => {
-    if (calcOpen) setTimeout(() => calcInputRef.current?.focus(), 40)
-  }, [calcOpen])
+  const calcAppend = useCallback((ch) => setCalcExpr((e) => (e + ch).slice(0, 40)), [])
+  const calcBackspace = useCallback(() => setCalcExpr((e) => e.slice(0, -1)), [])
+  const calcClear = useCallback(() => setCalcExpr(''), [])
   const safeEvalExpression = (expr) => {
-    // Aceita apenas: dígitos, espaços, + - * / ( ) . ,
-    if (!/^[\d\s+\-*/().,]+$/.test(expr)) return null
-    // Converte vírgula → ponto (notação BR)
-    const norm = expr.replace(/,/g, '.')
+    // Normaliza símbolos do teclado (× ÷ −) e vírgula BR antes de validar/avaliar.
+    const norm = String(expr)
+      .replace(/×/g, '*')
+      .replace(/÷/g, '/')
+      .replace(/−/g, '-')
+      .replace(/,/g, '.')
+    if (!/^[\d\s+\-*/().]+$/.test(norm)) return null
     try {
       const fn = new Function(`"use strict"; return (${norm});`)
       const val = fn()
@@ -644,23 +665,43 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                     </button>
                   </div>
                 </div>
-                <div className="ntx-date-field">
-                  <input
+                <div className="ntx-datetime-row">
+                  <button
                     id="tx-data-transacao"
-                    type="datetime-local"
-                    name="data_transacao"
-                    value={formData.data_transacao}
-                    onChange={handleChange}
+                    ref={dateAnchorRef}
+                    type="button"
+                    className="input-premium input-data-novo-tx ntx-date-trigger"
+                    onClick={() => setDateCalOpen((v) => !v)}
+                    aria-haspopup="dialog"
+                    aria-expanded={dateCalOpen}
+                  >
+                    <span className="ntx-date-trigger__text">
+                      {ymdToDdMmYyyy((formData.data_transacao || '').slice(0, 10)) || 'Selecionar data'}
+                    </span>
+                    <span className="ntx-date-cal" aria-hidden>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M8 2v4M16 2v4M3 10h18" />
+                        <rect x="3" y="4" width="18" height="18" rx="2" />
+                      </svg>
+                    </span>
+                  </button>
+                  <input
+                    type="time"
+                    name="data_transacao_time"
+                    aria-label="Hora"
+                    value={(formData.data_transacao || '').slice(11, 16) || '00:00'}
+                    onChange={setTimePart}
                     required
-                    className="input-premium input-data-novo-tx"
+                    className="input-premium ntx-time-field"
                   />
-                  <span className="ntx-date-cal" aria-hidden>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M8 2v4M16 2v4M3 10h18" />
-                      <rect x="3" y="4" width="18" height="18" rx="2" />
-                    </svg>
-                  </span>
                 </div>
+                <DatePickerBrPopover
+                  open={dateCalOpen}
+                  onClose={() => setDateCalOpen(false)}
+                  anchorRef={dateAnchorRef}
+                  valueYmd={(formData.data_transacao || '').slice(0, 10)}
+                  onSelectYmd={setDatePart}
+                />
                 {isEditMode && editingTransaction?.recorrente_index && editingTransaction?.data_compra && (
                   <p className="parcelamento-preview parcelamento-preview--hint">
                     Compra original em {new Date(editingTransaction.data_compra).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
@@ -706,24 +747,25 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   onFocus={scrollValorIntoView}
                   className="input-premium input-valor-novo-tx"
                 />
-                {/* (Q) Calc expression panel */}
+                {/* (Q) Calculadora — teclado */}
                 {calcOpen && (
-                  <div className="ntx-calc-panel">
-                    <input
-                      ref={calcInputRef}
-                      type="text"
-                      className="input-premium ntx-calc-input"
-                      placeholder="Ex: 150 + 80,50 * 2"
-                      value={calcExpr}
-                      onChange={(e) => setCalcExpr(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') { e.preventDefault(); handleCalcSubmit() }
-                        if (e.key === 'Escape') { e.preventDefault(); setCalcOpen(false); setCalcExpr('') }
-                      }}
-                    />
-                    <button type="button" className="ntx-calc-eq" onClick={handleCalcSubmit} aria-label="Calcular">
-                      =
-                    </button>
+                  <div className="ntx-calc">
+                    <div className="ntx-calc__display" aria-live="polite">{calcExpr || '0'}</div>
+                    <div className="ntx-calc__pad">
+                      {['7', '8', '9', '÷', '4', '5', '6', '×', '1', '2', '3', '−', '0', ',', '⌫', '+'].map((k) => (
+                        <button
+                          key={k}
+                          type="button"
+                          className={`ntx-calc__key${'÷×−+'.includes(k) ? ' ntx-calc__key--op' : ''}${k === '⌫' ? ' ntx-calc__key--del' : ''}`}
+                          onClick={() => (k === '⌫' ? calcBackspace() : calcAppend(k))}
+                          aria-label={k === '⌫' ? 'Apagar' : k}
+                        >
+                          {k}
+                        </button>
+                      ))}
+                      <button type="button" className="ntx-calc__key ntx-calc__key--clear" onClick={calcClear}>C</button>
+                      <button type="button" className="ntx-calc__key ntx-calc__key--eq" onClick={handleCalcSubmit} aria-label="Calcular e usar">=</button>
+                    </div>
                   </div>
                 )}
               </div>
