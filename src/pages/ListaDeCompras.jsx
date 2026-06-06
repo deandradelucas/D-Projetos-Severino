@@ -246,6 +246,95 @@ function IconChecklist() {
   )
 }
 
+function IconUsers() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  )
+}
+
+function IconUser() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  )
+}
+
+function IconRepeat() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="13" height="13" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m17 2 4 4-4 4" />
+      <path d="M3 11v-1a4 4 0 0 1 4-4h14" />
+      <path d="m7 22-4-4 4-4" />
+      <path d="M21 13v1a4 4 0 0 1-4 4H3" />
+    </svg>
+  )
+}
+
+function IconClipboard() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="8" y="2" width="8" height="4" rx="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="M12 11h4" /><path d="M12 16h4" /><path d="M8 11h.01" /><path d="M8 16h.01" />
+    </svg>
+  )
+}
+
+function IconCopy() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  )
+}
+
+function IconWallet() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h16a1 1 0 0 1 1 1v3" />
+      <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+      <circle cx="17" cy="14" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+function IconSparkles() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+    </svg>
+  )
+}
+
+function IconArchive() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="20" height="5" rx="1" />
+      <path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9" />
+      <path d="M10 13h4" />
+    </svg>
+  )
+}
+
+function IconTrash() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6h18" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <line x1="10" y1="11" x2="10" y2="17" />
+      <line x1="14" y1="11" x2="14" y2="17" />
+    </svg>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Hook: detecta altura do teclado virtual via visualViewport API
 // ---------------------------------------------------------------------------
@@ -1073,8 +1162,8 @@ function ModalRecorrenciaLista({ recorrenciaAtual, onClose, onSalvar, salvando }
   const overlayStyle = { '--lista-kb': keyboardH > 0 ? `${keyboardH + 8}px` : '0px' }
   const OPCOES = [
     { v: 'nenhuma', l: 'Não repetir' },
-    { v: 'semanal', l: '🔁 Toda semana' },
-    { v: 'mensal', l: '🔁 Todo mês' },
+    { v: 'semanal', l: 'Toda semana' },
+    { v: 'mensal', l: 'Todo mês' },
   ]
 
   return (
@@ -1872,7 +1961,7 @@ export default function ListaDeCompras() {
                       onClick={() => setEscopoLista('familia')}
                       aria-pressed={escopoLista === 'familia'}
                     >
-                      👨‍👩‍👧 {titularPrimeiroNome || 'Família'}
+                      <IconUsers /> {titularPrimeiroNome || 'Família'}
                     </button>
                     <button
                       type="button"
@@ -1880,7 +1969,7 @@ export default function ListaDeCompras() {
                       onClick={() => setEscopoLista('pessoal')}
                       aria-pressed={escopoLista === 'pessoal'}
                     >
-                      👤 Pessoal
+                      <IconUser /> Pessoal
                     </button>
                   </div>
                 )}
@@ -1888,7 +1977,7 @@ export default function ListaDeCompras() {
                 {/* Estado: sem listas */}
                 {semListas && (
                   <div className="page-lista-compras__onboarding">
-                    <span className="page-lista-compras__onboarding-icon">🛒</span>
+                    <span className="page-lista-compras__onboarding-icon"><IconSupermercado /></span>
                     <h2 className="page-lista-compras__onboarding-title">Crie sua primeira lista</h2>
                     <p className="page-lista-compras__onboarding-desc">
                       Organize suas compras, marque os itens no mercado e registre o gasto direto em Transações quando terminar.
@@ -1936,7 +2025,6 @@ export default function ListaDeCompras() {
                 {/* Visão geral: nenhuma lista aberta, mas há listas — orienta o toque */}
                 {!loading && listas.length > 0 && !listaAtiva && (
                   <div className="page-lista-compras__overview-hint" role="note">
-                    <span className="page-lista-compras__overview-hint-icon" aria-hidden="true">👆</span>
                     Toque numa lista acima para abrir, ou crie uma nova.
                   </div>
                 )}
@@ -1958,7 +2046,7 @@ export default function ListaDeCompras() {
                       )}
                       {listaAtivaDados?.recorrencia && listaAtivaDados.recorrencia !== 'nenhuma' && (
                         <span className="page-lista-compras__recorrencia-badge">
-                          🔁 {listaAtivaDados.recorrencia === 'semanal' ? 'Semanal' : 'Mensal'}
+                          <IconRepeat /> {listaAtivaDados.recorrencia === 'semanal' ? 'Semanal' : 'Mensal'}
                         </span>
                       )}
                     </div>
@@ -1981,7 +2069,7 @@ export default function ListaDeCompras() {
                               className="page-lista-compras__list-dropdown-item page-lista-compras__list-dropdown-item--accent"
                               onClick={() => { setMenuListaAberto(false); setModoComprando(true) }}
                             >
-                              🛒 Modo comprando
+                              <IconSupermercado /> Modo comprando
                             </button>
                           )}
                           <button
@@ -1990,7 +2078,7 @@ export default function ListaDeCompras() {
                             className="page-lista-compras__list-dropdown-item"
                             onClick={renomearLista}
                           >
-                            ✏️ Renomear
+                            <IconEdit /> Renomear
                           </button>
                           <button
                             type="button"
@@ -1998,7 +2086,7 @@ export default function ListaDeCompras() {
                             className="page-lista-compras__list-dropdown-item"
                             onClick={duplicarLista}
                           >
-                            📋 Duplicar lista
+                            <IconCopy /> Duplicar lista
                           </button>
                           {listaAtivaDados?.tipo !== 'tarefas' && (
                             <button
@@ -2007,7 +2095,7 @@ export default function ListaDeCompras() {
                               className="page-lista-compras__list-dropdown-item"
                               onClick={definirOrcamento}
                             >
-                              💰 {listaAtivaDados?.orcamento != null ? 'Alterar' : 'Definir'} orçamento
+                              <IconWallet /> {listaAtivaDados?.orcamento != null ? 'Alterar' : 'Definir'} orçamento
                             </button>
                           )}
                           <button
@@ -2016,7 +2104,7 @@ export default function ListaDeCompras() {
                             className="page-lista-compras__list-dropdown-item"
                             onClick={definirRecorrencia}
                           >
-                            🔁 {listaAtivaDados?.recorrencia && listaAtivaDados.recorrencia !== 'nenhuma' ? 'Alterar repetição' : 'Repetir lista'}
+                            <IconRepeat /> {listaAtivaDados?.recorrencia && listaAtivaDados.recorrencia !== 'nenhuma' ? 'Alterar repetição' : 'Repetir lista'}
                           </button>
                           {itens.some((i) => i.checked) && (
                             <button
@@ -2025,7 +2113,7 @@ export default function ListaDeCompras() {
                               className="page-lista-compras__list-dropdown-item"
                               onClick={confirmarLimpar}
                             >
-                              🧹 {listaAtivaDados?.tipo === 'tarefas' ? 'Limpar concluídas' : 'Limpar comprados'}
+                              <IconSparkles /> {listaAtivaDados?.tipo === 'tarefas' ? 'Limpar concluídas' : 'Limpar comprados'}
                             </button>
                           )}
                           <button
@@ -2034,7 +2122,7 @@ export default function ListaDeCompras() {
                             className="page-lista-compras__list-dropdown-item"
                             onClick={confirmarArquivar}
                           >
-                            🗄️ Arquivar lista
+                            <IconArchive /> Arquivar lista
                           </button>
                           <button
                             type="button"
@@ -2042,7 +2130,7 @@ export default function ListaDeCompras() {
                             className="page-lista-compras__list-dropdown-item page-lista-compras__list-dropdown-item--danger"
                             onClick={confirmarExcluir}
                           >
-                            🗑️ Excluir lista
+                            <IconTrash /> Excluir lista
                           </button>
                         </div>
                       )}
@@ -2056,7 +2144,7 @@ export default function ListaDeCompras() {
                 {/* Lista vazia */}
                 {listaVazia && !loadingItens && (
                   <div className="page-lista-compras__empty">
-                    <span className="page-lista-compras__empty-icon">📝</span>
+                    <span className="page-lista-compras__empty-icon"><IconClipboard /></span>
                     <h2 className="page-lista-compras__empty-title">Lista vazia</h2>
                     <p className="page-lista-compras__empty-desc">
                       Toque em <strong>Novo item</strong> para adicionar o primeiro.
