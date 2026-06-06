@@ -1,29 +1,31 @@
 /* ──────────────────────────────────────────────────────────────────────────
-   38-page-titles-uniform.css — FONTE ÚNICA do tamanho dos títulos de página
+   38-page-titles-uniform.css — Camada HUB (override autoritativo do cabeçalho)
 
-   Como funciona (e por que é à prova de guerra de especificidade):
-   - O tamanho vem do token --page-title-size (definido em 00-tokens-base.css).
-     Para mudar TODOS os títulos, edite só aquele token — nunca mais cace em 10
-     arquivos.
-   - As regras abaixo ficam numa CSS Cascade Layer (@layer page-titles). Uma
-     declaração !important dentro de uma layer VENCE qualquer !important fora de
-     layer, independente da especificidade do seletor. Como todo o CSS legado é
-     "unlayered", estas regras ganham sempre — por isso os seletores podem ser
-     simples.
+   PADRÃO (ver docs/design/css-conventions.md):
+   - Valores compartilhados do hero/título vêm de TOKENS (00-tokens-base.css):
+     --page-title-size / --page-title-weight / --page-title-line. Mudar o visual
+     de TODAS as páginas = editar o token (1 linha), nunca caçar em 10 arquivos.
+   - As regras ficam numa CSS Cascade Layer (@layer hub). Uma declaração
+     !important DENTRO de uma layer vence qualquer !important FORA de layer,
+     independente da especificidade. Como o CSS legado é todo "unlayered", esta
+     camada ganha sempre — por isso os seletores podem ser simples.
+   - É AQUI que vão futuros overrides hub que precisam valer em todas as páginas
+     (nunca crie `!important` por página num partial de skin).
 
-   Dashboard fica de fora: o container do Dashboard é o único SEM modificador
-   `page-*` (é só `dashboard-page`). Miramos `[class*="page-"]`, que casa
-   page-transacoes, page-metas, … mas não o Dashboard. Agenda/Listas usam
-   elementos próprios (strong / .page-lista-compras__title), incluídos abaixo.
+   Escopo do Dashboard: o container do Dashboard é o único SEM modificador
+   `page-*` (só `dashboard-page`). Miramos `[class*="page-"]` (casa
+   page-transacoes, page-metas, …, mas NÃO o Dashboard). Agenda e Listas usam
+   elementos próprios, incluídos abaixo. COR fica de fora (é por-skin).
 
    Carregar SEMPRE por último no dashboard.css.
    ────────────────────────────────────────────────────────────────────────── */
-@layer page-titles {
+@layer hub {
   .dashboard-container[class*="page-"] .dashboard-hub__title,
   .dashboard-container.page-relatorios .rel-ed__title,
   .dashboard-container.agenda-page .agenda-hero__title-row > strong,
   .dashboard-container.page-lista-compras .page-lista-compras__title {
     font-size: var(--page-title-size) !important;
+    font-weight: var(--page-title-weight) !important;
     line-height: var(--page-title-line) !important;
   }
 }

@@ -87,12 +87,18 @@
   /* Tipografia */
   --font-numeric-features: "tnum" 1, "ss01" 1;
 
-  /* Título de página (hero) — FONTE ÚNICA. Mude aqui para afetar TODAS as
-     páginas de uma vez (Transações, Relatórios, Metas, Agenda, Listas, …).
-     Aplicado via @layer no partial 38 — vence qualquer override !important
-     legado. O Dashboard tem tamanho próprio (partial 13), fora desta padronização. */
-  --page-title-size: clamp(1.9rem, 4.4vw, 2.7rem);
-  --page-title-line: 1.15;
+  /* ── HUB / HERO — FONTE ÚNICA do cabeçalho de página ──────────────────────
+     Valores COMPARTILHADOS entre todas as páginas. Mude aqui para afetar TODAS
+     de uma vez (Transações, Relatórios, Metas, Agenda, Listas, Cartões…).
+     Aplicados via `@layer hub` no partial 38 — vencem qualquer override
+     !important legado, sem guerra de especificidade.
+     NÃO inclui COR do título: cor é por-skin (--rel-text-hi, --cfg-text-hi…),
+     intencional por página. O Dashboard tem tamanho próprio (partial 13),
+     fora desta padronização.
+     >>> Padrão de CSS: docs/design/css-conventions.md <<< */
+  --page-title-size:   clamp(1.9rem, 4.4vw, 2.7rem);
+  --page-title-weight: 800;
+  --page-title-line:   1.15;
 
   /* Transições */
   --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);

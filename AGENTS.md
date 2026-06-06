@@ -173,6 +173,17 @@ Todo botão primário de **criar** de página hub usa o **mesmo FAB mobile**, co
 
 Ao criar uma página hub nova com ação de criar, use este FAB + `useFabCompact` — não invente um botão novo.
 
+### Título/cabeçalho de página — **tokens + `@layer hub`** (uma regra para todos)
+
+Padrão para **valores compartilhados** do cabeçalho de página (hero). Detalhes e o "porquê" em `docs/design/css-conventions.md`.
+
+- **Fonte única = tokens** em `src/pages/dashboard/partials/00-tokens-base.css` (grupo `HUB / HERO`): `--page-title-size`, `--page-title-weight`, `--page-title-line`. Para mudar o título de **TODAS as páginas**, edite o token — **uma linha**, nunca caçar em vários partials.
+- **Onde é aplicado:** `38-page-titles-uniform.css`, dentro de `@layer hub`. Uma declaração `!important` **dentro de uma layer vence qualquer `!important` fora de layer**, sem precisar de seletor gigante. É o lar de qualquer override hub que precise valer em todas as páginas.
+- **PROIBIDO:** criar `font-size`/peso de título com `!important` num partial de skin por página (`07`, `13`, `17`, `18`, `20`, `21`, `23`, …). Isso recria a guerra de especificidade. Use o token + a `@layer hub`.
+- **Cor do título é por-skin** (`--rel-text-hi`, `--cfg-text-hi`, `--ag-text-hi`, `--pg-text-hi`, `--m-text-hi`) — intencional, fica fora da padronização.
+- **Dashboard fica de fora** (tamanho próprio em `13`): o seletor mira `[class*="page-"]`, e o container do Dashboard é o único sem modificador `page-*`.
+- **Gotcha:** `dashboard-page` está em quase todas as páginas (é layout), **não** identifica o Dashboard. Nunca filtrar por `:not(.dashboard-page)`.
+
 ## Mapa rápido de pastas
 
 - `src/pages/` — telas (Dashboard, Transacoes, Login, admin, etc.)
