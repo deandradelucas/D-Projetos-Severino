@@ -493,7 +493,7 @@
     box-shadow: 0 12px 28px -14px rgba(212, 168, 75, 0.42) !important;
   }
 
-  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected span {
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected span:not([class*='agenda-day-preview']) {
     background: linear-gradient(135deg, #c49535 0%, #a07520 100%) !important;
   }
 
@@ -584,7 +584,7 @@
     color: #050505 !important;
   }
 
-  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected span {
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected span:not([class*='agenda-day-preview']) {
     background: #ffffff !important;
     color: #050505 !important;
   }
@@ -707,7 +707,7 @@
     box-shadow: 0 12px 28px -14px rgba(212, 168, 75, 0.42) !important;
   }
 
-  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected span {
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected span:not([class*='agenda-day-preview']) {
     background: linear-gradient(135deg, #c49535 0%, #a07520 100%) !important;
   }
 
@@ -786,7 +786,7 @@
     color: #050505 !important;
   }
 
-  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected span {
+  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected span:not([class*='agenda-day-preview']) {
     background: #ffffff !important;
     color: #050505 !important;
   }
