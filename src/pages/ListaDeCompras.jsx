@@ -1932,14 +1932,7 @@ export default function ListaDeCompras() {
                 <div className="page-lista-compras__header">
                   <div className="page-lista-compras__header-left">
                     <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
-                    <span className="page-lista-compras__header-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                        <circle cx="9" cy="21" r="1" />
-                        <circle cx="20" cy="21" r="1" />
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                      </svg>
-                    </span>
-                    <h1 className="page-lista-compras__title sr-only">Listas</h1>
+                    <h1 className="page-lista-compras__title">Listas</h1>
                   </div>
                   <button
                     type="button"
