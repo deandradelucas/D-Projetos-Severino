@@ -1,22 +1,29 @@
 /* ──────────────────────────────────────────────────────────────────────────
-   38-page-titles-uniform.css — Tamanho ÚNICO para todos os títulos de página
-   Iguala todos ao título do Relatórios: clamp(1.9rem, 4.4vw, 2.7rem).
+   38-page-titles-uniform.css — FONTE ÚNICA do tamanho dos títulos de página
 
-   Discriminador do Dashboard (verificado via Playwright):
-   - Dashboard real: container `dashboard-container dashboard-page …` SEM page-*.
-   - Demais páginas: têm sempre um modificador `page-X` (page-transacoes,
-     page-configuracoes, …). A classe `dashboard-page` é INCONSISTENTE (algumas
-     páginas têm, outras não) — por isso NÃO serve de filtro.
-   Logo: miramos `[class*="page-"]` (exclui o Dashboard puro) e adicionamos
-   `.dashboard-hub__hero` para a especificidade superar os overrides por página
-   (Configurações/Pagamento usam `… __hero .dashboard-hub__title !important`).
+   Como funciona (e por que é à prova de guerra de especificidade):
+   - O tamanho vem do token --page-title-size (definido em 00-tokens-base.css).
+     Para mudar TODOS os títulos, edite só aquele token — nunca mais cace em 10
+     arquivos.
+   - As regras abaixo ficam numa CSS Cascade Layer (@layer page-titles). Uma
+     declaração !important dentro de uma layer VENCE qualquer !important fora de
+     layer, independente da especificidade do seletor. Como todo o CSS legado é
+     "unlayered", estas regras ganham sempre — por isso os seletores podem ser
+     simples.
+
+   Dashboard fica de fora: o container do Dashboard é o único SEM modificador
+   `page-*` (é só `dashboard-page`). Miramos `[class*="page-"]`, que casa
+   page-transacoes, page-metas, … mas não o Dashboard. Agenda/Listas usam
+   elementos próprios (strong / .page-lista-compras__title), incluídos abaixo.
+
    Carregar SEMPRE por último no dashboard.css.
    ────────────────────────────────────────────────────────────────────────── */
-body[data-theme] .dashboard-container.ref-dashboard.app-horizon-shell[class*="page-"] .dashboard-hub__hero .dashboard-hub__title,
-body[data-theme] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .rel-ed__title,
-body[data-theme] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title > .agenda-hero__title-row > strong,
-body[data-theme] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title-row > strong,
-body[data-theme] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__title {
-  font-size: clamp(1.9rem, 4.4vw, 2.7rem) !important;
-  line-height: 1.15 !important;
+@layer page-titles {
+  .dashboard-container[class*="page-"] .dashboard-hub__title,
+  .dashboard-container.page-relatorios .rel-ed__title,
+  .dashboard-container.agenda-page .agenda-hero__title-row > strong,
+  .dashboard-container.page-lista-compras .page-lista-compras__title {
+    font-size: var(--page-title-size) !important;
+    line-height: var(--page-title-line) !important;
+  }
 }
