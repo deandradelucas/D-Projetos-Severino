@@ -67,7 +67,7 @@ export default function InvestimentoAportesDetalheModal({
           </h3>
           <button
             type="button"
-            className="modal-close"
+            className="close-btn"
             onClick={onClose}
             aria-label="Fechar"
           >

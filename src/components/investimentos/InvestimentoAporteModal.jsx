@@ -82,7 +82,7 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
           </h3>
           <button
             type="button"
-            className="modal-close"
+            className="close-btn"
             onClick={onClose}
             aria-label="Fechar"
             disabled={submitting}
