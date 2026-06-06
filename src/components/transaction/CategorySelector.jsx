@@ -6,6 +6,7 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
   const containerRef            = useRef(null)
   const triggerRef              = useRef(null)
   const searchInputRef          = useRef(null)
+  const dropdownRef             = useRef(null)
   const [dropPos, setDropPos]   = useState(null)
 
   // Calcula posição do dropdown com base no trigger.
@@ -72,6 +73,60 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
     return () => clearTimeout(t)
   }, [isOpen])
 
+  // Mobile: arrastar o sheet pra baixo (pela barrinha/topo) fecha. Arrastar na
+  // lista rola normalmente; só vira "fechar" se a lista estiver no topo.
+  useEffect(() => {
+    if (!isOpen || !dropPos?.mobile) return undefined
+    const sheet = dropdownRef.current
+    if (!sheet) return undefined
+    let startY = 0, dy = 0, dragging = false, armed = false
+    const optsEl = () => sheet.querySelector('.custom-select-options')
+    const onStart = (e) => {
+      if (e.touches.length !== 1) return
+      startY = e.touches[0].clientY
+      dy = 0
+      dragging = false
+      const opts = optsEl()
+      const onList = opts && opts.contains(e.target)
+      armed = !onList || opts.scrollTop <= 0
+    }
+    const onMove = (e) => {
+      if (!armed) return
+      dy = e.touches[0].clientY - startY
+      if (dy <= 0) { if (dragging) { dragging = false; sheet.style.transform = '' } return }
+      const opts = optsEl()
+      if (opts && opts.contains(e.target) && opts.scrollTop > 0) { armed = false; return }
+      if (!dragging && dy < 6) return
+      dragging = true
+      sheet.style.transition = 'none'
+      if (e.cancelable) e.preventDefault()
+      sheet.style.transform = `translateY(${dy}px)`
+    }
+    const onEnd = () => {
+      if (!dragging) return
+      dragging = false
+      sheet.style.transition = 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1)'
+      if (dy > 90) {
+        sheet.style.transform = 'translateY(100%)'
+        window.setTimeout(() => { onToggle(null); setSearch('') }, 200)
+      } else {
+        sheet.style.transform = ''
+      }
+    }
+    sheet.addEventListener('touchstart', onStart, { passive: true })
+    sheet.addEventListener('touchmove', onMove, { passive: false })
+    sheet.addEventListener('touchend', onEnd, { passive: true })
+    sheet.addEventListener('touchcancel', onEnd, { passive: true })
+    return () => {
+      sheet.removeEventListener('touchstart', onStart)
+      sheet.removeEventListener('touchmove', onMove)
+      sheet.removeEventListener('touchend', onEnd)
+      sheet.removeEventListener('touchcancel', onEnd)
+      sheet.style.transform = ''
+      sheet.style.transition = ''
+    }
+  }, [isOpen, dropPos?.mobile, onToggle])
+
   const filteredOptions = options.filter((o) =>
     String(o?.nome ?? '').toLowerCase().includes(search.toLowerCase())
   )
@@ -114,6 +169,7 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
     >
       <div
         className="custom-select-dropdown"
+        ref={dropdownRef}
         style={{
           position: 'static',
           display: 'flex',
