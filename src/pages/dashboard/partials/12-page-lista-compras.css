@@ -364,9 +364,17 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1 1 auto;
+  /* Não cresce: a medida ("2 kg") fica colada ao nome em vez de empurrada à direita. */
+  flex: 0 1 auto;
   min-width: 0;
   transition: color var(--transition-base), text-decoration var(--transition-base);
+}
+
+/* Controles (stepper de unidades / contador) + preço empurrados para a direita,
+   deixando nome + medida juntos à esquerda. `>` evita afetar o contador interno do stepper. */
+.page-lista-compras__item-body > .page-lista-compras__item-stepper,
+.page-lista-compras__item-body > .page-lista-compras__item-units {
+  margin-left: auto;
 }
 
 .page-lista-compras__item-qty {
