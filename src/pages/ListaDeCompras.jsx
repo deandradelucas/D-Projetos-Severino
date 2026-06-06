@@ -120,8 +120,9 @@ const CATEGORIAS_LOOKUP = {
   'molho': 'Temperos',
 }
 
-/** Rótulo exibido na lista — gastos são lançados em Alimentação → Supermercado. */
-const LISTA_GASTO_ROTULO = 'Supermercado'
+/** Rótulo exibido na tag da lista (e no subtítulo do WhatsApp). O gasto continua
+ *  sendo lançado em Alimentação → Supermercado (categorização independente). */
+const LISTA_GASTO_ROTULO = 'Compras'
 
 const CATEGORIA_EMOJI = {
   'Grãos e Cereais': '🌾',
