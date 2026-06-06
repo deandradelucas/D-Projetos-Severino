@@ -28,9 +28,12 @@ export function getFocusableElements(container) {
 
 /**
  * Escape, body scroll lock, horizon-modal-open e focus trap para modais.
- * @param {{ open: boolean, onClose?: () => void, containerRef: React.RefObject<HTMLElement|null>, blockClose?: boolean }} opts
+ * @param {{ open: boolean, onClose?: () => void, containerRef: React.RefObject<HTMLElement|null>, blockClose?: boolean, autoFocus?: boolean }} opts
+ *   autoFocus=false: NÃO move o foco ao abrir (use quando o modal já gerencia o
+ *   próprio foco — ex.: focar o input só no desktop, evitando abrir o teclado no
+ *   mobile). Mantém scroll-lock + Escape + focus-trap (Tab).
  */
-export function useModalA11y({ open, onClose, containerRef, blockClose = false }) {
+export function useModalA11y({ open, onClose, containerRef, blockClose = false, autoFocus = true }) {
   const titleId = useId()
 
   // Scroll-lock + foco inicial. Depende SÓ de `open` — assim o foco é dado
@@ -45,17 +48,19 @@ export function useModalA11y({ open, onClose, containerRef, blockClose = false }
     document.body.style.overflow = 'hidden'
     document.body.classList.add('horizon-modal-open')
 
-    const focusTimer = window.setTimeout(() => {
-      const focusable = getFocusableElements(containerRef.current)
-      focusable[0]?.focus()
-    }, 0)
+    const focusTimer = autoFocus
+      ? window.setTimeout(() => {
+          const focusable = getFocusableElements(containerRef.current)
+          focusable[0]?.focus()
+        }, 0)
+      : 0
 
     return () => {
       window.clearTimeout(focusTimer)
       document.body.style.overflow = previousOverflow
       document.body.classList.remove('horizon-modal-open')
     }
-  }, [open, containerRef])
+  }, [open, containerRef, autoFocus])
 
   // Listener de teclado (Escape + focus-trap no Tab). Pode re-bindar quando
   // `onClose`/`blockClose` mudam — é inofensivo, não mexe no foco atual.

@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import './dashboard.css'
 import './cartoes.css'
+import { useFabCompact } from '../hooks/useFabCompact'
+import { useModalA11y } from '../hooks/useModalA11y'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
@@ -52,6 +54,8 @@ function shiftRef(ref, delta) {
 // ──────────────────────────────────────────────────────────────────────────
 function ModalCartao({ cartaoEdit, onClose, onSalvar, salvando }) {
   const editando = Boolean(cartaoEdit)
+  const modalRef = useRef(null)
+  useModalA11y({ open: true, onClose, containerRef: modalRef })
   const [nome, setNome] = useState(cartaoEdit?.nome || '')
   const [bandeira, setBandeira] = useState(cartaoEdit?.bandeira || 'visa')
   const [cor, setCor] = useState(cartaoEdit?.cor || 'gold')
@@ -77,7 +81,7 @@ function ModalCartao({ cartaoEdit, onClose, onSalvar, salvando }) {
 
   return (
     <div className="page-cartoes__modal-overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-cartoes__modal" role="dialog" aria-modal="true" aria-labelledby="cartao-modal-title">
+      <div ref={modalRef} className="page-cartoes__modal" role="dialog" aria-modal="true" aria-labelledby="cartao-modal-title">
         <div className="page-cartoes__modal-head">
           <h2 id="cartao-modal-title" className="page-cartoes__modal-title">{editando ? 'Editar cartão' : 'Novo cartão'}</h2>
           <button type="button" className="page-cartoes__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
@@ -140,6 +144,8 @@ function ModalCartao({ cartaoEdit, onClose, onSalvar, salvando }) {
 // ──────────────────────────────────────────────────────────────────────────
 function ModalFatura({ cartao, pessoalParam, onClose }) {
   const [ref, setRef] = useState(cartao.fatura_atual?.ref || '')
+  const modalRef = useRef(null)
+  useModalA11y({ open: true, onClose, containerRef: modalRef })
   const [fatura, setFatura] = useState(null)
   const [loading, setLoading] = useState(true)
   const [busca, setBusca] = useState('')
@@ -208,9 +214,9 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
 
   return (
     <div className="page-cartoes__modal-overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-cartoes__modal page-cartoes__modal--fatura" role="dialog" aria-modal="true">
+      <div ref={modalRef} className="page-cartoes__modal page-cartoes__modal--fatura" role="dialog" aria-modal="true" aria-labelledby="fatura-modal-title">
         <div className="page-cartoes__modal-head">
-          <h2 className="page-cartoes__modal-title">{cartao.nome}</h2>
+          <h2 id="fatura-modal-title" className="page-cartoes__modal-title">{cartao.nome}</h2>
           <button type="button" className="page-cartoes__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
 
@@ -392,6 +398,9 @@ export default function Cartoes() {
   const [salvando, setSalvando] = useState(false)
   const [faturaTarget, setFaturaTarget] = useState(null)
   const [excluirTarget, setExcluirTarget] = useState(null)
+  // FAB padrão: encolhe ao rolar (ver useFabCompact / AGENTS.md «FAB padrão»)
+  const fabScrollRef = useRef(null)
+  const fabCompact = useFabCompact(fabScrollRef)
 
   const pessoalParam = isMembroConta && escopo === 'pessoal' ? '?pessoal=1' : ''
 
@@ -462,7 +471,7 @@ export default function Cartoes() {
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
-            <RefDashboardScroll>
+            <RefDashboardScroll ref={fabScrollRef}>
               <section className="dashboard-hub__hero" aria-label="Cartões">
                 <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
@@ -513,6 +522,23 @@ export default function Cartoes() {
           </div>
         </main>
       </div>
+
+      {!modalCartao && !faturaTarget && (
+        <button
+          type="button"
+          className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
+          onClick={() => { setCartaoEdit(null); setModalCartao(true) }}
+          aria-label="Criar novo cartão"
+        >
+          <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+          </span>
+          <span className="dashboard-mobile-tx-fab__label">Novo cartão</span>
+        </button>
+      )}
 
       {modalCartao && (
         <ModalCartao

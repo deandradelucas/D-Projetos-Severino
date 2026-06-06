@@ -1,5 +1,9 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { useFabCompact } from '../hooks/useFabCompact'
+import { useSwipeReveal } from '../hooks/useSwipeReveal'
+import { useModalA11y } from '../hooks/useModalA11y'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
 import './dashboard.css'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
@@ -142,9 +146,8 @@ function detectarCategoria(nome) {
   return 'Outros'
 }
 
-function formatarMoeda(valor) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor)
-}
+// Formatação BRL única do app (ver lib/formatCurrency.js)
+const formatarMoeda = formatCurrencyBRL
 
 function dataHojeIso() {
   const d = new Date()
@@ -288,6 +291,7 @@ function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
   const inputRef = useRef(null)
   const sheetRef = useRef(null)
   useSheetDragClose(sheetRef, { open: true, onClose })
+  useModalA11y({ open: true, onClose, containerRef: sheetRef, autoFocus: false })
   const keyboardH = useKeyboardOffset()
   /** Quando o teclado mobile abre, sobe o sheet via CSS var (--lista-kb lido no partial 32). */
   const overlayStyle = { '--lista-kb': keyboardH > 0 ? `${keyboardH + 8}px` : '0px' }
@@ -448,6 +452,8 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
   const [valorCentavos, setValorCentavos] = useState(Math.round((Number(total) || 0) * 100))
   const [salvando, setSalvando] = useState(false)
   const [carregandoCategorias, setCarregandoCategorias] = useState(true)
+  const modalRef = useRef(null)
+  useModalA11y({ open: true, onClose, containerRef: modalRef })
 
   const valorReal = valorCentavos / 100
   // Diferença entre o que foi pago e o estimado (#8 planejado vs real)
@@ -550,7 +556,7 @@ function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
 
   return (
     <div className="page-lista-compras__modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-gasto-titulo">
+      <div ref={modalRef} className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-gasto-titulo">
         <div className="page-lista-compras__modal-header">
           <h2 id="modal-gasto-titulo" className="page-lista-compras__modal-title">Registrar como gasto</h2>
           <button type="button" className="page-lista-compras__modal-close" onClick={onClose} aria-label="Fechar">
@@ -647,6 +653,7 @@ function ModalNovoItem({ historico, historicoPrecos = {}, onClose, onSalvar, adi
   const editando = !!itemEditando
   const sheetRef = useRef(null)
   useSheetDragClose(sheetRef, { open: true, onClose })
+  useModalA11y({ open: true, onClose, containerRef: sheetRef, autoFocus: false })
   const [nome, setNome] = useState(itemEditando?.nome ?? '')
   const [quantidade, setQuantidade] = useState(
     itemEditando?.quantidade != null ? Number(itemEditando.quantidade) : 1
@@ -939,6 +946,8 @@ function ModalNovoItem({ historico, historicoPrecos = {}, onClose, onSalvar, adi
 function ModalRenomearLista({ nomeAtual, onClose, onSalvar, salvando }) {
   const [nome, setNome] = useState(nomeAtual || '')
   const inputRef = useRef(null)
+  const modalRef = useRef(null)
+  useModalA11y({ open: true, onClose, containerRef: modalRef, autoFocus: false })
   const keyboardH = useKeyboardOffset()
   const overlayStyle = { '--lista-kb': keyboardH > 0 ? `${keyboardH + 8}px` : '0px' }
 
@@ -957,7 +966,7 @@ function ModalRenomearLista({ nomeAtual, onClose, onSalvar, salvando }) {
 
   return (
     <div className="page-lista-compras__modal-overlay" style={overlayStyle} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-renomear-titulo">
+      <div ref={modalRef} className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-renomear-titulo">
         <div className="page-lista-compras__modal-header">
           <h2 id="modal-renomear-titulo" className="page-lista-compras__modal-title">Renomear lista</h2>
           <button type="button" className="page-lista-compras__modal-close" onClick={onClose} aria-label="Fechar"><IconX /></button>
@@ -994,6 +1003,8 @@ function ModalRenomearLista({ nomeAtual, onClose, onSalvar, salvando }) {
 function ModalOrcamentoLista({ orcamentoAtual, onClose, onSalvar, salvando }) {
   const [centavos, setCentavos] = useState(orcamentoAtual != null ? Math.round(Number(orcamentoAtual) * 100) : 0)
   const inputRef = useRef(null)
+  const modalRef = useRef(null)
+  useModalA11y({ open: true, onClose, containerRef: modalRef, autoFocus: false })
   const keyboardH = useKeyboardOffset()
   const overlayStyle = { '--lista-kb': keyboardH > 0 ? `${keyboardH + 8}px` : '0px' }
 
@@ -1009,7 +1020,7 @@ function ModalOrcamentoLista({ orcamentoAtual, onClose, onSalvar, salvando }) {
 
   return (
     <div className="page-lista-compras__modal-overlay" style={overlayStyle} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-orcamento-titulo">
+      <div ref={modalRef} className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-orcamento-titulo">
         <div className="page-lista-compras__modal-header">
           <h2 id="modal-orcamento-titulo" className="page-lista-compras__modal-title">Orçamento da lista</h2>
           <button type="button" className="page-lista-compras__modal-close" onClick={onClose} aria-label="Fechar"><IconX /></button>
@@ -1052,6 +1063,8 @@ function ModalOrcamentoLista({ orcamentoAtual, onClose, onSalvar, salvando }) {
 // ---------------------------------------------------------------------------
 function ModalRecorrenciaLista({ recorrenciaAtual, onClose, onSalvar, salvando }) {
   const [sel, setSel] = useState(recorrenciaAtual || 'nenhuma')
+  const modalRef = useRef(null)
+  useModalA11y({ open: true, onClose, containerRef: modalRef })
   const keyboardH = useKeyboardOffset()
   const overlayStyle = { '--lista-kb': keyboardH > 0 ? `${keyboardH + 8}px` : '0px' }
   const OPCOES = [
@@ -1062,7 +1075,7 @@ function ModalRecorrenciaLista({ recorrenciaAtual, onClose, onSalvar, salvando }
 
   return (
     <div className="page-lista-compras__modal-overlay" style={overlayStyle} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-recorrencia-titulo">
+      <div ref={modalRef} className="page-lista-compras__modal" role="dialog" aria-modal="true" aria-labelledby="modal-recorrencia-titulo">
         <div className="page-lista-compras__modal-header">
           <h2 id="modal-recorrencia-titulo" className="page-lista-compras__modal-title">Repetir lista</h2>
           <button type="button" className="page-lista-compras__modal-close" onClick={onClose} aria-label="Fechar"><IconX /></button>
@@ -1120,6 +1133,9 @@ export default function ListaDeCompras() {
   const [modalRecorrencia, setModalRecorrencia] = useState(false)
   const [salvandoMeta, setSalvandoMeta] = useState(false)
   const [modoComprando, setModoComprando] = useState(false)
+  // FAB padrão: encolhe ao rolar (ver useFabCompact / AGENTS.md «FAB padrão»)
+  const fabScrollRef = useRef(null)
+  const fabCompact = useFabCompact(fabScrollRef)
   const [checkedAberto, setCheckedAberto] = useState(true)
   const [menuListaAberto, setMenuListaAberto] = useState(false)
   const [adicionando, setAdicionando] = useState(false)
@@ -1148,14 +1164,10 @@ export default function ListaDeCompras() {
       if (!res.ok) return
       const data = await res.json()
       setListas(data)
-      if (data.length > 0) {
-        const primeiraId = data[0].id
-        setListaAtiva(primeiraId)
-        setItens(data[0].itens || [])
-      } else {
-        setListaAtiva(null)
-        setItens([])
-      }
+      // Landa na «visão geral» (sem auto-abrir): mostra as abas + o FAB «Nova lista» grande
+      // (padrão dos outros FABs). Usuário toca numa aba para abrir a lista.
+      setListaAtiva(null)
+      setItens([])
     } catch {
       // silencioso
     } finally {
@@ -1732,7 +1744,7 @@ export default function ListaDeCompras() {
       if (b === 'Outros') return -1
       return a.localeCompare(b, 'pt-BR')
     })
-    return { grupos, ordenadas, checked }
+    return { grupos, ordenadas, checked, unchecked }
   }, [itens])
 
   // -------------------------------------------------------------------------
@@ -1757,22 +1769,17 @@ export default function ListaDeCompras() {
     linhas.push(`_${LISTA_GASTO_ROTULO}_`)
     linhas.push('')
 
-    const cats = itensAgrupados.ordenadas
-    cats.forEach((cat, idx) => {
-      const emoji = CATEGORIA_EMOJI[cat] || '🛒'
-      linhas.push(`${emoji} *${cat}*`)
-      itensAgrupados.grupos[cat].forEach((item) => {
-        const qtd = Number(item.quantidade)
-        const u = item.unidade || 'un'
-        const unid = Math.max(1, Number(item.unidades) || 1)
-        const partes = [`${qtd} ${u}`]
-        if (unid > 1) partes.push(`${unid}un`)
-        const preco = item.preco_estimado != null ? Number(item.preco_estimado) : null
-        const subtotal = preco != null && preco > 0 ? preco * unid : null
-        const sufixo = subtotal != null ? ` — ${formatarMoeda(subtotal)}` : ''
-        linhas.push(`• ${item.nome} (${partes.join(' · ')})${sufixo}`)
-      })
-      if (idx < cats.length - 1) linhas.push('')
+    // Lista única, sem categorias (mesma ordem da tela)
+    itensAgrupados.unchecked.forEach((item) => {
+      const qtd = Number(item.quantidade)
+      const u = item.unidade || 'un'
+      const unid = Math.max(1, Number(item.unidades) || 1)
+      const partes = [`${qtd} ${u}`]
+      if (unid > 1) partes.push(`${unid}un`)
+      const preco = item.preco_estimado != null ? Number(item.preco_estimado) : null
+      const subtotal = preco != null && preco > 0 ? preco * unid : null
+      const sufixo = subtotal != null ? ` — ${formatarMoeda(subtotal)}` : ''
+      linhas.push(`• ${item.nome} (${partes.join(' · ')})${sufixo}`)
     })
 
     if (totalEstimado > 0) {
@@ -1811,7 +1818,7 @@ export default function ListaDeCompras() {
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
-            <RefDashboardScroll>
+            <RefDashboardScroll ref={fabScrollRef}>
               <div className="page-lista-compras-wrap">
 
                 {/* Header */}
@@ -1905,6 +1912,14 @@ export default function ListaDeCompras() {
                         </button>
                       )
                     })}
+                  </div>
+                )}
+
+                {/* Visão geral: nenhuma lista aberta, mas há listas — orienta o toque */}
+                {!loading && listas.length > 0 && !listaAtiva && (
+                  <div className="page-lista-compras__overview-hint" role="note">
+                    <span className="page-lista-compras__overview-hint-icon" aria-hidden="true">👆</span>
+                    Toque numa lista acima para abrir, ou crie uma nova.
                   </div>
                 )}
 
@@ -2031,18 +2046,10 @@ export default function ListaDeCompras() {
                   </div>
                 )}
 
-                {/* Grupos de itens (unchecked) */}
-                {!loadingItens && itensAgrupados.ordenadas.map((cat) => (
-                  <div key={cat} className="page-lista-compras__category-group">
-                    {listaAtivaDados?.tipo !== 'tarefas' && (
-                      <div className="page-lista-compras__category-header">
-                        <span className="page-lista-compras__category-icon" aria-hidden="true">
-                          {CATEGORIA_EMOJI[cat] || '🛒'}
-                        </span>
-                        {cat}
-                      </div>
-                    )}
-                    {itensAgrupados.grupos[cat].map((item) => (
+                {/* Itens (unchecked) — lista única, sem cabeçalhos de categoria */}
+                {!loadingItens && itensAgrupados.unchecked.length > 0 && (
+                  <div className="page-lista-compras__category-group">
+                    {itensAgrupados.unchecked.map((item) => (
                       <ItemRow
                         key={item.id}
                         item={item}
@@ -2055,7 +2062,7 @@ export default function ListaDeCompras() {
                       />
                     ))}
                   </div>
-                ))}
+                )}
 
                 {/* Seção de itens marcados */}
                 {!loadingItens && itensAgrupados.checked.length > 0 && (
@@ -2174,6 +2181,25 @@ export default function ListaDeCompras() {
         </main>
       </div>
 
+      {/* FAB padrão «Nova lista» — só na visão geral (sem lista ativa, sem footer p/ colidir).
+          `!loading` evita o flash/encolhe no carregamento (listaAtiva ainda é null antes da lista chegar). */}
+      {!loading && !listaAtiva && !modoComprando && !modalNovaLista && (
+        <button
+          type="button"
+          className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
+          onClick={() => setModalNovaLista(true)}
+          aria-label="Criar nova lista"
+        >
+          <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+          </span>
+          <span className="dashboard-mobile-tx-fab__label">Nova lista</span>
+        </button>
+      )}
+
       {/* Modal nova lista */}
       {modalNovaLista && (
         <ModalNovaLista
@@ -2263,8 +2289,14 @@ function ItemRow({ item, onToggle, onRemover, onEditar, mostrarMedida = true, on
   const prazoFmt = item.prazo
     ? new Date(item.prazo).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
     : null
+  const { ref: swipeRef, closeIfOpen } = useSwipeReveal({ reveal: 72 })
   return (
-    <div className={`page-lista-compras__item${item.checked ? ' page-lista-compras__item--checked' : ''}`}>
+    <div
+      ref={swipeRef}
+      onClickCapture={closeIfOpen}
+      className={`page-lista-compras__item${item.checked ? ' page-lista-compras__item--checked' : ''}`}
+    >
+      <div className="page-lista-compras__item-fg">
       <button
         type="button"
         className={`page-lista-compras__item-check${item.checked ? ' page-lista-compras__item-check--checked' : ''}`}
@@ -2316,6 +2348,7 @@ function ItemRow({ item, onToggle, onRemover, onEditar, mostrarMedida = true, on
             {formatarMoeda(Number(item.preco_estimado) * Math.max(1, Number(item.unidades) || 1))}
           </span>
         )}
+      </div>
       </div>
 
       <div className="page-lista-compras__item-actions">

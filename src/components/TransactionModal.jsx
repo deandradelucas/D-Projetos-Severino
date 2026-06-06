@@ -8,6 +8,7 @@ import { ymdToDdMmYyyy, todayYmdLocal } from '../lib/dateInputBr'
 import { vencimentoCartaoParaData, calcularParcelaAtual } from '../lib/cartaoVencimento'
 import { useTransactionForm } from '../hooks/useTransactionForm'
 import { useModalA11y } from '../hooks/useModalA11y'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
 
 function tipoCategoriaIgual(tipoCampo, tipoAlvo) {
   return String(tipoCampo ?? '').trim().toUpperCase() === String(tipoAlvo ?? '').trim().toUpperCase()
@@ -232,7 +233,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   const handleCalcSubmit = useCallback(() => {
     const result = safeEvalExpression(calcExpr)
     if (result == null) return
-    const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(result)
+    const brl = formatCurrencyBRL(result)
     handleCurrencyChange({ target: { name: 'valorDisplay', value: brl } })
     setCalcOpen(false)
     setCalcExpr('')
@@ -846,8 +847,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               const numParcelasRestantes = numParcelas - parcelaInicial + 1
               const valorNum = parseFloat(formData.valor)
               const valorParcela = formData.parcelado && numParcelas >= 2 && valorNum > 0
-                ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                    .format(Math.floor((valorNum / numParcelas) * 100) / 100)
+                ? formatCurrencyBRL(Math.floor((valorNum / numParcelas) * 100) / 100)
                 : null
               const selectedCartao = cartoes.find((c) => String(c.id) === String(formData.cartao_id))
               const parcelaInfo = selectedCartao && Number.isFinite(numParcelas) && numParcelas >= 2
@@ -893,7 +893,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                         <span className="ntx-parc-preview__value">{valorParcela}</span>
                         <span className="ntx-parc-preview__sep">=</span>
                         <span className="ntx-parc-preview__total">
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valorNum)}
+                          {formatCurrencyBRL(valorNum)}
                         </span>
                       </div>
                     )}
@@ -1020,14 +1020,14 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                         </p>
                         {formData.prazo_indeterminado && valorNum > 0 && (
                           <p className="parcelamento-preview">
-                            Mensal · {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valorNum)} · sem prazo
+                            Mensal · {formatCurrencyBRL(valorNum)} · sem prazo
                           </p>
                         )}
                         {!formData.prazo_indeterminado && valorParcela && (
                           <p className="parcelamento-preview">
                             {parcelaInicial > 1
                               ? `${numParcelasRestantes} parcelas (${parcelaInicial}/${numParcelas} a ${numParcelas}/${numParcelas}) · ${valorParcela} cada`
-                              : `${numParcelas}x de ${valorParcela} · total ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valorNum)}`}
+                              : `${numParcelas}x de ${valorParcela} · total ${formatCurrencyBRL(valorNum)}`}
                           </p>
                         )}
                       </div>

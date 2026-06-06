@@ -19,6 +19,7 @@
 
   /* Acento gold — família completa */
   --accent:             #d4a84b;
+  --accent-rgb:         212, 168, 75; /* usado em rgba(var(--accent-rgb), a) — ex.: partial 12 */
   --accent-hover:       #c49535;
   --accent-active:      #b8832a;
   --accent-subtle:      #e8c878;

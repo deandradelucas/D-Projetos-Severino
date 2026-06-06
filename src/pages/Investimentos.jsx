@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './dashboard.css'
+import { useFabCompact } from '../hooks/useFabCompact'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
@@ -66,6 +67,10 @@ export default function Investimentos() {
   const [aporteDetalheTarget, setAporteDetalheTarget] = useState(null)
   const [removendoAporteId, setRemovendoAporteId] = useState(null)
   const [comparadorOpen, setComparadorOpen] = useState(false)
+
+  // FAB padrão: encolhe ao rolar (ver useFabCompact / AGENTS.md «FAB padrão»)
+  const fabScrollRef = useRef(null)
+  const fabCompact = useFabCompact(fabScrollRef)
 
   const session = readHorizonteUser()
   const uid = session?.id ? String(session.id).trim() : ''
@@ -272,7 +277,7 @@ export default function Investimentos() {
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
-            <RefDashboardScroll>
+            <RefDashboardScroll ref={fabScrollRef}>
               <section className="dashboard-hub__hero" aria-label="Investimentos">
                 <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} aria-label="Abrir menu" />
@@ -504,7 +509,7 @@ export default function Investimentos() {
       {!modalOpen && (
         <button
           type="button"
-          className="dashboard-mobile-tx-fab"
+          className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
           onClick={() => {
             setEditTarget(null)
             setModalResetKey((k) => k + 1)

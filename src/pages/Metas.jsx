@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './dashboard.css'
 import './metas.css'
+import { useFabCompact } from '../hooks/useFabCompact'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
@@ -281,6 +282,9 @@ export default function Metas() {
   const [aporteTarget, setAporteTarget] = useState(null)
   const [aporteSalvando, setAporteSalvando] = useState(false)
   const [excluirTarget, setExcluirTarget] = useState(null)
+  // FAB padrão: encolhe ao rolar (ver useFabCompact / AGENTS.md «FAB padrão»)
+  const fabScrollRef = useRef(null)
+  const fabCompact = useFabCompact(fabScrollRef)
 
   const pessoalParam = isMembroConta && escopo === 'pessoal' ? '?pessoal=1' : ''
 
@@ -379,7 +383,7 @@ export default function Metas() {
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub">
-            <RefDashboardScroll>
+            <RefDashboardScroll ref={fabScrollRef}>
               <section className="dashboard-hub__hero" aria-label="Metas">
                 <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
@@ -442,6 +446,23 @@ export default function Metas() {
           </div>
         </main>
       </div>
+
+      {!modalMeta && !aporteTarget && (
+        <button
+          type="button"
+          className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
+          onClick={() => { setMetaEdit(null); setModalMeta(true) }}
+          aria-label="Criar nova meta"
+        >
+          <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+          </span>
+          <span className="dashboard-mobile-tx-fab__label">Nova meta</span>
+        </button>
+      )}
 
       {modalMeta && (
         <ModalMeta

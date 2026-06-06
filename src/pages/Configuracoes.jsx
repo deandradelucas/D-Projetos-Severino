@@ -14,6 +14,7 @@ import { useTheme } from '../context/ThemeContext'
 import { useConfigWebAuthn } from '../hooks/useConfigWebAuthn'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
+import { showToast } from '../lib/toastStore'
 import { redirectSe401 } from '../lib/authRedirect'
 import { montarTextoConviteFamiliaComPwa } from '../lib/familiaConviteMensagemCompartilhavel'
 import { getPublicAppOriginForConvites } from '../lib/publicAppOrigin'
@@ -68,7 +69,6 @@ export default function Configuracoes() {
     }
   })
 
-  const [toast, setToast] = useState('')
   const [familiaTitular, setFamiliaTitular] = useState(null)
   const [familiaMembros, setFamiliaMembros] = useState([])
   const [familiaConvites, setFamiliaConvites] = useState([])
@@ -117,9 +117,9 @@ export default function Configuracoes() {
       })
       if (redirectSe401(res)) return
       if (!res.ok) throw new Error()
-      setToast('Preferência salva.')
+      showToast('Preferência salva.')
     } catch {
-      setToast('Erro ao salvar preferência.')
+      showToast('Erro ao salvar preferência.')
       setPerfil((p) => ({ ...p, preferencias: { ...(p.preferencias || {}), [key]: !value } }))
     } finally {
       setPrefsSaving('')
@@ -130,7 +130,7 @@ export default function Configuracoes() {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
-    if (!file.type.startsWith('image/')) { setToast('Selecione um arquivo de imagem.'); return }
+    if (!file.type.startsWith('image/')) { showToast('Selecione um arquivo de imagem.'); return }
     setAvatarSaving(true)
     try {
       const dataUrl = await fileToAvatarDataUrl(file)
@@ -141,7 +141,7 @@ export default function Configuracoes() {
       })
       if (redirectSe401(res)) return
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) { setToast(data.message || 'Erro ao salvar foto.'); return }
+      if (!res.ok) { showToast(data.message || 'Erro ao salvar foto.'); return }
       const novo = data?.perfil?.avatar_url ?? dataUrl
       setPerfil((p) => {
         const upd = { ...p, avatar_url: novo }
@@ -149,9 +149,9 @@ export default function Configuracoes() {
         return upd
       })
       window.dispatchEvent(new Event('horizonte-session-refresh'))
-      setToast('Foto atualizada!')
+      showToast('Foto atualizada!')
     } catch {
-      setToast('Não consegui processar a imagem.')
+      showToast('Não consegui processar a imagem.')
     } finally {
       setAvatarSaving(false)
     }
@@ -166,16 +166,16 @@ export default function Configuracoes() {
         body: JSON.stringify({ avatar_url: null }),
       })
       if (redirectSe401(res)) return
-      if (!res.ok) { const d = await res.json().catch(() => ({})); setToast(d.message || 'Erro ao remover foto.'); return }
+      if (!res.ok) { const d = await res.json().catch(() => ({})); showToast(d.message || 'Erro ao remover foto.'); return }
       setPerfil((p) => {
         const upd = { ...p, avatar_url: null }
         try { localStorage.setItem('horizonte_user', JSON.stringify(upd)) } catch { /* ignore */ }
         return upd
       })
       window.dispatchEvent(new Event('horizonte-session-refresh'))
-      setToast('Foto removida.')
+      showToast('Foto removida.')
     } catch {
-      setToast('Erro ao remover foto.')
+      showToast('Erro ao remover foto.')
     } finally {
       setAvatarSaving(false)
     }
@@ -183,7 +183,7 @@ export default function Configuracoes() {
 
   const salvarNome = useCallback(async () => {
     const nome = nomeInput.trim()
-    if (nome.length < 2) { setToast('Nome muito curto.'); return }
+    if (nome.length < 2) { showToast('Nome muito curto.'); return }
     setNomeSaving(true)
     try {
       const res = await apiFetch(apiUrl('/api/usuarios/perfil/nome'), {
@@ -199,9 +199,9 @@ export default function Configuracoes() {
       localStorage.setItem('horizonte_user', JSON.stringify(u))
       window.dispatchEvent(new Event('horizonte-session-refresh'))
       setNomeEditando(false)
-      setToast('Nome atualizado.')
+      showToast('Nome atualizado.')
     } catch (e) {
-      setToast(e.message || 'Erro ao atualizar nome.')
+      showToast(e.message || 'Erro ao atualizar nome.')
     } finally {
       setNomeSaving(false)
     }
@@ -221,9 +221,9 @@ export default function Configuracoes() {
       a.download = 'severino-meus-dados.json'
       a.click()
       URL.revokeObjectURL(url)
-      setToast('Download iniciado.')
+      showToast('Download iniciado.')
     } catch {
-      setToast('Erro ao exportar dados.')
+      showToast('Erro ao exportar dados.')
     } finally {
       setExportBusy(false)
     }
@@ -236,9 +236,9 @@ export default function Configuracoes() {
       if (redirectSe401(res)) return
       if (!res.ok) throw new Error()
       setSessoesTotal(1)
-      setToast('Outras sessões encerradas.')
+      showToast('Outras sessões encerradas.')
     } catch {
-      setToast('Erro ao encerrar sessões.')
+      showToast('Erro ao encerrar sessões.')
     } finally {
       setSessoesBusy(false)
     }
@@ -256,7 +256,7 @@ export default function Configuracoes() {
       if (!res.ok && res.status !== 401) throw new Error()
       logoutHorizonte()
     } catch {
-      setToast('Erro ao excluir conta.')
+      showToast('Erro ao excluir conta.')
       setExcluirBusy(false)
     }
   }, [excluirInput])
@@ -272,13 +272,6 @@ export default function Configuracoes() {
   }, [])
   const usuarioIdHeader = String(perfil?.id ?? '').trim()
 
-  const toastTimerRef = useRef(0)
-  useEffect(() => () => window.clearTimeout(toastTimerRef.current), [])
-  const showToast = useCallback((msg) => {
-    setToast(msg)
-    window.clearTimeout(toastTimerRef.current)
-    toastTimerRef.current = window.setTimeout(() => setToast(''), 4200)
-  }, [])
 
   const {
     webauthnList,
@@ -683,11 +676,6 @@ export default function Configuracoes() {
           </nav>
         </section>
 
-        {toast ? (
-          <div className="config-toast" role="status" aria-live="polite">
-            {toast}
-          </div>
-        ) : null}
 
         <div className="config-layout config-layout--clean">
           <section className="config-card config-profile-card" id="config-secao-conta">

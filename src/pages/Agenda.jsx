@@ -11,6 +11,7 @@ import { redirectSe401 } from '../lib/authRedirect'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { showToast } from '../lib/toastStore'
 import { useSheetDragClose } from '../hooks/useSheetDragClose'
+import { useFabCompact } from '../hooks/useFabCompact'
 import {
   SAO_PAULO_OFFSET,
   saoPauloDateKey,
@@ -59,6 +60,9 @@ export default function Agenda() {
   const savingRef = useRef(false)
   const editingRef = useRef(null)
   const agendaSheetRef = useRef(null)
+  // FAB padrão: encolhe ao rolar (ver useFabCompact / AGENTS.md «FAB padrão»)
+  const fabScrollRef = useRef(null)
+  const fabCompact = useFabCompact(fabScrollRef)
   const closeAgendaSheet = useCallback(() => { if (!savingRef.current) setModalOpen(false) }, [])
   useSheetDragClose(agendaSheetRef, { open: modalOpen, onClose: closeAgendaSheet })
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
@@ -378,7 +382,7 @@ export default function Agenda() {
 
         <main className="main-content relative z-10 ref-dashboard-main">
           <div className="ref-dashboard-inner dashboard-hub agenda-shell">
-            <RefDashboardScroll>
+            <RefDashboardScroll ref={fabScrollRef}>
               <section className="dashboard-hub__hero agenda-hero" aria-label="Agenda e lembretes">
                 <span className="agenda-hero__orb agenda-hero__orb--one" aria-hidden="true" />
                 <span className="agenda-hero__orb agenda-hero__orb--two" aria-hidden="true" />
@@ -564,7 +568,7 @@ export default function Agenda() {
     {!modalOpen && (
       <button
         type="button"
-        className="dashboard-mobile-tx-fab"
+        className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
         onClick={openNew}
         aria-label="Criar novo item na agenda"
       >

@@ -256,27 +256,8 @@ body[data-theme='dark']
   }
 }
 
-/* FAB fixo — Visão Geral: vitrificado + borda fina dourada (accent), sem fundo sólido */
-body:not([data-theme='dark']):has(
-    .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(
-        .page-investimentos
-      )
-  )
-  .dashboard-mobile-tx-fab {
-  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 72%, transparent) !important;
-  background: linear-gradient(
-    172deg,
-    rgba(255, 255, 255, 0.62) 0%,
-    rgba(255, 255, 255, 0.22) 48%,
-    rgba(255, 255, 255, 0.38) 100%
-  ) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(1.28) !important;
-  backdrop-filter: blur(20px) saturate(1.28) !important;
-  box-shadow:
-    0 10px 28px -14px rgba(15, 23, 42, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 -1px 0 rgba(15, 23, 42, 0.05) !important;
-}
+/* FAB fixo — Visão Geral (light): sem override próprio. Usa o estilo canônico do
+   partial 22 (vidro branco, borda branca, rótulo dourado) — idêntico à Transações. */
 
 body[data-theme='dark']:has(
     .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(
@@ -293,25 +274,13 @@ body[data-theme='dark']:has(
       transparent 62%
     ),
     rgba(15, 23, 42, 0.38) !important;
+  background-image: none !important;
   -webkit-backdrop-filter: blur(22px) saturate(1.22) !important;
   backdrop-filter: blur(22px) saturate(1.22) !important;
   box-shadow:
     0 14px 36px -20px rgba(0, 0, 0, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
-}
-
-body:not([data-theme='dark']):has(
-    .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(
-        .page-investimentos
-      )
-  )
-  .dashboard-mobile-tx-fab__icon {
-  background: rgba(15, 23, 42, 0.07) !important;
-  color: rgba(15, 23, 42, 0.72) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -1px 0 rgba(15, 23, 42, 0.06) !important;
 }
 
 body[data-theme='dark']:has(
@@ -327,20 +296,6 @@ body[data-theme='dark']:has(
     inset 0 -1px 0 rgba(0, 0, 0, 0.28) !important;
 }
 
-body:not([data-theme='dark']):has(
-    .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(
-        .page-investimentos
-      )
-  )
-  .dashboard-mobile-tx-fab__label {
-  color: transparent !important;
-  -webkit-text-fill-color: transparent !important;
-  background: linear-gradient(185deg, #c9a227 0%, #b58d3d 42%, #7a5a18 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  font-weight: 800 !important;
-}
-
 body[data-theme='dark']:has(
     .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(
         .page-investimentos
@@ -353,19 +308,6 @@ body[data-theme='dark']:has(
   -webkit-background-clip: text !important;
   background-clip: text !important;
   font-weight: 800 !important;
-}
-
-body:not([data-theme='dark']):has(
-    .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-admin):not(
-        .page-investimentos
-      )
-  )
-  .dashboard-mobile-tx-fab:focus-visible {
-  outline: 2px solid rgba(181, 141, 61, 0.65) !important;
-  outline-offset: 3px !important;
-  box-shadow:
-    0 0 0 5px rgba(181, 141, 61, 0.22),
-    0 4px 14px rgba(15, 23, 42, 0.14) !important;
 }
 
 body[data-theme='dark']:has(

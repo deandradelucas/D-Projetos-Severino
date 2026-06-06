@@ -148,6 +148,31 @@ Comportamento final validado (mobile Safari + tema claro/escuro). Evitar refacto
 
 Se precisar mudar blur, stacking ou ordem do DOM, testar Dashboard e uma página hub no telemóvel antes de commitar.
 
+### FAB padrão (botão primário de criar — **uma regra para todos**)
+
+Todo botão primário de **criar** de página hub usa o **mesmo FAB mobile**, com o mesmo layout e o mesmo efeito de minimizar ao rolar. Referência: «+ Nova transação». Páginas: Nova transação, Novo investimento, Nova agenda, Nova lista, Novo cartão, Nova meta.
+
+- **Markup (idêntico em todas):**
+  ```jsx
+  <button
+    type="button"
+    className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
+    onClick={abrirModal}
+    aria-label="Criar …"
+  >
+    <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14" /><path d="M5 12h14" /></svg>
+    </span>
+    <span className="dashboard-mobile-tx-fab__label">Novo …</span>
+  </button>
+  ```
+- **Encolher ao rolar:** hook `src/hooks/useFabCompact.js` — `const fabScrollRef = useRef(null); const fabCompact = useFabCompact(fabScrollRef)` e passar `ref={fabScrollRef}` no `<RefDashboardScroll>`. NÃO reimplementar o listener de scroll por página.
+- **CSS:** base + `--compact` são page-agnostic (`02b`, `22`); gold dark por página (`07`/`07b`/`05` ou o page-agnostic `36-fab-standard.css` para Listas/Cartões/Metas). Esconder o botão de header no mobile quando o FAB o substitui.
+- **Esconder o FAB** quando há modal/overlay aberto ou quando colidiria com um footer fixo (ex.: Listas só mostra o FAB «Nova lista» na visão geral, sem lista ativa).
+- **Mobile-only:** o FAB só aparece em `≤768px`; no desktop continua o botão de header/hero.
+
+Ao criar uma página hub nova com ação de criar, use este FAB + `useFabCompact` — não invente um botão novo.
+
 ## Mapa rápido de pastas
 
 - `src/pages/` — telas (Dashboard, Transacoes, Login, admin, etc.)

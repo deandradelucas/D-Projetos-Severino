@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
@@ -27,6 +27,7 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon'
 import PwaInstallBanner from '../components/PwaInstallBanner'
 import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
+import { useFabCompact } from '../hooks/useFabCompact'
 import TutorialDashboard from '../components/onboarding/TutorialDashboard'
 import { tutorialDashboardFoiVisto } from '../components/onboarding/tutorialDashboardState'
 
@@ -38,6 +39,9 @@ export default function Dashboard() {
   const [usuario, setUsuario] = useState(() => readHorizonteUserPainelState())
   const [menuAberto, setMenuAberto] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  // FAB padrão: encolhe ao rolar (ver useFabCompact / AGENTS.md «FAB padrão»)
+  const fabScrollRef = useRef(null)
+  const fabCompact = useFabCompact(fabScrollRef)
   const [proximoCompromisso, setProximoCompromisso] = useState(null)
   const [showTutorial, setShowTutorial] = useState(() => !tutorialDashboardFoiVisto())
 
@@ -202,7 +206,7 @@ export default function Dashboard() {
 
         <main className="main-content relative z-10 ref-dashboard-main">
         <div className="ref-dashboard-inner dashboard-hub">
-        <RefDashboardScroll>
+        <RefDashboardScroll ref={fabScrollRef}>
         <section className="dashboard-hub__hero" aria-label="Painel e ações rápidas">
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
@@ -567,21 +571,23 @@ export default function Dashboard() {
     </div>
 
     {!isModalOpen && (
-      <button
-        type="button"
-        data-tutorial-id="nova-transacao-btn"
-        className="dashboard-mobile-tx-fab"
-        onClick={() => setIsModalOpen(true)}
-        aria-label="Criar nova transação"
-      >
-        <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 5v14" />
-            <path d="M5 12h14" />
-          </svg>
-        </span>
-        <span className="dashboard-mobile-tx-fab__label">Nova transação</span>
-      </button>
+      <div className="dashboard-mobile-fabs">
+        <button
+          type="button"
+          data-tutorial-id="nova-transacao-btn"
+          className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
+          onClick={() => setIsModalOpen(true)}
+          aria-label="Criar nova transação"
+        >
+          <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+          </span>
+          <span className="dashboard-mobile-tx-fab__label">Nova transação</span>
+        </button>
+      </div>
     )}
 
     <TransactionModal
