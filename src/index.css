@@ -1452,3 +1452,52 @@ input:disabled {
     transition: none;
   }
 }
+
+/* ─── Severino IA — campo de linguagem natural no modal de Nova Transação ─── */
+.ntx-ai-quick {
+  margin-bottom: 16px;
+}
+.ntx-ai-quick__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent, #d4a84b);
+}
+.ntx-ai-quick__hint {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  font-size: 0.72rem;
+  color: var(--text-muted, #8896a5);
+}
+.ntx-ai-quick__field {
+  position: relative;
+}
+.ntx-ai-quick__field .input-premium {
+  border-color: var(--accent-border, rgba(212, 168, 75, 0.35)) !important;
+  box-shadow: 0 0 0 1px var(--accent-muted, rgba(212, 168, 75, 0.12)) !important;
+}
+.ntx-ai-quick__field .input-premium:focus {
+  box-shadow: 0 0 0 2px var(--accent, #d4a84b) !important;
+}
+.ntx-ai-quick__field .input-premium::placeholder {
+  font-style: italic;
+}
+.ntx-ai-quick__spin {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--accent, #d4a84b);
+}
+.ntx-ai-quick__spin .spinner {
+  width: 16px;
+  height: 16px;
+  opacity: 0.75;
+}

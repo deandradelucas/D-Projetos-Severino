@@ -3,6 +3,7 @@ import { Alerts } from '../lib/notify-telegram.mjs'
 import {
   askHorizon,
   suggestCategoryForTransaction,
+  parseWhatsAppMessageWithAI,
 } from '../lib/ai.mjs'
 import { getCategorias } from '../lib/transacoes.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
@@ -118,6 +119,44 @@ export function registerAiRoutes(app) {
     } catch (error) {
       log.warn('ai suggest-category failed', error?.message || error)
       return c.json({ categoria_id: null, subcategoria_id: null })
+    }
+  })
+
+  // Linguagem natural → transação estruturada (ex.: "gastei 45 com gasolina").
+  // Reusa o mesmo parser do WhatsApp. Devolve campos para autopreencher o modal.
+  // tipo === 'CHAT' = não identificou uma transação (não autopreenche).
+  app.post('/api/ai/parse-transaction', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+
+      if (!await rateLimitTake(`ai-parse-tx:${parsed.actorId}`, 40, 60_000)) {
+        return c.json({ tipo: 'CHAT', message: 'Muitas tentativas seguidas. Aguarde um momento.' }, 429)
+      }
+
+      const body = await c.req.json().catch(() => ({}))
+      const texto = String(body?.texto || '').trim()
+      if (texto.length < 3) return c.json({ tipo: 'CHAT' })
+
+      const categorias = await getCategorias(parsed.dataUsuarioId)
+      const extracted = await parseWhatsAppMessageWithAI(texto, categorias, parsed.dataUsuarioId)
+
+      if (!extracted || (extracted.tipo !== 'DESPESA' && extracted.tipo !== 'RECEITA')) {
+        return c.json({ tipo: 'CHAT' })
+      }
+
+      return c.json({
+        tipo: extracted.tipo,
+        valor: extracted.valor ?? null,
+        categoria_id: extracted.categoria_id ?? null,
+        subcategoria_id: extracted.subcategoria_id ?? null,
+        descricao: extracted.descricao ?? '',
+        data_transacao: extracted.data_transacao ?? null,
+      })
+    } catch (error) {
+      log.warn('ai parse-transaction failed', error?.message || error)
+      return c.json({ tipo: 'CHAT' })
     }
   })
 

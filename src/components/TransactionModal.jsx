@@ -30,9 +30,14 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   // Pacote 2 — validação visual
   const [validationAttempted, setValidationAttempted] = useState(false)
 
+  // Severino IA — linguagem natural ("gastei 45 com gasolina") autopreenche o form
+  const [aiText, setAiText] = useState('')
+  const [aiParsing, setAiParsing] = useState(false)
+
   const valorInputRef = useRef(null)
   const modalSheetRef = useRef(null)
   const suggestTimeoutRef = useRef(null)
+  const aiTimeoutRef = useRef(null)
 
   const scrollValorIntoView = useCallback(() => {
     const el = valorInputRef.current
@@ -96,6 +101,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     initForm()
     setAiSuggestedCat(false)
     setValidationAttempted(false)
+    setAiText('')
     // Sem auto-focus no campo valor: o foco inicial fica no botão Fechar
     // (via useModalA11y, que foca o primeiro elemento focável). Evita que o
     // cursor caia direto no valor ao abrir o modal — mesmo comportamento no
@@ -339,6 +345,62 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     }
   }, [formData.descricao, formData.tipo, formData.categoria_id, isOpen, isEditMode, usuarioId, setFormData])
 
+  // ─── Severino IA: aplica a transação extraída no formulário ───
+  const applyAiTransaction = useCallback((data) => {
+    if (data.valor != null && Number(data.valor) > 0) {
+      const cents = Math.round(Number(data.valor) * 100)
+      handleCurrencyChange({ target: { name: 'valorDisplay', value: String(cents) } })
+    }
+    setFormData((prev) => {
+      const next = { ...prev }
+      if (data.tipo === 'DESPESA' || data.tipo === 'RECEITA') next.tipo = data.tipo
+      if (data.categoria_id) next.categoria_id = data.categoria_id
+      next.subcategoria_id = data.subcategoria_id || ''
+      if (data.descricao) next.descricao = data.descricao
+      if (data.data_transacao) {
+        const d = new Date(data.data_transacao)
+        if (!Number.isNaN(d.getTime())) {
+          const off = d.getTimezoneOffset() * 60000
+          next.data_transacao = new Date(d - off).toISOString().slice(0, 16)
+        }
+      }
+      return next
+    })
+    if (data.categoria_id) setAiSuggestedCat(true)
+  }, [handleCurrencyChange, setFormData])
+
+  // Chama o endpoint de parse e autopreenche (silencioso se não for transação)
+  const runAiParse = useCallback(async (texto) => {
+    const t = String(texto || '').trim()
+    if (t.length < 4) return
+    setAiParsing(true)
+    try {
+      const res = await apiFetch(apiUrl('/api/ai/parse-transaction'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto: t }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.tipo === 'DESPESA' || data.tipo === 'RECEITA') applyAiTransaction(data)
+      }
+    } catch {
+      // best-effort: o formulário manual continua funcionando
+    } finally {
+      setAiParsing(false)
+    }
+  }, [applyAiTransaction])
+
+  // Debounce 850ms ao digitar no campo IA
+  useEffect(() => {
+    if (!isOpen || isEditMode) return undefined
+    const t = aiText.trim()
+    if (t.length < 4) return undefined
+    if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current)
+    aiTimeoutRef.current = setTimeout(() => runAiParse(t), 850)
+    return () => { if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current) }
+  }, [aiText, isOpen, isEditMode, runAiParse])
+
   // Com cartão + parcelamento: preenche a data de vencimento da 1ª parcela a partir
   // da data da compra. O backend cria TODAS as parcelas; as já vencidas entram como
   // pagas (histórico). Recalcula ao mudar a data da compra, o cartão ou ligar o
@@ -402,6 +464,47 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
 
         <form onSubmit={handleSubmitWithValidation} className={`modal-form modal-form--sheet${validationAttempted ? ' modal-form--validated' : ''}`}>
           <div className="modal-body modal-body--nova-tx">
+
+            {/* ── Severino IA: linguagem natural autopreenche o form ── */}
+            {!isEditMode && (
+              <div className="ntx-ai-quick">
+                <label htmlFor="tx-ai" className="ntx-ai-quick__label">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M12 3 14.5 8.5 20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5L12 3z" />
+                  </svg>
+                  Severino IA
+                  <span className="ntx-ai-quick__hint">descreva e a IA preenche</span>
+                </label>
+                <div className="ntx-ai-quick__field">
+                  <input
+                    id="tx-ai"
+                    type="text"
+                    className="input-premium"
+                    placeholder="Ex.: gastei 45 com gasolina"
+                    value={aiText}
+                    onChange={(e) => setAiText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current)
+                        runAiParse(aiText)
+                      }
+                    }}
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    enterKeyHint="done"
+                    aria-label="Descreva a transação para a IA preencher"
+                  />
+                  {aiParsing && (
+                    <span className="ntx-ai-quick__spin" aria-hidden>
+                      <svg className="spinner" viewBox="0 0 24 24" aria-hidden>
+                        <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="3" />
+                      </svg>
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* (R) Templates rápidos */}
             {!isEditMode && recentTemplates.length > 0 && (
