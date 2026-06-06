@@ -337,17 +337,19 @@ body[data-theme='dark'] .page-relatorios--editorial .rel-ed__hero {
     order: 3;
   }
   .page-relatorios--editorial .rel-ed__action { flex: 1 1 auto; justify-content: center; }
-  .page-relatorios--editorial .rel-ed__totals {
-    grid-template-columns: 1fr;
-  }
+  /* Receitas e Despesas lado a lado também no mobile (2 colunas) */
   .page-relatorios--editorial .rel-ed__total {
-    padding: 16px 0 4px;
+    padding: 14px 0 4px;
   }
   .page-relatorios--editorial .rel-ed__total + .rel-ed__total {
-    padding-left: 0;
-    border-left: 0;
-    border-top: 1px solid var(--rel-ed-line);
+    padding-left: 14px;
+    padding-right: 0;
+    border-left: 1px solid var(--rel-ed-line);
+    border-top: 0;
     padding-top: 14px;
+  }
+  .page-relatorios--editorial .rel-ed__total-value {
+    font-size: clamp(1.15rem, 4.6vw, 1.5rem);
   }
 }
 
@@ -390,6 +392,9 @@ body[data-theme='dark'] .page-relatorios--editorial .rel-ed__hero {
   gap: 8px;
   margin: 0 0 28px;
   flex-wrap: wrap;
+  /* É item flex de .ref-dashboard-scroll (coluna). Sem isto, o overflow-x:auto
+     do mobile dá min-height:0 e a coluna esmaga os chips para ~4px. */
+  flex-shrink: 0;
 }
 .page-relatorios--editorial .rel-ed__quick-chip {
   min-height: 38px;
