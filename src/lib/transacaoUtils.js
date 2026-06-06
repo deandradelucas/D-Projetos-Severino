@@ -2,6 +2,18 @@ export function transacaoDiaKey(dataTransacao) {
   if (dataTransacao == null) return ''
   const s = String(dataTransacao).trim()
   if (!s) return ''
+  // Data-only (YYYY-MM-DD): sem hora, sem fuso a converter — usa direto.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
+  // Timestamp: usa a data LOCAL (mesmo fuso da exibição na lista). Sem isso, uma
+  // transação às 21:34 (UTC-3) viraria 00:34 UTC do dia seguinte e cairia no
+  // cabeçalho de dia errado (ex.: 05/jun aparecendo sob "Sábado, 6 de jun").
+  const d = new Date(s)
+  if (!Number.isNaN(d.getTime())) {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
   const head = s.includes('T') ? s.split('T')[0] : s.slice(0, 10)
   return /^\d{4}-\d{2}-\d{2}$/.test(head) ? head : ''
 }

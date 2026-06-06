@@ -10,6 +10,7 @@ import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
+import { transacaoDiaKey } from '../lib/transacaoUtils'
 import {
   familiaMostrarQuemLancouNaUi,
   readHorizonteUser,
@@ -815,7 +816,7 @@ export default function Transacoes() {
         if (!desc.includes(termo) && !cat.includes(termo) && !sub.includes(termo)) return false
       }
       if (quickFilter) {
-        const key = String(t.data_transacao || '').slice(0, 10)
+        const key = transacaoDiaKey(t.data_transacao)
         if (quickFilter === 'hoje' && key !== hojeKey) return false
         if (quickFilter === '7d' && (key < seteDiasKey || key > hojeKey)) return false
         if (quickFilter === '30d' && (key < trintaDiasKey || key > hojeKey)) return false
@@ -845,7 +846,7 @@ export default function Transacoes() {
       // da transação. Mantém a linha e o cabeçalho do dia consistentes.
       const raw = t.recorrente_index && t.data_compra ? t.data_compra : t.data_transacao
       if (!raw) continue
-      const key = String(raw).slice(0, 10)
+      const key = transacaoDiaKey(raw)
       let group = indexMap.get(key)
       if (!group) {
         let label

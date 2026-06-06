@@ -13,6 +13,11 @@ describe('transacaoUtils', () => {
     expect(transacaoDiaKey('')).toBe('')
   })
 
+  it('transacaoDiaKey: data-only passa direto (sem conversão de fuso)', () => {
+    expect(transacaoDiaKey('2026-06-05')).toBe('2026-06-05')
+    expect(transacaoDiaKey('2026-06-05T00:00:00')).not.toBe('') // timestamp vira data local
+  })
+
   it('transacaoMesKey retorna YYYY-MM', () => {
     expect(transacaoMesKey('2026-04-09')).toBe('2026-04')
   })
