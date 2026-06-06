@@ -21,9 +21,9 @@
     /* safe-area é tratada só no footer (.modal-actions). Aqui fica 0 para não
        duplicar e criar a faixa branca abaixo dos botões no iPhone. */
     padding-bottom: 0 !important;
-    /* bordas laterais com mais respiro no celular */
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+    /* bordas laterais com mais respiro no celular (campos um pouco mais estreitos) */
+    padding-left: 20px !important;
+    padding-right: 20px !important;
     overflow-x: hidden !important;            /* mata o deslize lateral */
     overscroll-behavior: contain !important;  /* sem rubber-band / puxar */
   }
