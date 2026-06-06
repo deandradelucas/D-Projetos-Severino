@@ -1513,3 +1513,20 @@ input:disabled {
   height: 16px;
   opacity: 0.75;
 }
+
+/* ─── Seletor de categoria no mobile: ancorado no topo (busca acima do teclado) ─── */
+@media (max-width: 768px) {
+  .custom-select--cs-mobile .custom-select-dropdown {
+    overflow: hidden;
+  }
+  /* opções preenchem o espaço restante e rolam (sem o cap de 240px) */
+  .custom-select--cs-mobile .custom-select-options {
+    max-height: none !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
+  /* busca fixa no topo do dropdown */
+  .custom-select--cs-mobile .custom-select-search {
+    flex: 0 0 auto !important;
+  }
+}

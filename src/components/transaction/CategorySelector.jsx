@@ -15,15 +15,38 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
     if (!isOpen) return
     const update = () => {
       if (!triggerRef.current) return
-      const r = triggerRef.current.getBoundingClientRect()
-      setDropPos({ top: r.bottom + 2, left: r.left, width: r.width })
+      const isMobile = window.matchMedia('(max-width: 768px)').matches
+      if (isMobile) {
+        // No mobile, ancora no TOPO da tela: a busca fica sempre visível acima do
+        // teclado. Altura limitada à área visível (visualViewport) — ao abrir o
+        // teclado, o viewport encolhe e o dropdown se ajusta.
+        const vv = window.visualViewport
+        const vTop = vv?.offsetTop || 0
+        const vH = vv?.height || window.innerHeight
+        const margin = 10
+        setDropPos({
+          top: vTop + 8,
+          left: margin,
+          width: window.innerWidth - margin * 2,
+          maxHeight: Math.min(vH - 16, 520),
+          mobile: true,
+        })
+      } else {
+        const r = triggerRef.current.getBoundingClientRect()
+        setDropPos({ top: r.bottom + 2, left: r.left, width: r.width, mobile: false })
+      }
     }
     update()
     window.addEventListener('resize', update, { passive: true })
     window.addEventListener('scroll', update, { capture: true, passive: true })
+    const vv = window.visualViewport
+    vv?.addEventListener('resize', update, { passive: true })
+    vv?.addEventListener('scroll', update, { passive: true })
     return () => {
       window.removeEventListener('resize', update)
       window.removeEventListener('scroll', update, true)
+      vv?.removeEventListener('resize', update)
+      vv?.removeEventListener('scroll', update)
     }
   }, [isOpen])
 
@@ -73,7 +96,7 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
   const portalDropdown = isOpen && dropPos ? createPortal(
     <div
       id={`cs-portal-${name}`}
-      className="custom-select open"
+      className={`custom-select open${dropPos.mobile ? ' custom-select--cs-mobile' : ''}`}
       style={{
         position: 'fixed',
         top:      dropPos.top,
@@ -85,7 +108,11 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
     >
       <div
         className="custom-select-dropdown"
-        style={{ position: 'static', display: 'flex' }}
+        style={{
+          position: 'static',
+          display: 'flex',
+          maxHeight: dropPos.maxHeight ? `${dropPos.maxHeight}px` : undefined,
+        }}
       >
         <div className="custom-select-search">
           <input
