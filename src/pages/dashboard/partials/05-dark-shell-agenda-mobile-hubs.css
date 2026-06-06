@@ -269,7 +269,7 @@ body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__actions .dashboard
 
 .agenda-page .agenda-hero__title-row > strong {
   color: #ffffff;
-  font-size: clamp(1.44rem, 4.6vw, 2.06rem);
+  font-size: clamp(1.25rem, 2.1vw + 0.55rem, 1.95rem);
   font-weight: 820;
   letter-spacing: -0.06em;
   line-height: 1.15;

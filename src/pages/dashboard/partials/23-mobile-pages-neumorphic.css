@@ -1100,7 +1100,7 @@
     overflow: visible !important;
     white-space: nowrap !important;
     font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1.3rem !important;
+    font-size: clamp(1.25rem, 2.1vw + 0.55rem, 1.95rem) !important;
     font-weight: 700 !important;
     letter-spacing: -0.025em !important;
     color: var(--m-text-hi) !important;

@@ -111,7 +111,7 @@
     clip: auto !important;
     clip-path: none !important;
     white-space: nowrap !important;
-    font-size: 1.25rem;
+    font-size: clamp(1.25rem, 2.1vw + 0.55rem, 1.95rem);
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.2;
@@ -120,7 +120,7 @@
 
 .page-lista-compras__title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: clamp(1.25rem, 2.1vw + 0.55rem, 1.95rem);
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
