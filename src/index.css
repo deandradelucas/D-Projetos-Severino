@@ -1549,3 +1549,11 @@ input:disabled {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
+
+/* Ícone de calendário (datetime-local) do modal de transação em dourado da marca */
+.modal-content--nova-tx input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 1;
+  /* recolore o ícone nativo (preto) para ~#d4a84b */
+  filter: invert(66%) sepia(42%) saturate(560%) hue-rotate(2deg) brightness(92%) contrast(88%);
+}
