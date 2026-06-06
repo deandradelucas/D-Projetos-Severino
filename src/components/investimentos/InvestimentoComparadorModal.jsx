@@ -1,5 +1,7 @@
 import React, { useId, useMemo, useRef, useState } from 'react'
 import { useSheetDragClose } from '../../hooks/useSheetDragClose'
+import DatePickerBrPopover from './DatePickerBrPopover'
+import { maskDateBrInput, parseDdMmYyyyStrict, ymdToDdMmYyyy } from '../../lib/dateInputBr'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../../lib/currencyMaskBr'
 import { formatCurrencyBRL } from '../../lib/formatCurrency'
 import { INVESTIMENTOS_PRESETS_LIST } from '../../lib/investimentosPresets'
@@ -32,13 +34,16 @@ function calcSlot(slot, valorNum, prazoYmd, cdiAa) {
 export default function InvestimentoComparadorModal({ open, onClose, cdiAa }) {
   const titleId = useId()
   const sheetRef = useRef(null)
+  const btnCalRef = useRef(null)
   useSheetDragClose(sheetRef, { open, onClose })
   const [valorInput, setValorInput] = useState(valorToMaskedBRL(10000))
-  const [prazoYmd, setPrazoYmd] = useState('')
+  const [prazoBr, setPrazoBr] = useState('')
+  const [pickerOpen, setPickerOpen] = useState(false)
   const [slots, setSlots] = useState(SLOT_DEFAULTS)
 
   const hojeYmd = ymdLocalFromDate()
   const maxYmd = ymdMaxProjecaoLocal()
+  const prazoYmd = useMemo(() => parseDdMmYyyyStrict(prazoBr), [prazoBr])
 
   const valorNum = useMemo(() => {
     const v = parseCurrencyBRLMasked(valorInput)
@@ -68,6 +73,7 @@ export default function InvestimentoComparadorModal({ open, onClose, cdiAa }) {
   if (!open) return null
 
   return (
+    <>
     <div className="modal-backdrop page-investimentos-modal-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}>
       <div className="modal-content page-investimentos-modal page-investimentos-comparador" ref={sheetRef} role="dialog" aria-modal="true" aria-labelledby={titleId} onMouseDown={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -88,15 +94,33 @@ export default function InvestimentoComparadorModal({ open, onClose, cdiAa }) {
             </div>
             <div className="page-investimentos-comparador__field">
               <label className="page-investimentos-modal__section-label">Prazo (data de resgate)</label>
-              <input
-                type="date"
-                lang="pt-BR"
-                className="page-investimentos-modal__input"
-                min={hojeYmd}
-                max={maxYmd}
-                value={prazoYmd}
-                onChange={(e) => setPrazoYmd(e.target.value)}
-              />
+              <div className="page-investimentos-modal__date-field-wrap">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  placeholder="dd/mm/aaaa"
+                  lang="pt-BR"
+                  className="page-investimentos-modal__input page-investimentos-modal__input--date-br"
+                  value={prazoBr}
+                  onChange={(e) => setPrazoBr(maskDateBrInput(e.target.value))}
+                />
+                <button
+                  ref={btnCalRef}
+                  type="button"
+                  className="page-investimentos-modal__date-cal-btn"
+                  aria-label="Abrir calendário — prazo de resgate"
+                  aria-expanded={pickerOpen}
+                  onClick={() => setPickerOpen((v) => !v)}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -179,5 +203,16 @@ export default function InvestimentoComparadorModal({ open, onClose, cdiAa }) {
         </div>
       </div>
     </div>
+
+    <DatePickerBrPopover
+      open={pickerOpen}
+      onClose={() => setPickerOpen(false)}
+      anchorRef={btnCalRef}
+      valueYmd={prazoYmd}
+      onSelectYmd={(ymd) => setPrazoBr(ymdToDdMmYyyy(ymd))}
+      minYmd={hojeYmd}
+      maxYmd={maxYmd}
+    />
+    </>
   )
 }

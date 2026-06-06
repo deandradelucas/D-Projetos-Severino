@@ -1,6 +1,8 @@
-import React, { useEffect, useId, useRef, useState } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked } from '../../lib/currencyMaskBr'
 import { useSheetDragClose } from '../../hooks/useSheetDragClose'
+import DatePickerBrPopover from './DatePickerBrPopover'
+import { maskDateBrInput, parseDdMmYyyyStrict, ymdToDdMmYyyy } from '../../lib/dateInputBr'
 
 function localDateToday() {
   const d = new Date()
@@ -13,16 +15,21 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
   const dataInputId = useId()
   const valorInputRef = useRef(null)
   const sheetRef = useRef(null)
+  const btnCalRef = useRef(null)
   useSheetDragClose(sheetRef, { open, onClose })
 
   const [valorInput, setValorInput] = useState('')
-  const [dataInput, setDataInput] = useState(localDateToday())
+  const [dataBr, setDataBr] = useState(() => ymdToDdMmYyyy(localDateToday()))
+  const [pickerOpen, setPickerOpen] = useState(false)
   const [errors, setErrors] = useState({})
+
+  const dataYmd = useMemo(() => parseDdMmYyyyStrict(dataBr), [dataBr])
 
   useEffect(() => {
     if (!open) return
     setValorInput('') // eslint-disable-line react-hooks/set-state-in-effect
-    setDataInput(localDateToday())
+    setDataBr(ymdToDdMmYyyy(localDateToday()))
+    setPickerOpen(false)
     setErrors({})
     const focusTimer = window.setTimeout(() => valorInputRef.current?.focus(), 60)
     return () => window.clearTimeout(focusTimer)
@@ -46,8 +53,8 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
     const v = parseCurrencyBRLMasked(valorInput)
     if (!valorInput.trim()) errs.valor = 'Informe o valor do aporte.'
     else if (!Number.isFinite(v) || v < 0.01) errs.valor = 'Valor inválido (mínimo R$ 0,01).'
-    if (!dataInput) errs.data = 'Informe a data do aporte.'
-    else if (dataInput > localDateToday()) errs.data = 'A data do aporte não pode ser no futuro.'
+    if (!dataYmd) errs.data = 'Informe a data do aporte (dd/mm/aaaa).'
+    else if (dataYmd > localDateToday()) errs.data = 'A data do aporte não pode ser no futuro.'
     return errs
   }
 
@@ -56,10 +63,11 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
     const errs = validate()
     setErrors(errs)
     if (Object.keys(errs).length > 0) return
-    onSubmit({ valor: parseCurrencyBRLMasked(valorInput), data_aquisicao: dataInput })
+    onSubmit({ valor: parseCurrencyBRLMasked(valorInput), data_aquisicao: dataYmd })
   }
 
   return (
+    <>
     <div
       className="modal-backdrop page-investimentos-modal-backdrop"
       role="dialog"
@@ -122,16 +130,37 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
                   <label className="page-investimentos-modal__label" htmlFor={dataInputId}>
                     Data do aporte
                   </label>
-                  <input
-                    id={dataInputId}
-                    type="date"
-                    className="page-investimentos-modal__input page-investimentos-modal__input--date"
-                    max={localDateToday()}
-                    value={dataInput}
-                    onChange={(e) => setDataInput(e.target.value)}
-                    disabled={submitting}
-                    aria-describedby={errors.data ? `${dataInputId}-err` : undefined}
-                  />
+                  <div className="page-investimentos-modal__date-field-wrap">
+                    <input
+                      id={dataInputId}
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      placeholder="dd/mm/aaaa"
+                      lang="pt-BR"
+                      className="page-investimentos-modal__input page-investimentos-modal__input--date-br"
+                      value={dataBr}
+                      onChange={(e) => setDataBr(maskDateBrInput(e.target.value))}
+                      disabled={submitting}
+                      aria-describedby={errors.data ? `${dataInputId}-err` : undefined}
+                    />
+                    <button
+                      ref={btnCalRef}
+                      type="button"
+                      className="page-investimentos-modal__date-cal-btn"
+                      disabled={submitting}
+                      aria-label="Abrir calendário — data do aporte"
+                      aria-expanded={pickerOpen}
+                      onClick={() => setPickerOpen((v) => !v)}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                    </button>
+                  </div>
                   {errors.data && (
                     <p id={`${dataInputId}-err`} className="page-investimentos-modal__error" role="alert">
                       {errors.data}
@@ -156,5 +185,15 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
         </form>
       </div>
     </div>
+
+    <DatePickerBrPopover
+      open={pickerOpen}
+      onClose={() => setPickerOpen(false)}
+      anchorRef={btnCalRef}
+      valueYmd={dataYmd}
+      onSelectYmd={(ymd) => setDataBr(ymdToDdMmYyyy(ymd))}
+      maxYmd={localDateToday()}
+    />
+    </>
   )
 }

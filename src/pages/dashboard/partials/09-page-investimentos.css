@@ -736,17 +736,14 @@ body[data-theme='dark'] .page-investimentos-modal__surface {
   color: var(--text-secondary, #64748b);
 }
 
-.page-investimentos-modal__card {
-  margin: 0 0 0.85rem;
-  padding: 0.95rem 1rem;
-  border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: var(--bg-secondary, rgba(255, 255, 255, 0.03));
-}
-
+/* Sem card cinza interno — campos direto sobre o modal (igual Nova Transação) */
+.page-investimentos-modal__card,
 body[data-theme='light'] .page-investimentos-modal__card {
-  background: rgba(248, 250, 252, 0.95);
-  border-color: rgba(148, 163, 184, 0.28);
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
 }
 
 .page-investimentos-modal__fieldset {
@@ -1335,13 +1332,14 @@ body[data-theme='dark'] .page-investimentos-modal__perc-input-wrap {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, #d4a84b) 18%, transparent);
 }
 
-.page-investimentos-modal__label {
+/* 2 classes para vencer `.modal-form label` (UPPERCASE global) */
+.page-investimentos-modal .page-investimentos-modal__label {
   display: block;
   margin-bottom: 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.02em;
   color: var(--text-secondary, #64748b);
 }
 
@@ -1580,7 +1578,7 @@ body[data-theme='light'] .taxa-cdi-badge--hero {
   }
 
   .page-investimentos-modal__card {
-    padding: 0.82rem 0.78rem;
+    padding: 0;
   }
 
   .page-investimentos-modal__footer-hint {
