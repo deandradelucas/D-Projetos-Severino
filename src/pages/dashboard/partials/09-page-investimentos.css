@@ -2448,16 +2448,21 @@ body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__foo
   background: transparent !important;
 }
 
+/* Botão primário gold — cobre dark E light (antes só dark → no desktop tema
+   claro o .btn-primary global preto vencia). Gradiente igual ao padrão. */
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary,
-body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary:hover:not(:disabled) {
-  background: var(--accent) !important;
-  background-image: none !important;
-  border: none !important;
-  color: #111111 !important;
+body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary,
+body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary:hover:not(:disabled),
+body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(155deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 80%, black 20%) 100%) !important;
+  background-image: linear-gradient(155deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 80%, black 20%) 100%) !important;
+  border: 1px solid var(--accent) !important;
+  color: #1a1200 !important;
   box-shadow: none !important;
 }
 
-body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary:focus-visible {
+body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary:focus-visible,
+body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.28) !important;
 }
