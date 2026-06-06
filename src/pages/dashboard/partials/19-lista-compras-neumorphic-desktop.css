@@ -515,11 +515,12 @@
     max-width: 1200px !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
-    padding: 16px 0 20px !important;
+    padding: 10px 0 12px !important;
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 16px !important;
+    gap: 10px !important;
     flex-wrap: wrap !important;
     background: transparent !important;
     border: none !important;
@@ -527,12 +528,15 @@
     animation: none !important;
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer-main {
-    flex: 1 1 auto !important;
+    /* Não esticar nem ocupar 100% (o base mobile põe width:100%): sizes-to-content
+       para os 3 blocos (orçamento · total+novo · ações) caberem numa linha. */
+    flex: 0 1 auto !important;
+    width: auto !important;
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer-total-row {
     display: flex !important;
     align-items: center !important;
-    gap: 18px !important;
+    gap: 12px !important;
     flex-wrap: wrap !important;
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__total {
@@ -551,7 +555,7 @@
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__total-value {
     font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1.75rem !important;
+    font-size: 1.2rem !important;
     font-weight: 700 !important;
     color: var(--lc-text-hi) !important;
     font-variant-numeric: tabular-nums !important;
@@ -561,14 +565,14 @@
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__novo-item-fab {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 8px !important;
-    padding: 11px 20px !important;
+    gap: 7px !important;
+    padding: 8px 16px !important;
     border-radius: 999px !important;
     background: linear-gradient(155deg, var(--lc-raised) 0%, var(--lc-base) 100%) !important;
     border: 1px solid var(--lc-edge-hi) !important;
     color: var(--lc-text-hi) !important;
     font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
+    font-size: 0.85rem !important;
     font-weight: 600 !important;
     cursor: pointer !important;
     box-shadow: 6px 6px 14px var(--lc-shadow-soft), -4px -4px 12px var(--lc-light), inset 1px 1px 1px var(--lc-edge-hi) !important;
@@ -582,20 +586,22 @@
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__footer-actions {
     display: flex !important;
-    gap: 10px !important;
+    gap: 8px !important;
     align-items: center !important;
+    width: auto !important;
+    flex: 0 1 auto !important;
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__wa-btn {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 8px !important;
-    padding: 11px 18px !important;
+    gap: 7px !important;
+    padding: 8px 14px !important;
     border-radius: 999px !important;
     background: var(--lc-sunken) !important;
     border: 1px solid var(--lc-edge-hi) !important;
     color: var(--lc-text-mid) !important;
     font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
+    font-size: 0.8rem !important;
     font-weight: 500 !important;
     cursor: pointer !important;
     box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
@@ -607,13 +613,13 @@
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__cta-btn {
     display: inline-flex !important;
     align-items: center !important;
-    padding: 12px 22px !important;
+    padding: 9px 18px !important;
     border-radius: 999px !important;
     background: linear-gradient(155deg, var(--lc-accent) 0%, #c49535 100%) !important;
     border: 1px solid var(--lc-accent-glow) !important;
     color: #1a1200 !important;
     font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
+    font-size: 0.85rem !important;
     font-weight: 700 !important;
     cursor: pointer !important;
     box-shadow: 6px 8px 18px -6px var(--lc-accent-glow), inset 0 1px 0 rgba(255,255,255,0.25) !important;
