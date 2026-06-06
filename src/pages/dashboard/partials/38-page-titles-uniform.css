@@ -2,13 +2,17 @@
    38-page-titles-uniform.css — Tamanho ÚNICO para todos os títulos de página
    Iguala todos ao título do Relatórios: clamp(1.9rem, 4.4vw, 2.7rem).
 
-   IMPORTANTE: a classe `dashboard-page` está em TODAS as páginas (é o layout),
-   NÃO só no Dashboard. O Dashboard real é o único SEM modificador `page-*`.
-   Por isso miramos `[class*="page-"]` (pega page-transacoes, page-metas, …, mas
-   não o Dashboard puro) e damos especificidade MAIOR que a regra do Dashboard
-   (que usa .dashboard-page … !important). Carregar SEMPRE por último.
+   Discriminador do Dashboard (verificado via Playwright):
+   - Dashboard real: container `dashboard-container dashboard-page …` SEM page-*.
+   - Demais páginas: têm sempre um modificador `page-X` (page-transacoes,
+     page-configuracoes, …). A classe `dashboard-page` é INCONSISTENTE (algumas
+     páginas têm, outras não) — por isso NÃO serve de filtro.
+   Logo: miramos `[class*="page-"]` (exclui o Dashboard puro) e adicionamos
+   `.dashboard-hub__hero` para a especificidade superar os overrides por página
+   (Configurações/Pagamento usam `… __hero .dashboard-hub__title !important`).
+   Carregar SEMPRE por último no dashboard.css.
    ────────────────────────────────────────────────────────────────────────── */
-body[data-theme] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell[class*="page-"] .dashboard-hub__title,
+body[data-theme] .dashboard-container.ref-dashboard.app-horizon-shell[class*="page-"] .dashboard-hub__hero .dashboard-hub__title,
 body[data-theme] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .rel-ed__title,
 body[data-theme] .dashboard-container.ref-dashboard.app-horizon-shell .agenda-hero__title-row > strong,
 body[data-theme] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__title {
