@@ -200,6 +200,15 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   // (Q) Calculadora inline (teclado)
   const [calcOpen, setCalcOpen] = useState(false)
   const [calcExpr, setCalcExpr] = useState('')
+  const calcRef = useRef(null)
+  // Ao abrir a calculadora, rola o teclado para a vista (evita ter que scrollar até ele)
+  useEffect(() => {
+    if (!calcOpen) return
+    const id = window.setTimeout(() => {
+      calcRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }, 60)
+    return () => window.clearTimeout(id)
+  }, [calcOpen])
   const calcAppend = useCallback((ch) => setCalcExpr((e) => (e + ch).slice(0, 40)), [])
   const calcBackspace = useCallback(() => setCalcExpr((e) => e.slice(0, -1)), [])
   const calcClear = useCallback(() => setCalcExpr(''), [])
@@ -749,7 +758,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                 />
                 {/* (Q) Calculadora — teclado */}
                 {calcOpen && (
-                  <div className="ntx-calc">
+                  <div className="ntx-calc" ref={calcRef}>
                     <div className="ntx-calc__display" aria-live="polite">{calcExpr || '0'}</div>
                     <div className="ntx-calc__pad">
                       {['7', '8', '9', '÷', '4', '5', '6', '×', '1', '2', '3', '−', '0', ',', '⌫', '+'].map((k) => (
