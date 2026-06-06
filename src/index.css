@@ -1559,7 +1559,7 @@ input:disabled {
 }
 .ntx-date-trigger {
   position: relative;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-width: 0;
   display: flex;
   align-items: center;
@@ -1585,8 +1585,9 @@ input:disabled {
   display: inline-flex;
 }
 .ntx-time-field {
-  flex: 0 0 auto;
-  width: 104px;
+  flex: 0 0 108px !important; /* base explícita vence o width:100% dos partials mobile */
+  width: 108px !important;
+  min-width: 0;
   text-align: center;
 }
 .modal-content--nova-tx input[type="time"].ntx-time-field::-webkit-calendar-picker-indicator {
