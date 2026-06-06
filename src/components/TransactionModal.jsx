@@ -469,13 +469,15 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
             {/* ── Severino IA: linguagem natural autopreenche o form ── */}
             {!isEditMode && (
               <div className="ntx-ai-quick">
-                <label htmlFor="tx-ai" className="ntx-ai-quick__label">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M12 3 14.5 8.5 20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5L12 3z" />
-                  </svg>
-                  Severino IA
-                  <span className="ntx-ai-quick__hint">descreva e a IA preenche</span>
-                </label>
+                <div className="ntx-ai-quick__head">
+                  <span className="ntx-ai-quick__spark" aria-hidden>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 3 14.5 8.5 20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5L12 3z" />
+                    </svg>
+                  </span>
+                  <span className="ntx-ai-quick__title">Severino IA</span>
+                  <span className="ntx-ai-quick__sub">descreva e eu preencho</span>
+                </div>
                 <div className="ntx-ai-quick__field">
                   <input
                     id="tx-ai"

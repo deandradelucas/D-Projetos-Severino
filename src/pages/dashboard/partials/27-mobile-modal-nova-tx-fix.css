@@ -83,7 +83,7 @@
 
   /* ───────────────────────── Seções ───────────────────────── */
   .modal-content--nova-tx .nova-tx-section {
-    margin-bottom: 14px !important;
+    margin-bottom: 11px !important;
     padding: 0 !important;
     background: transparent !important;
     border: none !important;
@@ -111,7 +111,7 @@
   }
 
   /* ───────────────────────── Labels ───────────────────────── */
-  .modal-content--nova-tx .form-group { margin-bottom: 11px !important; }
+  .modal-content--nova-tx .form-group { margin-bottom: 9px !important; }
   .modal-content--nova-tx .form-group:last-child { margin-bottom: 0 !important; }
   .modal-content--nova-tx .form-group > label {
     display: block !important;

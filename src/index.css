@@ -1454,25 +1454,37 @@ input:disabled {
 }
 
 /* ─── Severino IA — campo de linguagem natural no modal de Nova Transação ─── */
+/* Mesmo selo dourado da faixa "Severino IA" do Dashboard (.ai-insights__spark) */
 .ntx-ai-quick {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
-.ntx-ai-quick__label {
+.ntx-ai-quick__head {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent, #d4a84b);
+  gap: 7px;
+  margin-bottom: 7px;
 }
-.ntx-ai-quick__hint {
+.ntx-ai-quick__spark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  color: var(--accent-foreground, #1a1200);
+  background: var(--accent, #d4a84b);
+  box-shadow: var(--shadow-accent, 0 2px 8px rgba(212, 168, 75, 0.35));
+}
+.ntx-ai-quick__title {
+  font-weight: 700;
+  font-size: 0.84rem;
+  letter-spacing: -0.01em;
   text-transform: none;
-  letter-spacing: 0;
-  font-weight: 500;
-  font-size: 0.72rem;
+  color: var(--text-primary);
+  cursor: text;
+}
+.ntx-ai-quick__sub {
+  font-size: 0.74rem;
   color: var(--text-muted, #8896a5);
 }
 .ntx-ai-quick__field {

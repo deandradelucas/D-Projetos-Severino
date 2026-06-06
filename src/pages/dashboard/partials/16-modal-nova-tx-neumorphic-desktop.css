@@ -165,7 +165,7 @@
   /* (I) Section title caps + linha gradient */
   body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section,
   body[data-theme='light'] .modal-content--nova-tx .nova-tx-section {
-    margin-bottom: 22px !important;
+    margin-bottom: 14px !important;
     padding: 0 !important;
     background: transparent !important;
     border: none !important;
@@ -176,7 +176,7 @@
     display: flex !important;
     align-items: center !important;
     gap: 10px !important;
-    margin: 0 0 14px !important;
+    margin: 0 0 10px !important;
     padding: 0 !important;
     font-family: 'Inter Variable', system-ui, sans-serif !important;
     font-size: 0.6875rem !important;
@@ -196,7 +196,7 @@
   /* Form group */
   body[data-theme='dark'] .modal-content--nova-tx .form-group,
   body[data-theme='light'] .modal-content--nova-tx .form-group {
-    margin-bottom: 14px !important;
+    margin-bottom: 10px !important;
   }
   body[data-theme='dark'] .modal-content--nova-tx .form-group label,
   body[data-theme='light'] .modal-content--nova-tx .form-group label {
