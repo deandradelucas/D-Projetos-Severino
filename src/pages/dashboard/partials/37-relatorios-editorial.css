@@ -221,6 +221,9 @@ body[data-theme='dark'] .page-relatorios--editorial .rel-ed__hero {
   border: 1px solid var(--rel-ed-line);
   border-radius: 16px;
   overflow: hidden;
+  /* É item flex de .ref-dashboard-scroll (coluna). Sem isto, o overflow:hidden
+     dá min-height:0 e a coluna esmaga a faixa para 1px (virava só uma linha). */
+  flex-shrink: 0;
 }
 .page-relatorios--editorial .rel-ed__stat {
   background: var(--rel-ed-card);

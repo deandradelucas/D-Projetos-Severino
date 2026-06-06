@@ -858,9 +858,6 @@ export default function Relatorios() {
               />
             ) : (
               <div className="rel-ed__ia-empty">
-                <p className="rel-ed__ia-empty-text">
-                  Receba um diagnóstico em linguagem natural deste período: o que pesou, o que melhorou e o próximo passo.
-                </p>
                 <button type="button" className="rel-ed__ia-btn" onClick={gerarAnaliseIA}>
                   Gerar análise
                 </button>
