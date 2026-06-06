@@ -243,6 +243,10 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     if (!window.matchMedia('(max-width: 768px)').matches) return undefined
     const sheet = modalSheetRef.current
     if (!sheet) return undefined
+    // O scroll agora acontece no corpo (header/footer fixos). O drag-to-close só
+    // dispara quando o corpo está no topo — senão é scroll normal.
+    const scroller = sheet.querySelector('.modal-body--nova-tx')
+    const scrollTopOf = () => (scroller ? scroller.scrollTop : sheet.scrollTop)
     let startY = 0
     let active = false
     let decided = false
@@ -251,7 +255,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     const onStart = (e) => {
       if (e.touches.length !== 1) return
       startY = e.touches[0].clientY
-      active = sheet.scrollTop <= 0
+      active = scrollTopOf() <= 0
       decided = false
       dy = 0
     }
@@ -261,7 +265,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       if (!decided) {
         if (Math.abs(dy) < 6) return
         // só dismiss se arrastar PRA BAIXO a partir do topo
-        if (dy < 0 || sheet.scrollTop > 0) { active = false; return }
+        if (dy < 0 || scrollTopOf() > 0) { active = false; return }
         decided = true
         sheet.classList.add('ntx-dragging')
       }

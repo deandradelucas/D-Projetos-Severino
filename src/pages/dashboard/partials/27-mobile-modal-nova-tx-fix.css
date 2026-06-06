@@ -76,9 +76,32 @@
   }
 
   /* ───────────────────────── Corpo (o 02c já define flex/scroll; aqui só padding) ───────────────────────── */
+  /* Header (X) + grabber + footer FIXOS; só o corpo rola (igual ao modal de
+     investimento). O sheet vira flex-column e não rola — quem rola é o corpo. */
+  .modal-content.modal-content--nova-tx {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+  .modal-content--nova-tx .modal-header--minimal {
+    flex: 0 0 auto !important;
+  }
+  .modal-content--nova-tx .modal-form.modal-form--sheet {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
+  .modal-content--nova-tx .modal-actions {
+    flex: 0 0 auto !important;
+  }
   .modal-content--nova-tx .modal-body.modal-body--nova-tx {
     padding: 2px 0 6px !important;
     overflow-x: hidden !important;
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   /* ───────────────────────── Seções ───────────────────────── */
