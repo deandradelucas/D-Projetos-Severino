@@ -36,6 +36,10 @@ export default function RelatoriosCharts({
   orcadoVsReal,
   top5Despesas,
   variacaoCategorias = [],
+  chartDataTimeline = [],
+  timelineMeses = 12,
+  setTimelineMeses,
+  timelineLoading = false,
   isMobile,
   isDark,
   chart,
@@ -77,8 +81,71 @@ export default function RelatoriosCharts({
   // Gráficos por mês só fazem sentido com 2+ meses no período (1 mês = 1 ponto).
   const multiMes = chartDataPorMes.length >= 2
 
+  // Linha do tempo: com muitos meses (24) afina os rótulos do eixo X.
+  const timelineHasData = chartDataTimeline.some((d) => d.Receitas > 0 || d.Despesas > 0)
+  const timelineInterval = chartDataTimeline.length > 14 ? 1 : 0
+
   return (
           <div className={`relatorios-charts${refreshing ? ' relatorios-charts--refreshing' : ''}`} aria-busy={refreshing}>
+
+            <section className="relatorios-charts__section" aria-labelledby="rel-timeline-heading">
+              <div className="relatorios-timeline__head">
+                <h3 id="rel-timeline-heading" className="relatorios-charts__section-title">Linha do tempo</h3>
+                <div className="relatorios-timeline__toggle" role="group" aria-label="Janela da linha do tempo">
+                  <button
+                    type="button"
+                    className={`relatorios-timeline__btn${timelineMeses === 12 ? ' relatorios-timeline__btn--active' : ''}`}
+                    aria-pressed={timelineMeses === 12}
+                    onClick={() => setTimelineMeses && setTimelineMeses(12)}
+                  >12 meses</button>
+                  <button
+                    type="button"
+                    className={`relatorios-timeline__btn${timelineMeses === 24 ? ' relatorios-timeline__btn--active' : ''}`}
+                    aria-pressed={timelineMeses === 24}
+                    onClick={() => setTimelineMeses && setTimelineMeses(24)}
+                  >24 meses</button>
+                </div>
+              </div>
+              <div className="relatorios-charts__section-grid">
+                <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+                  <div className="ref-panel__head">
+                    <div>
+                      <h2 className="ref-panel__title">Receitas x Despesas</h2>
+                      <p className="ref-panel__subtitle">Últimos {timelineMeses} meses — independe do filtro de período</p>
+                    </div>
+                  </div>
+                  <div className="relatorios-chart-card__body">
+                    {timelineLoading ? (
+                      <div className="relatorios-chart-empty">Carregando histórico…</div>
+                    ) : timelineHasData ? (
+                      <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
+                        <BarChart data={chartDataTimeline} margin={{ top: 12, right: 8, left: 0, bottom: 4 }} barGap={1} barCategoryGap="18%">
+                          <defs>
+                            <linearGradient id="relGradRecTl" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor={chart.barRecTop} stopOpacity={1} />
+                              <stop offset="100%" stopColor={chart.barRecBot} stopOpacity={0.92} />
+                            </linearGradient>
+                            <linearGradient id="relGradDesTl" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor={chart.barDesTop} stopOpacity={1} />
+                              <stop offset="100%" stopColor={chart.barDesBot} stopOpacity={0.9} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="4 8" stroke={chart.axis} strokeOpacity={0.18} vertical={false} />
+                          <XAxis dataKey="name" stroke={chart.axis} fontSize={isMobile ? 9 : 11} tickMargin={8} tick={{ fill: chart.tickFill }} axisLine={false} tickLine={false} interval={timelineInterval} angle={isMobile ? -45 : -30} textAnchor="end" height={isMobile ? 56 : 44} />
+                          <YAxis stroke={chart.axis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chart.tickFill }} tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} width={isMobile ? 56 : 64} />
+                          <Tooltip content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />} cursor={{ fill: chart.cursorFill }} />
+                          <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: chart.legend, fontSize: 12 }} />
+                          <Bar dataKey="Receitas" fill="url(#relGradRecTl)" radius={[3, 3, 0, 0]} maxBarSize={isMobile ? 14 : 22} activeBar={{ fillOpacity: 0.85 }} {...anim} />
+                          <Bar dataKey="Despesas" fill="url(#relGradDesTl)" radius={[3, 3, 0, 0]} maxBarSize={isMobile ? 14 : 22} activeBar={{ fillOpacity: 0.85 }} {...anim} animationBegin={reduceMotion ? 0 : 140} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="relatorios-chart-empty">Sem histórico de transações ainda.</div>
+                    )}
+                  </div>
+                </article>
+              </div>
+            </section>
 
             {multiMes && (<>
             <section className="relatorios-charts__section" aria-labelledby="rel-month-heading">

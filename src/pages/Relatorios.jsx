@@ -17,7 +17,7 @@ import { buildRelatorioPdfDoc, downloadRelatorioPdf } from '../lib/relatorioExpo
 import { showToast } from '../lib/toastStore'
 import { formatLocalDateISO, getFirstDayOfMonth, getLastDayOfMonth } from '../lib/dateUtils'
 import { RelatoriosChartsLoadingShell } from '../components/relatorios/RelatoriosLoadingComponents'
-import { tipoNormalizado, parseValorTransacao, isDespesaRecorrente } from '../lib/transacaoUtils'
+import { tipoNormalizado, parseValorTransacao, isDespesaRecorrente, labelMesBr } from '../lib/transacaoUtils'
 import './dashboard.css'
 
 // Lazy: o bloco de gráficos (recharts ~pesado) carrega só depois do shell pintar.
@@ -87,6 +87,11 @@ export default function Relatorios() {
   const [iaAnalise, setIaAnalise] = useState('')
   const [iaLoading, setIaLoading] = useState(false)
   const [iaErro, setIaErro] = useState(null)
+
+  // Linha do tempo histórica (independente do filtro de período): últimos N meses.
+  const [timelineMeses, setTimelineMeses] = useState(12)
+  const [timelineRaw, setTimelineRaw] = useState([])
+  const [timelineLoading, setTimelineLoading] = useState(true)
 
   const fetchCategorias = useCallback(async () => {
     try {
@@ -170,6 +175,36 @@ export default function Relatorios() {
       fetchLimites()
     }
   }, [usuario.id, fetchCategorias, fetchTransacoes, fetchRecorrenciasAtivas, fetchLimites])
+
+  // Linha do tempo: fetch próprio, independente do filtro de período da tela.
+  const fetchTimeline = useCallback(async (meses) => {
+    setTimelineLoading(true)
+    try {
+      const res = await fetchWithRetry(apiUrl(`/api/relatorios/resumo-mensal?meses=${meses}`), { cache: 'no-store' }, { fetchImpl: apiFetch })
+      if (redirectSe401(res)) return
+      if (res.ok) {
+        const data = await res.json()
+        setTimelineRaw(Array.isArray(data) ? data : [])
+      }
+    } catch (err) {
+      console.error('[Relatorios] fetchTimeline:', err)
+    } finally {
+      setTimelineLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (usuario.id) fetchTimeline(timelineMeses)
+  }, [usuario.id, timelineMeses, fetchTimeline])
+
+  const chartDataTimeline = useMemo(
+    () => (timelineRaw || []).map((r) => ({
+      name: labelMesBr(r.ym),
+      Receitas: Number(r.receitas) || 0,
+      Despesas: Number(r.despesas) || 0,
+    })),
+    [timelineRaw]
+  )
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target
@@ -922,6 +957,10 @@ export default function Relatorios() {
               orcadoVsReal={orcadoVsReal}
               top5Despesas={top5Despesas}
               variacaoCategorias={variacaoCategorias}
+              chartDataTimeline={chartDataTimeline}
+              timelineMeses={timelineMeses}
+              setTimelineMeses={setTimelineMeses}
+              timelineLoading={timelineLoading}
               isMobile={isMobile}
               isDark={isDark}
               chart={chart}

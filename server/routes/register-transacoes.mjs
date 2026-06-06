@@ -27,6 +27,7 @@ import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 import { getSupabaseAdmin } from '../lib/supabase-admin.mjs'
 import { registrarCorrecaoCategoria } from '../lib/domain/transacao-categoria-logger.mjs'
+import { getResumoMensal } from '../lib/relatorios-resumo.mjs'
 
 export function registerTransacoesRoutes(app) {
   app.get('/api/categorias', async (c) => {
@@ -81,6 +82,29 @@ export function registerTransacoesRoutes(app) {
     } catch (error) {
       log.error('get transactions failed', error)
       return c.json({ message: 'Erro ao buscar transações.' }, 500)
+    }
+  })
+
+  // Resumo mensal agregado (linha do tempo histórica, independente do filtro de
+  // período da tela de Relatórios). meses=12|24 (clamp 1..36 na lib).
+  app.get('/api/relatorios/resumo-mensal', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+
+      const ip = clientIpFromHono(c)
+      if (!await rateLimitTake(`rel-resumo:${parsed.actorId}:${ip}`, 60, 60_000)) {
+        return c.json({ message: 'Muitas consultas. Aguarde um momento.' }, 429)
+      }
+
+      const mesesQ = parseInt(c.req.query('meses') || '24', 10)
+      const meses = Number.isFinite(mesesQ) ? mesesQ : 24
+      const data = await getResumoMensal(parsed.dataUsuarioId, { meses })
+      return c.json(data)
+    } catch (error) {
+      log.error('get resumo-mensal failed', error)
+      return c.json({ message: 'Erro ao buscar resumo mensal.' }, 500)
     }
   })
 

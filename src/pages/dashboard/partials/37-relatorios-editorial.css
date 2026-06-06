@@ -580,3 +580,47 @@ body[data-theme='dark'] .page-relatorios--editorial .ref-dashboard-inner {
   .page-relatorios--editorial .rel-ed__ia { padding: 18px 16px; }
   .page-relatorios--editorial .rel-ed__ia-btn { width: 100%; }
 }
+
+/* ── Linha do tempo — cabeçalho com toggle 12/24 meses ─────────────────────── */
+.page-relatorios--editorial .relatorios-timeline__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.dashboard-container.page-relatorios.page-relatorios--editorial.ref-dashboard.app-horizon-shell .relatorios-timeline__head .relatorios-charts__section-title {
+  margin: 0;
+}
+.page-relatorios--editorial .relatorios-timeline__toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 11px;
+  border: 1px solid var(--rel-ed-line);
+  background: var(--rel-ed-card);
+  flex-shrink: 0;
+}
+.page-relatorios--editorial .relatorios-timeline__btn {
+  border: 0;
+  background: transparent;
+  padding: 7px 13px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--rel-ed-muted);
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+.page-relatorios--editorial .relatorios-timeline__btn:hover { color: var(--rel-ed-text); }
+.page-relatorios--editorial .relatorios-timeline__btn--active {
+  background: var(--rel-ed-gold);
+  color: #1a1200;
+}
+.page-relatorios--editorial .relatorios-timeline__btn:focus-visible {
+  outline: 2px solid var(--rel-ed-gold);
+  outline-offset: 2px;
+}
+@media (max-width: 480px) {
+  .page-relatorios--editorial .relatorios-timeline__btn { padding: 7px 10px; font-size: 0.76rem; }
+}
