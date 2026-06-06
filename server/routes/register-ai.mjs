@@ -4,11 +4,36 @@ import {
   askHorizon,
   suggestCategoryForTransaction,
   parseWhatsAppMessageWithAI,
+  analisarRelatorioFinanceiro,
 } from '../lib/ai.mjs'
 import { getCategorias } from '../lib/transacoes.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
+
+/** Mapeia erros do Gemini para uma resposta HTTP amigável (compartilhado entre rotas de IA). */
+function mapGeminiErrorToResponse(c, error) {
+  const raw = String(error?.message || '')
+  if (raw.includes('GEMINI_API_KEY') || /GEMINI_API_KEY não configurada/i.test(raw)) {
+    return c.json({ message: 'Chave de API do Gemini não configurada no servidor.' }, 500)
+  }
+  if (raw.includes('filtro de segurança')) {
+    return c.json({ message: raw }, 422)
+  }
+  if (/API key not valid|API_KEY_INVALID|PERMISSION_DENIED|invalid\s*API\s*key|API key expired|key expired/i.test(raw)) {
+    Alerts.geminiKeyInvalid()
+    return c.json({ message: 'A chave da IA expirou ou é inválida. Avise o suporte.' }, 503)
+  }
+  if (/quota|RESOURCE_EXHAUSTED|exceeded your current quota|429/i.test(raw)) {
+    Alerts.geminiQuota()
+    return c.json({ message: 'Limite de uso da IA atingido. Tente novamente em alguns minutos.' }, 503)
+  }
+  if (/^Gemini API \d{3}:/i.test(raw) || raw.includes('Resposta vazia da API do Gemini') || /^Resposta vazia \(/i.test(raw)) {
+    Alerts.geminiGenericFail(raw)
+    return c.json({ message: 'A IA não retornou uma resposta válida. Tente novamente.' }, 502)
+  }
+  return c.json({ message: 'Não foi possível processar a IA agora. Tente novamente.' }, 500)
+}
 
 export function registerAiRoutes(app) {
   app.post('/api/ai/chat', async (c) => {
@@ -157,6 +182,31 @@ export function registerAiRoutes(app) {
     } catch (error) {
       log.warn('ai parse-transaction failed', error?.message || error)
       return c.json({ tipo: 'CHAT' })
+    }
+  })
+
+  // Análise narrativa de um período de relatório. Recebe os agregados já
+  // computados no frontend (respeita o filtro de período/categoria da tela) e
+  // devolve um diagnóstico curto em linguagem natural.
+  app.post('/api/ai/analise-relatorio', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+
+      if (!await rateLimitTake(`ai-analise-rel:${parsed.actorId}:${clientKeyFromHono(c)}`, 12, 60_000)) {
+        return c.json({ message: 'Muitas análises seguidas. Aguarde cerca de um minuto e tente de novo.' }, 429)
+      }
+
+      const body = await c.req.json().catch(() => ({}))
+      const dados = body?.dados && typeof body.dados === 'object' ? body.dados : null
+      if (!dados) return c.json({ message: 'Dados do período ausentes.' }, 400)
+
+      const resposta = await analisarRelatorioFinanceiro(dados, null)
+      return c.json({ resposta })
+    } catch (error) {
+      log.error('ai analise-relatorio failed', error)
+      return mapGeminiErrorToResponse(c, error)
     }
   })
 

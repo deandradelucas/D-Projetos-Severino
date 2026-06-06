@@ -16,13 +16,28 @@ import { downloadRelatorioCsv } from '../lib/relatorioExportCsv'
 import { buildRelatorioPdfDoc, downloadRelatorioPdf } from '../lib/relatorioExportPdf'
 import { showToast } from '../lib/toastStore'
 import { formatLocalDateISO, getFirstDayOfMonth, getLastDayOfMonth } from '../lib/dateUtils'
-import { SkeletonKpi } from '../components/dashboard/DashboardSkeletons'
 import { RelatoriosChartsLoadingShell } from '../components/relatorios/RelatoriosLoadingComponents'
-import { tipoNormalizado, parseValorTransacao } from '../lib/transacaoUtils'
+import { tipoNormalizado, parseValorTransacao, isDespesaRecorrente } from '../lib/transacaoUtils'
 import './dashboard.css'
 
 // Lazy: o bloco de gráficos (recharts ~pesado) carrega só depois do shell pintar.
 const RelatoriosCharts = lazy(() => import('./relatorios/RelatoriosCharts'))
+
+/**
+ * Markdown leve para a análise da IA: escapa HTML (nomes de categoria são
+ * conteúdo do usuário → evita XSS) e converte **negrito** + quebras de linha.
+ */
+function renderIaAnalise(text) {
+  const esc = String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+  const inner = esc
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n{2,}/g, '</p><p>')
+    .replace(/\n/g, '<br/>')
+  return `<p>${inner}</p>`
+}
 
 export default function Relatorios() {
   const { privacyMode, theme } = useTheme()
@@ -65,7 +80,13 @@ export default function Relatorios() {
   }, [filters])
   const [filtrosAbertos, setFiltrosAbertos] = useState(false)
   const [prevSummary, setPrevSummary] = useState(null)
+  const [prevCategorias, setPrevCategorias] = useState(null)
   const [limitesOrcamento, setLimitesOrcamento] = useState([])
+
+  // Análise narrativa por IA (Severino) — sob demanda para economizar Gemini.
+  const [iaAnalise, setIaAnalise] = useState('')
+  const [iaLoading, setIaLoading] = useState(false)
+  const [iaErro, setIaErro] = useState(null)
 
   const fetchCategorias = useCallback(async () => {
     try {
@@ -247,7 +268,7 @@ export default function Relatorios() {
 
   // Busca o resumo do período anterior para calcular as variações (% vs período anterior)
   useEffect(() => {
-    if (!usuario.id || !prevRange) { setPrevSummary(null); return undefined }
+    if (!usuario.id || !prevRange) { setPrevSummary(null); setPrevCategorias(null); return undefined }
     let cancelled = false
     ;(async () => {
       try {
@@ -261,9 +282,12 @@ export default function Relatorios() {
         if (cancelled || !res.ok) return
         const data = await res.json()
         const agg = computeRelatorioAggregates(Array.isArray(data) ? data : [])
-        if (!cancelled) setPrevSummary(agg.summary)
+        if (!cancelled) {
+          setPrevSummary(agg.summary)
+          setPrevCategorias(agg.chartDataPorCategoria)
+        }
       } catch {
-        if (!cancelled) setPrevSummary(null)
+        if (!cancelled) { setPrevSummary(null); setPrevCategorias(null) }
       }
     })()
     return () => { cancelled = true }
@@ -331,6 +355,56 @@ export default function Relatorios() {
       .filter(Boolean)
       .sort((a, b) => b.gasto - a.gasto)
   }, [limitesOrcamento, categorias, chartDataPorCategoria])
+
+  // Feature 2 — Fixo vs Variável + comprometimento da renda.
+  // Fixo = despesas recorrentes (regra mensal) ou parceladas; o resto é variável.
+  // Usa transações reais do período (sem projeção) para refletir o que de fato saiu.
+  const fixoVsVariavel = useMemo(() => {
+    let fixo = 0
+    let variavel = 0
+    for (const t of transacoes || []) {
+      if (tipoNormalizado(t.tipo) !== 'DESPESA') continue
+      const v = parseValorTransacao(t)
+      if (isDespesaRecorrente(t)) fixo += v
+      else variavel += v
+    }
+    const total = fixo + variavel
+    return {
+      fixo,
+      variavel,
+      total,
+      pctFixo: total > 0 ? (fixo / total) * 100 : 0,
+      comprometimento: summary.receitas > 0 ? (fixo / summary.receitas) * 100 : null,
+    }
+  }, [transacoes, summary.receitas])
+
+  // Feature 1 — Variação por categoria vs período anterior (só faz sentido sem
+  // filtro de categoria; com filtro há uma categoria só). chartDataPorCategoria
+  // é de DESPESAS, então subir = gastar mais (ruim), cair = gastar menos (bom).
+  const variacaoCategorias = useMemo(() => {
+    if (!prevCategorias || filters.categoria_id) return []
+    const prevMap = new Map(prevCategorias.map((c) => [c.name, c.value]))
+    const curMap = new Map(chartDataPorCategoria.map((c) => [c.name, c.value]))
+    const names = new Set([...prevMap.keys(), ...curMap.keys()])
+    const rows = []
+    for (const name of names) {
+      if (name === 'Sem categoria') continue
+      const cur = curMap.get(name) || 0
+      const prev = prevMap.get(name) || 0
+      const diff = cur - prev
+      if (Math.abs(diff) < 1) continue
+      const pct = prev > 0 ? (diff / prev) * 100 : null
+      rows.push({ name, cur, prev, diff, pct })
+    }
+    rows.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff))
+    return rows
+  }, [prevCategorias, chartDataPorCategoria, filters.categoria_id])
+
+  // Invalida a análise da IA quando o período/categoria muda (dados mudaram).
+  useEffect(() => {
+    setIaAnalise('')
+    setIaErro(null)
+  }, [filters.dataInicio, filters.dataFim, filters.categoria_id])
 
   const exportToCSV = () => {
     try {
@@ -419,9 +493,50 @@ export default function Relatorios() {
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
+  // Feature 3 — gera a análise narrativa da IA enviando os agregados já
+  // computados (respeita o filtro de período/categoria que está na tela).
+  const gerarAnaliseIA = useCallback(async () => {
+    if (iaLoading || transacoes.length === 0) return
+    setIaLoading(true)
+    setIaErro(null)
+    try {
+      const taxaPoupanca = summary.receitas > 0 ? Math.max(0, (summary.saldo / summary.receitas) * 100) : 0
+      const dados = {
+        periodoLabel: `${periodLabel}${filters.categoria_id ? ` · ${selectedCategoryName}` : ''}`,
+        receitas: summary.receitas,
+        despesas: summary.despesas,
+        saldo: summary.saldo,
+        taxaPoupanca,
+        fixo: fixoVsVariavel.fixo,
+        variavel: fixoVsVariavel.variavel,
+        comprometimento: fixoVsVariavel.comprometimento,
+        topDespesas: chartDataPorCategoria.slice(0, 5).map((c) => ({ nome: c.name, valor: c.value })),
+        topReceitas: chartDataReceitasPorCategoria.slice(0, 5).map((c) => ({ nome: c.name, valor: c.value })),
+        variacoes: variacaoCategorias.slice(0, 6).map((v) => ({ nome: v.name, diff: v.diff, pct: v.pct })),
+        deltaReceitas,
+        deltaDespesas,
+      }
+      const res = await apiFetch(apiUrl('/api/ai/analise-relatorio'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dados }),
+      })
+      if (redirectSe401(res)) return
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data?.message || 'Não foi possível gerar a análise agora.')
+      const resposta = data?.resposta
+      if (typeof resposta !== 'string' || !resposta.trim()) throw new Error('A IA não retornou uma análise. Tente novamente.')
+      setIaAnalise(resposta.trim())
+    } catch (e) {
+      setIaErro(e?.message || 'Erro ao gerar análise.')
+    } finally {
+      setIaLoading(false)
+    }
+  }, [iaLoading, transacoes.length, summary, periodLabel, selectedCategoryName, filters.categoria_id, fixoVsVariavel, chartDataPorCategoria, chartDataReceitasPorCategoria, variacaoCategorias, deltaReceitas, deltaDespesas])
+
   return (
     <div
-      className="dashboard-container page-relatorios ref-dashboard app-horizon-shell"
+      className="dashboard-container page-relatorios page-relatorios--editorial ref-dashboard app-horizon-shell"
       style={{ '--rel-tooltip-bg': chart.tooltipBg }}
     >
       <div className="app-horizon-inner">
@@ -430,29 +545,28 @@ export default function Relatorios() {
       <main className="main-content relative z-10 ref-dashboard-main">
         <div className="ref-dashboard-inner dashboard-hub">
         <RefDashboardScroll>
-        <section className="dashboard-hub__hero" aria-label="Relatórios e exportação">
-          <div className="dashboard-hub__hero-row">
+        <header className="rel-ed__hero" aria-label="Relatórios e exportação">
+          <div className="rel-ed__hero-top">
             <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
-            <div className="dashboard-hub__hero-main">
-              <div className="dashboard-hub__hero-top">
-                <div className="dashboard-hub__hero-text">
-                  <h1 className="dashboard-hub__title">Relatórios</h1>
-                </div>
-                <div className="dashboard-hub__hero-actions relatorios-header-export" role="toolbar" aria-label="Exportar relatório">
+            <div className="rel-ed__heading">
+              <h1 className="rel-ed__title">Relatórios</h1>
+              <p className="rel-ed__period">{periodLabel} · {selectedCategoryName}</p>
+            </div>
+            <div className="rel-ed__actions" role="toolbar" aria-label="Exportar relatório">
                   <button
                     type="button"
-                    className="dashboard-hub__btn dashboard-hub__btn--secondary relatorios-btn-export"
+                    className="rel-ed__action"
                     onClick={exportToCSV}
                     disabled={transacoes.length === 0}
                     aria-label="Exportar relatório em CSV"
                     title="Exportar CSV"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                    <span className="desktop-only">CSV</span>
+                    <span className="rel-ed__action-label desktop-only">CSV</span>
                   </button>
                   <button
                     type="button"
-                    className="dashboard-hub__btn dashboard-hub__btn--primary relatorios-btn-export"
+                    className="rel-ed__action rel-ed__action--primary"
                     onClick={exportToPDF}
                     onMouseEnter={prefetchPdfDeps}
                     onFocus={prefetchPdfDeps}
@@ -461,97 +575,69 @@ export default function Relatorios() {
                     title={pdfExportLoading ? 'Gerando PDF…' : 'Baixar PDF'}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                    <span className="desktop-only">{pdfExportLoading ? '…' : 'PDF'}</span>
+                    <span className="rel-ed__action-label desktop-only">{pdfExportLoading ? '…' : 'PDF'}</span>
                   </button>
                   <button
                     type="button"
-                    className="dashboard-hub__btn dashboard-hub__btn--secondary relatorios-btn-export"
+                    className="rel-ed__action"
                     onClick={compartilharWhatsApp}
                     disabled={transacoes.length === 0}
                     aria-label="Compartilhar resumo no WhatsApp"
                     title="Compartilhar resumo no WhatsApp"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
-                    <span className="desktop-only">Resumo</span>
+                    <span className="rel-ed__action-label desktop-only">Resumo</span>
                   </button>
-                </div>
-              </div>
-              <div className="dashboard-hub__balance-line" aria-label="Saldo do período filtrado">
-                <span className="dashboard-hub__balance-line-label">Saldo disponível:</span>
-                <strong className={[privacyMode ? 'privacy-blur' : '', relatoriosSaldoValorClass].filter(Boolean).join(' ')}>
-                  {formatCurrency(summary.saldo)}
-                </strong>
               </div>
             </div>
-          </div>
-        </section>
 
-        <section
-          className={`ref-kpi-row relatorios-kpi-row--2col${refreshing ? ' relatorios-kpi-row--refreshing' : ''}`}
-          aria-label="Resumo do período"
-          aria-busy={loading || refreshing}
-        >
-          {loading ? (
-            <>
-              <SkeletonKpi />
-              <SkeletonKpi />
-            </>
-          ) : (
-            <>
-              <article className="ref-kpi-card ref-kpi-card--income">
-                <div className="ref-kpi-card__icon" aria-hidden>
-                  <img
-                    className="ref-kpi-card__icon-img"
-                    src="/images/icons/setacima.png"
-                    alt=""
-                    width={22}
-                    height={22}
-                    decoding="async"
-                  />
-                </div>
-                <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Receitas</p>
-                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(summary.receitas)}</p>
-                  {deltaReceitas != null && (
-                    <span
-                      className={`relatorios-kpi-delta ${deltaReceitas >= 0 ? 'relatorios-kpi-delta--good' : 'relatorios-kpi-delta--bad'}`}
-                      aria-label={`${deltaReceitas >= 0 ? 'Alta de' : 'Queda de'} ${Math.abs(deltaReceitas).toFixed(0)}% vs período anterior`}
-                    >
-                      <span aria-hidden="true">{deltaReceitas >= 0 ? '▲' : '▼'}</span>{' '}{Math.abs(deltaReceitas).toFixed(0)}% vs anterior
-                    </span>
-                  )}
-                </div>
-              </article>
-              <article className="ref-kpi-card ref-kpi-card--expense">
-                <div className="ref-kpi-card__icon" aria-hidden>
-                  <img
-                    className="ref-kpi-card__icon-img"
-                    src="/images/icons/setabaixo.png"
-                    alt=""
-                    width={22}
-                    height={22}
-                    decoding="async"
-                  />
-                </div>
-                <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Despesas</p>
-                  <p className={`ref-kpi-card__value ref-kpi-card__value--signed ${privacyMode ? 'privacy-blur' : ''}`}>
-                    −{'\u00a0'}
-                    {formatCurrency(summary.despesas)}
-                  </p>
-                  {deltaDespesas != null && (
-                    <span
-                      className={`relatorios-kpi-delta ${deltaDespesas > 0 ? 'relatorios-kpi-delta--bad' : 'relatorios-kpi-delta--good'}`}
-                      aria-label={`${deltaDespesas >= 0 ? 'Alta de' : 'Queda de'} ${Math.abs(deltaDespesas).toFixed(0)}% vs período anterior`}
-                    >
-                      <span aria-hidden="true">{deltaDespesas >= 0 ? '▲' : '▼'}</span>{' '}{Math.abs(deltaDespesas).toFixed(0)}% vs anterior
-                    </span>
-                  )}
-                </div>
-              </article>
-            </>
-          )}
-        </section>
+            <div className="rel-ed__balance" aria-label="Saldo do período" aria-busy={loading || refreshing}>
+              <p className="rel-ed__balance-label">Saldo do período</p>
+              {loading ? (
+                <div className="rel-ed__balance-skel" aria-hidden />
+              ) : (
+                <p className={['rel-ed__balance-value', relatoriosSaldoValorClass, privacyMode ? 'privacy-blur' : ''].filter(Boolean).join(' ')}>
+                  {formatCurrency(summary.saldo)}
+                </p>
+              )}
+            </div>
+
+            <div className="rel-ed__totals" aria-busy={loading || refreshing}>
+              {loading ? (
+                <>
+                  <div className="rel-ed__total rel-ed__total--skel" aria-hidden />
+                  <div className="rel-ed__total rel-ed__total--skel" aria-hidden />
+                </>
+              ) : (
+                <>
+                  <div className="rel-ed__total rel-ed__total--in">
+                    <span className="rel-ed__total-label">Receitas</span>
+                    <span className={`rel-ed__total-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(summary.receitas)}</span>
+                    {deltaReceitas != null && (
+                      <span
+                        className={`rel-ed__delta ${deltaReceitas >= 0 ? 'rel-ed__delta--good' : 'rel-ed__delta--bad'}`}
+                        aria-label={`${deltaReceitas >= 0 ? 'Alta de' : 'Queda de'} ${Math.abs(deltaReceitas).toFixed(0)}% vs período anterior`}
+                      >
+                        <span aria-hidden="true">{deltaReceitas >= 0 ? '▲' : '▼'}</span>{' '}{Math.abs(deltaReceitas).toFixed(0)}% vs anterior
+                      </span>
+                    )}
+                  </div>
+                  <div className="rel-ed__total rel-ed__total--out">
+                    <span className="rel-ed__total-label">Despesas</span>
+                    <span className={`rel-ed__total-value ${privacyMode ? 'privacy-blur' : ''}`}>−{' '}{formatCurrency(summary.despesas)}</span>
+                    {deltaDespesas != null && (
+                      <span
+                        className={`rel-ed__delta ${deltaDespesas > 0 ? 'rel-ed__delta--bad' : 'rel-ed__delta--good'}`}
+                        aria-label={`${deltaDespesas >= 0 ? 'Alta de' : 'Queda de'} ${Math.abs(deltaDespesas).toFixed(0)}% vs período anterior`}
+                      >
+                        <span aria-hidden="true">{deltaDespesas >= 0 ? '▲' : '▼'}</span>{' '}{Math.abs(deltaDespesas).toFixed(0)}% vs anterior
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+        </header>
 
         {/* Insights strip */}
         {!loading && transacoes.length > 0 && (() => {
@@ -578,73 +664,159 @@ export default function Relatorios() {
             }
           }
           return (
-            <div className="relatorios-insights" aria-label="Insights do período">
-              <div className="relatorios-insights__item relatorios-insights__item--wide">
-                <div className="relatorios-insights__item-head">
-                  <p className="relatorios-insights__label">Taxa de poupança</p>
-                  <p className={`relatorios-insights__value ${privacyMode ? 'privacy-blur' : ''}`}>
+            <section className="rel-ed__stats" aria-label="Insights do período">
+              <div className="rel-ed__stat rel-ed__stat--wide">
+                <p className="rel-ed__stat-label">Taxa de poupança</p>
+                <div className="rel-ed__savings">
+                  <p className={`rel-ed__stat-value ${privacyMode ? 'privacy-blur' : ''}`}>
                     {taxaPoupanca.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
                   </p>
+                  <p className="rel-ed__stat-hint">
+                    {taxaPoupanca >= 20 ? 'Ótimo! Acima de 20%' : taxaPoupanca > 0 ? 'Abaixo do ideal (20%)' : 'Gastos maiores que receitas'}
+                  </p>
                 </div>
-                <div className="relatorios-insights__bar">
+                <div className="rel-ed__savings-bar">
                   <div
-                    className={`relatorios-insights__bar-fill${taxaPoupanca >= 20 ? ' relatorios-insights__bar-fill--pos' : taxaPoupanca > 0 ? ' relatorios-insights__bar-fill--warn' : ' relatorios-insights__bar-fill--neg'}`}
+                    className={`rel-ed__savings-fill${taxaPoupanca >= 20 ? ' rel-ed__savings-fill--pos' : taxaPoupanca > 0 ? ' rel-ed__savings-fill--warn' : ' rel-ed__savings-fill--neg'}`}
                     style={{ width: `${Math.min(taxaPoupanca, 100).toFixed(2)}%` }}
                   />
                 </div>
-                <p className="relatorios-insights__hint">
-                  {taxaPoupanca >= 20 ? 'Ótimo! Acima de 20%' : taxaPoupanca > 0 ? 'Abaixo do ideal (20%)' : 'Gastos maiores que receitas'}
-                </p>
               </div>
+              {fixoVsVariavel.total > 0 && (
+                <div className="rel-ed__stat rel-ed__stat--wide">
+                  <p className="rel-ed__stat-label">Comprometimento da renda</p>
+                  <div className="rel-ed__savings">
+                    <p className={`rel-ed__stat-value ${privacyMode ? 'privacy-blur' : ''}`}>
+                      {fixoVsVariavel.comprometimento != null ? `${Math.round(fixoVsVariavel.comprometimento)}%` : '—'}
+                    </p>
+                    <p className="rel-ed__stat-hint">
+                      {fixoVsVariavel.comprometimento == null
+                        ? 'Sem receitas no período para comparar'
+                        : fixoVsVariavel.comprometimento <= 50
+                          ? 'Saudável — fixas até 50% da renda'
+                          : fixoVsVariavel.comprometimento <= 70
+                            ? 'Atenção — fixas acima de 50% da renda'
+                            : 'Apertado — fixas comprometem muito da renda'}
+                    </p>
+                  </div>
+                  <div className="rel-ed__split" aria-hidden="true">
+                    <span className="rel-ed__split-fill" style={{ width: `${fixoVsVariavel.pctFixo.toFixed(1)}%` }} />
+                  </div>
+                  <div className="rel-ed__split-legend">
+                    <span className="rel-ed__split-key">
+                      <i className="rel-ed__split-dot rel-ed__split-dot--fix" />
+                      Fixas <b className={privacyMode ? 'privacy-blur' : ''}>{formatCurrency(fixoVsVariavel.fixo)}</b>
+                    </span>
+                    <span className="rel-ed__split-key">
+                      <i className="rel-ed__split-dot rel-ed__split-dot--var" />
+                      Variáveis <b className={privacyMode ? 'privacy-blur' : ''}>{formatCurrency(fixoVsVariavel.variavel)}</b>
+                    </span>
+                  </div>
+                </div>
+              )}
               {maiorDesp && (
-                <div className="relatorios-insights__item">
-                  <p className="relatorios-insights__label">Maior gasto</p>
-                  <p className="relatorios-insights__value relatorios-insights__value--cat" title={maiorDesp.name}>{maiorDesp.name}</p>
-                  <p className={`relatorios-insights__sub ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(maiorDesp.value)}</p>
+                <div className="rel-ed__stat">
+                  <p className="rel-ed__stat-label">Maior gasto</p>
+                  <p className="rel-ed__stat-value rel-ed__stat-value--cat" title={maiorDesp.name}>{maiorDesp.name}</p>
+                  <p className={`rel-ed__stat-sub ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(maiorDesp.value)}</p>
                 </div>
               )}
               {maiorReceita && (
-                <div className="relatorios-insights__item">
-                  <p className="relatorios-insights__label">Maior receita</p>
-                  <p className="relatorios-insights__value relatorios-insights__value--cat" title={maiorReceita.name}>{maiorReceita.name}</p>
-                  <p className={`relatorios-insights__sub ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(maiorReceita.value)}</p>
+                <div className="rel-ed__stat">
+                  <p className="rel-ed__stat-label">Maior receita</p>
+                  <p className="rel-ed__stat-value rel-ed__stat-value--cat" title={maiorReceita.name}>{maiorReceita.name}</p>
+                  <p className={`rel-ed__stat-sub ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(maiorReceita.value)}</p>
                 </div>
               )}
               {ticketMedio > 0 && (
-                <div className="relatorios-insights__item">
-                  <p className="relatorios-insights__label">Ticket médio</p>
-                  <p className={`relatorios-insights__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(ticketMedio)}</p>
-                  <p className="relatorios-insights__sub">{nDespesas} {nDespesas === 1 ? 'despesa' : 'despesas'}</p>
+                <div className="rel-ed__stat">
+                  <p className="rel-ed__stat-label">Ticket médio</p>
+                  <p className={`rel-ed__stat-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(ticketMedio)}</p>
+                  <p className="rel-ed__stat-sub">{nDespesas} {nDespesas === 1 ? 'despesa' : 'despesas'}</p>
                 </div>
               )}
               {mediaDiaria > 0 && (
-                <div className="relatorios-insights__item">
-                  <p className="relatorios-insights__label">Média diária</p>
-                  <p className={`relatorios-insights__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(mediaDiaria)}</p>
-                  <p className="relatorios-insights__sub">de gasto por dia</p>
+                <div className="rel-ed__stat">
+                  <p className="rel-ed__stat-label">Média diária</p>
+                  <p className={`rel-ed__stat-value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(mediaDiaria)}</p>
+                  <p className="rel-ed__stat-sub">de gasto por dia</p>
                 </div>
               )}
               {diasPeriodo && (
-                <div className="relatorios-insights__item">
-                  <p className="relatorios-insights__label">Período</p>
-                  <p className="relatorios-insights__value">{diasPeriodo}</p>
-                  <p className="relatorios-insights__sub">dias analisados</p>
+                <div className="rel-ed__stat">
+                  <p className="rel-ed__stat-label">Período</p>
+                  <p className="rel-ed__stat-value">{diasPeriodo}</p>
+                  <p className="rel-ed__stat-sub">dias analisados</p>
                 </div>
               )}
               {projecao && (
-                <div className="relatorios-insights__item relatorios-insights__item--wide">
-                  <p className="relatorios-insights__label">Projeção de fim do período</p>
-                  <p className={`relatorios-insights__value ${privacyMode ? 'privacy-blur' : ''} ${projecao.saldoProj >= 0 ? 'relatorios-insights__value--pos' : 'relatorios-insights__value--neg'}`}>
+                <div className="rel-ed__stat rel-ed__stat--wide">
+                  <p className="rel-ed__stat-label">Projeção de fim do período</p>
+                  <p className={`rel-ed__stat-value ${privacyMode ? 'privacy-blur' : ''} ${projecao.saldoProj >= 0 ? 'rel-ed__stat-value--pos' : 'rel-ed__stat-value--neg'}`}>
                     Saldo ~ {formatCurrency(projecao.saldoProj)}
                   </p>
-                  <p className={`relatorios-insights__hint ${privacyMode ? 'privacy-blur' : ''}`}>
+                  <p className={`rel-ed__stat-hint ${privacyMode ? 'privacy-blur' : ''}`}>
                     No ritmo atual, despesas devem chegar a ~ {formatCurrency(projecao.despProj)}
                   </p>
                 </div>
               )}
-            </div>
+            </section>
           )
         })()}
+
+        {/* Análise narrativa por IA (Severino) — sob demanda */}
+        {!loading && transacoes.length > 0 && (
+          <section className="rel-ed__ia" aria-label="Análise do Severino">
+            <div className="rel-ed__ia-head">
+              <span className="rel-ed__ia-title">
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" />
+                  <path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z" />
+                </svg>
+                Análise do Severino
+              </span>
+              {iaAnalise && !iaLoading && (
+                <button
+                  type="button"
+                  className="rel-ed__ia-refresh"
+                  onClick={gerarAnaliseIA}
+                  aria-label="Gerar análise novamente"
+                  title="Gerar novamente"
+                >
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 4v6h-6" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {iaLoading ? (
+              <div className="rel-ed__ia-loading" role="status">
+                <span className="rel-ed__ia-dots" aria-hidden="true"><i /><i /><i /></span>
+                Severino está analisando seu período…
+              </div>
+            ) : iaErro ? (
+              <p className="rel-ed__ia-erro">
+                {iaErro}{' '}
+                <button type="button" className="rel-ed__ia-link" onClick={gerarAnaliseIA}>Tentar de novo</button>
+              </p>
+            ) : iaAnalise ? (
+              <div
+                className={`rel-ed__ia-text ${privacyMode ? 'privacy-blur' : ''}`}
+                dangerouslySetInnerHTML={{ __html: renderIaAnalise(iaAnalise) }}
+              />
+            ) : (
+              <div className="rel-ed__ia-empty">
+                <p className="rel-ed__ia-empty-text">
+                  Receba um diagnóstico em linguagem natural deste período: o que pesou, o que melhorou e o próximo passo.
+                </p>
+                <button type="button" className="rel-ed__ia-btn" onClick={gerarAnaliseIA}>
+                  Gerar análise
+                </button>
+              </div>
+            )}
+          </section>
+        )}
 
         <article
           className={`ref-panel page-relatorios-ref-filters page-relatorios-ref-filters--clean ${filtrosAbertos ? '' : 'page-relatorios-ref-filters--collapsed'}`}
@@ -749,6 +921,7 @@ export default function Relatorios() {
               totalPieRec={totalPieRec}
               orcadoVsReal={orcadoVsReal}
               top5Despesas={top5Despesas}
+              variacaoCategorias={variacaoCategorias}
               isMobile={isMobile}
               isDark={isDark}
               chart={chart}

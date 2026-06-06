@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   BarChart,
   Bar,
@@ -13,6 +13,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  Sector,
 } from 'recharts'
 import { RelatorioPieLegendList, RelatoriosTooltip } from '../../components/relatorios/RelatoriosLoadingComponents'
 import { formatPctBr } from '../../lib/relatoriosUtils'
@@ -34,6 +35,7 @@ export default function RelatoriosCharts({
   totalPieRec,
   orcadoVsReal,
   top5Despesas,
+  variacaoCategorias = [],
   isMobile,
   isDark,
   chart,
@@ -41,104 +43,44 @@ export default function RelatoriosCharts({
   privacyMode,
   drillCategoria,
 }) {
+  // Respeita prefers-reduced-motion: desliga as animações dos gráficos.
+  const reduceMotion = typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  // Config de entrada elegante (ease-out, ~1s) reutilizada nos series.
+  const anim = {
+    isAnimationActive: !reduceMotion,
+    animationEasing: 'ease-out',
+    animationDuration: 1000,
+  }
+  // Donut interativo: fatia sob o cursor cresce suavemente.
+  const [activeDespIdx, setActiveDespIdx] = useState(-1)
+  const [activeRecIdx, setActiveRecIdx] = useState(-1)
+  const renderActiveSlice = (p) => (
+    <g>
+      <Sector
+        cx={p.cx}
+        cy={p.cy}
+        innerRadius={p.innerRadius}
+        outerRadius={p.outerRadius + 8}
+        startAngle={p.startAngle}
+        endAngle={p.endAngle}
+        cornerRadius={4}
+        fill={p.fill}
+        stroke={p.fill}
+        strokeOpacity={0.25}
+        strokeWidth={6}
+      />
+    </g>
+  )
+
+  // Gráficos por mês só fazem sentido com 2+ meses no período (1 mês = 1 ponto).
+  const multiMes = chartDataPorMes.length >= 2
+
   return (
           <div className={`relatorios-charts${refreshing ? ' relatorios-charts--refreshing' : ''}`} aria-busy={refreshing}>
 
-            {/* ── NEON LINE CHART ───────────────────────────────────────────────── */}
-            <section className="relatorios-charts__section" aria-labelledby="rel-fluxo-heading">
-              <h3 id="rel-fluxo-heading" className="relatorios-charts__section-title">Fluxo</h3>
-              <div className="relatorios-charts__section-grid">
-                <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide relatorios-neon-card">
-                  <div className="ref-panel__head">
-                    <div>
-                      <h2 className="ref-panel__title">Fluxo do período</h2>
-                      <p className="ref-panel__subtitle">Evolução de receitas e despesas</p>
-                    </div>
-                  </div>
-                  <div className="relatorios-chart-card__body">
-                    {chartDataPorMes.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={isMobile ? 240 : 300} debounce={50}>
-                        <AreaChart data={chartDataPorMes} margin={{ top: 16, right: 8, left: 0, bottom: 4 }}>
-                          <defs>
-                            {isDark && (
-                              <filter id="neonLineGlow" x="-30%" y="-30%" width="160%" height="160%">
-                                <feGaussianBlur stdDeviation="3" result="blur" />
-                                <feMerge>
-                                  <feMergeNode in="blur" />
-                                  <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                              </filter>
-                            )}
-                            <linearGradient id="neonAreaRec" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor={isDark ? '#00e5a0' : '#22c55e'} stopOpacity={isDark ? 0.22 : 0.35} />
-                              <stop offset="95%" stopColor={isDark ? '#00e5a0' : '#22c55e'} stopOpacity={0} />
-                            </linearGradient>
-                            <linearGradient id="neonAreaDes" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor={isDark ? '#ff4d8d' : '#f43f5e'} stopOpacity={isDark ? 0.18 : 0.30} />
-                              <stop offset="95%" stopColor={isDark ? '#ff4d8d' : '#f43f5e'} stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid
-                            strokeDasharray="3 8"
-                            stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'}
-                            vertical={false}
-                          />
-                          <XAxis
-                            dataKey="name"
-                            stroke="transparent"
-                            fontSize={isMobile ? 10 : 11}
-                            tickMargin={8}
-                            tick={{ fill: isDark ? 'rgba(255,255,255,0.35)' : chart.tickFill }}
-                            axisLine={false}
-                            tickLine={false}
-                            interval={0}
-                            angle={isMobile ? -35 : 0}
-                            textAnchor={isMobile ? 'end' : 'middle'}
-                            height={isMobile ? 56 : 32}
-                          />
-                          <YAxis
-                            stroke="transparent"
-                            fontSize={isMobile ? 10 : 11}
-                            tickLine={false}
-                            axisLine={false}
-                            tick={{ fill: isDark ? 'rgba(255,255,255,0.35)' : chart.tickFill }}
-                            tickFormatter={(v) => (v >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)}
-                            width={isMobile ? 56 : 64}
-                          />
-                          <Tooltip
-                            content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />}
-                            cursor={{ stroke: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)', strokeWidth: 1, strokeDasharray: '4 4' }}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="Receitas"
-                            stroke={isDark ? '#00e5a0' : '#22c55e'}
-                            strokeWidth={2.5}
-                            fill="url(#neonAreaRec)"
-                            dot={false}
-                            activeDot={{ r: 5, fill: isDark ? '#00e5a0' : '#22c55e', strokeWidth: 0 }}
-                            filter={isDark ? 'url(#neonLineGlow)' : undefined}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="Despesas"
-                            stroke={isDark ? '#ff4d8d' : '#f43f5e'}
-                            strokeWidth={2.5}
-                            fill="url(#neonAreaDes)"
-                            dot={false}
-                            activeDot={{ r: 5, fill: isDark ? '#ff4d8d' : '#f43f5e', strokeWidth: 0 }}
-                            filter={isDark ? 'url(#neonLineGlow)' : undefined}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="relatorios-chart-empty">Sem dados mensais no período.</div>
-                    )}
-                  </div>
-                </article>
-              </div>
-            </section>
-
+            {multiMes && (<>
             <section className="relatorios-charts__section" aria-labelledby="rel-month-heading">
               <h3 id="rel-month-heading" className="relatorios-charts__section-title">
                 Mensal
@@ -173,8 +115,8 @@ export default function RelatoriosCharts({
                             cursor={{ fill: chart.cursorFill }}
                           />
                           <Legend iconType="circle" wrapperStyle={{ paddingTop: 12, color: chart.legend, fontSize: 12 }} />
-                          <Bar dataKey="Receitas" fill="url(#relGradRecMes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={40} />
-                          <Bar dataKey="Despesas" fill="url(#relGradDesMes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={40} />
+                          <Bar dataKey="Receitas" fill="url(#relGradRecMes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={40} activeBar={{ fillOpacity: 0.85 }} {...anim} />
+                          <Bar dataKey="Despesas" fill="url(#relGradDesMes)" radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]} maxBarSize={40} activeBar={{ fillOpacity: 0.85 }} {...anim} animationBegin={reduceMotion ? 0 : 140} />
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
@@ -209,7 +151,7 @@ export default function RelatoriosCharts({
                           <XAxis dataKey="name" stroke={chart.axis} fontSize={isMobile ? 10 : 11} tickMargin={8} tick={{ fill: chart.tickFill }} axisLine={false} tickLine={false} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? 'end' : 'middle'} height={isMobile ? 56 : 32} />
                           <YAxis stroke={chart.axis} fontSize={isMobile ? 10 : 11} tickLine={false} axisLine={false} tick={{ fill: chart.tickFill }} tickFormatter={(v) => (Math.abs(v) >= 1000 ? `R$ ${(v / 1000).toFixed(1)}k` : `R$ ${v}`)} width={isMobile ? 56 : 64} />
                           <Tooltip content={(props) => <RelatoriosTooltip {...props} formatCurrency={formatCurrency} />} cursor={{ stroke: chart.cursorFill, strokeWidth: 1 }} />
-                          <Area type="monotone" dataKey="Saldo" stroke={isDark ? '#e4bc6a' : '#c49535'} strokeWidth={2.5} fill="url(#relGradSaldoAcum)" dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                          <Area type="monotone" dataKey="Saldo" stroke={isDark ? '#e4bc6a' : '#c49535'} strokeWidth={2.5} fill="url(#relGradSaldoAcum)" dot={{ r: 3 }} activeDot={{ r: 5 }} {...anim} />
                         </AreaChart>
                       </ResponsiveContainer>
                     ) : (
@@ -219,6 +161,7 @@ export default function RelatoriosCharts({
                 </article>
               </div>
             </section>
+            </>)}
 
             <div className="relatorios-charts__pair">
               <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card">
@@ -245,8 +188,14 @@ export default function RelatoriosCharts({
                               nameKey="name"
                               stroke={chart.pieStroke}
                               strokeWidth={1}
+                              activeIndex={activeDespIdx >= 0 ? activeDespIdx : undefined}
+                              activeShape={renderActiveSlice}
+                              onMouseEnter={(_, index) => setActiveDespIdx(index)}
+                              onMouseLeave={() => setActiveDespIdx(-1)}
                               onClick={(_, index) => drillCategoria(chartDataPorCategoria[index]?.name)}
                               style={{ cursor: 'pointer' }}
+                              {...anim}
+                              animationBegin={reduceMotion ? 0 : 120}
                             >
                               {chartDataPorCategoria.map((_, index) => (
                                 <Cell key={`desp-${index}`} fill={chart.pieColorsDesp[index % chart.pieColorsDesp.length]} />
@@ -286,6 +235,7 @@ export default function RelatoriosCharts({
                 </div>
               </article>
 
+              {chartDataReceitasPorCategoria.length >= 2 && (
               <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card">
                 <div className="ref-panel__head">
                   <div>
@@ -310,8 +260,14 @@ export default function RelatoriosCharts({
                               nameKey="name"
                               stroke={chart.pieStroke}
                               strokeWidth={1}
+                              activeIndex={activeRecIdx >= 0 ? activeRecIdx : undefined}
+                              activeShape={renderActiveSlice}
+                              onMouseEnter={(_, index) => setActiveRecIdx(index)}
+                              onMouseLeave={() => setActiveRecIdx(-1)}
                               onClick={(_, index) => drillCategoria(chartDataReceitasPorCategoria[index]?.name)}
                               style={{ cursor: 'pointer' }}
+                              {...anim}
+                              animationBegin={reduceMotion ? 0 : 120}
                             >
                               {chartDataReceitasPorCategoria.map((_, index) => (
                                 <Cell key={`rec-${index}`} fill={chart.pieColorsRec[index % chart.pieColorsRec.length]} />
@@ -350,7 +306,41 @@ export default function RelatoriosCharts({
                   )}
                 </div>
               </article>
+            )}
             </div>
+
+            {variacaoCategorias.length > 0 && (
+              <section className="relatorios-charts__section" aria-labelledby="rel-var-heading">
+                <h3 id="rel-var-heading" className="relatorios-charts__section-title">Variações vs período anterior</h3>
+                <div className="relatorios-charts__section-grid">
+                  <article className="ref-panel page-relatorios-chart-panel relatorios-chart-card relatorios-chart-card--wide">
+                    <div className="ref-panel__head">
+                      <div>
+                        <h2 className="ref-panel__title">O que mudou</h2>
+                        <p className="ref-panel__subtitle">Categorias que mais subiram ou caíram vs o período anterior</p>
+                      </div>
+                    </div>
+                    <ul className="relatorios-var">
+                      {variacaoCategorias.slice(0, 6).map((v) => {
+                        const up = v.diff > 0
+                        return (
+                          <li key={v.name} className="relatorios-var__item">
+                            <span className="relatorios-var__cat" title={v.name}>{v.name}</span>
+                            <span className={`relatorios-var__delta ${up ? 'relatorios-var__delta--up' : 'relatorios-var__delta--down'}`}>
+                              <span className="relatorios-var__arrow" aria-hidden="true">{up ? '▲' : '▼'}</span>
+                              <span className={privacyMode ? 'privacy-blur' : ''}>{up ? '+' : '−'}{formatCurrency(Math.abs(v.diff))}</span>
+                              <span className="relatorios-var__pct">
+                                {v.pct != null ? `${up ? '+' : ''}${Math.round(v.pct)}%` : 'novo'}
+                              </span>
+                            </span>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </article>
+                </div>
+              </section>
+            )}
 
             {orcadoVsReal.length > 0 && (
               <section className="relatorios-charts__section" aria-labelledby="rel-orcado-heading">
@@ -413,6 +403,7 @@ export default function RelatoriosCharts({
               </section>
             )}
 
+            {multiMes && (
             <section className="relatorios-charts__section" aria-labelledby="rel-recorrentes-heading">
               <h3 id="rel-recorrentes-heading" className="relatorios-charts__section-title">
                 Recorrentes
@@ -498,6 +489,8 @@ export default function RelatoriosCharts({
                             fill="url(#relGradRecurrMes)"
                             radius={isMobile ? [3, 3, 0, 0] : [6, 6, 0, 0]}
                             maxBarSize={44}
+                            activeBar={{ fillOpacity: 0.85 }}
+                            {...anim}
                           />
                         </BarChart>
                       </ResponsiveContainer>
@@ -510,6 +503,7 @@ export default function RelatoriosCharts({
                 </article>
               </div>
             </section>
+            )}
           </div>
   )
 }
