@@ -1514,10 +1514,25 @@ input:disabled {
   opacity: 0.75;
 }
 
-/* ─── Seletor de categoria no mobile: ancorado no topo (busca acima do teclado) ─── */
+/* ─── Seletor (categoria/cartão) no mobile: BOTTOM SHEET acima do teclado ─── */
 @media (max-width: 768px) {
   .custom-select--cs-mobile .custom-select-dropdown {
     overflow: hidden;
+    border-radius: 22px 22px 0 0 !important;
+    box-shadow: 0 -16px 50px -12px rgba(0, 0, 0, 0.45) !important;
+    animation: csSheetUp 260ms cubic-bezier(0.22, 1, 0.36, 1) both !important;
+  }
+  /* alça (grabber) no topo do sheet */
+  .custom-select--cs-mobile .custom-select-dropdown::before {
+    content: '';
+    display: block;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 4px;
+    margin: 8px auto 2px;
+    border-radius: 999px;
+    background: var(--text-muted, #8896a5);
+    opacity: 0.4;
   }
   /* opções preenchem o espaço restante e rolam (sem o cap de 240px) */
   .custom-select--cs-mobile .custom-select-options {
@@ -1525,8 +1540,12 @@ input:disabled {
     flex: 1 1 auto !important;
     min-height: 0 !important;
   }
-  /* busca fixa no topo do dropdown */
+  /* busca fixa no topo do sheet */
   .custom-select--cs-mobile .custom-select-search {
     flex: 0 0 auto !important;
   }
+}
+@keyframes csSheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
 }

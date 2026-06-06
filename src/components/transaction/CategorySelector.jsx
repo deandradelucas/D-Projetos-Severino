@@ -17,19 +17,17 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
       if (!triggerRef.current) return
       const isMobile = window.matchMedia('(max-width: 768px)').matches
       if (isMobile) {
-        // No mobile, ancora no TOPO da tela: a busca fica sempre visível acima do
-        // teclado. Altura limitada à área visível (visualViewport) — ao abrir o
-        // teclado, o viewport encolhe e o dropdown se ajusta.
+        // No mobile vira um BOTTOM SHEET: sobe de baixo e fica acima do teclado.
+        // `bottom` = altura do teclado (0 sem teclado). Ao abrir o teclado, o
+        // visualViewport encolhe e o sheet se reposiciona acima dele — a busca
+        // (no topo do sheet) fica sempre visível.
         const vv = window.visualViewport
-        const vTop = vv?.offsetTop || 0
         const vH = vv?.height || window.innerHeight
-        const margin = 10
+        const kb = Math.max(0, window.innerHeight - ((vv?.offsetTop || 0) + vH))
         setDropPos({
-          top: vTop + 8,
-          left: margin,
-          width: window.innerWidth - margin * 2,
-          maxHeight: Math.min(vH - 16, 520),
           mobile: true,
+          bottom: kb,
+          maxHeight: Math.min(Math.round(vH * 0.72), vH - 12),
         })
       } else {
         const r = triggerRef.current.getBoundingClientRect()
@@ -97,7 +95,15 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
     <div
       id={`cs-portal-${name}`}
       className={`custom-select open${dropPos.mobile ? ' custom-select--cs-mobile' : ''}`}
-      style={{
+      style={dropPos.mobile ? {
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: dropPos.bottom,
+        width: '100%',
+        zIndex: 10200,
+        pointerEvents: 'all',
+      } : {
         position: 'fixed',
         top:      dropPos.top,
         left:     dropPos.left,
