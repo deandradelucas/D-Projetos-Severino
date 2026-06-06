@@ -40,7 +40,7 @@ body[data-theme='dark'] .page-relatorios--editorial .ref-dashboard-inner {
 }
 .page-relatorios--editorial .rel-ed__title {
   margin: 0;
-  font-size: clamp(1.25rem, 2.1vw + 0.55rem, 1.95rem);
+  font-size: clamp(1.9rem, 4.4vw, 2.7rem);
   font-weight: 800;
   letter-spacing: -0.025em;
   line-height: 1.04;

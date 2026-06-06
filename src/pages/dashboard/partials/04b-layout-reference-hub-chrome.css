@@ -667,11 +667,16 @@ body[data-theme='dark']
 .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__title {
   margin: 0;
   font-family: inherit;
-  font-size: clamp(1.25rem, 2.1vw + 0.55rem, 1.95rem);
+  font-size: clamp(1.9rem, 4.4vw, 2.7rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.2;
   color: var(--hub-title);
+}
+
+/* Dashboard fica de fora da padronização — mantém o título no tamanho próprio. */
+.dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title {
+  font-size: clamp(1.25rem, 2.1vw + 0.55rem, 1.95rem);
 }
 
 .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__btn {
