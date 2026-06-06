@@ -1,0 +1,15 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   38-page-titles-uniform.css — Tamanho ÚNICO para todos os títulos de página
+   Iguala todos ao título do Relatórios: clamp(1.9rem, 4.4vw, 2.7rem).
+   Vence os overrides por página (Transações, Pagamento, Configurações,
+   Investimentos, etc.) via maior especificidade + !important + carga por último.
+   O Dashboard fica de fora (:not(.dashboard-page)) — mantém o tamanho próprio.
+   Carregar SEMPRE por último no dashboard.css.
+   ────────────────────────────────────────────────────────────────────────── */
+body[data-theme] .dashboard-container.ref-dashboard.app-horizon-shell:not(.dashboard-page) .dashboard-hub__title,
+body[data-theme] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .rel-ed__title,
+body[data-theme] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title-row > strong,
+body[data-theme] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__title {
+  font-size: clamp(1.9rem, 4.4vw, 2.7rem) !important;
+  line-height: 1.15 !important;
+}
