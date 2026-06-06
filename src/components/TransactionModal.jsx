@@ -356,7 +356,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       if (data.tipo === 'DESPESA' || data.tipo === 'RECEITA') next.tipo = data.tipo
       if (data.categoria_id) next.categoria_id = data.categoria_id
       next.subcategoria_id = data.subcategoria_id || ''
-      if (data.descricao) next.descricao = data.descricao
+      // Descrição fica em branco de propósito — o usuário preenche com o que quiser
+      // (ex.: o local da compra). A IA já preencheu tipo/valor/categoria.
       if (data.data_transacao) {
         const d = new Date(data.data_transacao)
         if (!Number.isNaN(d.getTime())) {
