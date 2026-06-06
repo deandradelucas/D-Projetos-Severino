@@ -23,10 +23,32 @@ body[data-theme='dark'] .page-relatorios--editorial .ref-dashboard-inner {
   --rel-ed-card: #141618;
 }
 
-/* ── Hero ─────────────────────────────────────────────────────────────────── */
+/* ── Hero — card neumórfico (mesmo padrão das demais telas) ───────────────────
+   Antes era achatado (editorial). Agora usa o card raised padrão: raio 22px,
+   gradiente + sombra neumórfica, igual a Transações/Metas/etc. Valores espelham
+   13/17/15-neumorphic (referência). Claro/escuro abaixo. */
 .page-relatorios--editorial .rel-ed__hero {
-  padding: 6px 2px 0;
-  margin-bottom: 30px;
+  padding: 22px clamp(16px, 4vw, 30px) 24px;
+  margin: 0 0 28px;
+  border-radius: 22px;
+  border: 1px solid var(--rel-ed-line);
+  background: var(--rel-ed-card);
+}
+body[data-theme='light'] .page-relatorios--editorial .rel-ed__hero {
+  border-color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%);
+  box-shadow:
+    0 14px 36px -16px rgba(166, 180, 200, 0.55),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.95),
+    inset -1px -1px 1px rgba(140, 156, 178, 0.20);
+}
+body[data-theme='dark'] .page-relatorios--editorial .rel-ed__hero {
+  border-color: rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, #11141a 0%, #0e1117 100%);
+  box-shadow:
+    0 14px 36px -14px rgba(0, 0, 0, 0.85),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.055),
+    inset -1px -1px 1px rgba(0, 0, 0, 0.50);
 }
 .page-relatorios--editorial .rel-ed__hero-top {
   display: flex;
