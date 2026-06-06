@@ -57,13 +57,13 @@
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__section-label,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__section-label {
     display: block !important;
-    margin-bottom: 7px !important;
+    margin-bottom: 3px !important;
     font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
-    color: var(--m-text-lo) !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0.01em !important;
+    color: var(--m-text-mid) !important;
   }
   .page-investimentos-modal .page-investimentos-modal__label-optional {
     color: var(--m-text-lo) !important;
@@ -127,7 +127,7 @@
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__input--valor,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__input--valor {
-    padding-left: 44px !important;
+    padding-left: 50px !important;
     font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
     font-size: 1.15rem !important;
     font-weight: 700 !important;
