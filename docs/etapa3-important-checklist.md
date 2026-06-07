@@ -157,3 +157,28 @@ partials) for migrada coerentemente — projeto grande e de alto risco, despropo
 (débito de manutenibilidade, não funcional). **Recomendação: NÃO migrar para @layer.** O `!important`
 restante (~5.900: mobile estrutural + base + load-bearing desktop) é majoritariamente necessário pela
 arquitetura skin-sobre-base atual. Os ganhos seguros (~1.560 no desktop) já foram capturados.
+
+### Reversão do veredito "mobile é estrutural" (jun/2026) — ferramenta block-aware
+O achado "mobile quase 100% load-bearing" era **artefato do método linha-a-linha**, não da realidade.
+A ferramenta **`scripts/strip-important-keep.mjs`** (block-aware, comment-safe, @media-aware) preserva
+apenas blocos cujo seletor contém uma classe load-bearing (descoberta por strip-total + fingerprint) e
+remove o resto. Resultado no mobile:
+
+| Partial mobile | Antes | Depois | Δ | Verificação |
+|---|---|---|---|---|
+| `26-mobile-transacoes-fix` | 503 | 251 | −50% | diff=0 claro+escuro, root `.page-transacoes` |
+| `33-pagamento-mobile` | 123 | 0 | −100% | strip-total deu diff=0 (tudo redundante) |
+| `23-mobile-pages` (agenda+config) | 807 | 532 | −34% | diff=0 (agenda + config, dual-tema) |
+| `23-mobile-pages` (invest+lista+rel+pag) | 532 | 373 | −30% | diff=0 dual-tema nas 4 páginas; estados ocultos (modal/comparador invest, agenda-modal) preservados via KEEP |
+
+**Método por página no 23 (page-scoped por seletor):** baseline dual-tema (alternando `body.dataset.theme`
+no mesmo documento, sem nav) → strip-total temporário → diff por página revela classes load-bearing
+(invest: `page-investimentos-resumo`+`ref-panel`; relatórios: `relatorios-charts*`+`*chart-panel/card`;
+pagamento: `page-pagamento-planos/valor`+`pagamento-checkout-panel`+`*detalhes/historico`; lista: **nenhuma**,
+100% redundante) → restaura pristine → roda `strip-important-keep` com KEEP completo (load-bearing + estados
+ocultos + seções agenda/config inteiras) → verifica diff=0 dual-tema em todas. Estados ocultos (modais,
+comparador) **sempre no KEEP** porque o fingerprint não os mede.
+
+**Conclusão revisada:** o `!important` mobile **não** é majoritariamente estrutural — é em boa parte
+redundante por especificidade, igual ao desktop. O teto baixo anterior era limitação do método de bisecção
+por linha. Com a ferramenta block-aware, mobile rende tanto quanto desktop.
