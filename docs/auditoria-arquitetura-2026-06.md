@@ -87,14 +87,25 @@ Método: relocação pura (mover código sem mudar comportamento), verificada a 
     `ItemRow.jsx`, `ModoComprando.jsx`; `lib/listaCompras.js` (constantes/helpers puros);
     `hooks/useKeyboardOffset.js`. Build/lint/237 testes ok.
 - **Transacoes.jsx: 1.482 → 1.233 ln (−17%)** ✅
-  - 7 `useMemo` (cálculos derivados puros) → `lib/transacoesDerived.js`, com **+23 testes**
-    (suíte 237 → 260). Deps dos memos inalteradas. Build/lint ok (resta 1 warning
-    `exhaustive-deps` pré-existente, não introduzido pela refatoração).
+  - 7 `useMemo` (cálculos derivados puros) → `lib/transacoesDerived.js`, com **+23 testes**.
+    Deps dos memos inalteradas. (resta 1 warning `exhaustive-deps` pré-existente.)
+- **Configuracoes.jsx: 1.325 → 1.249 ln** ✅
+  - `lib/avatarImage.js`, `lib/familiaUi.js`, `components/configuracoes/ConfigNotificacoesCard.jsx`.
+    (Seções grandes Perfil/Família ficam para depois — muito acopladas a estado, exigem verificação visual.)
+- **Relatorios.jsx: 1.021 → 957 ln** ✅
+  - 7 derivações puras → `lib/relatoriosDerived.js`, com **+18 testes**.
+- **Pagamento.jsx: 992 → 951 ln** ✅
+  - derivações de UI (banner, desconto/economia, trial, status badge) → `lib/pagamentoUi.js`, com **+23 testes**.
+- **TransactionModal.jsx: 1.070 → 1.045 ln** ✅
+  - `tipoCategoriaIgual`, `filtrarCategoriasPorTipo`, `safeEvalExpression` (calculadora c/ guarda
+    anti-injeção) → `lib/transacaoFormUtils.js`, com **+8 testes**.
 
-Próximos god components (mesma técnica, quando houver janela): `Configuracoes.jsx` (1.325),
-`TransactionModal.jsx` (1.070), `Relatorios.jsx` (1.021), `Pagamento.jsx` (992).
+**Resultado agregado:** suíte de testes **237 → 309** (+72). Toda extração foi relocação pura
+(comportamento idêntico), verificada por `eslint`+`build`+testes a cada passo. A lógica derivada
+movida ganhou testes próprios.
 
 ### Pendente
 - Etapa 3 nas páginas restantes (Relatórios/Pagamento/Dashboard/Configurações/Investimentos/Lista) — em ambiente estável.
 - ~67 classes CSS mortas em regras mistas.
-- Decompor god components restantes (Configuracoes, TransactionModal, Relatorios, Pagamento).
+- Decomposição mais profunda (seções de JSX) de `Configuracoes.jsx` (Perfil ~170 ln, Família ~260 ln)
+  e de `TransactionModal.jsx` — exige verificação visual por serem muito acopladas a estado/handlers.
