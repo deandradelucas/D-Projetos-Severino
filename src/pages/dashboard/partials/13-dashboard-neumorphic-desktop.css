@@ -214,20 +214,20 @@
 
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-weight: 600 !important;
-    font-size: clamp(1.5rem, 1.6vw + 0.8rem, 2.125rem) !important;
-    line-height: 1.15 !important;
-    letter-spacing: -0.025em !important;
-    color: var(--neu-text-hi) !important;
-    font-variation-settings: normal !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.5rem, 1.6vw + 0.8rem, 2.125rem);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    color: var(--neu-text-hi);
+    font-variation-settings: normal;
   }
 
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title > span,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__title > span {
-    font-style: normal !important;
-    font-weight: 700 !important;
-    color: var(--neu-accent) !important;
+    font-style: normal;
+    font-weight: 700;
+    color: var(--neu-accent);
   }
 
   /* Data atual abaixo do título — caps tracking refinado */
@@ -267,17 +267,17 @@
   /* Hero number: saldo como protagonista */
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero {
-    display: grid !important;
+    display: grid;
     grid-template-columns: max-content auto;
     grid-template-rows: auto auto;
     column-gap: 14px;
     row-gap: 2px;
     align-items: end;
     margin-top: 18px;
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    box-shadow: none !important;
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
   }
 
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero .dashboard-hub__balance-line-label,
@@ -295,23 +295,23 @@
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong {
     grid-column: 1;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-weight: 700 !important;
-    font-size: clamp(2.25rem, 3.4vw + 0.9rem, 4rem) !important;
-    line-height: 1 !important;
-    letter-spacing: -0.035em !important;
-    font-variant-numeric: tabular-nums !important;
-    font-variation-settings: normal !important;
-    background: none !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.25rem, 3.4vw + 0.9rem, 4rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+    font-variation-settings: normal;
+    background: none;
     -webkit-text-fill-color: currentColor;
   }
 
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--positive { color: var(--neu-pos) !important; text-shadow: 0 0 32px var(--neu-pos-glow); }
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--negative { color: var(--neu-neg) !important; text-shadow: 0 0 32px var(--neu-neg-glow); }
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--zero { color: var(--neu-text-hi) !important; }
-  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--positive { color: var(--neu-pos) !important; }
-  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--negative { color: var(--neu-neg) !important; }
-  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--zero { color: var(--neu-text-hi) !important; }
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--positive { color: var(--neu-pos); text-shadow: 0 0 32px var(--neu-pos-glow); }
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--negative { color: var(--neu-neg); text-shadow: 0 0 32px var(--neu-neg-glow); }
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--zero { color: var(--neu-text-hi); }
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--positive { color: var(--neu-pos); }
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--negative { color: var(--neu-neg); }
+  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--zero { color: var(--neu-text-hi); }
 
   /* Delta placeholder (shimmer pill ao lado do saldo) */
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-delta--placeholder,
@@ -719,65 +719,65 @@
   /* Ícone da transação: badge inset neumórfico */
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-arrow-wrap,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-arrow-wrap {
-    width: 38px !important;
-    height: 38px !important;
-    border-radius: 11px !important;
-    background: var(--neu-surface-sunken) !important;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--neu-surface-sunken);
     box-shadow:
       inset 2px 2px 4px var(--neu-shadow),
-      inset -1px -1px 2px var(--neu-light) !important;
-    border: none !important;
+      inset -1px -1px 2px var(--neu-light);
+    border: none;
   }
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-arrow-wrap--up,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-arrow-wrap--up {
-    color: var(--neu-pos) !important;
+    color: var(--neu-pos);
     box-shadow:
       inset 2px 2px 4px var(--neu-shadow),
       inset -1px -1px 2px var(--neu-light),
-      0 0 0 1px var(--neu-pos-glow) !important;
+      0 0 0 1px var(--neu-pos-glow);
   }
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-arrow-wrap--down,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-tx-arrow-wrap--down {
-    color: var(--neu-neg) !important;
+    color: var(--neu-neg);
     box-shadow:
       inset 2px 2px 4px var(--neu-shadow),
       inset -1px -1px 2px var(--neu-light),
-      0 0 0 1px var(--neu-neg-glow) !important;
+      0 0 0 1px var(--neu-neg-glow);
   }
 
   /* Valor da transação: tabular + sinal sutil */
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 0.9375rem !important;
-    letter-spacing: -0.005em !important;
-    font-variant-numeric: tabular-nums !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    letter-spacing: -0.005em;
+    font-variant-numeric: tabular-nums;
   }
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val--pos,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val--pos {
-    color: var(--neu-pos) !important;
+    color: var(--neu-pos);
   }
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val--neg,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-val--neg {
-    color: var(--neu-text-hi) !important;
+    color: var(--neu-text-hi);
   }
 
   /* Texto secundário das linhas: respiro */
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-date,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-date {
-    color: var(--neu-text-lo) !important;
-    font-size: 0.8125rem !important;
+    color: var(--neu-text-lo);
+    font-size: 0.8125rem;
     letter-spacing: 0.01em;
   }
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-cat-text {
-    color: var(--neu-text-hi) !important;
-    font-weight: 500 !important;
+    color: var(--neu-text-hi);
+    font-weight: 500;
   }
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel .ref-tx-sub-text {
-    color: var(--neu-text-mid) !important;
+    color: var(--neu-text-mid);
   }
 
   /* ─── Focus rings globais (acessibilidade refinada) ─── */
@@ -819,14 +819,14 @@
      Centraliza via flex no scroll e força align-self:center nos filhos
      (o hero herda align-self:stretch de 04b). Desktop only (≥769px). */
   .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > * {
-    max-width: 1200px !important;
-    width: 100% !important;
-    align-self: center !important;
+    max-width: 1200px;
+    width: 100%;
+    align-self: center;
   }
 
   /* ─── Insights (Próximo compromisso + Despesas por categoria) ───
@@ -834,22 +834,22 @@
      impõe min-height:280px (sobra abaixo da última barra). Aqui zeramos o
      min-height e deixamos o grid esticar ambos até a altura do conteúdo maior. */
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__insights {
-    grid-template-columns: 1fr 1fr !important;
-    align-items: stretch !important;
-    grid-auto-rows: auto !important;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    grid-auto-rows: auto;
   }
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__insight-card {
-    min-height: 0 !important;
-    height: auto !important;
-    margin: 0 !important;
+    min-height: 0;
+    height: auto;
+    margin: 0;
   }
 
   /* ─── Reduce motion ─── */
   @media (prefers-reduced-motion: reduce) {
     body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell *,
     body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell * {
-      animation: none !important;
-      transition: none !important;
+      animation: none;
+      transition: none;
     }
   }
 }
