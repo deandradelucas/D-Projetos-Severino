@@ -9,10 +9,7 @@ import { vencimentoCartaoParaData, calcularParcelaAtual } from '../lib/cartaoVen
 import { useTransactionForm } from '../hooks/useTransactionForm'
 import { useModalA11y } from '../hooks/useModalA11y'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
-
-function tipoCategoriaIgual(tipoCampo, tipoAlvo) {
-  return String(tipoCampo ?? '').trim().toUpperCase() === String(tipoAlvo ?? '').trim().toUpperCase()
-}
+import { filtrarCategoriasPorTipo, safeEvalExpression } from '../lib/transacaoFormUtils'
 
 const ParcelamentoIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -213,23 +210,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   const calcAppend = useCallback((ch) => setCalcExpr((e) => (e + ch).slice(0, 40)), [])
   const calcBackspace = useCallback(() => setCalcExpr((e) => e.slice(0, -1)), [])
   const calcClear = useCallback(() => setCalcExpr(''), [])
-  const safeEvalExpression = (expr) => {
-    // Normaliza símbolos do teclado (× ÷ −) e vírgula BR antes de validar/avaliar.
-    const norm = String(expr)
-      .replace(/×/g, '*')
-      .replace(/÷/g, '/')
-      .replace(/−/g, '-')
-      .replace(/,/g, '.')
-    if (!/^[\d\s+\-*/().]+$/.test(norm)) return null
-    try {
-      const fn = new Function(`"use strict"; return (${norm});`)
-      const val = fn()
-      if (typeof val !== 'number' || !Number.isFinite(val)) return null
-      return Math.round(val * 100) / 100
-    } catch {
-      return null
-    }
-  }
   const handleCalcSubmit = useCallback(() => {
     const result = safeEvalExpression(calcExpr)
     if (result == null) return
@@ -471,13 +451,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   }, [handleChange])
 
   const categoriasFiltradas = useMemo(
-    () =>
-      [...categorias]
-        .filter((c) => tipoCategoriaIgual(c.tipo, formData.tipo))
-        .sort((a, b) =>
-          String(a.nome ?? '').localeCompare(String(b.nome ?? ''), 'pt', { sensitivity: 'base' })
-        ),
-    [categorias, formData.tipo]
+    () => filtrarCategoriasPorTipo(categorias, formData.tipo),
+    [categorias, formData.tipo],
   )
 
   if (!isOpen) return null
