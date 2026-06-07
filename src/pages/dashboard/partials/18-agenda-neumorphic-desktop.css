@@ -655,110 +655,110 @@
 
   /* Hora interna do card escondida no desktop (a timeline externa já mostra a hora) */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__time {
-    display: none !important;
+    display: none;
   }
 
   /* ─── Itens de evento ─── */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item {
-    background: var(--ag-surface-sunken) !important;
-    border-radius: 14px !important;
-    padding: 14px 16px !important;
+    background: var(--ag-surface-sunken);
+    border-radius: 14px;
+    padding: 14px 16px;
     box-shadow:
       inset 2px 2px 5px var(--ag-shadow-soft),
-      inset -1px -1px 3px var(--ag-light) !important;
-    transition: transform 220ms var(--ag-ease), box-shadow 220ms var(--ag-ease) !important;
-    border: 1px solid transparent !important;
+      inset -1px -1px 3px var(--ag-light);
+    transition: transform 220ms var(--ag-ease), box-shadow 220ms var(--ag-ease);
+    border: 1px solid transparent;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item:hover,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item:hover {
-    transform: translateX(3px) !important;
-    border-color: var(--ag-edge-hi) !important;
+    transform: translateX(3px);
+    border-color: var(--ag-edge-hi);
   }
 
   /* Tons semânticos de evento */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item--event,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item--event {
-    border-left: 3px solid var(--ag-accent) !important;
-    border-radius: 0 14px 14px 0 !important;
+    border-left: 3px solid var(--ag-accent);
+    border-radius: 0 14px 14px 0;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item--reminder,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item--reminder {
-    border-left: 3px solid var(--ag-blue) !important;
-    border-radius: 0 14px 14px 0 !important;
+    border-left: 3px solid var(--ag-blue);
+    border-radius: 0 14px 14px 0;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item--task,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item--task {
-    border-left: 3px solid var(--ag-purple) !important;
-    border-radius: 0 14px 14px 0 !important;
+    border-left: 3px solid var(--ag-purple);
+    border-radius: 0 14px 14px 0;
   }
 
   /* Ícone do evento */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__icon,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__icon {
-    width: 38px !important;
-    height: 38px !important;
-    border-radius: 10px !important;
-    background: var(--ag-surface-base) !important;
-    box-shadow: inset 1px 1px 3px var(--ag-shadow-soft), inset -1px -1px 1px var(--ag-light) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    color: var(--ag-accent) !important;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--ag-surface-base);
+    box-shadow: inset 1px 1px 3px var(--ag-shadow-soft), inset -1px -1px 1px var(--ag-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--ag-accent);
   }
 
   /* Tipografia dos eventos */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__type,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__type {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.12em !important;
-    color: var(--ag-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ag-text-lo);
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item h3,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item h3 {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    font-weight: 600 !important;
-    letter-spacing: -0.01em !important;
-    color: var(--ag-text-hi) !important;
-    margin: 2px 0 !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ag-text-hi);
+    margin: 2px 0;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__datetime,
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__reminder,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__datetime,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__reminder {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    color: var(--ag-text-mid) !important;
-    margin: 0 !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    color: var(--ag-text-mid);
+    margin: 0;
   }
 
   /* Ações do item (Editar, Concluir, Remover) */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__actions button,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__actions button {
-    padding: 6px 12px !important;
-    border-radius: 8px !important;
-    background: var(--ag-surface-base) !important;
-    border: 1px solid var(--ag-edge-hi) !important;
-    color: var(--ag-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    box-shadow: inset 1px 1px 2px var(--ag-shadow-soft), inset -1px -1px 1px var(--ag-light) !important;
-    transition: color 200ms var(--ag-ease) !important;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: var(--ag-surface-base);
+    border: 1px solid var(--ag-edge-hi);
+    color: var(--ag-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: inset 1px 1px 2px var(--ag-shadow-soft), inset -1px -1px 1px var(--ag-light);
+    transition: color 200ms var(--ag-ease);
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__actions button:hover,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__actions button:hover {
-    color: var(--ag-accent) !important;
+    color: var(--ag-accent);
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__btn--danger:hover,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__btn--danger:hover {
-    color: var(--ag-neg) !important;
+    color: var(--ag-neg);
   }
 
   /* Empty state */
@@ -976,172 +976,172 @@
 
   /* ── Feature 2: Pills de filtro por tipo ── */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pills {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
-    margin-bottom: 16px !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 7px !important;
-    padding: 7px 14px !important;
-    border-radius: 999px !important;
-    background: var(--ag-surface-sunken) !important;
-    border: 1px solid var(--ag-edge-hi) !important;
-    color: var(--ag-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    box-shadow: inset 2px 2px 4px var(--ag-shadow-soft), inset -1px -1px 2px var(--ag-light) !important;
-    transition: all 200ms var(--ag-ease) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: var(--ag-surface-sunken);
+    border: 1px solid var(--ag-edge-hi);
+    color: var(--ag-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: inset 2px 2px 4px var(--ag-shadow-soft), inset -1px -1px 2px var(--ag-light);
+    transition: all 200ms var(--ag-ease);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill:hover {
-    color: var(--ag-text-hi) !important;
+    color: var(--ag-text-hi);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill--active {
-    background: linear-gradient(155deg, var(--ag-surface-raised) 0%, var(--ag-surface-base) 100%) !important;
-    color: var(--ag-accent) !important;
-    box-shadow: 4px 4px 10px var(--ag-shadow-soft), -2px -2px 6px var(--ag-light), 0 0 0 1px var(--ag-accent-glow) !important;
+    background: linear-gradient(155deg, var(--ag-surface-raised) 0%, var(--ag-surface-base) 100%);
+    color: var(--ag-accent);
+    box-shadow: 4px 4px 10px var(--ag-shadow-soft), -2px -2px 6px var(--ag-light), 0 0 0 1px var(--ag-accent-glow);
   }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill--active.agenda-filter-pill--reminder { color: var(--ag-blue) !important; box-shadow: 4px 4px 10px var(--ag-shadow-soft), -2px -2px 6px var(--ag-light), 0 0 0 1px var(--ag-blue-glow) !important; }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill--active.agenda-filter-pill--milestone { color: var(--ag-purple) !important; box-shadow: 4px 4px 10px var(--ag-shadow-soft), -2px -2px 6px var(--ag-light), 0 0 0 1px var(--ag-purple-glow) !important; }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill--active.agenda-filter-pill--reminder { color: var(--ag-blue); box-shadow: 4px 4px 10px var(--ag-shadow-soft), -2px -2px 6px var(--ag-light), 0 0 0 1px var(--ag-blue-glow); }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill--active.agenda-filter-pill--milestone { color: var(--ag-purple); box-shadow: 4px 4px 10px var(--ag-shadow-soft), -2px -2px 6px var(--ag-light), 0 0 0 1px var(--ag-purple-glow); }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill__count {
-    min-width: 18px !important;
-    height: 18px !important;
-    padding: 0 5px !important;
-    border-radius: 999px !important;
-    background: var(--ag-surface-base) !important;
-    color: inherit !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
-    line-height: 18px !important;
-    text-align: center !important;
-    font-variant-numeric: tabular-nums !important;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--ag-surface-base);
+    color: inherit;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ── Feature 7: Grupos por período (Manhã/Tarde/Noite) ── */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-groups {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 20px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__head {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    margin-bottom: 12px !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__icon {
-    display: inline-flex !important;
-    color: var(--ag-accent) !important;
+    display: inline-flex;
+    color: var(--ag-accent);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__label {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.18em !important;
-    color: var(--ag-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ag-text-lo);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__count {
-    min-width: 18px !important;
-    height: 18px !important;
-    padding: 0 5px !important;
-    border-radius: 999px !important;
-    background: var(--ag-surface-sunken) !important;
-    box-shadow: inset 1px 1px 2px var(--ag-shadow-soft) !important;
-    color: var(--ag-text-mid) !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
-    line-height: 18px !important;
-    text-align: center !important;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--ag-surface-sunken);
+    box-shadow: inset 1px 1px 2px var(--ag-shadow-soft);
+    color: var(--ag-text-mid);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__head::after {
-    content: '' !important;
-    flex: 1 !important;
-    height: 1px !important;
-    background: linear-gradient(90deg, var(--ag-edge-lo), transparent) !important;
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--ag-edge-lo), transparent);
   }
 
   /* ── Feature 3: Timeline com horário ── */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item {
-    display: grid !important;
-    grid-template-columns: 48px 16px 1fr !important;
-    align-items: stretch !important;
-    gap: 0 !important;
-    cursor: grab !important;
+    display: grid;
+    grid-template-columns: 48px 16px 1fr;
+    align-items: stretch;
+    gap: 0;
+    cursor: grab;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item:active {
-    cursor: grabbing !important;
+    cursor: grabbing;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__time {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    font-weight: 700 !important;
-    color: var(--ag-text-mid) !important;
-    font-variant-numeric: tabular-nums !important;
-    padding-top: 16px !important;
-    text-align: right !important;
-    padding-right: 10px !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--ag-text-mid);
+    font-variant-numeric: tabular-nums;
+    padding-top: 16px;
+    text-align: right;
+    padding-right: 10px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__track {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    padding-top: 18px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 18px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__dot {
-    width: 10px !important;
-    height: 10px !important;
-    border-radius: 50% !important;
-    flex-shrink: 0 !important;
-    background: var(--ag-accent) !important;
-    box-shadow: 0 0 8px var(--ag-accent-glow) !important;
-    z-index: 1 !important;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--ag-accent);
+    box-shadow: 0 0 8px var(--ag-accent-glow);
+    z-index: 1;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__line {
-    flex: 1 !important;
-    width: 2px !important;
-    background: var(--ag-edge-lo) !important;
-    margin-top: 2px !important;
+    flex: 1;
+    width: 2px;
+    background: var(--ag-edge-lo);
+    margin-top: 2px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item:last-child .agenda-timeline-item__line {
-    display: none !important;
+    display: none;
   }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__track--reminder .agenda-timeline-item__dot { background: var(--ag-blue) !important; box-shadow: 0 0 8px var(--ag-blue-glow) !important; }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__track--milestone .agenda-timeline-item__dot { background: var(--ag-purple) !important; box-shadow: 0 0 8px var(--ag-purple-glow) !important; }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__track--done .agenda-timeline-item__dot { background: var(--ag-pos) !important; box-shadow: 0 0 8px var(--ag-pos-glow) !important; }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__track--reminder .agenda-timeline-item__dot { background: var(--ag-blue); box-shadow: 0 0 8px var(--ag-blue-glow); }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__track--milestone .agenda-timeline-item__dot { background: var(--ag-purple); box-shadow: 0 0 8px var(--ag-purple-glow); }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__track--done .agenda-timeline-item__dot { background: var(--ag-pos); box-shadow: 0 0 8px var(--ag-pos-glow); }
 
   /* Top row do item (tipo + badge) */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__top {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 8px !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
   }
 
   /* ── Feature 8: Badge de status ── */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge {
-    flex-shrink: 0 !important;
-    padding: 2px 9px !important;
-    border-radius: 999px !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.625rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
+    flex-shrink: 0;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
   }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge--scheduled { background: var(--ag-surface-base) !important; color: var(--ag-text-lo) !important; box-shadow: inset 1px 1px 2px var(--ag-shadow-soft) !important; }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge--confirmed { background: var(--ag-blue-glow) !important; color: var(--ag-blue) !important; }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge--done { background: var(--ag-pos-glow) !important; color: var(--ag-pos) !important; }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge--cancelled { background: var(--ag-neg-glow) !important; color: var(--ag-neg) !important; text-decoration: line-through !important; }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge--scheduled { background: var(--ag-surface-base); color: var(--ag-text-lo); box-shadow: inset 1px 1px 2px var(--ag-shadow-soft); }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge--confirmed { background: var(--ag-blue-glow); color: var(--ag-blue); }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge--done { background: var(--ag-pos-glow); color: var(--ag-pos); }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge--cancelled { background: var(--ag-neg-glow); color: var(--ag-neg); text-decoration: line-through; }
 
   /* ── Feature 6: Empty ilustrado ── */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-empty--illustrated {
@@ -1188,82 +1188,82 @@
   /* ── Feature 5: Hover preview no calendário ── */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day { position: relative !important; }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview {
-    position: absolute !important;
-    bottom: calc(100% + 8px) !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 30 !important;
-    min-width: 200px !important;
-    max-width: 260px !important;
-    padding: 10px 12px !important;
-    border-radius: 12px !important;
-    background: var(--ag-surface-raised) !important;
-    border: 1px solid var(--ag-edge-hi) !important;
-    box-shadow: 8px 12px 28px var(--ag-shadow), -4px -4px 12px var(--ag-light) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 6px !important;
-    pointer-events: none !important;
-    text-align: left !important;
-    animation: agPreviewIn 160ms var(--ag-ease) both !important;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    min-width: 200px;
+    max-width: 260px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--ag-surface-raised);
+    border: 1px solid var(--ag-edge-hi);
+    box-shadow: 8px 12px 28px var(--ag-shadow), -4px -4px 12px var(--ag-light);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    pointer-events: none;
+    text-align: left;
+    animation: agPreviewIn 160ms var(--ag-ease) both;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview::after {
-    content: '' !important;
-    position: absolute !important;
-    top: 100% !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    border: 6px solid transparent !important;
-    border-top-color: var(--ag-surface-raised) !important;
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--ag-surface-raised);
   }
   /* Primeira linha do calendário: preview abaixo da célula (não cobre o header) */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview--below {
-    top: calc(100% + 8px) !important;
-    bottom: auto !important;
+    top: calc(100% + 8px);
+    bottom: auto;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview--below::after {
-    top: auto !important;
-    bottom: 100% !important;
-    border-top-color: transparent !important;
-    border-bottom-color: var(--ag-surface-raised) !important;
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: var(--ag-surface-raised);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__row {
-    display: flex !important;
-    align-items: center !important;
-    gap: 7px !important;
-    min-width: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__dot {
-    width: 7px !important;
-    height: 7px !important;
-    border-radius: 50% !important;
-    flex-shrink: 0 !important;
-    background: var(--ag-accent) !important;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--ag-accent);
   }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__dot--reminder { background: var(--ag-blue) !important; }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__dot--milestone { background: var(--ag-purple) !important; }
-  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__dot--done { background: var(--ag-pos) !important; }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__dot--reminder { background: var(--ag-blue); }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__dot--milestone { background: var(--ag-purple); }
+  .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__dot--done { background: var(--ag-pos); }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__time {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
-    color: var(--ag-text-mid) !important;
-    font-variant-numeric: tabular-nums !important;
-    flex-shrink: 0 !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--ag-text-mid);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__title {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.75rem !important;
-    color: var(--ag-text-hi) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.75rem;
+    color: var(--ag-text-hi);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview__more {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    color: var(--ag-text-lo) !important;
-    font-style: italic !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    color: var(--ag-text-lo);
+    font-style: italic;
   }
   @keyframes agPreviewIn {
     from { opacity: 0; transform: translateX(-50%) translateY(4px); }
@@ -1301,36 +1301,36 @@
     gap: 12px !important;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle {
-    display: inline-flex !important;
-    padding: 3px !important;
-    border-radius: 999px !important;
-    background: var(--ag-surface-sunken) !important;
-    box-shadow: inset 2px 2px 4px var(--ag-shadow-soft), inset -1px -1px 2px var(--ag-light) !important;
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 999px;
+    background: var(--ag-surface-sunken);
+    box-shadow: inset 2px 2px 4px var(--ag-shadow-soft), inset -1px -1px 2px var(--ag-light);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle__btn {
-    padding: 6px 14px !important;
-    border-radius: 999px !important;
-    background: transparent !important;
-    border: none !important;
-    color: var(--ag-text-lo) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    transition: all 200ms var(--ag-ease) !important;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: transparent;
+    border: none;
+    color: var(--ag-text-lo);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 200ms var(--ag-ease);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle__btn--active {
-    background: linear-gradient(155deg, var(--ag-surface-raised) 0%, var(--ag-surface-base) 100%) !important;
-    color: var(--ag-accent) !important;
-    box-shadow: 3px 3px 7px var(--ag-shadow-soft), -2px -2px 5px var(--ag-light) !important;
+    background: linear-gradient(155deg, var(--ag-surface-raised) 0%, var(--ag-surface-base) 100%);
+    color: var(--ag-accent);
+    box-shadow: 3px 3px 7px var(--ag-shadow-soft), -2px -2px 5px var(--ag-light);
   }
 
   /* Week grid */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-week-grid {
-    display: grid !important;
-    grid-template-columns: repeat(7, 1fr) !important;
-    gap: 10px !important;
-    margin-top: 8px !important;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-top: 8px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week {
     width: 100% !important;
@@ -1385,8 +1385,8 @@
   @media (prefers-reduced-motion: reduce) {
     body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell *,
     body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell * {
-      transition: none !important;
-      animation: none !important;
+      transition: none;
+      animation: none;
     }
   }
 }
