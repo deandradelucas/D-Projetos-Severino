@@ -10,6 +10,7 @@ import ConfigSelectCustom from '../components/ConfigSelectCustom.jsx'
 import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
 import ConfigAparenciaCard from '../components/configuracoes/ConfigAparenciaCard'
 import ConfigBiometriaCard from '../components/configuracoes/ConfigBiometriaCard'
+import ConfigNotificacoesCard from '../components/configuracoes/ConfigNotificacoesCard'
 import { useTheme } from '../context/ThemeContext'
 import { useConfigWebAuthn } from '../hooks/useConfigWebAuthn'
 import { apiUrl } from '../lib/apiUrl'
@@ -20,40 +21,10 @@ import { montarTextoConviteFamiliaComPwa } from '../lib/familiaConviteMensagemCo
 import { getPublicAppOriginForConvites } from '../lib/publicAppOrigin'
 import { formatPhoneBRDisplay, maskPhoneBRMobile, validatePhoneBRMobile } from '../lib/formatPhoneBR'
 import { logoutHorizonte } from '../lib/logout'
+import { fileToAvatarDataUrl } from '../lib/avatarImage'
+import { PAPEL_CONVITE_OPCOES, papelFamiliaLabel, papelTone, inicial } from '../lib/familiaUi'
 
 const SUPORTE_WA = 'https://wa.me/5554996994482'
-
-/** Lê um arquivo de imagem, recorta no centro (quadrado) e redimensiona p/ 256px JPEG. */
-async function fileToAvatarDataUrl(file) {
-  const dataUrl = await new Promise((resolve, reject) => {
-    const r = new FileReader()
-    r.onload = () => resolve(r.result)
-    r.onerror = reject
-    r.readAsDataURL(file)
-  })
-  const img = await new Promise((resolve, reject) => {
-    const i = new Image()
-    i.onload = () => resolve(i)
-    i.onerror = reject
-    i.src = dataUrl
-  })
-  const size = 256
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')
-  const min = Math.min(img.width, img.height)
-  const sx = (img.width - min) / 2
-  const sy = (img.height - min) / 2
-  ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size)
-  return canvas.toDataURL('image/jpeg', 0.82)
-}
-
-const PAPEL_CONVITE_OPCOES = [
-  { value: 'MEMBER', label: 'Membro — pode lançar e editar (exceto pagamento do titular)' },
-  { value: 'VIEWER', label: 'Só leitura — não altera transações nem agenda' },
-  { value: 'ADMIN', label: 'Administrador familiar — mesmo nível de escrita que membro' },
-]
 
 export default function Configuracoes() {
   const { theme, setTheme, privacyMode, togglePrivacy } = useTheme()
@@ -97,14 +68,7 @@ export default function Configuracoes() {
   const [excluirInput, setExcluirInput] = useState('')
   const [excluirBusy, setExcluirBusy] = useState(false)
 
-  const PREF_NOTIF = [
-    { key: 'notif_lembretes', label: 'Lembretes de agenda', desc: 'Avisos de compromissos no WhatsApp' },
-    { key: 'notif_alertas', label: 'Alertas financeiros', desc: 'Gasto alto e estouro de orçamento' },
-    { key: 'notif_digest', label: 'Resumo semanal/mensal', desc: 'Digest das suas finanças' },
-    { key: 'notif_novidades', label: 'Novidades e dicas', desc: 'Comunicados do Severino' },
-  ]
   const prefs = (perfil && typeof perfil.preferencias === 'object' && perfil.preferencias) || {}
-  const prefVal = (k) => prefs[k] !== false // default: ativado
 
   const salvarPreferencia = useCallback(async (key, value) => {
     setPrefsSaving(key)
@@ -454,23 +418,6 @@ export default function Configuracoes() {
   useEffect(() => {
     setConviteCopiadoVisivel(false)
   }, [ultimoTokenConvite])
-
-  const papelFamiliaLabel = (p) => {
-    const x = String(p || '').toUpperCase()
-    if (x === 'ADMIN') return 'Administrador familiar'
-    if (x === 'VIEWER') return 'Só leitura'
-    return 'Membro'
-  }
-  const papelTone = (p) => {
-    const x = String(p || '').toUpperCase()
-    if (x === 'ADMIN') return 'admin'
-    if (x === 'VIEWER') return 'viewer'
-    return 'member'
-  }
-  const inicial = (nome, email) => {
-    const base = String(nome || email || '?').trim()
-    return base.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?'
-  }
 
   /** Alinhado ao servidor: 5 pessoas no total = titular + até 4 (membros + convites pendentes válidos). */
   const FAMILIA_MAX_VINCULADOS_UI = 4
@@ -850,30 +797,7 @@ export default function Configuracoes() {
           />
 
           {/* Central de notificações */}
-          <section className="config-card config-card--full" id="config-secao-notificacoes">
-            <div className="config-card-head">
-              <span className="config-card-kicker">Notificações</span>
-              <h2 className="config-card-title-clean">O que você recebe no WhatsApp</h2>
-              <p className="config-card-subtitle">Escolha quais mensagens o Severino envia para você.</p>
-            </div>
-            <div className="config-preference-list">
-              {PREF_NOTIF.map((p) => (
-                <label key={p.key} className="config-pref-row config-pref-row--clean">
-                  <span className="config-pref-label">
-                    {p.label}
-                    <small className="config-pref-desc">{p.desc}</small>
-                  </span>
-                  <input
-                    type="checkbox"
-                    className="switch-apple"
-                    checked={prefVal(p.key)}
-                    disabled={prefsSaving === p.key}
-                    onChange={(e) => void salvarPreferencia(p.key, e.target.checked)}
-                  />
-                </label>
-              ))}
-            </div>
-          </section>
+          <ConfigNotificacoesCard prefs={prefs} prefsSaving={prefsSaving} onToggle={salvarPreferencia} />
 
           <div className="config-familia-group config-layout__full-span" id="config-secao-familia">
             {Boolean(usuarioIdHeader) && !perfil.conta_familiar_membro && familiaTitular !== true ? (
