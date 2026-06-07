@@ -67,14 +67,14 @@
   /* ─── Full-bleed container ─── */
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell,
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    border-radius: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
   }
 
   /* Atmosphere */
@@ -82,54 +82,54 @@
     background:
       radial-gradient(ellipse 1000px 700px at 20% -5%, rgba(212, 168, 75, 0.028), transparent 55%),
       radial-gradient(ellipse 800px 600px at 85% 105%, rgba(96, 165, 250, 0.022), transparent 50%),
-      var(--ag-surface-base) !important;
+      var(--ag-surface-base);
   }
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell {
     background:
       radial-gradient(ellipse 1000px 700px at 20% -5%, rgba(212, 168, 75, 0.040), transparent 55%),
       radial-gradient(ellipse 800px 600px at 85% 105%, rgba(37, 99, 235, 0.025), transparent 50%),
-      var(--ag-surface-base) !important;
+      var(--ag-surface-base);
   }
 
   /* Cadeia flex para travar scroll */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell {
-    height: 100vh !important;
-    overflow: hidden !important;
+    height: 100vh;
+    overflow: hidden;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .app-horizon-inner {
-    height: 100% !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    display: flex !important;
-    gap: 20px !important;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    gap: 20px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
-    overflow: hidden !important;
-    min-height: 0 !important;
-    height: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
+    overflow: hidden;
+    min-height: 0;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding-top: 28px !important;
-    padding-right: 20px !important;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: 28px;
+    padding-right: 20px;
     padding-bottom: 20px !important;
   }
 
@@ -182,19 +182,19 @@
     width: 200px; height: 200px;
     background: radial-gradient(circle, var(--ag-accent), transparent 70%);
     top: -60px; right: 80px;
-    opacity: 0.18 !important;
+    opacity: 0.18;
   }
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__orb--two {
     width: 160px; height: 160px;
     background: radial-gradient(circle, var(--ag-blue), transparent 70%);
     bottom: -40px; left: 40px;
-    opacity: 0.14 !important;
+    opacity: 0.14;
   }
 
   /* Título da Agenda */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title > .agenda-hero__title-row > strong,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title > .agenda-hero__title-row > strong {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
     font-weight: 700 !important;
     /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
     letter-spacing: -0.025em !important;
@@ -217,49 +217,49 @@
     justify-content: space-between !important;
     flex-wrap: nowrap !important;
     gap: 20px !important;
-    width: 100% !important;
-    margin: 0 !important;
+    width: 100%;
+    margin: 0;
   }
   /* Zona esquerda: "Agenda" + stats agrupados (largura natural, sem flex-grow) */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    flex: 0 1 auto !important;
-    min-width: 0 !important;
-    margin: 0 !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 0 1 auto;
+    min-width: 0;
+    margin: 0;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title-row,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title-row {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    flex-wrap: nowrap !important;
-    gap: 14px !important;
-    width: auto !important;
-    min-width: 0 !important;
-    margin: 0 !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 14px;
+    width: auto;
+    min-width: 0;
+    margin: 0;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title-row > strong,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__title-row > strong {
-    flex: 0 0 auto !important;
-    line-height: 1.1 !important;
+    flex: 0 0 auto;
+    line-height: 1.1;
   }
   /* Zona direita: botão */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero .dashboard-hub__hero-actions,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero .dashboard-hub__hero-actions {
-    flex: 0 0 auto !important;
-    margin: 0 !important;
-    align-self: center !important;
-    display: flex !important;
-    align-items: center !important;
+    flex: 0 0 auto;
+    margin: 0;
+    align-self: center;
+    display: flex;
+    align-items: center;
   }
 
   /* Stats hero (Hoje / Semana) — agrupados ao lado do título, SEM margin auto */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stats,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stats {
-    display: flex !important;
+    display: flex;
     gap: 10px !important;
     align-items: center !important;
     flex: 0 0 auto !important;
@@ -347,7 +347,7 @@
     border-radius: 50% !important;
     background: var(--ag-accent) !important;
     box-shadow: 0 0 8px var(--ag-accent-glow) !important;
-    animation: agSummaryPulse 2.4s ease-in-out infinite !important;
+    animation: agSummaryPulse 2.4s ease-in-out infinite;
   }
   @keyframes agSummaryPulse {
     0%, 100% { opacity: 0.65; transform: scale(1); }
@@ -357,30 +357,30 @@
   /* Botão "+" no hero */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions .dashboard-hub__btn--primary,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions .dashboard-hub__btn--primary {
-    padding: 12px 22px !important;
-    border-radius: 999px !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 0.9375rem !important;
-    color: var(--ag-text-hi) !important;
-    background: linear-gradient(155deg, var(--ag-surface-raised) 0%, var(--ag-surface-base) 100%) !important;
-    border: 1px solid var(--ag-edge-hi) !important;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--ag-text-hi);
+    background: linear-gradient(155deg, var(--ag-surface-raised) 0%, var(--ag-surface-base) 100%);
+    border: 1px solid var(--ag-edge-hi);
     box-shadow:
       6px 6px 14px var(--ag-shadow-soft),
       -4px -4px 12px var(--ag-light),
-      inset 1px 1px 1px var(--ag-edge-hi) !important;
-    transition: all 220ms var(--ag-ease) !important;
-    cursor: pointer !important;
+      inset 1px 1px 1px var(--ag-edge-hi);
+    transition: all 220ms var(--ag-ease);
+    cursor: pointer;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions .dashboard-hub__btn--primary:hover,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions .dashboard-hub__btn--primary:hover {
-    transform: translateY(-2px) !important;
-    color: var(--ag-accent) !important;
+    transform: translateY(-2px);
+    color: var(--ag-accent);
     box-shadow:
       8px 10px 20px var(--ag-shadow),
       -5px -5px 14px var(--ag-light),
       0 0 0 1px var(--ag-accent-glow),
-      inset 1px 1px 1px var(--ag-edge-hi) !important;
+      inset 1px 1px 1px var(--ag-edge-hi);
   }
 
   /* ─── COLUNA CENTRAL — hero, calendário e lista mesma largura, centralizados ───
