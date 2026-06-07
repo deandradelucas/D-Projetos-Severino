@@ -438,8 +438,7 @@ body:has(.sidebar.open) .horizon-chat-window {
 
   .btn-primary,
   .btn-secondary,
-  .btn-edit,
-  .relatorios-btn-export {
+  .btn-edit {
     min-height: 48px;
     min-width: 44px;
     touch-action: manipulation;
