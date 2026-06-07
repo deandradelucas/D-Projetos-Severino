@@ -64,40 +64,40 @@
 
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo {
-    border-radius: 22px !important;
-    overflow: visible !important;
+    border-radius: 22px;
+    overflow: visible;
   }
 
   /* Wrapper sunken — cria o "poço" que faz os cards flutuarem */
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo__stats,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__stats {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 14px !important;
-    padding: 16px !important;
-    border-radius: 16px !important;
-    background: var(--inv-sunken) !important;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--inv-sunken);
     box-shadow:
       inset 3px 3px 8px var(--inv-shadow-soft),
-      inset -2px -2px 6px var(--inv-light) !important;
-    margin-bottom: 0 !important;
+      inset -2px -2px 6px var(--inv-light);
+    margin-bottom: 0;
   }
 
   /* KPI card — raised sobre o poço sunken */
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo__stat,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__stat {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 6px !important;
-    padding: 18px 20px !important;
-    border-radius: 13px !important;
-    background: linear-gradient(150deg, var(--inv-raised) 0%, color-mix(in srgb, var(--inv-raised) 94%, var(--inv-surface) 6%) 100%) !important;
-    border: 1px solid var(--inv-edge-hi) !important;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+    border-radius: 13px;
+    background: linear-gradient(150deg, var(--inv-raised) 0%, color-mix(in srgb, var(--inv-raised) 94%, var(--inv-surface) 6%) 100%);
+    border: 1px solid var(--inv-edge-hi);
     box-shadow:
       8px 8px 18px var(--inv-shadow),
       -5px -5px 12px var(--inv-light),
-      inset 0 1px 1px var(--inv-edge-hi) !important;
-    transition: box-shadow 200ms var(--inv-ease) !important;
+      inset 0 1px 1px var(--inv-edge-hi);
+    transition: box-shadow 200ms var(--inv-ease);
   }
 
   /* KPI "Total Estimado" — hero gold */
@@ -105,95 +105,95 @@
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__stat--accent {
     background: linear-gradient(150deg,
       color-mix(in srgb, var(--inv-raised) 88%, var(--inv-accent) 12%) 0%,
-      color-mix(in srgb, var(--inv-surface) 82%, var(--inv-accent) 18%) 100%) !important;
-    border-color: var(--inv-accent-soft) !important;
+      color-mix(in srgb, var(--inv-surface) 82%, var(--inv-accent) 18%) 100%);
+    border-color: var(--inv-accent-soft);
     box-shadow:
       8px 8px 18px var(--inv-shadow),
       -5px -5px 12px var(--inv-light),
       0 0 0 1.5px var(--inv-accent-soft),
       0 0 28px var(--inv-accent-glow),
-      inset 0 1px 1px rgba(255,255,255,0.6) !important;
+      inset 0 1px 1px rgba(255,255,255,0.6);
   }
 
   /* KPI label */
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo__stat-label,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__stat-label {
-    margin: 0 !important;
-    font-size: 0.625rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.12em !important;
-    color: var(--inv-text-faint) !important;
+    margin: 0;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--inv-text-faint);
   }
 
   /* KPI value */
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo__stat-value,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__stat-value {
-    margin: 0 !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1.5rem !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.04em !important;
-    font-variant-numeric: tabular-nums !important;
-    color: var(--inv-text-hi) !important;
-    line-height: 1 !important;
+    margin: 0;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    color: var(--inv-text-hi);
+    line-height: 1;
   }
 
   /* KPI valor accent — gold */
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo__stat--accent .page-investimentos-resumo__stat-value,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__stat--accent .page-investimentos-resumo__stat-value {
-    font-size: 1.75rem !important;
-    color: var(--inv-accent) !important;
+    font-size: 1.75rem;
+    color: var(--inv-accent);
   }
 
   /* Rendimentos — verde + maior */
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo__stat-value--pos,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__stat-value--pos {
-    color: var(--inv-pos) !important;
-    font-size: 1.5rem !important;
+    color: var(--inv-pos);
+    font-size: 1.5rem;
   }
 
   /* "Simular carteira até" — pill sunken discreta */
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo__projecao,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__projecao {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    padding: 9px 14px !important;
-    border-radius: 10px !important;
-    background: var(--inv-sunken) !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-radius: 10px;
+    background: var(--inv-sunken);
     box-shadow:
       inset 2px 2px 5px var(--inv-shadow-soft),
-      inset -1px -1px 3px var(--inv-light) !important;
-    margin-bottom: 14px !important;
+      inset -1px -1px 3px var(--inv-light);
+    margin-bottom: 14px;
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo__projecao-row,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__projecao-row {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    flex: 1 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo__projecao-label,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__projecao-label {
-    font-size: 0.71875rem !important;
-    font-weight: 600 !important;
-    color: var(--inv-text-mid) !important;
-    white-space: nowrap !important;
+    font-size: 0.71875rem;
+    font-weight: 600;
+    color: var(--inv-text-mid);
+    white-space: nowrap;
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-resumo__projecao-input,
   body[data-theme='dark'] .page-investimentos .page-investimentos-resumo__projecao-input {
-    font-size: 0.8125rem !important;
-    padding: 5px 10px !important;
-    border-radius: 8px !important;
-    border: 1px solid var(--inv-edge-lo) !important;
-    background: var(--inv-raised) !important;
-    color: var(--inv-text-hi) !important;
-    box-shadow: inset 1px 1px 3px var(--inv-shadow-soft) !important;
-    outline: none !important;
+    font-size: 0.8125rem;
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--inv-edge-lo);
+    background: var(--inv-raised);
+    color: var(--inv-text-hi);
+    box-shadow: inset 1px 1px 3px var(--inv-shadow-soft);
+    outline: none;
   }
 
   /* ══════════════════════════════════════════════
@@ -242,154 +242,154 @@
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card {
-    border-radius: 20px !important;
-    background: linear-gradient(150deg, var(--inv-raised) 0%, color-mix(in srgb, var(--inv-raised) 95%, var(--inv-surface) 5%) 100%) !important;
-    border: 1px solid var(--inv-edge-hi) !important;
+    border-radius: 20px;
+    background: linear-gradient(150deg, var(--inv-raised) 0%, color-mix(in srgb, var(--inv-raised) 95%, var(--inv-surface) 5%) 100%);
+    border: 1px solid var(--inv-edge-hi);
     box-shadow:
       10px 10px 24px var(--inv-shadow),
       -6px -6px 14px var(--inv-light),
       inset 0 1px 1px var(--inv-edge-hi),
-      inset 0 -1px 1px var(--inv-edge-lo) !important;
-    padding: 20px 22px !important;
+      inset 0 -1px 1px var(--inv-edge-lo);
+    padding: 20px 22px;
   }
 
   /* Primary hero block */
   body[data-theme='light'] .page-investimentos .page-investimentos-card__primary,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__primary {
-    display: flex !important;
-    align-items: flex-end !important;
-    justify-content: space-between !important;
-    padding: 16px 20px !important;
-    border-radius: 14px !important;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-radius: 14px;
     background: linear-gradient(150deg,
       color-mix(in srgb, var(--inv-raised) 90%, var(--inv-accent) 10%) 0%,
-      color-mix(in srgb, var(--inv-surface) 85%, var(--inv-accent) 15%) 100%) !important;
-    border: 1px solid var(--inv-accent-soft) !important;
+      color-mix(in srgb, var(--inv-surface) 85%, var(--inv-accent) 15%) 100%);
+    border: 1px solid var(--inv-accent-soft);
     box-shadow:
       0 0 0 1px var(--inv-accent-soft),
       0 0 24px var(--inv-accent-glow),
       6px 6px 16px var(--inv-shadow-soft),
-      -3px -3px 8px var(--inv-light) !important;
-    margin-bottom: 16px !important;
+      -3px -3px 8px var(--inv-light);
+    margin-bottom: 16px;
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card__primary-label,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__primary-label {
-    font-size: 0.625rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.12em !important;
-    color: var(--inv-text-faint) !important;
-    margin-bottom: 4px !important;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--inv-text-faint);
+    margin-bottom: 4px;
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card__primary-value,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__primary-value {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 2rem !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.045em !important;
-    color: var(--inv-accent) !important;
-    line-height: 1 !important;
-    font-variant-numeric: tabular-nums !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    color: var(--inv-accent);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card__primary-rendimento,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__primary-rendimento {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1.25rem !important;
-    font-weight: 700 !important;
-    color: var(--inv-pos) !important;
-    letter-spacing: -0.02em !important;
-    font-variant-numeric: tabular-nums !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--inv-pos);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card__primary-pct,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__primary-pct {
-    font-size: 0.8rem !important;
-    font-weight: 600 !important;
-    color: var(--inv-pos-mid) !important;
-    letter-spacing: -0.01em !important;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--inv-pos-mid);
+    letter-spacing: -0.01em;
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card__primary-sublabel,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__primary-sublabel {
-    font-size: 0.625rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.10em !important;
-    color: var(--inv-text-faint) !important;
-    margin-top: 5px !important;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    color: var(--inv-text-faint);
+    margin-top: 5px;
   }
 
   /* Metrics grid — poço sunken */
   body[data-theme='light'] .page-investimentos .page-investimentos-card__metrics,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__metrics {
-    padding: 16px 18px !important;
-    border-radius: 14px !important;
-    background: var(--inv-sunken) !important;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: var(--inv-sunken);
     box-shadow:
       inset 3px 3px 7px var(--inv-shadow-soft),
-      inset -2px -2px 5px var(--inv-light) !important;
-    border: none !important;
-    row-gap: 16px !important;
-    column-gap: 14px !important;
+      inset -2px -2px 5px var(--inv-light);
+    border: none;
+    row-gap: 16px;
+    column-gap: 14px;
   }
 
   /* Metric labels — sentence case legível */
   body[data-theme='light'] .page-investimentos .page-investimentos-card__metric-label,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__metric-label {
-    text-transform: none !important;
-    font-size: 0.6875rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.01em !important;
-    color: var(--inv-text-lo) !important;
-    margin-bottom: 3px !important;
+    text-transform: none;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--inv-text-lo);
+    margin-bottom: 3px;
   }
 
   /* Metric values */
   body[data-theme='light'] .page-investimentos .page-investimentos-card__metric-value,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__metric-value {
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
-    color: var(--inv-text-hi) !important;
-    font-variant-numeric: tabular-nums !important;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--inv-text-hi);
+    font-variant-numeric: tabular-nums;
   }
 
   /* "Total estimado" na grid — destaque gold */
   body[data-theme='light'] .page-investimentos .page-investimentos-card__metric--total .page-investimentos-card__metric-value,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__metric--total .page-investimentos-card__metric-value {
-    font-size: 1.2rem !important;
-    color: var(--inv-accent) !important;
-    font-weight: 800 !important;
+    font-size: 1.2rem;
+    color: var(--inv-accent);
+    font-weight: 800;
   }
 
   /* Divider rule */
   body[data-theme='light'] .page-investimentos .page-investimentos-card__metrics-rule-line,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__metrics-rule-line {
-    border-top: 1px solid var(--inv-edge-lo) !important;
-    margin: 2px 0 !important;
+    border-top: 1px solid var(--inv-edge-lo);
+    margin: 2px 0;
     opacity: 0.7;
   }
 
   /* "Isento (PF)" em gold nas métricas */
   body[data-theme='light'] .page-investimentos .page-investimentos-card__ir-isento,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__ir-isento {
-    color: var(--inv-accent) !important;
-    font-weight: 700 !important;
+    color: var(--inv-accent);
+    font-weight: 700;
   }
 
   /* Projeção container */
   body[data-theme='light'] .page-investimentos .page-investimentos-card__projecao,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__projecao {
-    margin-top: 16px !important;
-    padding: 14px 16px !important;
-    border-radius: 14px !important;
-    background: var(--inv-sunken) !important;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--inv-sunken);
     box-shadow:
       inset 2px 2px 5px var(--inv-shadow-soft),
-      inset -1px -1px 3px var(--inv-light) !important;
+      inset -1px -1px 3px var(--inv-light);
   }
 
   /* ══════════════════════════════════════════════
@@ -398,17 +398,17 @@
 
   body[data-theme='light'] .page-investimentos .page-investimentos-chip--isento,
   body[data-theme='dark'] .page-investimentos .page-investimentos-chip--isento {
-    background: var(--inv-pos-soft) !important;
-    color: var(--inv-pos) !important;
-    border-color: color-mix(in srgb, var(--inv-pos) 25%, transparent) !important;
-    font-weight: 700 !important;
+    background: var(--inv-pos-soft);
+    color: var(--inv-pos);
+    border-color: color-mix(in srgb, var(--inv-pos) 25%, transparent);
+    font-weight: 700;
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-chip--vencido,
   body[data-theme='dark'] .page-investimentos .page-investimentos-chip--vencido {
-    background: var(--inv-danger-soft) !important;
-    color: var(--inv-danger) !important;
-    font-weight: 700 !important;
+    background: var(--inv-danger-soft);
+    color: var(--inv-danger);
+    font-weight: 700;
   }
 
   /* ══════════════════════════════════════════════
@@ -417,73 +417,73 @@
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card__actions,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__actions {
-    display: flex !important;
-    gap: 8px !important;
-    padding-top: 16px !important;
-    border-top: 1px solid var(--inv-edge-lo) !important;
-    margin-top: 16px !important;
-    align-items: center !important;
+    display: flex;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--inv-edge-lo);
+    margin-top: 16px;
+    align-items: center;
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card__edit,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__edit,
   body[data-theme='light'] .page-investimentos .page-investimentos-card__aporte,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__aporte {
-    padding: 9px 20px !important;
-    border-radius: 999px !important;
-    background: linear-gradient(150deg, var(--inv-raised) 0%, var(--inv-surface) 100%) !important;
-    border: 1px solid var(--inv-edge-hi) !important;
-    color: var(--inv-text-mid) !important;
-    font-size: 0.8125rem !important;
-    font-weight: 600 !important;
+    padding: 9px 20px;
+    border-radius: 999px;
+    background: linear-gradient(150deg, var(--inv-raised) 0%, var(--inv-surface) 100%);
+    border: 1px solid var(--inv-edge-hi);
+    color: var(--inv-text-mid);
+    font-size: 0.8125rem;
+    font-weight: 600;
     cursor: pointer;
     box-shadow:
       4px 4px 10px var(--inv-shadow-soft),
-      -2px -2px 6px var(--inv-light) !important;
-    transition: all 180ms var(--inv-ease) !important;
+      -2px -2px 6px var(--inv-light);
+    transition: all 180ms var(--inv-ease);
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card__edit:hover,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__edit:hover,
   body[data-theme='light'] .page-investimentos .page-investimentos-card__aporte:hover,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__aporte:hover {
-    color: var(--inv-accent) !important;
+    color: var(--inv-accent);
     box-shadow:
       4px 4px 10px var(--inv-shadow-soft),
       -2px -2px 6px var(--inv-light),
-      0 0 0 1px var(--inv-accent-soft) !important;
+      0 0 0 1px var(--inv-accent-soft);
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card__remove,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__remove {
-    padding: 9px 20px !important;
-    border-radius: 999px !important;
-    background: var(--inv-danger-soft) !important;
-    border: 1px solid color-mix(in srgb, var(--inv-danger) 22%, transparent) !important;
-    color: var(--inv-danger) !important;
-    font-size: 0.8125rem !important;
-    font-weight: 600 !important;
+    padding: 9px 20px;
+    border-radius: 999px;
+    background: var(--inv-danger-soft);
+    border: 1px solid color-mix(in srgb, var(--inv-danger) 22%, transparent);
+    color: var(--inv-danger);
+    font-size: 0.8125rem;
+    font-weight: 600;
     cursor: pointer;
-    margin-left: auto !important;
-    transition: opacity 180ms var(--inv-ease) !important;
+    margin-left: auto;
+    transition: opacity 180ms var(--inv-ease);
   }
 
   body[data-theme='light'] .page-investimentos .page-investimentos-card__remove:hover,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__remove:hover {
-    opacity: 0.75 !important;
+    opacity: 0.75;
   }
 
   /* Banner sem data — accent suave */
   body[data-theme='light'] .page-investimentos .page-investimentos-card__missing-date-banner,
   body[data-theme='dark'] .page-investimentos .page-investimentos-card__missing-date-banner {
-    padding: 9px 14px !important;
-    border-radius: 10px !important;
-    background: var(--inv-accent-soft) !important;
-    border: 1px solid var(--inv-accent-glow) !important;
-    color: var(--inv-accent) !important;
-    font-size: 0.78rem !important;
-    font-weight: 500 !important;
-    margin-bottom: 12px !important;
+    padding: 9px 14px;
+    border-radius: 10px;
+    background: var(--inv-accent-soft);
+    border: 1px solid var(--inv-accent-glow);
+    color: var(--inv-accent);
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin-bottom: 12px;
   }
 
 }
