@@ -33,3 +33,6 @@ nul
 .backup-temp/
 .tmp/
 docker_logs.txt
+
+# CSS fingerprint baseline (gerado localmente; depende do ambiente)
+scripts/css-fingerprint/fingerprint-baseline.json

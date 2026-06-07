@@ -65,9 +65,30 @@ Sem as cenas 3-9, layerizar e ver `diff=0` nas páginas estáticas (cena 1) dari
 falsa confiança: modais, hover e erros de formulário quebrariam em produção com o
 teste "verde". Este harness é a condição **C1** do GO-CONDICIONAL.
 
+## Runner automatizado
+
+`scripts/css-fingerprint/run.mjs` — runner Playwright que injeta o núcleo via
+`addInitScript` (sobrevive a navegação), loga, e itera as cenas. Modos:
+
+```bash
+npm i -D playwright && npx playwright install chromium   # pré-requisito (pesado, não instalado por padrão)
+CSSFP_EMAIL=... CSSFP_PASS=... node scripts/css-fingerprint/run.mjs --baseline
+# ...aplicar mudança de CSS...
+CSSFP_EMAIL=... CSSFP_PASS=... node scripts/css-fingerprint/run.mjs --check   # exit 1 se qualquer cena diff>0
+```
+
+Credenciais só via env (o guard de segredos bloqueia hardcode). Cada cena roda
+`selfTest` (exige `ok:true`) — se o harness não detecta quebra numa cena, o `--check`
+falha (anti-teatro). O baseline (`fingerprint-baseline.json`) é gerado localmente e
+não versionado (depende de fontes/render do ambiente).
+
 ## Estado atual (passo 1)
 
-- ✅ Núcleo de captura validado (cenas 1, 2; auto-teste de quebra; máscara de voláteis).
-- ⏳ Cenas 3-9 (modais/hover/focus/erro/print/reduced-motion/`:has`) — extensões a
-  automatizar antes do passo 3 (layerizar base). São orquestração Playwright sobre o
-  núcleo já pronto.
+- ✅ **Núcleo de captura validado ao vivo** (cenas 1, 2; auto-teste de quebra → diff=385; máscara de voláteis → 0).
+- ✅ **Cena 3 (modal aberto)** validada ao vivo (nova-tx: 69 els capturados).
+- ✅ **Cena 6 (erro de formulário)** validada ao vivo (nova-tx submetido vazio: 2 `:invalid`, quebra plantada em `:invalid` detectada). **A cena crítica da app financeira.**
+- ✅ **Runner automatizado** (`run.mjs`) cobrindo cenas 1-8 (estáticas, pseudo, modais, erro, hover, print, reduced-motion) — `addInitScript` + `selfTest` por cena + modos baseline/check.
+- ⏳ **Falta executar o runner end-to-end** (requer `npm i -D playwright`) e ajustar seletores de cena por página + adicionar cena 9 (`:has`). Cenas hover/focus/print/reduced-motion usam primitivas padrão do Playwright sobre o núcleo já validado.
+
+**Próximo:** instalar playwright, rodar `--baseline` numa árvore limpa, e só então o
+**passo 3** (layerizar a base 00-12) com `--check` exigindo diff=0 em todas as cenas.
