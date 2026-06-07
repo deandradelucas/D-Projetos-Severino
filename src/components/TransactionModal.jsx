@@ -10,6 +10,7 @@ import { useTransactionForm } from '../hooks/useTransactionForm'
 import { useModalA11y } from '../hooks/useModalA11y'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { filtrarCategoriasPorTipo, safeEvalExpression } from '../lib/transacaoFormUtils'
+import CalcKeypad from './transaction/CalcKeypad'
 
 const ParcelamentoIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -741,24 +742,14 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                 />
                 {/* (Q) Calculadora — teclado */}
                 {calcOpen && (
-                  <div className="ntx-calc" ref={calcRef}>
-                    <div className="ntx-calc__display" aria-live="polite">{calcExpr || '0'}</div>
-                    <div className="ntx-calc__pad">
-                      {['7', '8', '9', '÷', '4', '5', '6', '×', '1', '2', '3', '−', '0', ',', '⌫', '+'].map((k) => (
-                        <button
-                          key={k}
-                          type="button"
-                          className={`ntx-calc__key${'÷×−+'.includes(k) ? ' ntx-calc__key--op' : ''}${k === '⌫' ? ' ntx-calc__key--del' : ''}`}
-                          onClick={() => (k === '⌫' ? calcBackspace() : calcAppend(k))}
-                          aria-label={k === '⌫' ? 'Apagar' : k}
-                        >
-                          {k}
-                        </button>
-                      ))}
-                      <button type="button" className="ntx-calc__key ntx-calc__key--clear" onClick={calcClear}>C</button>
-                      <button type="button" className="ntx-calc__key ntx-calc__key--eq" onClick={handleCalcSubmit} aria-label="Calcular e usar">=</button>
-                    </div>
-                  </div>
+                  <CalcKeypad
+                    calcRef={calcRef}
+                    expr={calcExpr}
+                    onAppend={calcAppend}
+                    onBackspace={calcBackspace}
+                    onClear={calcClear}
+                    onSubmit={handleCalcSubmit}
+                  />
                 )}
               </div>
 
