@@ -141,3 +141,19 @@ por redundância (que rendeu muito em Lista/Investimentos no desktop) tem **teto
 (media queries mistas, sub-views condicionais como Parceladas, modais). O caminho correto para
 eliminar o `!important` estrutural é a **causa-raiz #3 — cascade layers** (`@layer base, skin`),
 que faz o skin vencer sem `!important`. Recomendado avaliar #3 numa página-POC antes de prosseguir.
+
+### POC cascade layers (#3) — jun/2026 — REPROVADA (revertida)
+Testei a migração `@layer base, skin` no dashboard.css (base=00-12, skin=13-38 via
+`@import ... layer(...)`) + remoção de TODOS os `!important` dos partials. Medido em
+/configuracoes (conta real, freeze, baseline 155 elem).
+
+**Resultado: quebrou tudo — 155/155 elementos mudaram** (claro+escuro). Causa: ao layerizar
+só o dashboard.css, o CSS **unlayered** restante (Tailwind, .css de componentes, theme-mirrors)
+passa a vencer o dashboard layerizado (regra normal unlayered > regra normal layered). 100% revertido
+via `git checkout` (produção intocada).
+
+**Conclusão:** `@layer` só funciona se TODA a cascata (Tailwind + componentes + theme-mirrors +
+partials) for migrada coerentemente — projeto grande e de alto risco, desproporcional ao benefício
+(débito de manutenibilidade, não funcional). **Recomendação: NÃO migrar para @layer.** O `!important`
+restante (~5.900: mobile estrutural + base + load-bearing desktop) é majoritariamente necessário pela
+arquitetura skin-sobre-base atual. Os ganhos seguros (~1.560 no desktop) já foram capturados.
