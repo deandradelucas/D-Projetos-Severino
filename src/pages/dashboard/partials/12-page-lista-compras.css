@@ -83,23 +83,13 @@
   min-width: 0;
 }
 
-.page-lista-compras__header-icon {
-  display: flex;
-  align-items: center;
-  color: var(--accent);
-}
 
-.page-lista-compras__header-icon svg {
-  width: 26px;
-  height: 26px;
-  stroke-width: 1.8;
-}
+
+
 
 /* Desktop: mostra o título textual em vez do ícone */
 @media (min-width: 769px) {
-  .page-lista-compras__header-icon {
-    display: none;
-  }
+
 
   .page-lista-compras__title {
     position: static !important;

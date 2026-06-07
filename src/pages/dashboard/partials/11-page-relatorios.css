@@ -178,14 +178,7 @@ body[data-theme='dark'] .page-relatorios .relatorios-tooltip__pct {
 
 /* ─── NEON LINE CARD ────────────────────────────────────────────────────────── */
 
-body[data-theme='dark'] .relatorios-neon-card {
-  border-color: rgba(0, 229, 160, 0.14) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(0, 229, 160, 0.10),
-    0 0 0 1px rgba(0, 229, 160, 0.05),
-    0 1px 4px rgba(0, 0, 0, 0.5),
-    0 6px 24px rgba(0, 0, 0, 0.32) !important;
-}
+
 
 body[data-theme='dark'] .relatorios-neon-card .ref-panel__head {
   border-bottom-color: rgba(0, 229, 160, 0.09) !important;

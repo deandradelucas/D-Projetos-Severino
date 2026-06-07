@@ -634,11 +634,7 @@ body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-ho
 }
 
 /* Separa “Conta” (Ajustes + sair) do bloco principal do app */
-.nav-section-label--account {
-  margin-top: 6px;
-  padding-top: 14px;
-  border-top-color: rgba(255, 255, 255, 0.06);
-}
+
 
 .nav-item.nav-item--settings:not(.active) {
   color: rgba(255, 255, 255, 0.52);
@@ -1274,12 +1270,7 @@ body[data-theme='dark'] .pagamento-trial-urgencia--critico .pagamento-trial-urge
   margin: 0 0 12px;
 }
 
-.pagamento-modal__body {
-  font-size: 0.9rem;
-  color: var(--text-secondary, #94a3b8);
-  line-height: 1.6;
-  margin: 0 0 16px;
-}
+
 
 .pagamento-modal__error {
   font-size: 0.82rem;
@@ -1293,19 +1284,9 @@ body[data-theme='dark'] .pagamento-trial-urgencia--critico .pagamento-trial-urge
   justify-content: flex-end;
 }
 
-.btn-danger {
-  background: var(--danger, #ef4444);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 9px 20px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: filter 0.15s;
-}
-.btn-danger:hover:not(:disabled) { filter: brightness(1.1); }
-.btn-danger:disabled { opacity: 0.55; cursor: not-allowed; }
+
+
+
 
 .btn-danger-ghost {
   background: transparent;

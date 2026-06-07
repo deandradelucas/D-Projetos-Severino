@@ -1520,11 +1520,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
   justify-content: flex-end;
 }
 
-.relatorios-btn-export {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
+
 
 .page-relatorios.app-horizon-shell .page-relatorios-ref-filters--clean {
   position: relative;
@@ -1676,12 +1672,7 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
   }
 }
 
-.relatorios-empty-msg {
-  text-align: center;
-  padding: 44px 20px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
+
 
 .relatorios-charts {
   display: flex;
