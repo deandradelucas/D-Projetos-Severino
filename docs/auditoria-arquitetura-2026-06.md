@@ -64,17 +64,23 @@ página já vence a base), verificado por **fingerprint de estilos computados** 
 `diff=0` obrigatório — via loop local (dev + Playwright). Sem migração global de cascade layers
 (que inverteria a precedência de `!important` e quebraria tudo).
 
-Resultado por página (verificado `diff=0`, em produção):
+Resultado por página (verificado `diff=0` claro+escuro, em produção):
 - **Transações:** 723 → 285 (−433) ✅
 - **Agenda:** −81 ✅
-- **Configurações:** 521 → 202 ocorrências (−61%) ✅ — tentativa 3 (jun/2026), via Playwright MCP
-  (fingerprint claro+escuro, diff=0), modal de exclusão preservado. Ver `etapa3-important-checklist.md`.
+- **Configurações:** 521 → 202 (−61%) ✅
+- **Relatórios:** 435 → 253 (−42%) ✅
+- **Pagamento:** 689 → 539 (−22%) ✅
+- **Lista:** 503 → 63 (−87%) ✅
+- **Investimentos:** 611 → 120 (−80%) ✅
 
-Bloqueado pela conta de teste (João isento/esparso) — exigem conta paga/rica + abrir modais:
-- **Pagamento:** isento → só 45 elementos (UI de preços/checkout oculta).
-- **Lista/Investimentos:** sem dados → conteúdo esparso.
-- **Relatórios/Dashboard:** charts/animações (recharts, shimmers de delta) → ruído; Dashboard exigiria
-  máscara de voláteis (risco de falso-negativo) → adiado por conservadorismo.
+Método: Playwright MCP (fingerprint de estilos computados claro+escuro, diff=0 obrigatório),
+charts/svg/shimmer excluídos, blocos de estado oculto (modais/comparador) preservados. As 4 últimas
+foram desbloqueadas usando a **conta real do CEO** (dados ricos) — a conta de teste João (isenta/esparsa)
+não renderizava os estados. **Total removido nesta frente: ~1.500 `!important`.** Ver `etapa3-important-checklist.md`.
+
+Pendente:
+- **Dashboard** (168): 22 spans animados (contadores de delta) exigem máscara de voláteis
+  (risco de falso-negativo) → adiado por conservadorismo (única página não entregue).
 
 Não aplicado (com segurança — sem dano, tudo restaurado ao original):
 - **Lista, Investimentos:** conta de teste esparsa (poucos elementos) → guard abortou.

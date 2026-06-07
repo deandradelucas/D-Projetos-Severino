@@ -18,13 +18,22 @@ precedência de `!important` e quebra tudo).
 |---|---|---|
 | Transações | `15-transacoes-neumorphic-desktop.css` | ✅ 723→285 |
 | Agenda | `18-agenda-neumorphic-desktop.css` | ✅ −81 |
-| Configurações | `21-configuracoes-neumorphic-desktop.css` | ✅ **521→202 ocorrências (−61%)** — diff=0 claro+escuro (Playwright), modal de exclusão (386-424) preservado inteiro |
-| Relatórios | `17-relatorios-neumorphic-desktop.css` (435) | ⛔ bloqueado — recharts + precisa de transações (conta João esparsa) |
-| Pagamento | `20-pagamento-neumorphic-desktop.css` (689) | ⛔ bloqueado — João é isento → só 45 elementos (UI de preços/checkout é estado oculto; ~95% dos !important não renderizam) |
-| Dashboard | `13-dashboard-neumorphic-desktop.css` (168) | ⚠️ adiado — renderiza (307 elem), mas tem 22 spans animados (delta) → exige máscara de voláteis = risco de falso-negativo; não deployado por conservadorismo |
-| Investimentos | `16/17-investimentos-neumorphic-desktop.css` | ⛔ bloqueado — conta de teste esparsa |
-| Lista | `19-lista-compras-neumorphic-desktop.css` (503) | ⛔ bloqueado — João sem listas |
+| Configurações | `21-configuracoes-neumorphic-desktop.css` | ✅ **521→202 (−61%)** — diff=0 (Playwright), modal exclusão (386-424) preservado |
+| Relatórios | `17-relatorios-neumorphic-desktop.css` | ✅ **435→253 (−42%)** — conta real; charts/svg excluídos; filtros+cards+legendas preservados |
+| Pagamento | `20-pagamento-neumorphic-desktop.css` | ✅ **689→539 (−22%)** — conta real (não-isenta); só features de conversão (444-563); modais Pix/cancelar (1-80, 564-601) preservados inteiros |
+| Lista | `19-lista-compras-neumorphic-desktop.css` | ✅ **503→63 (−87%)** — conta real; skin visível 100% redundante; modais (690-788) preservados; HMR confirmado por sentinel |
+| Investimentos | `16+17-investimentos-neumorphic-desktop.css` | ✅ **611→120 (−80%)** — conta real; partial 17 100% redundante; resumo-bg + comparador/modal preservados |
+| Dashboard | `13-dashboard-neumorphic-desktop.css` (168) | ⚠️ adiado — 22 spans animados (contadores de delta) mesmo na conta real → exige máscara de voláteis (risco de falso-negativo); não deployado por conservadorismo |
 | Sidebar / Modais | `14-sidebar…`, `16-modal-nova-tx…` | ⏳ exigem estados (modal aberto) |
+
+### Tentativa 4 (jun/2026) — desbloqueio com conta real (CEO)
+Com a conta do CEO (dados ricos, não-isenta) as páginas antes bloqueadas pela conta de teste
+João renderizaram completas. **+4 páginas entregues** (Relatórios, Pagamento, Lista, Investimentos),
+todas com `diff=0` claro+escuro via Playwright, charts/svg/shimmer excluídos do fingerprint, e os
+blocos de estado oculto (modais/comparador) preservados integralmente por não serem mensuráveis sem
+acionar ações destrutivas (Pix/cancelar) na conta real. Padrão consistente: o skin **visível** é em
+grande parte `!important` redundante por especificidade; o **load-bearing** concentra-se em poucos
+blocos de fundo de painel (dark) + estados ocultos. Só **Dashboard** segue pendente (contadores animados).
 
 ### Tentativa 3 (jun/2026) — método validado e 1 página entregue
 - **Método confirmado funcional neste ambiente** com Playwright MCP: fingerprint de estilos
