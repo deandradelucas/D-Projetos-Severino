@@ -18,13 +18,24 @@ precedência de `!important` e quebra tudo).
 |---|---|---|
 | Transações | `15-transacoes-neumorphic-desktop.css` | ✅ 723→285 |
 | Agenda | `18-agenda-neumorphic-desktop.css` | ✅ −81 |
-| Relatórios | `17-relatorios-neumorphic-desktop.css` (435) | ⏳ pendente — recharts mudam contagem de elementos |
-| Pagamento | `20-pagamento-neumorphic-desktop.css` (259) | ⏳ pendente — ruído de render intermitente |
-| Configurações | `21-configuracoes-neumorphic-desktop.css` (189) | ⏳ pendente — dev local instável |
-| Dashboard | `13-dashboard-neumorphic-desktop.css` (168) | ⏳ pendente — idem |
-| Investimentos | `16/17-investimentos-neumorphic-desktop.css` | ⏳ pendente — conta de teste esparsa |
-| Lista | `19-lista-compras-neumorphic-desktop.css` (503) | ⏳ pendente — conta de teste sem listas |
-| Sidebar / Modais | `14-sidebar…`, `16-modal-nova-tx…` | ⏳ pendente — exigem estados (modal aberto) |
+| Configurações | `21-configuracoes-neumorphic-desktop.css` | ✅ **521→202 ocorrências (−61%)** — diff=0 claro+escuro (Playwright), modal de exclusão (386-424) preservado inteiro |
+| Relatórios | `17-relatorios-neumorphic-desktop.css` (435) | ⛔ bloqueado — recharts + precisa de transações (conta João esparsa) |
+| Pagamento | `20-pagamento-neumorphic-desktop.css` (689) | ⛔ bloqueado — João é isento → só 45 elementos (UI de preços/checkout é estado oculto; ~95% dos !important não renderizam) |
+| Dashboard | `13-dashboard-neumorphic-desktop.css` (168) | ⚠️ adiado — renderiza (307 elem), mas tem 22 spans animados (delta) → exige máscara de voláteis = risco de falso-negativo; não deployado por conservadorismo |
+| Investimentos | `16/17-investimentos-neumorphic-desktop.css` | ⛔ bloqueado — conta de teste esparsa |
+| Lista | `19-lista-compras-neumorphic-desktop.css` (503) | ⛔ bloqueado — João sem listas |
+| Sidebar / Modais | `14-sidebar…`, `16-modal-nova-tx…` | ⏳ exigem estados (modal aberto) |
+
+### Tentativa 3 (jun/2026) — método validado e 1 página entregue
+- **Método confirmado funcional neste ambiente** com Playwright MCP: fingerprint de estilos
+  computados (66 props × todos os elementos), baseline em `localStorage` (sobrevive ao HMR),
+  self-check (strip total → diff>0 → restore → diff=0), bisecção por faixa de linhas.
+- **Configurações entregue** (−61%, deployado HEAD 9b94fff). Load-bearing isolado: hero/nav/profile
+  (linhas 1-106), cards de tema (162-182), botão danger (278-281) — todos preservados.
+- **Aprendizado novo:** o dev server faz **full-reload no HMR** (perde a sessão → cai no /login às vezes);
+  contornado com baseline no localStorage + re-login. E o **fingerprint só vê o DOM renderizado** —
+  páginas com estado oculto (Pagamento isento, modais) ou conteúdo esparso (Lista/Investimentos sem
+  dados) **não são verificáveis** com a conta João; exigiriam conta paga/rica + abrir cada modal.
 
 ## Pré-requisitos (por que falhou no Windows)
 

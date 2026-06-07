@@ -67,6 +67,14 @@ página já vence a base), verificado por **fingerprint de estilos computados** 
 Resultado por página (verificado `diff=0`, em produção):
 - **Transações:** 723 → 285 (−433) ✅
 - **Agenda:** −81 ✅
+- **Configurações:** 521 → 202 ocorrências (−61%) ✅ — tentativa 3 (jun/2026), via Playwright MCP
+  (fingerprint claro+escuro, diff=0), modal de exclusão preservado. Ver `etapa3-important-checklist.md`.
+
+Bloqueado pela conta de teste (João isento/esparso) — exigem conta paga/rica + abrir modais:
+- **Pagamento:** isento → só 45 elementos (UI de preços/checkout oculta).
+- **Lista/Investimentos:** sem dados → conteúdo esparso.
+- **Relatórios/Dashboard:** charts/animações (recharts, shimmers de delta) → ruído; Dashboard exigiria
+  máscara de voláteis (risco de falso-negativo) → adiado por conservadorismo.
 
 Não aplicado (com segurança — sem dano, tudo restaurado ao original):
 - **Lista, Investimentos:** conta de teste esparsa (poucos elementos) → guard abortou.
