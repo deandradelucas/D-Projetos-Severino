@@ -12,14 +12,14 @@
 
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights {
-    display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 0 !important;
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important; border-radius: 18px !important;
-    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important; overflow: hidden !important;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi); border-radius: 18px;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light); overflow: hidden;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item {
-    padding: 14px 16px !important; border-right: 1px solid var(--m-edge-lo) !important; border-bottom: 1px solid var(--m-edge-lo) !important;
+    padding: 14px 16px; border-right: 1px solid var(--m-edge-lo); border-bottom: 1px solid var(--m-edge-lo);
   }
 
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__pair,
@@ -47,10 +47,10 @@
   /* ═══════════ INVESTIMENTOS ═══════════ */
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important; border-radius: 18px !important;
-    box-shadow: 6px 6px 16px var(--m-shadow-soft), -4px -4px 12px var(--m-light) !important; overflow: hidden !important;
-    margin-bottom: 12px !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi); border-radius: 18px;
+    box-shadow: 6px 6px 16px var(--m-shadow-soft), -4px -4px 12px var(--m-light); overflow: hidden;
+    margin-bottom: 12px;
   }
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo {
@@ -69,19 +69,19 @@
   }
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__bank-avatar,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__bank-avatar {
-    background: var(--m-sunken) !important; box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important; color: var(--m-accent) !important;
+    background: var(--m-sunken); box-shadow: inset 2px 2px 4px var(--m-shadow-soft); color: var(--m-accent);
   }
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-chip--tipo,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-chip--tipo {
-    background: var(--m-accent-glow) !important; color: var(--m-accent) !important;
+    background: var(--m-accent-glow); color: var(--m-accent);
   }
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__actions,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__actions {
-    background: var(--m-sunken) !important; border-top: 1px solid var(--m-edge-lo) !important;
+    background: var(--m-sunken); border-top: 1px solid var(--m-edge-lo);
   }
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-alerta,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-alerta {
-    padding: 0 14px !important;
+    padding: 0 14px;
   }
 
   /* ═══════════ AGENDA ═══════════ */
@@ -124,32 +124,32 @@
   /* ═══════════ LISTA DE COMPRAS ═══════════ */
   body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__category-group,
   body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__category-group {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important; border-radius: 18px !important; padding: 7px !important;
-    box-shadow: 6px 6px 16px var(--m-shadow-soft), -4px -4px 12px var(--m-light) !important; margin-bottom: 10px !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi); border-radius: 18px; padding: 7px;
+    box-shadow: 6px 6px 16px var(--m-shadow-soft), -4px -4px 12px var(--m-light); margin-bottom: 10px;
   }
   body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab,
   body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab {
-    background: var(--m-sunken) !important; border: 1px solid var(--m-edge-hi) !important; color: var(--m-text-mid) !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important; border-radius: 999px !important;
+    background: var(--m-sunken); border: 1px solid var(--m-edge-hi); color: var(--m-text-mid);
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft); border-radius: 999px;
   }
   body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab--active,
   body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__tab--active {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important; color: var(--m-accent) !important;
-    box-shadow: 3px 3px 8px var(--m-shadow-soft), 0 0 0 1px var(--m-accent-glow) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%); color: var(--m-accent);
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), 0 0 0 1px var(--m-accent-glow);
   }
   body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-check--checked,
   body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__item-check--checked {
-    background: linear-gradient(155deg, var(--m-accent), #c49535) !important; color: var(--m-accent-fg) !important; border-color: transparent !important;
+    background: linear-gradient(155deg, var(--m-accent), #c49535); color: var(--m-accent-fg); border-color: transparent;
   }
   body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__cta-btn,
   body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__cta-btn {
-    background: linear-gradient(155deg, var(--m-accent), #c49535) !important; color: var(--m-accent-fg) !important; border: none !important;
-    border-radius: 999px !important; font-weight: 700 !important;
+    background: linear-gradient(155deg, var(--m-accent), #c49535); color: var(--m-accent-fg); border: none;
+    border-radius: 999px; font-weight: 700;
   }
   body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__total-value,
   body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__total-value {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; color: var(--m-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-weight: 700; color: var(--m-text-hi);
   }
 
   /* ═══════════ PAGAMENTO ═══════════ */
@@ -181,11 +181,11 @@
   }
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-primary,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-primary {
-    background: linear-gradient(155deg, var(--m-accent), #c49535) !important; color: var(--m-accent-fg) !important; border: none !important; border-radius: 999px !important; font-weight: 700 !important;
+    background: linear-gradient(155deg, var(--m-accent), #c49535); color: var(--m-accent-fg); border: none; border-radius: 999px; font-weight: 700;
   }
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-pix-cta,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-pix-cta {
-    background: var(--m-pos-soft) !important; border: 1px solid var(--m-pos-glow) !important; color: var(--m-pos) !important; border-radius: 999px !important;
+    background: var(--m-pos-soft); border: 1px solid var(--m-pos-glow); color: var(--m-pos); border-radius: 999px;
   }
 
   /* ═══════════ CONFIGURAÇÕES ═══════════ */
@@ -273,68 +273,68 @@
 /* ═══════════════ Hero Investimentos — compacto + taxas claras (jun/2026) ═══════════════ */
 @media (max-width: 768px) {
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-    padding: 14px 14px !important;
-    margin: 10px 0 4px !important;
+    padding: 14px 14px;
+    margin: 10px 0 4px;
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
-    align-items: center !important;
-    gap: 10px !important;
+    align-items: center;
+    gap: 10px;
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__hero-text {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__title {
     /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
-    line-height: 1.15 !important;
-    margin: 0 !important;
+    line-height: 1.15;
+    margin: 0;
   }
   /* Comparar: so icone (44px) - libera largura pras taxas */
   body[data-theme="dark"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary,
   body[data-theme="light"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary {
-    width: 44px !important; min-width: 44px !important; padding: 0 !important; flex: 0 0 auto !important;
-    display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0 !important;
+    width: 44px; min-width: 44px; padding: 0; flex: 0 0 auto;
+    display: inline-flex; align-items: center; justify-content: center; gap: 0;
   }
-  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary .dashboard-hub__btn-label { display: none !important; }
-  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary .dashboard-hub__btn-ico { width: 18px !important; height: 18px !important; }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary .dashboard-hub__btn-label { display: none; }
+  .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary .dashboard-hub__btn-ico { width: 18px; height: 18px; }
 
   /* Taxas SELIC/CDI: 2 pills compactos empilhados (label em cima, valor embaixo), full-width abaixo do titulo */
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-hero__rates-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 7px !important;
-    width: 100% !important;
-    margin: 12px 0 0 !important;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    width: 100%;
+    margin: 12px 0 0;
   }
   body[data-theme="dark"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-selic-badge--hero,
   body[data-theme="light"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-selic-badge--hero,
   body[data-theme="dark"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-cdi-badge--hero,
   body[data-theme="light"] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-cdi-badge--hero {
-    flex-direction: column !important;
-    flex-wrap: nowrap !important;
-    align-items: flex-start !important;
-    gap: 1px !important;
-    padding: 8px 12px !important;
-    border-radius: 13px !important;
-    min-width: 0 !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 1px;
+    padding: 8px 12px;
+    border-radius: 13px;
+    min-width: 0;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-selic-badge__k,
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-cdi-badge__k {
-    font-size: 0.5625rem !important;
-    letter-spacing: 0.06em !important;
-    color: var(--m-text-lo) !important;
-    white-space: nowrap !important;
+    font-size: 0.5625rem;
+    letter-spacing: 0.06em;
+    color: var(--m-text-lo);
+    white-space: nowrap;
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-selic-badge__pill,
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .taxa-cdi-badge__pill {
-    font-size: 0.8125rem !important;
-    color: var(--m-text-hi) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100% !important;
+    font-size: 0.8125rem;
+    color: var(--m-text-hi);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 }
 
@@ -1052,54 +1052,54 @@
 @media (max-width: 768px) {
   body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header,
   body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
-    margin: 12px 0 10px !important;
-    padding: 16px 16px !important;
-    border-radius: 22px !important;
-    border: 1px solid var(--m-edge-hi) !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 12px 0 10px;
+    padding: 16px 16px;
+    border-radius: 22px;
+    border: 1px solid var(--m-edge-hi);
   }
   body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    box-shadow: 0 10px 26px -12px rgba(0,0,0,0.7), inset 1px 1px 1px var(--m-edge-hi) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    box-shadow: 0 10px 26px -12px rgba(0,0,0,0.7), inset 1px 1px 1px var(--m-edge-hi);
   }
   body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header {
-    background: linear-gradient(155deg, #ffffff 0%, #f5f7fa 100%) !important;
-    box-shadow: 0 10px 26px -14px var(--m-shadow), inset 1px 1px 1px var(--m-edge-hi) !important;
+    background: linear-gradient(155deg, #ffffff 0%, #f5f7fa 100%);
+    box-shadow: 0 10px 26px -14px var(--m-shadow), inset 1px 1px 1px var(--m-edge-hi);
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header-left {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    min-width: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
   }
   /* Revela o título "Listas" (estava sr-only) */
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header .page-lista-compras__title {
-    position: static !important;
-    width: auto !important;
-    height: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    clip: auto !important;
-    clip-path: none !important;
-    overflow: visible !important;
-    white-space: nowrap !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    clip: auto;
+    clip-path: none;
+    overflow: visible;
+    white-space: nowrap;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
     /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
-    font-weight: 700 !important;
-    letter-spacing: -0.025em !important;
-    color: var(--m-text-hi) !important;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--m-text-hi);
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header-icon {
-    display: inline-flex !important;
-    color: var(--m-accent) !important;
-    flex-shrink: 0 !important;
+    display: inline-flex;
+    color: var(--m-accent);
+    flex-shrink: 0;
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__header-icon svg {
-    width: 22px !important;
-    height: 22px !important;
+    width: 22px;
+    height: 22px;
   }
 }
 
@@ -1199,41 +1199,41 @@
 @media (max-width: 768px) {
   /* Inputs de filtro (data/select) — afundados, 16px anti-zoom */
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input {
-    font-size: 16px !important;
-    border-radius: 12px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-hi) !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light) !important;
+    font-size: 16px;
+    border-radius: 12px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-hi);
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light);
   }
   /* iOS: texto do type=date segue o color-scheme do app (senão fica invisível) */
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input { color-scheme: dark !important; }
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input { color-scheme: light !important; }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input { color-scheme: dark; }
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input { color-scheme: light; }
 
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-group label {
-    color: var(--m-text-lo) !important;
-    font-weight: 600 !important;
+    color: var(--m-text-lo);
+    font-weight: 600;
   }
 
   /* Atalhos de período — pills neumórficos preenchendo a linha */
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-shortcuts-row {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-shortcut-btn {
-    flex: 1 1 auto !important;
-    padding: 9px 14px !important;
-    border-radius: 999px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-mid) !important;
-    font-weight: 600 !important;
-    font-size: 0.8rem !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important;
+    flex: 1 1 auto;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-mid);
+    font-weight: 600;
+    font-size: 0.8rem;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft);
   }
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-shortcut-btn:active {
-    color: var(--m-accent) !important;
+    color: var(--m-accent);
   }
 }
 
