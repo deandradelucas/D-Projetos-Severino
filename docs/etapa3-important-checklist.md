@@ -205,3 +205,34 @@ por linha. Com a ferramenta block-aware, mobile rende tanto quanto desktop.
 - **Recomendação:** capturar a redundância da agenda em 05 exige (a) um seletor de KEEP por **regex de prelúdio**
   (ex.: contém `agenda-` mas não `ref-kpi`/`ref-panel`/`ref-tx`), evoluindo a ferramenta, **ou** (b) um run
   headless multi-viewport scriptado (CI/Linux) que automatize a matriz. Tarefa dedicada, fora deste round.
+
+### Round modais mobile (jun/2026) — categoria concluída como LOAD-BEARING
+Partials de modal mobile: `30-investimentos-modal` (178), `32-lista-modal` (161), `29-comparador` (129),
+`24-bottom-sheets` (32), `25-audit-fixes` (67).
+
+- **30-investimentos-modal testado a fundo:** modal aberto (`.page-investimentos-modal`, 66 els), strip-total muda
+  **11 claro / 41 escuro** — quase todo o modal é load-bearing no tema **escuro**. KEEP só dos sub-tokens
+  redundantes rendeu **178→171 (−7)**. Restaurado intacto (não vale verificação de modal por 7).
+- **Causa-raiz arquitetural:** modais existem para **sobrescrever o chrome base do modal** (definido em `02c`)
+  no mobile; o skin escuro precisa de `!important` para vencer. Por isso são intrinsecamente load-bearing —
+  ao contrário dos skins de página (conteúdo visível, redundante por especificidade).
+- **32/29/24/25 não processados:** cada um estiliza **múltiplos estados de modal ocultos** (32-lista: nova lista,
+  adicionar item, editar — abri só "nova lista", 23 els de 104 refs). Verificar com segurança exige abrir **todos**
+  os estados de cada modal — matriz cara e propensa a erro no ambiente atual, com rendimento esperado baixo
+  (evidência do 30). **Deferidos junto com 05** para um run scriptado dedicado.
+
+## Encerramento da campanha `!important` (jun/2026)
+Ganhos seguros capturados e deployados. O `!important` restante é majoritariamente **necessário pela
+arquitetura skin-sobre-base**: shell mobile (22, estrutural), modais (skin escuro sobre base), e o que sobra
+em 05 (mistura desktop+mobile não-isolável pela ferramenta atual). Próximos ganhos exigem **evoluir a
+ferramenta** (KEEP por regex de prelúdio) ou **automação headless multi-viewport** — não mais edição manual.
+
+| Round | Entregue |
+|---|---|
+| Skins desktop (rounds anteriores) | ~1.560 removidos (8 páginas) |
+| 23-mobile-pages | 807 → 373 (−434) |
+| 26-mobile-transacoes | 503 → 251 (−252) |
+| 33-pagamento-mobile | 123 → 0 (−123) |
+| 18-agenda-desktop | 714 → 449 (−265) |
+| 22-mobile-foundation | 249 → 207 (−42) |
+| **Deferidos (load-bearing/não-isolável):** | 05-dark-shell (574), modais 30/32/29/24/25 (~567) |
