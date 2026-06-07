@@ -124,3 +124,20 @@ O script de automação foi **temporário** e removido (dependia de `playwright-
 Chrome do sistema). Recriar a partir deste procedimento se for retomar — agora também
 **cobrindo estados ocultos (modais)** e excluindo `svg`/`.recharts-*` do fingerprint.
 O método é confiável para conteúdo estático/visível; o gargalo é ambiente + estados ocultos.
+
+### Investigação MOBILE (jun/2026) — passo #1 da re-auditoria
+Método validado em viewport 390×844 (login conta real, freeze de animação, exclusão de
+spark/pulse/shimmer, root `.page-transacoes`, estável 0/0 com 728 elementos).
+
+**Achado decisivo:** o maior partial mobile, `26-mobile-transacoes-fix` (503 `!important`),
+é **quase 100% load-bearing** — strip total muda **324/728** elementos; metade-1 (1-307) muda 186,
+metade-2 (308-615) muda 144. **Não há faixa redundante material.** Restaurado sem alteração.
+
+**Causa-raiz (confirmada):** o `!important` mobile é *estrutural* — o skin mobile e o CSS base
+disputam com mesma especificidade, então o `!important` é necessário para o skin vencer. A remoção
+por redundância (que rendeu muito em Lista/Investimentos no desktop) tem **teto baixo no mobile**.
+
+**Conclusão:** atacar o mobile `!important` página-a-página dá pouco retorno e alto atrito
+(media queries mistas, sub-views condicionais como Parceladas, modais). O caminho correto para
+eliminar o `!important` estrutural é a **causa-raiz #3 — cascade layers** (`@layer base, skin`),
+que faz o skin vencer sem `!important`. Recomendado avaliar #3 numa página-POC antes de prosseguir.
