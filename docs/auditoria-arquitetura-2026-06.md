@@ -46,7 +46,19 @@
 - Removida regra CSS órfã `.rel-ed__ia-empty-text` (elemento já removido da UI).
 - Verificação: lint limpo, build verde, 237 testes ok.
 
-### Pendente (próximas etapas)
-- Etapa 1b: varrer as 89 classes CSS mortas (espalhadas em 8 partials; mistura morto/vivo — exige passo classe-a-classe com re-auditoria).
-- Endpoint `GET /api/lista-compras/arquivadas`: implementação completa, **sem consumidor no front** — confirmar se é feature planejada antes de remover.
-- Demais etapas (tokens, layers, god components) conforme plano.
+### Etapa 1b — CSS morto (jun/2026) ✅
+- Criado `scripts/strip-dead-dashboard-css.mjs` (removedor seguro: só apaga regras cujo seletor mira EXCLUSIVAMENTE classes mortas).
+- Removidas **22 regras** exclusivamente-mortas em 7 partials. Build/lint/237 testes ok; Configurações validada no Playwright.
+- Restam ~67 classes mortas em regras "mistas" (classe morta + viva no mesmo seletor) → passo futuro mais cirúrgico.
+
+### Etapa 2 — tokens (jun/2026) ✅ (fechada SEM alterar — falso problema)
+- Investigação: os dois sistemas são **complementares e 95% disjuntos** (105 `@theme` Tailwind × 73 `:root`). Só 5 nomes coincidem (`--shadow-*`), com valores iguais no light + override dark no `:root`. As duas definições são **funcionalmente necessárias** (Tailwind util `shadow-accent` usado 6×; `var(--shadow-*)` 20× nos partials).
+- Unificar adicionaria complexidade/risco sem benefício → **não alterado** (M1 era falso-positivo).
+
+### C — endpoint órfão (jun/2026) ✅
+- Removido `GET /api/lista-compras/arquivadas` + função `listarListasArquivadas` (sem consumidor no front, sem plano de UI). Endpoints órfãos: 1 → 0.
+
+### Pendente
+- **Etapa 3** (causa-raiz: 8.645 `!important` + skins por página): programa incremental por estrutura compartilhada (card do hero → botões → reduzir `!important` por partial), com verificação visual a cada passo. **Não iniciada** (decisão: fazer em passos revisáveis).
+- ~67 classes CSS mortas em regras mistas.
+- Decompor god components (`ListaDeCompras.jsx` 2.597 ln, etc.).

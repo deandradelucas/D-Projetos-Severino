@@ -704,19 +704,3 @@ export async function listarHistoricoPrecos(usuarioId) {
   return mapa
 }
 
-/**
- * @param {string} usuarioId
- * @returns {Promise<Array>}
- */
-export async function listarListasArquivadas(usuarioId) {
-  const supabase = getSupabaseAdmin()
-  const { data, error } = await supabase
-    .from('shopping_lists')
-    .select(LIST_SELECT_COLS)
-    .eq('usuario_id', usuarioId)
-    .not('arquivada_em', 'is', null)
-    .order('arquivada_em', { ascending: false })
-
-  if (error) throw new Error(error.message || 'Erro ao listar arquivadas.')
-  return data || []
-}

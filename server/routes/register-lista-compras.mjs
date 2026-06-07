@@ -12,7 +12,6 @@ import {
   removerItem,
   listarHistoricoNomes,
   listarHistoricoPrecos,
-  listarListasArquivadas,
 } from '../lib/lista-compras.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { isUuidString } from '../lib/transacao-validate.mjs'
@@ -73,21 +72,6 @@ export function registerListaComprasRoutes(app) {
     } catch (error) {
       log.error('historico precos lista compras', error)
       return c.json({ message: error.message || 'Erro ao buscar histórico de preços.' }, 500)
-    }
-  })
-
-  // GET /api/lista-compras/arquivadas
-  app.get('/api/lista-compras/arquivadas', async (c) => {
-    try {
-      const usuarioId = resolveRequestUserId(c)
-      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
-      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
-
-      const rows = await listarListasArquivadas(resolveListaDataId(parsed, c))
-      return c.json(rows)
-    } catch (error) {
-      log.error('listar listas arquivadas', error)
-      return c.json({ message: error.message || 'Erro ao listar arquivadas.' }, 500)
     }
   })
 
