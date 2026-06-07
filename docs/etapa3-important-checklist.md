@@ -235,6 +235,8 @@ Partials de modal mobile: `30-investimentos-modal` (178), `32-lista-modal` (161)
 | `30-investimentos-modal` | 178 | 178 | 0 | ⏸ load-bearing no **escuro** (strip-total muda 41/66). KEEP redundante rendia só −7 → restaurado intacto. |
 | `25-audit-fixes` | 67 | 67 | 0 | ⏸ **override por design** ("carregado por último → vence empates de especificidade"). Cada regra existe para vencer 22-24/05 → load-bearing. |
 | `24-bottom-sheets` | 32 | 32 | 0 | ⏸ comportamento de sheet (transform/border-radius que faz o modal deslizar de baixo, sobrescrevendo o modal centralizado base) → load-bearing. |
+| `16-modal-nova-tx-desktop` | 366 | 270 | **−96** | ✅ modal Nova Transação desktop: chrome visível redundante; features ocultas (`tx-calc` calculadora, `tx-parc` parcelas, `tx-template`, `tx-ai-chip`, `modal-form--validated`, `tx-switch`) preservadas via KEEP. diff=0 claro+escuro. Deployado. |
+| `27-modal-nova-tx-mobile` | 488 | 488 | 0 | ⏸ mesmo modal no mobile: strip-total muda 52/57 de 66 → ~100% load-bearing (skin mobile precisa de !important). KEEP rendia só −2 → restaurado intacto. |
 
 - **Lição:** modal **não** é categoria uniforme. Modais de **conteúdo** (comparador, criar-lista) têm chrome visível
   redundante → reduzem bem. Modais de **skin escuro** (30) e arquivos de **override por design** (24/25) são
