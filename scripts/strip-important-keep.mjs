@@ -18,6 +18,11 @@
  *   Limita o strip aos blocos cujo prelúdio CASA o regex. Blocos fora do escopo
  *   ficam 100% intactos. Útil para isolar uma seção (ex.: --only=agenda) num
  *   arquivo heterogêneo cujos seletores compartilham tokens de container.
+ *
+ * --only-media=<regex> (opcional):
+ *   Limita o strip aos blocos DENTRO de uma @media cujo prelúdio casa o regex
+ *   (ex.: --only-media=min-width para tocar só regras desktop). Blocos fora de
+ *   uma @media casante ficam intactos. Combina com --only e KEEP.
  */
 import fs from 'node:fs'
 
@@ -39,15 +44,18 @@ const KEEP = keepCsv.split(',').map((s) => s.trim()).filter(Boolean).map((t) =>
   t.startsWith('re:') ? { re: new RegExp(t.slice(3)) } : { sub: t },
 )
 const ONLY = flags.only ? new RegExp(flags.only) : null
+const ONLY_MEDIA = flags['only-media'] ? new RegExp(flags['only-media']) : null
 
-function keepBlock(prelude) {
+function keepBlock(prelude, mediaOk) {
+  // Fora do escopo --only-media → preservar intacto
+  if (ONLY_MEDIA && !mediaOk) return true
   // Fora do escopo --only → preservar intacto
   if (ONLY && !ONLY.test(prelude)) return true
   // Load-bearing (substring ou regex) → preservar
   return KEEP.some((k) => (k.re ? k.re.test(prelude) : prelude.includes(k.sub)))
 }
 
-function strip(text) {
+function strip(text, mediaOk) {
   let out = '', i = 0
   const n = text.length
   while (i < n) {
@@ -59,14 +67,17 @@ function strip(text) {
     let d = 0, k = j
     for (; k < n; k++) { if (text[k] === '/' && text[k + 1] === '*') { const e = text.indexOf('*/', k + 2); k = e === -1 ? n : e + 1; continue } if (text[k] === '{') d++; else if (text[k] === '}') { d--; if (d === 0) { k++; break } } }
     const prelude = text.slice(i, j), body = text.slice(j, k)
-    if (/@(media|supports|layer|container)/.test(prelude)) out += prelude + '{' + strip(body.slice(1, -1)) + '}'
-    else out += prelude + (keepBlock(prelude) ? body : body.replace(/ !important/g, ''))
+    if (/@(media|supports|layer|container)/.test(prelude)) {
+      const childMediaOk = mediaOk || (ONLY_MEDIA ? ONLY_MEDIA.test(prelude) : true)
+      out += prelude + '{' + strip(body.slice(1, -1), childMediaOk) + '}'
+    } else out += prelude + (keepBlock(prelude, mediaOk) ? body : body.replace(/ !important/g, ''))
     i = k
   }
   return out
 }
 
+// Sem --only-media: tudo é "in scope" desde o topo. Com --only-media: só dentro de @media casante.
 const before = (fs.readFileSync(file, 'utf8').match(/!important/g) || []).length
-fs.writeFileSync(file, strip(fs.readFileSync(file, 'utf8')))
+fs.writeFileSync(file, strip(fs.readFileSync(file, 'utf8'), !ONLY_MEDIA))
 const after = (fs.readFileSync(file, 'utf8').match(/!important/g) || []).length
-console.log(`${file}: !important ${before} -> ${after}` + (ONLY ? ` [--only=${flags.only}]` : '') + ` (KEEP: ${keepCsv})`)
+console.log(`${file}: !important ${before} -> ${after}` + (ONLY ? ` [--only=${flags.only}]` : '') + (ONLY_MEDIA ? ` [--only-media=${flags['only-media']}]` : '') + ` (KEEP: ${keepCsv})`)
