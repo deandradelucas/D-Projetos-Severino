@@ -23,8 +23,16 @@ precedência de `!important` e quebra tudo).
 | Pagamento | `20-pagamento-neumorphic-desktop.css` | ✅ **689→539 (−22%)** — conta real (não-isenta); só features de conversão (444-563); modais Pix/cancelar (1-80, 564-601) preservados inteiros |
 | Lista | `19-lista-compras-neumorphic-desktop.css` | ✅ **503→63 (−87%)** — conta real; skin visível 100% redundante; modais (690-788) preservados; HMR confirmado por sentinel |
 | Investimentos | `16+17-investimentos-neumorphic-desktop.css` | ✅ **611→120 (−80%)** — conta real; partial 17 100% redundante; resumo-bg + comparador/modal preservados |
-| Dashboard | `13-dashboard-neumorphic-desktop.css` (168) | ⚠️ adiado — 22 spans animados (contadores de delta) mesmo na conta real → exige máscara de voláteis (risco de falso-negativo); não deployado por conservadorismo |
+| Dashboard | `13-dashboard-neumorphic-desktop.css` | ✅ **168→103 (−39%)** — conta real; **congelamento de animação** (spark/pulse via inline `animation:none!important`) p/ incluir KPI cards no fingerprint sem ruído; diff=0; load-bearing espalhado (container/scroll/hero-bg + KPI/tx-bg) preservado |
 | Sidebar / Modais | `14-sidebar…`, `16-modal-nova-tx…` | ⏳ exigem estados (modal aberto) |
+
+### Tentativa 5 (jun/2026) — Dashboard via congelamento de animação
+O ruído dos contadores de delta (spark placeholders + pulse dots) era **animação**, não async.
+Solução: injetar `animation:none!important; transition:none!important` inline em todos os elementos
+antes de capturar → estabiliza (0/0 entre calls) **incluindo** os elementos animados, eliminando a
+necessidade de máscara de índice (que tinha risco de falso-negativo). O congelamento é só no
+navegador (medição); o CSS em produção mantém as animações. Resultado: 168→103, diff=0, deployado.
+**Etapa 3 concluída em todas as 8 páginas-skin.**
 
 ### Tentativa 4 (jun/2026) — desbloqueio com conta real (CEO)
 Com a conta do CEO (dados ricos, não-isenta) as páginas antes bloqueadas pela conta de teste

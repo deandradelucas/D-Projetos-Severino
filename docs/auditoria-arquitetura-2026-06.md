@@ -72,15 +72,14 @@ Resultado por página (verificado `diff=0` claro+escuro, em produção):
 - **Pagamento:** 689 → 539 (−22%) ✅
 - **Lista:** 503 → 63 (−87%) ✅
 - **Investimentos:** 611 → 120 (−80%) ✅
+- **Dashboard:** 168 → 103 (−39%) ✅ — via congelamento de animação (spark/pulse) p/ fingerprint estável
 
 Método: Playwright MCP (fingerprint de estilos computados claro+escuro, diff=0 obrigatório),
-charts/svg/shimmer excluídos, blocos de estado oculto (modais/comparador) preservados. As 4 últimas
-foram desbloqueadas usando a **conta real do CEO** (dados ricos) — a conta de teste João (isenta/esparsa)
-não renderizava os estados. **Total removido nesta frente: ~1.500 `!important`.** Ver `etapa3-important-checklist.md`.
-
-Pendente:
-- **Dashboard** (168): 22 spans animados (contadores de delta) exigem máscara de voláteis
-  (risco de falso-negativo) → adiado por conservadorismo (única página não entregue).
+charts/svg excluídos, animações congeladas inline (medição), blocos de estado oculto (modais/comparador)
+preservados. As 5 últimas foram feitas usando a **conta real do CEO** (dados ricos) — a conta de teste
+João (isenta/esparsa) não renderizava os estados. **Total removido na Etapa 3: ~1.560 `!important`.**
+**Etapa 3 CONCLUÍDA em todas as 8 páginas-skin** (Transações, Agenda, Configurações, Relatórios,
+Pagamento, Lista, Investimentos, Dashboard). Ver `etapa3-important-checklist.md`.
 
 Não aplicado (com segurança — sem dano, tudo restaurado ao original):
 - **Lista, Investimentos:** conta de teste esparsa (poucos elementos) → guard abortou.
