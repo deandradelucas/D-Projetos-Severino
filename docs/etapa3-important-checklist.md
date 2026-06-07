@@ -187,7 +187,7 @@ por linha. Com a ferramenta block-aware, mobile rende tanto quanto desktop.
 | Partial | Antes | Depois | Δ | Status |
 |---|---|---|---|---|
 | `22-mobile-foundation` | 249 | 207 | −42 (−17%) | ✅ deployado — diff=0 shell (`.app-layout-shell`, 384 els) + drawer aberto (`.sidebar.open`), dual-tema. Maioria load-bearing (strip-total muda 135–143/384): o shell mobile disputa especificidade com a base, então o `!important` é necessário. Removido só o redundante (mobile-bottom-nav, containers de alto nível). |
-| `05-dark-shell-agenda-mobile-hubs` | 574 | 574 | 0 | ⏸ **DEFERIDO** (restaurado intacto) |
+| `05-dark-shell-agenda-mobile-hubs` | 574 | 494 | −80 | ✅ **agenda capturada** (deployado `395e1f2`) — ferramenta evoluída |
 
 **Por que 05 foi deferido (não é desistência — é a ferramenta errada para este arquivo):**
 - Sonda revelou redundância **concentrada na agenda** (strip-total muda só **15 claro / 4 escuro** de 227
@@ -205,6 +205,24 @@ por linha. Com a ferramenta block-aware, mobile rende tanto quanto desktop.
 - **Recomendação:** capturar a redundância da agenda em 05 exige (a) um seletor de KEEP por **regex de prelúdio**
   (ex.: contém `agenda-` mas não `ref-kpi`/`ref-panel`/`ref-tx`), evoluindo a ferramenta, **ou** (b) um run
   headless multi-viewport scriptado (CI/Linux) que automatize a matriz. Tarefa dedicada, fora deste round.
+
+### RESOLVIDO (jun/2026) — ferramenta evoluída destravou a agenda do 05
+Implementei a recomendação (a): `strip-important-keep.mjs` ganhou **`--only=<regex>`** (limita o strip a blocos
+cujo prelúdio casa o padrão; resto intacto) e **KEEP por regex** (`re:<padrão>`). Isso isola a seção de agenda
+sem colidir com os tokens de container do shell load-bearing.
+
+- **Comando:** `--only='(?<!:not\()\.agenda-page'` (casa `.agenda-page` **fora** de `:not()`, evitando os blocos
+  `:not(.agenda-page)` que são de outras páginas) + KEEP dos load-bearing de agenda (hero-row/actions, mobile-menu-btn,
+  icon-wrap, ref-dashboard-scroll), do container fixo (`re:agenda-page\.ref-dashboard\.app-horizon-shell\s*$`),
+  do modal (`agenda-modal` cobre backdrop), e de 3 seletores de **elemento/estado** que o fingerprint não pega por
+  não terem classe própria (`re:agenda-list-panel--daily h2`, `re:agenda-day-item h3`, `agenda-calendar-day--selected`).
+- **Resultado:** 574 → 494 (**−80**), `diff=0` em **agenda mobile + agenda desktop + modal de agenda**, claro+escuro.
+  Guard de **dashboard mobile intacto** (os únicos diffs foram do widget de chat `horizon-*`, conteúdo volátil — o
+  `--only=agenda` comprovadamente não tocou o shell). Deployado `395e1f2`.
+- **Aprendizado:** seletores de **elemento** (`h2`, `h3`) e de **estado** dentro da seção exigem KEEP por regex —
+  o fingerprint só sinaliza por classe do elemento, e elementos sem classe (um `h2`) passam batido. O `diff=0`
+  detalhado (com delta por prop) pegou o `h2 #050505→#111827` e fechou o furo.
+- **Restante de 05 (~494) é load-bearing** (shell de dashboard) ou seções de página não-isoladas — sem ROI seguro.
 
 ### Round modais mobile (jun/2026) — categoria concluída como LOAD-BEARING
 Partials de modal mobile: `30-investimentos-modal` (178), `32-lista-modal` (161), `29-comparador` (129),
