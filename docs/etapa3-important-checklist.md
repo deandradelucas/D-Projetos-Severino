@@ -62,7 +62,37 @@ precedência de `!important` e quebra tudo).
 - `diff = 0` no fingerprint (claro+escuro) **e** conferência visual em produção.
 - `npm run lint/build/test:unit` verdes.
 
+## ⚠️ LIÇÃO CRÍTICA — ponto-cego de estados ocultos
+
+O fingerprint só mede o **DOM atualmente renderizado**. Ele NÃO vê:
+- **Modais / overlays fechados** (Pix, cancelar, criar item, detalhe de transação).
+- Estados condicionais (planos, banners de trial, hover, foco, empty vs cheio).
+
+Consequência real observada: em **Pagamento**, remover quase todos os `!important`
+deu `diff=0` (a remoção total só mudou **3** elementos visíveis) — porque ~95% dos
+`!important` de `20-pagamento` são dos **modais** (não renderizados na tela do João).
+Aceitar isso teria **quebrado os modais Pix/cancelar**. Foi **revertido**.
+
+Regras para evitar:
+1. Antes de processar um partial, checar se ele estiliza modais/estados:
+   `grep -ciE "modal|overlay|drawer|portal" <partial>`. Se > 0, **abrir e testar cada
+   estado** (modal aberto, etc.) durante o fingerprint, ou pular o partial.
+2. Se o self-check "remoção total" mudar **pouquíssimos** elementos (ex.: < 10) num
+   partial grande, **desconfiar**: provavelmente a maioria dos `!important` é de estados
+   ocultos → não remover sem testar esses estados.
+3. `15-transacoes` tem 0 regras de modal → seguro. `18-agenda` tem 35 (modal de evento),
+   mas o modal foi testado em produção e ficou íntegro. `20-pagamento` tem modais → exige
+   testar os modais.
+
+## Tentativa 2 (jun/2026) — desfecho
+- **Pagamento:** `diff=0` enganoso (estados ocultos) → revertido. Não fazer sem testar modais.
+- **Relatórios:** recharts instabilizam o fingerprint (diff final alto) → revertido.
+- **Dashboard / Configurações:** conteúdo assíncrono/volátil demais (alto ruído) → abortado.
+- **Lista / Investimentos:** conta de teste esparsa → guard abortou.
+- Nenhum dano (tudo restaurado). Só **Transações** e **Agenda** seguem reduzidos.
+
 ## Observação
 O script de automação foi **temporário** e removido (dependia de `playwright-core` +
-Chrome do sistema). Recriar a partir deste procedimento se for retomar. O método em si
-é confiável; o gargalo foi o ambiente, não a abordagem.
+Chrome do sistema). Recriar a partir deste procedimento se for retomar — agora também
+**cobrindo estados ocultos (modais)** e excluindo `svg`/`.recharts-*` do fingerprint.
+O método é confiável para conteúdo estático/visível; o gargalo é ambiente + estados ocultos.
