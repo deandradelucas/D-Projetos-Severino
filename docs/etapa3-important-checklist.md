@@ -182,3 +182,26 @@ comparador) **sempre no KEEP** porque o fingerprint não os mede.
 **Conclusão revisada:** o `!important` mobile **não** é majoritariamente estrutural — é em boa parte
 redundante por especificidade, igual ao desktop. O teto baixo anterior era limitação do método de bisecção
 por linha. Com a ferramenta block-aware, mobile rende tanto quanto desktop.
+
+### Round cross-cutting (jun/2026) — 22 entregue, 05 deferido
+| Partial | Antes | Depois | Δ | Status |
+|---|---|---|---|---|
+| `22-mobile-foundation` | 249 | 207 | −42 (−17%) | ✅ deployado — diff=0 shell (`.app-layout-shell`, 384 els) + drawer aberto (`.sidebar.open`), dual-tema. Maioria load-bearing (strip-total muda 135–143/384): o shell mobile disputa especificidade com a base, então o `!important` é necessário. Removido só o redundante (mobile-bottom-nav, containers de alto nível). |
+| `05-dark-shell-agenda-mobile-hubs` | 574 | 574 | 0 | ⏸ **DEFERIDO** (restaurado intacto) |
+
+**Por que 05 foi deferido (não é desistência — é a ferramenta errada para este arquivo):**
+- Sonda revelou redundância **concentrada na agenda** (strip-total muda só **15 claro / 4 escuro** de 227
+  elementos em `/agenda` mobile → ~93% redundante) e shell de dashboard **majoritariamente load-bearing**
+  (107/96 de 384 mudam: ref-kpi/ref-panel/ref-tx/hub chrome).
+- **Bloqueio técnico:** as regras de agenda em 05 são scoped como `.dashboard-container.agenda-page …` —
+  **compartilham os tokens de container** (`dashboard-container`, `ref-dashboard`, `app-horizon-shell`) com o
+  shell load-bearing do dashboard. A ferramenta block-aware decide por "preservar se o prelúdio contém token X";
+  não há como isolar "agenda redundante" sem colidir com tokens que precisam ser preservados no dashboard.
+- **Escopo:** 05 cobre 7 páginas (dashboard, agenda, relatórios, configurações, pagamento, transações,
+  admin-usuários) em **desktop E mobile** (145 `!important` em `min-width`, 429 em `max-width`) + modal de
+  agenda (`agenda-modal-backdrop`, estado oculto) + chat `horizon-*` (conteúdo volátil que inflou o diff com
+  falsos positivos). A matriz de verificação segura (≈7 páginas × 2 viewports × 2 temas + modal) é grande e
+  propensa a erro no ambiente atual (HMR com full-reload + logout intermitente).
+- **Recomendação:** capturar a redundância da agenda em 05 exige (a) um seletor de KEEP por **regex de prelúdio**
+  (ex.: contém `agenda-` mas não `ref-kpi`/`ref-panel`/`ref-tx`), evoluindo a ferramenta, **ou** (b) um run
+  headless multi-viewport scriptado (CI/Linux) que automatize a matriz. Tarefa dedicada, fora deste round.
