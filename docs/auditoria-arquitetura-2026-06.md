@@ -104,8 +104,19 @@ Método: relocação pura (mover código sem mudar comportamento), verificada a 
 (comportamento idêntico), verificada por `eslint`+`build`+testes a cada passo. A lógica derivada
 movida ganhou testes próprios.
 
-### Pendente
-- Etapa 3 nas páginas restantes (Relatórios/Pagamento/Dashboard/Configurações/Investimentos/Lista) — em ambiente estável.
-- ~67 classes CSS mortas em regras mistas.
+### Etapa 6 — CSS morto em regras mistas (jun/2026) — PARCIAL
+- Detector aponta **85** classes mortas, **0** em regras exclusivamente-mortas (Etapa 1b já limpou).
+- Trim seguro de partes vírgula-separadas exclusivamente-mortas: **2 removidas**
+  (`.relatorios-btn-export`, `.pagamento-modal__body`) — vírgula = seletores independentes, sem
+  efeito nas partes vivas. (Ferramenta foi descartável; resultado já está no CSS.)
+- As **~83 restantes** vivem em seletores **compostos** (`.live.dead`, `.live .dead`): não matcham
+  (a classe morta nunca está no DOM), mas removê-las exige editar seletores compostos à mão — baixo
+  valor, risco de erro de parsing. Deixado para limpeza manual pontual.
+
+### Pendente (baixo valor / alto atrito — recomendado só sob demanda)
+- **Etapa 3** (redução de `!important`) nas páginas restantes — frágil neste ambiente Windows
+  (ver `etapa3-important-checklist.md`); exige fingerprint visual (Playwright) + cobertura de estados
+  ocultos. Sem benefício funcional/UX. Feito só em Transações e Agenda.
+- **~83 classes CSS mortas** em seletores compostos — cosmético.
 - Decomposição mais profunda (seções de JSX) de `Configuracoes.jsx` (Perfil ~170 ln, Família ~260 ln)
-  e de `TransactionModal.jsx` — exige verificação visual por serem muito acopladas a estado/handlers.
+  e `TransactionModal.jsx` — exige verificação visual por serem muito acopladas a estado/handlers.
