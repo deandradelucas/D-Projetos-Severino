@@ -26,102 +26,102 @@
   /* ─── Busca rápida ─── */
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search {
-    display: flex !important;
-    align-items: center !important;
-    gap: 9px !important;
-    width: 100% !important;
-    padding: 11px 14px !important;
-    border-radius: 13px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 13px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search svg,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search svg {
-    color: var(--m-text-lo) !important;
-    flex-shrink: 0 !important;
+    color: var(--m-text-lo);
+    flex-shrink: 0;
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search input,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search input {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    background: transparent !important;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    color: var(--m-text-hi) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 16px !important; /* anti-zoom iOS */
-    padding: 0 !important;
+    flex: 1 1 auto;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    color: var(--m-text-hi);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 16px; /* anti-zoom iOS */
+    padding: 0;
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search input::placeholder,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search input::placeholder {
-    color: var(--m-text-lo) !important;
+    color: var(--m-text-lo);
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search__clear,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-search__clear {
-    flex-shrink: 0 !important;
-    width: 22px !important;
-    height: 22px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    border: none !important;
-    border-radius: 50% !important;
-    background: var(--m-base) !important;
-    color: var(--m-text-mid) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 16px !important;
-    line-height: 1 !important;
-    cursor: pointer !important;
-    box-shadow: inset 1px 1px 2px var(--m-shadow-soft) !important;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    min-width: 44px;
+    min-height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: var(--m-base);
+    color: var(--m-text-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: inset 1px 1px 2px var(--m-shadow-soft);
   }
 
   /* ═══════════════════════ Chips de filtro rápido ═══════════════════════ */
   /* Scroll horizontal — 5 chips não cabem lado a lado em telas estreitas */
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
-    margin: 14px 0 2px !important;
-    padding: 2px 2px 8px !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin: 14px 0 2px;
+    padding: 2px 2px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters::-webkit-scrollbar {
-    display: none !important;
+    display: none;
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip {
-    flex-shrink: 0 !important;
-    padding: 8px 15px !important;
-    border-radius: 999px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    font-weight: 500 !important;
-    letter-spacing: -0.005em !important;
-    white-space: nowrap !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    cursor: pointer !important;
+    flex-shrink: 0;
+    padding: 8px 15px;
+    border-radius: 999px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    cursor: pointer;
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip--active,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip--active {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    color: var(--m-accent) !important;
-    font-weight: 600 !important;
-    box-shadow: 4px 4px 10px var(--m-shadow-soft), -2px -2px 6px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    color: var(--m-accent);
+    font-weight: 600;
+    box-shadow: 4px 4px 10px var(--m-shadow-soft), -2px -2px 6px var(--m-light), 0 0 0 1px var(--m-accent-glow);
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip--reset,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-chip--reset {
-    background: transparent !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-    color: var(--m-text-lo) !important;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--m-text-lo);
   }
 
   /* ═══════════════ Esconde o cabeçalho de tabela (desktop only) ═══════════════ */
@@ -132,38 +132,38 @@
   /* ═══════════════════════ Divisor de dia (Hoje, 10 jun…) ═══════════════════════ */
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider {
-    display: flex !important;
-    align-items: baseline !important;
-    flex-wrap: wrap !important;
-    gap: 4px 8px !important;
-    padding: 4px 2px 2px !important;
-    margin: 6px 0 2px !important;
-    background: transparent !important;
-    border: none !important;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    padding: 4px 2px 2px;
+    margin: 6px 0 2px;
+    background: transparent;
+    border: none;
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__label,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__label {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 0.8125rem !important;
-    letter-spacing: 0.01em !important;
-    color: var(--m-text-mid) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    color: var(--m-text-mid);
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__meta,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__meta {
-    font-size: 0.6875rem !important;
-    color: var(--m-text-lo) !important;
+    font-size: 0.6875rem;
+    color: var(--m-text-lo);
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__totals,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__totals {
-    margin-left: auto !important;
-    display: flex !important;
-    gap: 8px !important;
-    font-size: 0.6875rem !important;
-    font-variant-numeric: tabular-nums !important;
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
   }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__total--pos { color: var(--m-pos) !important; }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__total--neg { color: var(--m-neg) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__total--pos { color: var(--m-pos); }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-day-divider__total--neg { color: var(--m-neg); }
 
   /* ═══════════════════════ LINHA DE TRANSAÇÃO (DOM novo) ═══════════════════════ */
   /* 7 classes + --v2 vence o partial 07 (6 classes) e carrega depois.
@@ -398,8 +398,8 @@
 
   /* ═══════════════ #1 — Fade nas bordas dos chips (sinaliza scroll) ═══════════════ */
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters {
-    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%) !important;
-    mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%) !important;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%);
   }
 
   /* ═══════════════ #2 — Busca + chips fixos (sticky) ao rolar ═══════════════ */
@@ -416,35 +416,35 @@
     background: linear-gradient(180deg, #ffffff 78%, transparent 100%) !important;
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters {
-    position: sticky !important;
-    top: 92px !important;          /* abaixo do head (título + busca) */
-    z-index: 5 !important;
-    margin-top: 0 !important;
-    padding-top: 8px !important;
+    position: sticky;
+    top: 92px;          /* abaixo do head (título + busca) */
+    z-index: 5;
+    margin-top: 0;
+    padding-top: 8px;
   }
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters {
-    background: linear-gradient(180deg, var(--m-raised) 82%, transparent 100%) !important;
+    background: linear-gradient(180deg, var(--m-raised) 82%, transparent 100%);
   }
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-filters {
-    background: linear-gradient(180deg, #ffffff 82%, transparent 100%) !important;
+    background: linear-gradient(180deg, #ffffff 82%, transparent 100%);
   }
 
   /* ═══════════════ #4 — Botão Importar só ícone (economiza espaço) ═══════════════ */
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary {
-    width: 44px !important;
-    min-width: 44px !important;
-    padding: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0 !important;
+    width: 44px;
+    min-width: 44px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary .dashboard-hub__btn-label {
-    display: none !important;
+    display: none;
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary .dashboard-hub__btn-ico {
-    width: 18px !important; height: 18px !important;
+    width: 18px; height: 18px;
   }
 
   /* ═══════════════ #5 — Fundir cards Filtros + Transações ═══════════════ */
@@ -454,52 +454,52 @@
   /* Painel de filtros mais enxuto e conectado ao de transações */
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-filters,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-ref-filters {
-    margin-bottom: 0 !important;
+    margin-bottom: 0;
   }
 
   /* ═══════════════ #7 — Resumo (entradas/saídas/saldo) no topo da lista ═══════════════ */
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary,
   body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 8px !important;
-    margin: 4px 0 12px !important;
-    padding: 12px !important;
-    border-radius: 14px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 4px 0 12px;
+    padding: 12px;
+    border-radius: 14px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__item {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 3px !important;
-    min-width: 0 !important;
-    text-align: center !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+    text-align: center;
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__label {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.625rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
-    color: var(--m-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--m-text-lo);
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__value {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
-    font-variant-numeric: tabular-nums !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100% !important;
-    color: var(--m-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    color: var(--m-text-hi);
   }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__value--in { color: var(--m-pos) !important; }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__value--out { color: var(--m-neg) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__value--in { color: var(--m-pos); }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .tx-quick-summary__value--out { color: var(--m-neg); }
 }
 
 /* ═══════════════ #8 — Indicador de pull-to-refresh (fora do @media: keyframe) ═══════════════ */
@@ -507,24 +507,24 @@
 
 @media (max-width: 768px) {
   .tx-ptr {
-    position: fixed !important;
-    top: 0 !important;
-    left: 50% !important;
-    z-index: 60 !important;
-    width: 40px !important;
-    height: 40px !important;
-    margin-top: 8px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 50% !important;
-    pointer-events: none !important;
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    box-shadow: 0 8px 20px -8px var(--m-shadow) !important;
-    color: var(--m-accent) !important;
+    position: fixed;
+    top: 0;
+    left: 50%;
+    z-index: 60;
+    width: 40px;
+    height: 40px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    pointer-events: none;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi);
+    box-shadow: 0 8px 20px -8px var(--m-shadow);
+    color: var(--m-accent);
   }
-  .tx-ptr__spin--active { animation: txPtrSpin 700ms linear infinite !important; }
+  .tx-ptr__spin--active { animation: txPtrSpin 700ms linear infinite; }
 }
 
 /* ═══════════════ #6 — Swipe-to-reveal (deslizar p/ esquerda → Editar/Excluir) ═══════════════ */
@@ -621,7 +621,7 @@
     min-width: 0 !important;
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-grupo-title-row {
-    display: flex !important; align-items: center !important; gap: 8px !important; flex-wrap: wrap !important; min-width: 0 !important;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0;
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-parcelado-grupo__desc {
     font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
@@ -633,44 +633,44 @@
 
   /* Status badges */
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-badge {
-    display: inline-flex !important; align-items: center !important; gap: 4px !important;
-    padding: 2px 9px !important; border-radius: 999px !important; font-size: 0.66rem !important; font-weight: 700 !important; flex-shrink: 0 !important;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 9px; border-radius: 999px; font-size: 0.66rem; font-weight: 700; flex-shrink: 0;
   }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-badge--concluida { background: var(--m-pos-soft) !important; color: var(--m-pos) !important; }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-badge--atrasada { background: var(--m-neg-soft) !important; color: var(--m-neg) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-badge--concluida { background: var(--m-pos-soft); color: var(--m-pos); }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-badge--atrasada { background: var(--m-neg-soft); color: var(--m-neg); }
 
   /* Barra de progresso */
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-progress {
-    position: relative !important; height: 6px !important; margin: 10px 0 2px !important;
-    border-radius: 999px !important; background: var(--m-sunken) !important;
-    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft) !important;
+    position: relative; height: 6px; margin: 10px 0 2px;
+    border-radius: 999px; background: var(--m-sunken);
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft);
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-progress__bar {
-    height: 100% !important; border-radius: 999px !important;
-    background: linear-gradient(90deg, var(--m-accent), #c49535) !important;
+    height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, var(--m-accent), #c49535);
   }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-grupo--concluida .parc-progress__bar { background: linear-gradient(90deg, var(--m-pos), #15803d) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-grupo--concluida .parc-progress__bar { background: linear-gradient(90deg, var(--m-pos), #15803d); }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-progress__label {
-    position: absolute !important; right: 0 !important; top: -15px !important;
-    font-size: 0.62rem !important; font-weight: 700 !important; color: var(--m-text-lo) !important;
+    position: absolute; right: 0; top: -15px;
+    font-size: 0.62rem; font-weight: 700; color: var(--m-text-lo);
   }
 
   /* Pago / restante */
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante {
-    display: inline-flex !important; align-items: center !important; gap: 6px !important; font-size: 0.75rem !important; font-weight: 600 !important;
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600;
   }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante__pago { color: var(--m-pos) !important; }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante__restante { color: var(--m-text-mid) !important; }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante__sep { color: var(--m-text-lo) !important; opacity: 0.6 !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante__pago { color: var(--m-pos); }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante__restante { color: var(--m-text-mid); }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-pago-restante__sep { color: var(--m-text-lo); opacity: 0.6; }
 
   /* Chip "Próxima parcela" */
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-proxima-chip {
-    display: inline-flex !important; align-items: center !important; gap: 5px !important;
-    padding: 4px 10px !important; border-radius: 999px !important; align-self: flex-start !important;
-    background: var(--m-accent-glow) !important; color: var(--m-accent) !important;
-    font-size: 0.7rem !important; font-weight: 600 !important;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 999px; align-self: flex-start;
+    background: var(--m-accent-glow); color: var(--m-accent);
+    font-size: 0.7rem; font-weight: 600;
   }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-proxima-chip svg { flex-shrink: 0 !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-proxima-chip svg { flex-shrink: 0; }
 
   /* Valor + chevron à direita (topo) */
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .page-transacoes-parcelado-grupo__right {
@@ -721,59 +721,59 @@
    grudados; os chips quebravam em 2 linhas. Portado aqui. */
 @media (max-width: 768px) {
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-controls {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    gap: 10px !important;
-    margin: 0 0 12px !important;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-controls .tx-quick-search {
-    flex: 1 1 100% !important;
+    flex: 1 1 100%;
   }
   /* "Mais recente" (select) e "Expandir todas" lado a lado, com respiro */
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-sort {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    padding: 10px 14px !important;
-    border-radius: 12px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-mid) !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-mid);
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft);
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-expand-all {
-    flex: 0 0 auto !important;
-    padding: 10px 16px !important;
-    border-radius: 999px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-mid) !important;
-    font-size: 0.82rem !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important;
+    flex: 0 0 auto;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-mid);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft);
   }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-expand-all:active { color: var(--m-accent) !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-expand-all:active { color: var(--m-accent); }
 
   /* Filtros rápidos numa única linha rolável (eram 2 linhas) */
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-chips {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important;
-    margin: 0 0 14px !important;
-    padding-bottom: 2px !important;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 0 14px;
+    padding-bottom: 2px;
     -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent);
     mask-image: linear-gradient(90deg, #000 92%, transparent);
   }
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-chips::-webkit-scrollbar { display: none !important; }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-chips::-webkit-scrollbar { display: none; }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-status-chips .tx-quick-chip {
-    flex-shrink: 0 !important;
-    white-space: nowrap !important;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 }
