@@ -19,20 +19,18 @@ import {
   painelAssinaturaFromUser,
   ultimoPagamentoHistorico,
 } from '../lib/pagamentoPageModel.js'
+import {
+  pagamentoStatusBannerClass,
+  pagamentoHistoricoStatusPendente,
+  computeDescontoAnual,
+  computeDiasRestantesTrial,
+  trialUrgenciaVariant as calcTrialUrgenciaVariant,
+  trialUrgenciaMsg as calcTrialUrgenciaMsg,
+  trialProgresso as calcTrialProgresso,
+  computeEconomiaAnual,
+  computeStatusBadge,
+} from '../lib/pagamentoUi'
 import './dashboard.css'
-
-function pagamentoStatusBannerClass(statusUrl) {
-  if (statusUrl === 'success') return 'pagamento-banner pagamento-banner--success'
-  if (statusUrl === 'pending') return 'pagamento-banner pagamento-banner--warning'
-  return 'pagamento-banner pagamento-banner--danger'
-}
-
-/** Cobrança ainda pode mudar de estado no Asaas — vale continuar a sincronizar. */
-function pagamentoHistoricoStatusPendente(status) {
-  if (status == null || String(status).trim() === '') return false
-  const s = String(status).toLowerCase()
-  return s === 'pending' || s === 'in_process' || s === 'awaiting_risk_analysis'
-}
 
 const POLL_ASSINATURA_MS = 18_000
 const POLL_ASSINATURA_MAX_MS = 4 * 60_000
@@ -199,11 +197,7 @@ export default function Pagamento() {
     [ultimo],
   )
 
-  const descontoAnual = useMemo(() => {
-    const base = precosCatalogo.mensal * 12
-    if (base <= 0 || precosCatalogo.anual >= base) return 0
-    return Math.round((1 - precosCatalogo.anual / base) * 100)
-  }, [precosCatalogo])
+  const descontoAnual = useMemo(() => computeDescontoAnual(precosCatalogo), [precosCatalogo])
 
   /**
    * Volta do checkout / cobrança pendente: sincroniza de pouco em pouco (aba visível), sem piscar o skeleton.
@@ -420,30 +414,11 @@ export default function Pagamento() {
     historicoLen: historico.length,
   })
 
-  const diasRestantesTrial = useMemo(() => {
-    if (painelAssinatura.situacao !== 'trial' || !painelAssinatura.trialEndsAt) return null
-    const end = new Date(painelAssinatura.trialEndsAt)
-    if (Number.isNaN(end.getTime())) return null
-    return Math.max(0, Math.ceil((end - new Date()) / 86_400_000))
-  }, [painelAssinatura.situacao, painelAssinatura.trialEndsAt])
+  const diasRestantesTrial = computeDiasRestantesTrial(painelAssinatura)
 
-  const trialUrgenciaVariant =
-    diasRestantesTrial === null
-      ? null
-      : diasRestantesTrial <= 1
-        ? 'critico'
-        : diasRestantesTrial <= 3
-          ? 'aviso'
-          : 'normal'
+  const trialUrgenciaVariant = calcTrialUrgenciaVariant(diasRestantesTrial)
 
-  const trialUrgenciaMsg =
-    diasRestantesTrial === 0
-      ? 'Seu período gratuito termina hoje. Assine agora para não perder o acesso.'
-      : diasRestantesTrial === 1
-        ? 'Último dia de teste! Depois disso, você perde acesso ao app.'
-        : diasRestantesTrial <= 3
-          ? 'Restam poucos dias. Assine para manter o controle financeiro que você construiu.'
-          : 'Aproveite o período gratuito e assine antes de terminar para não perder o acesso.'
+  const trialUrgenciaMsg = calcTrialUrgenciaMsg(diasRestantesTrial)
 
   /** Card “Conta isenta” na coluna direita vira bloco abaixo do histórico (exceto conta admin). */
   const isentaOrientacaoAbaixoHistorico =
@@ -453,10 +428,7 @@ export default function Pagamento() {
   const unidadeCiclo = planoCheckout === 'anual' ? 'ano' : 'mês'
 
   // Economia e equivalência do plano anual (feature 2)
-  const economiaAnual = useMemo(
-    () => Math.max(0, precosCatalogo.mensal * 12 - precosCatalogo.anual),
-    [precosCatalogo],
-  )
+  const economiaAnual = useMemo(() => computeEconomiaAnual(precosCatalogo), [precosCatalogo])
   const mensalEquivalenteAnual = useMemo(() => precosCatalogo.anual / 12, [precosCatalogo])
 
   // Validação inline do CPF/CNPJ (feature 8)
@@ -465,23 +437,10 @@ export default function Pagamento() {
   const cpfTocado = cpfDigitos.length >= 11
 
   // Progresso do trial (feature 9) — trial padrão de 7 dias
-  const TRIAL_DIAS_TOTAL = 7
-  const trialProgresso =
-    diasRestantesTrial == null
-      ? 0
-      : Math.min(100, Math.max(6, ((TRIAL_DIAS_TOTAL - diasRestantesTrial) / TRIAL_DIAS_TOTAL) * 100))
+  const trialProgresso = calcTrialProgresso(diasRestantesTrial)
 
   // Badge de status no hero (feature 10)
-  const statusBadge = useMemo(() => {
-    const s = painelAssinatura.situacao
-    if (s === 'ativo' && painelAssinatura.paga) return { tone: 'ativo', label: 'Assinatura ativa' }
-    if (s === 'trial') return { tone: 'trial', label: 'Período de teste' }
-    if (s === 'admin') return { tone: 'ativo', label: 'Administrador' }
-    if (config.isento_pagamento) return { tone: 'ativo', label: 'Conta isenta' }
-    if (s === 'pausada') return { tone: 'aviso', label: 'Pausada' }
-    if (s === 'cancelada' || s === 'inativa' || expirado) return { tone: 'expirado', label: 'Inativa' }
-    return null
-  }, [painelAssinatura.situacao, painelAssinatura.paga, config.isento_pagamento, expirado])
+  const statusBadge = computeStatusBadge(painelAssinatura, config, expirado)
 
   // Itens inclusos na assinatura (feature 3)
   const FEATURES_INCLUSAS = [
