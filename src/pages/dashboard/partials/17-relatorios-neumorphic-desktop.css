@@ -56,14 +56,14 @@
   /* ─── A1 — Full-bleed container ─── */
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell,
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    border-radius: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
   }
 
   /* ─── A2 — Atmosphere background ─── */
@@ -71,220 +71,220 @@
     background:
       radial-gradient(ellipse 1200px 800px at 15% -10%, rgba(212, 168, 75, 0.030), transparent 60%),
       radial-gradient(ellipse 900px 700px at 88% 110%, rgba(59, 130, 246, 0.020), transparent 55%),
-      var(--rel-surface-base) !important;
+      var(--rel-surface-base);
   }
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell {
     background:
       radial-gradient(ellipse 1200px 800px at 15% -10%, rgba(212, 168, 75, 0.045), transparent 60%),
       radial-gradient(ellipse 900px 700px at 88% 110%, rgba(59, 130, 246, 0.025), transparent 55%),
-      var(--rel-surface-base) !important;
+      var(--rel-surface-base);
   }
 
   /* ─── B — Hero ─── */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-    padding: 26px 32px 28px !important;
-    margin: 0 0 16px !important;
-    border-radius: var(--rel-r) !important;
-    border: 1px solid var(--rel-edge-hi) !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    isolation: auto !important;
-    transform: none !important;
+    padding: 26px 32px 28px;
+    margin: 0 0 16px;
+    border-radius: var(--rel-r);
+    border: 1px solid var(--rel-edge-hi);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    isolation: auto;
+    transform: none;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-    background: #0e1117 !important;
-    background-image: linear-gradient(180deg, #11141a 0%, #0e1117 100%) !important;
+    background: #0e1117;
+    background-image: linear-gradient(180deg, #11141a 0%, #0e1117 100%);
     box-shadow:
       0 14px 36px -14px rgba(0, 0, 0, 0.85),
       inset 1px 1px 1px var(--rel-edge-hi),
-      inset -1px -1px 1px var(--rel-edge-lo) !important;
+      inset -1px -1px 1px var(--rel-edge-lo);
   }
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-    background: #f5f7fa !important;
-    background-image: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%) !important;
+    background: #f5f7fa;
+    background-image: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%);
     box-shadow:
       0 14px 36px -16px rgba(166, 180, 200, 0.55),
       inset 1px 1px 1px var(--rel-edge-hi),
-      inset -1px -1px 1px var(--rel-edge-lo) !important;
+      inset -1px -1px 1px var(--rel-edge-lo);
   }
 
   /* B1 — Título "Relatórios" em Plus Jakarta */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__title,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__title {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-weight: 600 !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-weight: 600;
     /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
-    line-height: 1.15 !important;
-    letter-spacing: -0.025em !important;
-    color: var(--rel-text-hi) !important;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    color: var(--rel-text-hi);
   }
 
   /* B2 — Hero number: saldo do período */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
-    margin-top: 14px !important;
-    gap: 2px 0 !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
+    margin-top: 14px;
+    gap: 2px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line-label,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line-label {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.18em !important;
-    color: var(--rel-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--rel-text-lo);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-weight: 700 !important;
-    font-size: clamp(2rem, 3vw + 0.8rem, 3.5rem) !important;
-    line-height: 1 !important;
-    letter-spacing: -0.035em !important;
-    font-variant-numeric: tabular-nums !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 3vw + 0.8rem, 3.5rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
   }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive { color: var(--rel-pos) !important; text-shadow: 0 0 28px var(--rel-pos-glow); }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative { color: var(--rel-neg) !important; text-shadow: 0 0 28px var(--rel-neg-glow); }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero { color: var(--rel-text-hi) !important; }
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive { color: var(--rel-pos) !important; }
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative { color: var(--rel-neg) !important; }
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero { color: var(--rel-text-hi) !important; }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive { color: var(--rel-pos); text-shadow: 0 0 28px var(--rel-pos-glow); }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative { color: var(--rel-neg); text-shadow: 0 0 28px var(--rel-neg-glow); }
+  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero { color: var(--rel-text-hi); }
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive { color: var(--rel-pos); }
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative { color: var(--rel-neg); }
+  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero { color: var(--rel-text-hi); }
 
   /* B4 — Botões CSV e PDF neumórficos */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary.relatorios-btn-export,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary.relatorios-btn-export {
-    padding: 10px 18px !important;
-    border-radius: 999px !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-weight: 500 !important;
-    font-size: 0.875rem !important;
-    color: var(--rel-text-mid) !important;
-    background: var(--rel-surface-sunken) !important;
-    border: 1px solid var(--rel-edge-hi) !important;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--rel-text-mid);
+    background: var(--rel-surface-sunken);
+    border: 1px solid var(--rel-edge-hi);
     box-shadow:
       inset 2px 2px 5px var(--rel-shadow-soft),
-      inset -1px -1px 3px var(--rel-light) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 7px !important;
-    transition: all 220ms var(--rel-ease) !important;
-    cursor: pointer !important;
+      inset -1px -1px 3px var(--rel-light);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 220ms var(--rel-ease);
+    cursor: pointer;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary.relatorios-btn-export:hover,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary.relatorios-btn-export:hover {
-    transform: translateY(-1px) !important;
-    color: var(--rel-text-hi) !important;
-    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%) !important;
+    transform: translateY(-1px);
+    color: var(--rel-text-hi);
+    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%);
     box-shadow:
       5px 5px 12px var(--rel-shadow-soft),
-      -3px -3px 8px var(--rel-light) !important;
+      -3px -3px 8px var(--rel-light);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export {
-    padding: 10px 18px !important;
-    border-radius: 999px !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 0.875rem !important;
-    color: var(--rel-text-hi) !important;
-    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%) !important;
-    border: 1px solid var(--rel-edge-hi) !important;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--rel-text-hi);
+    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%);
+    border: 1px solid var(--rel-edge-hi);
     box-shadow:
       6px 6px 14px var(--rel-shadow-soft),
       -4px -4px 12px var(--rel-light),
-      inset 1px 1px 1px var(--rel-edge-hi) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 7px !important;
-    transition: all 220ms var(--rel-ease) !important;
-    cursor: pointer !important;
+      inset 1px 1px 1px var(--rel-edge-hi);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 220ms var(--rel-ease);
+    cursor: pointer;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:hover,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:hover {
-    transform: translateY(-2px) !important;
-    color: var(--rel-accent) !important;
+    transform: translateY(-2px);
+    color: var(--rel-accent);
     box-shadow:
       8px 10px 20px var(--rel-shadow),
       -5px -5px 14px var(--rel-light),
       0 0 0 1px var(--rel-accent-glow),
-      inset 1px 1px 1px var(--rel-edge-hi) !important;
+      inset 1px 1px 1px var(--rel-edge-hi);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:active,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:active {
-    transform: translateY(0) !important;
+    transform: translateY(0);
     box-shadow:
       inset 3px 3px 8px var(--rel-shadow-soft),
-      inset -2px -2px 5px var(--rel-light) !important;
+      inset -2px -2px 5px var(--rel-light);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:disabled,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:disabled {
-    opacity: 0.45 !important;
-    pointer-events: none !important;
+    opacity: 0.45;
+    pointer-events: none;
   }
 
   /* ─── B3 — KPI cards Receitas/Despesas ─── */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card {
-    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%) !important;
-    border: 1px solid var(--rel-edge-hi) !important;
-    border-radius: var(--rel-r) !important;
+    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%);
+    border: 1px solid var(--rel-edge-hi);
+    border-radius: var(--rel-r);
     box-shadow:
       8px 8px 20px var(--rel-shadow-soft),
       -6px -6px 18px var(--rel-light),
       inset 1px 1px 1px var(--rel-edge-hi),
-      inset -1px -1px 1px var(--rel-edge-lo) !important;
-    transition: transform 260ms var(--rel-ease), box-shadow 260ms var(--rel-ease) !important;
-    padding: 20px 24px !important;
+      inset -1px -1px 1px var(--rel-edge-lo);
+    transition: transform 260ms var(--rel-ease), box-shadow 260ms var(--rel-ease);
+    padding: 20px 24px;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card:hover,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card:hover {
-    transform: translateY(-2px) !important;
+    transform: translateY(-2px);
     box-shadow:
       12px 14px 28px var(--rel-shadow),
       -8px -8px 22px var(--rel-light),
       inset 1px 1px 1px var(--rel-edge-hi),
-      inset -1px -1px 1px var(--rel-edge-lo) !important;
+      inset -1px -1px 1px var(--rel-edge-lo);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card__icon,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card__icon {
-    background: var(--rel-surface-sunken) !important;
+    background: var(--rel-surface-sunken);
     box-shadow:
       inset 2px 2px 4px var(--rel-shadow-soft),
-      inset -1px -1px 2px var(--rel-light) !important;
-    border-radius: 12px !important;
+      inset -1px -1px 2px var(--rel-light);
+    border-radius: 12px;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card__label,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card__label {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.16em !important;
-    color: var(--rel-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--rel-text-lo);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card__value,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card__value {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-weight: 700 !important;
-    font-size: clamp(1.5rem, 1.4vw + 0.9rem, 2rem) !important;
-    letter-spacing: -0.025em !important;
-    font-variant-numeric: tabular-nums !important;
-    color: var(--rel-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.5rem, 1.4vw + 0.9rem, 2rem);
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+    color: var(--rel-text-hi);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-card--income .ref-kpi-card__value,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-card--income .ref-kpi-card__value {
-    color: var(--rel-pos) !important;
+    color: var(--rel-pos);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-card--expense .ref-kpi-card__value,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-card--expense .ref-kpi-card__value {
-    color: var(--rel-neg) !important;
+    color: var(--rel-neg);
   }
 
   /* ─── C — Painel de Filtros ─── */
@@ -305,120 +305,120 @@
   /* Toggle do filtro */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-filters-toggle,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-filters-toggle {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    padding: 12px 10px !important;
-    background: transparent !important;
-    border: none !important;
-    color: var(--rel-text-hi) !important;
-    cursor: pointer !important;
-    border-radius: 12px !important;
-    transition: background 220ms var(--rel-ease) !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 10px;
+    background: transparent;
+    border: none;
+    color: var(--rel-text-hi);
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background 220ms var(--rel-ease);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-filters-toggle:hover,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-filters-toggle:hover {
-    background: var(--rel-surface-sunken) !important;
+    background: var(--rel-surface-sunken);
   }
 
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-filters-toggle .ref-panel__title,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-filters-toggle .ref-panel__title {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 1rem !important;
-    color: var(--rel-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--rel-text-hi);
   }
 
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-filter-summary,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-filter-summary {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    color: var(--rel-text-lo) !important;
-    font-weight: 400 !important;
-    margin-left: 10px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    color: var(--rel-text-lo);
+    font-weight: 400;
+    margin-left: 10px;
   }
 
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-filters-toggle__chevron,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-filters-toggle__chevron {
-    color: var(--rel-text-lo) !important;
-    transition: transform 280ms var(--rel-ease), color 280ms var(--rel-ease) !important;
-    flex-shrink: 0 !important;
+    color: var(--rel-text-lo);
+    transition: transform 280ms var(--rel-ease), color 280ms var(--rel-ease);
+    flex-shrink: 0;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-filters-toggle__chevron--open,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-filters-toggle__chevron--open {
-    transform: rotate(180deg) !important;
-    color: var(--rel-accent) !important;
+    transform: rotate(180deg);
+    color: var(--rel-accent);
   }
 
   /* Botão "Limpar filtros" */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-ref-filters .ref-panel__link--button,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-ref-filters .ref-panel__link--button {
-    padding: 8px 14px !important;
-    border-radius: 999px !important;
-    background: var(--rel-surface-sunken) !important;
-    border: 1px solid var(--rel-edge-hi) !important;
-    color: var(--rel-text-mid) !important;
-    font-size: 0.8125rem !important;
-    font-weight: 500 !important;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--rel-surface-sunken);
+    border: 1px solid var(--rel-edge-hi);
+    color: var(--rel-text-mid);
+    font-size: 0.8125rem;
+    font-weight: 500;
     box-shadow:
       inset 2px 2px 4px var(--rel-shadow-soft),
-      inset -1px -1px 2px var(--rel-light) !important;
-    cursor: pointer !important;
-    transition: color 220ms var(--rel-ease) !important;
+      inset -1px -1px 2px var(--rel-light);
+    cursor: pointer;
+    transition: color 220ms var(--rel-ease);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-ref-filters .ref-panel__link--button:hover,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .page-relatorios-ref-filters .ref-panel__link--button:hover {
-    color: var(--rel-accent) !important;
+    color: var(--rel-accent);
   }
 
   /* C2 — Botões de atalho de período (pills neumórficas) */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-shortcut-btn,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-shortcut-btn {
-    padding: 8px 16px !important;
-    border-radius: 999px !important;
-    background: var(--rel-surface-sunken) !important;
-    border: 1px solid var(--rel-edge-hi) !important;
-    color: var(--rel-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    font-weight: 500 !important;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--rel-surface-sunken);
+    border: 1px solid var(--rel-edge-hi);
+    color: var(--rel-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
     box-shadow:
       inset 2px 2px 4px var(--rel-shadow-soft),
-      inset -1px -1px 2px var(--rel-light) !important;
-    cursor: pointer !important;
-    transition: all 220ms var(--rel-ease) !important;
+      inset -1px -1px 2px var(--rel-light);
+    cursor: pointer;
+    transition: all 220ms var(--rel-ease);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-shortcut-btn:hover,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-shortcut-btn:hover {
-    color: var(--rel-accent) !important;
-    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%) !important;
+    color: var(--rel-accent);
+    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%);
     box-shadow:
       4px 4px 10px var(--rel-shadow-soft),
       -2px -2px 6px var(--rel-light),
-      0 0 0 1px var(--rel-accent-glow) !important;
+      0 0 0 1px var(--rel-accent-glow);
   }
 
   /* C3 — Inputs de data e select */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input {
-    padding: 9px 14px !important;
-    border-radius: 10px !important;
-    background: var(--rel-surface-sunken) !important;
-    border: 1px solid var(--rel-edge-hi) !important;
-    color: var(--rel-text-hi) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
+    padding: 9px 14px;
+    border-radius: 10px;
+    background: var(--rel-surface-sunken);
+    border: 1px solid var(--rel-edge-hi);
+    color: var(--rel-text-hi);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
     box-shadow:
       inset 2px 2px 4px var(--rel-shadow-soft),
-      inset -1px -1px 2px var(--rel-light) !important;
-    width: 100% !important;
+      inset -1px -1px 2px var(--rel-light);
+    width: 100%;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input:focus,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .filter-input:focus {
-    outline: 2px solid var(--rel-accent) !important;
-    outline-offset: 2px !important;
+    outline: 2px solid var(--rel-accent);
+    outline-offset: 2px;
   }
 
   /* ─── D — Cards de gráfico ─── */
