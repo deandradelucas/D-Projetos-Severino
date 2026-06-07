@@ -70,7 +70,7 @@ body[data-theme='light'] {
     background:
       radial-gradient(ellipse 700px 500px at 10% -6%, rgba(212, 168, 75, 0.040), transparent 60%),
       radial-gradient(ellipse 600px 480px at 95% 104%, rgba(96, 110, 200, 0.028), transparent 55%),
-      var(--m-base) !important;
+      var(--m-base);
   }
   body[data-theme='light'] .dashboard-container.app-horizon-shell,
   body[data-theme='light'] .dashboard-container.app-horizon-shell .main-content,
@@ -78,18 +78,18 @@ body[data-theme='light'] {
     background:
       radial-gradient(ellipse 700px 500px at 10% -6%, rgba(212, 168, 75, 0.060), transparent 60%),
       radial-gradient(ellipse 600px 480px at 95% 104%, rgba(37, 99, 235, 0.030), transparent 55%),
-      var(--m-base) !important;
+      var(--m-base);
   }
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .main-content,
   body[data-theme='light'] .dashboard-container.app-horizon-shell .main-content {
-    border: none !important;
+    border: none;
   }
 
   /* Respiro lateral consistente */
   .dashboard-container.app-horizon-shell .ref-dashboard-scroll {
-    padding-left: 14px !important;
-    padding-right: 14px !important;
-    gap: 12px !important;
+    padding-left: 14px;
+    padding-right: 14px;
+    gap: 12px;
   }
 
   /* ─── Hero (todas as páginas hub) ─── */
@@ -169,8 +169,8 @@ body[data-theme='light'] {
   /* ─── KPI cards ─── */
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip {
-    display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important;
-    background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 8px 0 0 !important;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    background: transparent; border: none; box-shadow: none; padding: 0; margin: 8px 0 0;
   }
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-kpi-card,
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-kpi-card {
@@ -350,24 +350,24 @@ body[data-theme='light'] {
 
   /* ─── Bottom nav neumórfica ─── */
   body[data-theme='dark'] .mobile-bottom-nav__bar {
-    background: linear-gradient(180deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(1.1) !important; backdrop-filter: blur(20px) saturate(1.1) !important;
-    border-top: 1px solid var(--m-edge-hi) !important;
-    box-shadow: 0 -8px 24px -10px rgba(0,0,0,0.6), inset 0 1px 0 var(--m-edge-hi) !important;
+    background: linear-gradient(180deg, var(--m-raised) 0%, var(--m-base) 100%);
+    -webkit-backdrop-filter: blur(20px) saturate(1.1); backdrop-filter: blur(20px) saturate(1.1);
+    border-top: 1px solid var(--m-edge-hi);
+    box-shadow: 0 -8px 24px -10px rgba(0,0,0,0.6), inset 0 1px 0 var(--m-edge-hi);
   }
   body[data-theme='light'] .mobile-bottom-nav__bar {
-    background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(1.1) !important; backdrop-filter: blur(20px) saturate(1.1) !important;
-    border-top: 1px solid var(--m-edge-hi) !important;
-    box-shadow: 0 -8px 24px -12px var(--m-shadow), inset 0 1px 0 var(--m-edge-hi) !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%);
+    -webkit-backdrop-filter: blur(20px) saturate(1.1); backdrop-filter: blur(20px) saturate(1.1);
+    border-top: 1px solid var(--m-edge-hi);
+    box-shadow: 0 -8px 24px -12px var(--m-shadow), inset 0 1px 0 var(--m-edge-hi);
   }
   body[data-theme='dark'] .mobile-bottom-nav__item,
   body[data-theme='light'] .mobile-bottom-nav__item {
-    color: var(--m-text-lo) !important; border-radius: 14px !important; transition: color 200ms var(--m-ease) !important;
+    color: var(--m-text-lo); border-radius: 14px; transition: color 200ms var(--m-ease);
   }
   body[data-theme='dark'] .mobile-bottom-nav__label,
   body[data-theme='light'] .mobile-bottom-nav__label {
-    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.625rem !important; font-weight: 600 !important;
+    font-family: 'Inter Variable', system-ui, sans-serif; font-size: 0.625rem; font-weight: 600;
   }
   body[data-theme='dark'] .mobile-bottom-nav__item--active,
   body[data-theme='light'] .mobile-bottom-nav__item--active { color: var(--m-accent) !important; }
@@ -409,20 +409,20 @@ body[data-theme='light'] {
   /* ─── Empty states ─── */
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-empty-state,
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-empty-state {
-    padding: 28px 18px !important; text-align: center !important;
+    padding: 28px 18px; text-align: center;
   }
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-empty,
-  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-empty { color: var(--m-text-lo) !important; }
+  body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-empty { color: var(--m-text-lo); }
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-empty-cta,
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-empty-cta {
-    background: linear-gradient(155deg, var(--m-accent) 0%, #c49535 100%) !important; color: var(--m-accent-fg) !important;
-    border: none !important; border-radius: 999px !important; font-weight: 700 !important; padding: 11px 22px !important;
-    box-shadow: 0 8px 18px -6px var(--m-accent-glow) !important;
+    background: linear-gradient(155deg, var(--m-accent) 0%, #c49535 100%); color: var(--m-accent-fg);
+    border: none; border-radius: 999px; font-weight: 700; padding: 11px 22px;
+    box-shadow: 0 8px 18px -6px var(--m-accent-glow);
   }
 
   /* Reduce motion */
   @media (prefers-reduced-motion: reduce) {
     body[data-theme='dark'] .dashboard-container.app-horizon-shell *,
-    body[data-theme='light'] .dashboard-container.app-horizon-shell * { transition: none !important; animation: none !important; }
+    body[data-theme='light'] .dashboard-container.app-horizon-shell * { transition: none; animation: none; }
   }
 }
