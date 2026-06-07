@@ -9,7 +9,6 @@ import { useTransactionCache, TRANSACOES_REVALIDATED_EVENT } from '../context/tr
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
-import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import {
   familiaMostrarQuemLancouNaUi,
   readHorizonteUser,
@@ -164,7 +163,8 @@ export default function Transacoes() {
       return
     }
     try {
-      void syncRecorrenciasMensais(session.id)
+      // syncRecorrenciasMensais é disparado pelo TransactionCacheProvider (mount + poll 45s),
+      // app-level — não duplicar aqui. (Auditoria squad 2026-06, A10.)
       const res = await fetchWithRetry(
         apiUrl(`/api/transacoes?${buildTxQuery(0).toString()}`),
         { cache: 'no-store' },

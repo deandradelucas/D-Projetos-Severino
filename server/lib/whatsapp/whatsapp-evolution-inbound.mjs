@@ -6,6 +6,7 @@ import { processarMensagemBot } from '../domain/whatsapp-bot.mjs'
 import { processarImportacaoDocumento } from '../domain/whatsapp-import.mjs'
 import { atualizarWhatsappId, buscarUsuarioPorTelefone } from '../usuarios.mjs'
 import { Alerts } from '../notify-telegram.mjs'
+import { safeEqualStr } from '../safe-equal.mjs'
 
 const SUPPORTED_DOC_MIMES = new Set([
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -548,7 +549,7 @@ export function buildBotBodyFromEvolutionPayload(payload) {
 export async function handleEvolutionWebhook(c) {
   const expected = process.env.WHATSAPP_WEBHOOK_TOKEN
   const token = c.req.param('token') || c.req.query('token')
-  if (!expected || token !== expected) return c.json({ ok: false, message: 'Não autorizado.' }, 401)
+  if (!expected || !safeEqualStr(token, expected)) return c.json({ ok: false, message: 'Não autorizado.' }, 401)
   const eventParam = c.req.param('event') || ''
 
   let payload

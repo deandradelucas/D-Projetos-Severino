@@ -25,6 +25,19 @@ Security score atribuído pelo auditor: **6.5/10** (acima da média para SaaS in
 | **C4** | ✅ **corrigido** | Backup JSON agora pagina com `.range()` (antes truncava em 1000 linhas sem erro). |
 | **C5** | 🔁 **premissa revisada** | Não há import estático de jspdf (já é 100% dinâmico). O preload vem de um **artefato de chunking do Rollup** (módulo compartilhado caiu em `vendor-jspdf` via `manualChunks id.includes('jspdf')`, puxando `import{r}` para o entry). Correção exige cirurgia no `manualChunks` — deferido. Impacto real: ~140 KB gzip em preload de baixa prioridade. |
 
+### Status dos ALTOS (2026-06-07)
+
+| ID | Status | Nota |
+|---|---|---|
+| **A3** (webhook WhatsApp timing-safe) | ✅ **corrigido** | `token !== expected` → `safeEqualStr(token, expected)`. |
+| **A5** (N+1 assinatura-db) | ✅ **corrigido** | 4 queries sequenciais → 1 query (fast path) + fallback progressivo só em 42703. |
+| **A6** (índice aba Parceladas) | ✅ **corrigido** | Índice parcial `(usuario_id, recorrente_grupo_id, status, recorrente_index) WHERE recorrente_grupo_id IS NOT NULL` criado no DB (migration 71). |
+| **A10** (sync recorrências duplicado) | ✅ **corrigido** | Removida a chamada duplicada em `Transacoes.jsx` (o `TransactionCacheProvider` já dispara app-level). |
+| **A8** (remover line-awesome) | ❌ **inválido** | line-awesome **não** é só 2 ícones: `TransacaoCategoriaIcon` cai em `<i class="las la-…">` como fallback (arrow + categorias sem PNG). Remover quebraria ícones. Auditor viu só `ConfigAparenciaCard`. Mantido. |
+| **A1** (refresh token httpOnly) | ⏳ pendente | Mudança no fluxo de auth (login/refresh) — maior risco; requer teste cuidadoso. A avaliar. |
+| **A2** (CORS só-https) | ⏳ pendente | `app.mjs:35` tem `http?` **intencional** (comentário: Hostinger em HTTP). Confirmar HTTPS forçado em prod antes de tightening. |
+| **A4** (marketing-stats paginação) | ⏳ pendente | Trocar SELECT-tudo por agregação SQL — médio esforço. |
+
 ---
 
 ## 🔴 CRÍTICOS (corrigir em 24-72h)

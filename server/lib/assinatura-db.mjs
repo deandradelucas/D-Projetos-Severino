@@ -84,18 +84,37 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
   if (!uid) return {}
   const supabase = getSupabaseAdmin()
 
-  let base = await supabase.from('usuarios').select('email, isento_pagamento').eq('id', uid).maybeSingle()
-  if (base.error && isMissingColumnError(base.error, 'isento_pagamento')) {
-    log.warn(
-      '[fetchAssinaturaCamposUsuario] coluna isento_pagamento ausente; rode scripts/migrations/06_isento_pagamento_usuarios.sql'
-    )
-    base = await supabase.from('usuarios').select('email').eq('id', uid).maybeSingle()
+  // Fast path: 1 query com todas as colunas (antes eram 4 round-trips sequenciais
+  // por causa de fallbacks defensivos de migração). Auditoria squad 2026-06, A5/BACKEND-3.
+  const ALL_COLS =
+    'email, isento_pagamento, trial_ends_at, bem_vindo_pagamento_visto_at, asaas_subscription_id, assinatura_proxima_cobranca, assinatura_asaas_status'
+  const one = await supabase.from('usuarios').select(ALL_COLS).eq('id', uid).maybeSingle()
+  if (!one.error) {
+    if (!one.data) return {}
+    const d = one.data
+    return {
+      email: d.email,
+      isento_pagamento: rawIsentoPagamento(d.isento_pagamento),
+      trial_ends_at: d.trial_ends_at ?? null,
+      bem_vindo_pagamento_visto_at: d.bem_vindo_pagamento_visto_at ?? null,
+      asaas_subscription_id: d.asaas_subscription_id ?? null,
+      assinatura_proxima_cobranca: d.assinatura_proxima_cobranca ?? null,
+      assinatura_asaas_status: d.assinatura_asaas_status ?? null,
+    }
   }
-  if (base.error) {
-    log.warn('[fetchAssinaturaCamposUsuario] base:', base.error.message || base.error)
+
+  // Fallback progressivo: só se alguma coluna não existir no banco (42703).
+  if (!isMissingColumnError(one.error)) {
+    log.warn('[fetchAssinaturaCamposUsuario] base:', one.error.message || one.error)
     return {}
   }
-  if (!base.data) return {}
+  log.warn('[fetchAssinaturaCamposUsuario] coluna ausente; usando fallback progressivo (rode as migrations pendentes)')
+
+  let base = await supabase.from('usuarios').select('email, isento_pagamento').eq('id', uid).maybeSingle()
+  if (base.error && isMissingColumnError(base.error, 'isento_pagamento')) {
+    base = await supabase.from('usuarios').select('email').eq('id', uid).maybeSingle()
+  }
+  if (base.error || !base.data) return {}
 
   const out = {
     email: base.data.email,
@@ -103,15 +122,12 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
     trial_ends_at: null,
     bem_vindo_pagamento_visto_at: null,
   }
-
   const tTrial = await supabase.from('usuarios').select('trial_ends_at').eq('id', uid).maybeSingle()
   if (!tTrial.error && tTrial.data?.trial_ends_at != null) out.trial_ends_at = tTrial.data.trial_ends_at
-
   const tBv = await supabase.from('usuarios').select('bem_vindo_pagamento_visto_at').eq('id', uid).maybeSingle()
   if (!tBv.error && tBv.data?.bem_vindo_pagamento_visto_at != null) {
     out.bem_vindo_pagamento_visto_at = tBv.data.bem_vindo_pagamento_visto_at
   }
-
   const tGw = await supabase
     .from('usuarios')
     .select('asaas_subscription_id, assinatura_proxima_cobranca, assinatura_asaas_status')
@@ -122,7 +138,6 @@ export async function fetchAssinaturaCamposUsuario(usuarioId) {
     out.assinatura_proxima_cobranca = tGw.data.assinatura_proxima_cobranca ?? null
     out.assinatura_asaas_status = tGw.data.assinatura_asaas_status ?? null
   }
-
   return out
 }
 
