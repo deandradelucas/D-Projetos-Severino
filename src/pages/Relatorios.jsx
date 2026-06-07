@@ -17,7 +17,16 @@ import { buildRelatorioPdfDoc, downloadRelatorioPdf } from '../lib/relatorioExpo
 import { showToast } from '../lib/toastStore'
 import { formatLocalDateISO, getFirstDayOfMonth, getLastDayOfMonth } from '../lib/dateUtils'
 import { RelatoriosChartsLoadingShell } from '../components/relatorios/RelatoriosLoadingComponents'
-import { tipoNormalizado, parseValorTransacao, isDespesaRecorrente, labelMesBr } from '../lib/transacaoUtils'
+import { labelMesBr } from '../lib/transacaoUtils'
+import {
+  computePrevRange,
+  pctDelta,
+  computeSaldoAcumulado,
+  computeTop5Despesas,
+  computeOrcadoVsReal,
+  computeFixoVsVariavel,
+  computeVariacaoCategorias,
+} from '../lib/relatoriosDerived'
 import './dashboard.css'
 
 // Lazy: o bloco de gráficos (recharts ~pesado) carrega só depois do shell pintar.
@@ -306,16 +315,10 @@ export default function Relatorios() {
   const formatCurrency = formatCurrencyBRL
 
   // R1 — período anterior de mesmo tamanho, imediatamente antes do filtrado
-  const prevRange = useMemo(() => {
-    if (!filters.dataInicio || !filters.dataFim) return null
-    const ini = new Date(`${filters.dataInicio}T00:00:00`)
-    const fim = new Date(`${filters.dataFim}T00:00:00`)
-    if (Number.isNaN(ini.getTime()) || Number.isNaN(fim.getTime())) return null
-    const lenDays = Math.round((fim - ini) / 86400000) + 1
-    const prevFim = new Date(ini); prevFim.setDate(prevFim.getDate() - 1)
-    const prevIni = new Date(prevFim); prevIni.setDate(prevIni.getDate() - (lenDays - 1))
-    return { dataInicio: formatLocalDateISO(prevIni), dataFim: formatLocalDateISO(prevFim) }
-  }, [filters.dataInicio, filters.dataFim])
+  const prevRange = useMemo(
+    () => computePrevRange({ dataInicio: filters.dataInicio, dataFim: filters.dataFim }),
+    [filters.dataInicio, filters.dataFim],
+  )
 
   // Busca o resumo do período anterior para calcular as variações (% vs período anterior)
   useEffect(() => {
@@ -344,10 +347,6 @@ export default function Relatorios() {
     return () => { cancelled = true }
   }, [usuario.id, prevRange, filters.categoria_id])
 
-  const pctDelta = (cur, prev) => {
-    if (prev == null || prev === 0) return null
-    return ((cur - prev) / Math.abs(prev)) * 100
-  }
   const deltaReceitas = prevSummary ? pctDelta(summary.receitas, prevSummary.receitas) : null
   const deltaDespesas = prevSummary ? pctDelta(summary.despesas, prevSummary.despesas) : null
 
@@ -361,95 +360,32 @@ export default function Relatorios() {
   }, [categorias])
 
   // R6 — saldo acumulado mês a mês
-  const chartDataSaldoAcumulado = useMemo(() => {
-    let acc = 0
-    return chartDataPorMes.map((m) => {
-      acc += (m.Receitas - m.Despesas)
-      return { name: m.name, Saldo: Math.round(acc * 100) / 100 }
-    })
-  }, [chartDataPorMes])
+  const chartDataSaldoAcumulado = useMemo(() => computeSaldoAcumulado(chartDataPorMes), [chartDataPorMes])
 
   // R7 — top 5 maiores despesas do período
-  const top5Despesas = useMemo(() => (
-    (transacoes || [])
-      .filter((t) => tipoNormalizado(t.tipo) === 'DESPESA')
-      .map((t) => ({
-        id: t.id,
-        desc: t.descricao || t.categorias?.nome || 'Despesa',
-        cat: t.categorias?.nome || 'Sem categoria',
-        valor: parseValorTransacao(t),
-        data: t.data_transacao,
-      }))
-      .sort((a, b) => b.valor - a.valor)
-      .slice(0, 5)
-  ), [transacoes])
+  const top5Despesas = useMemo(() => computeTop5Despesas(transacoes), [transacoes])
 
   // R3 — orçado vs real: gasto no período por categoria vs limite mensal definido
-  const orcadoVsReal = useMemo(() => {
-    if (!limitesOrcamento.length) return []
-    const spendByName = new Map(chartDataPorCategoria.map((c) => [c.name, c.value]))
-    return limitesOrcamento
-      .map((l) => {
-        const cat = categorias.find((c) => String(c.id) === String(l.categoria_id))
-        const limite = Number(l.limite_mensal) || 0
-        if (!cat || limite <= 0) return null
-        const gasto = spendByName.get(cat.nome) || 0
-        return {
-          id: l.categoria_id,
-          nome: cat.nome,
-          limite,
-          gasto,
-          pct: Math.min(100, Math.round((gasto / limite) * 100)),
-          excedido: gasto > limite,
-        }
-      })
-      .filter(Boolean)
-      .sort((a, b) => b.gasto - a.gasto)
-  }, [limitesOrcamento, categorias, chartDataPorCategoria])
+  const orcadoVsReal = useMemo(
+    () => computeOrcadoVsReal(limitesOrcamento, categorias, chartDataPorCategoria),
+    [limitesOrcamento, categorias, chartDataPorCategoria],
+  )
 
   // Feature 2 — Fixo vs Variável + comprometimento da renda.
   // Fixo = despesas recorrentes (regra mensal) ou parceladas; o resto é variável.
   // Usa transações reais do período (sem projeção) para refletir o que de fato saiu.
-  const fixoVsVariavel = useMemo(() => {
-    let fixo = 0
-    let variavel = 0
-    for (const t of transacoes || []) {
-      if (tipoNormalizado(t.tipo) !== 'DESPESA') continue
-      const v = parseValorTransacao(t)
-      if (isDespesaRecorrente(t)) fixo += v
-      else variavel += v
-    }
-    const total = fixo + variavel
-    return {
-      fixo,
-      variavel,
-      total,
-      pctFixo: total > 0 ? (fixo / total) * 100 : 0,
-      comprometimento: summary.receitas > 0 ? (fixo / summary.receitas) * 100 : null,
-    }
-  }, [transacoes, summary.receitas])
+  const fixoVsVariavel = useMemo(
+    () => computeFixoVsVariavel(transacoes, summary.receitas),
+    [transacoes, summary.receitas],
+  )
 
   // Feature 1 — Variação por categoria vs período anterior (só faz sentido sem
   // filtro de categoria; com filtro há uma categoria só). chartDataPorCategoria
   // é de DESPESAS, então subir = gastar mais (ruim), cair = gastar menos (bom).
-  const variacaoCategorias = useMemo(() => {
-    if (!prevCategorias || filters.categoria_id) return []
-    const prevMap = new Map(prevCategorias.map((c) => [c.name, c.value]))
-    const curMap = new Map(chartDataPorCategoria.map((c) => [c.name, c.value]))
-    const names = new Set([...prevMap.keys(), ...curMap.keys()])
-    const rows = []
-    for (const name of names) {
-      if (name === 'Sem categoria') continue
-      const cur = curMap.get(name) || 0
-      const prev = prevMap.get(name) || 0
-      const diff = cur - prev
-      if (Math.abs(diff) < 1) continue
-      const pct = prev > 0 ? (diff / prev) * 100 : null
-      rows.push({ name, cur, prev, diff, pct })
-    }
-    rows.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff))
-    return rows
-  }, [prevCategorias, chartDataPorCategoria, filters.categoria_id])
+  const variacaoCategorias = useMemo(
+    () => computeVariacaoCategorias(prevCategorias, chartDataPorCategoria, filters.categoria_id),
+    [prevCategorias, chartDataPorCategoria, filters.categoria_id],
+  )
 
   // Invalida a análise da IA quando o período/categoria muda (dados mudaram).
   useEffect(() => {
