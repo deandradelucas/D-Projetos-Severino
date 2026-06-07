@@ -246,6 +246,20 @@ Partials de modal mobile: `30-investimentos-modal` (178), `32-lista-modal` (161)
 
 Padrão reconfirmado: **regras de tema escuro são load-bearing** em quase todo componente (sidebar, modais, skins mobile). A redundância restante é estrutural/clara e já foi majoritariamente capturada.
 
+### Round bases-legadas (jun/2026) — descoberta de alto rendimento
+**Insight:** partials de **página legados**, superseded pelos skins neumórficos posteriores, ficaram quase
+inteiramente redundantes — o skin novo provê o estilo, o `!important` antigo não vence mais nada.
+
+| Partial | Antes | Depois | Δ | Resultado |
+|---|---|---|---|---|
+| `07-page-transacoes` | 321 | 144 | **−177** | ✅ superseded pelo skin `15`. Strip-total muda só 53/756 (desktop) — visível load-bearing (hero/balance/btn/ref-panel/filters/tx-val) + mobile (`ref-tx-arrow-wrap`/`btn-edit`/`btn-delete`) + aba **parcelados** e **modais** preservados. diff=0 desktop+mobile (à vista), parceladas íntegra (screenshot). Deployado `53c02a4`. |
+| `09-page-investimentos` | 57 | 57 | 0 | ⏸ página **volátil** (rates Selic/CDI + cards async → contagem de elementos instável 172/129/263 entre cargas). Fingerprint não confiável → deferido. |
+
+**Lição:** o método rende muito em **páginas estáticas/estáveis** com base legada (transações). Falha em
+**páginas com dados assíncronos voláteis** (investimentos, dashboard) onde a contagem de elementos varia entre
+cargas — ali o fingerprint por índice perde alinhamento. Para essas, exigiria congelar o estado de dados ou
+máscara de voláteis mais robusta.
+
 - **Lição:** modal **não** é categoria uniforme. Modais de **conteúdo** (comparador, criar-lista) têm chrome visível
   redundante → reduzem bem. Modais de **skin escuro** (30) e arquivos de **override por design** (24/25) são
   load-bearing. O fingerprint detalhado + KEEP de estados ocultos (verificados por presença no DOM) é o que torna
