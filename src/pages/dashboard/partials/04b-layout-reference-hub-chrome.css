@@ -31,9 +31,7 @@ body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .sidebar .
   }
 }
 
-body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relatorios-header-export {
-  flex-wrap: nowrap;
-}
+
 
 .dashboard-container.app-horizon-shell .mobile-menu-btn:focus-visible {
   outline: 2px solid var(--accent);
@@ -490,12 +488,7 @@ body[data-theme='light']
   min-width: 0;
 }
 
-.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__hero-actions.relatorios-header-export {
-  flex: 0 0 auto;
-  flex-wrap: nowrap;
-  min-width: 0;
-  justify-content: flex-end;
-}
+
 
 .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__title {
   white-space: nowrap;
@@ -2029,9 +2022,7 @@ body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row {
 }
 
 /* Desktop/tablet: valor + ações participam do mesmo grid; no mobile Transações o wrap vira coluna flex */
-.ref-tx-table-subgrid--actions .ref-tx-val-act-wrap {
-  display: contents;
-}
+
 
 @media (max-width: 767px) {
   body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row {
@@ -2162,12 +2153,10 @@ body[data-theme='light'] .ref-tx-table-subgrid--actions .ref-tx-row {
     }
 
     body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-icon-cell,
-    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-meta-cell,
-    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-cat-cell,
-    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-sub-cell,
-    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-rec-cell,
-    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-act-wrap > .ref-tx-val-cell,
-    body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-act-wrap > .ref-tx-actions-cell {
+body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-meta-cell,
+body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-cat-cell,
+body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-sub-cell,
+body[data-theme='light'] .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-rec-cell {
       grid-area: auto;
     }
 

@@ -147,10 +147,7 @@ body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-h
 }
 
 /* KPIs — valor com sinal (ex.: despesas) numa linha só no mobile */
-.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-card__value--signed {
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
+
 
 /* ─── TOOLTIP DARK MODE — texto visível sobre fundo #141618 ────────────────── */
 /* 02c define cores hardcoded para light (color: #0f172a, #64748b) que não herdam
@@ -180,9 +177,7 @@ body[data-theme='dark'] .page-relatorios .relatorios-tooltip__pct {
 
 
 
-body[data-theme='dark'] .relatorios-neon-card .ref-panel__head {
-  border-bottom-color: rgba(0, 229, 160, 0.09) !important;
-}
+
 
 @media (max-width: 768px) {
   .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card {
@@ -201,11 +196,5 @@ body[data-theme='dark'] .relatorios-neon-card .ref-panel__head {
     flex: 1 1 auto;
   }
 
-  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-card--expense .ref-kpi-card__value--signed {
-    font-size: clamp(14px, 3.5vw, 17px);
-    letter-spacing: -0.03em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-  }
+
 }

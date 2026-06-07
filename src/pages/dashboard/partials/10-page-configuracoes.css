@@ -257,8 +257,7 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-action-btn
   color: var(--text-primary);
 }
 
-body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-familia-convite-shell__textarea,
-body[data-theme='dark'] .page-configuracoes.app-horizon-shell textarea.config-invite-message-preview {
+body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-familia-convite-shell__textarea {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.12);
   color: var(--text-primary);

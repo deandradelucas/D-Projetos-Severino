@@ -645,10 +645,7 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions button {
   color: #fafafa !important;
 }
 
-.agenda-page .agenda-daily-list {
-  display: flex;
-  flex-direction: column;
-}
+
 
 .agenda-page .agenda-day-item {
   display: flex;
@@ -966,9 +963,7 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
     box-sizing: border-box;
   }
 
-  .agenda-page .agenda-list-panel--daily .agenda-daily-list {
-    min-height: 0;
-  }
+
 }
 
 @media (max-width: 900px) {
@@ -1307,10 +1302,7 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
     margin: 0 !important;
   }
 
-  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-act-wrap > .ref-tx-actions-cell {
-    justify-self: unset !important;
-    align-self: unset !important;
-  }
+
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .transacoes-actions {
     justify-content: flex-end !important;

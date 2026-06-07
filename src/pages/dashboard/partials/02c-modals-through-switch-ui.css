@@ -1512,13 +1512,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
   }
 }
 
-.page-relatorios .relatorios-header-export {
-  display: flex;
-  gap: 10px;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
+
 
 
 
@@ -1877,8 +1871,7 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
   pointer-events: none;
 }
 
-.page-relatorios .relatorios-charts--refreshing,
-.page-relatorios .relatorios-kpi-row--refreshing {
+.page-relatorios .relatorios-charts--refreshing {
   opacity: 0.88;
   transition: opacity 0.2s ease;
 }
@@ -2026,24 +2019,14 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
 }
 
 @media (max-width: 640px) {
-  .page-relatorios .relatorios-header-export {
-    width: 100%;
-  }
 
-  .page-relatorios .relatorios-header-export .relatorios-btn-export {
-    flex: 1;
-    justify-content: center;
-  }
+
+
 
   /* Shell: mantém exportações na mesma linha do título (ícones; texto .desktop-only oculto) */
-  .page-relatorios.app-horizon-shell .relatorios-header-export {
-    width: auto;
-    flex-wrap: nowrap;
-  }
 
-  .page-relatorios.app-horizon-shell .relatorios-header-export .relatorios-btn-export {
-    flex: 0 0 auto;
-  }
+
+
 
   .page-relatorios .relatorios-chart-card--wide {
     min-height: 280px;

@@ -8,14 +8,8 @@
 @media (max-width: 768px) {
 
   /* ═══════════ RELATÓRIOS ═══════════ */
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-row--3col,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-row--3col {
-    display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important;
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo {
-    grid-column: 1 / -1 !important;
-  }
+
+
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights {
     display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 0 !important;
@@ -27,10 +21,7 @@
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item {
     padding: 14px 16px !important; border-right: 1px solid var(--m-edge-lo) !important; border-bottom: 1px solid var(--m-edge-lo) !important;
   }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item--wide,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item--wide {
-    grid-column: 1 / -1 !important;
-  }
+
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__pair,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__pair {
     display: flex !important; flex-direction: column !important; gap: 12px !important;
@@ -51,11 +42,7 @@
     text-transform: uppercase !important; letter-spacing: 0.18em !important; color: var(--m-text-lo) !important;
   }
   /* Botões export CSV/PDF */
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-btn-export,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-btn-export {
-    border-radius: 999px !important; background: var(--m-sunken) !important; border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-mid) !important; box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important;
-  }
+
 
   /* ═══════════ INVESTIMENTOS ═══════════ */
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card,
@@ -1251,35 +1238,14 @@
 }
 
 /* Relatórios — linha de KPIs com 2 cards (Saldo do período removido, redundante c/ hero) */
-.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-row--2col {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 12px !important;
-}
+
 
 /* Relatórios — badge de variação vs período anterior (R1) + cores projeção (R2/R4) */
-.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-delta {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  margin-top: 5px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 99px;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-delta--good {
-  color: var(--m-pos, #15803d);
-  background: var(--m-pos-soft, rgba(22, 163, 74, 0.12));
-}
-.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-delta--bad {
-  color: var(--m-neg, #c0392b);
-  background: var(--m-neg-soft, rgba(224, 86, 79, 0.12));
-}
-.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__value--pos { color: var(--m-pos, #15803d) !important; }
-.dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__value--neg { color: var(--m-neg, #c0392b) !important; }
+
+
+
+
+
 
 /* Relatórios — Top 5 despesas (R7) */
 .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-top5 {

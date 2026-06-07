@@ -461,12 +461,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 /* Lista virtualizada (mobile): ocupa a coluna inteira do flex de cartões */
-.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-virtual-scroll {
-  grid-column: 1 / -1;
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
+
 
 /* Mobile: coluna de cartões. Desktop: grelha no @media (min-width: 769px) com o mesmo seletor + .tx-cal-grid
    para ganhar a `display:flex !important` antiga e aos subgrids globais (.ref-tx-table-subgrid--actions). */
@@ -578,21 +573,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   margin: 0 !important;
 }
 
-.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-val-act-wrap {
-  grid-column: 1 / -1;
-  grid-row: 4;
-  display: flex !important;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  align-self: center;
-  min-width: 0;
-  padding: 14px 0 0 !important;
-  margin: 2px 0 0 !important;
-  border-top: 1px solid var(--tx-dir-footer-line, #e4e7ec);
-}
+
 
 /* Ícone seta: mesmas medidas do hub “recentes” (mobile) */
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap {
@@ -655,15 +636,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap--d
   filter: none !important;
 }
 
-.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-val-act-wrap > .ref-tx-val-cell,
-.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-val-act-wrap > .ref-tx-actions-cell {
-  grid-area: unset !important;
-  justify-self: unset !important;
-  align-self: unset !important;
-  width: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
+
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-cat-text {
   font-weight: 600 !important;
@@ -714,43 +687,9 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 /* Data/hora em chip — só .ref-tx-date--row-meta (evita reabrir .ref-tx-date--paired-sub no desktop) */
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--row-meta {
-  display: inline-flex !important;
-  align-items: center !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  padding: 4px 8px !important;
-  border-radius: 999px !important;
-  font-size: 0.8125rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.01em !important;
-  line-height: 1.35 !important;
-  font-variant-numeric: tabular-nums !important;
-  white-space: nowrap !important;
-  color: rgba(71, 85, 105, 0.82) !important;
-  background: rgba(15, 23, 42, 0.045) !important;
-  border: 1px solid rgba(15, 23, 42, 0.06) !important;
-}
 
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--row-meta {
-  display: inline-flex !important;
-  align-items: center !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  padding: 4px 8px !important;
-  border-radius: 999px !important;
-  font-size: 0.8125rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.01em !important;
-  line-height: 1.35 !important;
-  font-variant-numeric: tabular-nums !important;
-  white-space: nowrap !important;
-  color: rgba(255, 255, 255, 0.56) !important;
-  background: #000000 !important;
-  border: 0.5px solid #0b0b0b !important;
-}
+
+
 
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-meta-cell {
@@ -935,9 +874,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   }
 
   /* Desktop: data já aparece no ref-tx-meta-cell — oculta a versão embutida na subcategoria. */
-  .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-date--paired-sub {
-    display: none !important;
-  }
+
 
   /* Evita herdar `grid-column: 1 / -1` dos layouts subgrid globais (.ref-tx-table-subgrid--actions). */
   body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions.tx-cal-grid .ref-tx-row:not(.ref-tx-row--skeleton),
@@ -1057,15 +994,9 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   }
 
   /* 6. Separador inferior — visível como na referência */
-  body[data-theme='light'] .tx-cal-grid .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-val-act-wrap {
-    border-top: 1px solid var(--tx-dir-footer-line, #e4e7ec) !important;
-    padding-top: 10px !important;
-  }
 
-  body[data-theme='dark'] .tx-cal-grid .ref-tx-row:not(.ref-tx-row--skeleton) > .ref-tx-val-act-wrap {
-    border-top: 1px solid var(--tx-dir-footer-line, rgba(255, 255, 255, 0.1)) !important;
-    padding-top: 10px !important;
-  }
+
+
 
 }
 
@@ -1174,16 +1105,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   /* Mobile: data só como chip ao lado da subcategoria — oculta a versão do meta-cell.
      Usa .ref-tx-meta-cell como âncora (sem >) porque no mobile o row fica dentro
      do virtualizer (.ref-tx-virtual-scroll > div > .ref-tx-row), não filho direto. */
-  body[data-theme='light'] .page-transacoes.app-horizon-shell
-    .page-transacoes-ref-table
-    .ref-tx-meta-cell
-    .ref-tx-date--row-meta,
-  body[data-theme='dark'] .page-transacoes.app-horizon-shell
-    .page-transacoes-ref-table
-    .ref-tx-meta-cell
-    .ref-tx-date--row-meta {
-    display: none !important;
-  }
+
 
   /* Subcategoria + chip de data na mesma linha (sem > — virtualizer envolve os rows no mobile). */
   .page-transacoes.app-horizon-shell
@@ -1203,37 +1125,11 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     min-width: 0;
   }
 
-  .page-transacoes.app-horizon-shell
-    .page-transacoes-ref-table
-    .ref-tx-date--paired-sub {
-    display: inline-flex !important;
-    align-items: center !important;
-    margin: 0 0 0 0.1rem !important;
-    padding: 3px 7px !important;
-    border-radius: 999px !important;
-    font-size: 0.66rem !important;
-    letter-spacing: -0.01em !important;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
 
-  body[data-theme='light']
-    .page-transacoes.app-horizon-shell
-    .page-transacoes-ref-table
-    .ref-tx-date--paired-sub {
-    background: rgba(15, 23, 42, 0.045) !important;
-    border: 1px solid rgba(15, 23, 42, 0.06) !important;
-    color: rgba(71, 85, 105, 0.82) !important;
-  }
 
-  body[data-theme='dark']
-    .page-transacoes.app-horizon-shell
-    .page-transacoes-ref-table
-    .ref-tx-date--paired-sub {
-    background: #000000 !important;
-    border: 0.5px solid #0b0b0b !important;
-    color: rgba(255, 255, 255, 0.56) !important;
-  }
+
+
+
 
   /* Separador · entre nome da subcategoria e chip da data. */
   .page-transacoes.app-horizon-shell

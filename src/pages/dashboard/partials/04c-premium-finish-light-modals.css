@@ -303,16 +303,9 @@ body[data-theme='light'] .ref-dashboard-inner {
     min-width: 0;
   }
 
-  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-header-export {
-    margin-left: 0;
-    flex-shrink: 0;
-  }
 
-  body[data-theme='light'] .page-relatorios.ref-dashboard.app-horizon-shell .relatorios-header-export .dashboard-hub__btn {
-    min-height: 40px;
-    padding: 0 10px;
-    font-size: 11px;
-  }
+
+
 
   /* Pagamento: título + subtítulo no hero */
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .dashboard-hub__hero-row {
@@ -796,9 +789,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-se
   color: rgba(15, 23, 42, 0.42);
 }
 
-body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label--account {
-  border-top-color: rgba(226, 232, 240, 0.85);
-}
+
 
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) {
   color: rgba(15, 23, 42, 0.48);
@@ -1378,27 +1369,9 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     align-self: start;
   }
 
-  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-act-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: flex-start;
-    gap: 2px;
-    grid-area: txright;
-    align-self: start;
-    min-width: 0;
-    height: fit-content;
-  }
 
-  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-act-wrap > .ref-tx-val-cell,
-  .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-val-act-wrap > .ref-tx-actions-cell {
-    grid-area: unset;
-    justify-self: unset;
-    align-self: unset;
-    padding: 0;
-    margin: 0;
-    width: auto;
-  }
+
+
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row > .ref-tx-cat-cell {
     grid-area: txcat;

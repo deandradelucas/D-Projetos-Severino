@@ -158,76 +158,6 @@
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero { color: var(--rel-text-hi); }
 
   /* B4 — Botões CSV e PDF neumórficos */
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary.relatorios-btn-export,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary.relatorios-btn-export {
-    padding: 10px 18px;
-    border-radius: 999px;
-    font-family: 'Inter Variable', system-ui, sans-serif;
-    font-weight: 500;
-    font-size: 0.875rem;
-    color: var(--rel-text-mid);
-    background: var(--rel-surface-sunken);
-    border: 1px solid var(--rel-edge-hi);
-    box-shadow:
-      inset 2px 2px 5px var(--rel-shadow-soft),
-      inset -1px -1px 3px var(--rel-light);
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    transition: all 220ms var(--rel-ease);
-    cursor: pointer;
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary.relatorios-btn-export:hover,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--secondary.relatorios-btn-export:hover {
-    transform: translateY(-1px);
-    color: var(--rel-text-hi);
-    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%);
-    box-shadow:
-      5px 5px 12px var(--rel-shadow-soft),
-      -3px -3px 8px var(--rel-light);
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export {
-    padding: 10px 18px;
-    border-radius: 999px;
-    font-family: 'Inter Variable', system-ui, sans-serif;
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: var(--rel-text-hi);
-    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%);
-    border: 1px solid var(--rel-edge-hi);
-    box-shadow:
-      6px 6px 14px var(--rel-shadow-soft),
-      -4px -4px 12px var(--rel-light),
-      inset 1px 1px 1px var(--rel-edge-hi);
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    transition: all 220ms var(--rel-ease);
-    cursor: pointer;
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:hover,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:hover {
-    transform: translateY(-2px);
-    color: var(--rel-accent);
-    box-shadow:
-      8px 10px 20px var(--rel-shadow),
-      -5px -5px 14px var(--rel-light),
-      0 0 0 1px var(--rel-accent-glow),
-      inset 1px 1px 1px var(--rel-edge-hi);
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:active,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:active {
-    transform: translateY(0);
-    box-shadow:
-      inset 3px 3px 8px var(--rel-shadow-soft),
-      inset -2px -2px 5px var(--rel-light);
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:disabled,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary.relatorios-btn-export:disabled {
-    opacity: 0.45;
-    pointer-events: none;
-  }
 
   /* ─── B3 — KPI cards Receitas/Despesas ─── */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .ref-kpi-row .ref-kpi-card,
@@ -436,15 +366,6 @@
   }
 
   /* Neon card — dark mode border em verde (preserva visual existente mas neumorphic) */
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-neon-card {
-    border-color: rgba(0, 229, 160, 0.16) !important;
-    box-shadow:
-      10px 10px 24px var(--rel-shadow-soft),
-      -8px -8px 22px var(--rel-light),
-      0 0 0 1px rgba(0, 229, 160, 0.08),
-      inset 1px 1px 1px rgba(0, 229, 160, 0.06),
-      inset -1px -1px 1px var(--rel-edge-lo) !important;
-  }
 
   /* D2 — Títulos dos gráficos */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-chart-card .ref-panel__title,
@@ -548,20 +469,6 @@
   }
 
   /* Empty message da página toda */
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-empty-msg,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-empty-msg {
-    padding: 40px 28px !important;
-    text-align: center !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    color: var(--rel-text-lo) !important;
-    border-radius: var(--rel-r) !important;
-    background: linear-gradient(155deg, var(--rel-surface-raised) 0%, var(--rel-surface-base) 100%) !important;
-    border: 1px solid var(--rel-edge-hi) !important;
-    box-shadow:
-      10px 10px 24px var(--rel-shadow-soft),
-      -8px -8px 22px var(--rel-light) !important;
-  }
 
   /* ─── E — Legenda dos pie charts ─── */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-pie-layout__legend,
@@ -657,38 +564,8 @@
   }
 
   /* ─── 3 KPIs em grid (relatorios-kpi-row--3col) ─── */
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-row--3col,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-row--3col {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 16px !important;
-  }
 
   /* 3º KPI: saldo colorido */
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo--pos .ref-kpi-card__value,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo--pos .ref-kpi-card__value {
-    color: var(--rel-pos) !important;
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo--neg .ref-kpi-card__value,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo--neg .ref-kpi-card__value {
-    color: var(--rel-neg) !important;
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo--pos .ref-kpi-card__icon,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo--pos .ref-kpi-card__icon {
-    color: var(--rel-pos) !important;
-    box-shadow:
-      inset 2px 2px 4px var(--rel-shadow-soft),
-      inset -1px -1px 2px var(--rel-light),
-      0 0 0 1px var(--rel-pos-glow) !important;
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo--neg .ref-kpi-card__icon,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-kpi-saldo--neg .ref-kpi-card__icon {
-    color: var(--rel-neg) !important;
-    box-shadow:
-      inset 2px 2px 4px var(--rel-shadow-soft),
-      inset -1px -1px 2px var(--rel-light),
-      0 0 0 1px var(--rel-neg-glow) !important;
-  }
 
   /* ─── Insights strip ─── */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights,
@@ -720,18 +597,7 @@
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item:last-child {
     border-right: none !important;
   }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item--wide,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item--wide {
-    gap: 8px !important;
-  }
 
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item-head,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__item-head {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: baseline !important;
-    gap: 8px !important;
-  }
 
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__label,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__label {
@@ -756,15 +622,6 @@
   }
 
   /* Categoria: texto menor, ellipsis */
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__value--cat,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__value--cat {
-    font-size: 1rem !important;
-    font-variant-numeric: normal !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    color: var(--rel-accent) !important;
-  }
 
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__sub,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__sub {
@@ -791,29 +648,6 @@
     background: var(--rel-surface-sunken) !important;
     box-shadow: inset 1px 1px 2px var(--rel-shadow-soft) !important;
     overflow: hidden !important;
-    width: 100% !important;
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__bar-fill,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__bar-fill {
-    height: 100% !important;
-    border-radius: 999px !important;
-    transition: width 800ms cubic-bezier(0.22, 1, 0.36, 1) !important;
-    min-width: 3px !important;
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__bar-fill--pos,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__bar-fill--pos {
-    background: linear-gradient(90deg, var(--rel-pos), #86efac) !important;
-    box-shadow: 0 0 8px var(--rel-pos-glow) !important;
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__bar-fill--warn,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__bar-fill--warn {
-    background: linear-gradient(90deg, #f59e0b, #fbbf24) !important;
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.25) !important;
-  }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__bar-fill--neg,
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights__bar-fill--neg {
-    background: linear-gradient(90deg, var(--rel-neg), #fca5a5) !important;
-    box-shadow: 0 0 8px var(--rel-neg-glow) !important;
     width: 100% !important;
   }
 

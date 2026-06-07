@@ -632,10 +632,7 @@
   }
 
   /* (D) Esconde célula subcategoria quando está vazia (—) */
-  body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-sub-cell--empty,
-  body[data-theme='light'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-sub-cell--empty {
-    visibility: hidden;
-  }
+
 
   /* (S) Linhas zebra — alternância sutil */
   body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-tx-row:nth-child(odd) {
