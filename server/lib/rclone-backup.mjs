@@ -114,14 +114,31 @@ async function fetchDatabaseBackup() {
   }
 
   for (const table of tables) {
-    const { data, error } = await supabase.from(table).select('*')
-    if (error) {
-      log.warn(`[DB] Aviso ao buscar tabela ${table}: ${error.message}`)
+    // PostgREST limita a 1000 linhas por request → sem paginação o backup JSON
+    // ficava SILENCIOSAMENTE truncado (risco de restore incompleto). Paginamos
+    // com .range() até esgotar a tabela. (Auditoria squad 2026-06, C4.)
+    const PAGE = 1000
+    const rows = []
+    let from = 0
+    let tableError = null
+    let truncated = false
+    for (let guard = 0; guard < 10000; guard++) {
+      const { data, error } = await supabase.from(table).select('*').range(from, from + PAGE - 1)
+      if (error) { tableError = error; break }
+      const batch = data ?? []
+      rows.push(...batch)
+      if (batch.length < PAGE) break
+      from += PAGE
+      if (guard === 9999) truncated = true
+    }
+    if (tableError) {
+      log.warn(`[DB] Aviso ao buscar tabela ${table}: ${tableError.message}`)
       backup.tables[table] = []
       backup.summary.rowsByTable[table] = 0
     } else {
-      backup.tables[table] = data ?? []
-      backup.summary.rowsByTable[table] = backup.tables[table].length
+      if (truncated) log.warn(`[DB] Tabela ${table} atingiu o teto de 10M linhas — backup pode estar incompleto.`)
+      backup.tables[table] = rows
+      backup.summary.rowsByTable[table] = rows.length
     }
   }
 

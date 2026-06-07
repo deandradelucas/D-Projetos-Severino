@@ -15,6 +15,16 @@
 
 Security score atribuído pelo auditor: **6.5/10** (acima da média para SaaS inicial; pontos fortes documentados no fim).
 
+## Status das correções (2026-06-07)
+
+| ID | Status | Nota |
+|---|---|---|
+| **C1** | ⏳ parcial | Guard anti-segredo (pre-commit) instalado (`scripts/check-secrets.mjs` + `.githooks`). **Rotação das chaves Asaas/N8N depende do CEO** nos painéis. |
+| **C2** | ✅ **falso positivo** | Verificado no DB vivo: `admin_audit_log` e `familia_convites` **já têm `relrowsecurity=true`** (advisor + `pg_class`). O auditor leu as migrations 13/21 mas perdeu a 42. Nenhuma tabela pública está sem RLS. |
+| **C3** | ✅ **corrigido** | `stripSenha` endurecido (denylist + regex `/_hash$/`) — remove `senha` + todos os `*_hash` de toda resposta de usuário. Cobre o vazamento no DTO `{...n}`. |
+| **C4** | ✅ **corrigido** | Backup JSON agora pagina com `.range()` (antes truncava em 1000 linhas sem erro). |
+| **C5** | 🔁 **premissa revisada** | Não há import estático de jspdf (já é 100% dinâmico). O preload vem de um **artefato de chunking do Rollup** (módulo compartilhado caiu em `vendor-jspdf` via `manualChunks id.includes('jspdf')`, puxando `import{r}` para o entry). Correção exige cirurgia no `manualChunks` — deferido. Impacto real: ~140 KB gzip em preload de baixa prioridade. |
+
 ---
 
 ## 🔴 CRÍTICOS (corrigir em 24-72h)

@@ -12,8 +12,19 @@ export function normalizeUsuarioRow(row) {
   return { ...row, nome }
 }
 
+/**
+ * Remove a senha E todo material secreto (`*_hash`: reset_token_hash,
+ * email_otp_hash, registration_token_hash, etc.) antes de devolver um
+ * registro de usuário para qualquer resposta de API. O regex `/_hash$/`
+ * é à prova de futuro — qualquer coluna de hash criada depois é removida
+ * automaticamente. (Auditoria squad 2026-06, C3.)
+ */
 export function stripSenha(row) {
   if (!row || typeof row !== 'object') return row
-  const { senha: _s, ...rest } = row
-  return rest
+  const out = {}
+  for (const [k, v] of Object.entries(row)) {
+    if (k === 'senha' || /_hash$/.test(k)) continue
+    out[k] = v
+  }
+  return out
 }
