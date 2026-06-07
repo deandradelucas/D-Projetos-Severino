@@ -224,20 +224,22 @@ sem colidir com os tokens de container do shell load-bearing.
   detalhado (com delta por prop) pegou o `h2 #050505→#111827` e fechou o furo.
 - **Restante de 05 (~494) é load-bearing** (shell de dashboard) ou seções de página não-isoladas — sem ROI seguro.
 
-### Round modais mobile (jun/2026) — categoria concluída como LOAD-BEARING
+### Round modais mobile (jun/2026) — resultado MISTO (não é categoria uniforme)
 Partials de modal mobile: `30-investimentos-modal` (178), `32-lista-modal` (161), `29-comparador` (129),
-`24-bottom-sheets` (32), `25-audit-fixes` (67).
+`24-bottom-sheets` (32), `25-audit-fixes` (67). Testados um a um com a ferramenta evoluída (KEEP de estados ocultos):
 
-- **30-investimentos-modal testado a fundo:** modal aberto (`.page-investimentos-modal`, 66 els), strip-total muda
-  **11 claro / 41 escuro** — quase todo o modal é load-bearing no tema **escuro**. KEEP só dos sub-tokens
-  redundantes rendeu **178→171 (−7)**. Restaurado intacto (não vale verificação de modal por 7).
-- **Causa-raiz arquitetural:** modais existem para **sobrescrever o chrome base do modal** (definido em `02c`)
-  no mobile; o skin escuro precisa de `!important` para vencer. Por isso são intrinsecamente load-bearing —
-  ao contrário dos skins de página (conteúdo visível, redundante por especificidade).
-- **32/29/24/25 não processados:** cada um estiliza **múltiplos estados de modal ocultos** (32-lista: nova lista,
-  adicionar item, editar — abri só "nova lista", 23 els de 104 refs). Verificar com segurança exige abrir **todos**
-  os estados de cada modal — matriz cara e propensa a erro no ambiente atual, com rendimento esperado baixo
-  (evidência do 30). **Deferidos junto com 05** para um run scriptado dedicado.
+| Modal | Antes | Depois | Δ | Resultado |
+|---|---|---|---|---|
+| `29-comparador` | 129 | 52 | **−77** | ✅ form visível 100% redundante; estado de resultado (`__resultado/__res-row/__melhor-badge/__slot--melhor/__liq-value/__cdi-aviso`, **não renderizado** até preencher) preservado via KEEP. diff=0 claro+escuro. Deployado. |
+| `32-lista-modal` | 161 | 74 | **−87** | ✅ form "nova lista" redundante (exceto `tipo-hint` dark); estados ocultos (`autocomplete/modal-resumo/modal-select/modal-total-display/modal-row/modal-subhint/modal-input--datetime`) preservados. diff=0 claro+escuro. |
+| `30-investimentos-modal` | 178 | 178 | 0 | ⏸ load-bearing no **escuro** (strip-total muda 41/66). KEEP redundante rendia só −7 → restaurado intacto. |
+| `25-audit-fixes` | 67 | 67 | 0 | ⏸ **override por design** ("carregado por último → vence empates de especificidade"). Cada regra existe para vencer 22-24/05 → load-bearing. |
+| `24-bottom-sheets` | 32 | 32 | 0 | ⏸ comportamento de sheet (transform/border-radius que faz o modal deslizar de baixo, sobrescrevendo o modal centralizado base) → load-bearing. |
+
+- **Lição:** modal **não** é categoria uniforme. Modais de **conteúdo** (comparador, criar-lista) têm chrome visível
+  redundante → reduzem bem. Modais de **skin escuro** (30) e arquivos de **override por design** (24/25) são
+  load-bearing. O fingerprint detalhado + KEEP de estados ocultos (verificados por presença no DOM) é o que torna
+  seguro reduzir os de conteúdo sem quebrar os sub-estados (resultado do comparador, autocomplete da lista).
 
 ## Encerramento da campanha `!important` (jun/2026)
 Ganhos seguros capturados e deployados. O `!important` restante é majoritariamente **necessário pela
