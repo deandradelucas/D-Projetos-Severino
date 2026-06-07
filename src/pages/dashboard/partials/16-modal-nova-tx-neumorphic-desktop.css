@@ -62,26 +62,26 @@
   /* (A) Backdrop com blur + dim */
   body[data-theme='dark'] .modal-backdrop:has(.modal-content--nova-tx),
   body[data-theme='light'] .modal-backdrop:has(.modal-content--nova-tx) {
-    -webkit-backdrop-filter: blur(12px) saturate(1.05) !important;
-    backdrop-filter: blur(12px) saturate(1.05) !important;
-    background: rgba(0, 0, 0, 0.55) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(1.05);
+    backdrop-filter: blur(12px) saturate(1.05);
+    background: rgba(0, 0, 0, 0.55);
     animation: ntxBackdropIn 240ms var(--ntx-ease) both;
   }
 
   /* (B) Modal surface raised + (J) animação entrada */
   body[data-theme='dark'] .modal-content--nova-tx,
   body[data-theme='light'] .modal-content--nova-tx {
-    background: linear-gradient(155deg, var(--ntx-surface-raised) 0%, var(--ntx-surface-base) 100%) !important;
-    border: 1px solid var(--ntx-edge-hi) !important;
-    border-radius: 22px !important;
-    padding: 0 !important;
-    max-width: 560px !important;
-    width: min(96vw, 560px) !important;
+    background: linear-gradient(155deg, var(--ntx-surface-raised) 0%, var(--ntx-surface-base) 100%);
+    border: 1px solid var(--ntx-edge-hi);
+    border-radius: 22px;
+    padding: 0;
+    max-width: 560px;
+    width: min(96vw, 560px);
     box-shadow:
       14px 14px 36px var(--ntx-shadow),
       -8px -8px 24px var(--ntx-light),
       inset 1px 1px 1px var(--ntx-edge-hi),
-      inset -1px -1px 1px var(--ntx-edge-lo) !important;
+      inset -1px -1px 1px var(--ntx-edge-lo);
     animation: ntxSheetIn 280ms var(--ntx-ease) both;
     overflow: hidden;
   }
@@ -98,31 +98,31 @@
   /* (C) Header — título à esquerda + close à direita */
   body[data-theme='dark'] .modal-content--nova-tx .modal-header,
   body[data-theme='light'] .modal-content--nova-tx .modal-header {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 18px 18px 0 20px !important;
-    border-bottom: none !important;
-    background: transparent !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 18px 0 20px;
+    border-bottom: none;
+    background: transparent;
   }
   /* Título visível no header — anula todas as propriedades do .sr-only moderno */
   body[data-theme='dark'] .modal-content--nova-tx .modal-header .sr-only,
   body[data-theme='light'] .modal-content--nova-tx .modal-header .sr-only {
-    position: static !important;
-    width: auto !important;
-    height: auto !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: visible !important;
-    clip: auto !important;
-    clip-path: none !important;
-    white-space: normal !important;
-    border: 0 !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
-    color: var(--ntx-text-hi) !important;
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    white-space: normal;
+    border: 0;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ntx-text-hi);
   }
   body[data-theme='dark'] .modal-content--nova-tx .close-btn,
   body[data-theme='light'] .modal-content--nova-tx .close-btn {
@@ -158,7 +158,7 @@
   /* Modal body padding */
   body[data-theme='dark'] .modal-content--nova-tx .modal-body--nova-tx,
   body[data-theme='light'] .modal-content--nova-tx .modal-body--nova-tx {
-    padding: 4px 26px 14px !important;
+    padding: 4px 26px 14px;
     max-height: 70vh;
     overflow-y: auto;
     scrollbar-width: thin;
@@ -214,8 +214,8 @@
   }
   body[data-theme='dark'] .modal-content--nova-tx .modal-label-optional,
   body[data-theme='light'] .modal-content--nova-tx .modal-label-optional {
-    color: var(--ntx-text-faint) !important;
-    font-weight: 500 !important;
+    color: var(--ntx-text-faint);
+    font-weight: 500;
     margin-left: 4px;
   }
 
@@ -257,7 +257,7 @@
   }
   body[data-theme='dark'] .modal-content--nova-tx input::placeholder,
   body[data-theme='light'] .modal-content--nova-tx input::placeholder {
-    color: var(--ntx-text-lo) !important;
+    color: var(--ntx-text-lo);
   }
 
   /* (E) Type toggle Despesa/Receita como segmented pill */
@@ -337,36 +337,36 @@
   /* Data toolbar + shortcuts Hoje/Ontem como pills (preview Pacote 2 H) */
   body[data-theme='dark'] .modal-content--nova-tx .modal-date-toolbar,
   body[data-theme='light'] .modal-content--nova-tx .modal-date-toolbar {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    margin-bottom: 6px !important;
-    gap: 12px !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    gap: 12px;
   }
   body[data-theme='dark'] .modal-content--nova-tx .date-shortcuts,
   body[data-theme='light'] .modal-content--nova-tx .date-shortcuts {
-    display: inline-flex !important;
-    gap: 6px !important;
+    display: inline-flex;
+    gap: 6px;
   }
   body[data-theme='dark'] .modal-content--nova-tx .date-shortcut-btn,
   body[data-theme='light'] .modal-content--nova-tx .date-shortcut-btn {
-    padding: 5px 12px !important;
-    border-radius: 999px !important;
-    background: var(--ntx-surface-sunken) !important;
-    border: 1px solid var(--ntx-edge-hi) !important;
-    color: var(--ntx-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.75rem !important;
-    font-weight: 500 !important;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--ntx-surface-sunken);
+    border: 1px solid var(--ntx-edge-hi);
+    color: var(--ntx-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
     cursor: pointer;
     box-shadow:
       inset 1.5px 1.5px 3px var(--ntx-shadow-soft),
-      inset -1px -1px 2px var(--ntx-light) !important;
-    transition: color 200ms var(--ntx-ease) !important;
+      inset -1px -1px 2px var(--ntx-light);
+    transition: color 200ms var(--ntx-ease);
   }
   body[data-theme='dark'] .modal-content--nova-tx .date-shortcut-btn:hover,
   body[data-theme='light'] .modal-content--nova-tx .date-shortcut-btn:hover {
-    color: var(--ntx-accent) !important;
+    color: var(--ntx-accent);
   }
 
   /* Parcelamento toggle row neumorphic */
@@ -425,33 +425,33 @@
   /* (F) (K) Modal actions footer + botões */
   body[data-theme='dark'] .modal-content--nova-tx .modal-actions,
   body[data-theme='light'] .modal-content--nova-tx .modal-actions {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    gap: 10px !important;
-    padding: 18px 26px 22px !important;
-    border-top: 1px solid var(--ntx-edge-lo) !important;
-    background: transparent !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 18px 26px 22px;
+    border-top: 1px solid var(--ntx-edge-lo);
+    background: transparent;
   }
   body[data-theme='dark'] .modal-content--nova-tx .btn-secondary,
   body[data-theme='light'] .modal-content--nova-tx .btn-secondary {
-    padding: 12px 22px !important;
-    border-radius: 999px !important;
-    background: var(--ntx-surface-sunken) !important;
-    border: 1px solid var(--ntx-edge-hi) !important;
-    color: var(--ntx-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 600 !important;
+    padding: 12px 22px;
+    border-radius: 999px;
+    background: var(--ntx-surface-sunken);
+    border: 1px solid var(--ntx-edge-hi);
+    color: var(--ntx-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
     cursor: pointer;
     box-shadow:
       inset 2px 2px 4px var(--ntx-shadow-soft),
-      inset -1px -1px 2px var(--ntx-light) !important;
-    transition: color 200ms var(--ntx-ease) !important;
+      inset -1px -1px 2px var(--ntx-light);
+    transition: color 200ms var(--ntx-ease);
   }
   body[data-theme='dark'] .modal-content--nova-tx .btn-secondary:hover,
   body[data-theme='light'] .modal-content--nova-tx .btn-secondary:hover {
-    color: var(--ntx-text-hi) !important;
+    color: var(--ntx-text-hi);
   }
   body[data-theme='dark'] .modal-content--nova-tx .btn-secondary:disabled,
   body[data-theme='light'] .modal-content--nova-tx .btn-secondary:disabled {
@@ -461,22 +461,22 @@
 
   body[data-theme='dark'] .modal-content--nova-tx .btn-primary,
   body[data-theme='light'] .modal-content--nova-tx .btn-primary {
-    padding: 12px 26px !important;
-    border-radius: 999px !important;
-    background: linear-gradient(155deg, var(--ntx-accent) 0%, color-mix(in srgb, var(--ntx-accent) 80%, black 20%) 100%) !important;
-    border: 1px solid var(--ntx-accent) !important;
-    color: #1a1200 !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.005em !important;
+    padding: 12px 26px;
+    border-radius: 999px;
+    background: linear-gradient(155deg, var(--ntx-accent) 0%, color-mix(in srgb, var(--ntx-accent) 80%, black 20%) 100%);
+    border: 1px solid var(--ntx-accent);
+    color: #1a1200;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.005em;
     cursor: pointer;
     box-shadow:
       6px 6px 14px var(--ntx-shadow-soft),
       -3px -3px 8px var(--ntx-light),
       0 0 16px var(--ntx-accent-glow),
-      inset 1px 1px 1px rgba(255, 255, 255, 0.25) !important;
-    transition: all 220ms var(--ntx-ease) !important;
+      inset 1px 1px 1px rgba(255, 255, 255, 0.25);
+    transition: all 220ms var(--ntx-ease);
   }
   body[data-theme='dark'] .modal-content--nova-tx .btn-primary:hover:not(:disabled),
   body[data-theme='light'] .modal-content--nova-tx .btn-primary:hover:not(:disabled) {
@@ -485,7 +485,7 @@
       8px 10px 18px var(--ntx-shadow),
       -4px -4px 10px var(--ntx-light),
       0 0 22px var(--ntx-accent-glow),
-      inset 1px 1px 1px rgba(255, 255, 255, 0.30) !important;
+      inset 1px 1px 1px rgba(255, 255, 255, 0.30);
   }
   body[data-theme='dark'] .modal-content--nova-tx .btn-primary:active:not(:disabled),
   body[data-theme='light'] .modal-content--nova-tx .btn-primary:active:not(:disabled) {
@@ -501,11 +501,11 @@
   }
   body[data-theme='dark'] .modal-content--nova-tx .btn-primary.loading,
   body[data-theme='light'] .modal-content--nova-tx .btn-primary.loading {
-    background: var(--ntx-surface-sunken) !important;
-    color: var(--ntx-text-mid) !important;
+    background: var(--ntx-surface-sunken);
+    color: var(--ntx-text-mid);
     box-shadow:
       inset 3px 3px 7px var(--ntx-shadow-soft),
-      inset -2px -2px 5px var(--ntx-light) !important;
+      inset -2px -2px 5px var(--ntx-light);
   }
   body[data-theme='dark'] .modal-content--nova-tx .btn-primary .spinner,
   body[data-theme='light'] .modal-content--nova-tx .btn-primary .spinner {
@@ -521,7 +521,7 @@
   body[data-theme='light'] .modal-content--nova-tx .spinner {
     animation: ntxSpin 800ms linear infinite;
     transform-origin: center;
-    color: var(--ntx-accent) !important;
+    color: var(--ntx-accent);
   }
 
   /* ============================================================
@@ -650,10 +650,10 @@
   /* (Q) Calc button + panel */
   body[data-theme='dark'] .modal-content--nova-tx .ntx-valor-label-row,
   body[data-theme='light'] .modal-content--nova-tx .ntx-valor-label-row {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    margin-bottom: 6px !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-calc-toggle,
   body[data-theme='light'] .modal-content--nova-tx .ntx-calc-toggle {
@@ -839,11 +839,11 @@
   }
   body[data-theme='dark'] .modal-content--nova-tx label.rec-vezes-row--toggle .rec-vezes-row__label,
   body[data-theme='light'] .modal-content--nova-tx label.rec-vezes-row--toggle .rec-vezes-row__label {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 600 !important;
-    color: var(--ntx-text-hi) !important;
-    margin: 0 !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ntx-text-hi);
+    margin: 0;
   }
 
   /* (S) Preview "10× R$ 250 = R$ 2.500" */
