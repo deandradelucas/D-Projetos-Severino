@@ -109,11 +109,11 @@
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item {
-    background: var(--m-sunken) !important; border-radius: 14px !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light) !important;
+    background: var(--m-sunken); border-radius: 14px;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light);
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item h3,
-  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item h3 { color: var(--m-text-hi) !important; }
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item h3 { color: var(--m-text-hi); }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day {
     background: var(--m-sunken) !important; box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important; border-radius: 12px !important;
@@ -519,31 +519,31 @@
   /* Toggle Mês/Semana (estava "MêsSemana" grudado) */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle {
-    display: inline-flex !important;
-    gap: 4px !important;
-    padding: 4px !important;
-    border-radius: 12px !important;
-    background: var(--m-sunken) !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 12px;
+    background: var(--m-sunken);
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle__btn,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle__btn {
-    padding: 6px 13px !important;
-    border-radius: 9px !important;
-    background: transparent !important;
-    border: none !important;
-    color: var(--m-text-mid) !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
+    padding: 6px 13px;
+    border-radius: 9px;
+    background: transparent;
+    border: none;
+    color: var(--m-text-mid);
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle__btn--active,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-view-toggle__btn--active {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    color: var(--m-accent) !important;
-    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    color: var(--m-accent);
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow);
   }
 }
 
@@ -728,10 +728,10 @@
 /* ═══════════════ Agenda — view "Semana" no mobile (estava empilhada vertical) ═══════════════ */
 @media (max-width: 768px) {
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-week-grid {
-    display: grid !important;
-    grid-template-columns: repeat(7, 1fr) !important;
-    gap: 5px !important;
-    margin-top: 10px !important;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 10px;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week {
@@ -816,91 +816,91 @@
 @media (max-width: 768px) {
   /* Filtros Tudo / Compromissos (estavam grudados "Tudo1Compromissos1") */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pills {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 7px !important;
-    margin-bottom: 14px !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 14px;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 7px !important;
-    padding: 7px 13px !important;
-    border-radius: 999px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    font-weight: 500 !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    cursor: pointer !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    cursor: pointer;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill--active,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill--active {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    color: var(--m-accent) !important;
-    box-shadow: 4px 4px 10px var(--m-shadow-soft), -2px -2px 6px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    color: var(--m-accent);
+    box-shadow: 4px 4px 10px var(--m-shadow-soft), -2px -2px 6px var(--m-light), 0 0 0 1px var(--m-accent-glow);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-filter-pill__count {
-    min-width: 18px !important;
-    height: 18px !important;
-    padding: 0 5px !important;
-    border-radius: 999px !important;
-    background: var(--m-base) !important;
-    color: inherit !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
-    line-height: 18px !important;
-    text-align: center !important;
-    font-variant-numeric: tabular-nums !important;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--m-base);
+    color: inherit;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
   }
 
   /* Grupos por período (Manhã/Tarde/Noite) — estavam grudados "Tarde1" */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-groups {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 16px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__head {
-    display: flex !important;
-    align-items: center !important;
-    gap: 9px !important;
-    margin-bottom: 10px !important;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 10px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__icon {
-    display: inline-flex !important;
-    color: var(--m-accent) !important;
-    flex-shrink: 0 !important;
+    display: inline-flex;
+    color: var(--m-accent);
+    flex-shrink: 0;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__label {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.625rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.14em !important;
-    color: var(--m-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--m-text-lo);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__count {
-    min-width: 16px !important;
-    height: 16px !important;
-    padding: 0 5px !important;
-    border-radius: 999px !important;
-    background: var(--m-sunken) !important;
-    color: var(--m-text-mid) !important;
-    font-size: 0.625rem !important;
-    font-weight: 700 !important;
-    line-height: 16px !important;
-    text-align: center !important;
-    box-shadow: inset 1px 1px 2px var(--m-shadow-soft) !important;
-    flex-shrink: 0 !important;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--m-sunken);
+    color: var(--m-text-mid);
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    box-shadow: inset 1px 1px 2px var(--m-shadow-soft);
+    flex-shrink: 0;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-period-group__head::after {
-    content: '' !important;
-    flex: 1 !important;
-    height: 1px !important;
-    background: linear-gradient(90deg, var(--m-edge-hi), transparent) !important;
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--m-edge-hi), transparent);
   }
 
   /* Reduz o espaço vazio abaixo da lista (era 300px pra forçar scroll; agora rola por flex) */
@@ -912,7 +912,7 @@
 /* ═══════════════ Agenda view "Semana" — cards compactos (não esticar / sem círculo dourado herdado) ═══════════════ */
 @media (max-width: 768px) {
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-week-grid {
-    align-items: start !important;
+    align-items: start;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week {
@@ -942,32 +942,32 @@
 /* ═══════════════ Agenda mobile — TRAVA a cadeia flex p/ o scroll engatar (Mês e Semana) ═══════════════ */
 @media (max-width: 768px) {
   .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell {
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-    overflow: hidden !important;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
   }
   .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .app-horizon-inner {
-    height: 100% !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    height: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
   .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    height: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
   .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
     flex: 1 1 0% !important;
@@ -984,67 +984,67 @@
 @media (max-width: 768px) {
   /* Item da timeline vira bloco simples (card full-width) */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item {
-    display: block !important;
+    display: block;
   }
   /* Esconde a hora solta e o track (dot/linha) — a hora vai pra dentro do card */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__time,
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-timeline-item__track {
-    display: none !important;
+    display: none;
   }
   /* Card full-width */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item {
-    width: 100% !important;
-    margin: 0 !important;
+    width: 100%;
+    margin: 0;
   }
   /* Top do card: hora + tipo + status */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__top {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    flex-wrap: wrap !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__time {
-    display: inline-flex !important;
-    align-items: center !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.01em !important;
-    color: var(--m-accent) !important;
-    font-variant-numeric: tabular-nums !important;
-    padding: 2px 9px !important;
-    border-radius: 999px !important;
-    background: var(--m-accent-glow) !important;
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--m-accent);
+    font-variant-numeric: tabular-nums;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: var(--m-accent-glow);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__type {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.06em !important;
-    color: var(--m-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--m-text-lo);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-status-badge {
-    margin-left: auto !important;
+    margin-left: auto;
   }
 }
 
 /* ═══════════════ Agenda — card da lista do dia: padding lateral (ícone/lixeira não encostam) ═══════════════ */
 @media (max-width: 768px) {
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item {
-    padding: 14px !important;
-    gap: 10px 12px !important;
+    padding: 14px;
+    gap: 10px 12px;
   }
   /* Ações (Editar/Concluir/Excluir) com respiro e sem encostar */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item__actions {
-    gap: 8px !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
   }
 }
 
@@ -1400,6 +1400,6 @@
    no mobile a lista do dia já aparece embaixo ao selecionar). */
 @media (max-width: 768px) {
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-preview {
-    display: none !important;
+    display: none;
   }
 }
