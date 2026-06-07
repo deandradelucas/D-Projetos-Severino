@@ -49,7 +49,18 @@
 ### Etapa 1b — CSS morto (jun/2026) ✅
 - Criado `scripts/strip-dead-dashboard-css.mjs` (removedor seguro: só apaga regras cujo seletor mira EXCLUSIVAMENTE classes mortas).
 - Removidas **22 regras** exclusivamente-mortas em 7 partials. Build/lint/237 testes ok; Configurações validada no Playwright.
-- Restam ~67 classes mortas em regras "mistas" (classe morta + viva no mesmo seletor) → passo futuro mais cirúrgico.
+
+### Etapa 1c — CSS morto em regras mistas/compostas (jun/2026) ✅
+- Criado `scripts/strip-dead-compound.mjs`: remove partes/regras cujo seletor exige uma classe morta
+  como token obrigatório (fora de `:not()/:is()/:has()`), portanto **nunca casam**.
+- **Descoberta crítica:** das 84 classes "mortas" do detector, **52 eram falso-positivos dinâmicos**
+  (construídas via template, ex.: `agenda-status-badge--${tone}`, `config-papel-chip--${papel}`,
+  `pagamento-status-chip--${tone}`) — VIVAS. O script ganhou um filtro anti-falso-positivo (prefixo BEM
+  no bundle JS) para preservá-las.
+- Removidas **63 regras + 4 partes** das **32 genuinamente mortas** (na maioria o design ANTIGO de
+  Relatórios: `relatorios-insights*`, `relatorios-kpi*`, `relatorios-neon-card`; + `ref-tx-*` órfãos,
+  `btn-danger`, etc.) em 11 partials (−434 linhas). Detector: 84 → 56 "não usadas".
+  Removível só por serem comprovadamente ausentes do src JS e não-dinâmicas. build/lint/309 testes ok.
 
 ### Etapa 2 — tokens (jun/2026) ✅ (fechada SEM alterar — falso problema)
 - Investigação: os dois sistemas são **complementares e 95% disjuntos** (105 `@theme` Tailwind × 73 `:root`). Só 5 nomes coincidem (`--shadow-*`), com valores iguais no light + override dark no `:root`. As duas definições são **funcionalmente necessárias** (Tailwind util `shadow-accent` usado 6×; `var(--shadow-*)` 20× nos partials).
@@ -122,14 +133,14 @@ movida ganhou testes próprios.
 - Trim seguro de partes vírgula-separadas exclusivamente-mortas: **2 removidas**
   (`.relatorios-btn-export`, `.pagamento-modal__body`) — vírgula = seletores independentes, sem
   efeito nas partes vivas. (Ferramenta foi descartável; resultado já está no CSS.)
-- As **~83 restantes** vivem em seletores **compostos** (`.live.dead`, `.live .dead`): não matcham
-  (a classe morta nunca está no DOM), mas removê-las exige editar seletores compostos à mão — baixo
-  valor, risco de erro de parsing. Deixado para limpeza manual pontual.
+- As restantes em seletores compostos foram resolvidas na **Etapa 1c** (ver acima): filtro
+  anti-falso-positivo dinâmico + remoção de 63 regras das 32 genuinamente mortas. ✅
 
-### Pendente (baixo valor / alto atrito — recomendado só sob demanda)
-- **Etapa 3** (redução de `!important`) nas páginas restantes — frágil neste ambiente Windows
-  (ver `etapa3-important-checklist.md`); exige fingerprint visual (Playwright) + cobertura de estados
-  ocultos. Sem benefício funcional/UX. Feito só em Transações e Agenda.
-- **~83 classes CSS mortas** em seletores compostos — cosmético.
+### Pendente (baixo valor — recomendado só sob demanda)
+- **Etapa 3** (redução de `!important`): ✅ **CONCLUÍDA nas 8 páginas-skin** (ver acima e
+  `etapa3-important-checklist.md`).
+- **CSS morto:** ✅ resolvido (Etapa 1b + 1c). Restam 56 "não usadas" no detector que são
+  **falso-positivos dinâmicos legítimos** (classes `--${variant}` construídas via template) — manter.
 - Decomposição mais profunda (seções de JSX) de `Configuracoes.jsx` (Perfil ~170 ln, Família ~260 ln)
   e `TransactionModal.jsx` — exige verificação visual por serem muito acopladas a estado/handlers.
+  (Único item de débito ainda em aberto; risco/custo alto, valor médio.)
