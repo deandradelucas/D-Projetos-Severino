@@ -238,6 +238,14 @@ Partials de modal mobile: `30-investimentos-modal` (178), `32-lista-modal` (161)
 | `16-modal-nova-tx-desktop` | 366 | 270 | **−96** | ✅ modal Nova Transação desktop: chrome visível redundante; features ocultas (`tx-calc` calculadora, `tx-parc` parcelas, `tx-template`, `tx-ai-chip`, `modal-form--validated`, `tx-switch`) preservadas via KEEP. diff=0 claro+escuro. Deployado. |
 | `27-modal-nova-tx-mobile` | 488 | 488 | 0 | ⏸ mesmo modal no mobile: strip-total muda 52/57 de 66 → ~100% load-bearing (skin mobile precisa de !important). KEEP rendia só −2 → restaurado intacto. |
 
+### Round sidebar (jun/2026)
+| Partial | Antes | Depois | Δ | Resultado |
+|---|---|---|---|---|
+| `14-sidebar-desktop` | 92 | 73 | **−19** | ✅ chrome redundante; root `.sidebar` preservado via `re:sidebar\s*$`; nav-item/logout/active load-bearing mantidos. diff=0 claro+escuro. Deployado. |
+| `08-shell-sidebar` | 82 | 82 | 0 | ⏸ dark load-bearing (strip muda 22/55) + regras do drawer mobile → baixo ROI/risco. Intacto. |
+
+Padrão reconfirmado: **regras de tema escuro são load-bearing** em quase todo componente (sidebar, modais, skins mobile). A redundância restante é estrutural/clara e já foi majoritariamente capturada.
+
 - **Lição:** modal **não** é categoria uniforme. Modais de **conteúdo** (comparador, criar-lista) têm chrome visível
   redundante → reduzem bem. Modais de **skin escuro** (30) e arquivos de **override por design** (24/25) são
   load-bearing. O fingerprint detalhado + KEEP de estados ocultos (verificados por presença no DOM) é o que torna
