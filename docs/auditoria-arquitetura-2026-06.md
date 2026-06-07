@@ -78,7 +78,23 @@ Lição: a automação em massa é **frágil no ambiente Windows** (processos zo
 mata; risco de corrupção silenciosa se o servidor não reflete edições). O método é sólido, mas
 o restante deve ser feito num ambiente estável (Linux/CI) ou supervisionado, página a página.
 
+### Etapa 5 — decomposição de god components (jun/2026) — PARCIAL
+Método: relocação pura (mover código sem mudar comportamento), verificada a cada passo por
+`eslint` + `build` + suíte de testes. Lógica derivada extraída ganhou testes próprios.
+
+- **ListaDeCompras.jsx: 2.597 → 1.217 ln (−53%)** ✅
+  - `components/lista/ListaIcons.jsx` (18 ícones), `ListaModais.jsx` (6 modais),
+    `ItemRow.jsx`, `ModoComprando.jsx`; `lib/listaCompras.js` (constantes/helpers puros);
+    `hooks/useKeyboardOffset.js`. Build/lint/237 testes ok.
+- **Transacoes.jsx: 1.482 → 1.233 ln (−17%)** ✅
+  - 7 `useMemo` (cálculos derivados puros) → `lib/transacoesDerived.js`, com **+23 testes**
+    (suíte 237 → 260). Deps dos memos inalteradas. Build/lint ok (resta 1 warning
+    `exhaustive-deps` pré-existente, não introduzido pela refatoração).
+
+Próximos god components (mesma técnica, quando houver janela): `Configuracoes.jsx` (1.325),
+`TransactionModal.jsx` (1.070), `Relatorios.jsx` (1.021), `Pagamento.jsx` (992).
+
 ### Pendente
 - Etapa 3 nas páginas restantes (Relatórios/Pagamento/Dashboard/Configurações/Investimentos/Lista) — em ambiente estável.
 - ~67 classes CSS mortas em regras mistas.
-- Decompor god components (`ListaDeCompras.jsx` 2.597 ln, etc.).
+- Decompor god components restantes (Configuracoes, TransactionModal, Relatorios, Pagamento).
