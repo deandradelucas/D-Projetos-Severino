@@ -58,7 +58,27 @@
 ### C — endpoint órfão (jun/2026) ✅
 - Removido `GET /api/lista-compras/arquivadas` + função `listarListasArquivadas` (sem consumidor no front, sem plano de UI). Endpoints órfãos: 1 → 0.
 
+### Etapa 3 — redução de `!important` (jun/2026) — PARCIAL
+Método validado: remover apenas `!important` **redundantes por especificidade** (o seletor da
+página já vence a base), verificado por **fingerprint de estilos computados** (claro+escuro) com
+`diff=0` obrigatório — via loop local (dev + Playwright). Sem migração global de cascade layers
+(que inverteria a precedência de `!important` e quebraria tudo).
+
+Resultado por página (verificado `diff=0`, em produção):
+- **Transações:** 723 → 285 (−433) ✅
+- **Agenda:** −81 ✅
+
+Não aplicado (com segurança — sem dano, tudo restaurado ao original):
+- **Lista, Investimentos:** conta de teste esparsa (poucos elementos) → guard abortou.
+- **Relatórios:** recharts mudam a contagem de elementos entre cargas → fingerprint instável.
+- **Pagamento:** ruído de render intermitente → verificação final revertia (conservador).
+- **Dashboard, Configurações:** dev server local instável após muitas edições (ERR_ABORTED).
+
+Lição: a automação em massa é **frágil no ambiente Windows** (processos zombie que `pkill` não
+mata; risco de corrupção silenciosa se o servidor não reflete edições). O método é sólido, mas
+o restante deve ser feito num ambiente estável (Linux/CI) ou supervisionado, página a página.
+
 ### Pendente
-- **Etapa 3** (causa-raiz: 8.645 `!important` + skins por página): programa incremental por estrutura compartilhada (card do hero → botões → reduzir `!important` por partial), com verificação visual a cada passo. **Não iniciada** (decisão: fazer em passos revisáveis).
+- Etapa 3 nas páginas restantes (Relatórios/Pagamento/Dashboard/Configurações/Investimentos/Lista) — em ambiente estável.
 - ~67 classes CSS mortas em regras mistas.
 - Decompor god components (`ListaDeCompras.jsx` 2.597 ln, etc.).
