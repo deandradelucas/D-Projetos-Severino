@@ -141,6 +141,13 @@ movida ganhou testes próprios.
   `etapa3-important-checklist.md`).
 - **CSS morto:** ✅ resolvido (Etapa 1b + 1c). Restam 56 "não usadas" no detector que são
   **falso-positivos dinâmicos legítimos** (classes `--${variant}` construídas via template) — manter.
-- Decomposição mais profunda (seções de JSX) de `Configuracoes.jsx` (Perfil ~170 ln, Família ~260 ln)
-  e `TransactionModal.jsx` — exige verificação visual por serem muito acopladas a estado/handlers.
-  (Único item de débito ainda em aberto; risco/custo alto, valor médio.)
+- ✅ **Decomposição de seções JSX acopladas concluída (jun/2026):**
+  - `Configuracoes.jsx` **1249 → 889 ln**: extraídos `ConfigPerfilCard` (avatar/nome/telefone/vínculo)
+    e `ConfigFamiliaCard` (convite/membros/papéis). Verificado por **comparação de innerHTML renderizado**
+    (Playwright, conta real): DOM idêntico exceto IDs internos do React (`useId`) → zero mudança de comportamento.
+  - `TransactionModal.jsx` **1045 → 1036 ln**: extraído o widget autocontido `CalcKeypad` (teclado da
+    calculadora). O restante é formulário controlado coeso — decompor criaria abstrações de interface
+    larga sem simplificar (contra "nunca criar abstrações sem justificativa"), então mantido.
+
+**Auditoria de arquitetura: CONCLUÍDA.** God components decompostos, Etapa 3 (`!important`) nas 8 páginas,
+CSS morto limpo (com filtro anti-falso-positivo), endpoint órfão/dep/tokens resolvidos. Sem débito aberto.
