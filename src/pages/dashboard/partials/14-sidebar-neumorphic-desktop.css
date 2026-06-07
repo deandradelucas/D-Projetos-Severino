@@ -106,41 +106,41 @@
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
-    width: 48px !important;
-    height: 48px !important;
-    color: var(--sb-text-hi) !important; /* alimenta o currentColor do "S" no SVG */
-    filter: none !important;
-    transition: transform 240ms var(--sb-ease) !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-    background: transparent !important;
+    width: 48px;
+    height: 48px;
+    color: var(--sb-text-hi); /* alimenta o currentColor do "S" no SVG */
+    filter: none;
+    transition: transform 240ms var(--sb-ease);
+    border: none;
+    box-shadow: none;
+    outline: none;
+    background: transparent;
   }
 
   /* Brand stack: zero gap + margem negativa no wordmark pra colar de vez */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-stack,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-stack {
-    gap: 10px !important;
-    text-decoration: none !important;
+    gap: 10px;
+    text-decoration: none;
     cursor: pointer;
   }
   /* Microinteração: leve zoom no símbolo ao passar o mouse na marca */
   .dashboard-container.app-horizon-shell .sidebar .brand-stack:hover .brand-mark {
-    transform: scale(1.05) !important;
+    transform: scale(1.05);
   }
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-    margin-left: 0 !important;
+    margin-left: 0;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 1.625rem !important;
-    letter-spacing: -0.025em !important;
-    color: var(--sb-text-hi) !important;
-    font-variation-settings: normal !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.625rem;
+    letter-spacing: -0.025em;
+    color: var(--sb-text-hi);
+    font-variation-settings: normal;
     text-shadow: 0 1px 0 var(--sb-edge-lo);
   }
 
