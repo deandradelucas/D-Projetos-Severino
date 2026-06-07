@@ -151,3 +151,36 @@ movida ganhou testes próprios.
 
 **Auditoria de arquitetura: CONCLUÍDA.** God components decompostos, Etapa 3 (`!important`) nas 8 páginas,
 CSS morto limpo (com filtro anti-falso-positivo), endpoint órfão/dep/tokens resolvidos. Sem débito aberto.
+
+---
+
+## Fechamento formal (re-auditoria — jun/2026)
+
+Re-auditoria completa do projeto após a frente de refatoração. Estado final e veredito.
+
+### Entregue (em produção, verificado)
+- **God components decompostos:** ListaDeCompras 2597→1217 (−53%), Configuracoes 1249→889 (−29%),
+  + lógica/derivações extraídas de Transacoes, Relatorios, Pagamento, TransactionModal → libs testáveis.
+  **+72 testes** (237→309). Decomposições de JSX verificadas por innerHTML idêntico (Playwright).
+- **`!important` redundante:** ~1.560 removidos nas 8 páginas-skin desktop, cada um com `diff=0`
+  (fingerprint de estilos computados claro+escuro via Playwright + freeze de animação).
+- **CSS morto:** Etapas 1b+1c — regras exclusivas e compostas removidas, com filtro
+  anti-falso-positivo (preservou 52 classes dinâmicas `--${variant}` que estavam vivas).
+- **Órfãos:** arquivos/endpoints/assets/dep = 0. Endpoint órfão e dep não-usada removidos.
+- **Performance:** rotas lazy + deps pesadas lazy — saudável, sem ação.
+
+### Avaliado e descartado com dado
+- **`!important` mobile (3.336):** o maior partial (`26-mobile-transacoes`, 503) é **~100% load-bearing**
+  (strip total muda 324/728 elementos) → não há redundância material; é estrutural.
+- **Cascade layers `@layer` (causa-raiz):** POC real reprovada — quebrou 155/155 elementos no
+  /configuracoes porque a cascata unlayered (Tailwind/componentes/theme-mirrors) vence a layerizada.
+  Só funcionaria migrando a cascata inteira (alto risco/custo). **Não migrar.** (Ver `etapa3-important-checklist.md`.)
+
+### Débito residual (aceito como estrutural)
+~5.900 `!important` restantes (mobile + base + load-bearing desktop) são **necessários pela arquitetura
+skin-sobre-base** e só removíveis pela migração `@layer` (descartada). É débito de manutenibilidade,
+não funcional. Os ganhos seguros já foram capturados.
+
+### Veredito
+**Auditoria encerrada.** Sem débito de alto valor em aberto. O caminho de maior retorno daqui em diante
+é evolução de produto/feature — não mais refatoração de CSS/arquitetura.
