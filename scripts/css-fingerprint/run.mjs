@@ -80,6 +80,18 @@ const STATE_SCENES = [
     id: 'modal-lista', route: '/lista-de-compras', root: '.page-lista-compras__modal-overlay',
     async open(page) { await clickByText(page, 'button', /nova lista/i) },
   },
+  {
+    id: 'modal-metas', route: '/metas', root: '.page-metas__modal-overlay',
+    async open(page) { await clickByText(page, 'button', /nova meta/i) },
+  },
+  {
+    id: 'modal-cartao', route: '/cartoes', root: '.page-cartoes__modal-overlay',
+    async open(page) { await clickByText(page, 'button', /novo cart/i) },
+  },
+  {
+    id: 'modal-agenda', route: '/agenda', root: '.agenda-modal',
+    async open(page) { await clickByText(page, 'button', /nova agenda/i) },
+  },
 ]
 // Hover/focus em elementos-chave (Playwright força o estado real).
 const HOVER_TARGETS = [
