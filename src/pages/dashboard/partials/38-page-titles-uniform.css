@@ -45,31 +45,10 @@
     color: #0b0b0b;
   }
 
-  /* ── CTA primário do hub — fonte ÚNICA e limpa (migração @layer 1.0.4).
-     Spec da 1.0.3: pílula dourada (var(--hub-accent)), texto #111. Sem !important:
-     vence por estar na layer `semantic` (acima de skin/base); o theme-dark deixou
-     de mirar este seletor. Substitui as regras espalhadas em 04b/06/13/fullblack. ── */
-  .dashboard-container .dashboard-hub__btn--primary {
-    background: var(--hub-accent, #c4a052);
-    background-image: none;
-    color: #111;
-    border: 1px solid rgba(0, 0, 0, 0.18);
-    border-radius: 9999px;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
-    padding: 0 22px;
-    min-height: 42px;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.28px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-  }
-  .dashboard-container .dashboard-hub__btn--primary:hover {
-    background: var(--hub-accent-hover, var(--hub-accent, #c4a052));
-    filter: brightness(1.05);
-  }
+  /* ── CTA primário do hub: a regra canônica vive UNLAYERED em src/index.css
+     (precisa vencer o preflight do Tailwind `button{font:inherit}`, que com o
+     @tailwindcss/vite acaba acima de qualquer @layer e senão herda 17px/400).
+     Mantido aqui só este ponteiro. ── */
 
   /* ── Cabeçalho mobile empilhado (padrão Relatórios) ──────────────────────────
      No mobile o hambúrguer + título + ações dividiam a MESMA linha apertada,

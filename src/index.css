@@ -152,6 +152,47 @@ html:has(body[data-theme='light']) {
   background-color: #ffffff;
 }
 
+/* ── CTA primário do hub (pílula dourada) — UNLAYERED de propósito ────────────
+   O preflight do Tailwind (`button{font:inherit}`, @layer base) acaba, sob o
+   plugin @tailwindcss/vite, vencendo qualquer regra de fonte em @layer — então
+   o botão herdava 17px/400 do hero em vez do 14px/700 da 1.0.3. Regra unlayered
+   vence o preflight (e todas as layers) sem !important. Valores idênticos à 1.0.3:
+   light #b58d3d / dark #c4a052, texto #111. Exclui .agenda-page (CTAs de modal da
+   Agenda têm tratamento próprio #000/#fff). ───────────────────────────────────── */
+.dashboard-container:not(.agenda-page) .dashboard-hub__btn--primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.28px;
+  line-height: 1.2;
+  min-height: 42px;
+  padding: 0 22px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  background: #b58d3d;
+  background-image: none;
+  color: #111;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.dashboard-container:not(.agenda-page) .dashboard-hub__btn--primary:hover {
+  filter: brightness(1.05);
+}
+body[data-theme='dark'] .dashboard-container:not(.agenda-page) .dashboard-hub__btn--primary {
+  background: #c4a052;
+}
+/* Dashboard home no mobile: FAB do rodapé substitui o «+ Nova transação» do hero (1.0.3). */
+@media (max-width: 768px) {
+  .dashboard-container.dashboard-page:not([class*="page-"]) .dashboard-hub__btn--primary {
+    display: none;
+  }
+}
+
 /* BemVindoAssinatura — pinta TODO o viewport de preto (Background.jsx, html, body, #root)
    para evitar que o safe-area bottom do iPhone mostre fundo branco do tema claro */
 html:has(.bem-vindo-page),
