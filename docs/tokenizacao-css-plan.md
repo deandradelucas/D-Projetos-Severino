@@ -30,11 +30,14 @@ Verificar build+lint+test:unit e raciocinar light+dark a cada fatia. Commit por 
 | `rgba(148,163,184,0.15)` | (card border, ver nota) | — | usado p/ borda dark | confirmar p/ tema |
 
 ## Fatias (ordem de execução)
-- [ ] **Fatia 1 — gold da marca:** `#d4a84b` sólido → `var(--accent)` (invariante, ~21 ocorr.). RISCO ZERO.
-- [ ] Fatia 2 — semânticas dark-scoped: dentro de regras `[data-theme='dark']`, `#ef4444→--error`, `#f87171→--error-text`, etc.
-- [ ] Fatia 3 — semânticas light-scoped: análogo no light.
-- [ ] Fatia 4+ — neutros estruturais (bg/borda) por partial, com juízo.
+- [x] **Fatia 1 — gold da marca:** `#d4a84b` → `var(--accent)` (invariante). 21 trocas. commit `99f286f`. ZERO change.
+- [x] **Fatia 2 — pos/neg por-página:** 37 defs `--*-pos/--*-neg` sólidas → `var(--success-text)`/`var(--error-text)`. Classificadas: 100% em bloco de tema correto. commit `7f97b97`. ZERO change.
+- [ ] **Fatia 3 — neutros estruturais (DECISÃO DO CEO):** page-local diverge dos globais por um fio (mobile `text-hi #f3f5f8` vs global `#f0f2f5`; `--m-card #14181f` vs `--bg-card #141618`). Repontar = mudança sub-perceptível mas NÃO-zero. CEO decide: (A) snapar p/ global (centraliza 100%, shift invisível) OU (B) manter page-local (zero change, centralização parcial).
+- [ ] Resto exact-match é assimétrico/raro (blue dark `#60a5fa`≠`--info` `#3b82f6`; accent-fg light `#fff`≠global `#1a1200`) — baixo valor, adiar.
 - [ ] Final — quando um componente é 100% token-driven, deletar seus overrides em mirror/polish/fullblack.
+
+## Conclusão da auditoria
+Tokenização **segura/zero-change** essencialmente esgota em Fatias 1+2 (~74 valores: só gold e pos/neg batem o global exatamente). Os neutros por-página foram afinados ligeiramente diferentes dos globais de propósito → unificá-los é decisão de design (snap perceptível), não refactor mecânico.
 
 ## Estado
 - Pré-tokenização: redução de darks já fez −686 linhas (regras mortas + pares idênticos, commits #1–#11). Ver [[project-dark-css-reduction-2026-06]].
