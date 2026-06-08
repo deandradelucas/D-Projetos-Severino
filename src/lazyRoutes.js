@@ -33,18 +33,6 @@ export const Metas = lazy(loadMetas)
 const loadCartoes = () => import('./pages/Cartoes.jsx')
 export const Cartoes = lazy(loadCartoes)
 
-const loadAdminUsuarios = () => import('./pages/AdminUsuarios.jsx')
-export const AdminUsuarios = lazy(loadAdminUsuarios)
-
-const loadAdminPagamentos = () => import('./pages/AdminPagamentos.jsx')
-export const AdminPagamentos = lazy(loadAdminPagamentos)
-
-const loadAdminAuditoria = () => import('./pages/AdminAuditoria.jsx')
-export const AdminAuditoria = lazy(loadAdminAuditoria)
-
-const loadAdminMarketing = () => import('./pages/AdminMarketing.jsx')
-export const AdminMarketing = lazy(loadAdminMarketing)
-
 const loadPagamento = () => import('./pages/Pagamento.jsx')
 export const Pagamento = lazy(loadPagamento)
 
@@ -73,10 +61,6 @@ const ROUTE_PREFETCH = {
   '/lista-de-compras': loadListaDeCompras,
   '/metas': loadMetas,
   '/cartoes': loadCartoes,
-  '/admin/usuarios': loadAdminUsuarios,
-  '/admin/pagamentos': loadAdminPagamentos,
-  '/admin/auditoria': loadAdminAuditoria,
-  '/admin/marketing': loadAdminMarketing,
   '/pagamento': loadPagamento,
   '/bem-vindo-assinatura': loadBemVindoAssinatura,
   '/trial-expirado': loadTrialExpirado,

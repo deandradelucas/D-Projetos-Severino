@@ -4,7 +4,6 @@ import { ThemeProvider } from './context/ThemeContext'
 import { TransactionCacheProvider } from './context/TransactionCacheContext'
 import AppErrorBoundary from './components/AppErrorBoundary'
 import RoutePageFallback from './components/RoutePageFallback'
-import SuperAdminOutlet from './components/SuperAdminOutlet'
 import AppSessionOutlet from './components/AppSessionOutlet'
 import Background from './components/Background'
 import PwaInstallPrompt from './components/PwaInstallPrompt'
@@ -23,10 +22,6 @@ import {
   ListaDeCompras,
   Metas,
   Cartoes,
-  AdminUsuarios,
-  AdminPagamentos,
-  AdminAuditoria,
-  AdminMarketing,
   Pagamento,
   BemVindoAssinatura,
   TrialExpirado,
@@ -71,12 +66,6 @@ function App() {
                   <Route path="/metas" element={<Metas />} />
                   <Route path="/cartoes" element={<Cartoes />} />
                   <Route path="/configuracoes" element={<Configuracoes />} />
-                </Route>
-                <Route element={<SuperAdminOutlet />}>
-                  <Route path="/admin/usuarios" element={<AdminUsuarios />} />
-                  <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
-                  <Route path="/admin/auditoria" element={<AdminAuditoria />} />
-                  <Route path="/admin/marketing" element={<AdminMarketing />} />
                 </Route>
                 <Route path="/" element={<Login />} />
               </Routes>

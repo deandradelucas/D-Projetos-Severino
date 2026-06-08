@@ -1,6 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef } from 'react'
 import { Link, NavLink, useLocation, useMatch, useResolvedPath } from 'react-router-dom'
-import { canAccessAdminPanelSession } from '../lib/superAdmin'
 import { navPrefetchHandlers, prefetchAppNavChunksNow } from '../lazyRoutes'
 import SeverinoMark from './SeverinoMark'
 import { logoutHorizonte } from '../lib/logout'
@@ -45,25 +44,6 @@ function SidebarNavItem({ item, pathname, closeMenu }) {
   )
 }
 
-function SidebarAdminNavLink({ to, title, children, pathname, closeMenu }) {
-  const resolved = useResolvedPath(to)
-  const match = useMatch({ path: resolved.pathname, end: true })
-  const isActive = Boolean(match)
-  return (
-    <NavLink
-      to={to}
-      end
-      {...navPrefetchHandlers(to)}
-      title={title}
-      aria-current={isActive ? 'page' : undefined}
-      className={mergeNavItemClass(isActive, to, pathname)}
-      onClick={closeMenu}
-    >
-      {children}
-    </NavLink>
-  )
-}
-
 const FOCUSABLE_SELECTOR = [
   'a[href]',
   'button:not([disabled])',
@@ -83,7 +63,6 @@ function getFocusableElements(container) {
 
 export default function Sidebar({ menuAberto, setMenuAberto }) {
   const { pathname } = useLocation()
-  const showAdminNav = canAccessAdminPanelSession()
   const sidebarRef = useRef(null)
   const closeButtonRef = useRef(null)
   const openerRef = useRef(null)
@@ -232,58 +211,6 @@ export default function Sidebar({ menuAberto, setMenuAberto }) {
               </Fragment>
             )
           })}
-
-          {showAdminNav && (
-            <>
-              <li className="nav-section-label">
-                <span className="nav-section-label__text">Administração</span>
-              </li>
-              <li>
-                <SidebarAdminNavLink to="/admin/usuarios" title="Logs Usuários" pathname={pathname} closeMenu={closeMenu}>
-                  <span className="icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
-                  </span>
-                  <span className="nav-item__label">Logs Usuários</span>
-                </SidebarAdminNavLink>
-              </li>
-              <li>
-                <SidebarAdminNavLink to="/admin/auditoria" title="Auditoria" pathname={pathname} closeMenu={closeMenu}>
-                  <span className="icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
-                    </svg>
-                  </span>
-                  <span className="nav-item__label">Auditoria</span>
-                </SidebarAdminNavLink>
-              </li>
-              <li>
-                <SidebarAdminNavLink to="/admin/pagamentos" title="Logs de Pagamentos" pathname={pathname} closeMenu={closeMenu}>
-                  <span className="icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <rect width="20" height="14" x="2" y="5" rx="2" />
-                      <line x1="2" x2="22" y1="10" y2="10" />
-                    </svg>
-                  </span>
-                  <span className="nav-item__label">Logs de Pagamentos</span>
-                </SidebarAdminNavLink>
-              </li>
-              <li>
-                <SidebarAdminNavLink to="/admin/marketing" title="Marketing" pathname={pathname} closeMenu={closeMenu}>
-                  <span className="icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                    </svg>
-                  </span>
-                  <span className="nav-item__label">Marketing</span>
-                </SidebarAdminNavLink>
-              </li>
-            </>
-          )}
         </ul>
 
         <span className="sidebar-version">v{version}</span>
