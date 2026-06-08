@@ -217,12 +217,9 @@ body[data-theme='dark'] .custom-select-option {
   color: #e2e8f0;
 }
 
-/* Botão fechar modal */
-body[data-theme='dark'] .close-btn {
-  background: rgba(30, 41, 59, 0.75);
-  color: #cbd5e1;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-}
+/* .close-btn dark removido por MORTO: o dashboard-theme-dark-fullblack.css carrega
+   DEPOIS e redefine bg/color/border com a mesma especificidade (vence por ordem).
+   Verificado fingerprint diff=0. */
 
 /* Campos de formulário genéricos dentro de modal */
 body[data-theme='dark'] .modal-form input:not([type='checkbox']):not([type='radio']),
