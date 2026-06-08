@@ -34,14 +34,14 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.app-horizon-shell {
   --tx-dir-title: #f4f4f5;
   --tx-dir-title-rec: #3ecf8e;
   --tx-dir-muted: #9ca3af;
-  --tx-dir-card-bg: var(--bg-card, #141618);
+  --tx-dir-card-bg: var(--bg-card);
   --tx-dir-card-border: rgba(148, 163, 184, 0.15);
   --tx-dir-card-shadow: none;
   --tx-dir-panel-bg: #0c0e12;
   --tx-dir-footer-line: rgba(255, 255, 255, 0.1);
   --tx-dir-icon-bg: #ffffff;
   --tx-dir-icon-border: rgba(15, 23, 42, 0.1);
-  --tx-nova-btn-bg: var(--bg-card, #141618);
+  --tx-nova-btn-bg: var(--bg-card);
   --tx-nova-btn-bg-hover: #1e2025;
   --tx-nova-btn-fg: #e2e8f0;
   --tx-nova-btn-border: rgba(148, 163, 184, 0.15);
@@ -91,7 +91,7 @@ body[data-theme='dark']
 body[data-theme='dark']
   .dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell
   .dashboard-hub__btn--primary:hover {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   background-image: none;
   color: #e2e8f0;
   border: 1px solid rgba(148, 163, 184, 0.15);
@@ -172,7 +172,7 @@ body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.a
   font-weight: 500;
   letter-spacing: 0.01em;
   line-height: 1.45;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
 }
 
 body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
@@ -255,7 +255,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   min-height: 0;
   padding: 6px 10px 6px;
   border: 1px solid rgba(148, 163, 184, 0.15);
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   background-image: none;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
@@ -354,7 +354,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters button.ref-panel__link--button {
   color: #e2e8f0;
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   border: 1px solid rgba(148, 163, 184, 0.15);
   border-radius: 999px;
   padding: 5px 11px;
@@ -733,16 +733,16 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--pos,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--pos {
-  color: var(--success, #107c52);
-  background: color-mix(in srgb, var(--success, #107c52) 16%, transparent);
-  border: 1px solid color-mix(in srgb, var(--success, #107c52) 28%, transparent);
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 28%, transparent);
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--neg,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--neg {
-  color: var(--danger, #dc2626);
-  background: color-mix(in srgb, var(--danger, #dc2626) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--danger, #dc2626) 28%, transparent);
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 28%, transparent);
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .transacoes-actions {
@@ -1208,7 +1208,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 .page-transacoes-parcelado-grupo {
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 14px;
-  background: var(--bg-card, #fff);
+  background: var(--bg-card);
   overflow: hidden;
   transition: box-shadow 0.18s ease, border-color 0.18s ease;
 }
@@ -1273,7 +1273,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 .page-transacoes-parcelado-grupo__desc {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1281,7 +1281,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 
 .page-transacoes-parcelado-grupo__meta {
   font-size: 0.78rem;
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary);
 }
 
 .page-transacoes-parcelado-grupo__right {
@@ -1294,12 +1294,12 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 .page-transacoes-parcelado-grupo__valor {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--danger, #dc2626);
+  color: var(--danger);
   white-space: nowrap;
 }
 
 .page-transacoes-parcelado-grupo__valor--rec {
-  color: var(--success, #16a34a);
+  color: var(--success);
 }
 
 .page-transacoes-parcelado-grupo__chev {
@@ -1308,7 +1308,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   justify-content: center;
   width: 20px;
   height: 20px;
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary);
   transition: transform 0.18s ease;
 }
 
@@ -1353,7 +1353,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 }
 
 .page-transacoes-parcelado-parcela__data {
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
@@ -1362,7 +1362,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--success, #16a34a);
+  color: var(--success);
   background: rgba(22, 163, 74, 0.1);
   padding: 2px 8px;
   border-radius: 999px;
@@ -1377,7 +1377,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 .page-transacoes-parcelado-parcela__valor {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
   text-align: right;
   white-space: nowrap;
 }
@@ -1435,7 +1435,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   width: 100%;
   margin-top: 12px;
   padding: 10px 16px;
-  background: var(--bg-card, #fff);
+  background: var(--bg-card);
   border: 1px solid var(--border-accent, rgba(15, 23, 42, 0.08));
   border-radius: 16px;
   box-shadow: 0 -4px 16px -8px rgba(0, 0, 0, 0.12);
@@ -1463,7 +1463,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -1551,7 +1551,7 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 
 /* Tema escuro — footer e card seguem a paleta dark */
 body[data-theme='dark'] .page-transacoes-parcelado-grupo {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   border-color: rgba(148, 163, 184, 0.15);
 }
 
@@ -1568,7 +1568,7 @@ body[data-theme='dark'] .page-transacoes-parcelado-parcela__valor {
 }
 
 body[data-theme='dark'] .page-transacoes-parcelados-footer {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   border-color: rgba(148, 163, 184, 0.15);
 }
 
@@ -1585,7 +1585,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
 }
 
 .modal-box {
-  background: var(--bg-card, #fff);
+  background: var(--bg-card);
   border-radius: 20px;
   width: 100%;
   max-width: 460px;
@@ -1605,7 +1605,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0;
-  color: var(--text-primary, #111);
+  color: var(--text-primary);
 }
 
 .modal-close-btn {
@@ -1613,7 +1613,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
   border: none;
   font-size: 1rem;
   cursor: pointer;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
   padding: 4px 8px;
   border-radius: 8px;
   line-height: 1;
@@ -1637,7 +1637,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
 
 .import-subtitle {
   font-size: 0.875rem;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
   margin: 0 0 16px;
 }
 
@@ -1653,7 +1653,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
 
 .import-dropzone:hover,
 .import-dropzone.dragging {
-  border-color: var(--accent, #6366f1);
+  border-color: var(--accent);
   background: rgba(99, 102, 241, 0.05);
 }
 
@@ -1668,7 +1668,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
   align-items: center;
   gap: 6px;
   font-size: 0.875rem;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
 }
 
 .import-drop-icon {
@@ -1701,7 +1701,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
   justify-content: center;
   gap: 10px;
   font-size: 0.875rem;
-  color: var(--text-primary, #111);
+  color: var(--text-primary);
 }
 
 .import-file-icon {
@@ -1710,7 +1710,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
 
 .import-file-size {
   font-size: 0.75rem;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
 }
 
 .import-error {
@@ -1735,7 +1735,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
 .import-result-lines p {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--text-primary, #111);
+  color: var(--text-primary);
 }
 
 /* Loading state */
@@ -1751,7 +1751,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
   width: 28px;
   height: 28px;
   border: 3px solid rgba(99, 102, 241, 0.2);
-  border-top-color: var(--accent, #6366f1);
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: importSpin 0.8s linear infinite;
 }
@@ -1762,14 +1762,14 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
 
 .import-loading-text {
   font-size: 0.85rem;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
 }
 
 /* Período */
 .import-period {
   margin-left: auto;
   font-size: 0.78rem;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1785,7 +1785,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
 }
 
 .import-bank-name {
-  color: var(--text-primary, #111);
+  color: var(--text-primary);
   font-weight: 500;
 }
 
@@ -1805,7 +1805,7 @@ body[data-theme='dark'] .page-transacoes-parcelados-footer {
 
 /* Dark mode */
 body[data-theme='dark'] .modal-box {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   border: 1px solid rgba(148, 163, 184, 0.12);
 }
 

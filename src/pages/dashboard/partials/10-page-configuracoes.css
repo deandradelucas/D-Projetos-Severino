@@ -126,7 +126,7 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-hero-name 
 /* Hero dark — glass vitrificado alinhado ao padrão 09b (todas as larguras) */
 body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
 body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
-  background-color: var(--bg-card, #141618);
+  background-color: var(--bg-card);
   background-image: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.025) 0%,
@@ -1036,7 +1036,7 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--pref
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--preferences .config-themes--compact .config-theme-card {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   border-color: rgba(148, 163, 184, 0.15);
   box-shadow: none;
 }
@@ -1134,7 +1134,7 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card--pref
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-select-custom__menu {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   border-color: rgba(148, 163, 184, 0.15);
   box-shadow: 0 24px 56px -20px rgba(0, 0, 0, 0.85);
 }
@@ -1233,7 +1233,7 @@ body[data-theme='light'] .page-configuracoes.app-horizon-shell .config-invite-pa
   font-size: 0.9375rem;
   font-weight: 650;
   line-height: 1.35;
-  color: var(--success, #16a34a);
+  color: var(--success);
   opacity: 0;
   max-height: 0;
   overflow: hidden;
@@ -1251,7 +1251,7 @@ body[data-theme='light'] .page-configuracoes.app-horizon-shell .config-invite-pa
 }
 
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-invite-copiado {
-  color: var(--success, #22c55e);
+  color: var(--success);
 }
 
 /* ——— Subsecções ——— */

@@ -547,7 +547,7 @@ body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__actions .dashboard
 body[data-theme='dark'] .agenda-page .agenda-hero,
 body[data-theme='dark'] .agenda-page .agenda-calendar-panel,
 body[data-theme='dark'] .agenda-page .agenda-list-panel--daily {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   border: 1px solid rgba(148, 163, 184, 0.15);
   box-shadow: none;
   border-radius: 18px;
@@ -1470,7 +1470,7 @@ body[data-theme='dark'] .agenda-page .agenda-day-item__actions .agenda-day-item_
 
   /* Dark mode: card-style em vez de branco */
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell:not(.agenda-page):not(.page-pagamento):not(.dashboard-page):not(.page-configuracoes):not(.page-relatorios) .dashboard-hub__btn--primary {
-    background: var(--bg-card, #141618);
+    background: var(--bg-card);
     border-color: rgba(148, 163, 184, 0.15);
     color: #e2e8f0;
     box-shadow: none;
@@ -1868,11 +1868,11 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-
   }
 
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card__label {
-    color: var(--text-secondary, #64748b);
+    color: var(--text-secondary);
   }
 
   .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell:not(.page-admin-usuarios) .ref-dashboard-kpi-strip .ref-kpi-card__value {
-    color: var(--text-primary, #0f172a);
+    color: var(--text-primary);
     margin-top: 3px;
     font-size: clamp(0.82rem, 3.2vw, 1rem);
     font-weight: 880;

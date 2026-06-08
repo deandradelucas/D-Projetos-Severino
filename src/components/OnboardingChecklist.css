@@ -76,7 +76,7 @@
   border-radius: 999px;
   border: none;
   background: var(--accent);
-  color: var(--accent-foreground, #1a1200);
+  color: var(--accent-foreground);
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 700;

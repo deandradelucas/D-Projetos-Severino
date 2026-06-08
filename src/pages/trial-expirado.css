@@ -88,7 +88,7 @@
 /* ─── CTA principal (botão dourado do sistema) ─── */
 .trial-cta {
   background: var(--accent);
-  color: var(--accent-foreground, #1a1200);
+  color: var(--accent-foreground);
   box-shadow: var(--shadow-accent, 0 4px 16px rgba(212, 168, 75, 0.32));
 }
 

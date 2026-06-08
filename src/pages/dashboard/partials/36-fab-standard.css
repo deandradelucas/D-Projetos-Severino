@@ -43,7 +43,7 @@
   border-radius: 14px;
   font-size: 0.875rem;
   line-height: 1.4;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
   background: color-mix(in srgb, var(--accent) 8%, transparent);
   border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
 }

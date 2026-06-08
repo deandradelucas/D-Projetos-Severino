@@ -1316,13 +1316,13 @@ input:disabled {
 }
 
 .value-positive {
-  color: var(--success-text, #15803d);
+  color: var(--success-text);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "ss01" 1;
 }
 
 .value-negative {
-  color: var(--error-text, #b91c1c);
+  color: var(--error-text);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "ss01" 1;
 }
@@ -1484,7 +1484,7 @@ input:disabled {
   height: 22px;
   flex-shrink: 0;
   border-radius: 7px;
-  color: var(--accent-foreground, #1a1200);
+  color: var(--accent-foreground);
   background: var(--accent);
   box-shadow: var(--shadow-accent, 0 2px 8px rgba(212, 168, 75, 0.35));
 }
@@ -1498,7 +1498,7 @@ input:disabled {
 }
 .ntx-ai-quick__sub {
   font-size: 0.74rem;
-  color: var(--text-muted, #8896a5);
+  color: var(--text-muted);
 }
 .ntx-ai-quick__field {
   position: relative;
@@ -1544,7 +1544,7 @@ input:disabled {
     height: 4px;
     margin: 8px auto 2px;
     border-radius: 999px;
-    background: var(--text-muted, #8896a5);
+    background: var(--text-muted);
     opacity: 0.4;
   }
   /* opções preenchem o espaço restante e rolam (sem o cap de 240px) */
@@ -1640,6 +1640,6 @@ input:disabled {
 .ntx-calc__key--eq {
   grid-column: span 3;
   background: var(--accent); border-color: var(--accent);
-  color: var(--accent-foreground, #1a1200); font-weight: 800;
+  color: var(--accent-foreground); font-weight: 800;
 }
 .ntx-calc__key--eq:active { background: var(--accent-hover); }

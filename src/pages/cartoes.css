@@ -180,7 +180,7 @@
   padding: 32px 20px;
 }
 .page-cartoes__empty-icon { font-size: 2.6rem; display: flex; align-items: center; justify-content: center; }
-.page-cartoes__empty-icon svg { width: 44px; height: 44px; color: var(--text-muted, #94a3b8); }
+.page-cartoes__empty-icon svg { width: 44px; height: 44px; color: var(--text-muted); }
 .page-cartoes__empty-title { margin: 4px 0 0; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
 .page-cartoes__empty-desc { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary); }
 .page-cartoes__empty-btn {
@@ -189,7 +189,7 @@
   border-radius: 999px;
   border: none;
   background: var(--accent);
-  color: var(--accent-foreground, #1a1200);
+  color: var(--accent-foreground);
   font-family: inherit;
   font-weight: 700;
   font-size: 0.9rem;
@@ -283,7 +283,7 @@
   border-radius: 12px;
   border: none;
   background: var(--accent);
-  color: var(--accent-foreground, #1a1200);
+  color: var(--accent-foreground);
   font-family: inherit;
   font-weight: 700;
   cursor: pointer;

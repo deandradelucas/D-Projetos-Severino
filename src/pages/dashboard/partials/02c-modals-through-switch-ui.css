@@ -686,14 +686,14 @@ body[data-theme='light'] .parcelamento-preview {
 
 /* Hint discreto (não tem o destaque colorido do preview de valor). */
 .parcelamento-preview.parcelamento-preview--hint {
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary);
   font-weight: 500;
   font-size: 12px;
   font-style: italic;
 }
 
 body[data-theme='light'] .parcelamento-preview.parcelamento-preview--hint {
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary);
 }
 
 /* Sub-opções de recorrência e parcelamento */
@@ -1246,7 +1246,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-pan
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.45;
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-secondary);
   font-weight: 450;
   max-width: 52ch;
 }
@@ -1256,7 +1256,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-pan
   padding: 4px 2px 2px;
   font-size: 14px;
   line-height: 1.5;
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-secondary);
 }
 
 .page-transacoes-tx-filter-hint {

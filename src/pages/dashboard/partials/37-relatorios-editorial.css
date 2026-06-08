@@ -11,8 +11,8 @@
   --rel-ed-neg: #e11d48;
   --rel-ed-line: rgba(15, 23, 42, 0.10);
   --rel-ed-text: var(--text, #0f172a);
-  --rel-ed-muted: var(--text-muted, #64748b);
-  --rel-ed-card: var(--bg-card, #ffffff);
+  --rel-ed-muted: var(--text-muted);
+  --rel-ed-card: var(--bg-card);
 }
 body[data-theme='dark'] .page-relatorios--editorial .ref-dashboard-inner {
   --rel-ed-pos: #34d399;

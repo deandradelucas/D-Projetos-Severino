@@ -1346,9 +1346,9 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     margin: 0;
     border-radius: 18px;
     box-sizing: border-box;
-    background: color-mix(in srgb, var(--bg-card, #f8fafc) 94%, var(--text-primary, #0f172a) 3%);
-    border: 1px solid color-mix(in srgb, var(--border-color, #e2e8f0) 65%, transparent);
-    box-shadow: 0 1px 0 color-mix(in srgb, var(--text-primary, #0f172a) 4%, transparent);
+    background: color-mix(in srgb, var(--bg-card) 94%, var(--text-primary) 3%);
+    border: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--text-primary) 4%, transparent);
   }
 
   body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions > .ref-tx-row::after,
@@ -1520,9 +1520,9 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     margin: 0 0 10px;
     border-radius: 14px;
     box-sizing: border-box;
-    background: color-mix(in srgb, var(--bg-card, #f8fafc) 94%, var(--text-primary, #0f172a) 3%);
-    border: 1px solid color-mix(in srgb, var(--border-color, #e2e8f0) 65%, transparent);
-    box-shadow: 0 1px 0 color-mix(in srgb, var(--text-primary, #0f172a) 4%, transparent);
+    background: color-mix(in srgb, var(--bg-card) 94%, var(--text-primary) 3%);
+    border: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--text-primary) 4%, transparent);
   }
 
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-tx-table-subgrid:not(.ref-tx-table-subgrid--actions) > .ref-tx-row::after,

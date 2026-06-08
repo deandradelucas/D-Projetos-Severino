@@ -46,7 +46,7 @@ body[data-theme='dark'] .relatorios-chart-card,
 body[data-theme='dark'] .config-card,
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-card,
 body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-theme-card {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   background-image: none;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: none;
@@ -138,14 +138,14 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
 /* KPIs e painéis — glass via 09b-dark-glass-cards.css */
 body[data-theme='dark'] .ref-kpi-card {
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   background-image: none;
   box-shadow: none;
 }
 
 @media (min-width: 769px) {
   body[data-theme='dark'] .ref-kpi-card {
-    background: var(--bg-card, #141618);
+    background: var(--bg-card);
     background-image: none;
     box-shadow: none;
   }
@@ -167,11 +167,11 @@ body[data-theme='dark'] .ref-kpi-card--balance .ref-kpi-card__value {
 }
 
 body[data-theme='dark'] .ref-kpi-card--income .ref-kpi-card__value {
-  color: var(--success, #34d399);
+  color: var(--success);
 }
 
 body[data-theme='dark'] .ref-kpi-card--expense .ref-kpi-card__value {
-  color: var(--danger, #f87171);
+  color: var(--danger);
 }
 
 body[data-theme='dark'] .ref-kpi-card__label {
@@ -180,14 +180,14 @@ body[data-theme='dark'] .ref-kpi-card__label {
 
 body[data-theme='dark'] .ref-panel {
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   background-image: none;
   box-shadow: none;
 }
 
 @media (min-width: 769px) {
   body[data-theme='dark'] .ref-panel {
-    background: var(--bg-card, #141618);
+    background: var(--bg-card);
     background-image: none;
     box-shadow: none;
   }
@@ -257,7 +257,7 @@ body[data-theme='dark'] .modal-backdrop {
 }
 
 body[data-theme='dark'] .modal-content {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   background-image: none;
   color: #f0f0f0;
   border: 1px solid rgba(148, 163, 184, 0.15);
@@ -309,7 +309,7 @@ body[data-theme='dark'] .custom-select.open .custom-select-trigger {
 }
 
 body[data-theme='dark'] .custom-select-dropdown {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   background-image: none;
   border-color: rgba(148, 163, 184, 0.15);
 }
@@ -440,7 +440,7 @@ body[data-theme='dark'] .horizon-chat-fab {
 }
 
 body[data-theme='dark'] .horizon-chat-window {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   background-image: none;
   border-color: rgba(148, 163, 184, 0.15);
   box-shadow: 0 28px 72px rgba(0, 0, 0, 0.65);
@@ -515,7 +515,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-men
 
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip {
   --rel-tooltip-bg: #141618;
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   background-image: none;
   border: 1px solid rgba(148, 163, 184, 0.15);
   color: #f0f0f0;
@@ -682,9 +682,9 @@ body[data-theme='dark'] .nav-item.active {
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
   font-weight: 800;
-  background: color-mix(in srgb, var(--accent, #e4bc6a) 13%, transparent);
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
   border-color: transparent;
-  color: var(--accent, #e4bc6a);
+  color: var(--accent);
   box-shadow: none;
 }
 
@@ -696,9 +696,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
-  background: color-mix(in srgb, var(--accent, #e4bc6a) 20%, transparent);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
   border: none;
-  color: var(--accent, #e4bc6a);
+  color: var(--accent);
   box-shadow: none;
 }
 
@@ -829,7 +829,7 @@ body[data-theme='dark'] .custom-select-dropdown,
 body[data-theme='dark'] .modal-content,
 body[data-theme='dark'] .horizon-chat-window,
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip {
-  background: var(--bg-card, #141618);
+  background: var(--bg-card);
   background-image: none;
   border-color: rgba(148, 163, 184, 0.15);
 }
@@ -890,10 +890,10 @@ body[data-theme='dark'] .mobile-bottom-nav__item {
 }
 
 body[data-theme='dark'] .mobile-bottom-nav__item--active {
-  color: var(--accent, #e4bc6a);
-  background: color-mix(in srgb, var(--accent, #e4bc6a) 16%, transparent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
   border-color: transparent;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent, #e4bc6a) 22%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent) 22%, transparent);
   -webkit-backdrop-filter: blur(14px) saturate(1.18);
   backdrop-filter: blur(14px) saturate(1.18);
 }
@@ -934,7 +934,7 @@ body[data-theme='dark']:not(:has(.dashboard-container.page-transacoes.ref-dashbo
   background: linear-gradient(
     185deg,
     #a7f3d0 0%,
-    var(--success, #10d68f) 38%,
+    var(--success) 38%,
     #059669 100%
   );
   -webkit-background-clip: text;

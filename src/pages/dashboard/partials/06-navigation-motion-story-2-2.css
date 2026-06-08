@@ -526,7 +526,7 @@
 
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel,
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel--daily {
-    background: var(--bg-card, #141618);
+    background: var(--bg-card);
     background-image: none;
     border: 1px solid rgba(148, 163, 184, 0.15);
     box-shadow: none;

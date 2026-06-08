@@ -2253,11 +2253,11 @@ body[data-theme='light'] .ref-empty-cta:active {
 
 /* Saldo zerado — tom neutro */
 body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
-  color: var(--text-secondary, #a3a3a3);
+  color: var(--text-secondary);
 }
 
 body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
 }
 
 /* ═══════════════ Foto de perfil no header da Home (canto direito) ═══════════════ */
@@ -2295,7 +2295,7 @@ body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-h
 .dashboard-hub__insight-empty {
   margin: 6px 0 0;
   font-size: 0.85rem;
-  color: var(--text-muted, #64748b);
+  color: var(--text-muted);
 }
 /* Próximo compromisso */
 .dashboard-hub__next {

@@ -182,7 +182,7 @@
   color: var(--text-muted);
 }
 .page-lista-compras__list-dropdown-item--accent svg { color: var(--accent); }
-.page-lista-compras__list-dropdown-item--danger svg { color: var(--error, #e0564f); }
+.page-lista-compras__list-dropdown-item--danger svg { color: var(--error); }
 
 /* Ícones SVG dos estados vazios (substituem os emojis grandes) */
 .page-lista-compras__onboarding-icon svg { width: 40px; height: 40px; color: var(--accent); }
