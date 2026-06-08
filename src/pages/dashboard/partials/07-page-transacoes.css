@@ -371,7 +371,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .filter-group label {
-  color: #475569;
+  color: var(--text-secondary);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -445,7 +445,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-filter-hint {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.45;
@@ -1820,7 +1820,7 @@ body[data-theme='dark'] .modal-header h2 {
 body[data-theme='dark'] .import-subtitle,
 body[data-theme='dark'] .import-dropzone-hint,
 body[data-theme='dark'] .import-file-size {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 body[data-theme='dark'] .import-file-selected,
