@@ -33,8 +33,13 @@ const BASE = process.env.CSSFP_BASE || 'http://localhost:3010'
 const EMAIL = process.env.CSSFP_EMAIL
 const PASS = process.env.CSSFP_PASS
 const MODE = process.argv.includes('--check') ? 'check' : process.argv.includes('--baseline') ? 'baseline' : null
+// --only <substr>: no modo check, captura/compara apenas cenas cujo key contém <substr>
+// (loop por-unidade rápido, ex.: --only /cartoes). Ignorado em baseline (sempre full).
+const onlyIdx = process.argv.indexOf('--only')
+const ONLY = MODE === 'check' && onlyIdx > -1 ? process.argv[onlyIdx + 1] : null
+const want = (key) => !ONLY || key.includes(ONLY)
 
-if (!MODE) { console.error('uso: --baseline | --check'); process.exit(1) }
+if (!MODE) { console.error('uso: --baseline | --check [--only <substr>]'); process.exit(1) }
 if (!EMAIL || !PASS) { console.error('defina CSSFP_EMAIL e CSSFP_PASS no ambiente'); process.exit(1) }
 
 // --- Definição das CENAS ---------------------------------------------------
@@ -183,6 +188,7 @@ async function run() {
   for (const vp of VIEWPORTS) {
     await page.setViewportSize({ width: vp.w, height: vp.h })
     for (const [route, root] of Object.entries(PAGE_ROOTS)) {
+      if (!want(`static|${route}`)) continue
       await gotoSettled(page, route, root); await closeChat()
       for (const theme of THEMES) {
         const key = `static|${route}|${vp.name}|${theme}`
@@ -195,6 +201,7 @@ async function run() {
   for (const vp of VIEWPORTS) {
     await page.setViewportSize({ width: vp.w, height: vp.h })
     for (const sc of STATE_SCENES) {
+      if (!want(`state|${sc.id}`)) continue
       await gotoSettled(page, sc.route, PAGE_ROOTS[sc.route]); await closeChat()
       try { await sc.open(page); await page.waitForSelector(sc.root, { timeout: 6000 }).catch(() => {}) } catch { /* gatilho ausente nesse vp */ }
       for (const theme of THEMES) {
@@ -206,6 +213,7 @@ async function run() {
   }
   // Cena 4: hover
   for (const h of HOVER_TARGETS) {
+    if (!want(`hover|${h.route}`)) continue
     await gotoSettled(page, h.route, h.root); await closeChat()
     try { await page.hover(h.sel, { timeout: 2000 }) } catch { /* ausente */ }
     for (const theme of THEMES) {
@@ -215,6 +223,7 @@ async function run() {
   }
   // Cena 7+8: mídia emulada (dashboard)
   for (const m of MEDIA) {
+    if (!want(`media|${m.id}`)) continue
     await page.emulateMedia(m.media ? { media: m.media } : { reducedMotion: m.reducedMotion })
     await gotoSettled(page, '/dashboard', '.app-layout-shell'); await closeChat()
     const res = await capture(page, '.app-layout-shell', 'light')
@@ -246,12 +255,14 @@ function diff(curr, b) {
   for (let i = 0; i < n; i++) if (curr[i].v !== b[i].v) d++
   return d + Math.abs(curr.length - b.length)
 }
+// Compara apenas as cenas CAPTURADAS (com --only, captura-se um subconjunto).
+const compareKeys = sceneKeys.filter((k) => base[k])
 let fail = 0
-for (const k of Object.keys(base)) {
+for (const k of compareKeys) {
   const d = diff(scenes[k], base[k])
   if (d !== 0) { fail++; console.error(`✖ ${k}: diff=${d}`) }
 }
 if (errored.length) { console.error(`✖ selfTest falhou em: ${errored.join(', ')}`); fail++ }
 if (fail) { console.error(`\n${fail} cena(s) divergente(s) — NÃO deployar.`); process.exit(1) }
-console.log(`✓ ${sceneKeys.length} cenas: diff=0 em todas.`)
+console.log(`✓ ${compareKeys.length} cena(s)${ONLY ? ` (filtro: ${ONLY})` : ''}: diff=0 em todas.`)
 process.exit(0)

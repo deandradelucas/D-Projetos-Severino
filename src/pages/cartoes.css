@@ -53,7 +53,7 @@
 /* ─── Card (aparência de cartão de crédito) ─── */
 .page-cartoes__card {
   --c1: #b8923f;
-  --c2: #d4a84b;
+  --c2: var(--accent);
   color: #fff;
   border-radius: 18px;
   padding: 18px;
@@ -194,7 +194,7 @@
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
-  box-shadow: var(--shadow-accent, 0 4px 14px rgba(212, 168, 75, 0.28));
+  box-shadow: var(--shadow-accent, 0 4px 14px rgba(var(--accent-rgb), 0.28));
 }
 
 /* ─── Modal (compartilha visual com Metas) ─── */
@@ -253,7 +253,7 @@
   outline: none;
 }
 .page-cartoes__input:focus { border-color: var(--accent); }
-.page-cartoes__input:focus-visible { outline: 2px solid rgba(212, 168, 75, 0.45); outline-offset: 2px; }
+.page-cartoes__input:focus-visible { outline: 2px solid rgba(var(--accent-rgb), 0.45); outline-offset: 2px; }
 
 .page-cartoes__cor-grid { display: flex; gap: 4px; flex-wrap: wrap; }
 .page-cartoes__cor-opt { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 7px; box-sizing: content-box; }
@@ -287,7 +287,7 @@
   font-family: inherit;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: var(--shadow-accent, 0 4px 14px rgba(212, 168, 75, 0.28));
+  box-shadow: var(--shadow-accent, 0 4px 14px rgba(var(--accent-rgb), 0.28));
 }
 .page-cartoes__btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -305,12 +305,12 @@
   outline: none;
 }
 .page-cartoes__busca-input:focus { border-color: var(--accent); }
-.page-cartoes__busca-input:focus-visible { outline: 2px solid rgba(212, 168, 75, 0.45); outline-offset: 2px; }
+.page-cartoes__busca-input:focus-visible { outline: 2px solid rgba(var(--accent-rgb), 0.45); outline-offset: 2px; }
 .page-cartoes__btn-ghost:focus-visible,
 .page-cartoes__btn-primary:focus-visible,
 .page-cartoes__card-menu-btn:focus-visible,
 .page-cartoes__fatura-nav button:focus-visible,
-.page-cartoes__escopo-btn:focus-visible { outline: 2px solid rgba(212, 168, 75, 0.45); outline-offset: 2px; }
+.page-cartoes__escopo-btn:focus-visible { outline: 2px solid rgba(var(--accent-rgb), 0.45); outline-offset: 2px; }
 
 /* ─── Fatura ─── */
 .page-cartoes__fatura-nav { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 0 20px 8px; }
