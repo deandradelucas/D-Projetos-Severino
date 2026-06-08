@@ -152,6 +152,20 @@ html:has(body[data-theme='light']) {
   background-color: #ffffff;
 }
 
+/* ── Fonte-base dos botões do hub — UNLAYERED ────────────────────────────────
+   Mesma razão do CTA: o preflight do Tailwind (`button{font:inherit}`) zera a
+   fonte de TODO botão e, sob o @tailwindcss/vite, vence os partials em @layer —
+   então secundário/ghost herdavam 17px/400 do hero em vez do tamanho do 04b.
+   Restaura o valor canônico da 1.0.3 (04b) unlayered. Vem ANTES do bloco do CTA
+   para o primário (mais abaixo) manter 14px/700. Exclui .agenda-page. ───────── */
+.dashboard-container:not(.agenda-page) .dashboard-hub__btn {
+  font-size: clamp(0.8125rem, 0.3vw + 0.74rem, 0.9375rem);
+  font-weight: 700;
+}
+.dashboard-container:not(.agenda-page) .dashboard-hub__btn--secondary {
+  font-weight: 500;
+}
+
 /* ── CTA primário do hub (pílula dourada) — UNLAYERED de propósito ────────────
    O preflight do Tailwind (`button{font:inherit}`, @layer base) acaba, sob o
    plugin @tailwindcss/vite, vencendo qualquer regra de fonte em @layer — então
