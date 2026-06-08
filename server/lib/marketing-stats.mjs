@@ -1,4 +1,5 @@
 import { log } from './logger.mjs'
+import { getPrecoMensal } from './plano-precos.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import {
   resumoPagamentosPorUsuarioIds,
@@ -95,8 +96,7 @@ export async function getMarketingStatsAdmin() {
     log.warn('[marketing-stats] receita pagamentos', e?.message || e)
   }
 
-  const planPriceRaw = parseFloat(process.env.HORIZONTE_PLANO_PRECO || '19.90')
-  const planPrice = Number.isFinite(planPriceRaw) && planPriceRaw > 0 ? planPriceRaw : 19.9
+  const planPrice = getPrecoMensal()
   const mrr = assinantes * planPrice
   const total_qualified = assinantes + trial_expirado
   const conversion_rate = total_qualified > 0 ? assinantes / total_qualified : 0

@@ -6,6 +6,7 @@ import {
 } from '@simplewebauthn/server'
 import { isoUint8Array } from '@simplewebauthn/server/helpers'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
+import { getPrecoMensal } from './plano-precos.mjs'
 import { normalizeUsuarioRow, stripSenha } from './usuario-schema.mjs'
 import { getWebAuthnRpIdAndOrigins } from './webauthn-config.mjs'
 import { buildAssinaturaUsuarioPayload } from './assinatura.mjs'
@@ -328,7 +329,7 @@ export async function finishAuthentication({ c, challengeId, credential, log }) 
       trial_dias_gratis: 7,
       assinatura_proxima_cobranca: null,
       assinatura_asaas_status: null,
-      plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
+      plano_preco_mensal: getPrecoMensal(),
       assinatura_situacao: 'inativa',
       assinatura_asaas_bloqueada: false,
       motivo_bloqueio_acesso: null,

@@ -1,4 +1,5 @@
 import { log } from './logger.mjs'
+import { getPrecoMensal } from './plano-precos.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { isSuperAdminEmail } from './super-admin.mjs'
 import { resolveEscopoUsuario, countVinculosFamiliaTitular } from './conta-familiar.mjs'
@@ -164,7 +165,7 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
       assinatura_paga: true,
       assinatura_asaas_status: row.assinatura_asaas_status,
     })
-    const precoMensalAdm = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
+    const precoMensalAdm = getPrecoMensal()
     const planoPrecoAdm = Number.isFinite(precoMensalAdm) && precoMensalAdm > 0 ? precoMensalAdm : 10
     return {
       trial_ends_at: trialEnds || row.trial_ends_at || null,
@@ -189,7 +190,7 @@ export async function buildAssinaturaUsuarioPayload(usuarioId, partialUser = {})
     }
   }
 
-  const precoMensal = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
+  const precoMensal = getPrecoMensal()
   const planoPreco = Number.isFinite(precoMensal) && precoMensal > 0 ? precoMensal : 10
 
   const portalLink =
@@ -242,7 +243,7 @@ export function buildAssinaturaFallbackPayload(baseUser) {
     trial_dias_gratis: 7,
     assinatura_proxima_cobranca: null,
     assinatura_asaas_status: null,
-    plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
+    plano_preco_mensal: getPrecoMensal(),
     assinatura_situacao: 'inativa',
     assinatura_asaas_bloqueada: false,
     motivo_bloqueio_acesso: null,

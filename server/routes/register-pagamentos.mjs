@@ -1,5 +1,6 @@
 import { randomUUID, timingSafeEqual } from 'node:crypto'
 import { log } from '../lib/logger.mjs'
+import { getPrecoMensal, getPrecoAnual } from '../lib/plano-precos.mjs'
 import { getRequestOrigin } from '../lib/password-reset.mjs'
 import { getPerfilUsuario } from '../lib/usuarios.mjs'
 import { criarAssinaturaComLink, isAsaasConfigured, cancelarAssinaturaAsaas } from '../lib/asaas.mjs'
@@ -60,8 +61,8 @@ export function registerPagamentosRoutes(app) {
         /* ignore */
       }
     }
-    const precoMensal = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
-    const precoAnual = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO_ANUAL || '100')
+    const precoMensal = getPrecoMensal()
+    const precoAnual = getPrecoAnual()
     return c.json({
       publicKey: null,
       ready: isAsaasConfigured(),
@@ -137,8 +138,8 @@ export function registerPagamentosRoutes(app) {
         return c.json({ message: 'CPF ou CNPJ inválido. Confira os números.' }, 400)
       }
 
-      const precoMensalCfg = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10')
-      const precoAnualCfg = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO_ANUAL || '100')
+      const precoMensalCfg = getPrecoMensal()
+      const precoAnualCfg = getPrecoAnual()
       const pm = Number.isFinite(precoMensalCfg) && precoMensalCfg > 0 ? precoMensalCfg : 10
       const pa = Number.isFinite(precoAnualCfg) && precoAnualCfg > 0 ? precoAnualCfg : 100
 
@@ -241,7 +242,7 @@ export function registerPagamentosRoutes(app) {
         return c.json({ message: 'Conta isenta — sem cobrança Pix.' }, 403)
       }
 
-      const precoAnualCfg = Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO_ANUAL || '100')
+      const precoAnualCfg = getPrecoAnual()
       const pa = Number.isFinite(precoAnualCfg) && precoAnualCfg > 0 ? precoAnualCfg : 100
 
       const out = await criarPixAnualComQrCode({

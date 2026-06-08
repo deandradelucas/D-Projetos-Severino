@@ -1,4 +1,5 @@
 import { log } from '../lib/logger.mjs'
+import { getPrecoMensal } from '../lib/plano-precos.mjs'
 import { getPerfilUsuario } from '../lib/usuarios.mjs'
 import { buildAssinaturaUsuarioPayload, marcarBemVindoPagamentoVisto } from '../lib/assinatura.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
@@ -24,7 +25,7 @@ export function registerAssinaturaRoutes(app) {
         trial_dias_gratis: 7,
         assinatura_proxima_cobranca: null,
         assinatura_asaas_status: null,
-        plano_preco_mensal: Number.parseFloat(process.env.HORIZONTE_PLANO_PRECO || '10') || 10,
+        plano_preco_mensal: getPrecoMensal(),
         assinatura_situacao: 'inativa',
         assinatura_asaas_bloqueada: false,
         motivo_bloqueio_acesso: null,
