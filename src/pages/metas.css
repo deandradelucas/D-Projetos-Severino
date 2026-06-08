@@ -257,18 +257,36 @@
   padding: 18px 20px 12px;
 }
 .page-metas__modal-title { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+/* Close do modal — AUTORIDADE ÚNICA aqui (metas.css é unlayered, vence os partials).
+   Consolidado: props próprias + as que o 35-close-btn (layered) fornecia (min-width,
+   min-height, padding, margin, display, box-shadow, transition), reproduzindo a aparência
+   híbrida atual. Verificado fingerprint diff=0 (cena modal-metas). 35 não estiliza mais. */
 .page-metas__modal-close {
   width: 32px;
   height: 32px;
+  min-width: 36px;
+  min-height: 36px;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0;
   border: none;
   border-radius: 8px;
   background: transparent;
+  background-image: none;
   color: var(--text-muted);
   font-size: 1.5rem;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 2px 2px 4px var(--m-shadow-soft),
+    inset -1px -1px 2px var(--m-light);
   cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
-.page-metas__modal-close:hover { background: var(--bg-secondary); color: var(--text-primary); }
+.page-metas__modal-close:hover { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--m-accent); }
 .page-metas__modal-close:focus-visible { outline: 2px solid rgba(212, 168, 75, 0.45); outline-offset: 2px; }
 .page-metas__modal-body { padding: 4px 20px 20px; display: flex; flex-direction: column; gap: 16px; }
 
