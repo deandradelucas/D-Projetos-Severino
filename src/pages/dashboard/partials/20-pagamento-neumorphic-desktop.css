@@ -14,7 +14,7 @@ body[data-theme='dark'] {
   --pg-edge-hi: rgba(255,255,255,0.055);
   --pg-text-hi: #f3f5f8; --pg-text-mid: #98a4b5; --pg-text-lo: #5a6878;
   --pg-accent: var(--accent); --pg-accent-glow: rgba(212,168,75,0.20);
-  --pg-pos: #4ade80; --pg-pos-soft: rgba(74,222,128,0.12); --pg-neg: #f87171; --pg-neg-soft: rgba(248,113,113,0.12);
+  --pg-pos: var(--success-text); --pg-pos-soft: rgba(74,222,128,0.12); --pg-neg: var(--error-text); --pg-neg-soft: rgba(248,113,113,0.12);
 }
 body[data-theme='light'] {
   --pg-base: #eef1f6; --pg-raised: #ffffff; --pg-sunken: #e4e8ee;
@@ -22,7 +22,7 @@ body[data-theme='light'] {
   --pg-edge-hi: rgba(255,255,255,0.95);
   --pg-text-hi: #0d1117; --pg-text-mid: #4a5568; --pg-text-lo: #8896a5;
   --pg-accent: #b8832a; --pg-accent-glow: rgba(184,131,42,0.18);
-  --pg-pos: #15803d; --pg-pos-soft: rgba(22,163,74,0.08); --pg-neg: #b91c1c; --pg-neg-soft: rgba(220,38,38,0.06);
+  --pg-pos: var(--success-text); --pg-pos-soft: rgba(22,163,74,0.08); --pg-neg: var(--error-text); --pg-neg-soft: rgba(220,38,38,0.06);
 }
 
 /* Modais Pix + cancelar: estilo neumórfico em TODAS as larguras (portal no body) */
@@ -87,8 +87,8 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
     --pg-edge-hi: rgba(255,255,255,0.055); --pg-edge-lo: rgba(0,0,0,0.50);
     --pg-text-hi: #f3f5f8; --pg-text-mid: #98a4b5; --pg-text-lo: #5a6878;
     --pg-accent: var(--accent); --pg-accent-glow: rgba(212,168,75,0.20);
-    --pg-pos: #4ade80; --pg-pos-glow: rgba(74,222,128,0.16); --pg-pos-soft: rgba(74,222,128,0.10);
-    --pg-neg: #f87171; --pg-neg-glow: rgba(248,113,113,0.16); --pg-neg-soft: rgba(248,113,113,0.10);
+    --pg-pos: var(--success-text); --pg-pos-glow: rgba(74,222,128,0.16); --pg-pos-soft: rgba(74,222,128,0.10);
+    --pg-neg: var(--error-text); --pg-neg-glow: rgba(248,113,113,0.16); --pg-neg-soft: rgba(248,113,113,0.10);
     --pg-warn: #fbbf24; --pg-warn-soft: rgba(245,158,11,0.12);
     --pg-ease: cubic-bezier(0.22,1,0.36,1); --pg-r: 22px;
   }
@@ -98,8 +98,8 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
     --pg-edge-hi: rgba(255,255,255,0.95); --pg-edge-lo: rgba(140,156,178,0.20);
     --pg-text-hi: #0d1117; --pg-text-mid: #4a5568; --pg-text-lo: #8896a5;
     --pg-accent: #b8832a; --pg-accent-glow: rgba(184,131,42,0.18);
-    --pg-pos: #15803d; --pg-pos-glow: rgba(22,163,74,0.14); --pg-pos-soft: rgba(22,163,74,0.08);
-    --pg-neg: #b91c1c; --pg-neg-glow: rgba(220,38,38,0.12); --pg-neg-soft: rgba(220,38,38,0.06);
+    --pg-pos: var(--success-text); --pg-pos-glow: rgba(22,163,74,0.14); --pg-pos-soft: rgba(22,163,74,0.08);
+    --pg-neg: var(--error-text); --pg-neg-glow: rgba(220,38,38,0.12); --pg-neg-soft: rgba(220,38,38,0.06);
     --pg-warn: #b45309; --pg-warn-soft: rgba(217,119,6,0.10);
     --pg-ease: cubic-bezier(0.22,1,0.36,1); --pg-r: 22px;
   }

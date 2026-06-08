@@ -50,7 +50,7 @@
     --inv-accent-mid:   #e2bc6a;
     --inv-accent-soft:  rgba(212, 168, 75, 0.15);
     --inv-accent-glow:  rgba(212, 168, 75, 0.28);
-    --inv-pos:          #4ade80;
+    --inv-pos:          var(--success-text);
     --inv-pos-mid:      #86efac;
     --inv-pos-soft:     rgba(74, 222, 128, 0.14);
     --inv-danger:       #f87171;
