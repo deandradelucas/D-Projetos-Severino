@@ -3,13 +3,11 @@
  * Bordas, botões, cartões e fundo — sem editar o CSS gerado.
  */
 
-/* Variáveis: superfícies um pouco mais ricas */
-body[data-theme='dark'] {
-  --bg-card: #161e2a;
-  --bg-card-elevated: #1c2736;
-  --border-color: rgba(148, 163, 184, 0.14);
-  --accent-muted: rgba(212, 168, 75, 0.14);
-}
+/* Bloco de tokens dark removido por MORTO (jun/2026): --bg-card/-elevated/
+   --border-color/--accent-muted eram redefinidos pelo 00-tokens-base.css, que
+   carrega DEPOIS (mesma especificidade body[data-theme='dark'] → vence por ordem
+   de fonte). Verificado por fingerprint diff=0. Mesma razão do bloco já removido
+   no dashboard-theme-dark-fullblack.css. */
 
 /* Botões primários (o espelho pode colapsar bg/cor por ordem de substituição) */
 body[data-theme='dark'] .btn-primary {
@@ -58,10 +56,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
-@media (min-width: 769px) {
-  
-}
-
 /* Menu shell: espelho mantém rgba(15,23,42,…) e hovers claros — força legibilidade */
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
   color: rgba(226, 232, 240, 0.82);
@@ -105,14 +99,6 @@ body[data-theme='dark'] .ref-kpi-card {
     0 1px 0 rgba(255, 255, 255, 0.07) inset,
     0 18px 44px -30px rgba(0, 0, 0, 0.55),
     0 0 40px -24px rgba(59, 130, 246, 0.06);
-}
-
-@media (min-width: 769px) {
-  
-}
-
-@media (min-width: 769px) {
-  
 }
 
 /* Container “card” em rotas não-shell */
@@ -202,10 +188,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-men
 }
 
 /* Desktop: sombra do item ativo sem “rim” branco forte */
-@media (min-width: 769px) {
-  
-}
-
 /* Mobile: shell deve deixar a foto aparecer (espelho pinta gradiente em todo .dashboard-container) */
 @media (max-width: 768px) {
   body[data-theme='dark'] .dashboard-container.app-horizon-shell {

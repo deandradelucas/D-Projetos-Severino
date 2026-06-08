@@ -188,10 +188,11 @@ async function run() {
   for (const vp of VIEWPORTS) {
     await page.setViewportSize({ width: vp.w, height: vp.h })
     for (const [route, root] of Object.entries(PAGE_ROOTS)) {
-      if (!want(`static|${route}`)) continue
+      if (!THEMES.some((t) => want(`static|${route}|${vp.name}|${t}`))) continue
       await gotoSettled(page, route, root); await closeChat()
       for (const theme of THEMES) {
         const key = `static|${route}|${vp.name}|${theme}`
+        if (!want(key)) continue
         const res = await capture(page, root, theme)
         scenes[key] = res.error ? res : res.rows
       }
@@ -201,11 +202,12 @@ async function run() {
   for (const vp of VIEWPORTS) {
     await page.setViewportSize({ width: vp.w, height: vp.h })
     for (const sc of STATE_SCENES) {
-      if (!want(`state|${sc.id}`)) continue
+      if (!THEMES.some((t) => want(`state|${sc.id}|${vp.name}|${t}`))) continue
       await gotoSettled(page, sc.route, PAGE_ROOTS[sc.route]); await closeChat()
       try { await sc.open(page); await page.waitForSelector(sc.root, { timeout: 6000 }).catch(() => {}) } catch { /* gatilho ausente nesse vp */ }
       for (const theme of THEMES) {
         const key = `state|${sc.id}|${vp.name}|${theme}`
+        if (!want(key)) continue
         const res = await capture(page, sc.root, theme)
         scenes[key] = res.error ? res : res.rows
       }
@@ -213,12 +215,14 @@ async function run() {
   }
   // Cena 4: hover
   for (const h of HOVER_TARGETS) {
-    if (!want(`hover|${h.route}`)) continue
+    if (!THEMES.some((t) => want(`hover|${h.route}|${t}`))) continue
     await gotoSettled(page, h.route, h.root); await closeChat()
     try { await page.hover(h.sel, { timeout: 2000 }) } catch { /* ausente */ }
     for (const theme of THEMES) {
+      const key = `hover|${h.route}|${theme}`
+      if (!want(key)) continue
       const res = await capture(page, h.root, theme)
-      scenes[`hover|${h.route}|${theme}`] = res.error ? res : res.rows
+      scenes[key] = res.error ? res : res.rows
     }
   }
   // Cena 7+8: mídia emulada (dashboard)
