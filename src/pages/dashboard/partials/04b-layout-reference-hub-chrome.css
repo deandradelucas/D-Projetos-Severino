@@ -36,13 +36,13 @@ body[data-theme='light'] .dashboard-container:not(.app-horizon-shell) .sidebar .
 .dashboard-container.app-horizon-shell .mobile-menu-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 60%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 60%, transparent);
 }
 
 .dashboard-container.app-horizon-shell .mobile-close-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #d4a84b) 28%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 /* Dashboard: faixa de KPIs — Saída e Entrada na mesma linha (grid no .ref-kpi-row) */
@@ -1988,7 +1988,7 @@ body[data-theme='light'] .ref-tx-rec-badge {
   align-items: center;
   justify-content: center;
   margin-left: 0;
-  color: var(--accent-hover, #c49535);
+  color: var(--accent-hover);
 }
 
 body[data-theme='light'] .ref-tx-actions-cell {

@@ -945,7 +945,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
     box-shadow:
-      inset 3px 0 0 var(--accent, #d4a84b),
+      inset 3px 0 0 var(--accent),
       0 10px 28px -18px rgba(15, 23, 42, 0.18),
       inset 0 1px 0 rgba(255, 255, 255, 0.95);
   }
@@ -1477,7 +1477,7 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     border-radius: 9px;
     align-items: center;
     justify-content: center;
-    background: color-mix(in srgb, var(--accent, #d4a84b) 12%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
   }
 
   .page-transacoes.app-horizon-shell .ref-tx-table-subgrid--actions .ref-tx-actions-cell .btn-edit,
@@ -1624,7 +1624,7 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
     border-radius: 10px;
     align-items: center;
     justify-content: center;
-    background: color-mix(in srgb, var(--accent, #d4a84b) 12%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
   }
 
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-panel.ref-panel--transactions {
@@ -3045,7 +3045,7 @@ body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary.load
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary:hover:not(:disabled),
 body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-primary:active:not(:disabled) {
-  background: var(--accent-hover, #c49535);
+  background: var(--accent-hover);
   background-image: none;
   color: #111111;
   box-shadow: none;

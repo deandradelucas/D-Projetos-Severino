@@ -19,7 +19,7 @@
   height: 24px;
   border-radius: 8px;
   color: var(--accent-foreground, #1a1200);
-  background: var(--accent, #d4a84b);
+  background: var(--accent);
   box-shadow: var(--shadow-accent, 0 2px 8px rgba(212, 168, 75, 0.35));
 }
 .ai-insights__title {
@@ -59,7 +59,7 @@
 }
 .ai-insight--alerta { --ai-accent: #ef4444; }
 .ai-insight--positivo { --ai-accent: #22c55e; }
-.ai-insight--neutro { --ai-accent: var(--accent, #d4a84b); }
+.ai-insight--neutro { --ai-accent: var(--accent); }
 .ai-insight--destaque { --ai-accent: #8b5cf6; }
 
 .ai-insight__icon {

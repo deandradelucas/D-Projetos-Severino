@@ -181,17 +181,17 @@
   flex-shrink: 0;
   color: var(--text-muted);
 }
-.page-lista-compras__list-dropdown-item--accent svg { color: var(--accent, #d4a84b); }
+.page-lista-compras__list-dropdown-item--accent svg { color: var(--accent); }
 .page-lista-compras__list-dropdown-item--danger svg { color: var(--error, #e0564f); }
 
 /* Ícones SVG dos estados vazios (substituem os emojis grandes) */
-.page-lista-compras__onboarding-icon svg { width: 40px; height: 40px; color: var(--accent, #d4a84b); }
+.page-lista-compras__onboarding-icon svg { width: 40px; height: 40px; color: var(--accent); }
 .page-lista-compras__empty-icon svg { width: 44px; height: 44px; color: var(--text-muted); }
 
 .page-lista-compras__escopo-btn--active {
   background: rgba(var(--accent-rgb, 212,168,75), 0.12);
-  border-color: var(--accent, #d4a84b);
-  color: var(--accent, #d4a84b);
+  border-color: var(--accent);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -273,7 +273,7 @@
 
 .page-lista-compras__lista-gasto-tag svg {
   flex-shrink: 0;
-  color: var(--accent-hover, #c49535);
+  color: var(--accent-hover);
 }
 
 /* Tarefas: identidade roxa (distinta do dourado de compras) */
@@ -456,7 +456,7 @@
 }
 
 .page-lista-compras__item-edit {
-  color: var(--accent, #d4a84b);
+  color: var(--accent);
 }
 
 .page-lista-compras__item-delete {
@@ -695,7 +695,7 @@
 }
 
 body[data-theme='dark'] .page-lista-compras__novo-item-fab {
-  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 52%, rgba(255, 255, 255, 0.12));
+  border: 1px solid color-mix(in srgb, var(--accent) 52%, rgba(255, 255, 255, 0.12));
   background: linear-gradient(
       158deg,
       rgba(255, 255, 255, 0.14) 0%,
@@ -1854,7 +1854,7 @@ body[data-theme='dark'] .page-lista-compras__item-step {
   border: none;
   padding: 0;
   cursor: pointer;
-  color: var(--accent, #d4a84b);
+  color: var(--accent);
   text-align: left;
 }
 .page-lista-compras__preco-hint--btn:active { opacity: 0.7; }
@@ -1905,7 +1905,7 @@ body[data-theme='dark'] .page-lista-compras__item-step {
   display: block;
   height: 100%;
   border-radius: 99px;
-  background: var(--accent, #d4a84b);
+  background: var(--accent);
   transition: width 280ms ease;
 }
 .page-lista-compras__orcamento--excedido .page-lista-compras__orcamento-fill {
@@ -1922,7 +1922,7 @@ body[data-theme='dark'] .page-lista-compras__item-step {
 
 /* Item de menu em destaque (Modo comprando) */
 .page-lista-compras__list-dropdown-item--accent {
-  color: var(--accent, #d4a84b);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -1933,7 +1933,7 @@ body[data-theme='dark'] .page-lista-compras__item-step {
   gap: 3px;
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--accent, #d4a84b);
+  color: var(--accent);
   background: rgba(212, 168, 75, 0.12);
   padding: 2px 8px;
   border-radius: 99px;
@@ -1960,7 +1960,7 @@ body[data-theme='light'] .page-lista-compras__modal-input--datetime { color-sche
   gap: 4px;
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--accent, #d4a84b);
+  color: var(--accent);
   background: rgba(212, 168, 75, 0.12);
   padding: 3px 10px;
   border-radius: 99px;

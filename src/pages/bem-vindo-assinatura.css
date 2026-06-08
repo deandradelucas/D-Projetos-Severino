@@ -91,7 +91,7 @@
 
 /* ─── CTA principal (mesmo padrão dos botões dourados do sistema) ─── */
 .bemvindo-cta {
-  background: var(--accent, #d4a84b);
+  background: var(--accent);
   color: var(--accent-foreground, #1a1200);
   box-shadow: var(--shadow-accent, 0 4px 16px rgba(212, 168, 75, 0.32));
 }

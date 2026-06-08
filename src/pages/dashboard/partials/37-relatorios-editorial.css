@@ -6,7 +6,7 @@
    ────────────────────────────────────────────────────────────────────────── */
 
 .page-relatorios--editorial .ref-dashboard-inner {
-  --rel-ed-gold: var(--accent, #d4a84b);
+  --rel-ed-gold: var(--accent);
   --rel-ed-pos: #16a34a;
   --rel-ed-neg: #e11d48;
   --rel-ed-line: rgba(15, 23, 42, 0.10);

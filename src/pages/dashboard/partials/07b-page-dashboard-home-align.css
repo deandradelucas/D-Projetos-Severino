@@ -265,7 +265,7 @@ body[data-theme='dark']:has(
       )
   )
   .dashboard-mobile-tx-fab {
-  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 52%, rgba(255, 255, 255, 0.12));
+  border: 1px solid color-mix(in srgb, var(--accent) 52%, rgba(255, 255, 255, 0.12));
   background:
     linear-gradient(
       158deg,
@@ -325,7 +325,7 @@ body[data-theme='dark']:has(
 
 /* Dark — Investimentos: FAB vidro + rótulo dourado (Transações: mesmo padrão em 07-page-transacoes.css) */
 body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab {
-  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 52%, rgba(255, 255, 255, 0.12));
+  border: 1px solid color-mix(in srgb, var(--accent) 52%, rgba(255, 255, 255, 0.12));
   background:
     linear-gradient(
       158deg,

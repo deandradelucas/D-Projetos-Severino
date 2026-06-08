@@ -1485,7 +1485,7 @@ input:disabled {
   flex-shrink: 0;
   border-radius: 7px;
   color: var(--accent-foreground, #1a1200);
-  background: var(--accent, #d4a84b);
+  background: var(--accent);
   box-shadow: var(--shadow-accent, 0 2px 8px rgba(212, 168, 75, 0.35));
 }
 .ntx-ai-quick__title {
@@ -1508,7 +1508,7 @@ input:disabled {
   box-shadow: 0 0 0 1px var(--accent-muted, rgba(212, 168, 75, 0.12));
 }
 .ntx-ai-quick__field .input-premium:focus {
-  box-shadow: 0 0 0 2px var(--accent, #d4a84b);
+  box-shadow: 0 0 0 2px var(--accent);
 }
 .ntx-ai-quick__field .input-premium::placeholder {
   font-style: italic;
@@ -1519,7 +1519,7 @@ input:disabled {
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  color: var(--accent, #d4a84b);
+  color: var(--accent);
 }
 .ntx-ai-quick__spin .spinner {
   width: 16px;
