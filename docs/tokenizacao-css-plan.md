@@ -33,7 +33,10 @@ Verificar build+lint+test:unit e raciocinar light+dark a cada fatia. Commit por 
 - [x] **Fatia 1 — gold da marca:** `#d4a84b` → `var(--accent)` (invariante). 21 trocas. commit `99f286f`. ZERO change.
 - [x] **Fatia 2 — pos/neg por-página:** 37 defs `--*-pos/--*-neg` sólidas → `var(--success-text)`/`var(--error-text)`. Classificadas: 100% em bloco de tema correto. commit `7f97b97`. ZERO change.
 - [x] **Fatia 3a — texto (CEO escolheu A):** 68 defs `--*-text-hi/mid/lo` → `var(--text-primary/secondary/muted)`. Light exato; dark micro-shift aprovado. commit `82efb58`.
-- [ ] **Fatia 3b — superfícies (NOVA decisão CEO):** escala neumórfica base/raised/sunken NÃO casa limpo com escala global de elevação (bg-base/primary/secondary/card). Alguns Δ invisíveis (`#0e1117`→bg-secondary), mas `sunken` light (`#e4e8ee`→`#eef0f4` Δ~10) é VISÍVEL e mapa raised↔card é ambíguo. Opções: (A) forçar snap ao global mais próximo (shifts visíveis em alguns + acoplamento) OU (B) manter base/raised/sunken page-local (são paleta de relevo soft-UI bespoke). PENDENTE.
+- [x] **Fatia 3b — superfícies (CEO: "só as invisíveis"):** 38 defs com Δ/canal≤7 → surface/base→`--bg-secondary`, raised/card→`--bg-card`, sunken(dark)→`--bg-primary`. Sunken LIGHT (Δ15-24) mantido page-local. commit `b8b579d`. Ordem do relevo preservada.
+
+## Progresso medido (hardcoded nos partials)
+~3111 (início) → **2949**. Sobram: 419 defs de token ainda hardcoded (majoritariamente BESPOKE sem global limpo: shadows, glows, edges, speculars, sunken-light, blue/purple, accent-glow) + ~547 cores em RULES (não-def). A paleta PRIMÁRIA (gold, pos/neg, texto hi/mid/lo, superfície sunken/base/raised) está single-source. O resto é (a) bespoke legítimo ou (b) track maior de cores rule-level (cada uma exige check de contexto/tema/valor; muitas nos 3 arquivos dark).
 - [ ] Resto exact-match é assimétrico/raro (blue dark `#60a5fa`≠`--info` `#3b82f6`; accent-fg light `#fff`≠global `#1a1200`) — baixo valor, adiar.
 - [ ] Final — quando um componente é 100% token-driven, deletar seus overrides em mirror/polish/fullblack.
 
