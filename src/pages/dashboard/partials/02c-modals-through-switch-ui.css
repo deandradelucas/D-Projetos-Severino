@@ -2252,11 +2252,9 @@ body[data-theme='dark'] .modal-content--nova-tx .type-btn.active.receita {
   border: 1px solid rgba(34, 197, 94, 0.32);
 }
 
-body[data-theme='dark'] .modal-content--nova-tx .close-btn {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-}
+/* .modal-content--nova-tx .close-btn (aparência dark) removida por MORTA: o 16
+   (desktop, --ntx-*) e o 27 (mobile, --m-*, seletor (0,3,1)) vencem em ambos os
+   viewports. :hover abaixo mantido (live no mobile, não-coberto pelo fingerprint). */
 
 body[data-theme='dark'] .modal-content--nova-tx .close-btn:hover {
   border-color: var(--accent);

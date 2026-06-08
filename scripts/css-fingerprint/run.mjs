@@ -195,7 +195,11 @@ async function run() {
   catch { console.error('playwright não instalado. Rode: npm i -D playwright && npx playwright install chromium'); process.exit(1) }
 
   const browser = await chromium.launch()
-  const ctx = await browser.newContext()
+  // serviceWorkers:'block' — o build de produção (vite preview) registra o SW do
+  // PWA, que intercepta/cacheia e trava a navegação headless. Bloquear evita o
+  // timeout no /login e dá navegação determinística (essencial p/ rodar contra
+  // preview, mais estável que o dev server sob carga de runs longos).
+  const ctx = await browser.newContext({ serviceWorkers: 'block' })
   await ctx.addInitScript(CAPTURE_SRC) // injeta __cssfp em TODA navegação
   const page = await ctx.newPage()
   await page.setViewportSize({ width: 1440, height: 900 })
@@ -224,7 +228,10 @@ async function run() {
     for (const sc of STATE_SCENES) {
       if (!THEMES.some((t) => want(`state|${sc.id}|${vp.name}|${t}`))) continue
       await gotoSettled(page, sc.route, PAGE_ROOTS[sc.route]); await closeChat()
-      try { await sc.open(page); await page.waitForSelector(sc.root, { timeout: 6000 }).catch(() => {}) } catch { /* gatilho ausente nesse vp */ }
+      // settle() no root do modal: espera o conteúdo async do modal (categorias,
+      // listas) estabilizar — sem isto, a contagem de elementos varia entre baseline
+      // e check (ex.: nova-tx mobile dava diff=30 de volatilidade).
+      try { await sc.open(page); await settle(page, sc.root) } catch { /* gatilho ausente nesse vp */ }
       for (const theme of THEMES) {
         const key = `state|${sc.id}|${vp.name}|${theme}`
         if (!want(key)) continue
