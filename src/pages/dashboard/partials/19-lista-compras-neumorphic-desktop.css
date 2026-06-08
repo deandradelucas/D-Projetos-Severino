@@ -690,99 +690,99 @@
   .page-lista-compras .page-lista-compras__modal,
   body[data-theme='dark'] .page-lista-compras__modal,
   body[data-theme='light'] .page-lista-compras__modal {
-    background: linear-gradient(155deg, var(--lc-raised, #fff) 0%, var(--lc-base, #eef1f6) 100%) !important;
-    border: 1px solid var(--lc-edge-hi, rgba(255,255,255,0.9)) !important;
-    border-radius: 24px !important;
-    box-shadow: 16px 16px 40px var(--lc-shadow, rgba(166,180,200,0.45)), -12px -12px 32px var(--lc-light, rgba(255,255,255,0.9)), inset 1px 1px 1px var(--lc-edge-hi, rgba(255,255,255,0.9)) !important;
-    padding: 28px !important;
+    background: linear-gradient(155deg, var(--lc-raised, #fff) 0%, var(--lc-base, #eef1f6) 100%);
+    border: 1px solid var(--lc-edge-hi, rgba(255,255,255,0.9));
+    border-radius: 24px;
+    box-shadow: 16px 16px 40px var(--lc-shadow, rgba(166,180,200,0.45)), -12px -12px 32px var(--lc-light, rgba(255,255,255,0.9)), inset 1px 1px 1px var(--lc-edge-hi, rgba(255,255,255,0.9));
+    padding: 28px;
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-title {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 1.25rem !important;
-    letter-spacing: -0.02em !important;
-    color: var(--lc-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    color: var(--lc-text-hi);
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-close {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 50% !important;
-    background: var(--lc-sunken) !important;
-    border: 1px solid var(--lc-edge-hi) !important;
-    color: var(--lc-text-mid) !important;
-    cursor: pointer !important;
-    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
-    transition: color 200ms var(--lc-ease) !important;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--lc-sunken);
+    border: 1px solid var(--lc-edge-hi);
+    color: var(--lc-text-mid);
+    cursor: pointer;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light);
+    transition: color 200ms var(--lc-ease);
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-close:hover {
-    color: var(--lc-neg) !important;
+    color: var(--lc-neg);
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-label {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.75rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.12em !important;
-    color: var(--lc-text-lo) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--lc-text-lo);
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-input,
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-select {
-    padding: 11px 14px !important;
-    border-radius: 12px !important;
-    background: var(--lc-sunken) !important;
-    border: 1px solid var(--lc-edge-hi) !important;
-    color: var(--lc-text-hi) !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
+    padding: 11px 14px;
+    border-radius: 12px;
+    background: var(--lc-sunken);
+    border: 1px solid var(--lc-edge-hi);
+    color: var(--lc-text-hi);
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light);
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-input:focus,
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-select:focus {
-    outline: 2px solid var(--lc-accent) !important;
-    outline-offset: 2px !important;
+    outline: 2px solid var(--lc-accent);
+    outline-offset: 2px;
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-total-display {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1.5rem !important;
-    font-weight: 700 !important;
-    color: var(--lc-accent) !important;
-    font-variant-numeric: tabular-nums !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--lc-accent);
+    font-variant-numeric: tabular-nums;
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-cancel {
-    padding: 10px 18px !important;
-    border-radius: 999px !important;
-    background: var(--lc-sunken) !important;
-    border: 1px solid var(--lc-edge-hi) !important;
-    color: var(--lc-text-mid) !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light) !important;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: var(--lc-sunken);
+    border: 1px solid var(--lc-edge-hi);
+    color: var(--lc-text-mid);
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: inset 2px 2px 4px var(--lc-shadow-soft), inset -1px -1px 2px var(--lc-light);
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-confirm {
-    padding: 10px 20px !important;
-    border-radius: 999px !important;
-    background: linear-gradient(155deg, var(--lc-accent) 0%, #c49535 100%) !important;
-    border: none !important;
-    color: #1a1200 !important;
-    font-weight: 700 !important;
-    cursor: pointer !important;
-    box-shadow: 5px 7px 16px -5px var(--lc-accent-glow) !important;
-    transition: transform 200ms var(--lc-ease) !important;
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: linear-gradient(155deg, var(--lc-accent) 0%, #c49535 100%);
+    border: none;
+    color: #1a1200;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 5px 7px 16px -5px var(--lc-accent-glow);
+    transition: transform 200ms var(--lc-ease);
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-confirm:hover:not(:disabled) {
-    transform: translateY(-1px) !important;
+    transform: translateY(-1px);
   }
   .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__modal-confirm:disabled {
-    opacity: 0.5 !important;
-    cursor: not-allowed !important;
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   /* Reduce motion */
   @media (prefers-reduced-motion: reduce) {
     body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell *,
     body[data-theme='light'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell * {
-      transition: none !important;
-      animation: none !important;
+      transition: none;
+      animation: none;
     }
   }
 }

@@ -36,29 +36,29 @@ body[data-theme='dark'] .modo-comprando__close,
 body[data-theme='light'] .modo-comprando__close,
 body[data-theme='dark'] .modal-close-btn,
 body[data-theme='light'] .modal-close-btn {
-  width: 36px !important;
-  height: 36px !important;
-  min-width: 36px !important;
-  min-height: 36px !important;
-  flex-shrink: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border-radius: 50% !important;
-  background: var(--m-sunken) !important;
-  background-image: none !important;
-  border: 1px solid var(--m-edge-hi) !important;
-  color: var(--m-text-mid) !important;
-  font-size: 1.25rem !important;
-  line-height: 1 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--m-sunken);
+  background-image: none;
+  border: 1px solid var(--m-edge-hi);
+  color: var(--m-text-mid);
+  font-size: 1.25rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   box-shadow:
     inset 2px 2px 4px var(--m-shadow-soft),
-    inset -1px -1px 2px var(--m-light) !important;
-  cursor: pointer !important;
-  transition: border-color 160ms ease, color 160ms ease, background 160ms ease !important;
-  -webkit-tap-highlight-color: transparent !important;
+    inset -1px -1px 2px var(--m-light);
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Ícone interno (SVG) — tamanho consistente. Não afeta X de texto. */
@@ -78,8 +78,8 @@ body[data-theme='dark'] .modo-comprando__close svg,
 body[data-theme='light'] .modo-comprando__close svg,
 body[data-theme='dark'] .modal-close-btn svg,
 body[data-theme='light'] .modal-close-btn svg {
-  width: 14px !important;
-  height: 14px !important;
+  width: 14px;
+  height: 14px;
 }
 
 /* ── Hover/focus — borda dourada + ícone mais forte ─────────────────────────── */
@@ -105,7 +105,7 @@ body[data-theme='dark'] .modo-comprando__close:hover,
 body[data-theme='light'] .modo-comprando__close:hover,
 body[data-theme='dark'] .modal-close-btn:hover,
 body[data-theme='light'] .modal-close-btn:hover {
-  border-color: var(--m-accent) !important;
-  color: var(--m-text-hi) !important;
-  background: var(--m-sunken) !important;
+  border-color: var(--m-accent);
+  color: var(--m-text-hi);
+  background: var(--m-sunken);
 }

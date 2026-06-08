@@ -80,7 +80,7 @@ body:has(.modal-backdrop) .dashboard-mobile-tx-fab,
 body:has(.modal-backdrop) .horizon-chat-fab,
 body:has(.modal-backdrop) .horizon-chat-window,
 body:has(.modal-backdrop) .pwa-install-sheet {
-  display: none !important;
+  display: none;
 }
 
 /* Modais da Lista usam overlay próprio (.page-lista-compras__modal-overlay) — esconder nav/FAB tb */
@@ -88,7 +88,7 @@ body:has(.page-lista-compras__modal-overlay) .mobile-bottom-nav,
 body:has(.page-lista-compras__modal-overlay) .dashboard-mobile-tx-fab,
 body:has(.page-lista-compras__modal-overlay) .dashboard-mobile-fabs,
 body:has(.page-lista-compras__modal-overlay) .horizon-chat-fab {
-  display: none !important;
+  display: none;
 }
 
 body.horizon-modal-open .mobile-bottom-nav,
@@ -96,25 +96,25 @@ body.horizon-modal-open .dashboard-mobile-tx-fab,
 body.horizon-modal-open .horizon-chat-fab,
 body.horizon-modal-open .horizon-chat-window,
 body.horizon-modal-open .pwa-install-sheet {
-  display: none !important;
+  display: none;
 }
 
 body.horizon-chat-open .mobile-bottom-nav,
 body.horizon-chat-open .dashboard-mobile-tx-fab,
 body.horizon-chat-open .dashboard-mobile-fabs {
-  display: none !important;
+  display: none;
 }
 
 body.horizon-sidebar-open .mobile-bottom-nav,
 body:has(.sidebar.open) .mobile-bottom-nav {
-  display: none !important;
+  display: none;
   z-index: 60;
-  pointer-events: none !important;
+  pointer-events: none;
 }
 
 body.horizon-sidebar-open .mobile-bottom-nav__bar,
 body:has(.sidebar.open) .mobile-bottom-nav__bar {
-  pointer-events: none !important;
+  pointer-events: none;
 }
 
 body.horizon-sidebar-open .dashboard-mobile-tx-fab,
@@ -123,7 +123,7 @@ body.horizon-sidebar-open .horizon-chat-fab,
 body:has(.sidebar.open) .horizon-chat-fab,
 body.horizon-sidebar-open .horizon-chat-window,
 body:has(.sidebar.open) .horizon-chat-window {
-  display: none !important;
+  display: none;
 }
 
 /* Base Responsive adjustments */
@@ -373,7 +373,7 @@ body:has(.sidebar.open) .horizon-chat-window {
 
   body.horizon-sidebar-open .dashboard-container.ref-dashboard.app-horizon-shell .main-content,
   body.horizon-sidebar-open .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    overflow: hidden !important;
+    overflow: hidden;
   }
 
   .mobile-backdrop {
@@ -648,7 +648,7 @@ body:has(.sidebar.open) .horizon-chat-window {
         rgba(255, 255, 255, 0.22) 42%,
         rgba(255, 255, 255, 0.4) 52%,
         rgba(255, 255, 255, 0.28) 100%
-      ) !important;
+      );
     -webkit-backdrop-filter: blur(22px) saturate(1.35);
     backdrop-filter: blur(22px) saturate(1.35);
     font: inherit;
@@ -827,7 +827,7 @@ body:has(.sidebar.open) .horizon-chat-window {
 .page-admin-filter-select--perfil {
   width: 100%;
   max-width: 168px;
-  min-height: 36px !important;
+  min-height: 36px;
 }
 
 .page-admin-usuarios-compact-block {
@@ -879,16 +879,16 @@ body:has(.sidebar.open) .horizon-chat-window {
 }
 
 .page-admin-usuarios .admin-acoes-btn {
-  padding: 5px 10px !important;
-  font-size: 11px !important;
+  padding: 5px 10px;
+  font-size: 11px;
   font-weight: 600;
   border-radius: 8px;
   white-space: nowrap;
 }
 
 .page-admin-usuarios .admin-acoes-btn--danger {
-  color: #b91c1c !important;
-  border-color: rgba(239, 68, 68, 0.45) !important;
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.45);
 }
 
 .page-admin-usuarios .admin-acoes-btn--danger:hover:not(:disabled) {
@@ -907,7 +907,7 @@ body:has(.sidebar.open) .horizon-chat-window {
 }
 
 .page-admin-usuarios-panel-head {
-  align-items: flex-start !important;
+  align-items: flex-start;
 }
 
 .page-admin-usuarios-head-stack {
@@ -945,7 +945,7 @@ body:has(.sidebar.open) .horizon-chat-window {
 }
 
 .page-admin-usuarios-filters-toggle {
-  font-weight: 700 !important;
+  font-weight: 700;
 }
 
 .page-admin-usuarios-filters-region {
@@ -953,9 +953,9 @@ body:has(.sidebar.open) .horizon-chat-window {
 }
 
 .page-admin-usuarios-intro {
-  text-transform: none !important;
-  letter-spacing: 0 !important;
-  line-height: 1.5 !important;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.5;
 }
 
 .page-admin-usuarios-adv-filters {
@@ -1227,18 +1227,18 @@ body[data-theme='dark'] .page-admin-usuario-card--editing {
 }
 
 .page-admin-usuario-card__actions {
-  gap: 5px !important;
+  gap: 5px;
 }
 
 .page-admin-usuario-card .admin-acoes-btn {
-  padding: 4px 9px !important;
-  font-size: 11px !important;
+  padding: 4px 9px;
+  font-size: 11px;
   border-radius: 7px;
 }
 
 .page-admin-usuario-card .admin-acoes-protegido {
-  font-size: 10px !important;
-  padding: 3px 7px !important;
+  font-size: 10px;
+  padding: 3px 7px;
 }
 
 .page-admin-usuario-card .page-admin-inline-input {
@@ -1265,7 +1265,7 @@ body[data-theme='dark'] .page-admin-usuario-card--editing {
 }
 
 .page-admin-usuario-card .page-admin-filter-select--perfil {
-  min-height: 32px !important;
+  min-height: 32px;
   max-width: 152px;
   font-size: 12px;
 }
@@ -1280,7 +1280,7 @@ body[data-theme='dark'] .page-admin-usuario-card--editing {
 }
 
 .page-admin-usuario-card .page-admin-usuarios-acesso-stack > div:first-child {
-  font-size: 12px !important;
+  font-size: 12px;
 }
 
 .page-admin-usuario-card .admin-subline {
@@ -1426,7 +1426,7 @@ body[data-theme='dark'] .page-admin-usuario-card.page-admin-usuario-card--skelet
 }
 
 .page-admin-filter-input--search {
-  padding-left: 40px !important;
+  padding-left: 40px;
   min-height: 40px;
 }
 
@@ -1466,8 +1466,8 @@ body[data-theme='dark'] .page-admin-usuario-card.page-admin-usuario-card--skelet
 }
 
 .page-admin-toolbar-btn {
-  font-size: 12px !important;
-  padding: 8px 12px !important;
+  font-size: 12px;
+  padding: 8px 12px;
 }
 
 .page-admin-usuarios-meta {
@@ -1563,8 +1563,8 @@ body[data-theme='dark'] .page-admin-usuario-card.page-admin-usuario-card--skelet
 }
 
 .page-admin-page-btn {
-  font-size: 12px !important;
-  padding: 6px 12px !important;
+  font-size: 12px;
+  padding: 6px 12px;
 }
 
 .page-admin-page-indicator {
@@ -2002,7 +2002,7 @@ body[data-theme='dark'] .dashboard-container.page-admin-usuarios.ref-dashboard.a
 }
 
 .page-admin-pagamentos-panel-head {
-  align-items: flex-start !important;
+  align-items: flex-start;
 }
 
 .page-admin-btn-danger-outline {
@@ -2406,9 +2406,9 @@ body[data-theme='dark'] .page-admin-payment-log-card--alert {
 }
 
 .page-admin-toolbar-btn--active {
-  border-color: rgba(99, 102, 241, 0.55) !important;
-  background: rgba(99, 102, 241, 0.12) !important;
-  color: var(--text-primary) !important;
+  border-color: rgba(99, 102, 241, 0.55);
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--text-primary);
 }
 
 .page-admin-payment-logs__client-filters {
@@ -2531,14 +2531,14 @@ body[data-theme='dark'] .page-admin-payment-log-card--alert {
 }
 
 .page-admin-payment-logs__pill--muted {
-  background: rgba(148, 163, 184, 0.2) !important;
-  color: #64748b !important;
+  background: rgba(148, 163, 184, 0.2);
+  color: #64748b;
 }
 
 .page-admin-payment-logs__action-btn {
-  padding: 4px 10px !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -2618,16 +2618,16 @@ body[data-theme='dark'] .page-admin-payment-log-card--alert {
 
 .page-admin-payment-logs-modal {
   font-family: var(--tx-dir-font);
-  max-width: 560px !important;
+  max-width: 560px;
   max-height: min(90vh, 720px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 24px 28px !important;
-  background: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  border: 1px solid rgba(148, 163, 184, 0.28) !important;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35) !important;
+  padding: 24px 28px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
 }
 
 .page-admin-payment-logs-modal__head {

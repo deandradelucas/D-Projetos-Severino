@@ -30,79 +30,79 @@
   /* ─── Full-bleed + atmosphere + cadeia flex ─── */
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell,
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell {
-    width: 100% !important; max-width: 100% !important; height: 100vh !important; max-height: 100vh !important;
-    margin: 0 !important; padding: 0 !important; border: none !important; border-radius: 0 !important; overflow: hidden !important;
+    width: 100%; max-width: 100%; height: 100vh; max-height: 100vh;
+    margin: 0; padding: 0; border: none; border-radius: 0; overflow: hidden;
   }
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell {
-    background: radial-gradient(ellipse 1100px 750px at 18% -8%, rgba(212,168,75,0.030), transparent 58%), radial-gradient(ellipse 850px 650px at 86% 108%, rgba(74,110,200,0.016), transparent 52%), var(--cfg-base) !important;
+    background: radial-gradient(ellipse 1100px 750px at 18% -8%, rgba(212,168,75,0.030), transparent 58%), radial-gradient(ellipse 850px 650px at 86% 108%, rgba(74,110,200,0.016), transparent 52%), var(--cfg-base);
   }
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell {
-    background: radial-gradient(ellipse 1100px 750px at 18% -8%, rgba(212,168,75,0.045), transparent 58%), radial-gradient(ellipse 850px 650px at 86% 108%, rgba(74,110,200,0.020), transparent 52%), var(--cfg-base) !important;
+    background: radial-gradient(ellipse 1100px 750px at 18% -8%, rgba(212,168,75,0.045), transparent 58%), radial-gradient(ellipse 850px 650px at 86% 108%, rgba(74,110,200,0.020), transparent 52%), var(--cfg-base);
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .app-horizon-inner {
-    height: 100% !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; overflow: hidden !important; display: flex !important; gap: 20px !important;
+    height: 100%; min-height: 0; padding: 0; margin: 0; overflow: hidden; display: flex; gap: 20px;
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .main-content.ref-dashboard-main {
-    overflow: hidden !important; min-height: 0 !important; height: 100% !important; padding: 0 !important; margin: 0 !important; display: flex !important; flex-direction: column !important;
-    background: transparent !important;
+    overflow: hidden; min-height: 0; height: 100%; padding: 0; margin: 0; display: flex; flex-direction: column;
+    background: transparent;
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
-    flex: 1 1 auto !important; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; padding: 0 !important; margin: 0 !important;
+    flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 0; margin: 0;
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    flex: 1 1 auto !important; min-height: 0 !important; overflow-y: auto !important; overflow-x: hidden !important;
-    padding: 28px 20px 24px 0 !important; align-items: center !important;
+    flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden;
+    padding: 28px 20px 24px 0; align-items: center;
   }
 
   /* ─── Hero "Ajustes" ─── */
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .page-configuracoes__hero,
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .page-configuracoes__hero {
-    position: relative !important; flex-shrink: 0 !important; width: 100% !important; max-width: 1080px !important; margin: 0 auto 20px !important;
-    padding: 24px 28px !important; border-radius: var(--cfg-r) !important; border: 1px solid var(--cfg-edge-hi) !important;
-    background: linear-gradient(155deg, var(--cfg-raised) 0%, var(--cfg-base) 100%) !important;
-    box-shadow: 0 14px 36px -16px var(--cfg-shadow), inset 1px 1px 1px var(--cfg-edge-hi), inset -1px -1px 1px var(--cfg-edge-lo) !important;
-    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    position: relative; flex-shrink: 0; width: 100%; max-width: 1080px; margin: 0 auto 20px;
+    padding: 24px 28px; border-radius: var(--cfg-r); border: 1px solid var(--cfg-edge-hi);
+    background: linear-gradient(155deg, var(--cfg-raised) 0%, var(--cfg-base) 100%);
+    box-shadow: 0 14px 36px -16px var(--cfg-shadow), inset 1px 1px 1px var(--cfg-edge-hi), inset -1px -1px 1px var(--cfg-edge-lo);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .page-configuracoes__hero .dashboard-hub__title {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important;
-    /* tamanho via token --page-title-size (partial 38) */ letter-spacing: -0.025em !important; color: var(--cfg-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-weight: 700;
+    /* tamanho via token --page-title-size (partial 38) */ letter-spacing: -0.025em; color: var(--cfg-text-hi);
   }
 
   /* ─── Layout central ─── */
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-layout--clean {
-    width: 100% !important; max-width: 1080px !important; margin: 0 auto !important; align-self: center !important;
+    width: 100%; max-width: 1080px; margin: 0 auto; align-self: center;
   }
 
   /* ─── Toast ─── */
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-toast {
-    width: 100% !important; max-width: 1080px !important; margin: 0 auto 16px !important;
-    padding: 12px 18px !important; border-radius: 14px !important; background: var(--cfg-pos-glow) !important;
-    border: 1px solid var(--cfg-pos-glow) !important; color: var(--cfg-pos) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; font-weight: 600 !important;
+    width: 100%; max-width: 1080px; margin: 0 auto 16px;
+    padding: 12px 18px; border-radius: 14px; background: var(--cfg-pos-glow);
+    border: 1px solid var(--cfg-pos-glow); color: var(--cfg-pos);
+    font-family: 'Inter Variable', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600;
   }
 
   /* ─── Cards ─── */
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card,
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card {
-    background: linear-gradient(155deg, var(--cfg-raised) 0%, var(--cfg-base) 100%) !important;
-    border: 1px solid var(--cfg-edge-hi) !important; border-radius: var(--cfg-r) !important; padding: 24px 26px !important;
-    box-shadow: 10px 10px 24px var(--cfg-shadow-soft), -8px -8px 22px var(--cfg-light), inset 1px 1px 1px var(--cfg-edge-hi), inset -1px -1px 1px var(--cfg-edge-lo) !important;
+    background: linear-gradient(155deg, var(--cfg-raised) 0%, var(--cfg-base) 100%);
+    border: 1px solid var(--cfg-edge-hi); border-radius: var(--cfg-r); padding: 24px 26px;
+    box-shadow: 10px 10px 24px var(--cfg-shadow-soft), -8px -8px 22px var(--cfg-light), inset 1px 1px 1px var(--cfg-edge-hi), inset -1px -1px 1px var(--cfg-edge-lo);
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-kicker {
-    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.6875rem !important; font-weight: 600 !important;
-    text-transform: uppercase !important; letter-spacing: 0.16em !important; color: var(--cfg-accent) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif; font-size: 0.6875rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.16em; color: var(--cfg-accent);
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-title-clean,
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-preferencias-heading {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important;
-    font-size: 1.125rem !important; letter-spacing: -0.02em !important; color: var(--cfg-text-hi) !important; margin-top: 4px !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-weight: 700;
+    font-size: 1.125rem; letter-spacing: -0.02em; color: var(--cfg-text-hi); margin-top: 4px;
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-subtitle {
-    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.8125rem !important; color: var(--cfg-text-lo) !important; margin-top: 4px !important;
+    font-family: 'Inter Variable', system-ui, sans-serif; font-size: 0.8125rem; color: var(--cfg-text-lo); margin-top: 4px;
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-name {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important;
-    font-size: 1.5rem !important; letter-spacing: -0.025em !important; color: var(--cfg-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-weight: 700;
+    font-size: 1.5rem; letter-spacing: -0.025em; color: var(--cfg-text-hi);
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-profile-email {
     font-family: 'Inter Variable', system-ui, sans-serif; font-size: 0.875rem; color: var(--cfg-text-mid);
@@ -160,26 +160,26 @@
 
   /* ─── Cards de tema (claro/escuro) ─── */
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-card {
-    display: flex !important; align-items: center !important; gap: 14px !important;
-    padding: 16px 18px !important; border-radius: 16px !important; cursor: pointer !important;
-    background: var(--cfg-sunken) !important; border: 1px solid var(--cfg-edge-hi) !important;
-    box-shadow: inset 2px 2px 5px var(--cfg-shadow-soft), inset -1px -1px 3px var(--cfg-light) !important;
-    transition: all 220ms var(--cfg-ease) !important;
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 18px; border-radius: 16px; cursor: pointer;
+    background: var(--cfg-sunken); border: 1px solid var(--cfg-edge-hi);
+    box-shadow: inset 2px 2px 5px var(--cfg-shadow-soft), inset -1px -1px 3px var(--cfg-light);
+    transition: all 220ms var(--cfg-ease);
   }
-  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-card:hover { transform: translateY(-2px) !important; }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-card:hover { transform: translateY(-2px); }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-card[aria-pressed='true'],
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-card.is-active,
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-card--active {
-    background: linear-gradient(155deg, var(--cfg-raised) 0%, var(--cfg-base) 100%) !important;
-    box-shadow: 5px 5px 12px var(--cfg-shadow-soft), -3px -3px 8px var(--cfg-light), 0 0 0 2px var(--cfg-accent-glow) !important;
+    background: linear-gradient(155deg, var(--cfg-raised) 0%, var(--cfg-base) 100%);
+    box-shadow: 5px 5px 12px var(--cfg-shadow-soft), -3px -3px 8px var(--cfg-light), 0 0 0 2px var(--cfg-accent-glow);
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-preview {
-    width: 48px !important; height: 48px !important; border-radius: 12px !important; flex-shrink: 0 !important;
-    display: flex !important; align-items: center !important; justify-content: center !important;
-    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2) !important;
+    width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
   }
-  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-preview--light { background: linear-gradient(155deg, #ffffff, #e4e8ee) !important; color: #b8832a !important; }
-  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-preview--dark { background: linear-gradient(155deg, #1c1e22, #0e1117) !important; color: #d4a84b !important; }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-preview--light { background: linear-gradient(155deg, #ffffff, #e4e8ee); color: #b8832a; }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-preview--dark { background: linear-gradient(155deg, #1c1e22, #0e1117); color: #d4a84b; }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-icon { font-size: 1.25rem; display: inline-flex; }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-body {
     display: flex; flex-direction: column; gap: 2px;
@@ -276,9 +276,9 @@
 
   /* Botão danger (excluir conta) */
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-action-btn--danger {
-    background: var(--cfg-neg-glow) !important; border-color: var(--cfg-neg-glow) !important; color: var(--cfg-neg) !important; box-shadow: none !important;
+    background: var(--cfg-neg-glow); border-color: var(--cfg-neg-glow); color: var(--cfg-neg); box-shadow: none;
   }
-  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-action-btn--danger:hover { color: var(--cfg-neg) !important; filter: brightness(1.1) !important; }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-action-btn--danger:hover { color: var(--cfg-neg); filter: brightness(1.1); }
 
   /* Zona de logout */
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-logout-zone {
@@ -384,41 +384,41 @@
 body[data-theme='dark'] { --cfg-m-raised: #11141a; --cfg-m-base: #0e1117; --cfg-m-sunken: #07090d; --cfg-m-edge: rgba(255,255,255,0.055); --cfg-m-shadow: rgba(0,0,0,0.70); --cfg-m-light: rgba(255,255,255,0.04); --cfg-m-text-hi: #f3f5f8; --cfg-m-text-mid: #98a4b5; --cfg-m-text-lo: #5a6878; --cfg-m-neg: #f87171; --cfg-m-neg-glow: rgba(248,113,113,0.16); }
 body[data-theme='light'] { --cfg-m-raised: #fff; --cfg-m-base: #eef1f6; --cfg-m-sunken: #e4e8ee; --cfg-m-edge: rgba(255,255,255,0.95); --cfg-m-shadow: rgba(166,180,200,0.45); --cfg-m-light: rgba(255,255,255,0.9); --cfg-m-text-hi: #0d1117; --cfg-m-text-mid: #4a5568; --cfg-m-text-lo: #8896a5; --cfg-m-neg: #b91c1c; --cfg-m-neg-glow: rgba(220,38,38,0.12); }
 .config-excluir-overlay {
-  position: fixed !important; inset: 0 !important; z-index: 90 !important;
-  display: flex !important; align-items: center !important; justify-content: center !important; padding: 16px !important;
-  background: rgba(0,0,0,0.5) !important; -webkit-backdrop-filter: blur(2px) !important; backdrop-filter: blur(2px) !important;
+  position: fixed; inset: 0; z-index: 90;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+  background: rgba(0,0,0,0.5); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
 }
 .config-excluir-modal {
-  width: 100% !important; max-width: 440px !important; padding: 28px !important; border-radius: 24px !important; text-align: center !important;
-  background: linear-gradient(155deg, var(--cfg-m-raised) 0%, var(--cfg-m-base) 100%) !important;
-  border: 1px solid var(--cfg-m-edge) !important;
-  box-shadow: 16px 16px 40px var(--cfg-m-shadow), -12px -12px 32px var(--cfg-m-light) !important;
+  width: 100%; max-width: 440px; padding: 28px; border-radius: 24px; text-align: center;
+  background: linear-gradient(155deg, var(--cfg-m-raised) 0%, var(--cfg-m-base) 100%);
+  border: 1px solid var(--cfg-m-edge);
+  box-shadow: 16px 16px 40px var(--cfg-m-shadow), -12px -12px 32px var(--cfg-m-light);
 }
 .config-excluir-icon {
-  display: inline-flex !important; align-items: center !important; justify-content: center !important;
-  width: 60px !important; height: 60px !important; border-radius: 50% !important; margin-bottom: 14px !important;
-  background: var(--cfg-m-neg-glow) !important; color: var(--cfg-m-neg) !important;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 60px; height: 60px; border-radius: 50%; margin-bottom: 14px;
+  background: var(--cfg-m-neg-glow); color: var(--cfg-m-neg);
 }
-.config-excluir-title { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; font-size: 1.375rem !important; color: var(--cfg-m-text-hi) !important; margin: 0 0 8px !important; }
-.config-excluir-body { font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; color: var(--cfg-m-text-mid) !important; margin: 0 0 18px !important; line-height: 1.5 !important; }
-.config-excluir-label { display: block !important; font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.8125rem !important; color: var(--cfg-m-text-lo) !important; margin-bottom: 8px !important; }
+.config-excluir-title { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-weight: 700; font-size: 1.375rem; color: var(--cfg-m-text-hi); margin: 0 0 8px; }
+.config-excluir-body { font-family: 'Inter Variable', system-ui, sans-serif; font-size: 0.875rem; color: var(--cfg-m-text-mid); margin: 0 0 18px; line-height: 1.5; }
+.config-excluir-label { display: block; font-family: 'Inter Variable', system-ui, sans-serif; font-size: 0.8125rem; color: var(--cfg-m-text-lo); margin-bottom: 8px; }
 .config-excluir-input {
-  text-align: center !important; letter-spacing: 0.15em !important; font-weight: 700 !important; text-transform: uppercase !important;
-  padding: 12px 14px !important; border-radius: 12px !important; background: var(--cfg-m-sunken) !important;
-  border: 1px solid var(--cfg-m-edge) !important; color: var(--cfg-m-text-hi) !important; width: 100% !important; box-sizing: border-box !important;
-  box-shadow: inset 2px 2px 4px var(--cfg-m-shadow) !important; margin-bottom: 18px !important;
+  text-align: center; letter-spacing: 0.15em; font-weight: 700; text-transform: uppercase;
+  padding: 12px 14px; border-radius: 12px; background: var(--cfg-m-sunken);
+  border: 1px solid var(--cfg-m-edge); color: var(--cfg-m-text-hi); width: 100%; box-sizing: border-box;
+  box-shadow: inset 2px 2px 4px var(--cfg-m-shadow); margin-bottom: 18px;
 }
-.config-excluir-actions { display: flex !important; gap: 10px !important; justify-content: center !important; flex-wrap: wrap !important; }
+.config-excluir-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .config-excluir-actions .config-action-btn {
-  padding: 12px 20px !important; border-radius: 999px !important; cursor: pointer !important; border: 1px solid var(--cfg-m-edge) !important;
-  font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.875rem !important; font-weight: 600 !important;
+  padding: 12px 20px; border-radius: 999px; cursor: pointer; border: 1px solid var(--cfg-m-edge);
+  font-family: 'Inter Variable', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600;
 }
 .config-excluir-actions .config-action-btn--primary {
-  background: linear-gradient(155deg, var(--cfg-m-raised) 0%, var(--cfg-m-base) 100%) !important; color: var(--cfg-m-text-hi) !important;
-  box-shadow: 5px 5px 12px var(--cfg-m-shadow), -3px -3px 8px var(--cfg-m-light) !important;
+  background: linear-gradient(155deg, var(--cfg-m-raised) 0%, var(--cfg-m-base) 100%); color: var(--cfg-m-text-hi);
+  box-shadow: 5px 5px 12px var(--cfg-m-shadow), -3px -3px 8px var(--cfg-m-light);
 }
 .config-excluir-actions .config-action-btn--danger-solid {
-  background: var(--cfg-m-neg) !important; color: #fff !important; border-color: transparent !important;
-  box-shadow: 5px 7px 16px -5px var(--cfg-m-neg-glow) !important;
+  background: var(--cfg-m-neg); color: #fff; border-color: transparent;
+  box-shadow: 5px 7px 16px -5px var(--cfg-m-neg-glow);
 }
-.config-excluir-actions .config-action-btn--danger-solid:disabled { opacity: 0.5 !important; cursor: not-allowed !important; }
+.config-excluir-actions .config-action-btn--danger-solid:disabled { opacity: 0.5; cursor: not-allowed; }

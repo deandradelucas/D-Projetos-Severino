@@ -94,19 +94,19 @@ body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-
 }
 
 body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line-label {
-  color: var(--text-secondary) !important;
+  color: var(--text-secondary);
 }
 
 body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive {
-  color: #15803d !important;
+  color: #15803d;
 }
 
 body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative {
-  color: #dc2626 !important;
+  color: #dc2626;
 }
 
 body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
-  color: var(--text-secondary, #64748b) !important;
+  color: var(--text-secondary, #64748b);
 }
 
 body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
@@ -114,15 +114,15 @@ body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-h
 }
 
 body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive {
-  color: #4ade80 !important;
+  color: #4ade80;
 }
 
 body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative {
-  color: #f87171 !important;
+  color: #f87171;
 }
 
 body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
-  color: var(--text-secondary, #a3a3a3) !important;
+  color: var(--text-secondary, #a3a3a3);
 }
 
 @media (max-width: 768px) {
@@ -154,23 +154,23 @@ body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-h
    o color: #f0f0f0 do container. Sobrescrevemos cada elemento filho aqui. */
 
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip__label {
-  color: rgba(255, 255, 255, 0.42) !important;
+  color: rgba(255, 255, 255, 0.42);
 }
 
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip__row {
-  color: rgba(255, 255, 255, 0.88) !important;
+  color: rgba(255, 255, 255, 0.88);
 }
 
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip__name {
-  color: rgba(255, 255, 255, 0.75) !important;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip__val {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip__pct {
-  color: rgba(255, 255, 255, 0.45) !important;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 /* ─── NEON LINE CARD ────────────────────────────────────────────────────────── */

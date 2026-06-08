@@ -91,7 +91,7 @@
      Valores COMPARTILHADOS entre todas as páginas. Mude aqui para afetar TODAS
      de uma vez (Transações, Relatórios, Metas, Agenda, Listas, Cartões…).
      Aplicados via `@layer hub` no partial 38 — vencem qualquer override
-     !important legado, sem guerra de especificidade.
+     legado, sem guerra de especificidade.
      NÃO inclui COR do título: cor é por-skin (--rel-text-hi, --cfg-text-hi…),
      intencional por página. O Dashboard tem tamanho próprio (partial 13),
      fora desta padronização.

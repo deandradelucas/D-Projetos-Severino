@@ -32,9 +32,9 @@
 /* Hero desktop — mesma largura e centramento dos cards */
 @media (min-width: 769px) {
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero {
-    align-self: center !important;
-    width: 100% !important;
-    max-width: min(1080px, 100%) !important;
+    align-self: center;
+    width: 100%;
+    max-width: min(1080px, 100%);
   }
 }
 
@@ -126,21 +126,21 @@ body[data-theme='dark'] .page-configuracoes.app-horizon-shell .config-hero-name 
 /* Hero dark — glass vitrificado alinhado ao padrão 09b (todas as larguras) */
 body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
 body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
-  background-color: var(--bg-card, #141618) !important;
+  background-color: var(--bg-card, #141618);
   background-image: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.025) 0%,
     transparent 55%
-  ) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.065),
-    0 1px 4px rgba(0, 0, 0, 0.4) !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  isolation: auto !important;
-  -webkit-transform: none !important;
-  transform: none !important;
+    0 1px 4px rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  isolation: auto;
+  -webkit-transform: none;
+  transform: none;
 }
 
 /* ——— Card base ——— */

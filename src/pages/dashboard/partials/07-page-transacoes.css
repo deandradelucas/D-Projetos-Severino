@@ -51,37 +51,37 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.app-horizon-shell {
 
 /* "+ Nova transação": mesmo visual em qualquer largura (dourado, texto escuro, pill, Poppins) */
 .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  font-family: var(--tx-dir-font) !important;
-  font-size: 0.875rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.02em !important;
-  line-height: 1.2 !important;
-  min-height: 42px !important;
-  padding: 0 22px !important;
-  border-radius: 9999px !important;
-  border: 1px solid var(--tx-nova-btn-border) !important;
-  background: var(--tx-nova-btn-bg) !important;
-  color: var(--tx-nova-btn-fg) !important;
-  box-shadow: var(--tx-nova-btn-shadow) !important;
-  flex-shrink: 0 !important;
-  white-space: nowrap !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--tx-dir-font);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  min-height: 42px;
+  padding: 0 22px;
+  border-radius: 9999px;
+  border: 1px solid var(--tx-nova-btn-border);
+  background: var(--tx-nova-btn-bg);
+  color: var(--tx-nova-btn-fg);
+  box-shadow: var(--tx-nova-btn-shadow);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:hover {
-  background: var(--tx-nova-btn-bg-hover) !important;
-  color: var(--tx-nova-btn-fg) !important;
-  border-color: var(--tx-nova-btn-border) !important;
+  background: var(--tx-nova-btn-bg-hover);
+  color: var(--tx-nova-btn-fg);
+  border-color: var(--tx-nova-btn-border);
 }
 
 .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:focus-visible {
-  outline: none !important;
+  outline: none;
   box-shadow:
     var(--tx-nova-btn-shadow),
-    0 0 0 3px var(--tx-nova-btn-ring) !important;
+    0 0 0 3px var(--tx-nova-btn-ring);
 }
 
 /* Dark — card-style (var(--bg-card) + borda sutil + texto claro) */
@@ -91,19 +91,19 @@ body[data-theme='dark']
 body[data-theme='dark']
   .dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell
   .dashboard-hub__btn--primary:hover {
-  background: var(--bg-card, #141618) !important;
-  background-image: none !important;
-  color: #e2e8f0 !important;
-  border: 1px solid rgba(148, 163, 184, 0.15) !important;
-  box-shadow: none !important;
-  transform: none !important;
+  background: var(--bg-card, #141618);
+  background-image: none;
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: none;
+  transform: none;
 }
 
 body[data-theme='dark']
   .dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell
   .dashboard-hub__btn--primary:focus-visible {
-  outline: none !important;
-  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.3) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.3);
 }
 
 /* Mobile — FAB «Nova transação»: vitrificado + borda dourada (igual Visão Geral / 07b) */
@@ -156,7 +156,7 @@ body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.a
 /* Mobile: FAB fixo substitui o «+ Nova transação» no hero (evita duplicar; 07 usa inline-flex !important acima) */
 @media (max-width: 768px) {
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
-    display: none !important;
+    display: none;
   }
 }
 
@@ -216,50 +216,50 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-h
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table.ref-panel {
-  min-height: 0 !important;
-  padding: 14px 14px 14px !important;
-  border: 1px solid var(--tx-dir-card-border, #e2e8f0) !important;
-  background: var(--tx-dir-panel-bg, #ffffff) !important;
-  background-image: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  box-shadow: none !important;
+  min-height: 0;
+  padding: 14px 14px 14px;
+  border: 1px solid var(--tx-dir-card-border, #e2e8f0);
+  background: var(--tx-dir-panel-bg, #ffffff);
+  background-image: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table.ref-panel {
-  min-height: 0 !important;
-  padding: 14px 14px 14px !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  background: #0c0e12 !important;
-  background-image: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  box-shadow: none !important;
+  min-height: 0;
+  padding: 14px 14px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0c0e12;
+  background-image: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
 }
 
 /* Filtros — mesmo vidro / cabeçalho que o painel da lista (.page-transacoes-ref-table) */
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters.ref-panel {
-  min-height: 0 !important;
-  padding: 6px 10px 6px !important;
-  border: 1px solid rgba(163, 163, 163, 0.28) !important;
-  background: rgba(255, 255, 255, 0.22) !important;
-  background-image: none !important;
-  -webkit-backdrop-filter: blur(22px) saturate(1.12) !important;
-  backdrop-filter: blur(22px) saturate(1.12) !important;
+  min-height: 0;
+  padding: 6px 10px 6px;
+  border: 1px solid rgba(163, 163, 163, 0.28);
+  background: rgba(255, 255, 255, 0.22);
+  background-image: none;
+  -webkit-backdrop-filter: blur(22px) saturate(1.12);
+  backdrop-filter: blur(22px) saturate(1.12);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.42) inset,
-    0 18px 48px -28px rgba(15, 23, 42, 0.22) !important;
+    0 18px 48px -28px rgba(15, 23, 42, 0.22);
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters.ref-panel {
-  min-height: 0 !important;
-  padding: 6px 10px 6px !important;
-  border: 1px solid rgba(148, 163, 184, 0.15) !important;
-  background: var(--bg-card, #141618) !important;
-  background-image: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  box-shadow: none !important;
+  min-height: 0;
+  padding: 6px 10px 6px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: var(--bg-card, #141618);
+  background-image: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .page-transacoes-filters-head {
@@ -581,35 +581,35 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   height: 44px;
   border-radius: 12px;
   box-shadow: none;
-  background: var(--tx-dir-icon-bg, #f1f3f6) !important;
+  background: var(--tx-dir-icon-bg, #f1f3f6);
 }
 
 /* Ícones receita/despesa — fundo neutro como no Dashboard (toda a página; linhas no virtualizer não são filho direto do grid) */
 body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap--up,
 body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap--down {
-  color: var(--tx-dir-muted, #64748b) !important;
-  background: var(--tx-dir-icon-bg, #f1f3f6) !important;
-  border: 1px solid rgba(148, 163, 184, 0.22) !important;
-  box-shadow: none !important;
+  color: var(--tx-dir-muted, #64748b);
+  background: var(--tx-dir-icon-bg, #f1f3f6);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap--up,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap--down {
-  color: var(--tx-dir-muted, #64748b) !important;
-  background: var(--tx-dir-icon-bg, #ffffff) !important;
-  border: 1px solid var(--tx-dir-icon-border, rgba(15, 23, 42, 0.1)) !important;
-  box-shadow: none !important;
+  color: var(--tx-dir-muted, #64748b);
+  background: var(--tx-dir-icon-bg, #ffffff);
+  border: 1px solid var(--tx-dir-icon-border, rgba(15, 23, 42, 0.1));
+  box-shadow: none;
 }
 
 .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap {
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap--up img:not(.transacao-categoria-icon__img),
 body[data-theme='light'] .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap--down img:not(.transacao-categoria-icon__img),
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap--up img:not(.transacao-categoria-icon__img),
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap--down img:not(.transacao-categoria-icon__img) {
-  filter: none !important;
+  filter: none;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap svg,
@@ -630,10 +630,10 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .ref-tx-arrow-wrap--d
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img.transacao-categoria-icon__img,
 .page-transacoes.app-horizon-shell .tx-cal-grid .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap img.transacao-categoria-icon__img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  filter: none !important;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: none;
 }
 
 
@@ -699,50 +699,50 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap {
-  width: 44px !important;
-  height: 44px !important;
-  border-radius: 12px !important;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap svg,
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap i,
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img:not(.transacao-categoria-icon__img) {
-  width: 14px !important;
-  height: 14px !important;
-  font-size: 14px !important;
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
   object-fit: contain;
 }
 
 /* Valor em chip arredondado — verde receita, vermelho despesa (como no Dashboard) */
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val {
-  display: inline-flex !important;
-  align-items: center !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  padding: 6px 8px !important;
-  border-radius: 999px !important;
-  box-shadow: none !important;
-  font-size: 0.9375rem !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.02em !important;
-  line-height: 1.25 !important;
-  font-variant-numeric: tabular-nums !important;
-  white-space: nowrap !important;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 8px;
+  border-radius: 999px;
+  box-shadow: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--pos,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--pos {
-  color: var(--success, #107c52) !important;
-  background: color-mix(in srgb, var(--success, #107c52) 16%, transparent) !important;
-  border: 1px solid color-mix(in srgb, var(--success, #107c52) 28%, transparent) !important;
+  color: var(--success, #107c52);
+  background: color-mix(in srgb, var(--success, #107c52) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success, #107c52) 28%, transparent);
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--neg,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-val--neg {
-  color: var(--danger, #dc2626) !important;
-  background: color-mix(in srgb, var(--danger, #dc2626) 14%, transparent) !important;
-  border: 1px solid color-mix(in srgb, var(--danger, #dc2626) 28%, transparent) !important;
+  color: var(--danger, #dc2626);
+  background: color-mix(in srgb, var(--danger, #dc2626) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger, #dc2626) 28%, transparent);
 }
 
 .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions .transacoes-actions {
@@ -790,23 +790,23 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-actions-cell .btn-edit,
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-actions-cell .btn-delete {
-  min-width: 30px !important;
-  min-height: 30px !important;
-  padding: 4px !important;
-  border-radius: 9px !important;
-  background: rgba(255, 255, 255, 0.42) !important;
-  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  min-width: 30px;
+  min-height: 30px;
+  padding: 4px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.28);
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-actions-cell .btn-edit,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-actions-cell .btn-delete {
-  min-width: 30px !important;
-  min-height: 30px !important;
-  padding: 4px !important;
-  border-radius: 9px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(148, 163, 184, 0.22) !important;
-  color: #e2e8f0 !important;
+  min-width: 30px;
+  min-height: 30px;
+  padding: 4px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: #e2e8f0;
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-table-subgrid--actions > .ref-tx-row--skeleton {
@@ -900,9 +900,9 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 
   /* 3. Ícone maior no desktop */
   .tx-cal-grid .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap {
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 12px !important;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
   }
 
   body[data-theme='light']
@@ -917,10 +917,10 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     .ref-tx-table-subgrid--actions.tx-cal-grid
     > .ref-tx-row:not(.ref-tx-row--skeleton)
     .ref-tx-arrow-wrap--down {
-    color: var(--tx-dir-muted, #64748b) !important;
-    background: var(--tx-dir-icon-bg, #f1f3f6) !important;
-    border: 1px solid rgba(148, 163, 184, 0.22) !important;
-    box-shadow: none !important;
+    color: var(--tx-dir-muted, #64748b);
+    background: var(--tx-dir-icon-bg, #f1f3f6);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: none;
   }
 
   body[data-theme='dark']
@@ -935,10 +935,10 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     .ref-tx-table-subgrid--actions.tx-cal-grid
     > .ref-tx-row:not(.ref-tx-row--skeleton)
     .ref-tx-arrow-wrap--down {
-    color: var(--tx-dir-muted, #64748b) !important;
-    background: var(--tx-dir-icon-bg, #ffffff) !important;
-    border: 1px solid var(--tx-dir-icon-border, rgba(15, 23, 42, 0.1)) !important;
-    box-shadow: none !important;
+    color: var(--tx-dir-muted, #64748b);
+    background: var(--tx-dir-icon-bg, #ffffff);
+    border: 1px solid var(--tx-dir-icon-border, rgba(15, 23, 42, 0.1));
+    box-shadow: none;
   }
 
   .page-transacoes.app-horizon-shell
@@ -953,15 +953,15 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
     > .ref-tx-row:not(.ref-tx-row--skeleton)
     .ref-tx-arrow-wrap--down
     img:not(.transacao-categoria-icon__img) {
-    filter: none !important;
+    filter: none;
   }
 
   .tx-cal-grid .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap svg,
   .tx-cal-grid .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap i,
   .tx-cal-grid .ref-tx-row:not(.ref-tx-row--skeleton) .ref-tx-arrow-wrap img:not(.transacao-categoria-icon__img) {
-    width: 14px !important;
-    height: 14px !important;
-    font-size: 14px !important;
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
   }
 
   /* 4. Categoria como título */
@@ -1063,7 +1063,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 @media (max-width: 768px) {
   body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table.ref-panel,
   body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table.ref-panel {
-    padding: 8px 10px 8px !important;
+    padding: 8px 10px 8px;
   }
 
   /* Sobrepõe 04c no escuro — alinha ao token do cartão “directório” */
@@ -1088,17 +1088,17 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   }
 
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap {
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 12px !important;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
   }
 
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap svg,
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap i,
   .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-arrow-wrap img:not(.transacao-categoria-icon__img) {
-    width: 14px !important;
-    height: 14px !important;
-    font-size: 14px !important;
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
     object-fit: contain;
   }
 
@@ -1392,8 +1392,8 @@ body:has(.sidebar.open) .dashboard-mobile-fabs {
 .page-transacoes-parcelado-parcela__acoes .btn-delete {
   width: 30px;
   height: 30px;
-  min-width: 44px !important;
-  min-height: 44px !important;
+  min-width: 44px;
+  min-height: 44px;
   padding: 0;
 }
 

@@ -58,7 +58,7 @@
 /* Mensal vs anual — checkout Asaas */
 .page-pagamento-planos.ref-panel {
   padding: 16px 20px 14px;
-  min-height: 0 !important;
+  min-height: 0;
   flex: 0 0 auto;
 }
 
@@ -410,20 +410,20 @@ body[data-theme='light'] .pagamento-banner {
 
 /* Tema escuro — CTA de checkout: fundo preto, borda e texto no verde do sistema (--success) */
 body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full {
-  background: #000000 !important;
-  background-image: none !important;
-  color: var(--success-text, #4ade80) !important;
-  border: 1.5px solid var(--success, #22c55e) !important;
-  box-shadow: 0 0 18px color-mix(in srgb, var(--success, #22c55e) 32%, transparent) !important;
+  background: #000000;
+  background-image: none;
+  color: var(--success-text, #4ade80);
+  border: 1.5px solid var(--success, #22c55e);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--success, #22c55e) 32%, transparent);
   text-shadow: 0 0 10px color-mix(in srgb, var(--success-text, #4ade80) 45%, transparent);
 }
 
 body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel .btn-primary.pagamento-checkout-panel__btn-full:hover:not(:disabled) {
-  background: #050505 !important;
-  background-image: none !important;
-  color: var(--success, #22c55e) !important;
-  border-color: var(--success, #22c55e) !important;
-  box-shadow: 0 0 22px color-mix(in srgb, var(--success, #22c55e) 42%, transparent) !important;
+  background: #050505;
+  background-image: none;
+  color: var(--success, #22c55e);
+  border-color: var(--success, #22c55e);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--success, #22c55e) 42%, transparent);
   text-shadow: 0 0 12px color-mix(in srgb, var(--success, #22c55e) 50%, transparent);
   transform: none;
 }
@@ -433,7 +433,7 @@ body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-ho
   outline-offset: 2px;
   box-shadow:
     0 0 0 3px color-mix(in srgb, var(--success, #22c55e) 38%, transparent),
-    0 0 18px color-mix(in srgb, var(--success, #22c55e) 36%, transparent) !important;
+    0 0 18px color-mix(in srgb, var(--success, #22c55e) 36%, transparent);
 }
 
 .page-pagamento-historico.ref-panel {
@@ -646,7 +646,7 @@ body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-ho
 
 /* Indicador lateral (::before) removido — menu estável ao trocar de rota */
 .nav-menu::before {
-  display: none !important;
+  display: none;
 }
 
 /* Faixa vertical (::after) removida anteriormente */
@@ -661,8 +661,8 @@ body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-ho
 
 .dashboard-container.app-horizon-shell .sidebar .nav-item.active::before,
 .dashboard-container.app-horizon-shell .sidebar .nav-item.active::after {
-  display: none !important;
-  content: none !important;
+  display: none;
+  content: none;
 }
 
 /* Recharts Legend Dots (Bolinhas dos Gráficos) */
@@ -709,7 +709,7 @@ body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-ho
   font-weight: 600;
   letter-spacing: inherit;
   background-color: var(--active-bg);
-  color: #000000 !important;
+  color: #000000;
   box-shadow: none;
 }
 

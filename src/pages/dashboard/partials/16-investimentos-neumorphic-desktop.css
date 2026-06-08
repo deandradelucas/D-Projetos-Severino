@@ -71,15 +71,15 @@
   /* ─── Resumo da carteira ─── */
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo {
-    background: linear-gradient(155deg, var(--neu-surface-raised) 0%, var(--neu-surface-base) 100%) !important;
-    border: 1px solid var(--neu-edge-hi) !important;
-    border-radius: 22px !important;
-    padding: 24px 28px !important;
+    background: linear-gradient(155deg, var(--neu-surface-raised) 0%, var(--neu-surface-base) 100%);
+    border: 1px solid var(--neu-edge-hi);
+    border-radius: 22px;
+    padding: 24px 28px;
     box-shadow:
       10px 10px 24px var(--neu-shadow),
       -8px -8px 22px var(--neu-light),
       inset 1px 1px 1px var(--neu-edge-hi),
-      inset -1px -1px 1px var(--neu-edge-lo) !important;
+      inset -1px -1px 1px var(--neu-edge-lo);
   }
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo .ref-panel__title,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo .ref-panel__title {
@@ -575,196 +575,196 @@
   /* ─── Comparador Modal ─── */
   body[data-theme='dark'] .page-investimentos-comparador,
   body[data-theme='light'] .page-investimentos-comparador {
-    max-width: 860px !important;
-    width: 100% !important;
+    max-width: 860px;
+    width: 100%;
   }
   body[data-theme='dark'] .page-investimentos-comparador__controls,
   body[data-theme='light'] .page-investimentos-comparador__controls {
-    display: flex !important;
-    gap: 16px !important;
-    margin-bottom: 24px !important;
-    flex-wrap: wrap !important;
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
   }
   body[data-theme='dark'] .page-investimentos-comparador__field,
   body[data-theme='light'] .page-investimentos-comparador__field {
-    flex: 1 1 200px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 6px !important;
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
   body[data-theme='dark'] .page-investimentos-comparador__slots,
   body[data-theme='light'] .page-investimentos-comparador__slots {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 16px !important;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
   }
   @media (max-width: 1024px) {
     body[data-theme='dark'] .page-investimentos-comparador__slots,
     body[data-theme='light'] .page-investimentos-comparador__slots {
-      grid-template-columns: 1fr !important;
+      grid-template-columns: 1fr;
     }
   }
   body[data-theme='dark'] .page-investimentos-comparador__slot,
   body[data-theme='light'] .page-investimentos-comparador__slot {
-    background: linear-gradient(155deg, var(--neu-surface-raised) 0%, var(--neu-surface-base) 100%) !important;
-    border: 1px solid var(--neu-edge-hi) !important;
-    border-radius: 16px !important;
-    padding: 18px !important;
-    box-shadow: 6px 6px 14px var(--neu-shadow-soft), -4px -4px 10px var(--neu-light), inset 1px 1px 1px var(--neu-edge-hi) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
-    position: relative !important;
+    background: linear-gradient(155deg, var(--neu-surface-raised) 0%, var(--neu-surface-base) 100%);
+    border: 1px solid var(--neu-edge-hi);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 6px 6px 14px var(--neu-shadow-soft), -4px -4px 10px var(--neu-light), inset 1px 1px 1px var(--neu-edge-hi);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
   }
   body[data-theme='dark'] .page-investimentos-comparador__slot--melhor,
   body[data-theme='light'] .page-investimentos-comparador__slot--melhor {
-    box-shadow: 6px 6px 14px var(--neu-shadow-soft), -4px -4px 10px var(--neu-light), 0 0 0 2px var(--neu-accent) !important;
+    box-shadow: 6px 6px 14px var(--neu-shadow-soft), -4px -4px 10px var(--neu-light), 0 0 0 2px var(--neu-accent);
   }
   body[data-theme='dark'] .page-investimentos-comparador__melhor-badge,
   body[data-theme='light'] .page-investimentos-comparador__melhor-badge {
-    position: absolute !important;
-    top: -10px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    padding: 3px 12px !important;
-    border-radius: 999px !important;
-    background: var(--neu-accent) !important;
-    color: #1a1200 !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.1em !important;
-    white-space: nowrap !important;
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: var(--neu-accent);
+    color: #1a1200;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
   }
   body[data-theme='dark'] .page-investimentos-comparador__slot-head,
   body[data-theme='light'] .page-investimentos-comparador__slot-head {
-    display: flex !important;
-    gap: 8px !important;
-    flex-wrap: wrap !important;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
   }
   body[data-theme='dark'] .page-investimentos-comparador__select,
   body[data-theme='light'] .page-investimentos-comparador__select {
-    flex: 1 1 auto !important;
-    padding: 7px 10px !important;
-    border-radius: 8px !important;
-    background: var(--neu-surface-sunken) !important;
-    border: 1px solid var(--neu-edge-hi) !important;
-    color: var(--neu-text-hi) !important;
-    font-size: 0.8125rem !important;
-    font-weight: 500 !important;
-    box-shadow: inset 1px 1px 3px var(--neu-shadow-soft) !important;
+    flex: 1 1 auto;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: var(--neu-surface-sunken);
+    border: 1px solid var(--neu-edge-hi);
+    color: var(--neu-text-hi);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    box-shadow: inset 1px 1px 3px var(--neu-shadow-soft);
   }
   body[data-theme='dark'] .page-investimentos-comparador__slot-taxa,
   body[data-theme='light'] .page-investimentos-comparador__slot-taxa {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   body[data-theme='dark'] .page-investimentos-comparador__taxa-input,
   body[data-theme='light'] .page-investimentos-comparador__taxa-input {
-    width: 80px !important;
-    padding: 8px 12px !important;
-    border-radius: 8px !important;
-    background: var(--neu-surface-sunken) !important;
-    border: 1px solid var(--neu-edge-hi) !important;
-    color: var(--neu-text-hi) !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    box-shadow: inset 2px 2px 4px var(--neu-shadow-soft), inset -1px -1px 2px var(--neu-light) !important;
-    text-align: center !important;
+    width: 80px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--neu-surface-sunken);
+    border: 1px solid var(--neu-edge-hi);
+    color: var(--neu-text-hi);
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    box-shadow: inset 2px 2px 4px var(--neu-shadow-soft), inset -1px -1px 2px var(--neu-light);
+    text-align: center;
   }
   body[data-theme='dark'] .page-investimentos-comparador__taxa-suf,
   body[data-theme='light'] .page-investimentos-comparador__taxa-suf {
-    font-size: 0.8125rem !important;
-    color: var(--neu-text-lo) !important;
-    font-weight: 500 !important;
+    font-size: 0.8125rem;
+    color: var(--neu-text-lo);
+    font-weight: 500;
   }
   body[data-theme='dark'] .page-investimentos-comparador__resultado,
   body[data-theme='light'] .page-investimentos-comparador__resultado {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 6px !important;
-    padding: 14px !important;
-    border-radius: 10px !important;
-    background: var(--neu-surface-sunken) !important;
-    box-shadow: inset 2px 2px 4px var(--neu-shadow-soft), inset -1px -1px 2px var(--neu-light) !important;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--neu-surface-sunken);
+    box-shadow: inset 2px 2px 4px var(--neu-shadow-soft), inset -1px -1px 2px var(--neu-light);
   }
   body[data-theme='dark'] .page-investimentos-comparador__res-row,
   body[data-theme='light'] .page-investimentos-comparador__res-row {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: baseline !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    color: var(--neu-text-mid) !important;
-    font-variant-numeric: tabular-nums !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    color: var(--neu-text-mid);
+    font-variant-numeric: tabular-nums;
   }
   body[data-theme='dark'] .page-investimentos-comparador__res-row span:first-child,
   body[data-theme='light'] .page-investimentos-comparador__res-row span:first-child {
-    color: var(--neu-text-lo) !important;
+    color: var(--neu-text-lo);
   }
   body[data-theme='dark'] .page-investimentos-comparador__res-row--ir,
   body[data-theme='light'] .page-investimentos-comparador__res-row--ir {
-    font-size: 0.75rem !important;
-    color: var(--neu-text-lo) !important;
+    font-size: 0.75rem;
+    color: var(--neu-text-lo);
   }
   body[data-theme='dark'] .page-investimentos-comparador__res-row--total,
   body[data-theme='light'] .page-investimentos-comparador__res-row--total {
-    padding-top: 6px !important;
-    border-top: 1px solid var(--neu-edge-lo) !important;
-    margin-top: 4px !important;
+    padding-top: 6px;
+    border-top: 1px solid var(--neu-edge-lo);
+    margin-top: 4px;
   }
   body[data-theme='dark'] .page-investimentos-comparador__liq-value,
   body[data-theme='light'] .page-investimentos-comparador__liq-value {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    color: var(--neu-pos) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--neu-pos);
   }
   body[data-theme='dark'] .page-investimentos-comparador__res-vazio,
   body[data-theme='light'] .page-investimentos-comparador__res-vazio {
-    font-size: 0.8125rem !important;
-    color: var(--neu-text-lo) !important;
-    text-align: center !important;
-    padding: 12px !important;
+    font-size: 0.8125rem;
+    color: var(--neu-text-lo);
+    text-align: center;
+    padding: 12px;
   }
   body[data-theme='dark'] .page-investimentos-comparador__cdi-aviso,
   body[data-theme='light'] .page-investimentos-comparador__cdi-aviso {
-    font-size: 0.8125rem !important;
-    color: #f59e0b !important;
-    margin-bottom: 12px !important;
-    padding: 10px 14px !important;
-    border-radius: 8px !important;
-    background: rgba(245, 158, 11, 0.08) !important;
-    border: 1px solid rgba(245, 158, 11, 0.2) !important;
+    font-size: 0.8125rem;
+    color: #f59e0b;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.2);
   }
 
   /* ─── Modal extras: textarea + hint + char-count ─── */
   body[data-theme='dark'] .page-investimentos-modal__input--textarea,
   body[data-theme='light'] .page-investimentos-modal__input--textarea {
-    resize: vertical !important;
-    min-height: 72px !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    line-height: 1.5 !important;
+    resize: vertical;
+    min-height: 72px;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
   body[data-theme='dark'] .page-investimentos-modal__char-count,
   body[data-theme='light'] .page-investimentos-modal__char-count {
-    font-size: 0.6875rem !important;
-    color: var(--neu-text-lo) !important;
-    text-align: right !important;
-    margin-top: 2px !important;
+    font-size: 0.6875rem;
+    color: var(--neu-text-lo);
+    text-align: right;
+    margin-top: 2px;
   }
   body[data-theme='dark'] .page-investimentos-modal__hint,
   body[data-theme='light'] .page-investimentos-modal__hint {
-    font-size: 0.75rem !important;
-    color: var(--neu-text-lo) !important;
-    margin-top: 4px !important;
+    font-size: 0.75rem;
+    color: var(--neu-text-lo);
+    margin-top: 4px;
   }
   body[data-theme='dark'] .page-investimentos-modal__section--extras,
   body[data-theme='light'] .page-investimentos-modal__section--extras {
-    margin-top: 4px !important;
+    margin-top: 4px;
   }
 }

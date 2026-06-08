@@ -30,21 +30,21 @@ body[data-theme='dark']
 body[data-theme='dark']
   .dashboard-container.dashboard-page.page-investimentos.ref-dashboard.app-horizon-shell
   .dashboard-hub__btn--primary:hover {
-  background: var(--tx-nova-btn-bg) !important;
-  background-image: none !important;
-  color: var(--tx-nova-btn-fg) !important;
-  border: 1px solid var(--tx-nova-btn-border) !important;
-  box-shadow: var(--tx-nova-btn-shadow) !important;
-  transform: none !important;
+  background: var(--tx-nova-btn-bg);
+  background-image: none;
+  color: var(--tx-nova-btn-fg);
+  border: 1px solid var(--tx-nova-btn-border);
+  box-shadow: var(--tx-nova-btn-shadow);
+  transform: none;
 }
 
 body[data-theme='dark']
   .dashboard-container.dashboard-page.page-investimentos.ref-dashboard.app-horizon-shell
   .dashboard-hub__btn--primary:focus-visible {
-  outline: none !important;
+  outline: none;
   box-shadow:
     var(--tx-nova-btn-shadow),
-    0 0 0 3px var(--tx-nova-btn-ring) !important;
+    0 0 0 3px var(--tx-nova-btn-ring);
 }
 
 .page-investimentos-hero__rates-row {
@@ -660,9 +660,9 @@ body[data-theme='dark'] .page-investimentos-card__edit:hover:not(:disabled) {
 
 /* Dark — overlay sem blur (padrão Nova lista) */
 body[data-theme='dark'] .page-investimentos-modal-backdrop.modal-backdrop {
-  background: rgba(0, 0, 0, 0.55) !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
+  background: rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .page-investimentos-modal.modal-content {
@@ -2267,12 +2267,12 @@ body[data-theme='light'] .page-investimentos-modal__input.page-investimentos-mod
 
 /* Modal Novo/Editar — dark: padrão Nova lista (tokens + overlay 0.55) */
 body[data-theme='dark'] .page-investimentos-modal.modal-content {
-  background: var(--bg-card) !important;
-  background-image: none !important;
+  background: var(--bg-card);
+  background-image: none;
   color: var(--text-primary);
-  border: 1px solid var(--border-color) !important;
-  border-radius: var(--radius-xl, 16px) !important;
-  box-shadow: var(--shadow-md) !important;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 16px);
+  box-shadow: var(--shadow-md);
 }
 
 body[data-theme='dark'] .page-investimentos-modal .modal-header {
@@ -2284,21 +2284,21 @@ body[data-theme='dark'] .page-investimentos-modal .modal-header h3 {
 }
 
 body[data-theme='dark'] .page-investimentos-modal .close-btn {
-  background: var(--bg-secondary) !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-muted, var(--text-secondary)) !important;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted, var(--text-secondary));
 }
 
 body[data-theme='dark'] .page-investimentos-modal .close-btn:hover {
-  border-color: var(--accent) !important;
-  color: var(--text-primary) !important;
-  background: var(--bg-secondary) !important;
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
 }
 
 body[data-theme='dark'] .page-investimentos-modal__surface {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   padding: 0;
 }
 
@@ -2343,9 +2343,9 @@ body[data-theme='dark'] .page-investimentos-modal .modal-form select.page-invest
 body[data-theme='dark'] .page-investimentos-modal__valor-input-wrap,
 body[data-theme='dark'] .page-investimentos-modal__perc-input-wrap,
 body[data-theme='dark'] .page-investimentos-modal__date-cal-btn {
-  background: var(--bg-secondary) !important;
-  border: 1.5px solid var(--border-color) !important;
-  color: var(--text-primary) !important;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-primary);
   color-scheme: dark;
 }
 
@@ -2366,17 +2366,17 @@ body[data-theme='dark'] .page-investimentos-modal__perc-input-wrap:focus-within,
 body[data-theme='dark'] .page-investimentos-modal__date-cal-btn:hover:not(:disabled),
 body[data-theme='dark'] .page-investimentos-modal__date-cal-btn:focus-visible {
   outline: none;
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15) !important;
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__input.page-investimentos-modal__input--select,
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__input.page-investimentos-modal__input--select:focus,
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__input.page-investimentos-modal__input--select:focus-visible {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   color-scheme: dark;
   accent-color: var(--accent);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
@@ -2391,33 +2391,33 @@ body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__inp
 }
 
 body[data-theme='dark'] .page-investimentos-modal__indexador-btn {
-  background: var(--bg-secondary) !important;
-  border: 1.5px solid var(--border-color) !important;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-color);
   color: var(--text-secondary);
 }
 
 body[data-theme='dark'] .page-investimentos-modal__indexador-btn:hover:not(:disabled) {
-  border-color: var(--accent) !important;
+  border-color: var(--accent);
   color: var(--text-primary);
 }
 
 body[data-theme='dark'] .page-investimentos-modal__indexador-btn--active {
-  border-color: var(--accent) !important;
-  background: rgba(212, 168, 75, 0.12) !important;
+  border-color: var(--accent);
+  background: rgba(212, 168, 75, 0.12);
   color: var(--text-primary);
   box-shadow: none;
 }
 
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-inst-dropdown {
-  background: var(--bg-card) !important;
-  border: 1px solid var(--border-color) !important;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   box-shadow: var(--shadow-md);
 }
 
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-inst-option:hover,
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-inst-option--active,
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-inst-option.page-investimentos-inst-option--active {
-  background: rgba(212, 168, 75, 0.1) !important;
+  background: rgba(212, 168, 75, 0.1);
   color: var(--text-primary);
   box-shadow: inset 0 0 0 1px rgba(212, 168, 75, 0.28);
 }
@@ -2433,16 +2433,16 @@ body[data-theme='dark'] .page-investimentos-modal__footer {
 }
 
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-secondary {
-  background: transparent !important;
-  border: 1.5px solid var(--border-color) !important;
-  color: var(--text-secondary) !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: 1.5px solid var(--border-color);
+  color: var(--text-secondary);
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-secondary:hover:not(:disabled) {
-  border-color: var(--accent) !important;
-  color: var(--text-primary) !important;
-  background: transparent !important;
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: transparent;
 }
 
 /* Botão primário gold — cobre dark E light (antes só dark → no desktop tema
@@ -2451,17 +2451,17 @@ body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__foo
 body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary,
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary:hover:not(:disabled),
 body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(155deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 80%, black 20%) 100%) !important;
-  background-image: linear-gradient(155deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 80%, black 20%) 100%) !important;
-  border: 1px solid var(--accent) !important;
-  color: #1a1200 !important;
-  box-shadow: none !important;
+  background: linear-gradient(155deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 80%, black 20%) 100%);
+  background-image: linear-gradient(155deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 80%, black 20%) 100%);
+  border: 1px solid var(--accent);
+  color: #1a1200;
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary:focus-visible,
 body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.28) !important;
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.28);
 }
 
 /* ============================================================
@@ -3160,7 +3160,7 @@ body[data-theme='dark'] .page-investimentos-aportes-table td {
 /* FAB «Novo investimento» em desktop (primário removido do hero; 02b esconde o FAB fora de ≤768px) */
 @media (min-width: 769px) {
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab {
-    display: inline-flex !important;
+    display: inline-flex;
     position: fixed;
     left: 0;
     right: 0;

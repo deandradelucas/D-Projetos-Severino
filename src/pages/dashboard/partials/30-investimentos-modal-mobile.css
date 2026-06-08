@@ -11,283 +11,283 @@
   /* Header */
   body[data-theme='dark'] .page-investimentos-modal .modal-header h3,
   body[data-theme='light'] .page-investimentos-modal .modal-header h3 {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1.15rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
-    color: var(--m-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--m-text-hi);
   }
   body[data-theme='dark'] .page-investimentos-modal .modal-header,
   body[data-theme='light'] .page-investimentos-modal .modal-header {
-    margin-bottom: 4px !important;
-    padding-bottom: 10px !important;
-    border-bottom: 1px solid var(--m-edge-hi) !important;
+    margin-bottom: 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--m-edge-hi);
   }
   body[data-theme='dark'] .page-investimentos-modal .close-btn,
   body[data-theme='light'] .page-investimentos-modal .close-btn {
-    width: 36px !important; height: 36px !important; min-height: 36px !important;
-    border-radius: 50% !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-mid) !important;
-    font-size: 1.3rem !important; line-height: 0 !important; padding: 2px 0 0 !important;
-    display: inline-flex !important; align-items: center !important; justify-content: center !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    width: 36px; height: 36px; min-height: 36px;
+    border-radius: 50%;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-mid);
+    font-size: 1.3rem; line-height: 0; padding: 2px 0 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
   }
 
   /* Surface: sem card duplo */
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__surface,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__surface {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
   }
 
   /* Seções compactas */
   .page-investimentos-modal .page-investimentos-modal__section {
-    margin-bottom: 12px !important;
-    padding: 0 !important;
+    margin-bottom: 12px;
+    padding: 0;
   }
   .page-investimentos-modal .page-investimentos-modal__section--row {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__section-label,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__section-label {
-    display: block !important;
-    margin-bottom: 3px !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.72rem !important;
-    font-weight: 600 !important;
-    text-transform: none !important;
-    letter-spacing: 0.01em !important;
-    color: var(--m-text-mid) !important;
+    display: block;
+    margin-bottom: 3px;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    color: var(--m-text-mid);
   }
   .page-investimentos-modal .page-investimentos-modal__label-optional {
-    color: var(--m-text-lo) !important;
-    font-weight: 500 !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
-    margin-left: 4px !important;
+    color: var(--m-text-lo);
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-left: 4px;
   }
 
   /* Inputs afundados (todos) */
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__input,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__input {
-    width: 100% !important;
-    padding: 13px 15px !important;
-    border-radius: 12px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-hi) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 16px !important;
-    font-weight: 500 !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    box-sizing: border-box !important;
-    outline: none !important;
+    width: 100%;
+    padding: 13px 15px;
+    border-radius: 12px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-hi);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    box-sizing: border-box;
+    outline: none;
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__input:focus,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__input:focus {
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light), 0 0 0 2px var(--m-accent-glow) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light), 0 0 0 2px var(--m-accent-glow);
   }
-  .page-investimentos-modal .page-investimentos-modal__input::placeholder { color: var(--m-text-lo) !important; }
+  .page-investimentos-modal .page-investimentos-modal__input::placeholder { color: var(--m-text-lo); }
 
   /* Select com seta custom */
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__input--select,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__input--select {
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    padding-right: 30px !important;
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 30px;
     background-image:
       linear-gradient(45deg, transparent 50%, var(--m-text-lo) 50%),
-      linear-gradient(135deg, var(--m-text-lo) 50%, transparent 50%) !important;
-    background-position: calc(100% - 17px) 52%, calc(100% - 12px) 52% !important;
-    background-size: 5px 5px, 5px 5px !important;
-    background-repeat: no-repeat !important;
+      linear-gradient(135deg, var(--m-text-lo) 50%, transparent 50%);
+    background-position: calc(100% - 17px) 52%, calc(100% - 12px) 52%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
   }
 
   /* Valor com prefixo R$ */
   .page-investimentos-modal .page-investimentos-modal__valor-input-wrap {
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
+    position: relative;
+    display: flex;
+    align-items: center;
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__valor-prefix,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__valor-prefix {
-    position: absolute !important;
-    left: 15px !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 0.95rem !important;
-    color: var(--m-text-mid) !important;
-    pointer-events: none !important;
+    position: absolute;
+    left: 15px;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--m-text-mid);
+    pointer-events: none;
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__input--valor,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__input--valor {
-    padding-left: 50px !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1.15rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
-    color: var(--m-text-hi) !important;
+    padding-left: 50px;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--m-text-hi);
   }
 
   /* % contratada */
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__input--perc,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__input--perc {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1.05rem !important;
-    font-weight: 700 !important;
-    text-align: center !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-align: center;
   }
   .page-investimentos-modal .page-investimentos-modal__perc-input-wrap {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   .page-investimentos-modal .page-investimentos-modal__perc-input-wrap .page-investimentos-modal__input--perc {
-    width: 110px !important;
-    flex: 0 0 auto !important;
+    width: 110px;
+    flex: 0 0 auto;
   }
   .page-investimentos-modal .page-investimentos-modal__perc-suffix {
-    font-size: 0.8125rem !important;
-    color: var(--m-text-lo) !important;
-    font-weight: 500 !important;
+    font-size: 0.8125rem;
+    color: var(--m-text-lo);
+    font-weight: 500;
   }
 
   /* Data BR + botão calendário */
   .page-investimentos-modal .page-investimentos-modal__date-field-wrap {
-    display: flex !important;
-    align-items: stretch !important;
-    gap: 8px !important;
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
   }
   .page-investimentos-modal .page-investimentos-modal__input--date-br {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__date-cal-btn,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__date-cal-btn {
-    flex: 0 0 auto !important;
-    width: 48px !important;
-    border-radius: 12px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-accent) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    cursor: pointer !important;
+    flex: 0 0 auto;
+    width: 48px;
+    border-radius: 12px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    cursor: pointer;
   }
 
   /* Toggle % do CDI / Pré-fixado — segmented */
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__indexador-toggle,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__indexador-toggle {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 6px !important;
-    padding: 5px !important;
-    border-radius: 14px !important;
-    background: var(--m-sunken) !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    margin-bottom: 10px !important;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 5px;
+    border-radius: 14px;
+    background: var(--m-sunken);
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    margin-bottom: 10px;
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__indexador-btn,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__indexador-btn {
-    padding: 11px 12px !important;
-    min-height: 44px !important;
-    border-radius: 10px !important;
-    background: transparent !important;
-    border: 1px solid transparent !important;
-    color: var(--m-text-mid) !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
+    padding: 11px 12px;
+    min-height: 44px;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--m-text-mid);
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__indexador-btn--active,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__indexador-btn--active {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    color: var(--m-accent) !important;
-    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    color: var(--m-accent);
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow);
   }
 
   /* Hints e link */
   .page-investimentos-modal .page-investimentos-modal__hint {
-    font-size: 0.78rem !important;
-    color: var(--m-text-lo) !important;
-    line-height: 1.4 !important;
-    margin: 6px 0 0 !important;
+    font-size: 0.78rem;
+    color: var(--m-text-lo);
+    line-height: 1.4;
+    margin: 6px 0 0;
   }
   .page-investimentos-modal .page-investimentos-modal__toggle-link {
-    color: var(--m-accent) !important;
-    font-size: 0.8125rem !important;
-    font-weight: 600 !important;
-    background: none !important;
-    border: none !important;
-    padding: 0 !important;
-    cursor: pointer !important;
+    color: var(--m-accent);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
   }
 
   /* Combobox dropdown de instituições */
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-inst-dropdown,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-inst-dropdown {
-    background: linear-gradient(180deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    border-radius: 14px !important;
-    box-shadow: 0 14px 40px -10px var(--m-shadow) !important;
+    background: linear-gradient(180deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi);
+    border-radius: 14px;
+    box-shadow: 0 14px 40px -10px var(--m-shadow);
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-inst-option,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-inst-option {
-    color: var(--m-text-hi) !important;
+    color: var(--m-text-hi);
   }
   .page-investimentos-modal .page-investimentos-inst-option--active {
-    background: var(--m-accent-glow) !important;
-    color: var(--m-accent) !important;
+    background: var(--m-accent-glow);
+    color: var(--m-accent);
   }
-  .page-investimentos-modal .page-investimentos-inst-option__tipo { color: var(--m-text-lo) !important; }
+  .page-investimentos-modal .page-investimentos-inst-option__tipo { color: var(--m-text-lo); }
 
   /* Footer */
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__footer {
-    border-top: 1px solid var(--m-edge-hi) !important;
-    padding-top: 12px !important;
-    gap: 10px !important;
+    border-top: 1px solid var(--m-edge-hi);
+    padding-top: 12px;
+    gap: 10px;
   }
   .page-investimentos-modal .page-investimentos-modal__footer-hint {
-    font-size: 0.75rem !important;
-    color: var(--m-text-lo) !important;
+    font-size: 0.75rem;
+    color: var(--m-text-lo);
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-secondary,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-secondary {
-    padding: 12px 18px !important;
-    min-height: 46px !important;
-    border-radius: 999px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    font-weight: 600 !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    cursor: pointer !important;
+    padding: 12px 18px;
+    min-height: 46px;
+    border-radius: 999px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    cursor: pointer;
   }
   body[data-theme='dark'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary,
   body[data-theme='light'] .page-investimentos-modal .page-investimentos-modal__footer-actions .btn-primary {
-    padding: 12px 22px !important;
-    min-height: 46px !important;
-    border-radius: 999px !important;
-    background: linear-gradient(155deg, var(--m-accent) 0%, color-mix(in srgb, var(--m-accent) 80%, black 20%) 100%) !important;
-    border: 1px solid var(--m-accent) !important;
-    color: var(--m-accent-fg) !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.005em !important;
-    box-shadow: 5px 5px 14px var(--m-shadow-soft), -3px -3px 8px var(--m-light), 0 0 16px var(--m-accent-glow) !important;
-    cursor: pointer !important;
+    padding: 12px 22px;
+    min-height: 46px;
+    border-radius: 999px;
+    background: linear-gradient(155deg, var(--m-accent) 0%, color-mix(in srgb, var(--m-accent) 80%, black 20%) 100%);
+    border: 1px solid var(--m-accent);
+    color: var(--m-accent-fg);
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    box-shadow: 5px 5px 14px var(--m-shadow-soft), -3px -3px 8px var(--m-light), 0 0 16px var(--m-accent-glow);
+    cursor: pointer;
   }
 }

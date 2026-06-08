@@ -68,16 +68,16 @@
   /* ─── Surface da sidebar: raised emerge com gradiente diagonal ─── */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
-    background: linear-gradient(160deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%) !important;
-    background-image: linear-gradient(160deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%) !important;
-    border: 1px solid var(--sb-edge-hi) !important;
-    border-radius: var(--sb-r-card) !important;
-    padding: 28px 16px 18px !important;
+    background: linear-gradient(160deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
+    background-image: linear-gradient(160deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
+    border: 1px solid var(--sb-edge-hi);
+    border-radius: var(--sb-r-card);
+    padding: 28px 16px 18px;
     box-shadow:
       10px 10px 28px var(--sb-shadow),
       -4px -4px 14px var(--sb-light),
       inset 1px 1px 1px var(--sb-edge-hi),
-      inset -1px -1px 1px var(--sb-edge-lo) !important;
+      inset -1px -1px 1px var(--sb-edge-lo);
   }
 
   /* Glow gold sutil no topo (luz vinda do nordeste) */
@@ -100,7 +100,7 @@
   .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
     position: relative;
     z-index: 1;
-    margin-bottom: 18px !important;
+    margin-bottom: 18px;
     padding: 0 8px;
   }
 
@@ -168,35 +168,35 @@
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
     position: relative;
-    display: flex !important;
+    display: flex;
     align-items: center;
     gap: 12px;
-    padding: 11px 14px !important;
-    margin: 0 !important;
-    width: 100% !important;
-    border-radius: var(--sb-r-item) !important;
-    background: transparent !important;
-    border: 1px solid transparent !important;
-    color: var(--sb-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    letter-spacing: -0.005em !important;
-    text-decoration: none !important;
+    padding: 11px 14px;
+    margin: 0;
+    width: 100%;
+    border-radius: var(--sb-r-item);
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--sb-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    text-decoration: none;
     transition:
       transform 240ms var(--sb-ease),
       background 240ms var(--sb-ease),
       color 240ms var(--sb-ease),
-      box-shadow 240ms var(--sb-ease) !important;
-    overflow: visible !important;
+      box-shadow 240ms var(--sb-ease);
+    overflow: visible;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
-    color: inherit !important;
-    font-family: inherit !important;
-    font-weight: inherit !important;
-    font-size: inherit !important;
+    color: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: inherit;
     line-height: 1.2;
   }
 
@@ -206,46 +206,46 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px !important;
-    height: 28px !important;
+    width: 28px;
+    height: 28px;
     border-radius: 9px;
     background: transparent;
-    color: var(--sb-text-lo) !important;
+    color: var(--sb-text-lo);
     transition: color 240ms var(--sb-ease), background 240ms var(--sb-ease), box-shadow 240ms var(--sb-ease);
   }
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap svg,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap svg {
     width: 20px;
     height: 20px;
-    stroke-width: 1.6 !important;
+    stroke-width: 1.6;
   }
 
   /* ─── Hover: clay raised + slide + glow gold ─── */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active),
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) {
     transform: translateX(3px);
-    background: linear-gradient(155deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%) !important;
-    color: var(--sb-text-hi) !important;
+    background: linear-gradient(155deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
+    color: var(--sb-text-hi);
     box-shadow:
       4px 4px 10px var(--sb-shadow-soft),
       -2px -2px 6px var(--sb-light),
-      inset 1px 1px 1px var(--sb-edge-hi) !important;
+      inset 1px 1px 1px var(--sb-edge-hi);
   }
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap {
-    color: var(--sb-accent) !important;
+    color: var(--sb-accent);
   }
 
   /* ─── Active: inset sunken + barra gold + glow ─── */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-    background: var(--sb-bg-sunken) !important;
-    color: var(--sb-text-hi) !important;
-    font-weight: 600 !important;
+    background: var(--sb-bg-sunken);
+    color: var(--sb-text-hi);
+    font-weight: 600;
     box-shadow:
       inset 3px 3px 8px var(--sb-shadow),
       inset -2px -2px 5px var(--sb-light),
-      0 0 0 1px var(--sb-accent-glow) !important;
+      0 0 0 1px var(--sb-accent-glow);
     transform: translateX(0);
   }
 
@@ -265,28 +265,28 @@
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
-    background: var(--sb-bg-base) !important;
-    color: var(--sb-accent) !important;
+    background: var(--sb-bg-base);
+    color: var(--sb-accent);
     box-shadow:
       inset 2px 2px 4px var(--sb-shadow),
       inset -1px -1px 2px var(--sb-light),
-      0 0 0 1px var(--sb-accent-glow) !important;
+      0 0 0 1px var(--sb-accent-glow);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg {
-    stroke-width: 1.8 !important;
+    stroke-width: 1.8;
     filter: drop-shadow(0 0 6px var(--sb-accent-glow));
   }
 
   /* ─── Focus rings ─── */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:focus-visible,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:focus-visible {
-    outline: none !important;
+    outline: none;
     box-shadow:
       4px 4px 10px var(--sb-shadow-soft),
       -2px -2px 6px var(--sb-light),
-      0 0 0 2px var(--sb-accent) !important;
+      0 0 0 2px var(--sb-accent);
   }
 
   /* ─── Section labels: caps tracking refinado ─── */
@@ -294,8 +294,8 @@
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label {
     position: relative;
     list-style: none;
-    margin: 18px 0 6px !important;
-    padding: 0 14px !important;
+    margin: 18px 0 6px;
+    padding: 0 14px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -311,12 +311,12 @@
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 600 !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.18em !important;
-    color: var(--sb-text-faint) !important;
+    letter-spacing: 0.18em;
+    color: var(--sb-text-faint);
   }
 
   /* ─── Logout: pílula danger sutil ─── */
@@ -329,35 +329,35 @@
     justify-content: center;
     gap: 10px;
     width: 100%;
-    margin-top: 12px !important;
-    padding: 12px 18px !important;
-    border-radius: var(--sb-r-pill) !important;
-    background: linear-gradient(155deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%) !important;
-    border: 1px solid var(--sb-edge-hi) !important;
-    color: var(--sb-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    letter-spacing: -0.005em !important;
+    margin-top: 12px;
+    padding: 12px 18px;
+    border-radius: var(--sb-r-pill);
+    background: linear-gradient(155deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
+    border: 1px solid var(--sb-edge-hi);
+    color: var(--sb-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
     box-shadow:
       5px 5px 12px var(--sb-shadow-soft),
       -3px -3px 8px var(--sb-light),
       inset 1px 1px 1px var(--sb-edge-hi),
-      inset -1px -1px 1px var(--sb-edge-lo) !important;
-    transition: all 240ms var(--sb-ease) !important;
+      inset -1px -1px 1px var(--sb-edge-lo);
+    transition: all 240ms var(--sb-ease);
     cursor: pointer;
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:hover,
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:hover {
     transform: translateY(-2px);
-    color: var(--sb-danger) !important;
-    background: linear-gradient(155deg, var(--sb-danger-soft) 0%, var(--sb-bg-base) 100%) !important;
+    color: var(--sb-danger);
+    background: linear-gradient(155deg, var(--sb-danger-soft) 0%, var(--sb-bg-base) 100%);
     box-shadow:
       7px 9px 16px var(--sb-shadow),
       -4px -4px 10px var(--sb-light),
       0 0 0 1px var(--sb-danger-glow),
-      inset 1px 1px 1px var(--sb-edge-hi) !important;
+      inset 1px 1px 1px var(--sb-edge-hi);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:active,
@@ -365,7 +365,7 @@
     transform: translateY(0);
     box-shadow:
       inset 3px 3px 8px var(--sb-shadow),
-      inset -2px -2px 5px var(--sb-light) !important;
+      inset -2px -2px 5px var(--sb-light);
   }
 
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn svg,
@@ -382,10 +382,10 @@
     text-align: center;
     margin-bottom: 6px;
     opacity: 0.5;
-    color: var(--sb-text-faint) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.65rem !important;
-    letter-spacing: 0.15em !important;
+    color: var(--sb-text-faint);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
   }
 
@@ -425,8 +425,8 @@
   @media (prefers-reduced-motion: reduce) {
     .dashboard-container.app-horizon-shell .sidebar *,
     .dashboard-container.app-horizon-shell .sidebar {
-      animation: none !important;
-      transition: none !important;
+      animation: none;
+      transition: none;
     }
   }
 }

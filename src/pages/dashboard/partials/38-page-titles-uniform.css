@@ -19,13 +19,12 @@
 
    Carregar SEMPRE por último no dashboard.css.
    ────────────────────────────────────────────────────────────────────────── */
-@layer hub {
+
   .dashboard-container[class*="page-"] .dashboard-hub__title,
   .dashboard-container.page-relatorios .rel-ed__title,
   .dashboard-container.agenda-page .agenda-hero__title-row > strong,
   .dashboard-container.page-lista-compras .page-lista-compras__title {
-    font-size: var(--page-title-size) !important;
-    font-weight: var(--page-title-weight) !important;
-    line-height: var(--page-title-line) !important;
+    font-size: var(--page-title-size);
+    font-weight: var(--page-title-weight);
+    line-height: var(--page-title-line);
   }
-}

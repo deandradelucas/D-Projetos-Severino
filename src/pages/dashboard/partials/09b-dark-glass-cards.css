@@ -21,18 +21,18 @@ body[data-theme='dark'] .ref-panel,
 body[data-theme='dark'] .config-card,
 body[data-theme='dark'] .config-theme-card,
 body[data-theme='dark'] .relatorios-chart-card {
-  background-color: var(--bg-card, #141618) !important;
+  background-color: var(--bg-card, #141618);
   background-image: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.03) 0%,
     rgba(255, 255, 255, 0.01) 30%,
     transparent 65%
-  ) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
     0 1px 4px rgba(0, 0, 0, 0.45),
-    0 6px 20px rgba(0, 0, 0, 0.28) !important;
+    0 6px 20px rgba(0, 0, 0, 0.28);
 }
 
 /* ─── HÉROS DE PÁGINA ──────────────────────────────────────────────────────── */
@@ -44,54 +44,54 @@ body[data-theme='dark'] .relatorios-chart-card {
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
 body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__hero,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell main.ref-dashboard-main--scrolled .dashboard-hub__hero {
-  background-color: var(--bg-card, #141618) !important;
+  background-color: var(--bg-card, #141618);
   background-image: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.025) 0%,
     transparent 55%
-  ) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.065),
     0 1px 4px rgba(0, 0, 0, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.2) !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  isolation: auto !important;
+    0 4px 12px rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  isolation: auto;
 }
 
 /* ─── PAINEL DE TRANSAÇÕES (home) ───────────────────────────────────────────── */
 
 body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
-  background-color: var(--bg-card, #141618) !important;
+  background-color: var(--bg-card, #141618);
   background-image: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.025) 0%,
     transparent 50%
-  ) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 1px 4px rgba(0, 0, 0, 0.4),
-    0 8px 24px rgba(0, 0, 0, 0.25) !important;
+    0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 /* ─── MODAIS E JANELAS FLUTUANTES ───────────────────────────────────────────── */
 
 body[data-theme='dark'] .modal-content,
 body[data-theme='dark'] .horizon-chat-window {
-  background-color: var(--bg-card, #141618) !important;
+  background-color: var(--bg-card, #141618);
   background-image: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.025) 0%,
     rgba(255, 255, 255, 0.005) 28%,
     transparent 58%
-  ) !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  );
+  border: 1px solid rgba(255, 255, 255, 0.09);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
     0 8px 32px rgba(0, 0, 0, 0.55),
-    0 24px 64px rgba(0, 0, 0, 0.4) !important;
+    0 24px 64px rgba(0, 0, 0, 0.4);
 }
 
 /* ─── HOVER: CARDS INTERATIVOS ──────────────────────────────────────────────── */
@@ -99,28 +99,28 @@ body[data-theme='dark'] .horizon-chat-window {
 /* O brilho da borda e do especular aumenta levemente ao passar o mouse */
 body[data-theme='dark'] .config-card:hover,
 body[data-theme='dark'] .relatorios-chart-card:hover {
-  border-color: rgba(255, 255, 255, 0.13) !important;
+  border-color: rgba(255, 255, 255, 0.13);
   background-image: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.042) 0%,
     rgba(255, 255, 255, 0.014) 30%,
     transparent 65%
-  ) !important;
+  );
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.10),
     0 2px 8px rgba(0, 0, 0, 0.5),
-    0 10px 32px rgba(0, 0, 0, 0.32) !important;
+    0 10px 32px rgba(0, 0, 0, 0.32);
 }
 
 body[data-theme='dark'] .ref-kpi-card:hover {
-  border-color: rgba(255, 255, 255, 0.11) !important;
+  border-color: rgba(255, 255, 255, 0.11);
 }
 
 /* ─── DIVISORES INTERNOS DOS PAINÉIS ────────────────────────────────────────── */
 
 /* Borda entre cabeçalho e corpo dos painéis — alinhada ao padrão glass */
 body[data-theme='dark'] .ref-panel__head {
-  border-bottom-color: rgba(255, 255, 255, 0.07) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.07);
 }
 
 /* Agenda modal herdada de 05-dark-shell — usa var(--bg-card) já correto */

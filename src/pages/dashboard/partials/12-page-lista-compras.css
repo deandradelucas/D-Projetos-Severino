@@ -20,7 +20,7 @@
   }
 
   .dashboard-container.page-lista-compras .main-content {
-    overflow: hidden !important;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -92,15 +92,15 @@
 
 
   .page-lista-compras__title {
-    position: static !important;
-    width: auto !important;
-    height: auto !important;
-    padding: 0 !important;
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
     margin: 0;
-    overflow: visible !important;
-    clip: auto !important;
-    clip-path: none !important;
-    white-space: nowrap !important;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    white-space: nowrap;
     /* tamanho via token --page-title-size (@layer page-titles, partial 38) */
     font-weight: 700;
     color: var(--text-primary);
@@ -1015,7 +1015,7 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   .dashboard-container.page-lista-compras .main-content.ref-dashboard-main {
     display: flex;
     flex-direction: column;
-    overflow: hidden !important;
+    overflow: hidden;
     min-height: 0;
   }
 

@@ -8,15 +8,15 @@
 /* A base .modal-content (02c) entra com opacity:0 via animação; o sheet do
    partial 24 não mexe na opacity → sem este reset o modal fica invisível. */
 .modal-content.tx-detalhe-modal {
-  opacity: 1 !important;
+  opacity: 1;
 }
 
 /* Head: badge de tipo + fechar */
 .tx-detalhe-modal .tx-detalhe-modal__head {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  margin-bottom: 4px !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
 }
 body[data-theme='dark'] .tx-detalhe-modal .tx-detalhe-modal__tipo,
 body[data-theme='light'] .tx-detalhe-modal .tx-detalhe-modal__tipo {
@@ -51,12 +51,12 @@ body[data-theme='light'] .tx-detalhe-modal .close-btn {
 
 /* Hero: ícone + valor grande + título */
 .tx-detalhe-modal .tx-detalhe-modal__hero {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  gap: 8px !important;
-  text-align: center !important;
-  padding: 6px 0 18px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 6px 0 18px;
 }
 body[data-theme='dark'] .tx-detalhe-modal .tx-detalhe-modal__icon,
 body[data-theme='light'] .tx-detalhe-modal .tx-detalhe-modal__icon {
@@ -90,9 +90,9 @@ body[data-theme='light'] .tx-detalhe-modal .tx-detalhe-modal__pendente {
 
 /* Lista de pares rótulo/valor */
 .tx-detalhe-modal .tx-detalhe-modal__list {
-  display: flex !important;
-  flex-direction: column !important;
-  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
 }
 body[data-theme='dark'] .tx-detalhe-modal .tx-detalhe-modal__row,
 body[data-theme='light'] .tx-detalhe-modal .tx-detalhe-modal__row {
@@ -126,9 +126,9 @@ body[data-theme='light'] .tx-detalhe-modal .tx-detalhe-modal__row dd {
 
 /* Ações */
 .tx-detalhe-modal .tx-detalhe-modal__actions {
-  display: flex !important;
-  gap: 10px !important;
-  margin-top: 18px !important;
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
 }
 body[data-theme='dark'] .tx-detalhe-modal .tx-detalhe-modal__actions .btn-secondary,
 body[data-theme='light'] .tx-detalhe-modal .tx-detalhe-modal__actions .btn-secondary {

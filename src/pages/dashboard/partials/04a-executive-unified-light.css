@@ -59,7 +59,7 @@ body[data-theme='light'] .nav-item.active {
 body[data-theme='light'] .nav-item.active::before,
 body[data-theme='light'] .nav-item.active::after,
 body[data-theme='light'] .nav-menu::before {
-  display: none !important;
+  display: none;
 }
 
 body[data-theme='light'] .logout-btn {
@@ -112,7 +112,7 @@ body[data-theme='light'] .data-table tbody td {
 }
 
 body[data-theme='light'] .data-table tbody tr:hover {
-  background: rgba(148, 163, 184, 0.08) !important;
+  background: rgba(148, 163, 184, 0.08);
 }
 
 body[data-theme='light'] .filter-input,
@@ -195,7 +195,7 @@ body[data-theme='light'] .config-layout {
 }
 body[data-theme='light'] .config-card {
   padding: 16px;
-  border-radius: 18px !important;
+  border-radius: 18px;
 }
 
 @media (max-width: 1200px) {

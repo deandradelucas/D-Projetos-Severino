@@ -37,11 +37,11 @@ body[data-theme='light'] .horizon-chat-fab:hover {
 }
 
 body[data-theme='light'] .chat-fab-active {
-  background: rgba(28, 28, 32, 0.72) !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  -webkit-backdrop-filter: blur(1px) !important;
-  backdrop-filter: blur(1px) !important;
+  background: rgba(28, 28, 32, 0.72);
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
 }
 
 body[data-theme='light'] .horizon-chat-window {
@@ -233,8 +233,8 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
 }
 
 .chat-fab-active {
-  background: #374151 !important;
-  color: #ffffff !important;
+  background: #374151;
+  color: #ffffff;
 }
 
 /* Pulse ring on FAB */
@@ -479,7 +479,7 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 12px 16px !important;
+  padding: 12px 16px;
 }
 
 .horizon-typing span {
@@ -705,7 +705,7 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   .horizon-chat-input {
     min-height: 38px;
     padding: 8px 12px;
-    font-size: 16px !important;
+    font-size: 16px;
   }
 
   .horizon-send-btn {
@@ -726,18 +726,18 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   body.horizon-chat-open .mobile-bottom-nav,
   body.horizon-chat-open .dashboard-mobile-tx-fab,
   body.horizon-chat-open .dashboard-mobile-fabs {
-    display: none !important;
+    display: none;
   }
 
   body.horizon-chat-open:has(.mobile-bottom-nav) .dashboard-container.app-horizon-shell .main-content,
   body.horizon-chat-open:has(.mobile-bottom-nav) .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
   body.horizon-chat-open:has(.dashboard-mobile-tx-fab) .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll,
   body.horizon-chat-open:has(.dashboard-mobile-fabs) .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
   }
 
   body.horizon-chat-open .ref-dashboard-scroll {
-    overflow: hidden !important;
+    overflow: hidden;
     overscroll-behavior: none;
   }
 
@@ -752,47 +752,47 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
 
   /* Cartão do Severino no mobile — sólido, altura estável, sem inline JS que esmagava o layout */
   body.horizon-chat-open .horizon-chat-window.horizon-chat-window--mobile-sheet.chat-window-open {
-    position: fixed !important;
-    left: 12px !important;
-    right: 12px !important;
-    width: auto !important;
-    max-width: min(384px, calc(100vw - 24px)) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
-    height: min(64dvh, 500px) !important;
-    max-height: min(64dvh, 500px) !important;
-    transform: scale(1) translateY(0) !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    z-index: 9600 !important;
-    overflow: hidden !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: min(384px, calc(100vw - 24px));
+    margin-left: auto;
+    margin-right: auto;
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    height: min(64dvh, 500px);
+    max-height: min(64dvh, 500px);
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 9600;
+    overflow: hidden;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
   body.horizon-chat-open[data-theme='light'] .horizon-chat-window.horizon-chat-window--mobile-sheet.chat-window-open {
-    background: #0c0e12 !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: #0c0e12;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow:
       0 24px 64px rgba(0, 0, 0, 0.45),
-      0 0 0 1px rgba(255, 255, 255, 0.06) inset !important;
+      0 0 0 1px rgba(255, 255, 255, 0.06) inset;
   }
 
   body.horizon-chat-open[data-theme='dark'] .horizon-chat-window.horizon-chat-window--mobile-sheet.chat-window-open {
-    background: linear-gradient(180deg, #121212 0%, #060606 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: linear-gradient(180deg, #121212 0%, #060606 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   /* Anula regra 04c que empurrava o cartão para cima do nav oculto */
   body.horizon-chat-open:has(.mobile-bottom-nav) .horizon-chat-window {
-    bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
   }
 
   body.horizon-chat-open.horizon-chat-keyboard .horizon-chat-window.horizon-chat-window--mobile-sheet.chat-window-open {
-    bottom: var(--horizon-chat-kb-bottom, max(12px, env(safe-area-inset-bottom, 0px))) !important;
-    height: min(52dvh, 420px) !important;
-    max-height: min(52dvh, 420px) !important;
+    bottom: var(--horizon-chat-kb-bottom, max(12px, env(safe-area-inset-bottom, 0px)));
+    height: min(52dvh, 420px);
+    max-height: min(52dvh, 420px);
   }
 }
 

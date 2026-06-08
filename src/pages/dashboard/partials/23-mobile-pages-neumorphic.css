@@ -24,22 +24,22 @@
 
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__pair,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__pair {
-    display: flex !important; flex-direction: column !important; gap: 12px !important;
+    display: flex; flex-direction: column; gap: 12px;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts {
-    display: flex !important; flex-direction: column !important; gap: 14px !important;
+    display: flex; flex-direction: column; gap: 14px;
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-chart-card,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-chart-card {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important; border-radius: 20px !important; padding: 16px !important;
-    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi); border-radius: 20px; padding: 16px;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light);
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__section-title,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-charts__section-title {
-    font-family: 'Inter Variable', system-ui, sans-serif !important; font-size: 0.625rem !important; font-weight: 700 !important;
-    text-transform: uppercase !important; letter-spacing: 0.18em !important; color: var(--m-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif; font-size: 0.625rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.18em; color: var(--m-text-lo);
   }
   /* Botões export CSV/PDF */
 
@@ -54,18 +54,18 @@
   }
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important; border-radius: 20px !important; padding: 18px 16px !important;
-    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi); border-radius: 20px; padding: 18px 16px;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light);
   }
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat {
-    background: var(--m-sunken) !important; border-radius: 14px !important; padding: 14px !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light) !important;
+    background: var(--m-sunken); border-radius: 14px; padding: 14px;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light);
   }
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat-value,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat-value {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; color: var(--m-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-weight: 700; color: var(--m-text-hi);
   }
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__bank-avatar,
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__bank-avatar {
@@ -89,23 +89,23 @@
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-panel,
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-list-panel {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important; border-radius: 20px !important; padding: 16px !important;
-    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi); border-radius: 20px; padding: 16px;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light);
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day {
-    color: var(--m-text-mid) !important; border-radius: 10px !important;
+    color: var(--m-text-mid); border-radius: 10px;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--today,
-  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--today { color: var(--m-accent) !important; font-weight: 700 !important; }
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--today { color: var(--m-accent); font-weight: 700; }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected .agenda-calendar-day__num,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected .agenda-calendar-day__num,
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected > span,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--selected > span {
-    display: grid !important; place-items: center !important; width: 30px !important; height: 30px !important; border-radius: 50% !important;
-    background: linear-gradient(155deg, var(--m-accent), #c49535) !important; color: var(--m-accent-fg) !important;
-    -webkit-text-fill-color: var(--m-accent-fg) !important; font-weight: 700 !important;
+    display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(155deg, var(--m-accent), #c49535); color: var(--m-accent-fg);
+    -webkit-text-fill-color: var(--m-accent-fg); font-weight: 700;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item {
@@ -116,10 +116,10 @@
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item h3 { color: var(--m-text-hi); }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day {
-    background: var(--m-sunken) !important; box-shadow: inset 2px 2px 4px var(--m-shadow-soft) !important; border-radius: 12px !important;
+    background: var(--m-sunken); box-shadow: inset 2px 2px 4px var(--m-shadow-soft); border-radius: 12px;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-num,
-  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-num { color: var(--m-text-hi) !important; }
+  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-num { color: var(--m-text-hi); }
 
   /* ═══════════ LISTA DE COMPRAS ═══════════ */
   body[data-theme='dark'] .dashboard-container.page-lista-compras.ref-dashboard.app-horizon-shell .page-lista-compras__category-group,
@@ -157,27 +157,27 @@
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .ref-panel,
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-aside {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important; border-radius: 20px !important;
-    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi); border-radius: 20px;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light);
   }
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__grid,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__grid {
-    grid-template-columns: 1fr !important; gap: 12px !important;
+    grid-template-columns: 1fr; gap: 12px;
   }
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option {
-    background: var(--m-sunken) !important; border: 1px solid var(--m-edge-hi) !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft) !important; border-radius: 16px !important;
+    background: var(--m-sunken); border: 1px solid var(--m-edge-hi);
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft); border-radius: 16px;
   }
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option--active,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__option--active {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    box-shadow: 4px 4px 10px var(--m-shadow-soft), 0 0 0 2px var(--m-accent-glow) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    box-shadow: 4px 4px 10px var(--m-shadow-soft), 0 0 0 2px var(--m-accent-glow);
   }
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__list,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-valor__list {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-primary,
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-primary {
@@ -191,16 +191,16 @@
   /* ═══════════ CONFIGURAÇÕES ═══════════ */
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card,
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important; border-radius: 20px !important; padding: 18px 16px !important;
-    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi); border-radius: 20px; padding: 18px 16px;
+    box-shadow: 8px 8px 20px var(--m-shadow-soft), -6px -6px 16px var(--m-light);
   }
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-title-clean,
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-title-clean {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important; font-weight: 700 !important; color: var(--m-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-weight: 700; color: var(--m-text-hi);
   }
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-kicker,
-  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-kicker { color: var(--m-accent) !important; }
+  body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-card-kicker { color: var(--m-accent); }
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-section-nav__pill,
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-section-nav__pill,
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-action-btn,
@@ -222,7 +222,7 @@
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-pref-row,
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-field,
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-field {
-    background: var(--m-sunken) !important; box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light) !important; border-radius: 14px !important;
+    background: var(--m-sunken); box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 3px var(--m-light); border-radius: 14px;
   }
   /* Convite familiar: QR + WhatsApp — sem layout no mobile (partial 21 é desktop-only) */
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-invite-grid {
@@ -340,7 +340,7 @@
 
 /* ═══════════════ Fix: modais de investimentos invisiveis no mobile (opacity:0 herdado do 02c; sheet do 24 nao corrige) ═══════════════ */
 @media (max-width: 768px) {
-  .modal-content.page-investimentos-modal { opacity: 1 !important; }
+  .modal-content.page-investimentos-modal { opacity: 1; }
 }
 
 /* ═══════════════ Fix iOS: input[type=date] invisível quando color-scheme do sistema != tema do app ═══════════════ */
@@ -348,65 +348,65 @@
   body[data-theme='light'] .page-investimentos-resumo__projecao-input,
   body[data-theme='light'] .page-investimentos-comparador input[type="date"],
   body[data-theme='light'] .page-investimentos input[type="date"] {
-    color-scheme: light !important;
-    color: var(--m-text-hi) !important;
-    -webkit-text-fill-color: var(--m-text-hi) !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    font-size: 16px !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft) !important;
+    color-scheme: light;
+    color: var(--m-text-hi);
+    -webkit-text-fill-color: var(--m-text-hi);
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    font-size: 16px;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft);
   }
   body[data-theme='dark'] .page-investimentos-resumo__projecao-input,
   body[data-theme='dark'] .page-investimentos-comparador input[type="date"],
   body[data-theme='dark'] .page-investimentos input[type="date"] {
-    color-scheme: dark !important;
-    color: var(--m-text-hi) !important;
-    -webkit-text-fill-color: var(--m-text-hi) !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    font-size: 16px !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft) !important;
+    color-scheme: dark;
+    color: var(--m-text-hi);
+    -webkit-text-fill-color: var(--m-text-hi);
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    font-size: 16px;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft);
   }
 }
 
 /* ═══════════════ Resumo da carteira (Investimentos) — mais compacto no mobile ═══════════════ */
 @media (max-width: 768px) {
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo.ref-panel {
-    padding: 14px 14px !important;
-    min-height: 0 !important;
+    padding: 14px 14px;
+    min-height: 0;
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__head {
-    margin-bottom: 8px !important;
-    padding-bottom: 8px !important;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__projecao {
-    margin: 8px 0 !important;
+    margin: 8px 0;
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__projecao-row {
-    gap: 8px !important;
-    align-items: center !important;
+    gap: 8px;
+    align-items: center;
   }
   /* Stats: 2 colunas compactas (corta a altura) */
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stats {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 8px !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat {
-    padding: 10px 12px !important;
-    gap: 2px !important;
-    border-radius: 13px !important;
+    padding: 10px 12px;
+    gap: 2px;
+    border-radius: 13px;
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat-label {
-    font-size: 0.56rem !important;
-    letter-spacing: 0.05em !important;
+    font-size: 0.56rem;
+    letter-spacing: 0.05em;
   }
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat-value {
-    font-size: 1.02rem !important;
-    line-height: 1.1 !important;
+    font-size: 1.02rem;
+    line-height: 1.1;
   }
   /* Stat "muted" (CDI indisponível) ocupa as 2 colunas */
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__stat--muted {
-    grid-column: 1 / -1 !important;
+    grid-column: 1 / -1;
   }
 }
 
@@ -414,106 +414,106 @@
 @media (max-width: 768px) {
   /* Tira da semana: 7 colunas (estava tudo grudado "Seg11Ter2...") */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week {
-    display: grid !important;
-    grid-template-columns: repeat(7, 1fr) !important;
-    gap: 5px !important;
-    margin-top: 12px !important;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 12px;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 2px !important;
-    padding: 7px 1px !important;
-    border-radius: 11px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid transparent !important;
-    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    cursor: pointer !important;
-    min-width: 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 7px 1px;
+    border-radius: 11px;
+    background: var(--m-sunken);
+    border: 1px solid transparent;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    cursor: pointer;
+    min-width: 0;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-wd {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.5rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.03em !important;
-    color: var(--m-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--m-text-lo);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-num {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 700 !important;
-    color: var(--m-text-hi) !important;
-    line-height: 1 !important;
-    font-variant-numeric: tabular-nums !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--m-text-hi);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-count {
-    min-height: 14px !important;
-    min-width: 14px !important;
-    padding: 0 3px !important;
-    border-radius: 999px !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.5rem !important;
-    font-weight: 700 !important;
-    line-height: 14px !important;
-    color: transparent !important;
-    background: transparent !important;
+    min-height: 14px;
+    min-width: 14px;
+    padding: 0 3px;
+    border-radius: 999px;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.5rem;
+    font-weight: 700;
+    line-height: 14px;
+    color: transparent;
+    background: transparent;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day--has .agenda-hero__week-count {
-    color: var(--m-accent-fg) !important;
-    background: var(--m-accent) !important;
+    color: var(--m-accent-fg);
+    background: var(--m-accent);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day--today {
-    border-color: var(--m-accent-glow) !important;
+    border-color: var(--m-accent-glow);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day--today .agenda-hero__week-num {
-    color: var(--m-accent) !important;
+    color: var(--m-accent);
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day--selected,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day--selected {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow);
   }
 
   /* Resumo "Sem próximos compromissos" — fonte do sistema */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__summary p {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    color: var(--m-text-mid) !important;
-    margin: 10px 0 0 !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    color: var(--m-text-mid);
+    margin: 10px 0 0;
   }
 
   /* Stats Hoje/Semana — pills compactos */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stats {
-    display: flex !important;
-    gap: 7px !important;
+    display: flex;
+    gap: 7px;
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stat,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stat {
-    display: inline-flex !important;
-    align-items: baseline !important;
-    gap: 6px !important;
-    padding: 5px 11px !important;
-    border-radius: 999px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stat span {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.625rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    color: var(--m-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--m-text-lo);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__stat strong {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    font-weight: 700 !important;
-    color: var(--m-accent) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--m-accent);
   }
 
   /* Toggle Mês/Semana (estava "MêsSemana" grudado) */
@@ -551,177 +551,177 @@
 @media (max-width: 768px) {
   /* Header */
   .agenda-modal .agenda-modal__header {
-    display: flex !important;
-    align-items: flex-start !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
-    margin-bottom: 12px !important;
-    padding-bottom: 10px !important;
-    border-bottom: 1px solid var(--m-edge-hi) !important;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--m-edge-hi);
   }
   .agenda-modal .agenda-section-eyebrow {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.625rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.1em !important;
-    color: var(--m-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--m-text-lo);
   }
   .agenda-modal .agenda-modal__header h2 {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1.1rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
-    color: var(--m-text-hi) !important;
-    margin: 2px 0 0 !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--m-text-hi);
+    margin: 2px 0 0;
   }
   body[data-theme='dark'] .agenda-modal .agenda-modal__close,
   body[data-theme='light'] .agenda-modal .agenda-modal__close {
-    width: 36px !important; height: 36px !important; min-height: 36px !important; flex-shrink: 0 !important;
-    border-radius: 50% !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-mid) !important;
-    font-size: 1.3rem !important; line-height: 0 !important; padding: 2px 0 0 !important;
-    display: inline-flex !important; align-items: center !important; justify-content: center !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
+    width: 36px; height: 36px; min-height: 36px; flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-mid);
+    font-size: 1.3rem; line-height: 0; padding: 2px 0 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
   }
 
   /* Campos */
   .agenda-modal .agenda-field {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 6px !important;
-    margin-bottom: 12px !important;
-    min-width: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+    min-width: 0;
   }
   .agenda-modal .agenda-field > span {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
-    color: var(--m-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--m-text-lo);
   }
   body[data-theme='dark'] .agenda-modal .agenda-field input,
   body[data-theme='light'] .agenda-modal .agenda-field input,
   body[data-theme='dark'] .agenda-modal .agenda-field select,
   body[data-theme='light'] .agenda-modal .agenda-field select {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    padding: 13px 15px !important;
-    border-radius: 12px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-hi) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 16px !important;
-    font-weight: 500 !important;
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    box-sizing: border-box !important;
-    outline: none !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 13px 15px;
+    border-radius: 12px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-hi);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    box-sizing: border-box;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
   }
   .agenda-modal .agenda-field input:focus,
   .agenda-modal .agenda-field select:focus {
-    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light), 0 0 0 2px var(--m-accent-glow) !important;
+    box-shadow: inset 2px 2px 5px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light), 0 0 0 2px var(--m-accent-glow);
   }
   /* Seta do select */
   .agenda-modal .agenda-field select {
-    padding-right: 30px !important;
+    padding-right: 30px;
     background-image:
       linear-gradient(45deg, transparent 50%, var(--m-text-lo) 50%),
-      linear-gradient(135deg, var(--m-text-lo) 50%, transparent 50%) !important;
-    background-position: calc(100% - 17px) 52%, calc(100% - 12px) 52% !important;
-    background-size: 5px 5px, 5px 5px !important;
-    background-repeat: no-repeat !important;
+      linear-gradient(135deg, var(--m-text-lo) 50%, transparent 50%);
+    background-position: calc(100% - 17px) 52%, calc(100% - 12px) 52%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
   }
   /* iOS: datetime-local visível conforme tema */
   body[data-theme='light'] .agenda-modal input[type="datetime-local"] {
-    color-scheme: light !important; color: var(--m-text-hi) !important; -webkit-text-fill-color: var(--m-text-hi) !important;
+    color-scheme: light; color: var(--m-text-hi); -webkit-text-fill-color: var(--m-text-hi);
   }
   body[data-theme='dark'] .agenda-modal input[type="datetime-local"] {
-    color-scheme: dark !important; color: var(--m-text-hi) !important; -webkit-text-fill-color: var(--m-text-hi) !important;
+    color-scheme: dark; color: var(--m-text-hi); -webkit-text-fill-color: var(--m-text-hi);
   }
 
   /* Grid (Aviso + toggle) empilha */
   /* Aviso de notificação + toggle WhatsApp na MESMA linha (2 colunas) */
   .agenda-modal .agenda-modal__grid {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-    gap: 10px !important;
-    align-items: stretch !important;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    align-items: stretch;
   }
   /* Toggle WhatsApp */
   body[data-theme='dark'] .agenda-modal .agenda-toggle,
   body[data-theme='light'] .agenda-modal .agenda-toggle {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 10px 12px !important;
-    border-radius: 12px !important;
-    background: var(--m-sunken) !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    cursor: pointer !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--m-sunken);
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    cursor: pointer;
   }
   .agenda-modal .agenda-toggle input[type="checkbox"] {
-    width: 20px !important; height: 20px !important;
-    accent-color: var(--m-accent) !important;
-    flex-shrink: 0 !important;
+    width: 20px; height: 20px;
+    accent-color: var(--m-accent);
+    flex-shrink: 0;
   }
   .agenda-modal .agenda-toggle span {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.75rem !important;
-    font-weight: 600 !important;
-    line-height: 1.2 !important;
-    color: var(--m-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--m-text-hi);
   }
 
   /* Ações */
   .agenda-modal .agenda-modal__actions {
-    margin-top: 6px !important;
-    padding-top: 12px !important;
-    border-top: 1px solid var(--m-edge-hi) !important;
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px solid var(--m-edge-hi);
   }
   .agenda-modal .agenda-modal__actions-main {
-    display: flex !important;
-    gap: 10px !important;
-    width: 100% !important;
+    display: flex;
+    gap: 10px;
+    width: 100%;
   }
   body[data-theme='dark'] .agenda-modal .agenda-secondary-btn,
   body[data-theme='light'] .agenda-modal .agenda-secondary-btn {
-    flex: 0 0 auto !important;
-    padding: 12px 18px !important;
-    min-height: 46px !important;
-    border-radius: 999px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid var(--m-edge-hi) !important;
-    color: var(--m-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    font-weight: 600 !important;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    cursor: pointer !important;
+    flex: 0 0 auto;
+    padding: 12px 18px;
+    min-height: 46px;
+    border-radius: 999px;
+    background: var(--m-sunken);
+    border: 1px solid var(--m-edge-hi);
+    color: var(--m-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    cursor: pointer;
   }
   body[data-theme='dark'] .agenda-modal .agenda-modal__actions-main .dashboard-hub__btn--primary,
   body[data-theme='light'] .agenda-modal .agenda-modal__actions-main .dashboard-hub__btn--primary {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 1 1 auto !important;
-    padding: 12px 22px !important;
-    min-height: 46px !important;
-    border-radius: 999px !important;
-    background: linear-gradient(155deg, var(--m-accent) 0%, color-mix(in srgb, var(--m-accent) 80%, black 20%) 100%) !important;
-    border: 1px solid var(--m-accent) !important;
-    color: var(--m-accent-fg) !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    font-weight: 700 !important;
-    box-shadow: 5px 5px 14px var(--m-shadow-soft), -3px -3px 8px var(--m-light), 0 0 16px var(--m-accent-glow) !important;
-    cursor: pointer !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    padding: 12px 22px;
+    min-height: 46px;
+    border-radius: 999px;
+    background: linear-gradient(155deg, var(--m-accent) 0%, color-mix(in srgb, var(--m-accent) 80%, black 20%) 100%);
+    border: 1px solid var(--m-accent);
+    color: var(--m-accent-fg);
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    box-shadow: 5px 5px 14px var(--m-shadow-soft), -3px -3px 8px var(--m-light), 0 0 16px var(--m-accent-glow);
+    cursor: pointer;
   }
 }
 
@@ -735,80 +735,80 @@
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week {
-    width: 100% !important;
-    height: auto !important;
-    min-height: 60px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 3px !important;
-    padding: 8px 2px !important;
-    border-radius: 12px !important;
-    background: var(--m-sunken) !important;
-    border: 1px solid transparent !important;
-    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light) !important;
-    min-width: 0 !important;
+    width: 100%;
+    height: auto;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 8px 2px;
+    border-radius: 12px;
+    background: var(--m-sunken);
+    border: 1px solid transparent;
+    box-shadow: inset 1.5px 1.5px 3px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
+    min-width: 0;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week .agenda-calendar-day__weekday {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.5rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.03em !important;
-    color: var(--m-text-lo) !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--m-text-lo);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week .agenda-calendar-day__num {
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.95rem !important;
-    font-weight: 700 !important;
-    color: var(--m-text-hi) !important;
-    font-variant-numeric: tabular-nums !important;
-    line-height: 1 !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--m-text-hi);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week .agenda-calendar-day__count {
-    min-width: 14px !important;
-    padding: 0 4px !important;
-    border-radius: 999px !important;
-    background: var(--m-accent) !important;
-    color: var(--m-accent-fg) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.5rem !important;
-    font-weight: 700 !important;
-    line-height: 14px !important;
+    min-width: 14px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--m-accent);
+    color: var(--m-accent-fg);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.5rem;
+    font-weight: 700;
+    line-height: 14px;
   }
   /* Hoje / selecionado */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week.agenda-calendar-day--today {
-    border-color: var(--m-accent-glow) !important;
+    border-color: var(--m-accent-glow);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week.agenda-calendar-day--today .agenda-calendar-day__num {
-    color: var(--m-accent) !important;
+    color: var(--m-accent);
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week.agenda-calendar-day--selected,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week.agenda-calendar-day--selected {
-    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow) !important;
+    background: linear-gradient(155deg, var(--m-raised) 0%, var(--m-base) 100%);
+    box-shadow: 3px 3px 8px var(--m-shadow-soft), -2px -2px 5px var(--m-light), 0 0 0 1px var(--m-accent-glow);
   }
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week.agenda-calendar-day--selected .agenda-calendar-day__num {
-    color: var(--m-accent) !important;
+    color: var(--m-accent);
   }
 }
 
 /* ═══════════════ Fix scroll Agenda mobile: desfaz height:100% do 04c que quebra o flex-scroll ═══════════════ */
 @media (max-width: 768px) {
   .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    flex: 1 1 0% !important;
-    height: auto !important;
-    max-height: none !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
+    flex: 1 1 0%;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   /* Painéis não encolhem (mantêm altura natural) → o scroller rola */
   .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > .agenda-calendar-panel,
   .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > .agenda-list-panel--daily,
   .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll > .agenda-hero {
-    flex: 0 0 auto !important;
+    flex: 0 0 auto;
   }
 }
 
@@ -905,7 +905,7 @@
 
   /* Reduz o espaço vazio abaixo da lista (era 300px pra forçar scroll; agora rola por flex) */
   body .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    padding-bottom: calc(118px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(118px + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -916,26 +916,26 @@
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week {
-    min-height: 62px !important;
-    height: auto !important;
-    max-height: none !important;
-    justify-content: center !important;
+    min-height: 62px;
+    height: auto;
+    max-height: none;
+    justify-content: center;
   }
   /* Mata o círculo dourado herdado do dia selecionado nos spans da view semana */
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week .agenda-calendar-day__weekday,
   .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-calendar-day--week .agenda-calendar-day__num {
-    background: transparent !important;
-    background-image: none !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    width: auto !important;
-    height: auto !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: block !important;
+    background: transparent;
+    background-image: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    display: block;
   }
 }
 
@@ -970,13 +970,13 @@
     overflow: hidden;
   }
   .dashboard-container.agenda-page.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-    flex: 1 1 0% !important;
-    min-height: 0 !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
+    flex: 1 1 0%;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 }
 

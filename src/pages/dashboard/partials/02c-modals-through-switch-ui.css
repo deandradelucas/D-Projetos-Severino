@@ -315,7 +315,7 @@ body[data-theme='dark'] .confirm-dialog__btn--secondary {
   .modal-content--nova-tx .modal-form input[type='datetime-local'].input-premium,
   .modal-content--nova-tx .custom-select-trigger,
   .modal-content--nova-tx .custom-select-search input {
-    font-size: 16px !important;
+    font-size: 16px;
   }
 
   .modal-content--nova-tx .modal-form--sheet {
@@ -725,9 +725,9 @@ body[data-theme='light'] .parcelamento-preview.parcelamento-preview--hint {
 }
 
 .rec-vezes-row__input {
-  width: 72px !important;
-  padding: 6px 10px !important;
-  font-size: 14px !important;
+  width: 72px;
+  padding: 6px 10px;
+  font-size: 14px;
   text-align: center;
 }
 
@@ -735,8 +735,8 @@ body[data-theme='light'] .parcelamento-preview.parcelamento-preview--hint {
    calendário, então ocupa o espaço disponível em vez de uma largura fixa.
    Sem isso, no mobile só "mm" + ícone aparecem (largura 72px insuficiente). */
 .rec-vezes-row__input--date {
-  width: auto !important;
-  max-width: 220px !important;
+  width: auto;
+  max-width: 220px;
   flex: 1 1 auto;
   min-width: 150px;
   text-align: left;
@@ -1043,7 +1043,7 @@ body[data-theme='light'] .rec-vezes-row__label {
 
 .custom-select-option.selected {
   background: var(--accent);
-  color: #000000 !important;
+  color: #000000;
   font-weight: 800;
   box-shadow: 0 4px 12px rgba(212, 168, 75, 0.25);
 }
@@ -1605,7 +1605,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
 /* Relatórios: painel de filtros compacto (sem altura mínima de card genérico) */
 body[data-theme='light'] .page-relatorios.app-horizon-shell .ref-panel.page-relatorios-ref-filters,
 body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relatorios-ref-filters {
-  min-height: 0 !important;
+  min-height: 0;
   flex: 0 0 auto;
 }
 
@@ -2163,7 +2163,7 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
 
 /* Modos de Visualização */
 .privacy-blur {
-  filter: blur(8px) !important;
+  filter: blur(8px);
   -webkit-user-select: none;
   user-select: none;
   pointer-events: none;
@@ -2177,26 +2177,26 @@ body[data-theme='dark'] .page-relatorios.app-horizon-shell .ref-panel.page-relat
    Carrega após fullblack; vence blur do backdrop genérico.
    --------------------------------------------------------------------------- */
 body[data-theme='dark'] .modal-backdrop:has(.modal-content--nova-tx) {
-  background: rgba(0, 0, 0, 0.55) !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
+  background: rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 body[data-theme='dark'] .modal-content.modal-content--nova-tx {
-  background: var(--bg-card) !important;
-  background-image: none !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: var(--radius-xl, 16px) !important;
-  box-shadow: var(--shadow-md) !important;
-  color: var(--text-primary) !important;
+  background: var(--bg-card);
+  background-image: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 16px);
+  box-shadow: var(--shadow-md);
+  color: var(--text-primary);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section__title {
-  color: var(--text-secondary) !important;
+  color: var(--text-secondary);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section + .nova-tx-section {
-  border-top-color: var(--border-color) !important;
+  border-top-color: var(--border-color);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-form label {
@@ -2209,9 +2209,9 @@ body[data-theme='dark'] .modal-content--nova-tx .modal-form select,
 body[data-theme='dark'] .modal-content--nova-tx .modal-form textarea,
 body[data-theme='dark'] .modal-content--nova-tx .custom-select-trigger,
 body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input {
-  background: var(--bg-secondary) !important;
-  border: 1.5px solid var(--border-color) !important;
-  color: var(--text-primary) !important;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-primary);
   color-scheme: dark;
 }
 
@@ -2223,19 +2223,19 @@ body[data-theme='dark'] .modal-content--nova-tx .custom-select-trigger:hover,
 body[data-theme='dark'] .modal-content--nova-tx .custom-select.open .custom-select-trigger,
 body[data-theme='dark'] .modal-content--nova-tx .custom-select-search input:focus {
   outline: none;
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15) !important;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .custom-select-dropdown {
-  background: var(--bg-card) !important;
-  background-image: none !important;
-  border-color: var(--border-color) !important;
+  background: var(--bg-card);
+  background-image: none;
+  border-color: var(--border-color);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .type-toggle {
-  background: var(--bg-secondary) !important;
-  border: 1.5px solid var(--border-color) !important;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-color);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .type-btn {
@@ -2243,40 +2243,40 @@ body[data-theme='dark'] .modal-content--nova-tx .type-btn {
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .type-btn.active.despesa {
-  background: rgba(239, 68, 68, 0.2) !important;
-  color: #fca5a5 !important;
-  box-shadow: none !important;
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  box-shadow: none;
   border: 1px solid rgba(239, 68, 68, 0.32);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .type-btn.active.receita {
-  background: rgba(34, 197, 94, 0.2) !important;
-  color: #86efac !important;
-  box-shadow: none !important;
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+  box-shadow: none;
   border: 1px solid rgba(34, 197, 94, 0.32);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .close-btn {
-  background: var(--bg-secondary) !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-secondary) !important;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .close-btn:hover {
-  border-color: var(--accent) !important;
-  color: var(--text-primary) !important;
+  border-color: var(--accent);
+  color: var(--text-primary);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-secondary {
-  background: transparent !important;
-  border: 1.5px solid var(--border-color) !important;
-  color: var(--text-secondary) !important;
+  background: transparent;
+  border: 1.5px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-actions .btn-secondary:hover:not(:disabled) {
-  border-color: var(--accent) !important;
-  color: var(--text-primary) !important;
-  background: transparent !important;
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: transparent;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .date-shortcut-btn {
@@ -2292,38 +2292,38 @@ body[data-theme='dark'] .modal-content--nova-tx .date-shortcut-btn:hover {
 
 /* Parcelamento — toggle e linhas (vence mirror azul) */
 body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia label.modal-recorrencia-toggle-row {
-  color: var(--text-primary) !important;
-  border: 1.5px solid var(--border-color) !important;
-  background: var(--bg-secondary) !important;
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-secondary);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia-on label.modal-recorrencia-toggle-row {
-  border-color: rgba(212, 168, 75, 0.45) !important;
-  background: rgba(212, 168, 75, 0.1) !important;
+  border-color: rgba(212, 168, 75, 0.45);
+  background: rgba(212, 168, 75, 0.1);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__iconWrap {
-  background: rgba(212, 168, 75, 0.16) !important;
-  color: var(--accent) !important;
+  background: rgba(212, 168, 75, 0.16);
+  color: var(--accent);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox,
 body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row .modal-recorrencia-toggle-row__checkbox {
-  accent-color: var(--accent) !important;
+  accent-color: var(--accent);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview {
-  color: var(--accent) !important;
+  color: var(--accent);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview.parcelamento-preview--hint {
-  color: var(--text-secondary) !important;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {
   body[data-theme='dark'] .modal-content--nova-tx {
-    box-shadow: var(--shadow-md) !important;
-    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
   }
 }
 

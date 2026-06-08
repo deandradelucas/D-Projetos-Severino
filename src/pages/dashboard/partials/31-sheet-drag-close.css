@@ -10,15 +10,15 @@
   .modal-content.sheet-dragging,
   .agenda-modal.sheet-dragging,
   .page-lista-compras__modal.sheet-dragging {
-    animation: none !important;
-    transition: none !important;
-    transform: translateY(var(--sheet-drag, 0px)) !important;
+    animation: none;
+    transition: none;
+    transform: translateY(var(--sheet-drag, 0px));
   }
   .modal-content.sheet-closing,
   .agenda-modal.sheet-closing,
   .page-lista-compras__modal.sheet-closing {
-    animation: none !important;
-    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
-    transform: translateY(var(--sheet-drag, 0px)) !important;
+    animation: none;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateY(var(--sheet-drag, 0px));
   }
 }

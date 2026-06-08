@@ -16,8 +16,8 @@
   .config-excluir-overlay,
   .page-lista-compras__modal-overlay,
   .page-investimentos-modal-backdrop {
-    align-items: flex-end !important;
-    padding: 0 !important;
+    align-items: flex-end;
+    padding: 0;
   }
 
   /* Sheet base — comum a todos os modais */
@@ -28,15 +28,15 @@
   .config-excluir-modal,
   .page-lista-compras__modal,
   .page-investimentos-modal {
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: 92vh !important;
-    border-radius: 26px 26px 0 0 !important;
-    padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    animation: mSheetUp 320ms cubic-bezier(0.22, 1, 0.36, 1) both !important;
-    box-sizing: border-box !important;
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 26px 26px 0 0;
+    padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    animation: mSheetUp 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    box-sizing: border-box;
   }
 
   /* Superfície neumórfica do sheet (dark + light) */
@@ -47,9 +47,9 @@
   body[data-theme='dark'] .config-excluir-modal,
   body[data-theme='dark'] .page-lista-compras__modal,
   body[data-theme='dark'] .page-investimentos-modal {
-    background: linear-gradient(180deg, var(--m-raised) 0%, var(--m-base) 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important; border-bottom: none !important;
-    box-shadow: 0 -16px 50px -10px rgba(0,0,0,0.75), inset 0 1px 0 var(--m-edge-hi) !important;
+    background: linear-gradient(180deg, var(--m-raised) 0%, var(--m-base) 100%);
+    border: 1px solid var(--m-edge-hi); border-bottom: none;
+    box-shadow: 0 -16px 50px -10px rgba(0,0,0,0.75), inset 0 1px 0 var(--m-edge-hi);
   }
   body[data-theme='light'] .modal-content,
   body[data-theme='light'] .agenda-modal,
@@ -58,9 +58,9 @@
   body[data-theme='light'] .config-excluir-modal,
   body[data-theme='light'] .page-lista-compras__modal,
   body[data-theme='light'] .page-investimentos-modal {
-    background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%) !important;
-    border: 1px solid var(--m-edge-hi) !important; border-bottom: none !important;
-    box-shadow: 0 -16px 50px -12px var(--m-shadow), inset 0 1px 0 var(--m-edge-hi) !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%);
+    border: 1px solid var(--m-edge-hi); border-bottom: none;
+    box-shadow: 0 -16px 50px -12px var(--m-shadow), inset 0 1px 0 var(--m-edge-hi);
   }
 
   /* Alça de arraste (grabber) no topo de cada sheet */
@@ -71,12 +71,12 @@
   .config-excluir-modal::before,
   .page-lista-compras__modal::before,
   .page-investimentos-modal::before {
-    content: '' !important;
-    position: sticky !important; top: 0 !important;
-    display: block !important;
-    width: 40px !important; height: 4px !important; margin: -6px auto 14px !important;
-    border-radius: 999px !important;
-    background: var(--m-text-lo) !important; opacity: 0.4 !important;
+    content: '';
+    position: sticky; top: 0;
+    display: block;
+    width: 40px; height: 4px; margin: -6px auto 14px;
+    border-radius: 999px;
+    background: var(--m-text-lo); opacity: 0.4;
   }
 
   @keyframes mSheetUp {
@@ -91,7 +91,7 @@
   .agenda-modal input, .agenda-modal select,
   .pagamento-pix-modal input, .pagamento-pix-modal textarea,
   .config-excluir-modal input {
-    font-size: 16px !important; /* evita zoom automático no iOS */
+    font-size: 16px; /* evita zoom automático no iOS */
   }
 
   /* Botões dos sheets — área de toque maior */
@@ -101,12 +101,12 @@
   .config-excluir-actions button,
   .page-lista-compras__modal-actions button,
   .page-investimentos-modal button {
-    min-height: 46px !important;
+    min-height: 46px;
   }
 
   /* Reduce motion */
   @media (prefers-reduced-motion: reduce) {
     .modal-content, .agenda-modal, .pagamento-pix-modal, .pagamento-modal,
-    .config-excluir-modal, .page-lista-compras__modal, .page-investimentos-modal { animation: none !important; }
+    .config-excluir-modal, .page-lista-compras__modal, .page-investimentos-modal { animation: none; }
   }
 }

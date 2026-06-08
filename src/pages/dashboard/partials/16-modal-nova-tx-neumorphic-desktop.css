@@ -126,33 +126,33 @@
   }
   body[data-theme='dark'] .modal-content--nova-tx .close-btn,
   body[data-theme='light'] .modal-content--nova-tx .close-btn {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 50% !important;
-    background: var(--ntx-surface-sunken) !important;
-    border: 1px solid var(--ntx-edge-hi) !important;
-    color: var(--ntx-text-mid) !important;
-    font-size: 1.25rem !important;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--ntx-surface-sunken);
+    border: 1px solid var(--ntx-edge-hi);
+    color: var(--ntx-text-mid);
+    font-size: 1.25rem;
     /* line-height: 0 + padding-top: 2px centra o glifo × da Plus Jakarta Sans */
-    line-height: 0 !important;
-    padding-top: 2px !important;
-    padding-bottom: 0 !important;
+    line-height: 0;
+    padding-top: 2px;
+    padding-bottom: 0;
     cursor: pointer;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     box-shadow:
       inset 2px 2px 4px var(--ntx-shadow-soft),
-      inset -1px -1px 2px var(--ntx-light) !important;
-    transition: color 200ms var(--ntx-ease), background 200ms var(--ntx-ease) !important;
+      inset -1px -1px 2px var(--ntx-light);
+    transition: color 200ms var(--ntx-ease), background 200ms var(--ntx-ease);
   }
   body[data-theme='dark'] .modal-content--nova-tx .close-btn:hover,
   body[data-theme='light'] .modal-content--nova-tx .close-btn:hover {
-    color: var(--ntx-neg) !important;
-    background: var(--ntx-neg-soft) !important;
+    color: var(--ntx-neg);
+    background: var(--ntx-neg-soft);
     /* Sem o rotate(90deg) herdado: o X usa SVG e tem padding-top de 2px, então
        girar fazia o glifo "deslizar" pra esquerda. Hover limpo só com cor/fundo. */
-    transform: none !important;
+    transform: none;
   }
 
   /* Modal body padding */
@@ -168,25 +168,25 @@
   /* (I) Section title caps + linha gradient */
   body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section,
   body[data-theme='light'] .modal-content--nova-tx .nova-tx-section {
-    margin-bottom: 14px !important;
-    padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    margin-bottom: 14px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
   }
   body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section__title,
   body[data-theme='light'] .modal-content--nova-tx .nova-tx-section__title {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    margin: 0 0 10px !important;
-    padding: 0 !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 10px;
+    padding: 0;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.18em !important;
-    color: var(--ntx-text-faint) !important;
+    letter-spacing: 0.18em;
+    color: var(--ntx-text-faint);
   }
   body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section__title::after,
   body[data-theme='light'] .modal-content--nova-tx .nova-tx-section__title::after {
@@ -199,18 +199,18 @@
   /* Form group */
   body[data-theme='dark'] .modal-content--nova-tx .form-group,
   body[data-theme='light'] .modal-content--nova-tx .form-group {
-    margin-bottom: 10px !important;
+    margin-bottom: 10px;
   }
   body[data-theme='dark'] .modal-content--nova-tx .form-group label,
   body[data-theme='light'] .modal-content--nova-tx .form-group label {
-    display: block !important;
-    margin-bottom: 6px !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.75rem !important;
-    font-weight: 600 !important;
-    color: var(--ntx-text-mid) !important;
-    letter-spacing: 0.02em !important;
-    text-transform: none !important;
+    display: block;
+    margin-bottom: 6px;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ntx-text-mid);
+    letter-spacing: 0.02em;
+    text-transform: none;
   }
   body[data-theme='dark'] .modal-content--nova-tx .modal-label-optional,
   body[data-theme='light'] .modal-content--nova-tx .modal-label-optional {
@@ -228,21 +228,21 @@
   body[data-theme='light'] .modal-content--nova-tx input[type="datetime-local"],
   body[data-theme='dark'] .modal-content--nova-tx .input-premium,
   body[data-theme='light'] .modal-content--nova-tx .input-premium {
-    width: 100% !important;
-    padding: 12px 16px !important;
-    border-radius: 12px !important;
-    background: var(--ntx-surface-sunken) !important;
-    border: 1px solid var(--ntx-edge-lo) !important;
-    color: var(--ntx-text-hi) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    font-weight: 500 !important;
-    letter-spacing: -0.005em !important;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--ntx-surface-sunken);
+    border: 1px solid var(--ntx-edge-lo);
+    color: var(--ntx-text-hi);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
     box-shadow:
       inset 2px 2px 5px var(--ntx-shadow-soft),
-      inset -1px -1px 2px var(--ntx-light) !important;
-    transition: box-shadow 200ms var(--ntx-ease), color 200ms var(--ntx-ease) !important;
-    outline: none !important;
+      inset -1px -1px 2px var(--ntx-light);
+    transition: box-shadow 200ms var(--ntx-ease), color 200ms var(--ntx-ease);
+    outline: none;
   }
   body[data-theme='dark'] .modal-content--nova-tx .input-premium:focus,
   body[data-theme='light'] .modal-content--nova-tx .input-premium:focus,
@@ -253,7 +253,7 @@
     box-shadow:
       inset 2px 2px 5px var(--ntx-shadow-soft),
       inset -1px -1px 2px var(--ntx-light),
-      0 0 0 2px var(--ntx-accent-glow) !important;
+      0 0 0 2px var(--ntx-accent-glow);
   }
   body[data-theme='dark'] .modal-content--nova-tx input::placeholder,
   body[data-theme='light'] .modal-content--nova-tx input::placeholder {
@@ -263,51 +263,51 @@
   /* (E) Type toggle Despesa/Receita como segmented pill */
   body[data-theme='dark'] .modal-content--nova-tx .type-toggle,
   body[data-theme='light'] .modal-content--nova-tx .type-toggle {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 6px !important;
-    padding: 5px !important;
-    border-radius: 14px !important;
-    background: var(--ntx-surface-sunken) !important;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 5px;
+    border-radius: 14px;
+    background: var(--ntx-surface-sunken);
     box-shadow:
       inset 2px 2px 5px var(--ntx-shadow-soft),
-      inset -1px -1px 2px var(--ntx-light) !important;
+      inset -1px -1px 2px var(--ntx-light);
   }
   body[data-theme='dark'] .modal-content--nova-tx .type-btn,
   body[data-theme='light'] .modal-content--nova-tx .type-btn {
-    padding: 11px 18px !important;
-    border-radius: 10px !important;
-    background: transparent !important;
-    border: 1px solid transparent !important;
-    color: var(--ntx-text-mid) !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 600 !important;
-    letter-spacing: -0.005em !important;
+    padding: 11px 18px;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--ntx-text-mid);
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
     cursor: pointer;
-    transition: all 220ms var(--ntx-ease) !important;
+    transition: all 220ms var(--ntx-ease);
   }
   body[data-theme='dark'] .modal-content--nova-tx .type-btn:hover:not(.active),
   body[data-theme='light'] .modal-content--nova-tx .type-btn:hover:not(.active) {
-    color: var(--ntx-text-hi) !important;
+    color: var(--ntx-text-hi);
   }
   body[data-theme='dark'] .modal-content--nova-tx .type-btn.despesa.active,
   body[data-theme='light'] .modal-content--nova-tx .type-btn.despesa.active {
-    background: linear-gradient(155deg, var(--ntx-surface-raised) 0%, var(--ntx-surface-base) 100%) !important;
-    color: var(--ntx-neg) !important;
+    background: linear-gradient(155deg, var(--ntx-surface-raised) 0%, var(--ntx-surface-base) 100%);
+    color: var(--ntx-neg);
     box-shadow:
       3px 3px 8px var(--ntx-shadow-soft),
       -2px -2px 5px var(--ntx-light),
-      0 0 0 1px var(--ntx-neg-glow) !important;
+      0 0 0 1px var(--ntx-neg-glow);
   }
   body[data-theme='dark'] .modal-content--nova-tx .type-btn.receita.active,
   body[data-theme='light'] .modal-content--nova-tx .type-btn.receita.active {
-    background: linear-gradient(155deg, var(--ntx-surface-raised) 0%, var(--ntx-surface-base) 100%) !important;
-    color: var(--ntx-pos) !important;
+    background: linear-gradient(155deg, var(--ntx-surface-raised) 0%, var(--ntx-surface-base) 100%);
+    color: var(--ntx-pos);
     box-shadow:
       3px 3px 8px var(--ntx-shadow-soft),
       -2px -2px 5px var(--ntx-light),
-      0 0 0 1px var(--ntx-pos-glow) !important;
+      0 0 0 1px var(--ntx-pos-glow);
   }
 
   /* (G) Valor como hero number — input GIGANTE, tabular, semântico
@@ -315,23 +315,23 @@
      igual ao concorrente "input[type=text]" mas declarado depois → vence */
   body[data-theme='dark'] .modal-content--nova-tx input.input-valor-novo-tx,
   body[data-theme='light'] .modal-content--nova-tx input.input-valor-novo-tx {
-    padding: 18px 20px !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 2rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.03em !important;
-    text-align: center !important;
-    font-variant-numeric: tabular-nums !important;
-    color: var(--ntx-text-hi) !important;
+    padding: 18px 20px;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    color: var(--ntx-text-hi);
   }
   /* Cor semântica do valor conforme tipo */
   body[data-theme='dark'] .modal-content--nova-tx .modal-body--nova-tx:has(.type-btn.receita.active) input.input-valor-novo-tx,
   body[data-theme='light'] .modal-content--nova-tx .modal-body--nova-tx:has(.type-btn.receita.active) input.input-valor-novo-tx {
-    color: var(--ntx-pos) !important;
+    color: var(--ntx-pos);
   }
   body[data-theme='dark'] .modal-content--nova-tx .modal-body--nova-tx:has(.type-btn.despesa.active) input.input-valor-novo-tx,
   body[data-theme='light'] .modal-content--nova-tx .modal-body--nova-tx:has(.type-btn.despesa.active) input.input-valor-novo-tx {
-    color: var(--ntx-neg) !important;
+    color: var(--ntx-neg);
   }
 
   /* Data toolbar + shortcuts Hoje/Ontem como pills (preview Pacote 2 H) */
@@ -372,15 +372,15 @@
   /* Parcelamento toggle row neumorphic */
   body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row,
   body[data-theme='light'] .modal-content--nova-tx .modal-recorrencia-toggle-row {
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    padding: 12px 14px !important;
-    border-radius: 12px !important;
-    background: var(--ntx-surface-sunken) !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--ntx-surface-sunken);
     box-shadow:
       inset 2px 2px 4px var(--ntx-shadow-soft),
-      inset -1px -1px 2px var(--ntx-light) !important;
+      inset -1px -1px 2px var(--ntx-light);
     cursor: pointer;
     transition: box-shadow 200ms var(--ntx-ease);
   }
@@ -389,35 +389,35 @@
     box-shadow:
       inset 2px 2px 4px var(--ntx-shadow-soft),
       inset -1px -1px 2px var(--ntx-light),
-      0 0 0 1px var(--ntx-accent-glow) !important;
+      0 0 0 1px var(--ntx-accent-glow);
   }
   body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__iconWrap,
   body[data-theme='light'] .modal-content--nova-tx .modal-recorrencia-toggle-row__iconWrap {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 10px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: var(--ntx-surface-base) !important;
-    color: var(--ntx-accent) !important;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ntx-surface-base);
+    color: var(--ntx-accent);
     box-shadow:
       2px 2px 5px var(--ntx-shadow-soft),
-      -1px -1px 3px var(--ntx-light) !important;
+      -1px -1px 3px var(--ntx-light);
     flex-shrink: 0;
   }
   body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__text,
   body[data-theme='light'] .modal-content--nova-tx .modal-recorrencia-toggle-row__text {
     flex: 1;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 0.875rem !important;
-    font-weight: 600 !important;
-    color: var(--ntx-text-hi) !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ntx-text-hi);
   }
   body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox,
   body[data-theme='light'] .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox {
-    width: 20px !important;
-    height: 20px !important;
+    width: 20px;
+    height: 20px;
     accent-color: var(--ntx-accent);
     cursor: pointer;
   }
@@ -492,7 +492,7 @@
     transform: translateY(0);
     box-shadow:
       inset 3px 3px 7px rgba(0, 0, 0, 0.20),
-      inset -2px -2px 5px rgba(255, 255, 255, 0.18) !important;
+      inset -2px -2px 5px rgba(255, 255, 255, 0.18);
   }
   body[data-theme='dark'] .modal-content--nova-tx .btn-primary:disabled,
   body[data-theme='light'] .modal-content--nova-tx .btn-primary:disabled {
@@ -532,18 +532,18 @@
   /* (L) IA chip — pílula gold neumórfica com glow */
   body[data-theme='dark'] .modal-content--nova-tx .ntx-ai-chip,
   body[data-theme='light'] .modal-content--nova-tx .ntx-ai-chip {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-    margin: 6px 0 0 !important;
-    padding: 4px 11px !important;
-    border-radius: 999px !important;
-    background: var(--ntx-accent-glow) !important;
-    color: var(--ntx-accent) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.08em !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 6px 0 0;
+    padding: 4px 11px;
+    border-radius: 999px;
+    background: var(--ntx-accent-glow);
+    color: var(--ntx-accent);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     box-shadow: 0 0 10px var(--ntx-accent-glow);
     animation: ntxAiChipPulse 2.4s ease-in-out infinite;
@@ -563,8 +563,8 @@
     box-shadow:
       inset 2px 2px 5px var(--ntx-shadow-soft),
       inset -1px -1px 2px var(--ntx-light),
-      0 0 0 2px var(--ntx-neg-glow) !important;
-    border-color: var(--ntx-neg) !important;
+      0 0 0 2px var(--ntx-neg-glow);
+    border-color: var(--ntx-neg);
     animation: ntxShakeField 280ms var(--ntx-ease);
   }
   /* Label do field inválido fica vermelha */
@@ -572,7 +572,7 @@
   body[data-theme='light'] .modal-content--nova-tx .modal-form--validated .form-group:has(input[required]:invalid) label,
   body[data-theme='dark'] .modal-content--nova-tx .modal-form--validated .form-group:has(input[required]:placeholder-shown) label,
   body[data-theme='light'] .modal-content--nova-tx .modal-form--validated .form-group:has(input[required]:placeholder-shown) label {
-    color: var(--ntx-neg) !important;
+    color: var(--ntx-neg);
   }
 
   /* Shake suave quando field marcado como inválido */
@@ -591,60 +591,60 @@
   /* (R) Templates rápidos */
   body[data-theme='dark'] .modal-content--nova-tx .ntx-templates,
   body[data-theme='light'] .modal-content--nova-tx .ntx-templates {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    gap: 8px !important;
-    margin: 0 0 22px !important;
-    padding: 12px !important;
-    border-radius: 12px !important;
-    background: var(--ntx-surface-sunken) !important;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 22px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--ntx-surface-sunken);
     box-shadow:
       inset 2px 2px 4px var(--ntx-shadow-soft),
-      inset -1px -1px 2px var(--ntx-light) !important;
+      inset -1px -1px 2px var(--ntx-light);
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-templates__label,
   body[data-theme='light'] .modal-content--nova-tx .ntx-templates__label {
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.6875rem !important;
-    font-weight: 700 !important;
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.14em !important;
-    color: var(--ntx-text-faint) !important;
+    letter-spacing: 0.14em;
+    color: var(--ntx-text-faint);
     margin-right: 4px;
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-template-chip,
   body[data-theme='light'] .modal-content--nova-tx .ntx-template-chip {
-    padding: 6px 14px !important;
-    border-radius: 999px !important;
-    background: linear-gradient(155deg, var(--ntx-surface-raised) 0%, var(--ntx-surface-base) 100%) !important;
-    border: 1px solid var(--ntx-edge-hi) !important;
-    color: var(--ntx-text-mid) !important;
-    font-family: 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.8125rem !important;
-    font-weight: 500 !important;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: linear-gradient(155deg, var(--ntx-surface-raised) 0%, var(--ntx-surface-base) 100%);
+    border: 1px solid var(--ntx-edge-hi);
+    color: var(--ntx-text-mid);
+    font-family: 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
     cursor: pointer;
     box-shadow:
       3px 3px 6px var(--ntx-shadow-soft),
-      -2px -2px 4px var(--ntx-light) !important;
-    transition: all 200ms var(--ntx-ease) !important;
+      -2px -2px 4px var(--ntx-light);
+    transition: all 200ms var(--ntx-ease);
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-template-chip:hover,
   body[data-theme='light'] .modal-content--nova-tx .ntx-template-chip:hover {
-    color: var(--ntx-accent) !important;
+    color: var(--ntx-accent);
     transform: translateY(-1px);
     box-shadow:
       4px 5px 9px var(--ntx-shadow-soft),
       -2px -2px 5px var(--ntx-light),
-      0 0 0 1px var(--ntx-accent-glow) !important;
+      0 0 0 1px var(--ntx-accent-glow);
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-template-chip--receita,
   body[data-theme='light'] .modal-content--nova-tx .ntx-template-chip--receita {
-    color: var(--ntx-pos) !important;
+    color: var(--ntx-pos);
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-template-chip--despesa,
   body[data-theme='light'] .modal-content--nova-tx .ntx-template-chip--despesa {
-    color: var(--ntx-neg) !important;
+    color: var(--ntx-neg);
   }
 
   /* (Q) Calc button + panel */
@@ -657,71 +657,71 @@
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-calc-toggle,
   body[data-theme='light'] .modal-content--nova-tx .ntx-calc-toggle {
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 8px !important;
-    background: var(--ntx-surface-sunken) !important;
-    border: 1px solid var(--ntx-edge-hi) !important;
-    color: var(--ntx-text-mid) !important;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--ntx-surface-sunken);
+    border: 1px solid var(--ntx-edge-hi);
+    color: var(--ntx-text-mid);
     cursor: pointer;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     box-shadow:
       inset 1.5px 1.5px 3px var(--ntx-shadow-soft),
-      inset -1px -1px 2px var(--ntx-light) !important;
-    transition: color 200ms var(--ntx-ease), box-shadow 200ms var(--ntx-ease) !important;
+      inset -1px -1px 2px var(--ntx-light);
+    transition: color 200ms var(--ntx-ease), box-shadow 200ms var(--ntx-ease);
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-calc-toggle:hover,
   body[data-theme='light'] .modal-content--nova-tx .ntx-calc-toggle:hover {
-    color: var(--ntx-accent) !important;
+    color: var(--ntx-accent);
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-calc-toggle--open,
   body[data-theme='light'] .modal-content--nova-tx .ntx-calc-toggle--open {
-    color: var(--ntx-accent) !important;
+    color: var(--ntx-accent);
     box-shadow:
       inset 1.5px 1.5px 3px var(--ntx-shadow-soft),
       inset -1px -1px 2px var(--ntx-light),
-      0 0 0 1px var(--ntx-accent-glow) !important;
+      0 0 0 1px var(--ntx-accent-glow);
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-calc-panel,
   body[data-theme='light'] .modal-content--nova-tx .ntx-calc-panel {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    margin-top: 8px !important;
-    padding: 10px !important;
-    border-radius: 12px !important;
-    background: var(--ntx-surface-sunken) !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--ntx-surface-sunken);
     box-shadow:
       inset 2px 2px 5px var(--ntx-shadow-soft),
-      inset -1px -1px 2px var(--ntx-light) !important;
+      inset -1px -1px 2px var(--ntx-light);
     animation: ntxBackdropIn 200ms var(--ntx-ease) both;
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-calc-input,
   body[data-theme='light'] .modal-content--nova-tx .ntx-calc-input {
     flex: 1 1 auto;
-    padding: 9px 12px !important;
-    font-family: 'JetBrains Mono', 'Inter Variable', system-ui, sans-serif !important;
-    font-size: 0.9375rem !important;
-    font-weight: 500 !important;
-    font-variant-numeric: tabular-nums !important;
-    letter-spacing: 0.005em !important;
+    padding: 9px 12px;
+    font-family: 'JetBrains Mono', 'Inter Variable', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.005em;
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-calc-eq,
   body[data-theme='light'] .modal-content--nova-tx .ntx-calc-eq {
-    width: 38px !important;
-    height: 38px !important;
-    border-radius: 10px !important;
-    background: linear-gradient(155deg, var(--ntx-accent) 0%, color-mix(in srgb, var(--ntx-accent) 80%, black 20%) 100%) !important;
-    border: 1px solid var(--ntx-accent) !important;
-    color: #1a1200 !important;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-size: 1.125rem !important;
-    font-weight: 800 !important;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(155deg, var(--ntx-accent) 0%, color-mix(in srgb, var(--ntx-accent) 80%, black 20%) 100%);
+    border: 1px solid var(--ntx-accent);
+    color: #1a1200;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 1.125rem;
+    font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 0 14px var(--ntx-accent-glow), inset 1px 1px 1px rgba(255,255,255,0.25) !important;
-    transition: transform 200ms var(--ntx-ease) !important;
+    box-shadow: 0 0 14px var(--ntx-accent-glow), inset 1px 1px 1px rgba(255,255,255,0.25);
+    transition: transform 200ms var(--ntx-ease);
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-calc-eq:hover,
   body[data-theme='light'] .modal-content--nova-tx .ntx-calc-eq:hover {
@@ -731,49 +731,49 @@
   /* (S) Switch neumorphic — esconde checkbox padrão (override min-width do 02c) */
   body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox--hidden,
   body[data-theme='light'] .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox--hidden {
-    position: absolute !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    width: 0 !important;
-    height: 0 !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    appearance: none !important;
-    -webkit-appearance: none !important;
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    appearance: none;
+    -webkit-appearance: none;
   }
 
   /* Override do grid template do partial 02c: o ntx-switch precisa do col 3 (era do input antigo).
      Garante que o input (hidden) não tome cell. */
   body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia label.modal-recorrencia-toggle-row,
   body[data-theme='light'] .modal-content--nova-tx .form-group--recorrencia label.modal-recorrencia-toggle-row {
-    display: grid !important;
-    grid-template-columns: auto minmax(0, 1fr) auto !important;
-    align-items: center !important;
-    column-gap: 12px !important;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 12px;
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-switch,
   body[data-theme='light'] .modal-content--nova-tx .ntx-switch {
     position: relative;
-    display: inline-block !important;
-    width: 46px !important;
-    height: 26px !important;
-    min-width: 46px !important;
-    min-height: 26px !important;
-    border-radius: 999px !important;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    min-width: 46px;
+    min-height: 26px;
+    border-radius: 999px;
     background: var(--ntx-surface-sunken);
     border: 1px solid var(--ntx-edge-lo);
     box-shadow:
       inset 2px 2px 5px var(--ntx-shadow),
       inset -1px -1px 2px var(--ntx-light);
     transition: background 220ms var(--ntx-ease), box-shadow 220ms var(--ntx-ease), border-color 220ms var(--ntx-ease);
-    flex-shrink: 0 !important;
-    align-self: center !important;
-    justify-self: end !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    flex-shrink: 0;
+    align-self: center;
+    justify-self: end;
+    margin: 0;
+    padding: 0;
     vertical-align: middle;
   }
   body[data-theme='light'] .modal-content--nova-tx .ntx-switch {
@@ -803,11 +803,11 @@
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-switch--on,
   body[data-theme='light'] .modal-content--nova-tx .ntx-switch--on {
-    background: linear-gradient(155deg, var(--ntx-accent) 0%, color-mix(in srgb, var(--ntx-accent) 75%, black 25%) 100%) !important;
-    border-color: var(--ntx-accent) !important;
+    background: linear-gradient(155deg, var(--ntx-accent) 0%, color-mix(in srgb, var(--ntx-accent) 75%, black 25%) 100%);
+    border-color: var(--ntx-accent);
     box-shadow:
       inset 1px 1px 3px rgba(0, 0, 0, 0.30),
-      0 0 14px var(--ntx-accent-glow) !important;
+      0 0 14px var(--ntx-accent-glow);
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-switch--on .ntx-switch__thumb,
   body[data-theme='light'] .modal-content--nova-tx .ntx-switch--on .ntx-switch__thumb {
@@ -824,18 +824,18 @@
      mas está declarada ANTES neste arquivo → esta vence por estar depois na cascata. */
   body[data-theme='dark'] .modal-content--nova-tx label.rec-vezes-row--toggle,
   body[data-theme='light'] .modal-content--nova-tx label.rec-vezes-row--toggle {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
-    padding: 14px 16px !important;
-    border-radius: 12px !important;
-    background: var(--ntx-surface-sunken) !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--ntx-surface-sunken);
     box-shadow:
       inset 2px 2px 4px var(--ntx-shadow-soft),
-      inset -1px -1px 2px var(--ntx-light) !important;
+      inset -1px -1px 2px var(--ntx-light);
     cursor: pointer;
-    margin: 0 !important;
+    margin: 0;
   }
   body[data-theme='dark'] .modal-content--nova-tx label.rec-vezes-row--toggle .rec-vezes-row__label,
   body[data-theme='light'] .modal-content--nova-tx label.rec-vezes-row--toggle .rec-vezes-row__label {
@@ -849,61 +849,61 @@
   /* (S) Preview "10× R$ 250 = R$ 2.500" */
   body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-preview,
   body[data-theme='light'] .modal-content--nova-tx .ntx-parc-preview {
-    display: flex !important;
-    align-items: baseline !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    margin-top: 12px !important;
-    padding: 12px 16px !important;
-    border-radius: 12px !important;
-    background: var(--ntx-accent-glow) !important;
-    color: var(--ntx-accent) !important;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--ntx-accent-glow);
+    color: var(--ntx-accent);
     box-shadow: 0 0 14px var(--ntx-accent-glow);
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif !important;
-    font-variant-numeric: tabular-nums !important;
-    letter-spacing: -0.015em !important;
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.015em;
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-preview__count,
   body[data-theme='light'] .modal-content--nova-tx .ntx-parc-preview__count {
-    font-size: 0.875rem !important;
-    font-weight: 700 !important;
+    font-size: 0.875rem;
+    font-weight: 700;
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-preview__value,
   body[data-theme='light'] .modal-content--nova-tx .ntx-parc-preview__value {
-    font-size: 1.125rem !important;
-    font-weight: 700 !important;
+    font-size: 1.125rem;
+    font-weight: 700;
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-preview__sep,
   body[data-theme='light'] .modal-content--nova-tx .ntx-parc-preview__sep {
-    font-size: 0.875rem !important;
+    font-size: 0.875rem;
     opacity: 0.7;
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-preview__total,
   body[data-theme='light'] .modal-content--nova-tx .ntx-parc-preview__total {
-    font-size: 1.25rem !important;
-    font-weight: 800 !important;
+    font-size: 1.25rem;
+    font-weight: 800;
   }
 
   /* (T) Calendário das parcelas */
   body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-calendar,
   body[data-theme='light'] .modal-content--nova-tx .ntx-parc-calendar {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)) !important;
-    gap: 6px !important;
-    margin-top: 12px !important;
-    padding: 12px !important;
-    border-radius: 12px !important;
-    background: var(--ntx-surface-sunken) !important;
-    box-shadow: inset 2px 2px 4px var(--ntx-shadow-soft), inset -1px -1px 2px var(--ntx-light) !important;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 6px;
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--ntx-surface-sunken);
+    box-shadow: inset 2px 2px 4px var(--ntx-shadow-soft), inset -1px -1px 2px var(--ntx-light);
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-cell,
   body[data-theme='light'] .modal-content--nova-tx .ntx-parc-cell {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 8px 6px !important;
-    border-radius: 8px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
+    border-radius: 8px;
     background: linear-gradient(155deg, var(--ntx-surface-raised) 0%, var(--ntx-surface-base) 100%);
     box-shadow:
       2px 2px 4px var(--ntx-shadow-soft),
@@ -947,7 +947,7 @@
   body[data-theme='light'] .modal-content--nova-tx .ntx-parc-cell--first .ntx-parc-cell__month,
   body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-cell--first .ntx-parc-cell__year,
   body[data-theme='light'] .modal-content--nova-tx .ntx-parc-cell--first .ntx-parc-cell__year {
-    color: #1a1200 !important;
+    color: #1a1200;
   }
   body[data-theme='dark'] .modal-content--nova-tx .ntx-parc-cell--last,
   body[data-theme='light'] .modal-content--nova-tx .ntx-parc-cell--last {

@@ -77,7 +77,7 @@ body[data-theme='dark'] .data-table tbody tr:nth-child(even) {
 }
 
 body[data-theme='dark'] .data-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* Inputs */
@@ -103,7 +103,7 @@ body[data-theme='dark'] .nav-item:hover:not(.active) {
 
 body[data-theme='dark'] .nav-item.active {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(212, 168, 75, 0.14) 100%);
-  color: #fafafa !important;
+  color: #fafafa;
   box-shadow:
     0 0 0 1px rgba(212, 168, 75, 0.35) inset,
     0 8px 24px -16px rgba(0, 0, 0, 0.5);
@@ -230,7 +230,7 @@ body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .sidebar {
 
 body[data-theme='dark'] .ref-empty-cta {
   background: linear-gradient(180deg, #e8c677 0%, #c9a24e 100%);
-  color: #0a0a0a !important;
+  color: #0a0a0a;
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.2) inset,
@@ -239,7 +239,7 @@ body[data-theme='dark'] .ref-empty-cta {
 
 body[data-theme='dark'] .ref-empty-cta:hover {
   background: linear-gradient(180deg, #f0d08a 0%, #d4ae5c 100%);
-  color: #0a0a0a !important;
+  color: #0a0a0a;
 }
 
 body[data-theme='dark'] .ref-empty {
@@ -278,8 +278,8 @@ body[data-theme='dark'] .modal-actions .btn-secondary:hover {
 }
 
 body[data-theme='dark'] .custom-select-option.selected {
-  background: linear-gradient(180deg, #181818 0%, #121212 100%) !important;
-  color: #fafafa !important;
+  background: linear-gradient(180deg, #181818 0%, #121212 100%);
+  color: #fafafa;
   border: 1px solid rgba(212, 168, 75, 0.4);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
@@ -339,11 +339,11 @@ body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section + .nova-tx-sect
 
 /* Nova transação — sheet preto + parcelamento (detalhes em 02c-modals; vence espelho azul) */
 body[data-theme='dark'] .modal-content.modal-content--nova-tx {
-  background: var(--bg-card) !important;
-  background-image: none !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: var(--radius-xl, 16px) !important;
-  box-shadow: var(--shadow-md) !important;
+  background: var(--bg-card);
+  background-image: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 16px);
+  box-shadow: var(--shadow-md);
   color: var(--text-primary);
 }
 
@@ -352,57 +352,57 @@ body[data-theme='dark'] .modal-content--nova-tx .modal-header h3 {
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia label.modal-recorrencia-toggle-row {
-  color: rgba(255, 255, 255, 0.9) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  background: #000000 !important;
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: #000000;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia-on label.modal-recorrencia-toggle-row {
-  border-color: rgba(212, 168, 75, 0.45) !important;
-  background: rgba(212, 168, 75, 0.1) !important;
+  border-color: rgba(212, 168, 75, 0.45);
+  background: rgba(212, 168, 75, 0.1);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__iconWrap {
-  background: rgba(212, 168, 75, 0.16) !important;
-  color: #d4a84b !important;
+  background: rgba(212, 168, 75, 0.16);
+  color: #d4a84b;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox {
-  accent-color: #d4a84b !important;
+  accent-color: #d4a84b;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row {
-  background: var(--bg-secondary) !important;
-  border: 1.5px solid var(--border-color) !important;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-color);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row__label {
-  color: var(--text-secondary) !important;
+  color: var(--text-secondary);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row.rec-vezes-row--toggle .rec-vezes-row__label {
-  color: var(--text-primary) !important;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row__input,
 body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row__input--date {
-  background: var(--bg-secondary) !important;
-  border: 1.5px solid var(--border-color) !important;
-  color: var(--text-primary) !important;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-primary);
   color-scheme: dark;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row .modal-recorrencia-toggle-row__checkbox {
-  accent-color: #d4a84b !important;
+  accent-color: #d4a84b;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview {
-  color: #d4a84b !important;
+  color: #d4a84b;
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview.parcelamento-preview--hint {
-  color: rgba(255, 255, 255, 0.55) !important;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 body[data-theme='dark'] .relatorios-empty-msg {
@@ -497,12 +497,12 @@ body[data-theme='dark'] .horizon-send-btn:hover:not(:disabled) {
 /* Menu legado sem shell — ativo */
 body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .nav-item.active {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(212, 168, 75, 0.14) 100%);
-  color: #fafafa !important;
+  color: #fafafa;
   box-shadow: 0 0 0 1px rgba(212, 168, 75, 0.32) inset;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu::before {
-  display: none !important;
+  display: none;
 }
 
 @media (min-width: 769px) {
@@ -619,13 +619,13 @@ body[data-theme='dark'] .app-background-root--plain-dark .app-background-root__p
 
 /* Shell: fundo #000 no container + inner (gap entre colunas e faixa lateral; espelho herdava slate). */
 body[data-theme='dark'] .dashboard-container.app-horizon-shell {
-  background: #000000 !important;
-  background-image: none !important;
+  background: #000000;
+  background-image: none;
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .app-horizon-inner {
-  background: #000000 !important;
-  background-image: none !important;
+  background: #000000;
+  background-image: none;
 }
 
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
@@ -674,7 +674,7 @@ body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .nav-item.a
 body[data-theme='dark'] .nav-item.active {
   background: rgba(212, 168, 75, 0.12);
   border-color: rgba(212, 168, 75, 0.42);
-  color: #ffffff !important;
+  color: #ffffff;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 8px 24px -18px rgba(0, 0, 0, 0.55);
@@ -684,7 +684,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
   font-weight: 800;
   background: color-mix(in srgb, var(--accent, #e4bc6a) 13%, transparent);
   border-color: transparent;
-  color: var(--accent, #e4bc6a) !important;
+  color: var(--accent, #e4bc6a);
   box-shadow: none;
 }
 
@@ -709,7 +709,7 @@ body[data-theme='dark']
 body[data-theme='dark'] .ref-empty-cta,
 body[data-theme='dark'] .horizon-send-btn {
   background: linear-gradient(135deg, #8b5cf6 0%, #ff4fb8 52%, #ffc83d 100%);
-  color: #ffffff !important;
+  color: #ffffff;
   border-color: rgba(255, 255, 255, 0.18);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.22) inset,
@@ -723,7 +723,7 @@ body[data-theme='dark']
 body[data-theme='dark'] .ref-empty-cta:hover,
 body[data-theme='dark'] .horizon-send-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #a855f7 0%, #ff5fc0 50%, #ffd15c 100%);
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 body[data-theme='dark'] .btn-primary:focus-visible,
@@ -774,7 +774,7 @@ body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .da
 }
 
 body[data-theme='dark'] .ref-kpi-card--balance .ref-kpi-card__value {
-  color: var(--transacoes-balance-pos, #3b82f6) !important;
+  color: var(--transacoes-balance-pos, #3b82f6);
   text-shadow: 0 0 22px rgba(59, 130, 246, 0.22);
 }
 
@@ -784,7 +784,7 @@ body[data-theme='dark'] .page-transacoes-recorrencia-row__tipo--rec {
 }
 
 body[data-theme='dark'] .ref-kpi-card--expense .ref-kpi-card__value {
-  color: #ff4d67 !important;
+  color: #ff4d67;
   text-shadow: 0 0 22px rgba(255, 77, 103, 0.28);
 }
 
@@ -844,16 +844,16 @@ body[data-theme='dark'] .page-relatorios .relatorios-tooltip {
 }
 
 body[data-theme='dark'] .custom-select-option.selected {
-  background: rgba(212, 168, 75, 0.16) !important;
-  color: #fafafa !important;
-  border-color: rgba(212, 168, 75, 0.42) !important;
+  background: rgba(212, 168, 75, 0.16);
+  color: #fafafa;
+  border-color: rgba(212, 168, 75, 0.42);
   box-shadow: none;
 }
 
 body[data-theme='dark'] .custom-select-option:hover,
 body[data-theme='dark'] .data-table tbody tr:hover,
 body[data-theme='dark'] .ref-tx-row:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 body[data-theme='dark'] .data-table thead th {
@@ -908,7 +908,7 @@ body[data-theme='dark'] .mobile-bottom-nav__item--active {
 }
 
 body[data-theme='dark'] .dashboard-mobile-tx-fab {
-  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 48%, rgba(255, 255, 255, 0.12)) !important;
+  border: 1px solid color-mix(in srgb, var(--accent, #d4a84b) 48%, rgba(255, 255, 255, 0.12));
   background:
     linear-gradient(
       148deg,
@@ -918,21 +918,21 @@ body[data-theme='dark'] .dashboard-mobile-tx-fab {
       transparent 100%
     ),
     linear-gradient(180deg, rgba(26, 26, 28, 0.88) 0%, rgba(10, 10, 12, 0.94) 100%),
-    rgba(0, 0, 0, 0.45) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(1.2) !important;
-  backdrop-filter: blur(20px) saturate(1.2) !important;
+    rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  backdrop-filter: blur(20px) saturate(1.2);
   box-shadow:
     0 20px 48px -26px rgba(0, 0, 0, 0.75),
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35) !important;
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
 }
 
 body[data-theme='dark'] .dashboard-mobile-tx-fab__icon {
-  background: rgba(255, 255, 255, 0.11) !important;
-  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.11);
+  color: #ffffff;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.32) !important;
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32);
 }
 
 /* Verde só fora de Transações/Investimentos (FAB pode estar fora do .dashboard-container) */
@@ -948,62 +948,62 @@ body[data-theme='dark']:not(:has(.dashboard-container.page-transacoes.ref-dashbo
   );
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent !important;
+  color: transparent;
   -webkit-text-fill-color: transparent;
 }
 
 body[data-theme='dark'] .chat-fab-active {
-  background: linear-gradient(135deg, #8b5cf6 0%, #ff4fb8 52%, #ffc83d 100%) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  color: #ffffff !important;
+  background: linear-gradient(135deg, #8b5cf6 0%, #ff4fb8 52%, #ffc83d 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.24) inset,
-    0 18px 44px -22px rgba(139, 92, 246, 0.9) !important;
+    0 18px 44px -22px rgba(139, 92, 246, 0.9);
 }
 
 /* Shell ref-dashboard: fundo totalmente preto (Configurações, Transações, etc.). */
 body[data-theme='dark']:has(.dashboard-container.ref-dashboard.app-horizon-shell) .app-background-root__plain-fill {
-  background: #000000 !important;
-  background-image: none !important;
+  background: #000000;
+  background-image: none;
 }
 
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .main-content,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub,
 body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-scroll {
-  background: #000000 !important;
-  background-image: none !important;
+  background: #000000;
+  background-image: none;
 }
 
 body[data-theme='dark'] .dashboard-container.dashboard-page,
 body[data-theme='dark'] .dashboard-container.dashboard-page.app-horizon-shell {
-  background: #000000 !important;
-  background-image: none !important;
+  background: #000000;
+  background-image: none;
 }
 
 body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__tx-panel {
-  background: var(--bg-card) !important;
-  background-image: none !important;
-  border: 1px solid rgba(148, 163, 184, 0.15) !important;
-  box-shadow: none !important;
+  background: var(--bg-card);
+  background-image: none;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card {
-  background: var(--bg-card) !important;
-  background-image: none !important;
-  border: 1px solid rgba(148, 163, 184, 0.15) !important;
-  box-shadow: none !important;
+  background: var(--bg-card);
+  background-image: none;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: none;
 }
 
 body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--income .ref-kpi-card__icon {
-  color: var(--success) !important;
-  background: linear-gradient(165deg, color-mix(in srgb, var(--success) 22%, transparent) 0%, color-mix(in srgb, var(--success) 10%, transparent) 100%) !important;
-  border-color: color-mix(in srgb, var(--success) 35%, transparent) !important;
-  box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--success) 35%, transparent) !important;
+  color: var(--success);
+  background: linear-gradient(165deg, color-mix(in srgb, var(--success) 22%, transparent) 0%, color-mix(in srgb, var(--success) 10%, transparent) 100%);
+  border-color: color-mix(in srgb, var(--success) 35%, transparent);
+  box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--success) 35%, transparent);
 }
 
 body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--expense .ref-kpi-card__icon {
-  color: var(--danger) !important;
-  background: linear-gradient(165deg, color-mix(in srgb, var(--danger) 20%, transparent) 0%, color-mix(in srgb, var(--danger) 10%, transparent) 100%) !important;
-  border-color: color-mix(in srgb, var(--danger) 35%, transparent) !important;
-  box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--danger) 30%, transparent) !important;
+  color: var(--danger);
+  background: linear-gradient(165deg, color-mix(in srgb, var(--danger) 20%, transparent) 0%, color-mix(in srgb, var(--danger) 10%, transparent) 100%);
+  border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+  box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--danger) 30%, transparent);
 }
