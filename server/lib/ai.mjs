@@ -1,4 +1,4 @@
-export { transcribeWhatsAppAudioWithGemini, parseWhatsAppMessageWithAI, parseWhatsAppAudioDirectWithAI, sanitizeTransacaoExtraidaIA } from './ai-whatsapp.mjs'
+export { parseWhatsAppMessageWithAI, parseWhatsAppAudioDirectWithAI } from './ai-whatsapp.mjs'
 export { askHorizon } from './ai-horizon.mjs'
 export { analisarRelatorioFinanceiro } from './ai-relatorio.mjs'
 export { suggestCategoryForTransaction } from './ai-category.mjs'
