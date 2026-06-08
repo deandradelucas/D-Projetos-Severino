@@ -570,17 +570,9 @@
     color: var(--m-text-hi);
     margin: 2px 0 0;
   }
-  body[data-theme='dark'] .agenda-modal .agenda-modal__close,
-  body[data-theme='light'] .agenda-modal .agenda-modal__close {
-    width: 36px; height: 36px; min-height: 36px; flex-shrink: 0;
-    border-radius: 50%;
-    background: var(--m-sunken);
-    border: 1px solid var(--m-edge-hi);
-    color: var(--m-text-mid);
-    font-size: 1.3rem; line-height: 0; padding: 2px 0 0;
-    display: inline-flex; align-items: center; justify-content: center;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
-  }
+  /* .agenda-modal .agenda-modal__close consolidado em 35-close-btn-standard.css
+     (35 vence por ordem; font-size/line-height/padding diferem do 35 — o check
+     confirma qual aplica). diff=0 esperado (modal-agenda mobile). */
 
   /* Campos */
   .agenda-modal .agenda-field {

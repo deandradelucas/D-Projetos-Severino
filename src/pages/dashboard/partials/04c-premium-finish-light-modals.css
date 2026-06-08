@@ -1939,18 +1939,9 @@ body[data-theme='dark'] .agenda-modal {
   margin-bottom: 18px;
 }
 
-.agenda-modal__close {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 999px;
-  background: rgba(148, 163, 184, 0.1);
-  color: var(--agenda-ink);
-  font-size: 24px;
-  cursor: pointer;
-}
+/* .agenda-modal__close (aparencia) consolidado em 35-close-btn-standard.css
+   (seletores (0,3,1) .agenda-page/.agenda-modal-backdrop do 35 vencem esta base,
+   o 18 e o 23 em todos os viewports). focus-visible mantido abaixo. diff=0 (modal-agenda). */
 
 .agenda-field {
   display: grid;
@@ -2195,9 +2186,8 @@ body[data-theme='dark'] .agenda-page .agenda-secondary-btn {
   border-radius: 18px;
 }
 
-.agenda-page .agenda-modal__close {
-  border-radius: 14px;
-}
+/* .agenda-page .agenda-modal__close (border-radius:14px) removido: 35 vence com
+   border-radius:50% (seletor (0,3,1)). diff=0 (modal-agenda). */
 
 body[data-theme='dark'] .agenda-page .agenda-field input,
 body[data-theme='dark'] .agenda-page .agenda-field textarea,
