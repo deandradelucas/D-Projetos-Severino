@@ -22,7 +22,7 @@
     --rel-text-hi: #f3f5f8;
     --rel-text-mid: #98a4b5;
     --rel-text-lo: #5a6878;
-    --rel-accent: #d4a84b;
+    --rel-accent: var(--accent);
     --rel-accent-glow: rgba(212, 168, 75, 0.20);
     --rel-pos: #4ade80;
     --rel-pos-glow: rgba(74, 222, 128, 0.16);

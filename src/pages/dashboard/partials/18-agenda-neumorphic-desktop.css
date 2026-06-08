@@ -24,7 +24,7 @@
     --ag-text-hi: #f3f5f8;
     --ag-text-mid: #98a4b5;
     --ag-text-lo: #5a6878;
-    --ag-accent: #d4a84b;
+    --ag-accent: var(--accent);
     --ag-accent-glow: rgba(212, 168, 75, 0.22);
     --ag-pos: #4ade80;
     --ag-pos-glow: rgba(74, 222, 128, 0.16);

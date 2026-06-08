@@ -39,7 +39,7 @@
     --neu-text-hi: #f3f5f8;
     --neu-text-mid: #98a4b5;
     --neu-text-lo: #5a6878;
-    --neu-accent: #d4a84b;
+    --neu-accent: var(--accent);
     --neu-accent-glow: rgba(212, 168, 75, 0.18);
     --neu-pos: #4ade80;
     --neu-pos-glow: rgba(74, 222, 128, 0.16);

@@ -22,7 +22,7 @@
     --ntx-text-mid: #98a4b5;
     --ntx-text-lo: #5a6878;
     --ntx-text-faint: #3e4856;
-    --ntx-accent: #d4a84b;
+    --ntx-accent: var(--accent);
     --ntx-accent-soft: rgba(212, 168, 75, 0.14);
     --ntx-accent-glow: rgba(212, 168, 75, 0.22);
     --ntx-pos: #4ade80;

@@ -13,7 +13,7 @@ body[data-theme='dark'] {
   --pg-light: rgba(255,255,255,0.040); --pg-shadow: rgba(0,0,0,0.70); --pg-shadow-soft: rgba(0,0,0,0.45);
   --pg-edge-hi: rgba(255,255,255,0.055);
   --pg-text-hi: #f3f5f8; --pg-text-mid: #98a4b5; --pg-text-lo: #5a6878;
-  --pg-accent: #d4a84b; --pg-accent-glow: rgba(212,168,75,0.20);
+  --pg-accent: var(--accent); --pg-accent-glow: rgba(212,168,75,0.20);
   --pg-pos: #4ade80; --pg-pos-soft: rgba(74,222,128,0.12); --pg-neg: #f87171; --pg-neg-soft: rgba(248,113,113,0.12);
 }
 body[data-theme='light'] {
@@ -86,7 +86,7 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
     --pg-light: rgba(255,255,255,0.040); --pg-shadow: rgba(0,0,0,0.70); --pg-shadow-soft: rgba(0,0,0,0.45);
     --pg-edge-hi: rgba(255,255,255,0.055); --pg-edge-lo: rgba(0,0,0,0.50);
     --pg-text-hi: #f3f5f8; --pg-text-mid: #98a4b5; --pg-text-lo: #5a6878;
-    --pg-accent: #d4a84b; --pg-accent-glow: rgba(212,168,75,0.20);
+    --pg-accent: var(--accent); --pg-accent-glow: rgba(212,168,75,0.20);
     --pg-pos: #4ade80; --pg-pos-glow: rgba(74,222,128,0.16); --pg-pos-soft: rgba(74,222,128,0.10);
     --pg-neg: #f87171; --pg-neg-glow: rgba(248,113,113,0.16); --pg-neg-soft: rgba(248,113,113,0.10);
     --pg-warn: #fbbf24; --pg-warn-soft: rgba(245,158,11,0.12);

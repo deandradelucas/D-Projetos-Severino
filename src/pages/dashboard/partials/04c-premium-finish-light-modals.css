@@ -1731,7 +1731,7 @@ body[data-theme='light'] .ref-panel__link:focus-visible {
 /* Agenda — shell premium com timeline e WhatsApp */
 .agenda-shell {
   --agenda-accent: var(--accent);
-  --agenda-accent-2: #d4a84b;
+  --agenda-accent-2: var(--accent);
   --agenda-success: #22c55e;
   --agenda-danger: #ef4444;
   --agenda-ink: var(--hub-title, #111827);
@@ -2118,11 +2118,11 @@ body[data-theme='dark'] .agenda-field select {
 
 .agenda-page .agenda-shell {
   --agenda-accent: var(--accent);
-  --agenda-accent-2: #d4a84b;
+  --agenda-accent-2: var(--accent);
 }
 
 body[data-theme='dark'] .agenda-page .agenda-shell {
-  --agenda-accent: #d4a84b;
+  --agenda-accent: var(--accent);
   --agenda-accent-2: #e4bc6a;
   --agenda-ink: #fafafa;
   --agenda-muted: rgba(250, 250, 250, 0.62);

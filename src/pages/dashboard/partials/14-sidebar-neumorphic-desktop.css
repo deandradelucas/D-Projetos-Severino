@@ -24,7 +24,7 @@
     --sb-text-mid: #a4b0c0;
     --sb-text-lo: #5a6878;
     --sb-text-faint: #3e4856;
-    --sb-accent: #d4a84b;
+    --sb-accent: var(--accent);
     --sb-accent-soft: rgba(212, 168, 75, 0.14);
     --sb-accent-glow: rgba(212, 168, 75, 0.22);
     --sb-accent-glow-strong: rgba(212, 168, 75, 0.32);

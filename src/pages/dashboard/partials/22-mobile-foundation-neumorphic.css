@@ -21,7 +21,7 @@ body[data-theme='dark'] {
   --m-text-hi: #f3f5f8;
   --m-text-mid: #97a4b6;
   --m-text-lo: #5c6b7c;
-  --m-accent: #d4a84b;
+  --m-accent: var(--accent);
   --m-accent-glow: rgba(212, 168, 75, 0.22);
   --m-accent-fg: #1a1200;
   --m-pos: #4ade80;

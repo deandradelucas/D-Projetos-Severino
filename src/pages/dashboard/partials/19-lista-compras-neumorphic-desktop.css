@@ -21,7 +21,7 @@
     --lc-text-hi: #f3f5f8;
     --lc-text-mid: #98a4b5;
     --lc-text-lo: #5a6878;
-    --lc-accent: #d4a84b;
+    --lc-accent: var(--accent);
     --lc-accent-glow: rgba(212, 168, 75, 0.20);
     --lc-pos: #4ade80;
     --lc-pos-glow: rgba(74, 222, 128, 0.16);

@@ -46,7 +46,7 @@
     --inv-text-mid:     #8fa2b8;
     --inv-text-lo:      #526070;
     --inv-text-faint:   #374252;
-    --inv-accent:       #d4a84b;
+    --inv-accent:       var(--accent);
     --inv-accent-mid:   #e2bc6a;
     --inv-accent-soft:  rgba(212, 168, 75, 0.15);
     --inv-accent-glow:  rgba(212, 168, 75, 0.28);

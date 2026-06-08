@@ -58,8 +58,8 @@
   --sidebar-text-muted:       #5a6a7a;
   --sidebar-item-hover:       rgba(255, 255, 255, 0.06);
   --sidebar-item-active:      rgba(212, 168, 75, 0.15);
-  --sidebar-item-active-text: #d4a84b;
-  --sidebar-item-active-bar:  #d4a84b;
+  --sidebar-item-active-text: var(--accent);
+  --sidebar-item-active-bar:  var(--accent);
   /* compat aliases */
   --sidebar-border-color:  rgba(255, 255, 255, 0.06);
   --sidebar-hover-bg:      rgba(255, 255, 255, 0.06);
@@ -74,7 +74,7 @@
   --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* compat */
 
   /* Séries de gráficos */
-  --chart-1: #d4a84b;
+  --chart-1: var(--accent);
   --chart-2: #6b8ede;
   --chart-3: #7dd3aa;
   --chart-4: #c47bc4;
@@ -174,8 +174,8 @@ body[data-theme='dark'] {
   --sidebar-text-muted:       #485868;
   --sidebar-item-hover:       rgba(255, 255, 255, 0.05);
   --sidebar-item-active:      rgba(212, 168, 75, 0.12);
-  --sidebar-item-active-text: #d4a84b;
-  --sidebar-item-active-bar:  #d4a84b;
+  --sidebar-item-active-text: var(--accent);
+  --sidebar-item-active-bar:  var(--accent);
   /* compat aliases */
   --sidebar-border-color: rgba(255, 255, 255, 0.05);
   --sidebar-hover-bg:     rgba(255, 255, 255, 0.05);
