@@ -1346,26 +1346,10 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
   color: var(--text-primary);
 }
 
-.page-lista-compras__modal-close {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: var(--bg-secondary);
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-base);
-  padding: 0;
-}
-
-.page-lista-compras__modal-close:hover {
-  background: var(--bg-card);
-  color: var(--text-primary);
-}
-
+/* .page-lista-compras__modal-close (botao + :hover) consolidado em
+   partials/35-close-btn-standard.css (seletor de alta especificidade do 35 vence
+   esta base, o 19 e o 32 em todos os viewports). Mantida so a regra svg abaixo
+   (svg excluido do fingerprint; stroke-width bespoke). diff=0 (cena modal-lista). */
 .page-lista-compras__modal-close svg {
   width: 16px;
   height: 16px;

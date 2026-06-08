@@ -30,16 +30,8 @@
     letter-spacing: -0.02em;
     color: var(--m-text-hi);
   }
-  body[data-theme='dark'] .page-lista-compras__modal .page-lista-compras__modal-close,
-  body[data-theme='light'] .page-lista-compras__modal .page-lista-compras__modal-close {
-    width: 36px; height: 36px; min-height: 36px; flex-shrink: 0;
-    border-radius: 50%;
-    background: var(--m-sunken);
-    border: 1px solid var(--m-edge-hi);
-    color: var(--m-text-mid);
-    display: inline-flex; align-items: center; justify-content: center;
-    box-shadow: inset 2px 2px 4px var(--m-shadow-soft), inset -1px -1px 2px var(--m-light);
-  }
+  /* .page-lista-compras__modal-close consolidado em 35-close-btn-standard.css
+     (mesmos tokens --m-*; 35 vence por especificidade). diff=0 (cena modal-lista). */
 
   /* Campos + labels */
   .page-lista-compras__modal .page-lista-compras__modal-field { margin-bottom: 12px; min-width: 0; }
