@@ -1,5 +1,9 @@
-/* eslint-disable max-lines -- gerado */
-/*  AUTO-GENERADO por scripts/gen-dashboard-dark-rules.mjs — não editar.  */
+/* eslint-disable max-lines */
+/*  Espelho dark do dashboard. Originalmente AUTO-GERADO por
+    scripts/gen-dashboard-dark-rules.mjs — gerador APOSENTADO na Etapa B0 (jun/2026)
+    porque lia dashboard.css, que após a migração @layer virou só @imports
+    (regerar produziria um mirror VAZIO e quebraria o dark). Agora mantido
+    MANUALMENTE até a Etapa B2/B3 (dark sobre tokens) substituir este mecanismo.  */
 @media (max-width: 768px) {
 
   [data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .main-content {

@@ -4,31 +4,12 @@
  * Azul reservado a saldo / destaque financeiro principal; verde/vermelho semânticos preservados.
  */
 
-/* Tokens (sobrescreve polish parcial + espelho) */
+/* Etapa B1: bloco de tokens dark removido por MORTO — todos os tokens abaixo eram
+   redefinidos pelo bloco dark do 00-tokens-base.css, que carrega DEPOIS (dashboard.css
+   importa 00-tokens após o fullblack) e vence por ordem-de-fonte. Verificado por valor
+   computado (ex.: --bg-card resolvia #141618 do 00-tokens, não #000 daqui). Preservado
+   apenas o token ÚNICO deste arquivo (saldo positivo das Transações). */
 body[data-theme='dark'] {
-  --bg-primary: #000000;
-  --bg-secondary: #000000;
-  --bg-card: #000000;
-  --bg-card-elevated: #0a0a0a;
-  --active-bg: #141414;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --text-primary: #fafafa;
-  --text-secondary: #a3a3a3;
-  --accent: #d4a84b;
-  --accent-hover: #e4bc6a;
-  --accent-muted: rgba(212, 168, 75, 0.12);
-  --success: #34d399;
-  --danger: #f87171;
-  --sidebar-bg: #000000;
-  --sidebar-text: #fafafa;
-  --sidebar-text-muted: rgba(250, 250, 250, 0.52);
-  --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
-  --sidebar-border-color: rgba(255, 255, 255, 0.09);
-  --content-border-color: rgba(255, 255, 255, 0.07);
-  --content-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.35);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.35);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.32);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.38);
   --transacoes-balance-pos: #3b82f6;
 }
 
