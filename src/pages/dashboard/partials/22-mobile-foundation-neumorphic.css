@@ -11,16 +11,16 @@
 body[data-theme='dark'] {
   --m-base: #0b0e13;
   --m-raised: #13161d;
-  --m-card: #14181f;
+  --m-card: var(--bg-card);
   --m-sunken: #090b10;
   --m-light: rgba(255, 255, 255, 0.045);
   --m-shadow: rgba(0, 0, 0, 0.55);
   --m-shadow-soft: rgba(0, 0, 0, 0.38);
   --m-edge-hi: rgba(255, 255, 255, 0.06);
   --m-edge-lo: rgba(0, 0, 0, 0.45);
-  --m-text-hi: #f3f5f8;
-  --m-text-mid: #97a4b6;
-  --m-text-lo: #5c6b7c;
+  --m-text-hi: var(--text-primary);
+  --m-text-mid: var(--text-secondary);
+  --m-text-lo: var(--text-muted);
   --m-accent: var(--accent);
   --m-accent-glow: rgba(212, 168, 75, 0.22);
   --m-accent-fg: #1a1200;
@@ -37,16 +37,16 @@ body[data-theme='dark'] {
 body[data-theme='light'] {
   --m-base: #eef1f6;
   --m-raised: #ffffff;
-  --m-card: #ffffff;
+  --m-card: var(--bg-card);
   --m-sunken: #e6eaf0;
   --m-light: rgba(255, 255, 255, 0.92);
   --m-shadow: rgba(159, 174, 197, 0.40);
   --m-shadow-soft: rgba(159, 174, 197, 0.26);
   --m-edge-hi: rgba(255, 255, 255, 0.95);
   --m-edge-lo: rgba(150, 165, 188, 0.22);
-  --m-text-hi: #0d1117;
-  --m-text-mid: #4a5568;
-  --m-text-lo: #8896a5;
+  --m-text-hi: var(--text-primary);
+  --m-text-mid: var(--text-secondary);
+  --m-text-lo: var(--text-muted);
   --m-accent: #b8832a;
   --m-accent-glow: rgba(184, 131, 42, 0.20);
   --m-accent-fg: #ffffff;

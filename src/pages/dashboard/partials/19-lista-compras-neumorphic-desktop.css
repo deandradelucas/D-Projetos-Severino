@@ -18,9 +18,9 @@
     --lc-shadow-soft: rgba(0, 0, 0, 0.45);
     --lc-edge-hi: rgba(255, 255, 255, 0.055);
     --lc-edge-lo: rgba(0, 0, 0, 0.50);
-    --lc-text-hi: #f3f5f8;
-    --lc-text-mid: #98a4b5;
-    --lc-text-lo: #5a6878;
+    --lc-text-hi: var(--text-primary);
+    --lc-text-mid: var(--text-secondary);
+    --lc-text-lo: var(--text-muted);
     --lc-accent: var(--accent);
     --lc-accent-glow: rgba(212, 168, 75, 0.20);
     --lc-pos: var(--success-text);
@@ -39,9 +39,9 @@
     --lc-shadow-soft: rgba(166, 180, 200, 0.28);
     --lc-edge-hi: rgba(255, 255, 255, 0.95);
     --lc-edge-lo: rgba(140, 156, 178, 0.20);
-    --lc-text-hi: #0d1117;
-    --lc-text-mid: #4a5568;
-    --lc-text-lo: #8896a5;
+    --lc-text-hi: var(--text-primary);
+    --lc-text-mid: var(--text-secondary);
+    --lc-text-lo: var(--text-muted);
     --lc-accent: #b8832a;
     --lc-accent-glow: rgba(184, 131, 42, 0.18);
     --lc-pos: var(--success-text);

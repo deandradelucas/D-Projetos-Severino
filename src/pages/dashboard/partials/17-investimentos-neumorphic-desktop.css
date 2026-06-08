@@ -16,9 +16,9 @@
     --inv-shadow-soft:  rgba(110, 130, 160, 0.28);
     --inv-edge-hi:      rgba(255, 255, 255, 0.95);
     --inv-edge-lo:      rgba(120, 140, 165, 0.20);
-    --inv-text-hi:      #0d1117;
-    --inv-text-mid:     #3d4f63;
-    --inv-text-lo:      #7a8fa5;
+    --inv-text-hi:      var(--text-primary);
+    --inv-text-mid:     var(--text-secondary);
+    --inv-text-lo:      var(--text-muted);
     --inv-text-faint:   #a0b0c0;
     --inv-accent:       #a67825;
     --inv-accent-mid:   #c49030;
@@ -42,9 +42,9 @@
     --inv-shadow-soft:  rgba(0, 0, 0, 0.48);
     --inv-edge-hi:      rgba(255, 255, 255, 0.065);
     --inv-edge-lo:      rgba(0, 0, 0, 0.52);
-    --inv-text-hi:      #f0f3f7;
-    --inv-text-mid:     #8fa2b8;
-    --inv-text-lo:      #526070;
+    --inv-text-hi:      var(--text-primary);
+    --inv-text-mid:     var(--text-secondary);
+    --inv-text-lo:      var(--text-muted);
     --inv-text-faint:   #374252;
     --inv-accent:       var(--accent);
     --inv-accent-mid:   #e2bc6a;

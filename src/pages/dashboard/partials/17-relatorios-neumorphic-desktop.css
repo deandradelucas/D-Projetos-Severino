@@ -19,9 +19,9 @@
     --rel-shadow-soft: rgba(0, 0, 0, 0.45);
     --rel-edge-hi: rgba(255, 255, 255, 0.055);
     --rel-edge-lo: rgba(0, 0, 0, 0.50);
-    --rel-text-hi: #f3f5f8;
-    --rel-text-mid: #98a4b5;
-    --rel-text-lo: #5a6878;
+    --rel-text-hi: var(--text-primary);
+    --rel-text-mid: var(--text-secondary);
+    --rel-text-lo: var(--text-muted);
     --rel-accent: var(--accent);
     --rel-accent-glow: rgba(212, 168, 75, 0.20);
     --rel-pos: var(--success-text);
@@ -40,9 +40,9 @@
     --rel-shadow-soft: rgba(166, 180, 200, 0.28);
     --rel-edge-hi: rgba(255, 255, 255, 0.95);
     --rel-edge-lo: rgba(140, 156, 178, 0.20);
-    --rel-text-hi: #0d1117;
-    --rel-text-mid: #4a5568;
-    --rel-text-lo: #8896a5;
+    --rel-text-hi: var(--text-primary);
+    --rel-text-mid: var(--text-secondary);
+    --rel-text-lo: var(--text-muted);
     --rel-accent: #b8832a;
     --rel-accent-glow: rgba(184, 131, 42, 0.18);
     --rel-pos: var(--success-text);

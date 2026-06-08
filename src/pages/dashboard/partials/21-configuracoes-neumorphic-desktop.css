@@ -12,7 +12,7 @@
     --cfg-base: #0e1117; --cfg-raised: #11141a; --cfg-sunken: #07090d;
     --cfg-light: rgba(255,255,255,0.040); --cfg-shadow: rgba(0,0,0,0.70); --cfg-shadow-soft: rgba(0,0,0,0.45);
     --cfg-edge-hi: rgba(255,255,255,0.055); --cfg-edge-lo: rgba(0,0,0,0.50);
-    --cfg-text-hi: #f3f5f8; --cfg-text-mid: #98a4b5; --cfg-text-lo: #5a6878;
+    --cfg-text-hi: var(--text-primary); --cfg-text-mid: var(--text-secondary); --cfg-text-lo: var(--text-muted);
     --cfg-accent: var(--accent); --cfg-accent-glow: rgba(212,168,75,0.20);
     --cfg-pos: var(--success-text); --cfg-pos-glow: rgba(74,222,128,0.16); --cfg-neg: var(--error-text); --cfg-neg-glow: rgba(248,113,113,0.16);
     --cfg-ease: cubic-bezier(0.22,1,0.36,1); --cfg-r: 22px;
@@ -21,7 +21,7 @@
     --cfg-base: #eef1f6; --cfg-raised: #ffffff; --cfg-sunken: #e4e8ee;
     --cfg-light: rgba(255,255,255,0.90); --cfg-shadow: rgba(166,180,200,0.45); --cfg-shadow-soft: rgba(166,180,200,0.28);
     --cfg-edge-hi: rgba(255,255,255,0.95); --cfg-edge-lo: rgba(140,156,178,0.20);
-    --cfg-text-hi: #0d1117; --cfg-text-mid: #4a5568; --cfg-text-lo: #8896a5;
+    --cfg-text-hi: var(--text-primary); --cfg-text-mid: var(--text-secondary); --cfg-text-lo: var(--text-muted);
     --cfg-accent: #b8832a; --cfg-accent-glow: rgba(184,131,42,0.18);
     --cfg-pos: var(--success-text); --cfg-pos-glow: rgba(22,163,74,0.14); --cfg-neg: var(--error-text); --cfg-neg-glow: rgba(220,38,38,0.12);
     --cfg-ease: cubic-bezier(0.22,1,0.36,1); --cfg-r: 22px;

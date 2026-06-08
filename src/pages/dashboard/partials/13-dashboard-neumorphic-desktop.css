@@ -36,9 +36,9 @@
     --neu-shadow-soft: rgba(0, 0, 0, 0.45);
     --neu-edge-hi: rgba(255, 255, 255, 0.06);
     --neu-edge-lo: rgba(0, 0, 0, 0.50);
-    --neu-text-hi: #f3f5f8;
-    --neu-text-mid: #98a4b5;
-    --neu-text-lo: #5a6878;
+    --neu-text-hi: var(--text-primary);
+    --neu-text-mid: var(--text-secondary);
+    --neu-text-lo: var(--text-muted);
     --neu-accent: var(--accent);
     --neu-accent-glow: rgba(212, 168, 75, 0.18);
     --neu-pos: var(--success-text);
@@ -56,9 +56,9 @@
     --neu-shadow-soft: rgba(166, 180, 200, 0.28);
     --neu-edge-hi: rgba(255, 255, 255, 0.95);
     --neu-edge-lo: rgba(140, 156, 178, 0.22);
-    --neu-text-hi: #0d1117;
-    --neu-text-mid: #4a5568;
-    --neu-text-lo: #8896a5;
+    --neu-text-hi: var(--text-primary);
+    --neu-text-mid: var(--text-secondary);
+    --neu-text-lo: var(--text-muted);
     --neu-accent: #b8832a;
     --neu-accent-glow: rgba(184, 131, 42, 0.18);
     --neu-pos: var(--success-text);

@@ -21,9 +21,9 @@
     --ag-shadow-soft: rgba(0, 0, 0, 0.45);
     --ag-edge-hi: rgba(255, 255, 255, 0.055);
     --ag-edge-lo: rgba(0, 0, 0, 0.50);
-    --ag-text-hi: #f3f5f8;
-    --ag-text-mid: #98a4b5;
-    --ag-text-lo: #5a6878;
+    --ag-text-hi: var(--text-primary);
+    --ag-text-mid: var(--text-secondary);
+    --ag-text-lo: var(--text-muted);
     --ag-accent: var(--accent);
     --ag-accent-glow: rgba(212, 168, 75, 0.22);
     --ag-pos: var(--success-text);
@@ -47,9 +47,9 @@
     --ag-shadow-soft: rgba(166, 180, 200, 0.28);
     --ag-edge-hi: rgba(255, 255, 255, 0.95);
     --ag-edge-lo: rgba(140, 156, 178, 0.20);
-    --ag-text-hi: #0d1117;
-    --ag-text-mid: #4a5568;
-    --ag-text-lo: #8896a5;
+    --ag-text-hi: var(--text-primary);
+    --ag-text-mid: var(--text-secondary);
+    --ag-text-lo: var(--text-muted);
     --ag-accent: #b8832a;
     --ag-accent-glow: rgba(184, 131, 42, 0.20);
     --ag-pos: var(--success-text);

@@ -12,7 +12,7 @@ body[data-theme='dark'] {
   --pg-base: #0e1117; --pg-raised: #11141a; --pg-sunken: #07090d;
   --pg-light: rgba(255,255,255,0.040); --pg-shadow: rgba(0,0,0,0.70); --pg-shadow-soft: rgba(0,0,0,0.45);
   --pg-edge-hi: rgba(255,255,255,0.055);
-  --pg-text-hi: #f3f5f8; --pg-text-mid: #98a4b5; --pg-text-lo: #5a6878;
+  --pg-text-hi: var(--text-primary); --pg-text-mid: var(--text-secondary); --pg-text-lo: var(--text-muted);
   --pg-accent: var(--accent); --pg-accent-glow: rgba(212,168,75,0.20);
   --pg-pos: var(--success-text); --pg-pos-soft: rgba(74,222,128,0.12); --pg-neg: var(--error-text); --pg-neg-soft: rgba(248,113,113,0.12);
 }
@@ -20,7 +20,7 @@ body[data-theme='light'] {
   --pg-base: #eef1f6; --pg-raised: #ffffff; --pg-sunken: #e4e8ee;
   --pg-light: rgba(255,255,255,0.90); --pg-shadow: rgba(166,180,200,0.45); --pg-shadow-soft: rgba(166,180,200,0.28);
   --pg-edge-hi: rgba(255,255,255,0.95);
-  --pg-text-hi: #0d1117; --pg-text-mid: #4a5568; --pg-text-lo: #8896a5;
+  --pg-text-hi: var(--text-primary); --pg-text-mid: var(--text-secondary); --pg-text-lo: var(--text-muted);
   --pg-accent: #b8832a; --pg-accent-glow: rgba(184,131,42,0.18);
   --pg-pos: var(--success-text); --pg-pos-soft: rgba(22,163,74,0.08); --pg-neg: var(--error-text); --pg-neg-soft: rgba(220,38,38,0.06);
 }
@@ -85,7 +85,7 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
     --pg-base: #0e1117; --pg-raised: #11141a; --pg-sunken: #07090d;
     --pg-light: rgba(255,255,255,0.040); --pg-shadow: rgba(0,0,0,0.70); --pg-shadow-soft: rgba(0,0,0,0.45);
     --pg-edge-hi: rgba(255,255,255,0.055); --pg-edge-lo: rgba(0,0,0,0.50);
-    --pg-text-hi: #f3f5f8; --pg-text-mid: #98a4b5; --pg-text-lo: #5a6878;
+    --pg-text-hi: var(--text-primary); --pg-text-mid: var(--text-secondary); --pg-text-lo: var(--text-muted);
     --pg-accent: var(--accent); --pg-accent-glow: rgba(212,168,75,0.20);
     --pg-pos: var(--success-text); --pg-pos-glow: rgba(74,222,128,0.16); --pg-pos-soft: rgba(74,222,128,0.10);
     --pg-neg: var(--error-text); --pg-neg-glow: rgba(248,113,113,0.16); --pg-neg-soft: rgba(248,113,113,0.10);
@@ -96,7 +96,7 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
     --pg-base: #eef1f6; --pg-raised: #ffffff; --pg-sunken: #e4e8ee;
     --pg-light: rgba(255,255,255,0.90); --pg-shadow: rgba(166,180,200,0.45); --pg-shadow-soft: rgba(166,180,200,0.28);
     --pg-edge-hi: rgba(255,255,255,0.95); --pg-edge-lo: rgba(140,156,178,0.20);
-    --pg-text-hi: #0d1117; --pg-text-mid: #4a5568; --pg-text-lo: #8896a5;
+    --pg-text-hi: var(--text-primary); --pg-text-mid: var(--text-secondary); --pg-text-lo: var(--text-muted);
     --pg-accent: #b8832a; --pg-accent-glow: rgba(184,131,42,0.18);
     --pg-pos: var(--success-text); --pg-pos-glow: rgba(22,163,74,0.14); --pg-pos-soft: rgba(22,163,74,0.08);
     --pg-neg: var(--error-text); --pg-neg-glow: rgba(220,38,38,0.12); --pg-neg-soft: rgba(220,38,38,0.06);

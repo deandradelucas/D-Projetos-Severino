@@ -18,9 +18,9 @@
     --ntx-shadow-soft: rgba(0, 0, 0, 0.45);
     --ntx-edge-hi: rgba(255, 255, 255, 0.060);
     --ntx-edge-lo: rgba(0, 0, 0, 0.50);
-    --ntx-text-hi: #f3f5f8;
-    --ntx-text-mid: #98a4b5;
-    --ntx-text-lo: #5a6878;
+    --ntx-text-hi: var(--text-primary);
+    --ntx-text-mid: var(--text-secondary);
+    --ntx-text-lo: var(--text-muted);
     --ntx-text-faint: #3e4856;
     --ntx-accent: var(--accent);
     --ntx-accent-soft: rgba(212, 168, 75, 0.14);
@@ -43,9 +43,9 @@
     --ntx-shadow-soft: rgba(166, 180, 200, 0.30);
     --ntx-edge-hi: rgba(255, 255, 255, 0.95);
     --ntx-edge-lo: rgba(140, 156, 178, 0.22);
-    --ntx-text-hi: #0d1117;
-    --ntx-text-mid: #4a5568;
-    --ntx-text-lo: #8896a5;
+    --ntx-text-hi: var(--text-primary);
+    --ntx-text-mid: var(--text-secondary);
+    --ntx-text-lo: var(--text-muted);
     --ntx-text-faint: #b0bbc8;
     --ntx-accent: #b8832a;
     --ntx-accent-soft: rgba(184, 131, 42, 0.10);
