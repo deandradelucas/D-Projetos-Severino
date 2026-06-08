@@ -41,7 +41,7 @@
 }
 
 .bemvindo-title-accent {
-  color: #b8832a;
+  color: var(--accent-active);
 }
 
 .bemvindo-subtitle {
@@ -55,7 +55,7 @@
 
 /* ─── Bullets ─── */
 .bemvindo-bullets-label {
-  color: #b8832a;
+  color: var(--accent-active);
 }
 
 .bemvindo-bullet {

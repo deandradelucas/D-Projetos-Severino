@@ -541,8 +541,8 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: linear-gradient(155deg, var(--ag-accent) 0%, #c49535 100%);
-    background-image: linear-gradient(155deg, var(--ag-accent) 0%, #c49535 100%);
+    background: linear-gradient(155deg, var(--ag-accent) 0%, var(--accent-hover) 100%);
+    background-image: linear-gradient(155deg, var(--ag-accent) 0%, var(--accent-hover) 100%);
     color: #1a1200;
     -webkit-text-fill-color: #1a1200;
     font-weight: 700;

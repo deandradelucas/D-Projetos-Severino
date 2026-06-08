@@ -415,7 +415,7 @@ body[data-theme='light'] {
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-empty { color: var(--m-text-lo); }
   body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-empty-cta,
   body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-empty-cta {
-    background: linear-gradient(155deg, var(--m-accent) 0%, #c49535 100%); color: var(--m-accent-fg);
+    background: linear-gradient(155deg, var(--m-accent) 0%, var(--accent-hover) 100%); color: var(--m-accent-fg);
     border: none; border-radius: 999px; font-weight: 700; padding: 11px 22px;
     box-shadow: 0 8px 18px -6px var(--m-accent-glow);
   }

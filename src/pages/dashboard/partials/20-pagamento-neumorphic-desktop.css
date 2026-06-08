@@ -241,7 +241,7 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .btn-primary,
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-checkout-panel__btn-full.btn-primary {
     padding: 13px 24px; border-radius: 999px;
-    background: linear-gradient(155deg, var(--pg-accent) 0%, #c49535 100%); border: 1px solid var(--pg-accent-glow);
+    background: linear-gradient(155deg, var(--pg-accent) 0%, var(--accent-hover) 100%); border: 1px solid var(--pg-accent-glow);
     color: #1a1200; font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 700; font-size: 0.9375rem;
     cursor: pointer; box-shadow: 6px 8px 18px -6px var(--pg-accent-glow), inset 0 1px 0 rgba(255,255,255,0.25);
     transition: all 220ms var(--pg-ease);
@@ -303,7 +303,7 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
   }
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__cta {
     flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
-    padding: 11px 18px; border-radius: 999px; background: linear-gradient(155deg, var(--pg-accent) 0%, #c49535 100%);
+    padding: 11px 18px; border-radius: 999px; background: linear-gradient(155deg, var(--pg-accent) 0%, var(--accent-hover) 100%);
     color: #1a1200; font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 700; font-size: 0.875rem;
     text-decoration: none; box-shadow: 6px 8px 18px -6px var(--pg-accent-glow); transition: transform 200ms var(--pg-ease);
   }
@@ -411,7 +411,7 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
   }
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .pagamento-trial-urgencia__progress-fill {
     height: 100%; border-radius: 999px;
-    background: linear-gradient(90deg, var(--pg-accent), #e8c878); box-shadow: 0 0 8px var(--pg-accent-glow);
+    background: linear-gradient(90deg, var(--pg-accent), var(--accent-subtle)); box-shadow: 0 0 8px var(--pg-accent-glow);
     transition: width 800ms var(--pg-ease);
   }
 
@@ -422,7 +422,7 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
   .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell .page-pagamento-planos__ribbon {
     position: absolute; top: -11px; left: 18px;
     padding: 3px 12px; border-radius: 999px;
-    background: linear-gradient(155deg, var(--pg-accent) 0%, #c49535 100%); color: #1a1200;
+    background: linear-gradient(155deg, var(--pg-accent) 0%, var(--accent-hover) 100%); color: #1a1200;
     font-family: 'Inter Variable', system-ui, sans-serif; font-size: 0.625rem; font-weight: 800;
     text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;
     box-shadow: 0 4px 12px var(--pg-accent-glow);

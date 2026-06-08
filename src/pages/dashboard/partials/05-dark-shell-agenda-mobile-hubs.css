@@ -212,8 +212,8 @@ body:has(.agenda-modal-backdrop) .pwa-install-sheet {
 
 body[data-theme='light'] .agenda-modal-backdrop .agenda-modal__actions .dashboard-hub__btn--primary,
 body[data-theme='dark'] .agenda-modal-backdrop .agenda-modal__actions .dashboard-hub__btn--primary {
-  background: linear-gradient(135deg, var(--accent) 0%, #c49535 52%, #a07520 100%);
-  background-image: linear-gradient(135deg, var(--accent) 0%, #c49535 52%, #a07520 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 52%, #a07520 100%);
+  background-image: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 52%, #a07520 100%);
   border: 1px solid rgba(212, 168, 75, 0.45);
   color: #111111;
   box-shadow: 0 10px 28px -14px rgba(212, 168, 75, 0.55);

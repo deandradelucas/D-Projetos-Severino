@@ -647,7 +647,7 @@
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-progress__bar {
     height: 100%; border-radius: 999px;
-    background: linear-gradient(90deg, var(--m-accent), #c49535);
+    background: linear-gradient(90deg, var(--m-accent), var(--accent-hover));
   }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-grupo--concluida .parc-progress__bar { background: linear-gradient(90deg, var(--m-pos), #15803d); }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-progress__label {
@@ -710,7 +710,7 @@
 }
 
 @media (max-width: 768px) {
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__value--warning { color: var(--m-accent, #c49535); }
+  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__value--warning { color: var(--m-accent); }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__value--pos { color: var(--m-pos); }
   .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .parc-footer-4 .page-transacoes-parcelados-footer__value--neg { color: var(--m-neg); }
 }

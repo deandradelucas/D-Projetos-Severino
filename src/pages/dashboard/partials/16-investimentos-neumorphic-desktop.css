@@ -259,7 +259,7 @@
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-resumo__meta-fill {
     height: 100%;
     border-radius: 999px;
-    background: linear-gradient(90deg, var(--neu-accent), #e8c878);
+    background: linear-gradient(90deg, var(--neu-accent), var(--accent-subtle));
     box-shadow: 0 0 12px var(--neu-accent-glow);
     transition: width 800ms cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -453,7 +453,7 @@
   body[data-theme='light'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card__venc-progress-bar {
     height: 100%;
     border-radius: 999px;
-    background: linear-gradient(90deg, var(--neu-accent), #e8c878);
+    background: linear-gradient(90deg, var(--neu-accent), var(--accent-subtle));
     box-shadow: 0 0 8px var(--neu-accent-glow);
     transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
   }

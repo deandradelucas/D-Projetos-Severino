@@ -138,7 +138,7 @@
 }
 
 .page-lista-compras__nova-btn:hover {
-  background: #c49535;
+  background: var(--accent-hover);
   box-shadow: 0 4px 14px rgba(212, 168, 75, 0.4);
 }
 
@@ -1070,7 +1070,7 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 .page-lista-compras__cta-btn {
   padding: 9px 18px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent) 0%, #c49535 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
   color: #111;
   font-size: 0.85rem;
   font-weight: 700;
@@ -1244,7 +1244,7 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 }
 
 .page-lista-compras__onboarding-btn:hover {
-  background: #c49535;
+  background: var(--accent-hover);
 }
 
 /* ---------------------------------------------------------------------------
@@ -1561,7 +1561,7 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
 }
 
 .page-lista-compras__modal-confirm:hover {
-  background: #c49535;
+  background: var(--accent-hover);
 }
 
 .page-lista-compras__modal-confirm:disabled {

@@ -2273,7 +2273,7 @@ body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-h
   padding: 0;
   cursor: pointer;
   border: 1px solid rgba(212, 168, 75, 0.30);
-  background: linear-gradient(155deg, var(--accent), #c49535);
+  background: linear-gradient(155deg, var(--accent), var(--accent-hover));
   color: #1a1205;
   font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
   font-weight: 700;

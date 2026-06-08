@@ -40,7 +40,7 @@
 }
 
 .trial-title-accent {
-  color: #b8832a;
+  color: var(--accent-active);
 }
 
 .trial-subtitle {
@@ -58,7 +58,7 @@
 
 /* ─── Lista de perda ─── */
 .trial-loss-label {
-  color: #b8832a;
+  color: var(--accent-active);
 }
 
 .trial-loss-item {
