@@ -92,6 +92,14 @@ const STATE_SCENES = [
     id: 'modal-agenda', route: '/agenda', root: '.agenda-modal',
     async open(page) { await clickByText(page, 'button', /nova agenda/i) },
   },
+  {
+    id: 'modal-investimento', route: '/investimentos', root: '.page-investimentos-modal',
+    async open(page) { await clickByText(page, 'button', /novo investimento/i) },
+  },
+  {
+    id: 'modal-tx-detalhe', route: '/transacoes', root: '.tx-detalhe-modal',
+    async open(page) { await page.click('.ref-tx-row', { timeout: 5000 }).catch(() => {}); await page.waitForTimeout(350) },
+  },
 ]
 // Hover/focus em elementos-chave (Playwright força o estado real).
 const HOVER_TARGETS = [
