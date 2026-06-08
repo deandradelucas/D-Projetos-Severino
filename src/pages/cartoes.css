@@ -3,10 +3,10 @@
    ============================================================================= */
 
 .page-cartoes-panel {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
 
 /* ─── Toggle Família / Pessoal ─── */
@@ -139,7 +139,7 @@
   cursor: pointer;
 }
 .page-cartoes__menu button:hover { background: var(--bg-secondary); }
-.page-cartoes__menu--danger { color: #dc2626 !important; }
+.page-cartoes__menu button.page-cartoes__menu--danger { color: #dc2626; }
 
 .page-cartoes__card-fatura { display: flex; flex-direction: column; gap: 2px; position: relative; z-index: 1; }
 .page-cartoes__card-fatura-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.8; }

@@ -4,10 +4,10 @@
    ============================================================================= */
 
 .page-metas-panel {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
 
 /* ─── Toggle Família / Pessoal ─── */
@@ -139,7 +139,7 @@
   cursor: pointer;
 }
 .page-metas__menu button:hover { background: var(--bg-secondary); }
-.page-metas__menu--danger { color: #dc2626 !important; }
+.page-metas__menu button.page-metas__menu--danger { color: #dc2626; }
 
 /* ─── Barra de progresso ─── */
 .page-metas__bar {
