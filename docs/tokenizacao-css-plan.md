@@ -32,7 +32,8 @@ Verificar build+lint+test:unit e raciocinar light+dark a cada fatia. Commit por 
 ## Fatias (ordem de execução)
 - [x] **Fatia 1 — gold da marca:** `#d4a84b` → `var(--accent)` (invariante). 21 trocas. commit `99f286f`. ZERO change.
 - [x] **Fatia 2 — pos/neg por-página:** 37 defs `--*-pos/--*-neg` sólidas → `var(--success-text)`/`var(--error-text)`. Classificadas: 100% em bloco de tema correto. commit `7f97b97`. ZERO change.
-- [ ] **Fatia 3 — neutros estruturais (DECISÃO DO CEO):** page-local diverge dos globais por um fio (mobile `text-hi #f3f5f8` vs global `#f0f2f5`; `--m-card #14181f` vs `--bg-card #141618`). Repontar = mudança sub-perceptível mas NÃO-zero. CEO decide: (A) snapar p/ global (centraliza 100%, shift invisível) OU (B) manter page-local (zero change, centralização parcial).
+- [x] **Fatia 3a — texto (CEO escolheu A):** 68 defs `--*-text-hi/mid/lo` → `var(--text-primary/secondary/muted)`. Light exato; dark micro-shift aprovado. commit `82efb58`.
+- [ ] **Fatia 3b — superfícies (NOVA decisão CEO):** escala neumórfica base/raised/sunken NÃO casa limpo com escala global de elevação (bg-base/primary/secondary/card). Alguns Δ invisíveis (`#0e1117`→bg-secondary), mas `sunken` light (`#e4e8ee`→`#eef0f4` Δ~10) é VISÍVEL e mapa raised↔card é ambíguo. Opções: (A) forçar snap ao global mais próximo (shifts visíveis em alguns + acoplamento) OU (B) manter base/raised/sunken page-local (são paleta de relevo soft-UI bespoke). PENDENTE.
 - [ ] Resto exact-match é assimétrico/raro (blue dark `#60a5fa`≠`--info` `#3b82f6`; accent-fg light `#fff`≠global `#1a1200`) — baixo valor, adiar.
 - [ ] Final — quando um componente é 100% token-driven, deletar seus overrides em mirror/polish/fullblack.
 
