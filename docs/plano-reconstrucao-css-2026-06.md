@@ -91,9 +91,23 @@ CSS "solto" hoje (componentes React com `.css` próprio: `DashboardInsightsStrip
 
 ---
 
-## 3. Execução — Big-bang faseado com rede de segurança
+## 3. Execução — Consolidação in-place verificável (decisão CEO 08-jun)
 
-> "Big-bang" = reconstrução total do zero (não remendo). A rede de segurança (captura de referência + verificação por tela) é o que torna "pixel-fiel" possível. Sem ela, big-bang cego perde a UI refinada de meses.
+> **Mecânica escolhida pelo CEO:** consolidação in-place, NÃO árvore-paralela big-bang.
+> Motivo: a Fase 0 confirmou a prova do squad (`v1.0.4-css-migration-status.md`) de que
+> re-layerizar os arquivos atuais quebra (autoridade é por-regra, não por-arquivo), e que
+> um cutover único só é verificável no fim (depurar 48k linhas no escuro se diff≠0).
+> Com o fingerprint funcionando, migra-se componente/página por vez, rodando `--check`
+> (diff=0) e **commitando a cada passo**. Mesmo destino arquitetural; risco controlado;
+> o app nunca quebra. "Big-bang na estrutura, pragmatismo na regra."
+>
+> **Loop por unidade:** consolidar (juntar as regras espalhadas do componente num só lugar,
+> remover duplicação base+skin+mobile+dark, trocar hardcoded→token) → `npm run build` +
+> `test:unit` + lint → fingerprint `--check` diff=0 → commit. Se diff≠0, sabe-se exatamente
+> qual unidade. Quando a autoridade de um componente vive em um arquivo, o `@layer` semântico
+> passa a ser seguro para aquele componente.
+
+> A rede de segurança (Fase 0, fingerprint) é o que torna "pixel-fiel" verificável a cada passo.
 
 ### Fase 0 — Rede de segurança e captura da referência (ANTES de apagar)
 - [ ] Confirmar árvore git limpa; trabalhar em `release/1.0.4` (já fora de produção).
