@@ -49,16 +49,8 @@ body[data-theme='dark'] .data-table thead th {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-body[data-theme='dark'] .data-table tbody td {
-  color: #f0f0f0;
-}
-
 body[data-theme='dark'] .data-table tbody tr:nth-child(even) {
   background: rgba(255, 255, 255, 0.02);
-}
-
-body[data-theme='dark'] .data-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.05);
 }
 
 /* Inputs */
@@ -69,25 +61,10 @@ body[data-theme='dark'] .input-premium {
   color: #fafafa;
 }
 
-body[data-theme='dark'] .filter-input:focus,
-body[data-theme='dark'] .input-premium:focus {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(212, 168, 75, 0.45);
-  box-shadow: 0 0 0 2px rgba(212, 168, 75, 0.12);
-}
-
 /* Navegação legada (sem shell) */
 body[data-theme='dark'] .nav-item:hover:not(.active) {
   background: rgba(255, 255, 255, 0.06);
   color: #fafafa;
-}
-
-body[data-theme='dark'] .nav-item.active {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(212, 168, 75, 0.14) 100%);
-  color: #fafafa;
-  box-shadow:
-    0 0 0 1px rgba(212, 168, 75, 0.35) inset,
-    0 8px 24px -16px rgba(0, 0, 0, 0.5);
 }
 
 body[data-theme='dark'] .logout-btn {
@@ -147,14 +124,6 @@ body[data-theme='dark'] .ref-kpi-card--balance .ref-kpi-card__value {
   color: var(--transacoes-balance-pos, #3b82f6);
 }
 
-body[data-theme='dark'] .ref-kpi-card--income .ref-kpi-card__value {
-  color: var(--success);
-}
-
-body[data-theme='dark'] .ref-kpi-card--expense .ref-kpi-card__value {
-  color: var(--danger);
-}
-
 body[data-theme='dark'] .ref-kpi-card__label {
   color: var(--text-secondary);
 }
@@ -184,12 +153,6 @@ body[data-theme='dark'] .ref-panel__link {
   color: rgba(250, 250, 250, 0.9);
 }
 
-body[data-theme='dark'] .ref-panel__link:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(212, 168, 75, 0.35);
-  color: #fafafa;
-}
-
 /* Container legado sem shell */
 body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) {
   background: linear-gradient(165deg, #0a0a0a 0%, #000000 100%);
@@ -197,11 +160,6 @@ body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.04) inset,
     0 28px 56px -34px rgba(0, 0, 0, 0.65);
-}
-
-body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .main-content {
-  background: linear-gradient(180deg, #0c0c0c 0%, #060606 100%);
-  color: #f0f0f0;
 }
 
 body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .sidebar {
@@ -216,11 +174,6 @@ body[data-theme='dark'] .ref-empty-cta {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.2) inset,
     0 10px 28px -14px rgba(0, 0, 0, 0.55);
-}
-
-body[data-theme='dark'] .ref-empty-cta:hover {
-  background: linear-gradient(180deg, #f0d08a 0%, #d4ae5c 100%);
-  color: #0a0a0a;
 }
 
 body[data-theme='dark'] .ref-empty {
@@ -247,17 +200,6 @@ body[data-theme='dark'] .modal-content {
     0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
-body[data-theme='dark'] .modal-actions .btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
-  color: #f0f0f0;
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-body[data-theme='dark'] .modal-actions .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fafafa;
-}
-
 body[data-theme='dark'] .custom-select-option.selected {
   background: linear-gradient(180deg, #181818 0%, #121212 100%);
   color: #fafafa;
@@ -272,11 +214,6 @@ body[data-theme='dark'] .custom-select-trigger {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-body[data-theme='dark'] .custom-select-trigger:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(212, 168, 75, 0.4);
-}
-
 body[data-theme='dark'] .custom-select-trigger span.text-placeholder {
   color: #a3a3a3;
 }
@@ -285,37 +222,13 @@ body[data-theme='dark'] .custom-select-trigger span.text-white {
   color: #fafafa;
 }
 
-body[data-theme='dark'] .custom-select.open .custom-select-trigger {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-body[data-theme='dark'] .custom-select-dropdown {
-  background: var(--bg-card);
-  background-image: none;
-  border-color: rgba(148, 163, 184, 0.15);
-}
-
 body[data-theme='dark'] .custom-select-search {
   background: rgba(0, 0, 0, 0.35);
   border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 
-body[data-theme='dark'] .custom-select-search input {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #fafafa;
-}
-
 body[data-theme='dark'] .chevron {
   color: #a3a3a3;
-}
-
-body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section__title {
-  color: #a3a3a3;
-}
-
-body[data-theme='dark'] .modal-content--nova-tx .nova-tx-section + .nova-tx-section {
-  border-top-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Nova transação — sheet preto + parcelamento (detalhes em 02c-modals; vence espelho azul) */
@@ -336,20 +249,6 @@ body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia label.m
   color: rgba(255, 255, 255, 0.9);
   border-color: rgba(255, 255, 255, 0.12);
   background: #000000;
-}
-
-body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia-on label.modal-recorrencia-toggle-row {
-  border-color: rgba(212, 168, 75, 0.45);
-  background: rgba(212, 168, 75, 0.1);
-}
-
-body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__iconWrap {
-  background: rgba(212, 168, 75, 0.16);
-  color: var(--accent);
-}
-
-body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox {
-  accent-color: var(--accent);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row {
@@ -374,18 +273,6 @@ body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row__input--date {
   color-scheme: dark;
 }
 
-body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row .modal-recorrencia-toggle-row__checkbox {
-  accent-color: var(--accent);
-}
-
-body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview {
-  color: var(--accent);
-}
-
-body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview.parcelamento-preview--hint {
-  color: rgba(255, 255, 255, 0.55);
-}
-
 body[data-theme='dark'] .relatorios-empty-msg {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, #0a0a0a 100%);
   color: #d4d4d4;
@@ -403,14 +290,6 @@ body[data-theme='dark'] .date-shortcut-btn:hover {
   background: rgba(212, 168, 75, 0.12);
   color: #f5e6c8;
   border-color: rgba(212, 168, 75, 0.38);
-}
-
-body[data-theme='dark'] .ref-tx-row:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
-  color: rgba(163, 163, 163, 0.92);
 }
 
 /* Chat */
@@ -458,18 +337,6 @@ body[data-theme='dark'] .horizon-suggestion-chip:hover {
   color: #0a0a0a;
 }
 
-body[data-theme='dark'] .horizon-chat-input {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #fafafa;
-}
-
-body[data-theme='dark'] .horizon-send-btn {
-  color: #0a0a0a;
-  background: linear-gradient(180deg, #e8c677 0%, #c9a24e 100%);
-  border-color: rgba(255, 255, 255, 0.14);
-}
-
 body[data-theme='dark'] .horizon-send-btn:hover:not(:disabled) {
   color: #0a0a0a;
   filter: brightness(1.05);
@@ -487,11 +354,7 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-men
 }
 
 @media (min-width: 769px) {
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.08) inset,
-      0 12px 32px -20px rgba(0, 0, 0, 0.6);
-  }
+  
 }
 
 body[data-theme='dark'] .page-relatorios .relatorios-tooltip {
@@ -522,14 +385,6 @@ body[data-theme='dark'] .type-toggle {
   border-color: rgba(255, 255, 255, 0.12);
 }
 
-body[data-theme='dark'] .custom-select-option {
-  color: #f0f0f0;
-}
-
-body[data-theme='dark'] .custom-select-option:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
 body[data-theme='dark'] .close-btn {
   background: rgba(255, 255, 255, 0.06);
   color: #d4d4d4;
@@ -541,43 +396,15 @@ body[data-theme='dark'] .close-btn:hover {
   color: #fafafa;
 }
 
-body[data-theme='dark'] .modal-form input:not([type='checkbox']):not([type='radio']),
-body[data-theme='dark'] .modal-form select,
-body[data-theme='dark'] .modal-form textarea {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #fafafa;
-}
-
 body[data-theme='dark'] .modal-form input::placeholder,
 body[data-theme='dark'] .modal-form textarea::placeholder {
   color: #737373;
-}
-
-body[data-theme='dark'] .btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
-  color: #f0f0f0;
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-body[data-theme='dark'] .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fafafa;
-  border-color: rgba(255, 255, 255, 0.16);
 }
 
 /* Sidebar espelho (largura / estrutura): só fundo e borda */
 body[data-theme='dark'] .sidebar {
   background: #050505;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-body[data-theme='dark'] .nav-item {
-  color: #d4d4d4;
-}
-
-body[data-theme='dark'] .nav-item:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.06);
 }
 
 body[data-theme='dark'] .btn-delete {
@@ -609,10 +436,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .app-horizon-inne
   background-image: none;
 }
 
-body[data-theme='dark'] .dashboard-container.ref-dashboard.app-horizon-shell .ref-dashboard-inner.dashboard-hub {
-  background: transparent;
-}
-
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .main-content,
 body[data-theme='dark'] .dashboard-container:not(.app-horizon-shell) .main-content {
   background: #000000;
@@ -635,10 +458,6 @@ body[data-theme='dark'] .nav-item {
   color: rgba(255, 255, 255, 0.72);
 }
 
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
-  color: rgba(255, 255, 255, 0.92);
-}
-
 body[data-theme='dark'] .nav-item:hover:not(.active) {
   background: rgba(255, 255, 255, 0.075);
   border-color: rgba(255, 255, 255, 0.12);
@@ -659,21 +478,6 @@ body[data-theme='dark'] .nav-item.active {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 8px 24px -18px rgba(0, 0, 0, 0.55);
-}
-
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-  font-weight: 800;
-  background: color-mix(in srgb, var(--accent) 13%, transparent);
-  border-color: transparent;
-  color: var(--accent);
-  box-shadow: none;
-}
-
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap,
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.nav-item--settings:not(.active) .icon-wrap {
-  background: rgba(255, 255, 255, 0.055);
-  border: none;
-  color: rgba(255, 255, 255, 0.95);
 }
 
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
