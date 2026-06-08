@@ -168,6 +168,20 @@ Ordem por risco/uso (mais usada primeiro, para validar o vocabulário cedo):
 consolidação **por-componente** que puxa a regra dark junto. Loop por componente:
 juntar regras espalhadas (base+skin+mobile+dark) num arquivo → `--check` diff=0 → commit.
 
+### ⚠️ Descoberta-chave (close-btn, 08-jun): autoridade é MIX POR-PROPRIEDADE
+Duas tentativas de consolidar o close-btn quebraram diff=0 e revelaram o cerne da dívida:
+1. **Unlayered vence layered:** `metas.css`/`cartoes.css` (importados direto pelo JSX) são
+   *unlayered* → vencem QUALQUER regra em `@layer app` (os 52 partials, incl. 35-close-btn),
+   independente de especificidade.
+2. **Mas a aparência final é um mix por-propriedade:** o arquivo unlayered vence as props que
+   *ele* seta; o partial layered ainda fornece as props que o unlayered *não* seta. Nenhum é
+   dono completo do componente.
+3. **Logo "remover a regra redundante" é armadilha** — mesmo parecendo 100% sobrescrita, cada
+   arquivo contribui um subconjunto distinto de propriedades.
+4. **Método correto:** unir as props de TODAS as regras contribuintes → escrever no arquivo-alvo
+   cada prop com o valor vencedor atual → remover as outras → `--check` diff=0. O harness é o
+   oráculo (rodar a cada passo); raciocínio de especificidade não basta.
+
 ## 5. Riscos e mitigação
 | Risco | Mitigação |
 |---|---|
