@@ -1,4 +1,4 @@
-@layer theme, base, tokens, base-struct, base-overrides, dark-shell, navigation, skin-desktop, skin-mobile, shared-standards, semantic, theme-dark, components, vendor, utilities;
+@layer theme, base, tokens, base-struct, base-overrides, dark-shell, navigation, skin-desktop, skin-mobile, shared-standards, theme-dark, semantic, components, vendor, utilities;
 @import "tailwindcss";
 
 @theme {

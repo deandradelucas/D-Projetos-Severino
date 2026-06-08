@@ -703,9 +703,6 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
 }
 
 body[data-theme='dark'] .btn-primary,
-body[data-theme='dark']
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-investimentos)
-  .dashboard-hub__btn--primary,
 body[data-theme='dark'] .ref-empty-cta,
 body[data-theme='dark'] .horizon-send-btn {
   background: linear-gradient(135deg, #8b5cf6 0%, #ff4fb8 52%, #ffc83d 100%);
@@ -717,19 +714,13 @@ body[data-theme='dark'] .horizon-send-btn {
 }
 
 body[data-theme='dark'] .btn-primary:hover,
-body[data-theme='dark']
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-investimentos)
-  .dashboard-hub__btn--primary:hover,
 body[data-theme='dark'] .ref-empty-cta:hover,
 body[data-theme='dark'] .horizon-send-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #a855f7 0%, #ff5fc0 50%, #ffd15c 100%);
   color: #ffffff;
 }
 
-body[data-theme='dark'] .btn-primary:focus-visible,
-body[data-theme='dark']
-  .dashboard-container.ref-dashboard.app-horizon-shell:not(.page-transacoes):not(.page-investimentos)
-  .dashboard-hub__btn--primary:focus-visible {
+body[data-theme='dark'] .btn-primary:focus-visible {
   box-shadow:
     0 0 0 3px rgba(212, 168, 75, 0.4),
     0 18px 42px -24px rgba(0, 0, 0, 0.55);
