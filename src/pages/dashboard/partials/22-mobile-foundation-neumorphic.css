@@ -9,10 +9,10 @@
 
 /* ─── Tokens mobile (globais; só usados em ≤768px) ─── */
 body[data-theme='dark'] {
-  --m-base: #0b0e13;
-  --m-raised: #13161d;
+  --m-base: var(--bg-secondary);
+  --m-raised: var(--bg-card);
   --m-card: var(--bg-card);
-  --m-sunken: #090b10;
+  --m-sunken: var(--bg-primary);
   --m-light: rgba(255, 255, 255, 0.045);
   --m-shadow: rgba(0, 0, 0, 0.55);
   --m-shadow-soft: rgba(0, 0, 0, 0.38);
@@ -35,8 +35,8 @@ body[data-theme='dark'] {
   --m-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 body[data-theme='light'] {
-  --m-base: #eef1f6;
-  --m-raised: #ffffff;
+  --m-base: var(--bg-secondary);
+  --m-raised: var(--bg-card);
   --m-card: var(--bg-card);
   --m-sunken: #e6eaf0;
   --m-light: rgba(255, 255, 255, 0.92);

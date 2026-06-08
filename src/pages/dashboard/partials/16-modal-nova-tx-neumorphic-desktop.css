@@ -10,7 +10,7 @@
   /* ─── Tokens locais (escopo modal) ─── */
   body[data-theme='dark'] .modal-backdrop:has(.modal-content--nova-tx),
   body[data-theme='dark'] .modal-content--nova-tx {
-    --ntx-surface-base: #0e1117;
+    --ntx-surface-base: var(--bg-secondary);
     --ntx-surface-raised: #14181f;
     --ntx-surface-sunken: #0a0c11;
     --ntx-light: rgba(255, 255, 255, 0.045);
@@ -35,7 +35,7 @@
   }
   body[data-theme='light'] .modal-backdrop:has(.modal-content--nova-tx),
   body[data-theme='light'] .modal-content--nova-tx {
-    --ntx-surface-base: #eef1f6;
+    --ntx-surface-base: var(--bg-secondary);
     --ntx-surface-raised: #ffffff;
     --ntx-surface-sunken: #e4e8ee;
     --ntx-light: rgba(255, 255, 255, 0.90);

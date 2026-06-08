@@ -9,7 +9,7 @@
 
   /* ─── Tokens ─── */
   body[data-theme='dark'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell {
-    --cfg-base: #0e1117; --cfg-raised: #11141a; --cfg-sunken: #07090d;
+    --cfg-base: var(--bg-secondary); --cfg-raised: var(--bg-card); --cfg-sunken: var(--bg-primary);
     --cfg-light: rgba(255,255,255,0.040); --cfg-shadow: rgba(0,0,0,0.70); --cfg-shadow-soft: rgba(0,0,0,0.45);
     --cfg-edge-hi: rgba(255,255,255,0.055); --cfg-edge-lo: rgba(0,0,0,0.50);
     --cfg-text-hi: var(--text-primary); --cfg-text-mid: var(--text-secondary); --cfg-text-lo: var(--text-muted);
@@ -18,7 +18,7 @@
     --cfg-ease: cubic-bezier(0.22,1,0.36,1); --cfg-r: 22px;
   }
   body[data-theme='light'] .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell {
-    --cfg-base: #eef1f6; --cfg-raised: #ffffff; --cfg-sunken: #e4e8ee;
+    --cfg-base: var(--bg-secondary); --cfg-raised: var(--bg-card); --cfg-sunken: #e4e8ee;
     --cfg-light: rgba(255,255,255,0.90); --cfg-shadow: rgba(166,180,200,0.45); --cfg-shadow-soft: rgba(166,180,200,0.28);
     --cfg-edge-hi: rgba(255,255,255,0.95); --cfg-edge-lo: rgba(140,156,178,0.20);
     --cfg-text-hi: var(--text-primary); --cfg-text-mid: var(--text-secondary); --cfg-text-lo: var(--text-muted);

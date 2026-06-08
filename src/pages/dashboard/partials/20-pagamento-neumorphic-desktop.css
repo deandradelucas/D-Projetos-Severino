@@ -9,7 +9,7 @@
    renderizados via portal fora do .dashboard-container. Válidos em qualquer
    largura (mobile/tablet/desktop). */
 body[data-theme='dark'] {
-  --pg-base: #0e1117; --pg-raised: #11141a; --pg-sunken: #07090d;
+  --pg-base: var(--bg-secondary); --pg-raised: var(--bg-card); --pg-sunken: var(--bg-primary);
   --pg-light: rgba(255,255,255,0.040); --pg-shadow: rgba(0,0,0,0.70); --pg-shadow-soft: rgba(0,0,0,0.45);
   --pg-edge-hi: rgba(255,255,255,0.055);
   --pg-text-hi: var(--text-primary); --pg-text-mid: var(--text-secondary); --pg-text-lo: var(--text-muted);
@@ -17,7 +17,7 @@ body[data-theme='dark'] {
   --pg-pos: var(--success-text); --pg-pos-soft: rgba(74,222,128,0.12); --pg-neg: var(--error-text); --pg-neg-soft: rgba(248,113,113,0.12);
 }
 body[data-theme='light'] {
-  --pg-base: #eef1f6; --pg-raised: #ffffff; --pg-sunken: #e4e8ee;
+  --pg-base: var(--bg-secondary); --pg-raised: var(--bg-card); --pg-sunken: #e4e8ee;
   --pg-light: rgba(255,255,255,0.90); --pg-shadow: rgba(166,180,200,0.45); --pg-shadow-soft: rgba(166,180,200,0.28);
   --pg-edge-hi: rgba(255,255,255,0.95);
   --pg-text-hi: var(--text-primary); --pg-text-mid: var(--text-secondary); --pg-text-lo: var(--text-muted);
@@ -82,7 +82,7 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
 
   /* ─── Tokens ─── */
   body[data-theme='dark'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
-    --pg-base: #0e1117; --pg-raised: #11141a; --pg-sunken: #07090d;
+    --pg-base: var(--bg-secondary); --pg-raised: var(--bg-card); --pg-sunken: var(--bg-primary);
     --pg-light: rgba(255,255,255,0.040); --pg-shadow: rgba(0,0,0,0.70); --pg-shadow-soft: rgba(0,0,0,0.45);
     --pg-edge-hi: rgba(255,255,255,0.055); --pg-edge-lo: rgba(0,0,0,0.50);
     --pg-text-hi: var(--text-primary); --pg-text-mid: var(--text-secondary); --pg-text-lo: var(--text-muted);
@@ -93,7 +93,7 @@ body[data-theme='dark'] .pagamento-pix-modal, body[data-theme='light'] .pagament
     --pg-ease: cubic-bezier(0.22,1,0.36,1); --pg-r: 22px;
   }
   body[data-theme='light'] .dashboard-container.page-pagamento.ref-dashboard.app-horizon-shell {
-    --pg-base: #eef1f6; --pg-raised: #ffffff; --pg-sunken: #e4e8ee;
+    --pg-base: var(--bg-secondary); --pg-raised: var(--bg-card); --pg-sunken: #e4e8ee;
     --pg-light: rgba(255,255,255,0.90); --pg-shadow: rgba(166,180,200,0.45); --pg-shadow-soft: rgba(166,180,200,0.28);
     --pg-edge-hi: rgba(255,255,255,0.95); --pg-edge-lo: rgba(140,156,178,0.20);
     --pg-text-hi: var(--text-primary); --pg-text-mid: var(--text-secondary); --pg-text-lo: var(--text-muted);

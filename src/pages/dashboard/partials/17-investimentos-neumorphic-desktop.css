@@ -8,8 +8,8 @@
   /* ─── Tokens ─── */
   body[data-theme='light'] .page-investimentos {
     --inv-bg:           #e8ecf2;
-    --inv-surface:      #eef1f6;
-    --inv-raised:       #ffffff;
+    --inv-surface:      var(--bg-secondary);
+    --inv-raised:       var(--bg-card);
     --inv-sunken:       #dde2ea;
     --inv-light:        rgba(255, 255, 255, 1);
     --inv-shadow:       rgba(90, 110, 140, 0.42);
@@ -34,9 +34,9 @@
 
   body[data-theme='dark'] .page-investimentos {
     --inv-bg:           #070a0f;
-    --inv-surface:      #0e1117;
-    --inv-raised:       #14181f;
-    --inv-sunken:       #08090e;
+    --inv-surface:      var(--bg-secondary);
+    --inv-raised:       var(--bg-card);
+    --inv-sunken:       var(--bg-primary);
     --inv-light:        rgba(255, 255, 255, 0.048);
     --inv-shadow:       rgba(0, 0, 0, 0.72);
     --inv-shadow-soft:  rgba(0, 0, 0, 0.48);

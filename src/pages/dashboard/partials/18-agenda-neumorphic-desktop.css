@@ -13,7 +13,7 @@
      tokens --ag-* fiquem disponíveis dentro do modal portaled. */
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell,
   body[data-theme='dark'] .agenda-modal-backdrop {
-    --ag-surface-base: #0e1117;
+    --ag-surface-base: var(--bg-secondary);
     --ag-surface-raised: #11141a;
     --ag-surface-sunken: #07090d;
     --ag-light: rgba(255, 255, 255, 0.040);
@@ -39,7 +39,7 @@
   }
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell,
   body[data-theme='light'] .agenda-modal-backdrop {
-    --ag-surface-base: #eef1f6;
+    --ag-surface-base: var(--bg-secondary);
     --ag-surface-raised: #ffffff;
     --ag-surface-sunken: #e4e8ee;
     --ag-light: rgba(255, 255, 255, 0.90);

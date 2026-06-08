@@ -28,7 +28,7 @@
   }
 
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell {
-    --neu-surface-base: #0e1117;
+    --neu-surface-base: var(--bg-secondary);
     --neu-surface-raised: #14181f;
     --neu-surface-sunken: #0a0c11;
     --neu-light: rgba(255, 255, 255, 0.045);
@@ -48,7 +48,7 @@
   }
 
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell {
-    --neu-surface-base: #eef1f6;
+    --neu-surface-base: var(--bg-secondary);
     --neu-surface-raised: #f5f7fa;
     --neu-surface-sunken: #e4e8ee;
     --neu-light: rgba(255, 255, 255, 0.85);

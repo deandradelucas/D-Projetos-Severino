@@ -11,7 +11,7 @@
 
   /* ─── Tokens locais (copiam --neu-* do partial 13 sem depender de .dashboard-page) ─── */
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell {
-    --rel-surface-base: #0e1117;
+    --rel-surface-base: var(--bg-secondary);
     --rel-surface-raised: #11141a;
     --rel-surface-sunken: #07090d;
     --rel-light: rgba(255, 255, 255, 0.040);
@@ -32,7 +32,7 @@
     --rel-r: 22px;
   }
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell {
-    --rel-surface-base: #eef1f6;
+    --rel-surface-base: var(--bg-secondary);
     --rel-surface-raised: #ffffff;
     --rel-surface-sunken: #e4e8ee;
     --rel-light: rgba(255, 255, 255, 0.90);
