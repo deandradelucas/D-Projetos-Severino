@@ -30,19 +30,29 @@
     'background-clip','-webkit-text-fill-color','outline-color','outline-width','fill','stroke','backdrop-filter','filter',
     'white-space','text-overflow','object-fit','background-size','background-position','content',
   ]
-  // Subárvores excluídas: gráficos (cor inline em SVG) e elementos animados.
-  const EXCLUDE = 'svg,.recharts-wrapper,[class*="shimmer"],[class*="skeleton"],[class*="spark"],[class*="pulse"],[class*="orb"]'
+  // Subárvores excluídas: gráficos (cor inline em SVG), elementos animados e o
+  // Horizon Chat (overlay de IA com conteúdo/animação não-determinísticos —
+  // streaming, tamanho e sombra variam entre cargas; não é CSS-sob-teste estável).
+  const EXCLUDE = 'svg,.recharts-wrapper,[class*="shimmer"],[class*="skeleton"],[class*="spark"],[class*="pulse"],[class*="orb"],[class*="horizon-chat"],[class*="horizon-msg"],[class*="horizon-suggestion"]'
+
+  // Congela animação/transição GLOBALMENTE — inclusive pseudo-elementos
+  // (::before/::after), que NÃO podem ser congelados via element.style. Sem isto,
+  // animações de entrada em pseudos (ex.: dashboard-hub__date::before) produzem
+  // valores de opacity/transform voláteis entre cargas → falso diff.
+  function freezeAnimations() {
+    if (document.getElementById('__cssfp_freeze')) return
+    const f = document.createElement('style')
+    f.id = '__cssfp_freeze'
+    f.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;animation-delay:0s!important;transition-delay:0s!important;animation-duration:0s!important;caret-color:transparent!important}'
+    document.head.appendChild(f)
+  }
 
   function capRaw(rootSel, theme) {
     if (theme) document.body.dataset.theme = theme
+    freezeAnimations()
     const root = document.querySelector(rootSel)
     if (!root) return null
     const els = [root, ...root.querySelectorAll('*')].filter((el) => !el.closest(EXCLUDE))
-    // Congela animação/transição (só na medição; produção mantém).
-    els.forEach((el) => {
-      el.style.setProperty('animation', 'none', 'important')
-      el.style.setProperty('transition', 'none', 'important')
-    })
     const rows = []
     for (const el of els) {
       const cls = typeof el.className === 'string' ? el.className : ''
@@ -95,6 +105,9 @@
     /** Auto-teste: prova que o harness ACUSA uma quebra (senão diff=0 é teatro). */
     selfTest(rootSel, theme) {
       const baseline = capStable(rootSel, theme)
+      if (!baseline) {
+        return { ok: false, error: 'root não encontrado', rootSel, detectouQuebra: false, voltouAoZero: false }
+      }
       const st = document.createElement('style')
       st.id = '__cssfp_plant'
       st.textContent = `${rootSel}, ${rootSel} *{outline-width:7px !important}`

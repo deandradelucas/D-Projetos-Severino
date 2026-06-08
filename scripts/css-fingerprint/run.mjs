@@ -48,6 +48,8 @@ const PAGE_ROOTS = {
   '/configuracoes': '.page-configuracoes',
   '/lista-de-compras': '.page-lista-compras',
   '/pagamento': '.page-pagamento',
+  '/metas': '.page-metas',
+  '/cartoes': '.page-cartoes',
 }
 const VIEWPORTS = [{ name: 'desktop', w: 1440, h: 900 }, { name: 'mobile', w: 390, h: 844 }]
 const THEMES = ['light', 'dark']
@@ -97,16 +99,60 @@ async function clickByText(page, sel, re) {
 }
 
 async function login(page) {
+  // Login via API (mesmo endpoint do app) — robusto ao fluxo multi-step da UI
+  // (AuthPhoneShell + webauthn). Persiste refresh token + user; o bootstrap do
+  // app reobtém o access token na próxima navegação.
   await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' })
+  const res = await page.evaluate(async ([base, email, pass]) => {
+    const r = await fetch(`${base}/api/auth/login`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.trim().toLowerCase(), password: pass }),
+    })
+    const raw = await r.text(); let d = {}; try { d = JSON.parse(raw) } catch { /* */ }
+    if (r.ok && d.refreshToken) {
+      localStorage.setItem('horizonte_refresh_token', d.refreshToken)
+      if (d.user?.id) localStorage.setItem('horizonte_user', JSON.stringify(d.user))
+    }
+    return { ok: r.ok, hasRefresh: !!d.refreshToken, msg: d.message || raw.slice(0, 120) }
+  }, [BASE, EMAIL, PASS])
+  if (!res.ok || !res.hasRefresh) throw new Error(`login API falhou: ${res.msg}`)
+  await page.waitForTimeout(800)
+}
+
+// Aguarda a página montar de verdade: root presente + rede ociosa + settle.
+// Substitui o sleep fixo (900ms era insuficiente para páginas data-heavy —
+// causava root ausente → selfTest falho).
+async function settle(page, root) {
+  if (root) await page.waitForSelector(root, { state: 'attached', timeout: 15000 }).catch(() => {})
+  await page.waitForLoadState('networkidle', { timeout: 6000 }).catch(() => {})
+  // Espera o DOM PARAR de mudar: conteúdo async (ex.: delta de saldo do dashboard
+  // com placeholder/shimmer) altera a contagem de elementos conforme carrega.
+  // Capturar antes disso = contagem variável → falso diff. Poll até 2 leituras
+  // consecutivas terem a mesma contagem de descendentes do root.
+  if (root) {
+    await page.waitForFunction((r) => {
+      const el = document.querySelector(r)
+      if (!el) return false
+      const n = el.querySelectorAll('*').length
+      if (window.__cssfp_lastN === n) return true
+      window.__cssfp_lastN = n
+      return false
+    }, root, { timeout: 8000, polling: 450 }).catch(() => {})
+  }
   await page.waitForTimeout(500)
-  await page.evaluate(([e, p]) => {
-    const set = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set
-    const email = document.querySelector('input[type="email"]'); const pass = document.querySelector('input[type="password"]')
-    set.call(email, e); email.dispatchEvent(new Event('input', { bubbles: true }))
-    set.call(pass, p); pass.dispatchEvent(new Event('input', { bubbles: true }))
-    ;[...document.querySelectorAll('button')].find((b) => /entrar/i.test(b.textContent)).click()
-  }, [EMAIL, PASS])
-  await page.waitForTimeout(1500)
+}
+
+// Navega e garante a raiz. Sob carga do dev server, a 1ª navegação às vezes não
+// monta a raiz a tempo — recarrega 1x antes de desistir (mata a flakiness).
+async function gotoSettled(page, route, root) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await page.goto(`${BASE}${route}`, { waitUntil: 'domcontentloaded' })
+    await settle(page, root)
+    if (!root) return true
+    const found = await page.$(root)
+    if (found) return true
+  }
+  return false
 }
 
 async function capture(page, root, theme) {
@@ -137,8 +183,7 @@ async function run() {
   for (const vp of VIEWPORTS) {
     await page.setViewportSize({ width: vp.w, height: vp.h })
     for (const [route, root] of Object.entries(PAGE_ROOTS)) {
-      await page.goto(`${BASE}${route}`, { waitUntil: 'domcontentloaded' })
-      await page.waitForTimeout(900); await closeChat()
+      await gotoSettled(page, route, root); await closeChat()
       for (const theme of THEMES) {
         const key = `static|${route}|${vp.name}|${theme}`
         const res = await capture(page, root, theme)
@@ -150,9 +195,8 @@ async function run() {
   for (const vp of VIEWPORTS) {
     await page.setViewportSize({ width: vp.w, height: vp.h })
     for (const sc of STATE_SCENES) {
-      await page.goto(`${BASE}${sc.route}`, { waitUntil: 'domcontentloaded' })
-      await page.waitForTimeout(900); await closeChat()
-      try { await sc.open(page) } catch { /* gatilho ausente nesse vp */ }
+      await gotoSettled(page, sc.route, PAGE_ROOTS[sc.route]); await closeChat()
+      try { await sc.open(page); await page.waitForSelector(sc.root, { timeout: 6000 }).catch(() => {}) } catch { /* gatilho ausente nesse vp */ }
       for (const theme of THEMES) {
         const key = `state|${sc.id}|${vp.name}|${theme}`
         const res = await capture(page, sc.root, theme)
@@ -162,8 +206,7 @@ async function run() {
   }
   // Cena 4: hover
   for (const h of HOVER_TARGETS) {
-    await page.goto(`${BASE}${h.route}`, { waitUntil: 'domcontentloaded' })
-    await page.waitForTimeout(900); await closeChat()
+    await gotoSettled(page, h.route, h.root); await closeChat()
     try { await page.hover(h.sel, { timeout: 2000 }) } catch { /* ausente */ }
     for (const theme of THEMES) {
       const res = await capture(page, h.root, theme)
@@ -173,8 +216,7 @@ async function run() {
   // Cena 7+8: mídia emulada (dashboard)
   for (const m of MEDIA) {
     await page.emulateMedia(m.media ? { media: m.media } : { reducedMotion: m.reducedMotion })
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' })
-    await page.waitForTimeout(900); await closeChat()
+    await gotoSettled(page, '/dashboard', '.app-layout-shell'); await closeChat()
     const res = await capture(page, '.app-layout-shell', 'light')
     scenes[`media|${m.id}`] = res.error ? res : res.rows
   }

@@ -82,13 +82,26 @@ Credenciais só via env (o guard de segredos bloqueia hardcode). Cada cena roda
 falha (anti-teatro). O baseline (`fingerprint-baseline.json`) é gerado localmente e
 não versionado (depende de fontes/render do ambiente).
 
-## Estado atual (passo 1)
+## Estado atual (08-jun-2026 — runner end-to-end VERDE)
 
-- ✅ **Núcleo de captura validado ao vivo** (cenas 1, 2; auto-teste de quebra → diff=385; máscara de voláteis → 0).
-- ✅ **Cena 3 (modal aberto)** validada ao vivo (nova-tx: 69 els capturados).
-- ✅ **Cena 6 (erro de formulário)** validada ao vivo (nova-tx submetido vazio: 2 `:invalid`, quebra plantada em `:invalid` detectada). **A cena crítica da app financeira.**
-- ✅ **Runner automatizado** (`run.mjs`) cobrindo cenas 1-8 (estáticas, pseudo, modais, erro, hover, print, reduced-motion) — `addInitScript` + `selfTest` por cena + modos baseline/check.
-- ⏳ **Falta executar o runner end-to-end** (requer `npm i -D playwright`) e ajustar seletores de cena por página + adicionar cena 9 (`:has`). Cenas hover/focus/print/reduced-motion usam primitivas padrão do Playwright sobre o núcleo já validado.
+Pré-condição C1 **cumprida**: o runner roda ponta-a-ponta e prova estabilidade.
 
-**Próximo:** instalar playwright, rodar `--baseline` numa árvore limpa, e só então o
-**passo 3** (layerizar a base 00-12) com `--check` exigindo diff=0 em todas as cenas.
+- ✅ **62 cenas** capturadas (10 rotas × desktop/mobile × light/dark + 4 estados de modal/erro + hover + print/reduced-motion), **todas com `selfTest ok`** (anti-teatro) e **`--check` diff=0** numa árvore sem mudança de CSS. É a base sólida para o cutover do rebuild (`docs/plano-reconstrucao-css-2026-06.md`).
+- ✅ **playwright instalado** como devDep. Binário chromium via `npx playwright install chromium`.
+- ✅ **Login via API** (`POST /api/auth/login` → grava `horizonte_refresh_token`+`horizonte_user` no localStorage; o bootstrap do app reobtém o access token). Robusto ao fluxo multi-step da UI (AuthPhoneShell + webauthn) que travava o login por formulário.
+- ✅ **Determinismo resolvido** (3 correções no harness):
+  1. **Freeze global de animações** via stylesheet `*,*::before,*::after{animation:none!important;…}` — o `element.style` antigo **não** congelava pseudo-elementos (entrada animada de `dashboard-hub__date::before` gerava opacity/transform voláteis).
+  2. **Horizon Chat excluído** da captura (`[class*="horizon-chat|horizon-msg|horizon-suggestion"]`) — overlay de IA com tamanho/sombra/streaming não-determinísticos.
+  3. **DOM-settle** no `settle()` — espera a contagem de descendentes do root estabilizar antes de capturar (conteúdo async, ex.: delta de saldo do dashboard com placeholder/shimmer, mudava a contagem entre cargas). Mais `gotoSettled` com retry (recarrega 1× se a raiz não montar sob carga do dev server).
+- ✅ Rotas `/metas` e `/cartoes` adicionadas ao `PAGE_ROOTS`.
+- ⏳ Cena 9 (`:has()` / componentes globais por rota) ainda não automatizada (baixo risco — o rebuild mantém as classes BEM).
+
+**Como rodar** (dev stack limpo — vite 3010 / api 3001):
+```bash
+CSSFP_BASE=http://localhost:3010 CSSFP_EMAIL=<email> CSSFP_PASS=<senha> \
+  node scripts/css-fingerprint/run.mjs --baseline   # antes de mexer no CSS
+# ...reescrever CSS...
+CSSFP_BASE=http://localhost:3010 CSSFP_EMAIL=<email> CSSFP_PASS=<senha> \
+  node scripts/css-fingerprint/run.mjs --check       # exit 1 se qualquer cena diff>0
+```
+`fingerprint-baseline.json` é local (gitignored — depende de fontes/render do ambiente).
