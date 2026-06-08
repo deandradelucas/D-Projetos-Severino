@@ -223,18 +223,35 @@
 .page-cartoes__modal--fatura { max-width: 500px; }
 .page-cartoes__modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 12px; }
 .page-cartoes__modal-title { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+/* Close do modal — AUTORIDADE ÚNICA aqui (cartoes.css é unlayered, vence os partials).
+   Mesmo padrão do metas: união das props próprias + as que o 35-close-btn fornecia
+   (min-width, min-height, padding, margin, display, box-shadow, transition). diff=0. */
 .page-cartoes__modal-close {
   width: 32px;
   height: 32px;
+  min-width: 36px;
+  min-height: 36px;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0;
   border: none;
   border-radius: 8px;
   background: transparent;
+  background-image: none;
   color: var(--text-muted);
   font-size: 1.5rem;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 2px 2px 4px var(--m-shadow-soft),
+    inset -1px -1px 2px var(--m-light);
   cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
-.page-cartoes__modal-close:hover { background: var(--bg-secondary); color: var(--text-primary); }
+.page-cartoes__modal-close:hover { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--m-accent); }
 .page-cartoes__modal-body { padding: 4px 20px 20px; display: flex; flex-direction: column; gap: 16px; }
 
 .page-cartoes__field { display: flex; flex-direction: column; gap: 7px; flex: 1; min-width: 0; }
