@@ -175,10 +175,6 @@ body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.a
   color: var(--text-secondary);
 }
 
-body[data-theme='dark'] .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
-  color: var(--text-secondary);
-}
-
 .page-transacoes.app-horizon-shell .page-transacoes-tx-meta {
   font-size: 0.8125rem;
   font-weight: 500;
@@ -289,15 +285,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   height: 18px;
 }
 
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .ref-panel__title {
-  color: var(--text-primary);
-  font-size: 0.9375rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.35;
-}
-
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .ref-panel__title {
+.page-transacoes.app-horizon-shell .page-transacoes-ref-filters .ref-panel__title {
   color: var(--text-primary);
   font-size: 0.9375rem;
   font-weight: 700;
@@ -370,16 +358,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   border-color: rgba(148, 163, 184, 0.3);
 }
 
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .filter-group label {
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  line-height: 1.3;
-}
-
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .filter-group label {
+.page-transacoes.app-horizon-shell .page-transacoes-ref-filters .filter-group label {
   color: var(--text-secondary);
   font-size: 0.75rem;
   font-weight: 600;
@@ -428,7 +407,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   margin-bottom: 8px;
 }
 
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-panel-head__titles .ref-panel__title {
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-panel-head__titles .ref-panel__title {
   color: var(--text-primary);
   font-size: 1.0625rem;
   font-weight: 700;
@@ -436,23 +415,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
   line-height: 1.3;
 }
 
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-panel-head__titles .ref-panel__title {
-  color: var(--text-primary);
-  font-size: 1.0625rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.3;
-}
-
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-filter-hint {
-  color: var(--text-secondary);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  line-height: 1.45;
-  letter-spacing: 0.01em;
-}
-
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-filter-hint {
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-filter-hint {
   color: var(--text-secondary);
   font-size: 0.8125rem;
   font-weight: 500;
