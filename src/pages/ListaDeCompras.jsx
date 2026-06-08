@@ -6,7 +6,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
-import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
+import { redirectSe401, redirectAssinaturaExpiradaSe403, redirectSeAuthBloqueada } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
 import ConfirmDialog from '../components/ConfirmDialog'
 import {
@@ -89,7 +89,7 @@ export default function ListaDeCompras() {
       const res = await apiFetch(apiUrl(`/api/lista-compras${pp}`), {
         cache: 'no-store',
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) return
       const data = await res.json()
       setListas(data)
@@ -125,7 +125,7 @@ export default function ListaDeCompras() {
       const res = await apiFetch(apiUrl(`/api/lista-compras/${listaId}/itens${pp}`), {
         cache: 'no-store',
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) return
       const data = await res.json()
       setItens(data)
@@ -262,7 +262,7 @@ export default function ListaDeCompras() {
           prazo: prazo || null,
         }),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao adicionar item.', 'error')
@@ -324,7 +324,7 @@ export default function ListaDeCompras() {
           prazo: prazo || null,
         }),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao salvar alterações.', 'error')
@@ -357,7 +357,7 @@ export default function ListaDeCompras() {
         method: 'POST',
         cache: 'no-store',
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) {
         // Reverter em caso de erro
         setItens((prev) => prev.map((i) =>
@@ -389,7 +389,7 @@ export default function ListaDeCompras() {
         method: 'DELETE',
         cache: 'no-store',
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) {
         // Recarregar se falhou
         carregarItens(listaAtiva, pessoalParam)
@@ -411,7 +411,7 @@ export default function ListaDeCompras() {
         method: 'DELETE',
         cache: 'no-store',
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao arquivar.', 'error')
@@ -445,7 +445,7 @@ export default function ListaDeCompras() {
         method: 'DELETE',
         cache: 'no-store',
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao excluir.', 'error')
@@ -551,7 +551,7 @@ export default function ListaDeCompras() {
         cache: 'no-store',
         body: JSON.stringify({ unidades: novo }),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) carregarItens(listaAtiva, pessoalParam)
     } catch {
       carregarItens(listaAtiva, pessoalParam)
@@ -573,7 +573,7 @@ export default function ListaDeCompras() {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' }, cache: 'no-store',
         body: JSON.stringify({ nome }),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) { showToast('Erro ao renomear.', 'error'); return }
       const atualizada = await res.json().catch(() => ({}))
       setListas((prev) => prev.map((l) => (l.id === listaAtiva ? { ...l, nome: atualizada?.nome || nome } : l)))
@@ -594,7 +594,7 @@ export default function ListaDeCompras() {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' }, cache: 'no-store',
         body: JSON.stringify({ orcamento: valor }),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) { showToast('Erro ao definir orçamento.', 'error'); return }
       const atualizada = await res.json().catch(() => ({}))
       setListas((prev) => prev.map((l) => (l.id === listaAtiva ? { ...l, orcamento: atualizada?.orcamento ?? valor } : l)))
@@ -616,7 +616,7 @@ export default function ListaDeCompras() {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' }, cache: 'no-store',
         body: JSON.stringify({ recorrencia: r }),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) { showToast('Erro ao definir recorrência.', 'error'); return }
       const atualizada = await res.json().catch(() => ({}))
       setListas((prev) => prev.map((l) => (l.id === listaAtiva

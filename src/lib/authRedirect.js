@@ -13,3 +13,13 @@ export function redirectAssinaturaExpiradaSe403(res) {
   window.location.replace('/trial-expirado')
   return true
 }
+
+/**
+ * Guard combinado de autenticação: trata 401 (sessão expirada -> login) e
+ * 403 (assinatura expirada -> trial-expirado). Retorna true se redirecionou
+ * (o chamador deve abortar o fluxo). Substitui o padrão repetido
+ * `redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)`.
+ */
+export function redirectSeAuthBloqueada(res) {
+  return redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)
+}

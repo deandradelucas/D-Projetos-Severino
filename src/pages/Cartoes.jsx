@@ -9,7 +9,7 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
-import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
+import { redirectSeAuthBloqueada } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../lib/currencyMaskBr'
@@ -415,7 +415,7 @@ export default function Cartoes() {
     setLoading(true)
     try {
       const res = await apiFetch(apiUrl(`/api/cartoes${pp}`), { cache: 'no-store' })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) throw new Error('Não foi possível carregar os cartões.')
       const data = await res.json()
       setCartoes(Array.isArray(data) ? data : [])
@@ -445,7 +445,7 @@ export default function Cartoes() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || 'Erro ao salvar cartão.') }
       setModalCartao(false); setCartaoEdit(null)
       showToast(cartaoEdit ? 'Cartão atualizado.' : 'Cartão criado!', 'success')
@@ -461,7 +461,7 @@ export default function Cartoes() {
     if (!excluirTarget) return
     try {
       const res = await apiFetch(apiUrl(`/api/cartoes/${excluirTarget.id}${pessoalParam}`), { method: 'DELETE' })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) throw new Error('Erro ao excluir cartão.')
       setExcluirTarget(null)
       showToast('Cartão excluído.', 'success')

@@ -9,7 +9,7 @@ import {
 } from '../../lib/listaCompras'
 import { apiUrl } from '../../lib/apiUrl'
 import { apiFetch } from '../../lib/apiFetch'
-import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../../lib/authRedirect'
+import { redirectSeAuthBloqueada } from '../../lib/authRedirect'
 import { showToast } from '../../lib/toastStore'
 
 // Modais da página de Listas (Compras / Tarefas) — extraídos de pages/ListaDeCompras.jsx.
@@ -55,7 +55,7 @@ export function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
           orcamento: tipo === 'compras' && orcamentoCentavos > 0 ? orcamentoCentavos / 100 : null,
         }),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao criar lista.', 'error')
@@ -181,7 +181,7 @@ export function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
     ;(async () => {
       try {
         const res = await apiFetch(apiUrl('/api/categorias'))
-        if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+        if (redirectSeAuthBloqueada(res)) return
         if (!res.ok) return
         const data = await res.json()
         if (cancelled) return
@@ -244,7 +244,7 @@ export function ModalRegistrarGasto({ lista, total, onClose, onRegistrado }) {
         cache: 'no-store',
         body: JSON.stringify(body),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         showToast(err.message || 'Erro ao registrar gasto.', 'error')

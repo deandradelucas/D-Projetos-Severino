@@ -8,7 +8,7 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
-import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
+import { redirectSeAuthBloqueada } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../lib/currencyMaskBr'
@@ -297,7 +297,7 @@ export default function Metas() {
     setLoading(true)
     try {
       const res = await apiFetch(apiUrl(`/api/metas${pp}`), { cache: 'no-store' })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) throw new Error('Não foi possível carregar as metas.')
       const data = await res.json()
       setMetas(Array.isArray(data) ? data : [])
@@ -333,7 +333,7 @@ export default function Metas() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || 'Erro ao salvar meta.') }
       setModalMeta(false); setMetaEdit(null)
       showToast(metaEdit ? 'Meta atualizada.' : 'Meta criada!', 'success')
@@ -354,7 +354,7 @@ export default function Metas() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ valor }),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || 'Erro ao registrar valor.') }
       const atualizada = await res.json()
       if (atualizada?.concluida_em) showToast('🎉 Meta concluída! Parabéns!', 'success')
@@ -371,7 +371,7 @@ export default function Metas() {
     if (!excluirTarget) return
     try {
       const res = await apiFetch(apiUrl(`/api/metas/${excluirTarget.id}${pessoalParam}`), { method: 'DELETE' })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) throw new Error('Erro ao excluir meta.')
       setExcluirTarget(null)
       showToast('Meta excluída.', 'success')

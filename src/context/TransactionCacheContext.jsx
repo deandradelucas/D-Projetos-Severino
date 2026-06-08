@@ -16,7 +16,7 @@ import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
-import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
+import { redirectSeAuthBloqueada } from '../lib/authRedirect'
 import { readHorizonteUser } from '../lib/horizonteSession'
 import { TransactionCacheContext, TRANSACOES_REVALIDATED_EVENT } from './transactionCacheStore'
 
@@ -68,7 +68,7 @@ export function TransactionCacheProvider({ children }) {
         { fetchImpl: apiFetch },
       )
 
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
 
       if (res.ok) {
         const data = await res.json()

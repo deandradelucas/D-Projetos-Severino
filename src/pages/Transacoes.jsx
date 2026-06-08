@@ -16,7 +16,8 @@ import {
   horizonteUserProfileTemId,
   subscribeHorizonteSessionRefresh,
 } from '../lib/horizonteSession'
-import { redirectSe401, redirectAssinaturaExpiradaSe403 } from '../lib/authRedirect'
+import { redirectSeAuthBloqueada } from '../lib/authRedirect'
+import { fetchCategorias as fetchCategoriasApi } from '../lib/apiCategorias'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
@@ -104,17 +105,8 @@ export default function Transacoes() {
   const fetchCategorias = useCallback(async () => {
     const session = readHorizonteUser()
     if (!session?.id) return
-    try {
-      const res = await apiFetch(apiUrl('/api/categorias'), {
-      })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
-      if (res.ok) {
-        const data = await res.json()
-        setCategorias(data || [])
-      }
-    } catch (err) {
-      console.error('[Transacoes] fetchCategorias:', err)
-    }
+    const data = await fetchCategoriasApi()
+    if (data) setCategorias(data)
   }, [])
 
   const fetchRecorrencias = useCallback(async () => {
@@ -123,7 +115,7 @@ export default function Transacoes() {
     try {
       const res = await apiFetch(apiUrl('/api/recorrencias-mensais'), {
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (res.ok) {
         const data = await res.json()
         setRecorrencias(Array.isArray(data) ? data : [])
@@ -169,7 +161,7 @@ export default function Transacoes() {
         { cache: 'no-store' },
         { fetchImpl: apiFetch },
       )
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (res.ok) {
         const data = await res.json()
         const rows = Array.isArray(data) ? data : []
@@ -200,7 +192,7 @@ export default function Transacoes() {
         { cache: 'no-store' },
         { fetchImpl: apiFetch },
       )
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (res.ok) {
         const data = await res.json()
         const rows = Array.isArray(data) ? data : []
@@ -357,7 +349,7 @@ export default function Transacoes() {
       const res = await apiFetch(apiUrl(`/api/recorrencias-mensais/${id}`), {
         method: 'DELETE',
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (res.ok) fetchRecorrencias()
     } catch (err) {
       console.error('[Transacoes] encerrarRecorrencia:', err)
@@ -389,7 +381,7 @@ export default function Transacoes() {
       const res = await apiFetch(apiUrl(`/api/transacoes/${id}`), {
         method: 'DELETE',
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (res.ok) {
         syncGlobalCache({ silent: true })
       } else {
@@ -412,7 +404,7 @@ export default function Transacoes() {
       const res = await apiFetch(apiUrl(`/api/transacoes/grupo/${grupoId}`), {
         method: 'DELETE',
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (res.ok) {
         syncGlobalCache({ silent: true })
       } else {
@@ -517,7 +509,7 @@ export default function Transacoes() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'PAGO' }),
       })
-      if (redirectSe401(res) || redirectAssinaturaExpiradaSe403(res)) return
+      if (redirectSeAuthBloqueada(res)) return
       if (res.ok) syncGlobalCache({ silent: true })
       else fetchTransacoes()
     } catch (err) {

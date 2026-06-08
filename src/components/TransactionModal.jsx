@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
+import { fetchCategorias as fetchCategoriasApi } from '../lib/apiCategorias'
 import CategorySelector from './transaction/CategorySelector'
 import DatePickerBrPopover from './investimentos/DatePickerBrPopover'
 import { ymdToDdMmYyyy, todayYmdLocal } from '../lib/dateInputBr'
@@ -50,15 +51,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   const fetchCategorias = useCallback(async () => {
     setLoadingCats(true)
     try {
-      const res = await apiFetch(apiUrl('/api/categorias'), {
-        cache: 'no-store',
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setCategorias(data || [])
-      }
-    } catch {
-      // Erros de rede não são fatais — modal permanece funcional
+      const data = await fetchCategoriasApi()
+      if (data) setCategorias(data)
     } finally {
       setLoadingCats(false)
     }

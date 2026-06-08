@@ -6,6 +6,7 @@ import { useTheme } from '../context/ThemeContext'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
 import { redirectSe401 } from '../lib/authRedirect'
+import { fetchCategorias as fetchCategoriasApi } from '../lib/apiCategorias'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { useRelatorioAggregates, computeRelatorioAggregates } from '../hooks/useRelatorioAggregates'
@@ -103,15 +104,8 @@ export default function Relatorios() {
   const [timelineLoading, setTimelineLoading] = useState(true)
 
   const fetchCategorias = useCallback(async () => {
-    try {
-      const res = await apiFetch(apiUrl('/api/categorias'), {
-      })
-      if (redirectSe401(res)) return
-      if (res.ok) {
-        const data = await res.json()
-        setCategorias(data || [])
-      }
-    } catch (err) { console.error('[Relatorios] fetchCategorias:', err) }
+    const data = await fetchCategoriasApi()
+    if (data) setCategorias(data)
   }, [])
 
   // R3 — limites mensais por categoria (Orçado vs Real)
