@@ -3,7 +3,7 @@
    utilities) para reproduzir os partials unlayered da 1.0.3, e acima de `base`
    para o preflight do Tailwind PERDER dos partials. As layers semânticas da
    migração invertiam precedência (genérico vencendo específico de página). */
-@layer theme, base, components, utilities, app;
+@layer theme, base, components, utilities, app, app-top;
 @import "tailwindcss";
 
 @theme {

@@ -47,5 +47,5 @@
 @import './dashboard/partials/17-investimentos-neumorphic-desktop.css' layer(app);
 @import './dashboard/partials/35-close-btn-standard.css' layer(app);
 @import './dashboard/partials/36-fab-standard.css' layer(app);
-@import './dashboard/partials/37-relatorios-editorial.css' layer(app);
-@import './dashboard/partials/38-page-titles-uniform.css' layer(app);
+@import './dashboard/partials/37-relatorios-editorial.css' layer(app-top);
+@import './dashboard/partials/38-page-titles-uniform.css' layer(app-top);
