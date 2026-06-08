@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { useVirtualizer } from '@tanstack/react-virtual'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import TransactionModal from '../components/TransactionModal'
@@ -223,16 +222,6 @@ export default function Transacoes() {
     return () => mq.removeEventListener('change', sync)
   }, [])
 
-  // Virtualizador desativado: tanto desktop quanto mobile agora renderizam a
-  // lista agrupada por dia (transacoesPorDia) com divisores + totais do dia.
-  const virtualizer = useVirtualizer({
-    count: 0,
-    getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => 172,
-    gap: 14,
-    overscan: 5,
-  })
-
   // Reset de estado ao trocar de usuário
   useEffect(() => {
     firstFetchDoneRef.current = false
@@ -259,27 +248,6 @@ export default function Transacoes() {
     const t = setTimeout(() => void fetchTransacoesRef.current?.(), 400)
     return () => clearTimeout(t)
   }, [filters])
-
-  // Infinite scroll (mobile virtualizado): carrega mais quando último item virtual fica visível
-  const virtualItems = virtualizer.getVirtualItems()
-  const lastVirtualIndex = virtualItems[virtualItems.length - 1]?.index ?? -1
-  useEffect(() => {
-    if (useDesktopTxGrid) return
-    if (
-      lastVirtualIndex >= transacoes.length - 1 &&
-      hasMore &&
-      !loadingMore &&
-      !loading &&
-      !refreshing
-    ) {
-      void loadMoreTransacoes()
-    }
-  // loadMoreTransacoes é omitido de propósito: suas deps internas (loading,
-  // refreshing, loadingMore, hasMore, transacoes.length, buildTxQuery) já
-  // disparam o efeito por outras vias. Adicioná-lo ao array criaria um trigger
-  // duplicado a cada recomposição do useCallback, sem mudança de comportamento.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [useDesktopTxGrid, lastVirtualIndex, hasMore, loadingMore, loading, refreshing, transacoes.length])
 
   // Infinite scroll (desktop + mobile — lista agrupada com sentinela no rodapé)
   useEffect(() => {

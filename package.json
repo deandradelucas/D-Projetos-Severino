@@ -42,7 +42,6 @@
     "@simplewebauthn/browser": "^13.3.0",
     "@simplewebauthn/server": "^13.3.0",
     "@supabase/supabase-js": "^2.106.2",
-    "@tanstack/react-virtual": "^3.13.24",
     "bcryptjs": "^3.0.3",
     "dompurify": "^3.4.3",
     "hono": "^4.12.23",
