@@ -290,7 +290,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .ref-panel__title {
-  color: #0f172a;
+  color: var(--text-primary);
   font-size: 0.9375rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -298,7 +298,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters .ref-panel__title {
-  color: #f8fafc;
+  color: var(--text-primary);
   font-size: 0.9375rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -365,7 +365,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-filters button.ref-panel__link--button:hover {
-  color: #f1f5f9;
+  color: var(--text-primary);
   background: rgba(148, 163, 184, 0.08);
   border-color: rgba(148, 163, 184, 0.3);
 }
@@ -429,7 +429,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
 }
 
 body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-panel-head__titles .ref-panel__title {
-  color: #0f172a;
+  color: var(--text-primary);
   font-size: 1.0625rem;
   font-weight: 700;
   letter-spacing: -0.025em;
@@ -437,7 +437,7 @@ body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref
 }
 
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .page-transacoes-tx-panel-head__titles .ref-panel__title {
-  color: #f8fafc;
+  color: var(--text-primary);
   font-size: 1.0625rem;
   font-weight: 700;
   letter-spacing: -0.025em;
@@ -1560,11 +1560,11 @@ body[data-theme='dark'] .page-transacoes-parcelado-grupo--open {
 }
 
 body[data-theme='dark'] .page-transacoes-parcelado-grupo__desc {
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 body[data-theme='dark'] .page-transacoes-parcelado-parcela__valor {
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 body[data-theme='dark'] .page-transacoes-parcelados-footer {
@@ -1814,7 +1814,7 @@ body[data-theme='dark'] .modal-header {
 }
 
 body[data-theme='dark'] .modal-header h2 {
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 body[data-theme='dark'] .import-subtitle,
@@ -1826,7 +1826,7 @@ body[data-theme='dark'] .import-file-size {
 body[data-theme='dark'] .import-file-selected,
 body[data-theme='dark'] .import-result-lines p,
 body[data-theme='dark'] .import-bank-name {
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 body[data-theme='dark'] .import-bank-detected {
