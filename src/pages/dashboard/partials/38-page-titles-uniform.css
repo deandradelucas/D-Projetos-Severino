@@ -29,6 +29,22 @@
     line-height: var(--page-title-line);
   }
 
+  /* Agenda no light mode: o título "Agenda" ficava branco sobre o hero claro
+     (regressão da migração @layer — 05-dark-shell, layer theme-dark, define
+     color:#fff incondicional e passou a vencer as regras light de 06/18, que
+     estão em layers inferiores). A layer `semantic` está acima de theme-dark,
+     então este override restaura o texto escuro no claro. Dark mode = branco. */
+  body[data-theme='light'] .dashboard-container.agenda-page .agenda-hero__title-row > strong {
+    color: #0f172a;
+  }
+  /* mesma regressão atingiu os stats (Hoje/Semana) do hero da Agenda no claro */
+  body[data-theme='light'] .dashboard-container.agenda-page .agenda-hero__stat > span {
+    color: rgba(15, 23, 42, 0.48);
+  }
+  body[data-theme='light'] .dashboard-container.agenda-page .agenda-hero__stat > strong {
+    color: #0b0b0b;
+  }
+
   /* ── CTA primário do hub — fonte ÚNICA e limpa (migração @layer 1.0.4).
      Spec da 1.0.3: pílula dourada (var(--hub-accent)), texto #111. Sem !important:
      vence por estar na layer `semantic` (acima de skin/base); o theme-dark deixou
@@ -53,4 +69,41 @@
   .dashboard-container .dashboard-hub__btn--primary:hover {
     background: var(--hub-accent-hover, var(--hub-accent, #c4a052));
     filter: brightness(1.05);
+  }
+
+  /* ── Cabeçalho mobile empilhado (padrão Relatórios) ──────────────────────────
+     No mobile o hambúrguer + título + ações dividiam a MESMA linha apertada,
+     forçando o título a quebrar ("Investi/mentos"). Replicamos o layout que a
+     página de Relatórios já usa e que o CEO aprovou: hambúrguer sozinho no topo,
+     o NOME da página como título solto em linha própria (largura total, sem
+     quebra), e as ações numa linha abaixo.
+
+     Escopo: `[class*="page-"]` casa page-transacoes/investimentos/cartoes/metas/
+     configuracoes/pagamento (e lista). NÃO casa `dashboard-page` nem `agenda-page`
+     (sem o hífen após "page"), então o Dashboard fica de fora — como pedido.
+     Relatórios já tem o seu próprio bloco responsivo → excluído com :not().
+     ────────────────────────────────────────────────────────────────────────── */
+  @media (max-width: 560px) {
+    .dashboard-container[class*="page-"]:not(.page-relatorios) .dashboard-hub__hero-row {
+      flex-wrap: wrap;
+      align-items: center;
+      row-gap: 14px;
+    }
+    .dashboard-container[class*="page-"]:not(.page-relatorios) .dashboard-hub__hero-row > .mobile-menu-btn {
+      order: 1;
+    }
+    /* título solto: linha própria, largura total → nunca quebra */
+    .dashboard-container[class*="page-"]:not(.page-relatorios) .dashboard-hub__hero-row > .dashboard-hub__hero-text {
+      order: 3;
+      flex: 1 1 100%;
+      min-width: 0;
+      align-items: flex-start;
+      justify-content: flex-start;
+      text-align: left;
+    }
+    /* ações na última linha */
+    .dashboard-container[class*="page-"]:not(.page-relatorios) .dashboard-hub__hero-row > .dashboard-hub__hero-actions {
+      order: 4;
+      flex: 1 1 100%;
+    }
   }
