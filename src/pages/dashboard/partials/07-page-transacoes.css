@@ -802,11 +802,7 @@ body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-
   backdrop-filter: none;
 }
 
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-skeleton-stack {
-  gap: 10px;
-}
-
-body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-skeleton-stack {
+.page-transacoes.app-horizon-shell .page-transacoes-ref-table .ref-tx-skeleton-stack {
   gap: 10px;
 }
 
