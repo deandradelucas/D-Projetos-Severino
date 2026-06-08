@@ -308,10 +308,9 @@
 
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--positive { color: var(--neu-pos); text-shadow: 0 0 32px var(--neu-pos-glow); }
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--negative { color: var(--neu-neg); text-shadow: 0 0 32px var(--neu-neg-glow); }
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--zero { color: var(--neu-text-hi); }
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--positive { color: var(--neu-pos); }
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--negative { color: var(--neu-neg); }
-  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--zero { color: var(--neu-text-hi); }
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--zero { color: var(--neu-text-hi); }
 
   /* Delta placeholder (shimmer pill ao lado do saldo) */
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-delta--placeholder,
@@ -467,16 +466,10 @@
       inset -1px -1px 1px var(--neu-edge-lo);
   }
 
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--expense {
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--expense {
     animation: neuCardReveal 600ms var(--neu-stagger-1) var(--neu-ease) both;
   }
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--income {
-    animation: neuCardReveal 600ms var(--neu-stagger-2) var(--neu-ease) both;
-  }
-  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--expense {
-    animation: neuCardReveal 600ms var(--neu-stagger-1) var(--neu-ease) both;
-  }
-  body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--income {
+  .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .ref-dashboard-kpi-strip .ref-kpi-card--income {
     animation: neuCardReveal 600ms var(--neu-stagger-2) var(--neu-ease) both;
   }
 

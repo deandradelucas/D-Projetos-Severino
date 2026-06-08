@@ -152,10 +152,9 @@
   }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive { color: var(--rel-pos); text-shadow: 0 0 28px var(--rel-pos-glow); }
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative { color: var(--rel-neg); text-shadow: 0 0 28px var(--rel-neg-glow); }
-  body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero { color: var(--rel-text-hi); }
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--positive { color: var(--rel-pos); }
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative { color: var(--rel-neg); }
-  body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero { color: var(--rel-text-hi); }
+  .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero { color: var(--rel-text-hi); }
 
   /* B4 — Botões CSV e PDF neumórficos */
 
@@ -418,16 +417,7 @@
       8px 8px 20px var(--rel-shadow-soft),
       -4px -4px 12px var(--rel-light);
   }
-  body[data-theme='dark'] .page-relatorios .relatorios-tooltip__label {
-    color: var(--rel-text-lo);
-    font-family: 'Inter Variable', system-ui, sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 4px;
-  }
-  body[data-theme='light'] .page-relatorios .relatorios-tooltip__label {
+  .page-relatorios .relatorios-tooltip__label {
     color: var(--rel-text-lo);
     font-family: 'Inter Variable', system-ui, sans-serif;
     font-size: 0.75rem;
@@ -444,10 +434,7 @@
     font-variant-numeric: tabular-nums;
     color: var(--rel-text-hi);
   }
-  body[data-theme='dark'] .page-relatorios .relatorios-tooltip__pct {
-    color: var(--rel-text-lo);
-  }
-  body[data-theme='light'] .page-relatorios .relatorios-tooltip__pct {
+  .page-relatorios .relatorios-tooltip__pct {
     color: var(--rel-text-lo);
   }
 
