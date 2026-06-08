@@ -145,15 +145,28 @@ Ordem por risco/uso (mais usada primeiro, para validar o vocabulário cedo):
 
 ---
 
-## 4. Critérios de sucesso (Definition of Done)
-- Linhas de CSS: 48.399 → **alvo 6.000–9.000** (−80%).
+## 4. Critérios de sucesso (Definition of Done) — RECALIBRADO 08-jun
+
+> **Recalibração (decisão CEO):** "arquitetura primeiro, pixel-fiel travado". A Fase 1
+> provou que os 3 dark files são **~90% design dark genuíno** (gradientes/sombras/surfaces
+> bespoke), NÃO código morto — pixel-fiel impede deletá-los. Eles são **eliminados por
+> co-localização** (dobrar cada regra dark no arquivo do componente), o que **realoca**
+> linhas em vez de apagá-las. Logo a meta −80% era irreal. Objetivo real = **qualidade
+> arquitetural a diff=0**, com redução de linhas modesta (~30-45%).
+
+- **Visual: pixel-fiel** à referência da Fase 0 (fingerprint diff=0 em todas as cenas) — **inegociável**.
 - `!important`: 32 → **0**.
-- Arquivos CSS: 60 → **~25** organizados por ITCSS.
-- 3 dark files: **deletados** (dark = swap de token).
-- Cores hardcoded fora de `tokens/`: **0**.
-- Visual: pixel-fiel à referência da Fase 0 (todas as rotas × 2 temas × desktop+mobile × estados).
-- `npm run ci` verde (test:unit + lint + build + audits).
-- Zero regressão funcional (modais, forms, swipe, FAB, calendário, pull-to-refresh).
+- **file = authority**: cada componente com suas regras (light+dark) num só lugar; fim da duplicação base/skin/mobile/dark.
+- **3 dark files eliminados por co-localização** (regras dobradas nos componentes; dark = `body[data-theme=dark]` co-locado ou swap de token).
+- `@layer` semântico limpo (reset/tokens/base/layout/components/pages/utilities) — viável por componente após consolidar sua autoridade.
+- Cores: gold/semânticas invariantes via token; bespoke (paletas de feature, sombras) permanecem literais documentadas.
+- Linhas de CSS: redução **~30-45%** (consequência, não meta).
+- `npm run ci` verde; zero regressão funcional.
+
+### Mecânica convergente (descoberta na Fase 1)
+"Deletar dark files", "dedup de partials" e "consolidar componentes" são **o mesmo trabalho**:
+consolidação **por-componente** que puxa a regra dark junto. Loop por componente:
+juntar regras espalhadas (base+skin+mobile+dark) num arquivo → `--check` diff=0 → commit.
 
 ## 5. Riscos e mitigação
 | Risco | Mitigação |
