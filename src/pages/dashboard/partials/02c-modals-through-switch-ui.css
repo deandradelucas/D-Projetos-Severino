@@ -1418,11 +1418,7 @@ body[data-theme='light'] .page-relatorios.app-horizon-shell .page-relatorios-ref
   padding-top: 4px;
 }
 
-body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table {
-  min-height: 0;
-  flex: 1 1 auto;
-}
-
+body[data-theme='light'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table,
 body[data-theme='dark'] .page-transacoes.app-horizon-shell .page-transacoes-ref-table {
   min-height: 0;
   flex: 1 1 auto;

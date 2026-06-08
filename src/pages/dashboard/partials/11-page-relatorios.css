@@ -89,7 +89,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line,
+body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
   color: var(--text-secondary);
 }
 
@@ -105,11 +106,8 @@ body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-
   color: #dc2626;
 }
 
-body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
-  color: var(--text-secondary);
-}
-
-body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line {
+body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero,
+body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
   color: var(--text-secondary);
 }
 
@@ -119,10 +117,6 @@ body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-h
 
 body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--negative {
   color: #f87171;
-}
-
-body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line strong.dashboard-hub__balance-value--zero {
-  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {

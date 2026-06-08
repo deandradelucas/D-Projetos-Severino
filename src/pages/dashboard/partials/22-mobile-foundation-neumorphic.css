@@ -146,9 +146,9 @@ body[data-theme='light'] {
     font-weight: 700; font-size: clamp(2rem, 9vw, 2.75rem); line-height: 1.05;
     letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
   }
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--positive { color: var(--m-pos); }
-  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--negative { color: var(--m-neg); }
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--positive,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--positive { color: var(--m-pos); }
+  body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--negative,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-line--hero strong.dashboard-hub__balance-value--negative { color: var(--m-neg); }
   body[data-theme='dark'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-delta--placeholder,
   body[data-theme='light'] .dashboard-container.dashboard-page.ref-dashboard.app-horizon-shell .dashboard-hub__balance-delta--placeholder {

@@ -642,11 +642,7 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-me
   gap: clamp(5px, 0.45vw + 4px, 8px);
 }
 
-body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:first-child {
-  margin-top: 0;
-  padding-top: 0;
-}
-
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:first-child,
 body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:first-child {
   margin-top: 0;
   padding-top: 0;

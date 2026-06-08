@@ -196,7 +196,8 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
     0 12px 28px -18px rgba(0, 0, 0, 0.55);
 }
 
-body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg {
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg,
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg {
   color: var(--shell-nav-nova-gold);
 }
 
@@ -301,10 +302,6 @@ body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-it
 body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
   background: var(--shell-nav-nova-gold-soft);
   border-color: var(--shell-nav-nova-gold-icon-border);
-  color: var(--shell-nav-nova-gold);
-}
-
-body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg {
   color: var(--shell-nav-nova-gold);
 }
 
