@@ -50,7 +50,7 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.app-horizon-shell {
 }
 
 /* "+ Nova transação": mesmo visual em qualquer largura (dourado, texto escuro, pill, Poppins) */
-.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+.dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn.dashboard-hub__btn--primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -71,13 +71,13 @@ body[data-theme='dark'] .dashboard-container.page-transacoes.app-horizon-shell {
   white-space: nowrap;
 }
 
-.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:hover {
+.dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn.dashboard-hub__btn--primary:hover {
   background: var(--tx-nova-btn-bg-hover);
   color: var(--tx-nova-btn-fg);
   border-color: var(--tx-nova-btn-border);
 }
 
-.dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary:focus-visible {
+.dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn.dashboard-hub__btn--primary:focus-visible {
   outline: none;
   box-shadow:
     var(--tx-nova-btn-shadow),
@@ -155,7 +155,7 @@ body[data-theme='dark']:has(.dashboard-container.page-transacoes.ref-dashboard.a
 
 /* Mobile: FAB fixo substitui o «+ Nova transação» no hero (evita duplicar; 07 usa inline-flex !important acima) */
 @media (max-width: 768px) {
-  .dashboard-container.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn--primary {
+  .dashboard-container.dashboard-page.page-transacoes.ref-dashboard.app-horizon-shell .dashboard-hub__btn.dashboard-hub__btn--primary {
     display: none;
   }
 }

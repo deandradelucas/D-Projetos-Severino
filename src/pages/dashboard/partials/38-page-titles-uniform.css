@@ -45,10 +45,10 @@
     color: #0b0b0b;
   }
 
-  /* ── CTA primário do hub: a regra canônica vive UNLAYERED em src/index.css
-     (precisa vencer o preflight do Tailwind `button{font:inherit}`, que com o
-     @tailwindcss/vite acaba acima de qualquer @layer e senão herda 17px/400).
-     Mantido aqui só este ponteiro. ── */
+  /* ── CTA primário do hub: regido pelos próprios partials por página (07b dourado
+     no Dashboard/Cartões/Metas/…, 07 dourado em Transações, 09 transparente em
+     Investimentos) na layer `app`. O preflight perde porque `app` está acima de
+     `base` e o `button{font:inherit}` do index.css virou `font-family:inherit`. ── */
 
   /* ── Cabeçalho mobile empilhado (padrão Relatórios) ──────────────────────────
      No mobile o hambúrguer + título + ações dividiam a MESMA linha apertada,
