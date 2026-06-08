@@ -720,7 +720,7 @@ body[data-theme='dark'] .page-lista-compras__novo-item-fab__icon {
 }
 
 body[data-theme='dark'] .page-lista-compras__novo-item-fab__label {
-  background: linear-gradient(185deg, #f0deaa 0%, #d4a84b 45%, #b58d3d 100%);
+  background: linear-gradient(185deg, #f0deaa 0%, var(--accent) 45%, #b58d3d 100%);
   -webkit-background-clip: text;
   background-clip: text;
 }
@@ -1746,7 +1746,7 @@ body[data-theme='dark'] .page-lista-compras__footer .page-lista-compras__novo-it
   transition: border-color 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
 }
 .page-lista-compras__tipo-btn--active {
-  border-color: #d4a84b;
+  border-color: var(--accent);
   background: rgba(212, 168, 75, 0.14);
   color: #b45309;
   box-shadow: 0 0 0 1px rgba(212, 168, 75, 0.45);
@@ -1763,7 +1763,7 @@ body[data-theme='dark'] .page-lista-compras__tipo-btn {
   color: rgba(255, 255, 255, 0.6);
 }
 body[data-theme='dark'] .page-lista-compras__tipo-btn--active {
-  border-color: #d4a84b;
+  border-color: var(--accent);
   background: rgba(212, 168, 75, 0.18);
   color: #e4bc6a;
 }
@@ -1789,7 +1789,7 @@ body[data-theme='dark'] .page-lista-compras__tipo-btn--active {
   transition: border-color 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
 }
 .page-lista-compras__recorrencia-opt--active {
-  border-color: #d4a84b;
+  border-color: var(--accent);
   background: rgba(212, 168, 75, 0.14);
   color: #b45309;
   box-shadow: 0 0 0 1px rgba(212, 168, 75, 0.45);
@@ -1800,7 +1800,7 @@ body[data-theme='dark'] .page-lista-compras__recorrencia-opt {
   color: rgba(255, 255, 255, 0.6);
 }
 body[data-theme='dark'] .page-lista-compras__recorrencia-opt--active {
-  border-color: #d4a84b;
+  border-color: var(--accent);
   background: rgba(212, 168, 75, 0.18);
   color: #e4bc6a;
 }

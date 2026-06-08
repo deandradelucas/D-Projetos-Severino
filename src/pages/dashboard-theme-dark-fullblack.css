@@ -364,11 +364,11 @@ body[data-theme='dark'] .modal-content--nova-tx .form-group--recorrencia-on labe
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__iconWrap {
   background: rgba(212, 168, 75, 0.16);
-  color: #d4a84b;
+  color: var(--accent);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .modal-recorrencia-toggle-row__checkbox {
-  accent-color: #d4a84b;
+  accent-color: var(--accent);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row {
@@ -394,11 +394,11 @@ body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row__input--date {
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .rec-vezes-row .modal-recorrencia-toggle-row__checkbox {
-  accent-color: #d4a84b;
+  accent-color: var(--accent);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview {
-  color: #d4a84b;
+  color: var(--accent);
 }
 
 body[data-theme='dark'] .modal-content--nova-tx .parcelamento-preview.parcelamento-preview--hint {

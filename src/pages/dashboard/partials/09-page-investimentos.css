@@ -3225,7 +3225,7 @@ body[data-theme='dark'] .page-investimentos-aportes-table td {
     letter-spacing: -0.035em;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    background: linear-gradient(185deg, #d4a84b 0%, #c49535 42%, #a07520 100%);
+    background: linear-gradient(185deg, var(--accent) 0%, #c49535 42%, #a07520 100%);
     -webkit-background-clip: text;
     background-clip: text;
   }

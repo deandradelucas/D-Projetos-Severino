@@ -72,7 +72,7 @@
 
 .pwa-install-sheet__close:focus-visible,
 .pwa-install-sheet__btn:focus-visible {
-  outline: 2px solid #d4a84b;
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
@@ -102,7 +102,7 @@
 
 .pwa-install-sheet__eyebrow {
   margin: 0 0 4px;
-  color: #d4a84b;
+  color: var(--accent);
   font-size: 0.66rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -190,7 +190,7 @@
 .pwa-install-sheet__btn--primary {
   border: 1px solid rgba(255, 255, 255, 0.18);
   color: #0a0a0a;
-  background: linear-gradient(135deg, #f1d28b, #d4a84b 55%, #b8923f);
+  background: linear-gradient(135deg, #f1d28b, var(--accent) 55%, #b8923f);
   box-shadow: 0 14px 30px -20px rgba(212, 168, 75, 0.85);
 }
 

@@ -87,7 +87,7 @@ body[data-theme='dark'] .dashboard-container.page-cartoes.ref-dashboard.app-hori
 body[data-theme='dark'] .dashboard-container.page-metas.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab__label {
   color: transparent;
   -webkit-text-fill-color: transparent;
-  background: linear-gradient(185deg, #f0deaa 0%, #d4a84b 45%, #b58d3d 100%);
+  background: linear-gradient(185deg, #f0deaa 0%, var(--accent) 45%, #b58d3d 100%);
   -webkit-background-clip: text;
   background-clip: text;
   font-weight: 800;

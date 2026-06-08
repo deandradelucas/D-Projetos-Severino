@@ -928,7 +928,7 @@ input:disabled {
   overflow: visible;
   clip: auto;
   white-space: normal;
-  background: var(--color-accent-gold, #d4a84b);
+  background: var(--color-accent-gold);
   color: #0a0a0a;
   font: inherit;
   font-weight: 600;
@@ -1095,7 +1095,7 @@ input:disabled {
   background: linear-gradient(
     90deg,
     transparent,
-    var(--color-accent-gold, #d4a84b),
+    var(--color-accent-gold),
     transparent
   );
   background-size: 200% 100%;
@@ -1389,7 +1389,7 @@ input:disabled {
 
 /* ── Gradient text gold — utilitário reutilizável ────────── */
 .text-gradient-gold {
-  background: linear-gradient(135deg, #f1d28b 0%, #d4a84b 55%, #b8923f 100%);
+  background: linear-gradient(135deg, #f1d28b 0%, var(--accent) 55%, #b8923f 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1397,7 +1397,7 @@ input:disabled {
 }
 
 .text-gradient-gold-subtle {
-  background: linear-gradient(135deg, #e8c878 0%, #d4a84b 60%, #c49535 100%);
+  background: linear-gradient(135deg, #e8c878 0%, var(--accent) 60%, #c49535 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1594,7 +1594,7 @@ input:disabled {
   transform: translateY(-50%);
   z-index: 2;
   pointer-events: none;
-  color: #d4a84b;
+  color: var(--accent);
   display: inline-flex;
 }
 .ntx-time-field {

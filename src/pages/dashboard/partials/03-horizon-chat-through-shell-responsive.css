@@ -105,7 +105,7 @@ body[data-theme='light'] .horizon-msg-user .horizon-msg-time {
 }
 
 body[data-theme='light'] .horizon-typing span {
-  background: #d4a84b;
+  background: var(--accent);
 }
 
 body[data-theme='light'] .horizon-error-msg {
@@ -309,7 +309,7 @@ body[data-theme='light'] .horizon-chat-window.horizon-chat-window--shell-dock.ch
   height: 38px;
   border-radius: 50%;
   background: rgba(212, 168, 75, 0.2);
-  color: #d4a84b;
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -164,7 +164,7 @@ body[data-theme='dark'] .horizon-msg-user .horizon-msg-time {
   color: rgba(15, 23, 42, 0.45);
 }
 body[data-theme='dark'] .horizon-typing span {
-  background: #d4a84b;
+  background: var(--accent);
 }
 body[data-theme='dark'] .horizon-error-msg {
   color: #fecaca;

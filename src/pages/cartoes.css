@@ -258,7 +258,7 @@
 .page-cartoes__cor-grid { display: flex; gap: 4px; flex-wrap: wrap; }
 .page-cartoes__cor-opt { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 7px; box-sizing: content-box; }
 .page-cartoes__cor-opt--active { border-color: var(--text-primary); }
-.page-cartoes__cor-opt--gold { background: #d4a84b; }
+.page-cartoes__cor-opt--gold { background: var(--accent); }
 .page-cartoes__cor-opt--green { background: #22c55e; }
 .page-cartoes__cor-opt--blue { background: #3b82f6; }
 .page-cartoes__cor-opt--purple { background: #8b5cf6; }

@@ -32,7 +32,7 @@
 
 .bemvindo-badge-ping,
 .bemvindo-badge-dot {
-  background: #d4a84b;
+  background: var(--accent);
 }
 
 /* ─── Headline ─── */

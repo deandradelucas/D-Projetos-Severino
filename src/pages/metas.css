@@ -312,7 +312,7 @@
   cursor: pointer;
 }
 .page-metas__cor-opt--active { border-color: var(--text-primary); }
-.page-metas__cor-opt--gold { background: #d4a84b; }
+.page-metas__cor-opt--gold { background: var(--accent); }
 .page-metas__cor-opt--green { background: #22c55e; }
 .page-metas__cor-opt--blue { background: #3b82f6; }
 .page-metas__cor-opt--purple { background: #8b5cf6; }

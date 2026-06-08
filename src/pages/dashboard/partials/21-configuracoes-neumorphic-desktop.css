@@ -179,7 +179,7 @@
     box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
   }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-preview--light { background: linear-gradient(155deg, #ffffff, #e4e8ee); color: #b8832a; }
-  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-preview--dark { background: linear-gradient(155deg, #1c1e22, #0e1117); color: #d4a84b; }
+  .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-preview--dark { background: linear-gradient(155deg, #1c1e22, #0e1117); color: var(--accent); }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-icon { font-size: 1.25rem; display: inline-flex; }
   .dashboard-container.page-configuracoes.ref-dashboard.app-horizon-shell .config-theme-body {
     display: flex; flex-direction: column; gap: 2px;

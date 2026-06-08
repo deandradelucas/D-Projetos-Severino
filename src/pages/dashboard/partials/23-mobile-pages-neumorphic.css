@@ -1323,7 +1323,7 @@
 }
 .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-empty__btn {
   margin-top: 8px; padding: 10px 22px; border-radius: 999px; cursor: pointer;
-  background: linear-gradient(155deg, var(--m-accent, #d4a84b), #c49535); color: var(--m-accent-fg, #fff);
+  background: linear-gradient(155deg, var(--m-accent), #c49535); color: var(--m-accent-fg, #fff);
   border: none; font-weight: 700; font-size: 0.88rem;
   box-shadow: 0 6px 16px -6px var(--m-accent-glow, rgba(212,168,75,0.4));
 }
@@ -1351,7 +1351,7 @@
 }
 .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__fill {
   display: block; height: 100%; border-radius: 99px;
-  background: linear-gradient(90deg, var(--m-accent, #d4a84b), #c49535); transition: width 320ms ease;
+  background: linear-gradient(90deg, var(--m-accent), #c49535); transition: width 320ms ease;
 }
 .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__row--over .relatorios-orcado__fill { background: var(--m-neg, #e0564f); }
 .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-orcado__row--over .relatorios-orcado__vals { color: var(--m-neg, #e0564f); }
@@ -1373,7 +1373,7 @@
   position: absolute; right: -3px; bottom: -3px;
   width: 22px; height: 22px; border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
-  background: var(--m-accent, #d4a84b); color: var(--m-accent-fg, #1a1205);
+  background: var(--m-accent); color: var(--m-accent-fg, #1a1205);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   border: 2px solid var(--m-base, #ffffff);
 }
