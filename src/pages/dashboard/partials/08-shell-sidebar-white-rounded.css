@@ -146,16 +146,9 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-w
 }
 
 @media (min-width: 769px) {
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
-    width: 60px;
-    height: 60px;
-  }
+  
 
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-    font-size: 26px;
-  }
+  
 }
 
 @media (max-width: 768px) {
@@ -347,10 +340,5 @@ body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-ite
 }
 
 @media (max-width: 768px) {
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-    box-shadow:
-      inset 3px 0 0 var(--shell-nav-nova-gold),
-      0 10px 28px -18px rgba(15, 23, 42, 0.18),
-      inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  }
+  
 }

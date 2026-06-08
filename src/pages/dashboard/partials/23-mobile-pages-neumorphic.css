@@ -9,7 +9,6 @@
 
   /* ═══════════ RELATÓRIOS ═══════════ */
 
-
   body[data-theme='dark'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights,
   body[data-theme='light'] .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-insights {
     display: grid; grid-template-columns: 1fr 1fr; gap: 0;
@@ -42,7 +41,6 @@
     text-transform: uppercase; letter-spacing: 0.18em; color: var(--m-text-lo);
   }
   /* Botões export CSV/PDF */
-
 
   /* ═══════════ INVESTIMENTOS ═══════════ */
   body[data-theme='dark'] .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .page-investimentos-card,
@@ -114,10 +112,7 @@
   }
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item h3,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-day-item h3 { color: var(--m-text-hi); }
-  body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day,
-  body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-day {
-    background: var(--m-sunken); box-shadow: inset 2px 2px 4px var(--m-shadow-soft); border-radius: 12px;
-  }
+  
   body[data-theme='dark'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-num,
   body[data-theme='light'] .dashboard-container.agenda-page.ref-dashboard.app-horizon-shell .agenda-hero__week-num { color: var(--m-text-hi); }
 
@@ -1239,13 +1234,7 @@
 
 /* Relatórios — linha de KPIs com 2 cards (Saldo do período removido, redundante c/ hero) */
 
-
 /* Relatórios — badge de variação vs período anterior (R1) + cores projeção (R2/R4) */
-
-
-
-
-
 
 /* Relatórios — Top 5 despesas (R7) */
 .dashboard-container.page-relatorios.ref-dashboard.app-horizon-shell .relatorios-top5 {

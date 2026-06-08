@@ -609,9 +609,7 @@ body:has(.sidebar.open) .horizon-chat-window {
       0 -8px 28px -8px rgba(15, 23, 42, 0.12);
   }
 
-  body[data-theme='light'] .mobile-bottom-nav__item {
-    color: rgba(15, 23, 42, 0.62);
-  }
+  
 
   body[data-theme='light'] .mobile-bottom-nav__item--active {
     color: var(--accent);
@@ -1911,7 +1909,6 @@ body[data-theme='dark'] .dashboard-container.page-admin-auditoria.ref-dashboard.
     overflow: visible;
   }
 }
-
 
 .page-admin-usuarios .admin-pill {
   display: inline-block;

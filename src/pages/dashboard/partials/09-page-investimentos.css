@@ -908,10 +908,6 @@ body[data-theme='dark'] .page-investimentos-modal__date-cal-btn {
   color: var(--text-secondary);
 }
 
-body[data-theme='dark'] .page-investimentos-modal__date-cal-btn:hover:not(:disabled) {
-  color: var(--text-primary);
-}
-
 /* Calendário pt-BR (popover portal) — mesmo vocabulário visual do modal */
 .page-investimentos-date-popover {
   box-sizing: border-box;
@@ -2171,10 +2167,6 @@ body[data-theme='dark'] .page-investimentos-modal__section {
   color: var(--text-secondary);
 }
 
-body[data-theme='dark'] .page-investimentos-modal__section-label {
-  color: var(--text-secondary);
-}
-
 /* Data + Valor lado a lado */
 .page-investimentos-modal__section--row {
   display: grid;
@@ -2213,10 +2205,6 @@ body[data-theme='dark'] .page-investimentos-modal__section-label {
   color: var(--text-secondary);
 }
 
-body[data-theme='dark'] .page-investimentos-modal__hint--preset {
-  color: rgba(248, 250, 252, 0.55);
-}
-
 /* Toggle link "nome personalizado" */
 .page-investimentos-modal__toggle-link {
   display: inline-flex;
@@ -2238,14 +2226,6 @@ body[data-theme='dark'] .page-investimentos-modal__hint--preset {
 
 .page-investimentos-modal__toggle-link:hover {
   color: var(--text-primary);
-}
-
-body[data-theme='dark'] .page-investimentos-modal__toggle-link {
-  color: rgba(248, 250, 252, 0.52);
-}
-
-body[data-theme='dark'] .page-investimentos-modal__toggle-link:hover {
-  color: rgba(248, 250, 252, 0.9);
 }
 
 /* Select nativo para tipo de aplicação */
@@ -2327,10 +2307,6 @@ body[data-theme='dark'] .page-investimentos-modal__perc-suffix,
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-inst-dropdown__empty,
 body[data-theme='dark'] .page-investimentos-modal .page-investimentos-inst-option__nome {
   color: var(--text-primary);
-}
-
-body[data-theme='dark'] .page-investimentos-modal .page-investimentos-inst-option__tipo {
-  color: var(--text-secondary);
 }
 
 body[data-theme='dark'] .page-investimentos-modal__label-optional {
@@ -3215,7 +3191,6 @@ body[data-theme='dark'] .page-investimentos-aportes-table td {
       inset 0 1px 0 rgba(255, 255, 255, 0.65),
       inset 0 -1px 0 rgba(15, 23, 42, 0.06);
   }
-
 
   .dashboard-container.page-investimentos.ref-dashboard.app-horizon-shell .dashboard-mobile-tx-fab__label {
     overflow: hidden;
