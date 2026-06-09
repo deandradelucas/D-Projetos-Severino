@@ -208,12 +208,13 @@ export function AgendaDayList({
                           {evento.local ? <p className="agenda-event__local">{evento.local}</p> : null}
                         </div>
                         <div className="agenda-day-item__actions">
-                          <button type="button" onClick={() => onEdit(evento)} aria-label={`Editar ${evento.titulo}`}>
+                          <button type="button" className="agenda-day-item__btn" onClick={() => onEdit(evento)} aria-label={`Editar ${evento.titulo}`}>
                             Editar
                           </button>
                           {evento.status !== 'CONCLUIDO' && (
                             <button
                               type="button"
+                              className="agenda-day-item__btn"
                               onClick={() => onSetStatus(evento, 'CONCLUIDO')}
                               aria-label={`Concluir ${evento.titulo}`}
                             >
