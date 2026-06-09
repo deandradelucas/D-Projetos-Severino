@@ -37,6 +37,7 @@ import {
   calcularQuickTotals,
 } from '../lib/transacoesDerived'
 import './dashboard.css'
+import '../styles/pages/transacoes.css'
 
 /** Itens por requisição — menos DOM inicial; “Carregar mais” busca o restante. */
 const TX_PAGE_SIZE = 80
