@@ -506,15 +506,17 @@
 @media (max-width: 768px) {
   /* CTA "+ Nova transação" sai no mobile — o FAB flutuante cobre a ação */
   .dashboard-hub__btn--primary { display: none; }
-  /* ícones (whatsapp/privacidade/avatar) vão pra CIMA (top-right); a saudação
-     fica embaixo ocupando a largura toda (não quebra mais em 3 linhas). */
-  .dashboard-hub__hero { padding: 14px 16px; margin-bottom: 12px; }
-  .dashboard-hub__hero-top { flex-direction: column; align-items: stretch; gap: 4px; }
-  .dashboard-hub__hero-actions { order: -1; align-self: flex-end; width: auto; flex-wrap: nowrap; flex-shrink: 0; gap: 8px; }
-  .dashboard-hub__hero-text { min-width: 0; }
-  .dashboard-hub__title { font-size: 1.4rem; line-height: 1.1; }
-  .dashboard-hub__date { white-space: nowrap; margin-top: 3px; }
-  /* saldo mais enxuto */
+  /* Tudo numa linha só: hambúrguer | saudação+data | ícones (sem linha extra
+     só pros ícones, que deixava muito espaço em branco). */
+  .dashboard-hub__hero { padding: 12px 16px 14px; margin-bottom: 12px; }
+  .dashboard-hub__hero-row { gap: 10px; align-items: center; }
+  .dashboard-hub__hero-top { flex-direction: row; align-items: center; gap: 10px; }
+  .dashboard-hub__hero-text { flex: 1; min-width: 0; }
+  .dashboard-hub__hero-actions { align-self: center; width: auto; flex-wrap: nowrap; flex-shrink: 0; gap: 6px; }
+  .dashboard-hub__icon-btn, .dashboard-hub__avatar { width: 40px; height: 40px; }
+  .dashboard-hub__title { font-size: 1.25rem; line-height: 1.15; }
+  .dashboard-hub__date { white-space: nowrap; margin-top: 2px; }
+  /* saldo enxuto, colado */
   .dashboard-hub__balance-line--hero { margin-top: 10px; }
   .dashboard-hub__balance-line-label { margin-bottom: 2px; }
   .dashboard-hub__balance-line--hero strong { font-size: 1.95rem; }
