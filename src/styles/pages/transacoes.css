@@ -200,6 +200,8 @@
   background: var(--surface-sunken);
 }
 .tx-quick-summary__item { display: flex; flex-direction: column; gap: 2px; align-items: center; text-align: center; }
+/* separadores verticais entre Entradas · Saídas · Saldo */
+.tx-quick-summary__item + .tx-quick-summary__item { border-left: 1px solid var(--hairline-strong); }
 .tx-quick-summary__label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
 .tx-quick-summary__value { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-weight: 700; font-size: 0.98rem; font-variant-numeric: tabular-nums; color: var(--text-primary); }
 .tx-quick-summary__value--in { color: var(--success); }
