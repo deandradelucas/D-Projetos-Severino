@@ -1,15 +1,13 @@
 /* =============================================================================
-   14 — SIDEBAR · NEO-SKEUMORPHISM (Desktop ≥ 769px)
-   =============================================================================
-   Aplica-se a TODAS as páginas internas (.dashboard-container.app-horizon-shell).
-   Mobile (drawer) preserva o comportamento atual.
-   - Tema DARK: sidebar dark obsidian
-   - Tema LIGHT: sidebar branca neumórfica (clay branco)
+   layout/sidebar.css — Sidebar neumórfica (desktop >= 769px)
+   -----------------------------------------------------------------------------
+   Rewrite limpo do antigo partial 14 (+ tweaks de 05/polish/08). Autoridade ÚNICA
+   da sidebar. Tema via tokens --sb-* (definidos 1x por tema); as REGRAS são únicas
+   (sem duplicar seletor light/dark — o corpo é idêntico, dirigido por var(--sb-*)).
    ============================================================================= */
 
 @media (min-width: 769px) {
-
-  /* ─── Tokens DARK (default — tema escuro) ─── */
+  /* ── Tokens por tema (a única coisa que difere light/dark) ─────────────── */
   body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
     --sb-bg-base: #0a0c11;
     --sb-bg-raised: #11141a;
@@ -36,8 +34,6 @@
     --sb-r-item: 12px;
     --sb-r-pill: 999px;
   }
-
-  /* ─── Tokens LIGHT (tema claro — sidebar branca clay) ─── */
   body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
     --sb-bg-base: #eef1f6;
     --sb-bg-raised: #ffffff;
@@ -65,11 +61,9 @@
     --sb-r-pill: 999px;
   }
 
-  /* ─── Surface da sidebar: raised emerge com gradiente diagonal ─── */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
+  /* ── Daqui pra baixo: REGRAS ÚNICAS (sem duplicar tema) ─────────────────── */
+  .dashboard-container.app-horizon-shell .sidebar {
     background: linear-gradient(160deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
-    background-image: linear-gradient(160deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
     border: 1px solid var(--sb-edge-hi);
     border-radius: var(--sb-r-card);
     padding: 28px 16px 18px;
@@ -80,9 +74,8 @@
       inset -1px -1px 1px var(--sb-edge-lo);
   }
 
-  /* Glow gold sutil no topo (luz vinda do nordeste) */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar::after,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar::after {
+  /* Glow gold sutil no topo */
+  .dashboard-container.app-horizon-shell .sidebar::after {
     content: '';
     position: absolute;
     top: 0;
@@ -96,19 +89,17 @@
     border-radius: var(--sb-r-card) var(--sb-r-card) 0 0;
   }
 
-  /* ─── Brand: mark + wordmark em Fraunces ─── */
+  /* ── Brand ─────────────────────────────────────────────────────────────── */
   .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
     position: relative;
     z-index: 1;
     margin-bottom: 18px;
     padding: 0 8px;
   }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-mark,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-mark {
+  .dashboard-container.app-horizon-shell .sidebar .brand-mark {
     width: 48px;
     height: 48px;
-    color: var(--sb-text-hi); /* alimenta o currentColor do "S" no SVG */
+    color: var(--sb-text-hi);
     filter: none;
     transition: transform 240ms var(--sb-ease);
     border: none;
@@ -116,25 +107,16 @@
     outline: none;
     background: transparent;
   }
-
-  /* Brand stack: zero gap + margem negativa no wordmark pra colar de vez */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-stack,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-stack {
+  .dashboard-container.app-horizon-shell .sidebar .brand-stack {
     gap: 10px;
     text-decoration: none;
     cursor: pointer;
   }
-  /* Microinteração: leve zoom no símbolo ao passar o mouse na marca */
   .dashboard-container.app-horizon-shell .sidebar .brand-stack:hover .brand-mark {
     transform: scale(1.05);
   }
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
+  .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
     margin-left: 0;
-  }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
     font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
     font-weight: 700;
     font-size: 1.625rem;
@@ -144,7 +126,7 @@
     text-shadow: 0 1px 0 var(--sb-edge-lo);
   }
 
-  /* ─── Nav menu ─── */
+  /* ── Nav menu ──────────────────────────────────────────────────────────── */
   .dashboard-container.app-horizon-shell .sidebar .nav-menu {
     position: relative;
     z-index: 1;
@@ -164,9 +146,8 @@
     border-radius: 2px;
   }
 
-  /* ─── Nav items: clay buttons ─── */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item {
+  /* ── Nav items: clay buttons ───────────────────────────────────────────── */
+  .dashboard-container.app-horizon-shell .sidebar .nav-item {
     position: relative;
     display: flex;
     align-items: center;
@@ -190,9 +171,7 @@
       box-shadow 240ms var(--sb-ease);
     overflow: visible;
   }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
+  .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
     color: inherit;
     font-family: inherit;
     font-weight: inherit;
@@ -200,9 +179,8 @@
     line-height: 1.2;
   }
 
-  /* Ícone wrap: badge minimalista */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
+  /* Ícone wrap */
+  .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -213,16 +191,14 @@
     color: var(--sb-text-lo);
     transition: color 240ms var(--sb-ease), background 240ms var(--sb-ease), box-shadow 240ms var(--sb-ease);
   }
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap svg,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .icon-wrap svg {
+  .dashboard-container.app-horizon-shell .sidebar .icon-wrap svg {
     width: 20px;
     height: 20px;
     stroke-width: 1.6;
   }
 
-  /* ─── Hover: clay raised + slide + glow gold ─── */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active),
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) {
+  /* Hover: clay raised + slide + glow gold */
+  .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) {
     transform: translateX(3px);
     background: linear-gradient(155deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
     color: var(--sb-text-hi);
@@ -231,14 +207,12 @@
       -2px -2px 6px var(--sb-light),
       inset 1px 1px 1px var(--sb-edge-hi);
   }
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap {
+  .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap {
     color: var(--sb-accent);
   }
 
-  /* ─── Active: inset sunken + barra gold + glow ─── */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
+  /* Active: inset sunken + barra gold + glow */
+  .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
     background: var(--sb-bg-sunken);
     color: var(--sb-text-hi);
     font-weight: 600;
@@ -248,9 +222,7 @@
       0 0 0 1px var(--sb-accent-glow);
     transform: translateX(0);
   }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active::before,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active::before {
+  .dashboard-container.app-horizon-shell .sidebar .nav-item.active::before {
     content: '';
     position: absolute;
     left: -2px;
@@ -262,9 +234,7 @@
     background: linear-gradient(180deg, transparent 0%, var(--sb-accent) 30%, var(--sb-accent) 70%, transparent 100%);
     box-shadow: 0 0 14px var(--sb-accent-glow-strong);
   }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
+  .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
     background: var(--sb-bg-base);
     color: var(--sb-accent);
     box-shadow:
@@ -272,16 +242,13 @@
       inset -1px -1px 2px var(--sb-light),
       0 0 0 1px var(--sb-accent-glow);
   }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg {
+  .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg {
     stroke-width: 1.8;
     filter: drop-shadow(0 0 6px var(--sb-accent-glow));
   }
 
-  /* ─── Focus rings ─── */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-item:focus-visible,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-item:focus-visible {
+  /* Focus rings */
+  .dashboard-container.app-horizon-shell .sidebar .nav-item:focus-visible {
     outline: none;
     box-shadow:
       4px 4px 10px var(--sb-shadow-soft),
@@ -289,9 +256,8 @@
       0 0 0 2px var(--sb-accent);
   }
 
-  /* ─── Section labels: caps tracking refinado ─── */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label {
+  /* ── Section labels ────────────────────────────────────────────────────── */
+  .dashboard-container.app-horizon-shell .sidebar .nav-section-label {
     position: relative;
     list-style: none;
     margin: 18px 0 6px;
@@ -300,17 +266,13 @@
     align-items: center;
     gap: 10px;
   }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label::after,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label::after {
+  .dashboard-container.app-horizon-shell .sidebar .nav-section-label::after {
     content: '';
     flex: 1;
     height: 1px;
     background: linear-gradient(90deg, var(--sb-edge-hi), transparent);
   }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
+  .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
     font-family: 'Inter Variable', system-ui, sans-serif;
     font-size: 0.6875rem;
     font-weight: 600;
@@ -319,9 +281,8 @@
     color: var(--sb-text-faint);
   }
 
-  /* ─── Logout: pílula danger sutil ─── */
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn {
+  /* ── Logout ────────────────────────────────────────────────────────────── */
+  .dashboard-container.app-horizon-shell .sidebar .logout-btn {
     position: relative;
     z-index: 1;
     display: flex;
@@ -347,9 +308,7 @@
     transition: all 240ms var(--sb-ease);
     cursor: pointer;
   }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:hover,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:hover {
+  .dashboard-container.app-horizon-shell .sidebar .logout-btn:hover {
     transform: translateY(-2px);
     color: var(--sb-danger);
     background: linear-gradient(155deg, var(--sb-danger-soft) 0%, var(--sb-bg-base) 100%);
@@ -359,22 +318,18 @@
       0 0 0 1px var(--sb-danger-glow),
       inset 1px 1px 1px var(--sb-edge-hi);
   }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:active,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn:active {
+  .dashboard-container.app-horizon-shell .sidebar .logout-btn:active {
     transform: translateY(0);
     box-shadow:
       inset 3px 3px 8px var(--sb-shadow),
       inset -2px -2px 5px var(--sb-light);
   }
-
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar .logout-btn svg,
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar .logout-btn svg {
+  .dashboard-container.app-horizon-shell .sidebar .logout-btn svg {
     width: 18px;
     height: 18px;
   }
 
-  /* ─── Version stamp ─── */
+  /* ── Version stamp ─────────────────────────────────────────────────────── */
   .dashboard-container.app-horizon-shell .sidebar .sidebar-version {
     position: relative;
     z-index: 1;
@@ -389,7 +344,7 @@
     text-transform: uppercase;
   }
 
-  /* ─── Stagger reveal no load ─── */
+  /* ── Stagger reveal no load ────────────────────────────────────────────── */
   .dashboard-container.app-horizon-shell .sidebar .nav-menu > li {
     animation: sbItemReveal 500ms var(--sb-ease) both;
   }
@@ -404,7 +359,6 @@
   .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(9)  { animation-delay: 360ms; }
   .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(10) { animation-delay: 400ms; }
   .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(n+11) { animation-delay: 440ms; }
-
   .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
     animation: sbBrandReveal 600ms var(--sb-ease) both;
   }
@@ -421,7 +375,6 @@
     to   { opacity: 1; transform: scale(1); }
   }
 
-  /* Reduce motion */
   @media (prefers-reduced-motion: reduce) {
     .dashboard-container.app-horizon-shell .sidebar *,
     .dashboard-container.app-horizon-shell .sidebar {

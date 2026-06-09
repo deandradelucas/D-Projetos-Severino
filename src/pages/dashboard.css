@@ -1,51 +1,10 @@
-/* release/1.0.4 — Arquitetura @layer granular (squad Segunda-feira). Ver docs/arquitetura-css-layers.md */
-@import './dashboard-theme-dark-mirror.css' layer(app);
-@import './dashboard-theme-dark-polish.css' layer(app);
-@import './dashboard-theme-dark-fullblack.css' layer(app);
-@import './dashboard/partials/00-tokens-base.css' layer(app);
-@import './dashboard/partials/01-layout-sidebar-intro.css' layer(app);
-@import './dashboard/partials/02a-page-pagamento-through-main-content-base.css' layer(app);
-@import './dashboard/partials/02b-dashboard-admin-through-pre-modal.css' layer(app);
-@import './dashboard/partials/02c-modals-through-switch-ui.css' layer(app);
-@import './dashboard/partials/03-horizon-chat-through-shell-responsive.css' layer(app);
-@import './dashboard/partials/04a-executive-unified-light.css' layer(app);
-@import './dashboard/partials/04b-layout-reference-hub-chrome.css' layer(app);
-@import './dashboard/partials/04c-premium-finish-light-modals.css' layer(app);
-@import './dashboard/partials/05-dark-shell-agenda-mobile-hubs.css' layer(app);
-@import './dashboard/partials/06-navigation-motion-story-2-2.css' layer(app);
-@import './dashboard/partials/07-page-transacoes.css' layer(app);
-@import './dashboard/partials/08-shell-sidebar-white-rounded.css' layer(app);
-@import './dashboard/partials/09-page-investimentos.css' layer(app);
-@import './dashboard/partials/09b-dark-glass-cards.css' layer(app);
-@import './dashboard/partials/10-page-configuracoes.css' layer(app);
-@import './dashboard/partials/11-page-relatorios.css' layer(app);
-@import './dashboard/partials/07b-page-dashboard-home-align.css' layer(app);
-@import './dashboard/partials/12-page-lista-compras.css' layer(app);
-@import './dashboard/partials/13-dashboard-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/14-sidebar-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/15-transacoes-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/16-investimentos-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/17-relatorios-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/18-agenda-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/19-lista-compras-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/20-pagamento-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/21-configuracoes-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/22-mobile-foundation-neumorphic.css' layer(app);
-@import './dashboard/partials/23-mobile-pages-neumorphic.css' layer(app);
-@import './dashboard/partials/24-mobile-bottom-sheets.css' layer(app);
-@import './dashboard/partials/25-mobile-audit-fixes.css' layer(app);
-@import './dashboard/partials/26-mobile-transacoes-fix.css' layer(app);
-@import './dashboard/partials/27-mobile-modal-nova-tx-fix.css' layer(app);
-@import './dashboard/partials/28-tx-detalhe-modal.css' layer(app);
-@import './dashboard/partials/29-investimentos-comparador-mobile.css' layer(app);
-@import './dashboard/partials/30-investimentos-modal-mobile.css' layer(app);
-@import './dashboard/partials/31-sheet-drag-close.css' layer(app);
-@import './dashboard/partials/32-lista-modal-mobile.css' layer(app);
-@import './dashboard/partials/33-pagamento-mobile.css' layer(app);
-@import './dashboard/partials/34-lista-modo-comprando.css' layer(app);
-@import './dashboard/partials/16-modal-nova-tx-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/17-investimentos-neumorphic-desktop.css' layer(app);
-@import './dashboard/partials/35-close-btn-standard.css' layer(app);
-@import './dashboard/partials/36-fab-standard.css' layer(app);
-@import './dashboard/partials/37-relatorios-editorial.css' layer(app-top);
-@import './dashboard/partials/38-page-titles-uniform.css' layer(app-top);
+/* =============================================================================
+   dashboard.css — manifesto da NOVA arquitetura CSS (rewrite limpo, release/1.0.4)
+   -----------------------------------------------------------------------------
+   Global (tokens, cores, dark, neumorfismo, fonte Jakarta, reset) vive em
+   index.css → src/styles/global.css. Aqui só importamos os componentes/páginas
+   do app, reconstruídos do zero em src/styles/. Cresce conforme reconstruímos.
+   ============================================================================= */
+
+/* Layout */
+@import '../styles/layout/sidebar.css';

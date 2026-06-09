@@ -201,3 +201,40 @@ body[data-theme='dark'] {
     display: none;
   }
 }
+
+/* ============================================================
+   NEUMORFISMO GLOBAL — vocabulário único de relevo soft-UI
+   Use estes tokens em qualquer card/superfície/botão neumórfico.
+   Trocar o relevo do app inteiro = mudar AQUI.
+   ============================================================ */
+:root {
+  /* Superfícies de relevo (light) */
+  --neu-base:    #eef1f6;
+  --neu-raised:  #ffffff;
+  --neu-sunken:  #e4e8ee;
+  /* Luz e sombra (light) */
+  --neu-light:        rgba(255, 255, 255, 0.90);
+  --neu-light-strong: rgba(255, 255, 255, 1);
+  --neu-shadow:       rgba(166, 180, 200, 0.45);
+  --neu-shadow-soft:  rgba(166, 180, 200, 0.28);
+  --neu-edge-hi:      rgba(255, 255, 255, 0.95);
+  --neu-edge-lo:      rgba(140, 156, 178, 0.20);
+  /* Raios e easing padrão do relevo */
+  --neu-r-card: 18px;
+  --neu-r-item: 12px;
+  --neu-ease:   cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body[data-theme='dark'] {
+  /* Superfícies de relevo (dark) */
+  --neu-base:    #0a0c11;
+  --neu-raised:  #11141a;
+  --neu-sunken:  #07090d;
+  /* Luz e sombra (dark) */
+  --neu-light:        rgba(255, 255, 255, 0.040);
+  --neu-light-strong: rgba(255, 255, 255, 0.065);
+  --neu-shadow:       rgba(0, 0, 0, 0.72);
+  --neu-shadow-soft:  rgba(0, 0, 0, 0.45);
+  --neu-edge-hi:      rgba(255, 255, 255, 0.055);
+  --neu-edge-lo:      rgba(0, 0, 0, 0.55);
+}

@@ -5,6 +5,7 @@
    migração invertiam precedência (genérico vencendo específico de página). */
 @layer theme, base, components, utilities, app, app-top;
 @import "tailwindcss";
+@import "./styles/global.css";
 
 @theme {
   /* ── Tipografia — família ────────────────────────────────── */
