@@ -693,7 +693,7 @@
     position: fixed;
     left: 0;
     right: 0;
-    bottom: max(78px, calc(70px + var(--safe-bottom, 0px)));
+    bottom: max(66px, calc(58px + var(--safe-bottom, 0px)));
     z-index: 900;
     align-items: center;
     justify-content: center;
