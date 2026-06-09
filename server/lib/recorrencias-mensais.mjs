@@ -63,6 +63,7 @@ async function inserirTransacaoGerada(supabase, usuarioId, rule, dataIso) {
     status: 'EFETIVADA',
     categoria_id: rule.categoria_id,
     subcategoria_id: rule.subcategoria_id,
+    cartao_id: rule.cartao_id ?? null,
     data_transacao: dataIso,
     recorrencia_mensal_id: rule.id,
   })
@@ -93,6 +94,7 @@ export async function criarRegraRecorrenciaDia1(usuarioId, primeiraLinha, totalM
     descricao: primeiraLinha.descricao ?? '',
     categoria_id: primeiraLinha.categoria_id ?? null,
     subcategoria_id: primeiraLinha.subcategoria_id ?? null,
+    cartao_id: primeiraLinha.cartao_id ?? null,
     dia_mes: 1,
     ativo: true,
     ultima_geracao_mes: mesRef,
@@ -180,7 +182,7 @@ export async function processarRecorrenciasPendentes(usuarioIdFilter = null) {
   let q = supabase
     .from('recorrencias_mensais')
     .select(
-      'id, usuario_id, tipo, valor, descricao, categoria_id, subcategoria_id, ultima_geracao_mes, ativo, total_meses, mes_inicio'
+      'id, usuario_id, tipo, valor, descricao, categoria_id, subcategoria_id, cartao_id, ultima_geracao_mes, ativo, total_meses, mes_inicio'
     )
     .eq('ativo', true)
 

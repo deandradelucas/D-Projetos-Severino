@@ -33,21 +33,12 @@ function vencimentoFatura(year, monthIdx, diaFech, diaVenc) {
   if (v <= fim) v = closingDate(year, monthIdx + 1, diaVenc)
   return v
 }
-/** Referência (year, monthIdx) da fatura que VENCE a seguir — a conta a pagar.
- *  O vencimento exibido é o próximo dia de vencimento estritamente após hoje. */
-function refProximaFaturaAPagar(diaFech, diaVenc, hoje = new Date()) {
-  const venc = Number(diaVenc)
-  const fech = Number(diaFech)
-  const hojeMid = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())
-  // próximo dia de vencimento estritamente após hoje
-  let y = hojeMid.getFullYear()
-  let mo = hojeMid.getMonth()
-  let d = new Date(y, mo, clampDay(y, mo, venc))
-  if (d <= hojeMid) { mo += 1; d = new Date(y, mo, clampDay(y, mo, venc)) }
-  // mês de fechamento da fatura que vence em d: mesmo mês se venc > fech, senão o anterior
-  const dIdx = d.getFullYear() * 12 + d.getMonth()
-  const refIdx = dIdx - (venc > fech ? 0 : 1)
-  return { year: Math.floor(refIdx / 12), monthIdx: ((refIdx % 12) + 12) % 12 }
+/** Referência (year, monthIdx) da fatura ABERTA hoje — onde entram os gastos
+ *  do ciclo atual (compras novas aparecem aqui). Vencimento = o desta fatura. */
+function refAtual(diaFech, hoje = new Date()) {
+  const fech = closingDate(hoje.getFullYear(), hoje.getMonth(), diaFech)
+  const base = hoje > fech ? new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1) : hoje
+  return { year: base.getFullYear(), monthIdx: base.getMonth() }
 }
 function parseRef(ref) {
   const m = /^(\d{4})-(\d{2})$/.exec(String(ref || ''))
@@ -126,7 +117,7 @@ export async function listarCartoesComResumo(usuarioId) {
   const cartoes = await listarCartoes(usuarioId)
   const out = []
   for (const c of cartoes) {
-    const ref = refProximaFaturaAPagar(c.dia_fechamento, c.dia_vencimento)
+    const ref = refAtual(c.dia_fechamento)
     const { ini, fim } = cicloFatura(ref.year, ref.monthIdx, c.dia_fechamento)
     const total = await somaPeriodo(usuarioId, c.id, ini, fim)
     const venc = vencimentoFatura(ref.year, ref.monthIdx, c.dia_fechamento, c.dia_vencimento)
@@ -314,7 +305,7 @@ export async function faturaDoCartao(usuarioId, cartaoId, ref) {
   if (cErr) throw new Error(cErr.message || 'Erro ao buscar cartão.')
   if (!cartao) throw new Error('Cartão não encontrado.')
 
-  const refObj = parseRef(ref) || refProximaFaturaAPagar(cartao.dia_fechamento, cartao.dia_vencimento)
+  const refObj = parseRef(ref) || refAtual(cartao.dia_fechamento)
   const { ini, fim } = cicloFatura(refObj.year, refObj.monthIdx, cartao.dia_fechamento)
   const venc = vencimentoFatura(refObj.year, refObj.monthIdx, cartao.dia_fechamento, cartao.dia_vencimento)
 
