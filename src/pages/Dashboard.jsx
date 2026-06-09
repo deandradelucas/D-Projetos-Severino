@@ -225,7 +225,7 @@ export default function Dashboard() {
       month: 'short',
     })
     const partes = fmt.formatToParts(new Date())
-    const weekday = partes.find((p) => p.type === 'weekday')?.value || ''
+    const weekday = (partes.find((p) => p.type === 'weekday')?.value || '').replace(/-feira/i, '')
     const day = partes.find((p) => p.type === 'day')?.value || ''
     const month = partes.find((p) => p.type === 'month')?.value?.replace('.', '') || ''
     const weekdayCap = weekday.charAt(0).toUpperCase() + weekday.slice(1)

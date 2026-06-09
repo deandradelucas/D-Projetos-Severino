@@ -260,7 +260,8 @@ export function agruparTransacoesPorDia(transacoesVisiveis) {
       else {
         const [y, m, d] = key.split('-').map(Number)
         const dt = new Date(y, m - 1, d, 12)
-        label = cap(fmtLong.format(dt).replace(/\.$/, '').replace(/\.\s/g, ' '))
+        // remove "-feira" do dia da semana (Sexta-feira → Sexta); domingo/sábado intactos
+        label = cap(fmtLong.format(dt).replace(/-feira/i, '').replace(/\.$/, '').replace(/\.\s/g, ' '))
       }
       group = { key, label, txs: [], totalReceitas: 0, totalDespesas: 0 }
       grupos.push(group)

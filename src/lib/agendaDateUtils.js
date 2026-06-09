@@ -58,6 +58,7 @@ export function localToIso(value) {
 
 export function capitalizeDateLabel(value) {
   return value
+    .replace(/-feira/i, '') // Sexta-feira → Sexta (domingo/sábado não têm sufixo)
     .replace('.', '')
     .replace(/(^|,\s*|\s+de\s+)(\p{L})/gu, (_, prefix, letter) => `${prefix}${letter.toLocaleUpperCase('pt-BR')}`)
 }

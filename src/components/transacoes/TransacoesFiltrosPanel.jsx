@@ -18,10 +18,13 @@ export function TransacoesFiltrosPanel({
   onToggle,
   onChange,
   onClearFilters,
-  onDeleteAll,
   filtroParceladasAtivo,
   onToggleParceladas,
 }) {
+  // Quantos filtros do formulário estão preenchidos (feedback no header)
+  const activeCount = ['busca', 'tipo', 'categoria_id', 'dataInicio', 'dataFim', 'lancamentos']
+    .reduce((n, k) => n + (filters[k] ? 1 : 0), 0)
+
   return (
     <article className="ref-panel page-transacoes-ref-filters">
       <div className="ref-panel__head page-transacoes-filters-head">
@@ -37,6 +40,11 @@ export function TransacoesFiltrosPanel({
             <span className="ref-panel__title" role="heading" aria-level={2}>
               Filtros
             </span>
+            {activeCount > 0 && (
+              <span className="tx-filters-count" aria-label={`${activeCount} ${activeCount === 1 ? 'filtro ativo' : 'filtros ativos'}`}>
+                {activeCount}
+              </span>
+            )}
           </span>
           <svg
             className={`page-transacoes-filters-toggle__chevron ${filtrosAbertos ? 'page-transacoes-filters-toggle__chevron--open' : ''}`}
@@ -60,16 +68,18 @@ export function TransacoesFiltrosPanel({
           aria-pressed={filtroParceladasAtivo}
           title="Filtrar compras parceladas"
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
             <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
             <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
             <path d="M6 15h4M14 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
           Parceladas
         </button>
-        <button type="button" className="ref-panel__link ref-panel__link--button" onClick={onClearFilters}>
-          Limpar filtros
-        </button>
+        {activeCount > 0 && (
+          <button type="button" className="ref-panel__link ref-panel__link--button" onClick={onClearFilters}>
+            Limpar filtros
+          </button>
+        )}
       </div>
       <div
         id="transacoes-filtros-fields"
@@ -128,11 +138,6 @@ export function TransacoesFiltrosPanel({
             <label htmlFor="tx-fim">Fim</label>
             <input id="tx-fim" type="date" name="dataFim" className="filter-input" value={filters.dataFim} onChange={onChange} />
           </div>
-        </div>
-        <div className="transacoes-filter-delete-row">
-          <button type="button" className="transacoes-filter-delete-all-btn" onClick={onDeleteAll}>
-            Apagar tudo
-          </button>
         </div>
       </div>
     </article>

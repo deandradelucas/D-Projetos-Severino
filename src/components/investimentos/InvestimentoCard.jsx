@@ -71,7 +71,7 @@ function proximoDiaUtilLabel() {
   d.setDate(d.getDate() + 1)
   for (let i = 0; i < 7; i++) {
     if (ehDiaUtilComPregaoCdi(d)) {
-      return d.toLocaleDateString('pt-BR', { weekday: 'long' })
+      return d.toLocaleDateString('pt-BR', { weekday: 'long' }).replace(/-feira/i, '')
     }
     d.setDate(d.getDate() + 1)
   }

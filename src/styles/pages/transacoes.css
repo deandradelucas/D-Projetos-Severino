@@ -55,9 +55,62 @@
   text-align: left;
   padding: 0;
 }
-.page-transacoes-filters-toggle__lead { display: flex; flex-direction: column; gap: 2px; }
+.page-transacoes-filters-toggle__lead { display: flex; align-items: center; gap: 8px; }
+/* contador de filtros ativos ao lado de "Filtros" */
+.tx-filters-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
 .page-transacoes-filters-toggle__chevron { color: var(--text-muted); transition: transform 200ms var(--ease); flex-shrink: 0; }
 .page-transacoes-filters-toggle__chevron--open { transform: rotate(180deg); }
+
+/* Botão "Parceladas" (toggle) — pílula no padrão dos chips, com ícone alinhado */
+.tx-parceladas-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 6px 13px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.tx-parceladas-chip svg { flex-shrink: 0; }
+.tx-parceladas-chip:hover { background: var(--surface-2); color: var(--text-primary); }
+.tx-parceladas-chip--active { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
+
+/* Contador ao lado do título: total normal; "X de Y" quando há filtro ativo */
+.tx-title-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.tx-count-badge {
+  flex-shrink: 0;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+}
+.tx-count-badge--filtered { background: var(--accent-muted); color: var(--accent); }
+.tx-count-badge__total { color: var(--text-muted); font-weight: 600; }
 
 .transacoes-filter-grid,
 .page-transacoes-filter-grid {
@@ -81,18 +134,6 @@
   font-size: 0.9rem;
 }
 .filter-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
-.transacoes-filter-delete-row { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
-.transacoes-filter-delete-all-btn {
-  padding: 8px 14px;
-  border-radius: var(--r-md);
-  border: 1px solid var(--error-muted);
-  background: var(--error-muted);
-  color: var(--error);
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-.transacoes-filter-delete-all-btn:hover { background: var(--error); color: #fff; border-color: var(--error); }
 
 /* ── Recorrências (regras dia 1) ───────────────────────────────────────────── */
 .page-transacoes-rec-head { align-items: flex-start; }
@@ -176,8 +217,20 @@
 }
 
 /* ── Chips de filtro rápido ────────────────────────────────────────────────── */
-.tx-quick-filters { display: flex; flex-wrap: wrap; gap: 7px; }
+/* linha única com rolagem horizontal (sem quebra em 2 linhas no mobile) */
+.tx-quick-filters {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 7px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tx-quick-filters::-webkit-scrollbar { display: none; }
 .tx-quick-chip {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
   padding: 6px 13px;
   border-radius: var(--r-pill);
   border: 1px solid var(--hairline-strong);
@@ -185,6 +238,7 @@
   color: var(--text-secondary);
   font-size: 0.8rem;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
 }
@@ -430,17 +484,21 @@
    MOBILE (<=768): swipe-to-reveal nas linhas + ajustes
    ============================================================================= */
 @media (max-width: 768px) {
-  /* ── Hero da página (sem avatar): hambúrguer + título em cima, ações embaixo ── */
+  /* ── Hero da página (sem avatar): hambúrguer + título + ações numa linha só ── */
   .page-transacoes .dashboard-hub__hero { padding: 14px 16px; margin-bottom: 12px; }
-  .page-transacoes .dashboard-hub__hero-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 8px; }
+  .page-transacoes .dashboard-hub__hero-row { display: flex; flex-wrap: nowrap; align-items: center; gap: 10px; }
   .page-transacoes .dashboard-hub__hero-text { flex: 1; min-width: 0; }
   .page-transacoes .dashboard-hub__title { font-size: 1.4rem; line-height: 1.15; }
-  .page-transacoes .dashboard-hub__hero-actions { width: 100%; justify-content: flex-end; gap: 8px; flex-wrap: nowrap; }
+  .page-transacoes .dashboard-hub__hero-actions { flex-shrink: 0; gap: 8px; flex-wrap: nowrap; }
   .page-transacoes .dashboard-hub__btn--secondary { flex-shrink: 0; }
   .page-transacoes .dashboard-hub__icon-btn { width: 40px; height: 40px; }
 
   /* ── Linha: 3 colunas (ícone | conteúdo | valor); ações saem da tela à direita
         e são reveladas ao arrastar (swipe → translateX negativo) ── */
+  /* recorta o vazamento das ações (position:absolute; left:100%) — sem isto a
+     lista gera overflow horizontal e os botões aparecem em todas as linhas.
+     O swipe revela a célula ao deslizar a linha p/ dentro desta área. */
+  .page-transacoes-ref-table .ref-tx-list { overflow-x: clip; }
   .page-transacoes-ref-table .ref-tx-row--v2 {
     grid-template-columns: auto minmax(0, 1fr) auto;
     transform: translateX(var(--tx-swipe, 0px));

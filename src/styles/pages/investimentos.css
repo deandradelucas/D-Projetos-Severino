@@ -9,6 +9,26 @@
 
 /* ── Hero: linha de taxas (Selic / CDI) ────────────────────────────────────── */
 .page-investimentos .page-investimentos-hero__rates-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+/* badges de taxa (estavam sem CSS — label e valor colavam: "Selic14,50%") */
+.page-investimentos .taxa-selic-badge--hero,
+.page-investimentos .taxa-cdi-badge--hero {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  background: var(--surface-sunken);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+.page-investimentos .taxa-selic-badge__k,
+.page-investimentos .taxa-cdi-badge__k { color: var(--text-muted); font-weight: 600; }
+.page-investimentos .taxa-selic-badge__pill,
+.page-investimentos .taxa-cdi-badge__pill { color: var(--text-primary); font-weight: 700; font-variant-numeric: tabular-nums; }
+.page-investimentos .taxa-selic-badge__pill--muted,
+.page-investimentos .taxa-cdi-badge__pill--muted { color: var(--text-muted); font-weight: 600; }
+.page-investimentos .taxa-selic-badge__pill--warn,
+.page-investimentos .taxa-cdi-badge__pill--warn { color: var(--error); font-weight: 600; }
 
 /* ── Resumo (patrimônio + diversificação + meta + projeção) ────────────────── */
 .page-investimentos-resumo {
@@ -28,6 +48,12 @@
 }
 .page-investimentos-resumo__badge--sim { background: var(--success-muted); color: var(--success); }
 .page-investimentos-resumo__body { display: flex; flex-direction: column; gap: 16px; }
+/* desktop: stats (2x2) à esquerda + donut ao lado, em vez de empilhado */
+@media (min-width: 769px) {
+  .page-investimentos-resumo__body { flex-direction: row; align-items: center; gap: 28px; }
+  .page-investimentos-resumo__stats { flex: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .page-investimentos-resumo__chart { flex-shrink: 0; width: 200px; }
+}
 
 .page-investimentos-resumo__stat { display: flex; flex-direction: column; gap: 3px; }
 .page-investimentos-resumo__stat .page-investimentos-resumo__meta-title,
@@ -63,9 +89,9 @@
 .page-investimentos-resumo__projecao-label { font-size: 0.78rem; color: var(--text-secondary); }
 .page-investimentos-resumo__projecao-row { display: flex; align-items: center; gap: 8px; }
 .page-investimentos-resumo__projecao-input {
-  width: 90px; padding: 8px 10px; border-radius: var(--r-md);
+  width: 150px; padding: 8px 10px; border-radius: var(--r-md);
   border: 1px solid var(--hairline-strong); background: var(--surface);
-  color: var(--text-primary); font-size: 0.9rem; text-align: center;
+  color: var(--text-primary); font-size: 0.9rem;
 }
 .page-investimentos-resumo__projecao-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
 .page-investimentos-resumo__projecao-erro { font-size: 0.76rem; color: var(--error); }
@@ -84,7 +110,7 @@
 /* ── Donut (diversificação) ────────────────────────────────────────────────── */
 .page-investimentos-resumo__chart { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .page-investimentos-resumo__donut { position: relative; display: inline-flex; }
-.page-investimentos-resumo__donut-svg { display: block; }
+.page-investimentos-resumo__donut-svg { display: block; width: 140px; height: 140px; }
 .page-investimentos-resumo__donut-center-label,
 .page-investimentos-resumo__donut-center-name,
 .page-investimentos-resumo__donut-center-sublabel { font-size: 0.7rem; color: var(--text-muted); }
@@ -155,10 +181,13 @@
 }
 .page-investimentos-card__aporte { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
 .page-investimentos-card__edit:hover { color: var(--accent); border-color: var(--accent-border); }
-.page-investimentos-card__collapse-area { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.page-investimentos-card__collapse-area { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-shrink: 0; }
+/* card recolhido: a linha principal preenche a largura → valor + chevron à direita */
+.page-investimentos-card--collapsed .page-investimentos-card__top-row { flex: 1; min-width: 0; }
 .page-investimentos-card__collapse-btn { width: 32px; padding: 0; }
 .page-investimentos-card__collapse-chevron { transition: transform 200ms var(--ease); }
-.page-investimentos-card__collapse-chevron--collapsed { transform: rotate(-90deg); }
+/* recolhido aponta p/ baixo (expandir); expandido fica "^" (recolher) */
+.page-investimentos-card__collapse-chevron--collapsed { transform: rotate(180deg); }
 .page-investimentos-card__collapsed-nome { font-weight: 600; color: var(--text-primary); }
 .page-investimentos-card__collapsed-value { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .page-investimentos-card__aportes-link {
@@ -367,6 +396,18 @@
    MOBILE (<=768)
    ============================================================================= */
 @media (max-width: 768px) {
+  /* Hero: título + taxas ocupam a largura; "+ Novo" some (vira FAB); "Comparar"
+     vira botão-ícone p/ caber sem estourar a linha. */
+  .page-investimentos .dashboard-hub__hero { padding: 14px 16px; margin-bottom: 12px; }
+  .page-investimentos .dashboard-hub__hero-row { gap: 10px; align-items: flex-start; }
+  .page-investimentos .dashboard-hub__hero-text { flex: 1; min-width: 0; }
+  .page-investimentos .dashboard-hub__title { font-size: 1.4rem; line-height: 1.15; }
+  .page-investimentos .dashboard-hub__hero-actions { gap: 8px; }
+  .page-investimentos .dashboard-hub__hero-actions .dashboard-hub__btn-label { display: none; }
+  .page-investimentos .dashboard-hub__hero-actions .dashboard-hub__btn--secondary {
+    width: 40px; height: 40px; padding: 0; justify-content: center;
+  }
+
   .page-investimentos-cards { grid-template-columns: 1fr; }
   .page-investimentos-comparador__slots { grid-template-columns: 1fr; }
   .page-investimentos-modal__input,

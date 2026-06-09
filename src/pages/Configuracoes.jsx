@@ -67,6 +67,7 @@ export default function Configuracoes() {
   const [sessoesTotal, setSessoesTotal] = useState(null)
   const [sessoesBusy, setSessoesBusy] = useState(false)
   const [exportBusy, setExportBusy] = useState(false)
+  const [apagarTxOpen, setApagarTxOpen] = useState(false)
   const [excluirModalOpen, setExcluirModalOpen] = useState(false)
   const [excluirInput, setExcluirInput] = useState('')
   const [excluirBusy, setExcluirBusy] = useState(false)
@@ -227,6 +228,19 @@ export default function Configuracoes() {
       setExcluirBusy(false)
     }
   }, [excluirInput])
+
+  // Apaga TODAS as transações (mantém a conta). Movido para cá: antes vivia no
+  // painel de filtros de Transações, onde era perigoso/fora de contexto.
+  const apagarTodasTransacoes = useCallback(async () => {
+    try {
+      const res = await apiFetch(apiUrl('/api/transacoes'), { method: 'DELETE' })
+      if (redirectSe401(res)) return
+      if (!res.ok) throw new Error()
+      showToast('Todas as transações foram apagadas.')
+    } catch {
+      showToast('Erro ao apagar transações.')
+    }
+  }, [])
 
   // Carrega contagem de sessões ativas
   useEffect(() => {
@@ -749,6 +763,13 @@ export default function Configuracoes() {
               <button
                 type="button"
                 className="config-action-btn config-action-btn--danger"
+                onClick={() => setApagarTxOpen(true)}
+              >
+                Apagar todas as transações
+              </button>
+              <button
+                type="button"
+                className="config-action-btn config-action-btn--danger"
                 onClick={() => { setExcluirInput(''); setExcluirModalOpen(true) }}
               >
                 Excluir minha conta
@@ -851,6 +872,14 @@ export default function Configuracoes() {
         document.body,
       )}
 
+      <ConfirmDialog
+        open={apagarTxOpen}
+        title="Apagar todas as transações?"
+        message="Todas as suas transações serão excluídas permanentemente. Esta ação não pode ser desfeita. Sua conta e configurações permanecem."
+        confirmLabel="Apagar tudo"
+        onConfirm={() => apagarTodasTransacoes()}
+        onClose={() => setApagarTxOpen(false)}
+      />
       <ConfirmDialog
         open={Boolean(confirmBiometricRemoval)}
         title="Remover biometria?"
