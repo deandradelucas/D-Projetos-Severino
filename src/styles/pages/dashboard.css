@@ -164,6 +164,59 @@
 /* Delta — placeholder/shimmer removido (pedido CEO) */
 .dashboard-hub__balance-delta--placeholder { display: none; }
 
+/* #1 Donut Entrada × Saída do mês (preenche a direita do hero). Mobile: oculto. */
+.dashboard-hub__hero-chart { display: none; }
+@media (min-width: 769px) {
+  .dashboard-hub__hero-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-shrink: 0;
+    align-self: center;
+  }
+}
+.dashboard-hub__donut {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: conic-gradient(var(--success) 0 var(--entrada-pct, 50%), var(--error) var(--entrada-pct, 50%) 100%);
+  display: grid;
+  place-items: center;
+}
+.dashboard-hub__donut-hole {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+.dashboard-hub__donut-legend { display: flex; gap: 14px; }
+.dashboard-hub__donut-leg {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.dashboard-hub__donut-leg::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.dashboard-hub__donut-leg--in::before { background: var(--success); }
+.dashboard-hub__donut-leg--out::before { background: var(--error); }
+
 /* ── KPIs: Entrada / Saída ─────────────────────────────────────────────────── */
 .dashboard-hub__kpis,
 .ref-dashboard-kpi-strip {

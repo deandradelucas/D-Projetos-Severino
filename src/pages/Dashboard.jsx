@@ -318,9 +318,18 @@ export default function Dashboard() {
                 <strong className={[privacyMode ? 'privacy-blur' : '', saldoValorClass].filter(Boolean).join(' ')}>
                   {formatCurrency(saldoTotal)}
                 </strong>
-                <span className="dashboard-hub__balance-delta dashboard-hub__balance-delta--placeholder" aria-hidden>
-                  <span className="dashboard-hub__balance-delta-shimmer" />
-                </span>
+              </div>
+            </div>
+            <div className="dashboard-hub__hero-chart" aria-hidden>
+              <div
+                className="dashboard-hub__donut"
+                style={{ '--entrada-pct': `${totalDespesas + totalReceitas > 0 ? Math.round((totalReceitas / (totalDespesas + totalReceitas)) * 100) : 50}%` }}
+              >
+                <span className="dashboard-hub__donut-hole">no mês</span>
+              </div>
+              <div className="dashboard-hub__donut-legend">
+                <span className="dashboard-hub__donut-leg dashboard-hub__donut-leg--in">Entrada</span>
+                <span className="dashboard-hub__donut-leg dashboard-hub__donut-leg--out">Saída</span>
               </div>
             </div>
           </div>
