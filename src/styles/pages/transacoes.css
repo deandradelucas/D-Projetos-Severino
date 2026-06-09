@@ -442,6 +442,74 @@
   .page-transacoes-tx-filter-hint { font-size: 0.78rem; }
 }
 
+/* =============================================================================
+   Modal de detalhe da transação (clique numa linha) — TransacaoDetalheModal
+   Reaproveita .modal-content (card flat); estiliza o conteúdo interno.
+   ============================================================================= */
+.tx-detalhe-modal { max-width: 440px; }
+.tx-detalhe-modal__head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 0; }
+.tx-detalhe-modal__tipo { padding: 3px 11px; border-radius: var(--r-pill); font-size: 0.7rem; font-weight: 700; }
+.tx-detalhe-modal__tipo.is-rec { background: var(--success-muted); color: var(--success); }
+.tx-detalhe-modal__tipo.is-desp { background: var(--error-muted); color: var(--error); }
+
+.tx-detalhe-modal__hero { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 6px 18px 18px; text-align: center; }
+.tx-detalhe-modal__icon {
+  display: grid; place-items: center;
+  width: 52px; height: 52px;
+  margin-bottom: 4px;
+  border-radius: var(--r-lg);
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+}
+.tx-detalhe-modal__valor {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.9rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+.tx-detalhe-modal__valor.is-pos { color: var(--success); }
+.tx-detalhe-modal__valor.is-neg { color: var(--text-primary); }
+.tx-detalhe-modal__titulo { margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); }
+.tx-detalhe-modal__pendente { padding: 2px 9px; border-radius: var(--r-pill); background: var(--accent-muted); color: var(--accent); font-size: 0.68rem; font-weight: 700; }
+
+.tx-detalhe-modal__list { margin: 0; padding: 0 18px; display: flex; flex-direction: column; overflow-y: auto; }
+.tx-detalhe-modal__row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 11px 0; border-top: 1px solid var(--hairline); }
+.tx-detalhe-modal__row dt { margin: 0; font-size: 0.82rem; color: var(--text-muted); flex-shrink: 0; }
+.tx-detalhe-modal__row dd { margin: 0; font-size: 0.88rem; font-weight: 500; color: var(--text-primary); text-align: right; min-width: 0; word-break: break-word; }
+.tx-detalhe-modal__status { padding: 2px 9px; border-radius: var(--r-pill); font-size: 0.72rem; font-weight: 600; }
+.tx-detalhe-modal__status.is-pend { background: var(--accent-muted); color: var(--accent); }
+.tx-detalhe-modal__status.is-pago { background: var(--success-muted); color: var(--success); }
+
+.tx-detalhe-modal__actions { display: flex; gap: 10px; padding: 16px 18px; margin-top: 8px; border-top: 1px solid var(--hairline); flex-shrink: 0; }
+.tx-detalhe-modal__actions .btn-secondary {
+  flex: 1;
+  padding: 11px;
+  border-radius: var(--r-md);
+  background: transparent;
+  border: 1px solid var(--hairline-strong);
+  color: var(--text-secondary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tx-detalhe-modal__actions .btn-secondary:hover { background: var(--surface-2); color: var(--text-primary); }
+.tx-detalhe-modal__delete {
+  flex: 1;
+  padding: 11px;
+  border-radius: var(--r-md);
+  background: var(--error-muted);
+  border: 1px solid transparent;
+  color: var(--error);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tx-detalhe-modal__delete:hover { background: var(--error); color: #fff; }
+
 @media (prefers-reduced-motion: reduce) {
   .page-transacoes-ref-table .ref-tx-row--v2 { transition: none; }
 }
