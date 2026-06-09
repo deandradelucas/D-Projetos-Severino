@@ -511,9 +511,10 @@
      fica embaixo ocupando a largura toda (não quebra mais em 3 linhas). */
   .dashboard-hub__hero { padding: 14px 16px; margin-bottom: 12px; }
   /* Coluna de ícones (avatar → privacidade → WhatsApp) ABSOLUTA no topo-direita,
-     fora do fluxo — assim saudação + data + saldo sobem todos juntos à esquerda. */
-  .dashboard-hub__hero { position: relative; }
-  .dashboard-hub__hero-actions {
+     fora do fluxo — assim saudação + data + saldo sobem todos juntos à esquerda.
+     SÓ no hero do dashboard (que tem avatar); outras páginas mantêm inline. */
+  .dashboard-hub__hero:has(.dashboard-hub__avatar) { position: relative; }
+  .dashboard-hub__hero:has(.dashboard-hub__avatar) .dashboard-hub__hero-actions {
     position: absolute;
     top: 14px;
     right: 16px;
@@ -524,12 +525,12 @@
     gap: 8px;
   }
   .dashboard-hub__hero-actions .dashboard-hub__avatar { order: 1; }
-  .dashboard-hub__hero-actions .dashboard-hub__icon-btn--privacy { order: 2; }
-  .dashboard-hub__hero-actions .dashboard-hub__icon-btn--wa { order: 3; }
+  .dashboard-hub__hero:has(.dashboard-hub__avatar) .dashboard-hub__hero-actions .dashboard-hub__icon-btn--privacy { order: 2; }
+  .dashboard-hub__hero:has(.dashboard-hub__avatar) .dashboard-hub__hero-actions .dashboard-hub__icon-btn--wa { order: 3; }
   .dashboard-hub__icon-btn, .dashboard-hub__avatar { width: 40px; height: 40px; }
   /* texto e saldo fluem à esquerda, com folga p/ não passar sob os ícones.
      min-height garante que o card contenha a coluna de 3 ícones (WhatsApp). */
-  .dashboard-hub__hero-main { padding-right: 52px; min-height: 132px; }
+  .dashboard-hub__hero:has(.dashboard-hub__avatar) .dashboard-hub__hero-main { padding-right: 52px; min-height: 132px; }
   .dashboard-hub__hero-top { display: block; }
   .dashboard-hub__hero-text { min-width: 0; }
   .dashboard-hub__title { font-size: 1.4rem; line-height: 1.1; }

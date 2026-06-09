@@ -419,7 +419,17 @@
    MOBILE (<=768): swipe-to-reveal nas linhas + ajustes
    ============================================================================= */
 @media (max-width: 768px) {
-  /* linha vira 3 colunas (ícone | conteúdo | valor); ações ficam atrás (swipe) */
+  /* ── Hero da página (sem avatar): hambúrguer + título em cima, ações embaixo ── */
+  .page-transacoes .dashboard-hub__hero { padding: 14px 16px; margin-bottom: 12px; }
+  .page-transacoes .dashboard-hub__hero-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 8px; }
+  .page-transacoes .dashboard-hub__hero-text { flex: 1; min-width: 0; }
+  .page-transacoes .dashboard-hub__title { font-size: 1.4rem; line-height: 1.15; }
+  .page-transacoes .dashboard-hub__hero-actions { width: 100%; justify-content: flex-end; gap: 8px; flex-wrap: nowrap; }
+  .page-transacoes .dashboard-hub__btn--secondary { flex-shrink: 0; }
+  .page-transacoes .dashboard-hub__icon-btn { width: 40px; height: 40px; }
+
+  /* ── Linha: 3 colunas (ícone | conteúdo | valor); ações saem da tela à direita
+        e são reveladas ao arrastar (swipe → translateX negativo) ── */
   .page-transacoes-ref-table .ref-tx-row--v2 {
     grid-template-columns: auto minmax(0, 1fr) auto;
     transform: translateX(var(--tx-swipe, 0px));
@@ -428,12 +438,15 @@
   .page-transacoes-ref-table .ref-tx-row--swiping { transition: none; }
   .page-transacoes-ref-table .ref-tx-actions-cell {
     position: absolute;
+    left: 100%;
     top: 0;
-    right: 0;
     bottom: 0;
-    z-index: -1;
+    width: 84px;
+    display: flex;
     align-items: center;
-    padding-right: 6px;
+    justify-content: center;
+    gap: 6px;
+    padding-left: 8px;
   }
   .page-transacoes-ref-table .transacoes-actions .btn-edit,
   .page-transacoes-ref-table .transacoes-actions .btn-delete { width: 36px; height: 36px; }
