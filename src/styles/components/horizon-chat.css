@@ -279,8 +279,9 @@
     padding-bottom: var(--safe-bottom, 0px);
   }
   .horizon-chat-window.chat-window-open { transform: translateY(0); }
-  /* acima do FAB de nova transacao (52px) pra nao colidir */
-  .horizon-chat-fab { right: 16px; bottom: calc(72px + var(--safe-bottom, 0px) + 12px + 64px); }
+  /* mesma base do FAB "+ Nova transação" (canto inferior direito, ao lado do
+     pill centralizado). Posição determinística por CSS — sem pulo na carga. */
+  .horizon-chat-fab { right: 16px; bottom: max(78px, calc(70px + var(--safe-bottom, 0px))); }
 }
 
 @media (prefers-reduced-motion: reduce) {

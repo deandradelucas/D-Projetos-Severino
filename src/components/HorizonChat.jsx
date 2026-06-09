@@ -89,17 +89,19 @@ function useHorizonShellDock(chatOpen) {
         const w = Math.min(maxCardW, Math.max(260, mainW - sideInset * 2))
         const left = mainL + (mainW - w) / 2
 
-        /* Cartão aberto no mobile: geometria só via CSS (.horizon-chat-window--mobile-sheet) */
+        /* Mobile: FAB posicionado só via CSS (.horizon-chat-fab no horizon-chat.css)
+           — evita o "pulo" na carga (a medição do nav acontecia antes do layout
+           assentar). fabStyle: null deixa o CSS mandar. */
         if (chatOpen) {
           setDock({
-            fabStyle: { position: 'fixed', bottom: fabBottom, right: fabRight },
+            fabStyle: null,
             winStyle: null,
           })
           return
         }
 
         setDock({
-          fabStyle: { position: 'fixed', bottom: fabBottom, right: fabRight },
+          fabStyle: null,
           winStyle: {
             position: 'fixed',
             left: `${left}px`,
