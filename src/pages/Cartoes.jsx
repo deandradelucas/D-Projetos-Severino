@@ -308,7 +308,7 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
               <button type="button" onClick={() => setRef((r) => shiftRef(r, 1))} aria-label="Próximo mês"><IconChevronRight /></button>
             </div>
             <div className="page-cartoes__fatura-resumo">
-              <div>
+              <div className="page-cartoes__fatura-resumo-main">
                 <span className="page-cartoes__fatura-total-label">Total da fatura</span>
                 <span className="page-cartoes__fatura-total">{fatura ? formatCurrencyBRL(fatura.total) : '—'}</span>
               </div>

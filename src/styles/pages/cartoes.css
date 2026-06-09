@@ -163,6 +163,7 @@
 .page-cartoes__fatura-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .page-cartoes__fatura-mes { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
 .page-cartoes__fatura-resumo { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: var(--r-md); background: var(--surface-sunken); }
+.page-cartoes__fatura-resumo-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .page-cartoes__fatura-total-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
 .page-cartoes__fatura-total { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .page-cartoes__fatura-venc { font-size: 0.78rem; color: var(--text-secondary); }
