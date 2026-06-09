@@ -115,4 +115,7 @@
   .mobile-backdrop,
   .mobile-menu-btn,
   .mobile-bottom-nav { display: none !important; }
+  /* botao de fechar o drawer: so existe no mobile (este arquivo carrega depois
+     do sidebar.css, entao a regra de esconder precisa estar aqui pra vencer) */
+  .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn { display: none; }
 }
