@@ -411,8 +411,9 @@ export default function Dashboard() {
           </div>
         )}
 
-        {insights.length > 0 && (
-          <section className="ai-insights" aria-label="Insights da Severino IA">
+        <div className="dashboard-hub__band">
+          {insights.length > 0 && (
+            <section className="ai-insights" aria-label="Insights da Severino IA">
             <div className="ai-insights__head">
               <span className="ai-insights__spark" aria-hidden>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -433,12 +434,11 @@ export default function Dashboard() {
                 </article>
               ))}
             </div>
-          </section>
-        )}
+            </section>
+          )}
 
-        {!loading && (
-          <section className="dashboard-hub__insights" aria-label="Próximo compromisso e despesas">
-            <article className="ref-panel dashboard-hub__insight-card">
+          {!loading && (
+            <article className="ref-panel dashboard-hub__insight-card dashboard-hub__insight-card--next">
               <div className="ref-panel__head">
                 <h2 className="ref-panel__title">Próximo compromisso</h2>
                 <Link to="/agenda" className="ref-panel__link">
@@ -462,7 +462,11 @@ export default function Dashboard() {
                 <p className="dashboard-hub__insight-empty">Nenhum compromisso à vista. <span aria-hidden="true">🎉</span></p>
               )}
             </article>
+          )}
+        </div>
 
+        {!loading && (
+          <section className="dashboard-hub__insights dashboard-hub__insights--single" aria-label="Despesas por categoria">
             <article className="ref-panel dashboard-hub__insight-card">
               <div className="ref-panel__head">
                 <h2 className="ref-panel__title">Despesas por categoria</h2>
