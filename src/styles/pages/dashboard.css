@@ -252,8 +252,9 @@
   background: var(--surface-sunken);
 }
 .ref-kpi-card__icon-img { width: 24px; height: 24px; }
-.ref-kpi-card--expense .ref-kpi-card__icon { color: var(--error); background: var(--error-muted); }
-.ref-kpi-card--income .ref-kpi-card__icon { color: var(--success); background: var(--success-muted); }
+/* fundo do ícone na MESMA cor forte da % do card; seta em branco p/ contraste */
+.ref-kpi-card--expense .ref-kpi-card__icon { color: #fff; background: var(--error); }
+.ref-kpi-card--income .ref-kpi-card__icon { color: #fff; background: var(--success); }
 .ref-kpi-card__body { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
 .ref-kpi-card__label {
   margin: 0;
