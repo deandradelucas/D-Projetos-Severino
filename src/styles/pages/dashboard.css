@@ -3,12 +3,9 @@
    3 tiers (mobile/tablet/desktop). Tokens: surface, hairline, elev, accent.
    ============================================================================= */
 
-/* #2 Bento: layout contido (não estica em telas largas) + ritmo consistente.
-   Conteúdo do dashboard é dinâmico, então usamos card-grid fluido (não tiles fixos). */
+/* #2 Bento: card-grid fluido + ritmo 16px. A CONTENÇÃO de largura (max 1440,
+   centrado) é GLOBAL no shell (.main-content), valendo p/ todas as páginas. */
 .dashboard-hub { width: 100%; }
-@media (min-width: 1024px) {
-  .dashboard-hub { max-width: 1440px; margin-inline: auto; }
-}
 
 /* ── Hero card ─────────────────────────────────────────────────────────────── */
 .dashboard-hub__hero {
