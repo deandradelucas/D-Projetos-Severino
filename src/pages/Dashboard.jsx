@@ -359,12 +359,12 @@ export default function Dashboard() {
                 <div className="ref-kpi-card__body">
                   <p className="ref-kpi-card__label">Saída</p>
                   <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(totalDespesas)}</p>
-                  <span className="ref-kpi-card__delta ref-kpi-card__delta--placeholder" aria-hidden>
-                    <span className="ref-kpi-card__delta-shimmer" />
-                  </span>
                 </div>
-                <div className="ref-kpi-card__spark ref-kpi-card__spark--placeholder" aria-hidden>
-                  <span /><span /><span /><span /><span /><span /><span />
+                <div className="ref-kpi-card__pct" aria-hidden>
+                  <span className="ref-kpi-card__pct-value">
+                    {totalDespesas + totalReceitas > 0 ? Math.round((totalDespesas / (totalDespesas + totalReceitas)) * 100) : 0}%
+                  </span>
+                  <span className="ref-kpi-card__pct-label">do total</span>
                 </div>
               </article>
               <article className="ref-kpi-card ref-kpi-card--income">
@@ -381,12 +381,12 @@ export default function Dashboard() {
                 <div className="ref-kpi-card__body">
                   <p className="ref-kpi-card__label">Entrada</p>
                   <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(totalReceitas)}</p>
-                  <span className="ref-kpi-card__delta ref-kpi-card__delta--placeholder" aria-hidden>
-                    <span className="ref-kpi-card__delta-shimmer" />
-                  </span>
                 </div>
-                <div className="ref-kpi-card__spark ref-kpi-card__spark--placeholder" aria-hidden>
-                  <span /><span /><span /><span /><span /><span /><span />
+                <div className="ref-kpi-card__pct" aria-hidden>
+                  <span className="ref-kpi-card__pct-value">
+                    {totalDespesas + totalReceitas > 0 ? Math.round((totalReceitas / (totalDespesas + totalReceitas)) * 100) : 0}%
+                  </span>
+                  <span className="ref-kpi-card__pct-label">do total</span>
                 </div>
               </article>
             </>

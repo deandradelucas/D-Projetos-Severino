@@ -217,6 +217,30 @@
 }
 /* #6 valor neutro; o ícone (vermelho/verde) carrega o sinal */
 .ref-kpi-card__value { color: var(--text-primary); }
+/* #3 % do total movimentado (à direita, colorido) — preenche o espaço do card */
+.ref-kpi-card__pct {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 1px;
+  margin-left: auto;
+}
+.ref-kpi-card__pct-value {
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-secondary);
+}
+.ref-kpi-card--expense .ref-kpi-card__pct-value { color: var(--error); }
+.ref-kpi-card--income .ref-kpi-card__pct-value { color: var(--success); }
+.ref-kpi-card__pct-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
 .ref-kpi-card__delta--placeholder,
 .ref-kpi-card__spark,
 .ref-kpi-card__spark--placeholder { display: none; }
@@ -405,6 +429,8 @@
   .ref-kpi-card { gap: 12px; padding: 14px; }
   .ref-kpi-card__icon { width: 44px; height: 44px; }
   .ref-kpi-card__value { font-size: clamp(1.05rem, 4.5vw, 1.35rem); }
+  .ref-kpi-card__pct-label { display: none; }
+  .ref-kpi-card__pct-value { font-size: 0.95rem; }
   .ai-insight { width: 240px; }
   .dashboard-hub__insights { grid-template-columns: 1fr; gap: 12px; }
 }
