@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
-import '../styles/legacy/OnboardingChecklist.css'
 
 const DISMISS_KEY = 'severino_onboarding_dismissed'
 
