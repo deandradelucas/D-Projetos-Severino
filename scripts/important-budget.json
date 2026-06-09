@@ -1,10 +1,9 @@
 {
-  "total": 21,
+  "total": 19,
   "files": {
     "src/styles/layout/mobile-nav.css": 1,
     "src/styles/legacy/from-index.css": 9,
     "src/styles/legacy/PwaInstallPrompt.css": 1,
-    "src/styles/pages/dashboard.css": 2,
     "src/styles/responsive.css": 8
   }
 }

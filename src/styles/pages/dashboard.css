@@ -156,8 +156,10 @@
   letter-spacing: -0.035em;
   color: var(--text-primary);
 }
-.dashboard-hub__balance-value--positive { color: var(--success) !important; }
-.dashboard-hub__balance-value--negative { color: var(--error) !important; }
+/* #6 Hierarquia de cor — saldo NEUTRO (estilo Mercury/Ramp); o sinal vem do
+   contexto (cards Saída/Entrada). Cor semântica usada com parcimônia. */
+.dashboard-hub__balance-value--positive,
+.dashboard-hub__balance-value--negative { color: var(--text-primary); }
 
 /* Delta — placeholder/shimmer removido (pedido CEO) */
 .dashboard-hub__balance-delta--placeholder { display: none; }
@@ -213,8 +215,8 @@
   letter-spacing: -0.02em;
   color: var(--text-primary);
 }
-.ref-kpi-card--expense .ref-kpi-card__value { color: var(--error); }
-.ref-kpi-card--income .ref-kpi-card__value { color: var(--success); }
+/* #6 valor neutro; o ícone (vermelho/verde) carrega o sinal */
+.ref-kpi-card__value { color: var(--text-primary); }
 .ref-kpi-card__delta--placeholder,
 .ref-kpi-card__spark,
 .ref-kpi-card__spark--placeholder { display: none; }
