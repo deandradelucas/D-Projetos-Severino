@@ -20,20 +20,20 @@
   height: 56px;
   padding: 0;
   overflow: hidden;
-  border: 1px solid rgba(var(--accent-rgb), 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 50%;
-  /* vidro fosco (glassmorphism): fundo translucido + blur do que esta atras */
-  background: rgba(var(--accent-rgb), 0.18);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
-  backdrop-filter: blur(14px) saturate(150%);
-  color: var(--accent-foreground);
+  /* vidro fosco black (glassmorphism): fundo preto translucido + blur do fundo */
+  background: rgba(15, 18, 24, 0.55);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  color: #fff;
   box-shadow: var(--elev-3);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: transform 200ms var(--ease), background 150ms var(--ease);
 }
-.horizon-chat-fab:hover { transform: scale(1.05); background: rgba(var(--accent-rgb), 0.28); }
-.horizon-chat-fab.chat-fab-active { background: rgba(var(--accent-rgb), 0.28); }
+.horizon-chat-fab:hover { transform: scale(1.05); background: rgba(15, 18, 24, 0.68); }
+.horizon-chat-fab.chat-fab-active { background: rgba(15, 18, 24, 0.68); }
 .horizon-fab-logo { width: 60%; height: 60%; object-fit: contain; }
 .horizon-fab-pulse {
   position: absolute;
