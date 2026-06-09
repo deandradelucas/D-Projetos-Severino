@@ -1,8 +1,8 @@
 /* =============================================================================
    dashboard.css — manifesto da NOVA arquitetura CSS (rewrite limpo, release/1.0.4)
    -----------------------------------------------------------------------------
-   Global (tokens, cores, dark, neumorfismo, fonte Jakarta, reset) vive em
-   index.css → src/styles/global.css. Aqui só importamos os componentes/páginas
+   Global (tokens, cores, dark, neumorfismo, fonte Jakarta, reset) vive todo no
+   src/index.css (arquivo global único). Aqui só importamos os componentes/páginas
    do app, reconstruídos do zero em src/styles/. Cresce conforme reconstruímos.
    ============================================================================= */
 
