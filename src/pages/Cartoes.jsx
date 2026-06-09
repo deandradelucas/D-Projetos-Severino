@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import './dashboard.css'
-import './cartoes.css'
+import '../styles/legacy/cartoes.css'
 import { useFabCompact } from '../hooks/useFabCompact'
 import { useModalA11y } from '../hooks/useModalA11y'
 import Sidebar from '../components/Sidebar'

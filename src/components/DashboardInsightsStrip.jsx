@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
-import './DashboardInsightsStrip.css'
+import '../styles/legacy/DashboardInsightsStrip.css'
 
 /**
  * Faixa de insights proativos da "Severino IA" no topo do Dashboard.

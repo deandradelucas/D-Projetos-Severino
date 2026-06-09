@@ -1,0 +1,1461 @@
+/* ============================================================
+   LEGACY — CSS antigo extraído do index.css (auth / bem-vindo / legal / trial).
+   NÃO é a arquitetura nova. Reconstruir por página e deletar os trechos aqui.
+   ============================================================ */
+
+/* BemVindoAssinatura — pinta TODO o viewport de preto (Background.jsx, html, body, #root)
+   para evitar que o safe-area bottom do iPhone mostre fundo branco do tema claro */
+html:has(.bem-vindo-page),
+html:has(.bem-vindo-page) body,
+html:has(.bem-vindo-page) #root {
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+html:has(.bem-vindo-page) .app-background-root__plain-fill {
+  background: #000000 !important;
+}
+
+html:has(.bem-vindo-page) .app-layout-shell,
+html:has(.bem-vindo-page) .app-routes-grow {
+  background-color: #000000 !important;
+}
+
+/* BemVindoAssinatura — esconde o chat FAB nessa rota */
+html:has(.bem-vindo-page) .horizon-chat-fab,
+html:has(.bem-vindo-page) .horizon-chat-window {
+  display: none !important;
+}
+
+.bem-vindo-page {
+  font-family: var(--font-marketing);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.trial-expirado-page {
+  font-family: var(--font-marketing);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Documentos legais (Política de Privacidade / Termos) */
+.legal-doc-body h2 { font-size: 1.1rem; font-weight: 700; color: #111827; margin-top: 1.75rem; margin-bottom: 0.35rem; }
+.legal-doc-body p { margin: 0.5rem 0; }
+.legal-doc-body ul { list-style: disc; padding-left: 1.25rem; margin: 0.4rem 0; }
+.legal-doc-body li { margin: 0.25rem 0; }
+.legal-doc-body a { color: #b45309; text-decoration: underline; }
+.legal-doc-body strong { color: #111827; }
+.auth-shell-glass {
+  font-family: var(--font-marketing);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.auth-shell-glass input,
+.auth-shell-glass button,
+.auth-shell-glass textarea,
+.auth-shell-glass select,
+.auth-shell-glass label,
+.auth-shell-glass a,
+.auth-shell-glass h1,
+.auth-shell-glass h2,
+.auth-shell-glass p,
+.auth-shell-glass li,
+.auth-shell-glass span {
+  font-family: var(--font-marketing);
+}
+
+/* Login/Cadastro — fallback atrás da foto (evita flash/branco nas bordas em alguns viewports) */
+.auth-shell-glass--hero {
+  background-color: #0f172a;
+}
+
+.auth-shell-glass--blobs {
+  background-color: #ffffff;
+}
+
+/* Login — fundo branco sólido (sem foto lateral nem blobs) */
+.auth-shell-glass--plain-white {
+  background-color: #ffffff;
+}
+
+body[data-theme='light']:has(.auth-shell-glass--plain-white) {
+  background-color: #ffffff;
+  background-image: none;
+}
+
+html:has(body[data-theme='light']:has(.auth-shell-glass--plain-white)) {
+  background-color: #ffffff;
+}
+
+/* Login 50/50 — copy | formulário */
+.auth-shell-glass--split {
+  background-color: #ffffff;
+}
+
+body[data-theme='light']:has(.auth-shell-glass--split),
+html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
+  background-color: #ffffff;
+  background-image: none;
+}
+
+.auth-shell-copy-column {
+  background-color: #000000;
+  color: #f1f5f9;
+  font-family: var(--font-marketing);
+}
+
+.auth-login-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.auth-login-copy,
+.auth-login-copy h2,
+.auth-login-copy p,
+.auth-login-copy li,
+.auth-login-copy span,
+.auth-login-copy strong {
+  font-family: inherit;
+}
+
+.auth-shell-copy-column__inner {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: 0;
+  padding: 1.25rem 1.5rem 1rem;
+  padding-top: max(1.25rem, env(safe-area-inset-top));
+}
+
+.auth-login-copy__headline {
+  margin: 0;
+  font-size: clamp(1.375rem, 1.6vw + 0.85rem, 1.875rem);
+  font-weight: 600;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  text-wrap: pretty;
+}
+
+.auth-login-copy__headline-accent {
+  color: #e8c56a;
+}
+
+.auth-login-copy__lead {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.62;
+  color: rgba(226, 232, 240, 0.88);
+  max-width: 38rem;
+}
+
+.auth-login-copy__solution {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.62;
+  color: rgba(241, 245, 249, 0.95);
+  max-width: 38rem;
+}
+
+.auth-login-copy__solution strong {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.auth-login-copy__benefits {
+  --benefit-stagger: 70ms;
+  margin: 0.15rem 0 0;
+  padding: 0.65rem 0 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-login-copy__benefit {
+  --benefit-i: 0;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.7rem 0.5rem 0.7rem 0.75rem;
+  border-radius: 0.625rem;
+  border: 1px solid rgba(212, 168, 75, 0.24);
+  background: rgba(212, 168, 75, 0.06);
+  opacity: 0;
+  animation: auth-login-copy-benefit-in 0.45s ease forwards;
+  animation-delay: calc(var(--benefit-i) * var(--benefit-stagger) + 80ms);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.auth-login-copy__benefit:hover {
+  background: rgba(212, 168, 75, 0.1);
+  border-color: rgba(212, 168, 75, 0.38);
+}
+
+.auth-login-copy__benefit--whatsapp {
+  border-color: rgba(37, 211, 102, 0.28);
+  background: rgba(37, 211, 102, 0.06);
+}
+
+.auth-login-copy__benefit--whatsapp:hover {
+  background: rgba(37, 211, 102, 0.1);
+  border-color: rgba(37, 211, 102, 0.42);
+}
+
+@keyframes auth-login-copy-benefit-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-login-copy__svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+}
+
+.auth-login-copy__benefit .auth-login-copy__icon {
+  margin-top: 0;
+}
+
+.auth-login-copy__icon {
+  display: grid;
+  place-items: center;
+  margin-top: 0.12rem;
+  height: 1.625rem;
+  width: 1.625rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: rgba(212, 168, 75, 0.14);
+  color: #e8c56a;
+}
+
+.auth-login-copy__icon--whatsapp {
+  height: 2.125rem;
+  width: 2.125rem;
+  border-radius: 0.5rem;
+  background: #25d366;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(37, 211, 102, 0.35);
+}
+
+.auth-login-copy__svg--whatsapp {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.auth-login-copy__benefit-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.auth-login-copy__arrow {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  align-self: center;
+  margin-left: 0.35rem;
+  color: rgba(232, 197, 106, 0.9);
+  animation: auth-login-copy-arrow-pulse 1.65s ease-in-out infinite;
+}
+
+.auth-login-copy__arrow-svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.auth-login-copy__benefit--whatsapp .auth-login-copy__arrow {
+  color: #4ade80;
+}
+
+@keyframes auth-login-copy-arrow-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateX(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(5px);
+  }
+}
+
+.auth-login-copy__benefit-title {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #ffffff;
+}
+
+.auth-login-copy__benefit-text {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.875rem;
+  line-height: 1.58;
+  color: rgba(203, 213, 225, 0.9);
+}
+
+.auth-login-copy__proof {
+  margin: 0;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.875rem;
+  line-height: 1.58;
+  color: rgba(203, 213, 225, 0.82);
+  max-width: 36rem;
+}
+
+.auth-login-copy__cta-hint {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgba(212, 168, 75, 0.95);
+  max-width: 36rem;
+}
+
+/* Login com foto — overlay separado mobile (cartão sobre foto) vs desktop (só na coluna da imagem) */
+.auth-shell-glass-hero-overlay--mobile {
+  background-color: rgba(255, 255, 255, 0.52);
+}
+
+.auth-shell-glass-hero-overlay--desktop {
+  background: linear-gradient(115deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.45) 100%);
+}
+
+/* Login/Cadastro glass — reflexo sob o cartão só em telas pequenas */
+.auth-shell-glass-card-reflect {
+  -webkit-box-reflect: below 14px
+    linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.12) 22%, rgba(255, 255, 255, 0.04) 48%, transparent 82%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-shell-glass-card-reflect {
+    -webkit-box-reflect: none;
+  }
+}
+
+/* Desktop: layout em duas colunas no login (foto | formulário) — cartão sem “aro” de vidro branco */
+@media (min-width: 1024px) {
+  .auth-shell-glass-card-reflect {
+    -webkit-box-reflect: none;
+  }
+
+  /* Painel do formulário: fundo sólido (não compete com borda do cartão) */
+  .auth-shell-glass--hero .auth-shell-glass-form-column {
+    background-color: #e8edf4;
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.35);
+  }
+
+  /* Cartão: papel branco discreto, sem borda cinza clara */
+  .auth-shell-glass--hero .auth-shell-glass-card {
+    border-color: transparent;
+    border-width: 0;
+    background-color: #ffffff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow:
+      0 18px 48px -28px rgba(15, 23, 42, 0.14),
+      0 0 0 1px rgba(15, 23, 42, 0.05);
+  }
+
+  /* Cadastro: fundo em gradiente + cartão sem contorno branco */
+  .auth-shell-glass--blobs {
+    background-color: #dde5f0;
+    background-image:
+      radial-gradient(ellipse 85% 58% at 14% 10%, rgba(255, 255, 255, 0.75), transparent 56%),
+      radial-gradient(ellipse 72% 52% at 92% 90%, rgba(148, 163, 184, 0.38), transparent 52%),
+      linear-gradient(163deg, #e9eef6 0%, #d7dfea 46%, #c9d4e3 100%);
+  }
+
+  .auth-shell-glass--blobs .auth-shell-glass-card {
+    border-color: transparent;
+    border-width: 0;
+    background-color: rgba(255, 255, 255, 0.94);
+    box-shadow:
+      0 22px 64px -36px rgba(15, 23, 42, 0.16),
+      0 0 0 1px rgba(255, 255, 255, 0.55) inset;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .auth-shell-glass--plain-white .auth-shell-glass-form-column {
+    background-color: #ffffff;
+    box-shadow: none;
+  }
+
+  .auth-shell-glass--plain-white .auth-shell-glass-card {
+    border-color: #e5e7eb;
+    background-color: #ffffff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: 0 12px 40px -24px rgba(15, 23, 42, 0.1);
+  }
+
+  .auth-shell-glass--split .auth-shell-glass-form-column {
+    background-color: #ffffff;
+    border-left: 1px solid #e8ecf1;
+    box-shadow: inset 8px 0 24px -20px rgba(15, 23, 42, 0.06);
+  }
+
+  .auth-shell-glass--split .auth-shell-glass-card {
+    border-color: #e5e7eb;
+    box-shadow:
+      0 12px 40px -24px rgba(15, 23, 42, 0.12),
+      0 0 0 1px rgba(15, 23, 42, 0.04);
+  }
+
+  .auth-shell-copy-column__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    width: 100%;
+    max-width: 100%;
+    min-height: min(100%, 100dvh);
+    padding: 2.5rem clamp(2rem, 4.5vw, 2.75rem) 2.75rem;
+    padding-top: max(2.5rem, env(safe-area-inset-top));
+    padding-bottom: max(2.75rem, env(safe-area-inset-bottom));
+  }
+
+  .auth-login-copy {
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  .auth-login-copy__headline {
+    font-size: clamp(1.75rem, 2.1vw, 2rem);
+    line-height: 1.26;
+  }
+
+  .auth-login-copy__lead,
+  .auth-login-copy__solution {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    max-width: none;
+  }
+
+  .auth-login-copy__benefit-title {
+    font-size: 1rem;
+  }
+
+  .auth-login-copy__benefit-text {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .auth-login-copy__proof,
+  .auth-login-copy__cta-hint {
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-login-copy__benefit {
+    opacity: 1;
+    animation: none;
+  }
+
+  .auth-login-copy__arrow {
+    opacity: 0.85;
+    animation: none;
+    transform: none;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 1024px) {
+  .auth-shell-copy-column__inner {
+    justify-content: flex-start;
+    padding-block: 1.5rem;
+  }
+
+  .auth-login-copy__proof {
+    display: none;
+  }
+}
+
+/* Encadeia altura no mobile: rotas preenchem a viewport sem scroll lateral */
+.app-layout-shell {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@media (max-width: 768px) {
+  .app-layout-shell {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .app-routes-grow > .dashboard-container.app-horizon-shell {
+    flex: 1 1 auto;
+    min-height: 0;
+    align-self: stretch;
+  }
+}
+
+.app-routes-grow {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* iOS safe area: evita conteúdo sob notch / home indicator */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.app-routes-grow > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/*
+ * Desktop / PWA em janela larga: encadeia altura como no mobile e permite centralizar o shell
+ * (.dashboard-container.app-horizon-shell usa margin auto + largura máxima em dashboard.css).
+ */
+@media (min-width: 769px) {
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+  }
+
+  .app-layout-shell {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .app-routes-grow:has(.dashboard-container.app-horizon-shell) {
+    align-items: center;
+  }
+}
+
+/* Camada de foto + vinheta: fixa na viewport, sem “andar” lateral no mobile */
+.app-background-root {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: strict;
+  pointer-events: none;
+}
+
+/* Página Configurações: fundo sólido (sem foto Horizonte), alinhado a UI “papel” branca */
+.app-background-root__plain-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.app-background-root--plain-light .app-background-root__plain-fill {
+  background: #ffffff;
+}
+
+.app-background-root--plain-dark .app-background-root__plain-fill {
+  background: #000000;
+}
+
+/* Tema claro — fundo premium (login e telas sem shell) */
+body[data-theme='light'] {
+  color-scheme: light;
+  background-color: #8ca8d4;
+  background-image:
+    radial-gradient(ellipse 100% 70% at 15% -5%, rgba(255, 255, 255, 0.42), transparent 52%),
+    radial-gradient(ellipse 90% 60% at 95% 105%, rgba(79, 70, 229, 0.07), transparent 48%),
+    linear-gradient(168deg, #9eb6e0 0%, #7d9ad0 42%, #6d8ec4 100%);
+}
+
+/* App autenticado (tema claro): fundo sólido, sem fotos no carregamento das rotas */
+body[data-theme='light']:has(.app-horizon-shell) {
+  background-color: #ffffff;
+  background-image: none;
+}
+
+html:has(body[data-theme='light']:has(.app-horizon-shell)) {
+  background-color: #ffffff;
+}
+
+/* Rotas autenticadas: sem foto/vinheta por baixo do shell */
+body[data-theme='light']:has(.app-horizon-shell) .app-routes-grow {
+  background-color: #ffffff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/*
+ * Dashboard com shell: no desktop mantém o cartão branco único (sem foto nas laterais).
+ * No mobile (≤768px) não aplicar isto — assim .app-routes-grow segue com foto + blur(1px)
+ * por baixo da área de rotas e o cabeçalho (backdrop-filter) tem conteúdo visível a desfocar.
+ */
+@media (min-width: 769px) {
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) .app-routes-grow {
+    background-color: #ffffff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+    background-color: #ffffff;
+  }
+
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) {
+    background-color: #ffffff;
+  }
+
+  body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+    background-color: #ffffff;
+  }
+}
+
+/* Tema escuro */
+body[data-theme='dark'] {
+  color-scheme: dark;
+  background-color: #000000;
+  background-image: none;
+}
+
+body[data-theme='dark']:has(.app-horizon-shell) {
+  background-color: #000000;
+  background-image: none;
+}
+
+html:has(body[data-theme='dark']:has(.app-horizon-shell)) {
+  background-color: #000000;
+}
+
+body[data-theme='dark']:has(.app-horizon-shell) .app-routes-grow {
+  background-color: #000000;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+input,
+textarea,
+select,
+button {
+  /* só a FAMÍLIA herda — `font: inherit` (shorthand) zerava font-size/weight e,
+     por ser unlayered, vencia os partials da layer `app`, fazendo todo botão
+     herdar 17px/400 do hero. (Inofensivo na 1.0.3 só porque os partials eram
+     unlayered e venciam por ordem-de-fonte.) */
+  font-family: inherit;
+}
+
+/* Cursor de mãozinha em tudo que é clicável.
+   O default do browser para <button> e <select> é seta — esta regra padroniza
+   para pointer. Campos de texto (input text/textarea) mantêm o cursor I-beam.
+   Elementos clicáveis que são <div>/<span> (onClick no React) não são detectáveis
+   por seletor — usar role="button" ou a classe .clickable para herdar o pointer. */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+a[href],
+label[for],
+select:not(:disabled),
+summary,
+input[type='checkbox']:not(:disabled),
+input[type='radio']:not(:disabled),
+input[type='submit']:not(:disabled),
+input[type='button']:not(:disabled),
+input[type='reset']:not(:disabled),
+input[type='file']:not(:disabled),
+input[type='range'],
+input[type='color'],
+.clickable,
+[data-clickable] {
+  cursor: pointer;
+}
+
+/* :has() isolado — se o browser não suportar, descarta só esta regra (não a de cima) */
+label:has(input[type='checkbox']:not(:disabled)),
+label:has(input[type='radio']:not(:disabled)) {
+  cursor: pointer;
+}
+
+/* Elementos interativos desabilitados: cursor de bloqueado */
+button:disabled,
+select:disabled,
+[aria-disabled='true'],
+input:disabled {
+  cursor: not-allowed;
+}
+
+/* Skip link — teclado / leitores de ecrã (UX + WCAG 2.4.1) */
+.skip-to-main {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  z-index: 9999;
+}
+
+.skip-to-main:focus {
+  position: fixed;
+  left: max(12px, env(safe-area-inset-left, 0px));
+  top: max(12px, env(safe-area-inset-top, 0px));
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 10px 14px;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  background: var(--color-accent-gold);
+  color: #0a0a0a;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  outline: none;
+}
+
+.skip-to-main:focus-visible {
+  outline: 2px solid #0a0a0a;
+  outline-offset: 2px;
+}
+
+/* Texto só para tecnologias assistivas */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+
+@media (max-width: 768px) {
+  html {
+    overflow: hidden;
+    overflow-x: clip;
+    min-height: 100svh;
+    height: 100svh;
+    overscroll-behavior: none;
+    background-color: #050607;
+  }
+
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+    height: 100svh;
+    max-height: 100svh;
+    min-height: 100svh;
+    overflow: hidden;
+    overflow-x: clip;
+    overscroll-behavior: none;
+    touch-action: pan-y;
+    background-color: #050607;
+  }
+
+  #root {
+    display: flex;
+    flex-direction: column;
+    height: 100svh;
+    min-height: 100svh;
+    flex: 1;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+  }
+
+  /* Shell autenticado (tema claro): qualquer .app-horizon-shell — evita moldura escura nas páginas sem .ref-dashboard */
+  html:has(body[data-theme='light'] .dashboard-container.app-horizon-shell) {
+    background-color: #ffffff;
+  }
+
+  body[data-theme='light']:has(.dashboard-container.app-horizon-shell),
+  body[data-theme='light']:has(.dashboard-container.app-horizon-shell) #root {
+    background-color: #ffffff;
+  }
+
+  body[data-theme='light']:has(.dashboard-container.app-horizon-shell) .app-routes-grow {
+    background-color: #ffffff;
+  }
+
+  html:has(body[data-theme='dark']) {
+    background-color: #000000;
+  }
+
+  body[data-theme='dark'],
+  body[data-theme='dark'] #root {
+    background-color: #000000;
+  }
+
+  /* Shell autenticado: safe-area já nos painéis internos / FAB — não somar padding aqui */
+  .app-routes-grow:has(.dashboard-container.app-horizon-shell) {
+    padding-bottom: 0;
+  }
+
+  /* BemVindoAssinatura: componente cobre toda a tela — remove padding e força fundo preto */
+  .app-routes-grow:has(.bem-vindo-page) {
+    padding-bottom: 0;
+    background-color: #000000;
+    overflow: visible;
+  }
+
+  html:has(.bem-vindo-page),
+  html:has(.bem-vindo-page) body,
+  html:has(.bem-vindo-page) #root {
+    background-color: #000000 !important;
+    background-image: none !important;
+  }
+
+  body::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* Por baixo do portal (tema claro): fundo claro consistente com o cartão — evita moldura escura nas bordas */
+  html:has(body[data-theme='light'] .auth-shell-glass) {
+    background-color: #eef2f7;
+  }
+
+  body[data-theme='light']:has(.auth-shell-glass),
+  body[data-theme='light']:has(.auth-shell-glass) #root {
+    background-color: #eef2f7;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+    max-width: 100%;
+  }
+}
+
+/* Safari iOS (iPhone 16 Pro incluso): fixa variação de viewport dinâmica */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    html,
+    body,
+    #root {
+      min-height: -webkit-fill-available;
+      height: -webkit-fill-available;
+    }
+
+    .app-background-root {
+      min-height: -webkit-fill-available;
+      height: -webkit-fill-available;
+    }
+  }
+}
+
+/* Suspense fallback — carregamento de rota (lazy) */
+.route-page-fallback {
+  flex: 1;
+  min-height: min(45vh, 360px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.route-page-fallback__bar {
+  width: min(120px, 40vw);
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-accent-gold),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: route-page-fallback-shimmer 0.9s ease-in-out infinite;
+}
+
+@keyframes route-page-fallback-shimmer {
+  0% {
+    background-position: 100% 0;
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    background-position: -100% 0;
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-page-fallback__bar {
+    animation: none;
+    opacity: 0.75;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Barras de rolagem — desktop (mesma linguagem dos cards: fundo + bloco elevado)
+   Cores alinhadas a dashboard.css (--bg-secondary, --bg-card-elevated, bordas).
+   Mobile: inalterado.
+   -------------------------------------------------------------------------- */
+@media (min-width: 769px) {
+  :root {
+    /* Light — canal = área ao redor do painel; thumb = superfície tipo card */
+    --sb-track: #e4e9ef;
+    --sb-thumb: #ffffff;
+    --sb-thumb-hover: #f8fafc;
+    --sb-thumb-border: rgba(15, 23, 42, 0.09);
+    --sb-thumb-inset: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+
+  body[data-theme='dark'] {
+    --sb-track: #000000;
+    --sb-thumb: #141414;
+    --sb-thumb-hover: #1f1f1f;
+    --sb-thumb-border: rgba(255, 255, 255, 0.1);
+    --sb-thumb-inset: none;
+  }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sb-thumb) var(--sb-track);
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--sb-track);
+    border-radius: 8px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--sb-thumb);
+    border-radius: 8px;
+    border: 1px solid var(--sb-thumb-border);
+    box-shadow: var(--sb-thumb-inset);
+    background-clip: padding-box;
+    min-height: 36px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--sb-thumb-hover);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: var(--sb-track);
+  }
+}
+
+/* ── Story 2.4 — Keyframes canônicos (prefers-reduced-motion aware) ── */
+
+@keyframes hz-fade-slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hz-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hz-modal-slide-up {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes hz-toast-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes hz-ripple {
+  from { transform: scale(0); opacity: 0.6; }
+  to   { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes hz-shimmer {
+  from { background-position: -200% center; }
+  to   { background-position:  200% center; }
+}
+
+/* Toast container — slide from right */
+.hz-toast-enter {
+  animation: hz-toast-in 250ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hz-toast-enter {
+    animation: none;
+  }
+}
+
+/*
+ * PWA instalado:
+ * - Desktop: fundo preto por trás do shell centralizado (letterboxing, manifest).
+ * - Mobile tema claro + shell: mantém branco (as regras globais + Background); o preto forçava faixa inferior / desalinhamento visual no safe area.
+ */
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
+  @media (min-width: 769px) {
+    .app-background-root--plain-light .app-background-root__plain-fill {
+      background: #000000;
+    }
+
+    html,
+    html:has(body[data-theme='light']) {
+      background-color: #000000;
+    }
+
+    body[data-theme='light'] {
+      background-color: #000000;
+      background-image: none;
+    }
+
+    html:has(body[data-theme='light']:has(.app-horizon-shell)),
+    html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+      background-color: #000000;
+    }
+
+    body[data-theme='light']:has(.app-horizon-shell),
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell),
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+      background-color: #000000;
+      background-image: none;
+    }
+
+    body[data-theme='light']:has(.app-horizon-shell) .app-routes-grow {
+      background-color: #000000;
+    }
+
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) .app-routes-grow {
+      background-color: #000000;
+    }
+
+    html:has(body[data-theme='light'] .dashboard-container.ref-dashboard.app-horizon-shell) {
+      background-color: #000000;
+    }
+
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) {
+      background-color: #000000;
+    }
+
+    body[data-theme='light']:has(.dashboard-container.ref-dashboard.app-horizon-shell) #root {
+      background-color: #000000;
+    }
+  }
+
+  /* Mobile instalado: tema claro + shell autenticado = mesma pintura que no browser (sem barra preta em baixo). */
+  @media (max-width: 768px) {
+    html:has(body[data-theme='light']:has(.dashboard-container.app-horizon-shell)),
+    html:has(body[data-theme='light'] .dashboard-container.app-horizon-shell) {
+      background-color: #ffffff;
+    }
+
+    body[data-theme='light']:has(.dashboard-container.app-horizon-shell),
+    body[data-theme='light']:has(.dashboard-container.app-horizon-shell) #root {
+      background-color: #ffffff;
+      background-image: none;
+    }
+
+    body[data-theme='light']:has(.dashboard-container.app-horizon-shell) .app-routes-grow {
+      background-color: #ffffff;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+
+    .app-background-root--plain-light .app-background-root__plain-fill {
+      background: #ffffff;
+    }
+  }
+}
+
+/* ── Utilitários de tipografia numérica ──────────────────────── */
+.tabular-nums,
+.font-numeric {
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-feature-settings: "tnum", "zero", "cv11", "ss01";
+  letter-spacing: -0.012em;
+}
+
+.value-positive {
+  color: var(--success-text);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+.value-negative {
+  color: var(--error-text);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+/* ── Cards base reutilizáveis ────────────────────────────────── */
+.card-base {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-base:hover {
+  background: var(--bg-card-elevated);
+  border-color: var(--border-strong);
+}
+
+.card-accent {
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md), var(--shadow-accent);
+}
+
+.card-alert-error   { border-left: 3px solid var(--error);   }
+.card-alert-warning { border-left: 3px solid var(--warning); }
+.card-alert-success { border-left: 3px solid var(--success); }
+.card-alert-info    { border-left: 3px solid var(--info);    }
+
+/* ── Utilitários de tipografia premium ───────────────────── */
+.text-display {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: var(--tracking-display, -0.035em);
+  font-feature-settings: 'cv11', 'ss01', 'cv05';
+}
+
+.text-headline {
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: var(--tracking-tight, -0.015em);
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+.text-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: var(--tracking-eyebrow, 0.14em);
+  text-transform: uppercase;
+}
+
+/* ── @font-face fallback com métricas ajustadas (previne CLS) ── */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial'), local('Helvetica Neue'), local('Helvetica');
+  size-adjust: 100%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+/* ── Gradient text gold — utilitário reutilizável ────────── */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #f1d28b 0%, var(--accent) 55%, #b8923f 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.text-gradient-gold-subtle {
+  background: linear-gradient(135deg, var(--accent-subtle) 0%, var(--accent) 60%, var(--accent-hover) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── Animações de valores monetários ─────────────────────── */
+@keyframes hz-value-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes hz-value-update {
+  0%   { opacity: 1; transform: translateY(0);   }
+  25%  { opacity: 0; transform: translateY(-4px); }
+  75%  { opacity: 0; transform: translateY(4px);  }
+  100% { opacity: 1; transform: translateY(0);   }
+}
+
+.value-reveal {
+  animation: hz-value-reveal 500ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+.value-update {
+  animation: hz-value-update 380ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Count-up CSS puro — para valores inteiros (ex: "43 transações") */
+@supports (animation-timeline: scroll()) {
+  @property --hz-count {
+    syntax: '<integer>';
+    initial-value: 0;
+    inherits: false;
+  }
+}
+
+.count-animate {
+  --hz-count: 0;
+  counter-reset: hz-count var(--hz-count);
+  transition: --hz-count 1200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.count-animate::after {
+  content: counter(hz-count);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .value-reveal,
+  .value-update {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .count-animate {
+    transition: none;
+  }
+}
+
+/* ─── Severino IA — campo de linguagem natural no modal de Nova Transação ─── */
+/* Mesmo selo dourado da faixa "Severino IA" do Dashboard (.ai-insights__spark) */
+.ntx-ai-quick {
+  margin-bottom: 14px;
+}
+.ntx-ai-quick__head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+.ntx-ai-quick__spark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  color: var(--accent-foreground);
+  background: var(--accent);
+  box-shadow: var(--shadow-accent, 0 2px 8px rgba(212, 168, 75, 0.35));
+}
+.ntx-ai-quick__title {
+  font-weight: 700;
+  font-size: 0.84rem;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--text-primary);
+  cursor: text;
+}
+.ntx-ai-quick__sub {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+.ntx-ai-quick__field {
+  position: relative;
+}
+.ntx-ai-quick__field .input-premium {
+  border-color: var(--accent-border, rgba(212, 168, 75, 0.35));
+  box-shadow: 0 0 0 1px var(--accent-muted, rgba(212, 168, 75, 0.12));
+}
+.ntx-ai-quick__field .input-premium:focus {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.ntx-ai-quick__field .input-premium::placeholder {
+  font-style: italic;
+}
+.ntx-ai-quick__spin {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--accent);
+}
+.ntx-ai-quick__spin .spinner {
+  width: 16px;
+  height: 16px;
+  opacity: 0.75;
+}
+
+/* ─── Seletor (categoria/cartão) no mobile: BOTTOM SHEET acima do teclado ─── */
+@media (max-width: 768px) {
+  .custom-select--cs-mobile .custom-select-dropdown {
+    overflow: hidden;
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -16px 50px -12px rgba(0, 0, 0, 0.45);
+    animation: csSheetUp 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  /* alça (grabber) no topo do sheet */
+  .custom-select--cs-mobile .custom-select-dropdown::before {
+    content: '';
+    display: block;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 4px;
+    margin: 8px auto 2px;
+    border-radius: 999px;
+    background: var(--text-muted);
+    opacity: 0.4;
+  }
+  /* opções preenchem o espaço restante e rolam (sem o cap de 240px) */
+  .custom-select--cs-mobile .custom-select-options {
+    max-height: none;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  /* busca fixa no topo do sheet */
+  .custom-select--cs-mobile .custom-select-search {
+    flex: 0 0 auto;
+  }
+}
+@keyframes csSheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* Campo de data do modal de transação: gatilho custom (abre o calendário do
+   sistema — DatePickerBrPopover) + campo de hora separado. Ícone dourado da marca. */
+.ntx-datetime-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.ntx-date-trigger {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  padding-right: 42px; /* espaço pro ícone dourado */
+}
+.ntx-date-trigger__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ntx-date-trigger .ntx-date-cal {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
+  color: var(--accent);
+  display: inline-flex;
+}
+.ntx-time-field {
+  flex: 0 0 108px; /* base explícita vence o width:100% dos partials mobile (unlayered > layered) */
+  width: 108px;
+  min-width: 0;
+  text-align: center;
+}
+.modal-content--nova-tx input[type="time"].ntx-time-field::-webkit-calendar-picker-indicator {
+  filter: invert(72%) sepia(38%) saturate(560%) hue-rotate(2deg) brightness(92%);
+  cursor: pointer;
+}
+
+/* ─── Calculadora (teclado) do campo Valor — modal de transação ─── */
+.ntx-calc { margin-top: 8px; animation: ntxCalcIn 180ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes ntxCalcIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.ntx-calc__display {
+  text-align: right;
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 1.15rem; font-weight: 700; letter-spacing: -0.01em;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 10px 14px; margin-bottom: 8px; min-height: 24px;
+  overflow-x: auto; white-space: nowrap;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.ntx-calc__pad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+.ntx-calc__key {
+  padding: 13px 0; border-radius: 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-card); color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 1.1rem; font-weight: 600; cursor: pointer;
+  transition: transform 80ms ease, background 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.ntx-calc__key:active { transform: scale(0.95); background: var(--bg-secondary); }
+.ntx-calc__key--op { color: var(--accent); font-weight: 700; }
+.ntx-calc__key--del { color: var(--text-secondary); }
+.ntx-calc__key--clear { color: var(--error); font-weight: 700; }
+.ntx-calc__key--eq {
+  grid-column: span 3;
+  background: var(--accent); border-color: var(--accent);
+  color: var(--accent-foreground); font-weight: 800;
+}
+.ntx-calc__key--eq:active { background: var(--accent-hover); }

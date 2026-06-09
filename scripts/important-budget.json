@@ -1,7 +1,7 @@
 {
   "total": 10,
   "files": {
-    "src/components/PwaInstallPrompt.css": 1,
-    "src/index.css": 9
+    "src/styles/legacy/from-index.css": 9,
+    "src/styles/legacy/PwaInstallPrompt.css": 1
   }
 }

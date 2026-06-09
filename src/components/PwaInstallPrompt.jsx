@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BRAND_ASSETS } from '../lib/brandAssets'
-import './PwaInstallPrompt.css'
+import '../styles/legacy/PwaInstallPrompt.css'
 
 const DISMISS_KEY = 'horizonte_pwa_install_dismissed_at'
 const DISMISS_WINDOW_MS = 7 * 24 * 60 * 60 * 1000

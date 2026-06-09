@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './dashboard.css'
-import './metas.css'
+import '../styles/legacy/metas.css'
 import { useFabCompact } from '../hooks/useFabCompact'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'

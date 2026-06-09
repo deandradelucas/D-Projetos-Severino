@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { clearHorizonteAccessToken } from '../lib/horizonteAccessToken'
-import './trial-expirado.css'
+import '../styles/legacy/trial-expirado.css'
 
 function readUser() {
   try {

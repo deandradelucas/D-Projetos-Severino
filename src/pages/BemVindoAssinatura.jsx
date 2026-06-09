@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
-import './bem-vindo-assinatura.css'
+import '../styles/legacy/bem-vindo-assinatura.css'
 
 function readUser() {
   try {
