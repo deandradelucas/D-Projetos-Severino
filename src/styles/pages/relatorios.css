@@ -157,9 +157,19 @@
 .relatorios-chart-card__body--pie { display: flex; align-items: center; justify-content: center; }
 .relatorios-chart-empty { display: grid; place-items: center; min-height: 160px; color: var(--text-muted); font-size: 0.85rem; }
 
-.relatorios-pie-layout { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.relatorios-pie-layout__chart { flex-shrink: 0; }
-.relatorios-pie-layout__legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.relatorios-pie-layout { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; width: 100%; }
+.relatorios-pie-layout__chart { flex-shrink: 0; width: 180px; height: 180px; }
+.relatorios-pie-layout__legend { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px; }
+
+/* legenda dos donuts — nome à esquerda, % e valor alinhados à direita */
+.relatorios-pie-legend { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 0; padding: 0; list-style: none; }
+.relatorios-pie-legend__item { display: flex; align-items: center; gap: 10px; }
+.relatorios-pie-legend__swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.relatorios-pie-legend__body { flex: 1; min-width: 0; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.relatorios-pie-legend__name { font-size: 0.86rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.relatorios-pie-legend__meta { display: inline-flex; align-items: baseline; gap: 8px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.relatorios-pie-legend__pct { font-size: 0.78rem; color: var(--text-muted); }
+.relatorios-pie-legend__val { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
 
 /* tooltip de gráfico */
 .relatorios-tooltip { padding: 8px 11px; border-radius: var(--r-sm); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-2); font-size: 0.8rem; }
