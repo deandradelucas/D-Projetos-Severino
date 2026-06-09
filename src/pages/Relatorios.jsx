@@ -27,6 +27,7 @@ import {
   computeOrcadoVsReal,
   computeFixoVsVariavel,
   computeVariacaoCategorias,
+  computeProjecaoFimPeriodo,
 } from '../lib/relatoriosDerived'
 import './dashboard.css'
 import '../styles/pages/relatorios.css'
@@ -653,18 +654,9 @@ export default function Relatorios() {
           // R4 — maior receita por categoria + média diária de gasto
           const maiorReceita = chartDataReceitasPorCategoria[0]
           const mediaDiaria = diasPeriodo ? summary.despesas / diasPeriodo : 0
-          // R2 — projeção de fim do período (só quando o período inclui hoje e ainda não terminou)
-          const hojeP = new Date(); hojeP.setHours(0, 0, 0, 0)
-          const iniP = filters.dataInicio ? new Date(`${filters.dataInicio}T00:00:00`) : null
-          const fimP = filters.dataFim ? new Date(`${filters.dataFim}T00:00:00`) : null
-          let projecao = null
-          if (iniP && fimP && diasPeriodo && hojeP >= iniP && hojeP < fimP) {
-            const diasDecorridos = Math.max(1, Math.round((hojeP - iniP) / 86400000) + 1)
-            if (diasDecorridos < diasPeriodo) {
-              const despProj = (summary.despesas / diasDecorridos) * diasPeriodo
-              projecao = { despProj, saldoProj: summary.receitas - despProj }
-            }
-          }
+          // R2 — projeção de fim do período. Estima só os dias restantes pelo
+          // ritmo de gasto cotidiano (sem extrapolar lançamentos pontuais).
+          const projecao = computeProjecaoFimPeriodo(transacoes, summary, filters)
           return (
             <section className="rel-ed__stats" aria-label="Insights do período">
               <div className="rel-ed__stat rel-ed__stat--wide">

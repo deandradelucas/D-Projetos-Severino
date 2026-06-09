@@ -91,6 +91,61 @@ export function computeFixoVsVariavel(transacoes, receitas) {
   }
 }
 
+/** Mediana de uma lista de números (robusta a outliers). */
+function mediana(nums) {
+  if (!nums.length) return 0
+  const s = [...nums].sort((a, b) => a - b)
+  const mid = Math.floor(s.length / 2)
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2
+}
+
+/**
+ * Projeção de fim do período (R2) — versão que NÃO extrapola gastos pontuais.
+ *
+ * O que já foi gasto é fato (não multiplica). A projeção apenas estima os dias
+ * que ainda faltam, usando o ritmo de gasto do dia a dia. Desse ritmo são
+ * excluídos:
+ *   - recorrências/parcelas (não repetem de novo dentro do mesmo mês);
+ *   - gastos atípicos/pontuais (outliers — ex.: fatura, compra grande única),
+ *     definidos como transação > 4× a mediana das despesas cotidianas.
+ *
+ * despProj = despesasJáGastas + ritmoDiárioCotidiano × diasRestantes
+ *
+ * Retorna null quando o período não inclui "hoje" ou já terminou (sem dias a
+ * projetar) — nesses casos a tela não mostra o card de projeção.
+ */
+export function computeProjecaoFimPeriodo(transacoes, summary, filters, hoje = new Date()) {
+  if (!filters?.dataInicio || !filters?.dataFim) return null
+  const ini = new Date(`${filters.dataInicio}T00:00:00`)
+  const fim = new Date(`${filters.dataFim}T00:00:00`)
+  if (Number.isNaN(ini.getTime()) || Number.isNaN(fim.getTime())) return null
+  const hojeMid = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())
+  if (hojeMid < ini || hojeMid >= fim) return null // período não inclui hoje, ou já acabou
+
+  const diasPeriodo = Math.round((fim - ini) / 86400000) + 1
+  const diasDecorridos = Math.max(1, Math.round((hojeMid - ini) / 86400000) + 1)
+  const diasRestantes = diasPeriodo - diasDecorridos
+  if (diasRestantes <= 0) return null
+
+  // Despesas cotidianas = nem recorrente/parcela. Sobre elas, descarta outliers.
+  const cotidianas = (transacoes || [])
+    .filter((t) => tipoNormalizado(t.tipo) === 'DESPESA' && !isDespesaRecorrente(t))
+    .map(parseValorTransacao)
+  const med = mediana(cotidianas)
+  const limiteOutlier = med > 0 ? med * 4 : Infinity
+  const baseRitmo = cotidianas.reduce((s, v) => (v <= limiteOutlier ? s + v : s), 0)
+
+  const ritmoDiario = baseRitmo / diasDecorridos
+  const despProj = summary.despesas + ritmoDiario * diasRestantes
+  return {
+    despProj,
+    saldoProj: summary.receitas - despProj,
+    ritmoDiario,
+    diasRestantes,
+    diasDecorridos,
+  }
+}
+
 /** Variação por categoria (DESPESAS) vs período anterior (Feature 1).
  *  Vazio quando não há período anterior ou quando há filtro de categoria. */
 export function computeVariacaoCategorias(prevCategorias, chartDataPorCategoria, categoriaIdFilter) {

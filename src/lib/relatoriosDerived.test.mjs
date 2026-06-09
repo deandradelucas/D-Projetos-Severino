@@ -7,6 +7,7 @@ import {
   computeOrcadoVsReal,
   computeFixoVsVariavel,
   computeVariacaoCategorias,
+  computeProjecaoFimPeriodo,
 } from './relatoriosDerived.js'
 
 describe('computePrevRange', () => {
@@ -129,5 +130,47 @@ describe('computeVariacaoCategorias', () => {
   it('pct null quando prev é 0 (categoria nova)', () => {
     const r = computeVariacaoCategorias([], [{ name: 'Novo', value: 80 }], null)
     expect(r[0]).toMatchObject({ name: 'Novo', prev: 0, diff: 80, pct: null })
+  })
+})
+
+describe('computeProjecaoFimPeriodo', () => {
+  const filtros = { dataInicio: '2026-06-01', dataFim: '2026-06-30' } // 30 dias
+  const hoje = new Date('2026-06-09T12:00:00') // dia 9 → 9 decorridos, 21 restantes
+
+  it('NÃO extrapola gasto pontual: já-gasto é fato + ritmo cotidiano nos dias restantes', () => {
+    // 9 dias: 1 fatura pontual de 2000 + 9 gastos cotidianos de 100 (=900). Total 2900.
+    const txs = [
+      { tipo: 'DESPESA', valor: 2000, descricao: 'Fatura' },
+      ...Array.from({ length: 9 }, () => ({ tipo: 'DESPESA', valor: 100 })),
+    ]
+    const summary = { receitas: 5000, despesas: 2900 }
+    const r = computeProjecaoFimPeriodo(txs, summary, filtros, hoje)
+    // mediana das cotidianas (2000 + nove 100s) = 100 → limite 400 → 2000 é outlier.
+    // baseRitmo = 900; ritmoDiário = 900/9 = 100; futuro = 100*21 = 2100.
+    // despProj = 2900 (fato) + 2100 = 5000 (NÃO 2900/9*30 = 9666).
+    expect(r.despProj).toBeCloseTo(5000, 2)
+    expect(r.saldoProj).toBeCloseTo(0, 2)
+    expect(r.diasRestantes).toBe(21)
+  })
+
+  it('exclui recorrências/parcelas do ritmo diário', () => {
+    const txs = [
+      { tipo: 'DESPESA', valor: 600, recorrencia_mensal_id: 'm1' }, // recorrente → fora do ritmo
+      { tipo: 'DESPESA', valor: 90 },
+      { tipo: 'DESPESA', valor: 90 },
+    ]
+    const summary = { receitas: 3000, despesas: 780 }
+    const r = computeProjecaoFimPeriodo(txs, summary, filtros, hoje)
+    // ritmo = (90+90)/9 = 20/dia; futuro = 20*21 = 420; despProj = 780 + 420 = 1200
+    expect(r.despProj).toBeCloseTo(1200, 2)
+  })
+
+  it('null quando hoje fora do período (já terminou)', () => {
+    const r = computeProjecaoFimPeriodo([], { receitas: 0, despesas: 0 }, filtros, new Date('2026-07-05T12:00:00'))
+    expect(r).toBeNull()
+  })
+
+  it('null quando filtro incompleto', () => {
+    expect(computeProjecaoFimPeriodo([], { receitas: 0, despesas: 0 }, { dataInicio: '' }, hoje)).toBeNull()
   })
 })
