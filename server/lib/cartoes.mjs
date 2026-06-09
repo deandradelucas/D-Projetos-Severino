@@ -40,6 +40,16 @@ function refAtual(diaFech, hoje = new Date()) {
   const base = hoje > fech ? new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1) : hoje
   return { year: base.getFullYear(), monthIdx: base.getMonth() }
 }
+/** Próximo dia de vencimento (Date) a partir de hoje — rola só depois de passar. */
+function proximoVencimentoData(diaVenc, hoje = new Date()) {
+  const venc = Number(diaVenc)
+  const hojeMid = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())
+  let y = hojeMid.getFullYear()
+  let mo = hojeMid.getMonth()
+  let d = new Date(y, mo, clampDay(y, mo, venc))
+  if (d < hojeMid) { mo += 1; d = new Date(y, mo, clampDay(y, mo, venc)) }
+  return d
+}
 function parseRef(ref) {
   const m = /^(\d{4})-(\d{2})$/.exec(String(ref || ''))
   if (!m) return null
@@ -120,7 +130,9 @@ export async function listarCartoesComResumo(usuarioId) {
     const ref = refAtual(c.dia_fechamento)
     const { ini, fim } = cicloFatura(ref.year, ref.monthIdx, c.dia_fechamento)
     const total = await somaPeriodo(usuarioId, c.id, ini, fim)
-    const venc = vencimentoFatura(ref.year, ref.monthIdx, c.dia_fechamento, c.dia_vencimento)
+    // vencimento exibido = próximo dia de vencimento (10/jun amanhã), não a data
+    // técnica do ciclo (10/jul). A fatura mostrada é a aberta (compras atuais).
+    const venc = proximoVencimentoData(c.dia_vencimento)
     out.push({
       ...c,
       fatura_atual: {
@@ -307,7 +319,11 @@ export async function faturaDoCartao(usuarioId, cartaoId, ref) {
 
   const refObj = parseRef(ref) || refAtual(cartao.dia_fechamento)
   const { ini, fim } = cicloFatura(refObj.year, refObj.monthIdx, cartao.dia_fechamento)
-  const venc = vencimentoFatura(refObj.year, refObj.monthIdx, cartao.dia_fechamento, cartao.dia_vencimento)
+  // fatura ATUAL (aberta): mostra o próximo vencimento; meses navegados usam a data real do ciclo
+  const refCur = refAtual(cartao.dia_fechamento)
+  const venc = (refObj.year === refCur.year && refObj.monthIdx === refCur.monthIdx)
+    ? proximoVencimentoData(cartao.dia_vencimento)
+    : vencimentoFatura(refObj.year, refObj.monthIdx, cartao.dia_fechamento, cartao.dia_vencimento)
 
   const { data: txs, error: tErr } = await supabase
     .from('transacoes')

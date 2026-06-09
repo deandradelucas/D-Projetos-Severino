@@ -18,11 +18,21 @@
 
 /* ── Resumo agregado (total a pagar / limite usado / próximo vencimento) ────── */
 .page-cartoes__resumo {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px;
-  padding: 16px 18px; margin-bottom: 16px;
+  display: flex; align-items: stretch;
+  padding: 16px 20px; margin-bottom: 16px;
   border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
 }
-.page-cartoes__resumo-item { display: flex; flex-direction: column; gap: 3px; }
+.page-cartoes__resumo-item { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding: 2px 20px; }
+/* separador vertical entre os itens */
+.page-cartoes__resumo-item + .page-cartoes__resumo-item { border-left: 1px solid var(--hairline); }
+.page-cartoes__resumo-item:first-child { padding-left: 0; }
+.page-cartoes__resumo-item:last-child { padding-right: 0; }
+@media (max-width: 640px) {
+  /* celular: empilha com separador horizontal */
+  .page-cartoes__resumo { flex-direction: column; }
+  .page-cartoes__resumo-item { padding: 0; }
+  .page-cartoes__resumo-item + .page-cartoes__resumo-item { border-left: none; border-top: 1px solid var(--hairline); padding-top: 12px; margin-top: 12px; }
+}
 .page-cartoes__resumo-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
 .page-cartoes__resumo-valor { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .page-cartoes__resumo-sub { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); }
