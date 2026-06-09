@@ -7,7 +7,9 @@
    ============================================================================= */
 
 /* Layout */
+@import '../styles/layout/shell.css';
 @import '../styles/layout/sidebar.css';
+@import '../styles/layout/mobile-nav.css';
 
 /* Componentes */
 @import '../styles/components/insights-strip.css';

@@ -1,385 +1,354 @@
 /* =============================================================================
-   layout/sidebar.css — Sidebar neumórfica (desktop >= 769px)
+   layout/sidebar.css — Sidebar neumórfica · 3 tiers
    -----------------------------------------------------------------------------
-   Rewrite limpo do antigo partial 14 (+ tweaks de 05/polish/08). Autoridade ÚNICA
-   da sidebar. Tema via tokens --sb-* (definidos 1x por tema); as REGRAS são únicas
-   (sem duplicar seletor light/dark — o corpo é idêntico, dirigido por var(--sb-*)).
+   APARÊNCIA (tokens --sb-* + regras) = base, vale em qualquer tamanho.
+   LAYOUT:
+     Mobile  (<=768) : drawer (fixed, desliza da esquerda via .open) + backdrop.
+     Tablet  (769-1023): rail fixo ~200px.
+     Desktop (>=1024): rail fixo ~240px.
+   Regras únicas por seletor (tema via var(--sb-*), sem duplicar light/dark).
    ============================================================================= */
 
+/* ── Tokens por tema (única coisa que difere light/dark) ───────────────────── */
+body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
+  --sb-bg-base: #0a0c11;
+  --sb-bg-raised: #11141a;
+  --sb-bg-sunken: #07090d;
+  --sb-light: rgba(255, 255, 255, 0.040);
+  --sb-shadow: rgba(0, 0, 0, 0.72);
+  --sb-shadow-soft: rgba(0, 0, 0, 0.45);
+  --sb-edge-hi: rgba(255, 255, 255, 0.055);
+  --sb-edge-lo: rgba(0, 0, 0, 0.55);
+  --sb-text-hi: var(--text-primary);
+  --sb-text-mid: var(--text-secondary);
+  --sb-text-lo: var(--text-muted);
+  --sb-text-faint: #3e4856;
+  --sb-accent: var(--accent);
+  --sb-accent-soft: rgba(212, 168, 75, 0.14);
+  --sb-accent-glow: rgba(212, 168, 75, 0.22);
+  --sb-accent-glow-strong: rgba(212, 168, 75, 0.32);
+  --sb-danger: #f87171;
+  --sb-danger-soft: rgba(248, 113, 113, 0.10);
+  --sb-danger-glow: rgba(248, 113, 113, 0.18);
+  --sb-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --sb-r-card: 18px;
+  --sb-r-item: 12px;
+  --sb-r-pill: 999px;
+}
+body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
+  --sb-bg-base: #eef1f6;
+  --sb-bg-raised: #ffffff;
+  --sb-bg-sunken: #e4e8ee;
+  --sb-light: rgba(255, 255, 255, 0.90);
+  --sb-shadow: rgba(166, 180, 200, 0.45);
+  --sb-shadow-soft: rgba(166, 180, 200, 0.28);
+  --sb-edge-hi: rgba(255, 255, 255, 0.95);
+  --sb-edge-lo: rgba(140, 156, 178, 0.20);
+  --sb-text-hi: var(--text-primary);
+  --sb-text-mid: var(--text-secondary);
+  --sb-text-lo: var(--text-muted);
+  --sb-text-faint: #b0bbc8;
+  --sb-accent: #b8832a;
+  --sb-accent-soft: rgba(184, 131, 42, 0.10);
+  --sb-accent-glow: rgba(184, 131, 42, 0.20);
+  --sb-accent-glow-strong: rgba(184, 131, 42, 0.30);
+  --sb-danger: #dc2626;
+  --sb-danger-soft: rgba(220, 38, 38, 0.08);
+  --sb-danger-glow: rgba(220, 38, 38, 0.16);
+  --sb-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --sb-r-card: 18px;
+  --sb-r-item: 12px;
+  --sb-r-pill: 999px;
+}
+
+/* ── APARÊNCIA (base, todos os tamanhos) ───────────────────────────────────── */
+.dashboard-container.app-horizon-shell .sidebar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: linear-gradient(160deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
+  border: 1px solid var(--sb-edge-hi);
+  border-radius: var(--sb-r-card);
+  padding: 28px 16px 18px;
+  box-shadow:
+    10px 10px 28px var(--sb-shadow),
+    -4px -4px 14px var(--sb-light),
+    inset 1px 1px 1px var(--sb-edge-hi),
+    inset -1px -1px 1px var(--sb-edge-lo);
+}
+.dashboard-container.app-horizon-shell .sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 140px;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 100% at 80% 0%, var(--sb-accent-soft), transparent 70%);
+  opacity: 0.6;
+  z-index: 0;
+  border-radius: var(--sb-r-card) var(--sb-r-card) 0 0;
+}
+
+/* Brand */
+.dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding: 0 8px;
+}
+.dashboard-container.app-horizon-shell .sidebar .brand-mark {
+  width: 48px;
+  height: 48px;
+  color: var(--sb-text-hi);
+  transition: transform 240ms var(--sb-ease);
+}
+.dashboard-container.app-horizon-shell .sidebar .brand-stack {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.dashboard-container.app-horizon-shell .sidebar .brand-stack:hover .brand-mark { transform: scale(1.05); }
+.dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.625rem;
+  letter-spacing: -0.025em;
+  color: var(--sb-text-hi);
+  text-shadow: 0 1px 0 var(--sb-edge-lo);
+}
+
+/* Nav menu */
+.dashboard-container.app-horizon-shell .sidebar .nav-menu {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-edge-hi) transparent;
+}
+.dashboard-container.app-horizon-shell .sidebar .nav-menu::-webkit-scrollbar { width: 4px; }
+.dashboard-container.app-horizon-shell .sidebar .nav-menu::-webkit-scrollbar-thumb { background: var(--sb-edge-hi); border-radius: 2px; }
+
+/* Nav items */
+.dashboard-container.app-horizon-shell .sidebar .nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  width: 100%;
+  border-radius: var(--sb-r-item);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--sb-text-mid);
+  font-family: 'Inter Variable', system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  transition: transform 240ms var(--sb-ease), background 240ms var(--sb-ease), color 240ms var(--sb-ease), box-shadow 240ms var(--sb-ease);
+}
+.dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
+  color: inherit; font-family: inherit; font-weight: inherit; font-size: inherit; line-height: 1.2;
+}
+.dashboard-container.app-horizon-shell .sidebar .icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--sb-text-lo);
+  transition: color 240ms var(--sb-ease), background 240ms var(--sb-ease), box-shadow 240ms var(--sb-ease);
+}
+.dashboard-container.app-horizon-shell .sidebar .icon-wrap svg { width: 20px; height: 20px; stroke-width: 1.6; }
+
+/* Hover */
+.dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) {
+  transform: translateX(3px);
+  background: linear-gradient(155deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
+  color: var(--sb-text-hi);
+  box-shadow: 4px 4px 10px var(--sb-shadow-soft), -2px -2px 6px var(--sb-light), inset 1px 1px 1px var(--sb-edge-hi);
+}
+.dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap { color: var(--sb-accent); }
+
+/* Active */
+.dashboard-container.app-horizon-shell .sidebar .nav-item.active {
+  background: var(--sb-bg-sunken);
+  color: var(--sb-text-hi);
+  font-weight: 600;
+  box-shadow: inset 3px 3px 8px var(--sb-shadow), inset -2px -2px 5px var(--sb-light), 0 0 0 1px var(--sb-accent-glow);
+}
+.dashboard-container.app-horizon-shell .sidebar .nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -2px; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 60%;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, transparent 0%, var(--sb-accent) 30%, var(--sb-accent) 70%, transparent 100%);
+  box-shadow: 0 0 14px var(--sb-accent-glow-strong);
+}
+.dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
+  background: var(--sb-bg-base);
+  color: var(--sb-accent);
+  box-shadow: inset 2px 2px 4px var(--sb-shadow), inset -1px -1px 2px var(--sb-light), 0 0 0 1px var(--sb-accent-glow);
+}
+.dashboard-container.app-horizon-shell .sidebar .nav-item.active svg { stroke-width: 1.8; filter: drop-shadow(0 0 6px var(--sb-accent-glow)); }
+
+/* Focus */
+.dashboard-container.app-horizon-shell .sidebar .nav-item:focus-visible {
+  outline: none;
+  box-shadow: 4px 4px 10px var(--sb-shadow-soft), -2px -2px 6px var(--sb-light), 0 0 0 2px var(--sb-accent);
+}
+
+/* Section labels */
+.dashboard-container.app-horizon-shell .sidebar .nav-section-label {
+  position: relative;
+  list-style: none;
+  margin: 18px 0 6px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dashboard-container.app-horizon-shell .sidebar .nav-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--sb-edge-hi), transparent);
+}
+.dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
+  font-family: 'Inter Variable', system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--sb-text-faint);
+}
+
+/* Logout */
+.dashboard-container.app-horizon-shell .sidebar .logout-btn {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 18px;
+  border-radius: var(--sb-r-pill);
+  background: linear-gradient(155deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
+  border: 1px solid var(--sb-edge-hi);
+  color: var(--sb-text-mid);
+  font-family: 'Inter Variable', system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 5px 5px 12px var(--sb-shadow-soft), -3px -3px 8px var(--sb-light), inset 1px 1px 1px var(--sb-edge-hi), inset -1px -1px 1px var(--sb-edge-lo);
+  transition: all 240ms var(--sb-ease);
+  cursor: pointer;
+}
+.dashboard-container.app-horizon-shell .sidebar .logout-btn:hover {
+  transform: translateY(-2px);
+  color: var(--sb-danger);
+  background: linear-gradient(155deg, var(--sb-danger-soft) 0%, var(--sb-bg-base) 100%);
+  box-shadow: 7px 9px 16px var(--sb-shadow), -4px -4px 10px var(--sb-light), 0 0 0 1px var(--sb-danger-glow), inset 1px 1px 1px var(--sb-edge-hi);
+}
+.dashboard-container.app-horizon-shell .sidebar .logout-btn:active {
+  transform: translateY(0);
+  box-shadow: inset 3px 3px 8px var(--sb-shadow), inset -2px -2px 5px var(--sb-light);
+}
+.dashboard-container.app-horizon-shell .sidebar .logout-btn svg { width: 18px; height: 18px; }
+
+/* Version */
+.dashboard-container.app-horizon-shell .sidebar .sidebar-version {
+  position: relative;
+  z-index: 1;
+  display: block;
+  text-align: center;
+  margin-bottom: 6px;
+  opacity: 0.5;
+  color: var(--sb-text-faint);
+  font-family: 'Inter Variable', system-ui, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ── LAYOUT: MOBILE (base) = drawer fora do fluxo ──────────────────────────── */
+.dashboard-container.app-horizon-shell .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 84vw;
+  max-width: 320px;
+  z-index: 1100;
+  border-radius: 0 var(--sb-r-card) var(--sb-r-card) 0;
+  transform: translateX(-100%);
+  transition: transform 280ms var(--sb-ease);
+  padding-top: max(28px, var(--safe-top, 0px));
+  padding-bottom: max(18px, var(--safe-bottom, 0px));
+}
+.dashboard-container.app-horizon-shell .sidebar.open { transform: translateX(0); }
+
+/* ── LAYOUT: TABLET+ (>=769) = rail fixo no fluxo ──────────────────────────── */
 @media (min-width: 769px) {
-  /* ── Tokens por tema (a única coisa que difere light/dark) ─────────────── */
-  body[data-theme='dark'] .dashboard-container.app-horizon-shell .sidebar {
-    --sb-bg-base: #0a0c11;
-    --sb-bg-raised: #11141a;
-    --sb-bg-sunken: #07090d;
-    --sb-light: rgba(255, 255, 255, 0.040);
-    --sb-light-strong: rgba(255, 255, 255, 0.065);
-    --sb-shadow: rgba(0, 0, 0, 0.72);
-    --sb-shadow-soft: rgba(0, 0, 0, 0.45);
-    --sb-edge-hi: rgba(255, 255, 255, 0.055);
-    --sb-edge-lo: rgba(0, 0, 0, 0.55);
-    --sb-text-hi: var(--text-primary);
-    --sb-text-mid: var(--text-secondary);
-    --sb-text-lo: var(--text-muted);
-    --sb-text-faint: #3e4856;
-    --sb-accent: var(--accent);
-    --sb-accent-soft: rgba(212, 168, 75, 0.14);
-    --sb-accent-glow: rgba(212, 168, 75, 0.22);
-    --sb-accent-glow-strong: rgba(212, 168, 75, 0.32);
-    --sb-danger: #f87171;
-    --sb-danger-soft: rgba(248, 113, 113, 0.10);
-    --sb-danger-glow: rgba(248, 113, 113, 0.18);
-    --sb-ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --sb-r-card: 18px;
-    --sb-r-item: 12px;
-    --sb-r-pill: 999px;
-  }
-  body[data-theme='light'] .dashboard-container.app-horizon-shell .sidebar {
-    --sb-bg-base: #eef1f6;
-    --sb-bg-raised: #ffffff;
-    --sb-bg-sunken: #e4e8ee;
-    --sb-light: rgba(255, 255, 255, 0.90);
-    --sb-light-strong: rgba(255, 255, 255, 1);
-    --sb-shadow: rgba(166, 180, 200, 0.45);
-    --sb-shadow-soft: rgba(166, 180, 200, 0.28);
-    --sb-edge-hi: rgba(255, 255, 255, 0.95);
-    --sb-edge-lo: rgba(140, 156, 178, 0.20);
-    --sb-text-hi: var(--text-primary);
-    --sb-text-mid: var(--text-secondary);
-    --sb-text-lo: var(--text-muted);
-    --sb-text-faint: #b0bbc8;
-    --sb-accent: #b8832a;
-    --sb-accent-soft: rgba(184, 131, 42, 0.10);
-    --sb-accent-glow: rgba(184, 131, 42, 0.20);
-    --sb-accent-glow-strong: rgba(184, 131, 42, 0.30);
-    --sb-danger: #dc2626;
-    --sb-danger-soft: rgba(220, 38, 38, 0.08);
-    --sb-danger-glow: rgba(220, 38, 38, 0.16);
-    --sb-ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --sb-r-card: 18px;
-    --sb-r-item: 12px;
-    --sb-r-pill: 999px;
-  }
-
-  /* ── Daqui pra baixo: REGRAS ÚNICAS (sem duplicar tema) ─────────────────── */
   .dashboard-container.app-horizon-shell .sidebar {
-    background: linear-gradient(160deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
-    border: 1px solid var(--sb-edge-hi);
+    position: relative;
+    transform: none;
+    z-index: 1;
+    height: auto;
+    width: 200px;
+    flex: 0 0 200px;
+    max-width: none;
     border-radius: var(--sb-r-card);
+    transition: none;
     padding: 28px 16px 18px;
-    box-shadow:
-      10px 10px 28px var(--sb-shadow),
-      -4px -4px 14px var(--sb-light),
-      inset 1px 1px 1px var(--sb-edge-hi),
-      inset -1px -1px 1px var(--sb-edge-lo);
   }
+  /* botão fechar do drawer some no rail */
+  .dashboard-container.app-horizon-shell .sidebar .mobile-close-btn { display: none; }
+}
 
-  /* Glow gold sutil no topo */
-  .dashboard-container.app-horizon-shell .sidebar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 140px;
-    pointer-events: none;
-    background: radial-gradient(ellipse 80% 100% at 80% 0%, var(--sb-accent-soft), transparent 70%);
-    opacity: 0.6;
-    z-index: 0;
-    border-radius: var(--sb-r-card) var(--sb-r-card) 0 0;
+/* ── DESKTOP (>=1024) = rail mais largo ────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .dashboard-container.app-horizon-shell .sidebar {
+    width: 240px;
+    flex: 0 0 240px;
   }
+}
 
-  /* ── Brand ─────────────────────────────────────────────────────────────── */
-  .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
-    position: relative;
-    z-index: 1;
-    margin-bottom: 18px;
-    padding: 0 8px;
-  }
-  .dashboard-container.app-horizon-shell .sidebar .brand-mark {
-    width: 48px;
-    height: 48px;
-    color: var(--sb-text-hi);
-    filter: none;
-    transition: transform 240ms var(--sb-ease);
-    border: none;
-    box-shadow: none;
-    outline: none;
-    background: transparent;
-  }
-  .dashboard-container.app-horizon-shell .sidebar .brand-stack {
-    gap: 10px;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  .dashboard-container.app-horizon-shell .sidebar .brand-stack:hover .brand-mark {
-    transform: scale(1.05);
-  }
-  .dashboard-container.app-horizon-shell .sidebar .brand-wordmark {
-    margin-left: 0;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
-    font-weight: 700;
-    font-size: 1.625rem;
-    letter-spacing: -0.025em;
-    color: var(--sb-text-hi);
-    font-variation-settings: normal;
-    text-shadow: 0 1px 0 var(--sb-edge-lo);
-  }
+/* ── Stagger reveal no load ────────────────────────────────────────────────── */
+.dashboard-container.app-horizon-shell .sidebar .nav-menu > li { animation: sbItemReveal 500ms var(--sb-ease) both; }
+.dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(1)  { animation-delay:  40ms; }
+.dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(2)  { animation-delay:  80ms; }
+.dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(3)  { animation-delay: 120ms; }
+.dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(4)  { animation-delay: 160ms; }
+.dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(5)  { animation-delay: 200ms; }
+.dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(6)  { animation-delay: 240ms; }
+.dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(7)  { animation-delay: 280ms; }
+.dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(8)  { animation-delay: 320ms; }
+.dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(n+9) { animation-delay: 360ms; }
+.dashboard-container.app-horizon-shell .sidebar .brand-wrapper { animation: sbBrandReveal 600ms var(--sb-ease) both; }
+.dashboard-container.app-horizon-shell .sidebar .logout-btn { animation: sbItemReveal 600ms 500ms var(--sb-ease) both; }
 
-  /* ── Nav menu ──────────────────────────────────────────────────────────── */
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 0;
-    list-style: none;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--sb-edge-hi) transparent;
-  }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu::-webkit-scrollbar { width: 4px; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu::-webkit-scrollbar-thumb {
-    background: var(--sb-edge-hi);
-    border-radius: 2px;
-  }
+@keyframes sbItemReveal { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes sbBrandReveal { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
 
-  /* ── Nav items: clay buttons ───────────────────────────────────────────── */
-  .dashboard-container.app-horizon-shell .sidebar .nav-item {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 14px;
-    margin: 0;
-    width: 100%;
-    border-radius: var(--sb-r-item);
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--sb-text-mid);
-    font-family: 'Inter Variable', system-ui, sans-serif;
-    font-size: 0.875rem;
-    font-weight: 500;
-    letter-spacing: -0.005em;
-    text-decoration: none;
-    transition:
-      transform 240ms var(--sb-ease),
-      background 240ms var(--sb-ease),
-      color 240ms var(--sb-ease),
-      box-shadow 240ms var(--sb-ease);
-    overflow: visible;
-  }
-  .dashboard-container.app-horizon-shell .sidebar .nav-item .nav-item__label {
-    color: inherit;
-    font-family: inherit;
-    font-weight: inherit;
-    font-size: inherit;
-    line-height: 1.2;
-  }
-
-  /* Ícone wrap */
-  .dashboard-container.app-horizon-shell .sidebar .icon-wrap {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 9px;
-    background: transparent;
-    color: var(--sb-text-lo);
-    transition: color 240ms var(--sb-ease), background 240ms var(--sb-ease), box-shadow 240ms var(--sb-ease);
-  }
-  .dashboard-container.app-horizon-shell .sidebar .icon-wrap svg {
-    width: 20px;
-    height: 20px;
-    stroke-width: 1.6;
-  }
-
-  /* Hover: clay raised + slide + glow gold */
-  .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) {
-    transform: translateX(3px);
-    background: linear-gradient(155deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
-    color: var(--sb-text-hi);
-    box-shadow:
-      4px 4px 10px var(--sb-shadow-soft),
-      -2px -2px 6px var(--sb-light),
-      inset 1px 1px 1px var(--sb-edge-hi);
-  }
-  .dashboard-container.app-horizon-shell .sidebar .nav-item:hover:not(.active) .icon-wrap {
-    color: var(--sb-accent);
-  }
-
-  /* Active: inset sunken + barra gold + glow */
-  .dashboard-container.app-horizon-shell .sidebar .nav-item.active {
-    background: var(--sb-bg-sunken);
-    color: var(--sb-text-hi);
-    font-weight: 600;
-    box-shadow:
-      inset 3px 3px 8px var(--sb-shadow),
-      inset -2px -2px 5px var(--sb-light),
-      0 0 0 1px var(--sb-accent-glow);
-    transform: translateX(0);
-  }
-  .dashboard-container.app-horizon-shell .sidebar .nav-item.active::before {
-    content: '';
-    position: absolute;
-    left: -2px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 60%;
-    border-radius: 0 3px 3px 0;
-    background: linear-gradient(180deg, transparent 0%, var(--sb-accent) 30%, var(--sb-accent) 70%, transparent 100%);
-    box-shadow: 0 0 14px var(--sb-accent-glow-strong);
-  }
-  .dashboard-container.app-horizon-shell .sidebar .nav-item.active .icon-wrap {
-    background: var(--sb-bg-base);
-    color: var(--sb-accent);
-    box-shadow:
-      inset 2px 2px 4px var(--sb-shadow),
-      inset -1px -1px 2px var(--sb-light),
-      0 0 0 1px var(--sb-accent-glow);
-  }
-  .dashboard-container.app-horizon-shell .sidebar .nav-item.active svg {
-    stroke-width: 1.8;
-    filter: drop-shadow(0 0 6px var(--sb-accent-glow));
-  }
-
-  /* Focus rings */
-  .dashboard-container.app-horizon-shell .sidebar .nav-item:focus-visible {
-    outline: none;
-    box-shadow:
-      4px 4px 10px var(--sb-shadow-soft),
-      -2px -2px 6px var(--sb-light),
-      0 0 0 2px var(--sb-accent);
-  }
-
-  /* ── Section labels ────────────────────────────────────────────────────── */
-  .dashboard-container.app-horizon-shell .sidebar .nav-section-label {
-    position: relative;
-    list-style: none;
-    margin: 18px 0 6px;
-    padding: 0 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .dashboard-container.app-horizon-shell .sidebar .nav-section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, var(--sb-edge-hi), transparent);
-  }
-  .dashboard-container.app-horizon-shell .sidebar .nav-section-label__text {
-    font-family: 'Inter Variable', system-ui, sans-serif;
-    font-size: 0.6875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: var(--sb-text-faint);
-  }
-
-  /* ── Logout ────────────────────────────────────────────────────────────── */
-  .dashboard-container.app-horizon-shell .sidebar .logout-btn {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    margin-top: 12px;
-    padding: 12px 18px;
-    border-radius: var(--sb-r-pill);
-    background: linear-gradient(155deg, var(--sb-bg-raised) 0%, var(--sb-bg-base) 100%);
-    border: 1px solid var(--sb-edge-hi);
-    color: var(--sb-text-mid);
-    font-family: 'Inter Variable', system-ui, sans-serif;
-    font-size: 0.875rem;
-    font-weight: 500;
-    letter-spacing: -0.005em;
-    box-shadow:
-      5px 5px 12px var(--sb-shadow-soft),
-      -3px -3px 8px var(--sb-light),
-      inset 1px 1px 1px var(--sb-edge-hi),
-      inset -1px -1px 1px var(--sb-edge-lo);
-    transition: all 240ms var(--sb-ease);
-    cursor: pointer;
-  }
-  .dashboard-container.app-horizon-shell .sidebar .logout-btn:hover {
-    transform: translateY(-2px);
-    color: var(--sb-danger);
-    background: linear-gradient(155deg, var(--sb-danger-soft) 0%, var(--sb-bg-base) 100%);
-    box-shadow:
-      7px 9px 16px var(--sb-shadow),
-      -4px -4px 10px var(--sb-light),
-      0 0 0 1px var(--sb-danger-glow),
-      inset 1px 1px 1px var(--sb-edge-hi);
-  }
-  .dashboard-container.app-horizon-shell .sidebar .logout-btn:active {
-    transform: translateY(0);
-    box-shadow:
-      inset 3px 3px 8px var(--sb-shadow),
-      inset -2px -2px 5px var(--sb-light);
-  }
-  .dashboard-container.app-horizon-shell .sidebar .logout-btn svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  /* ── Version stamp ─────────────────────────────────────────────────────── */
-  .dashboard-container.app-horizon-shell .sidebar .sidebar-version {
-    position: relative;
-    z-index: 1;
-    display: block;
-    text-align: center;
-    margin-bottom: 6px;
-    opacity: 0.5;
-    color: var(--sb-text-faint);
-    font-family: 'Inter Variable', system-ui, sans-serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-  }
-
-  /* ── Stagger reveal no load ────────────────────────────────────────────── */
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li {
-    animation: sbItemReveal 500ms var(--sb-ease) both;
-  }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(1)  { animation-delay:  40ms; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(2)  { animation-delay:  80ms; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(3)  { animation-delay: 120ms; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(4)  { animation-delay: 160ms; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(5)  { animation-delay: 200ms; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(6)  { animation-delay: 240ms; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(7)  { animation-delay: 280ms; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(8)  { animation-delay: 320ms; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(9)  { animation-delay: 360ms; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(10) { animation-delay: 400ms; }
-  .dashboard-container.app-horizon-shell .sidebar .nav-menu > li:nth-child(n+11) { animation-delay: 440ms; }
-  .dashboard-container.app-horizon-shell .sidebar .brand-wrapper {
-    animation: sbBrandReveal 600ms var(--sb-ease) both;
-  }
-  .dashboard-container.app-horizon-shell .sidebar .logout-btn {
-    animation: sbItemReveal 600ms 500ms var(--sb-ease) both;
-  }
-
-  @keyframes sbItemReveal {
-    from { opacity: 0; transform: translateX(-12px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
-  @keyframes sbBrandReveal {
-    from { opacity: 0; transform: scale(0.92); }
-    to   { opacity: 1; transform: scale(1); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .dashboard-container.app-horizon-shell .sidebar *,
-    .dashboard-container.app-horizon-shell .sidebar {
-      animation: none;
-      transition: none;
-    }
-  }
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-container.app-horizon-shell .sidebar,
+  .dashboard-container.app-horizon-shell .sidebar * { animation: none; transition: none; }
 }

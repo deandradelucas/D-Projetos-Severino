@@ -1,0 +1,85 @@
+/* =============================================================================
+   layout/shell.css — MOLDURA do app (3 tiers: mobile / tablet / desktop)
+   -----------------------------------------------------------------------------
+   Árvore:
+     .app-layout-shell > .app-routes-grow
+       .dashboard-container.app-horizon-shell
+         .app-horizon-inner   →  flex row: [ <aside.sidebar> | <main.main-content> ]
+   Desktop/tablet: sidebar = rail à esquerda + conteúdo ao lado.
+   Mobile: sidebar = drawer (fixed, fora do fluxo) + conteúdo full-width + bottom nav.
+   ============================================================================= */
+
+.app-layout-shell {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
+
+.app-routes-grow {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.dashboard-container.app-horizon-shell {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+}
+
+.app-horizon-inner {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── DESKTOP (>= 1024px) ───────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .dashboard-container.app-horizon-shell {
+    height: 100vh;
+    overflow: hidden;
+    padding: 24px;
+    gap: 24px;
+  }
+  .app-horizon-inner { gap: 24px; }
+  .main-content { padding: 4px; border-radius: var(--neu-r-card); }
+}
+
+/* ── TABLET (769–1023px) ───────────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .dashboard-container.app-horizon-shell {
+    height: 100vh;
+    overflow: hidden;
+    padding: 16px;
+    gap: 16px;
+  }
+  .app-horizon-inner { gap: 16px; }
+  .main-content { padding: 2px; border-radius: var(--neu-r-card); }
+}
+
+/* ── MOBILE (<= 768px) ─────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* sidebar vira drawer (position:fixed em sidebar.css) → sai do fluxo */
+  .dashboard-container.app-horizon-shell {
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+  }
+  .app-horizon-inner { display: block; }
+  .main-content {
+    padding: 16px;
+    /* respiro pro bottom nav (altura + safe-area do iPhone) */
+    padding-bottom: calc(72px + var(--safe-bottom, 0px));
+  }
+}
