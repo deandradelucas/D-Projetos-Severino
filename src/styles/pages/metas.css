@@ -116,6 +116,13 @@
 .page-metas__icon-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .page-metas__cor-opt { width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; box-shadow: inset 0 0 0 1px var(--hairline); }
 .page-metas__cor-opt--active { border-color: var(--text-primary); }
+/* cores das metas (faltavam no flat — círculos apareciam vazios) */
+.page-metas__cor-opt--gold { background: var(--accent); }
+.page-metas__cor-opt--green { background: #22c55e; }
+.page-metas__cor-opt--blue { background: #3b82f6; }
+.page-metas__cor-opt--purple { background: #8b5cf6; }
+.page-metas__cor-opt--red { background: #ef4444; }
+.page-metas__cor-opt--teal { background: #14b8a6; }
 .page-metas__icon-opt {
   display: grid; place-items: center; width: 42px; height: 42px;
   border-radius: var(--r-md); border: 1px solid var(--hairline-strong); background: var(--surface);
