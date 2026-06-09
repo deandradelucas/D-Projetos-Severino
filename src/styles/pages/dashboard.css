@@ -386,7 +386,7 @@
 
 /* Despesas por categoria — barras (full-width: rótulo | barra | valor em linha) */
 .dashboard-hub__bars { display: flex; flex-direction: column; gap: 9px; }
-.dashboard-hub__bar-row { display: grid; grid-template-columns: minmax(110px, 1.4fr) 3fr auto; align-items: center; gap: 12px; }
+.dashboard-hub__bar-row { display: grid; grid-template-columns: minmax(110px, 1.4fr) 3fr auto 40px; align-items: center; gap: 12px; }
 .dashboard-hub__bar-label {
   font-size: 0.8rem;
   color: var(--text-secondary);
@@ -400,6 +400,15 @@
   font-weight: 600;
   color: var(--text-primary);
   text-align: right;
+  white-space: nowrap;
+}
+.dashboard-hub__bar-pct {
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .dashboard-hub__bar-track {
@@ -505,10 +514,136 @@
   .ref-kpi-card__pct-value { font-size: 0.95rem; }
   .ai-insight { width: 240px; }
   .dashboard-hub__insights { grid-template-columns: 1fr; gap: 12px; }
-  .dashboard-hub__bar-row { grid-template-columns: minmax(80px, 1fr) 2fr auto; gap: 8px; }
+  .dashboard-hub__bar-row { grid-template-columns: minmax(70px, 1fr) 2fr auto 32px; gap: 8px; }
   .dashboard-hub__bar-label { font-size: 0.75rem; }
+  .dashboard-hub__bar-pct { font-size: 0.68rem; }
+}
+
+/* ============================================================================
+   PAINEL "Transações" (últimas transações) — card flat + tabela responsiva
+   ============================================================================ */
+.dashboard-hub__tx-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--elev-1);
+}
+.dashboard-hub__tx-panel .ref-tx-list { display: flex; flex-direction: column; min-width: 0; }
+.dashboard-hub__tx-panel .ref-tx-table-subgrid { display: flex; flex-direction: column; }
+
+/* grade da tabela (desktop/tablet): ícone | data | categoria | subcategoria | rec | valor */
+.dashboard-hub__tx-panel .ref-tx-list-head,
+.dashboard-hub__tx-panel .ref-tx-row {
+  display: grid;
+  grid-template-columns: 40px minmax(110px, 1fr) minmax(110px, 1.2fr) minmax(90px, 1fr) 24px auto;
+  align-items: center;
+  gap: 12px;
+}
+
+/* cabeçalho */
+.dashboard-hub__tx-panel .ref-tx-list-head {
+  padding: 0 2px 10px;
+  border-bottom: 1px solid var(--hairline);
+}
+.dashboard-hub__tx-panel .ref-tx-list-head > span {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+.dashboard-hub__tx-panel .ref-tx-list-head__val { text-align: right; }
+
+/* linhas */
+.dashboard-hub__tx-panel .ref-tx-row {
+  padding: 11px 2px;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  transition: background 140ms var(--ease);
+}
+.dashboard-hub__tx-panel .ref-tx-row:last-child { border-bottom: none; }
+.dashboard-hub__tx-panel .ref-tx-row:hover { background: var(--surface-2); }
+
+/* ícone (seta tinta entrada/saída) */
+.dashboard-hub__tx-panel .ref-tx-icon-cell { display: flex; }
+.dashboard-hub__tx-panel .ref-tx-arrow-wrap {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: var(--r-md); flex-shrink: 0;
+}
+.dashboard-hub__tx-panel .ref-tx-arrow-wrap--up { background: var(--success-muted); color: var(--success); }
+.dashboard-hub__tx-panel .ref-tx-arrow-wrap--down { background: var(--error-muted); color: var(--error); }
+
+/* meta (data + badges) */
+.dashboard-hub__tx-panel .ref-tx-meta-cell { min-width: 0; }
+.dashboard-hub__tx-panel .ref-tx-meta-primary { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.dashboard-hub__tx-panel .ref-tx-date { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); }
+.dashboard-hub__tx-panel .ref-tx-rec-badge {
+  font-size: 0.62rem; font-weight: 700; padding: 1px 6px; border-radius: 999px;
+  background: var(--accent-muted); color: var(--accent);
+}
+.dashboard-hub__tx-panel .ref-tx-pendente-chip {
+  font-size: 0.62rem; font-weight: 700; padding: 1px 7px; border-radius: 999px;
+  background: var(--surface-sunken); color: var(--text-secondary);
+}
+.dashboard-hub__tx-panel .ref-tx-lancador { font-size: 0.7rem; color: var(--text-muted); }
+.dashboard-hub__tx-panel .ref-tx-recorrencia-ico-wrap { display: inline-flex; color: var(--text-muted); }
+
+/* categoria / subcategoria */
+.dashboard-hub__tx-panel .ref-tx-field-label { display: none; }
+.dashboard-hub__tx-panel .ref-tx-cat-text {
+  display: flex; align-items: center; gap: 7px; margin: 0; min-width: 0;
+  font-size: 0.85rem; color: var(--text-primary);
+}
+.dashboard-hub__tx-panel .ref-tx-cat-text__label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dashboard-hub__tx-panel .ref-tx-tipo-pulse { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dashboard-hub__tx-panel .ref-tx-tipo-pulse--receita { background: var(--success); }
+.dashboard-hub__tx-panel .ref-tx-tipo-pulse--despesa { background: var(--error); }
+.dashboard-hub__tx-panel .ref-tx-sub-text {
+  margin: 0; font-size: 0.8rem; color: var(--text-secondary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dashboard-hub__tx-panel .ref-tx-rec-cell { display: flex; justify-content: center; color: var(--text-muted); }
+
+/* valor */
+.dashboard-hub__tx-panel .ref-tx-val-cell { text-align: right; }
+.dashboard-hub__tx-panel .ref-tx-val {
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-weight: 700; font-size: 0.9rem; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.dashboard-hub__tx-panel .ref-tx-val--pos { color: var(--success); }
+.dashboard-hub__tx-panel .ref-tx-val--neg { color: var(--text-primary); }
+
+/* skeleton + empty */
+.dashboard-hub__tx-panel .ref-empty-state { padding: 28px 8px; text-align: center; }
+.dashboard-hub__tx-panel .ref-empty { color: var(--text-secondary); font-size: 0.9rem; }
+
+/* ── MOBILE (<=768): empilha cada linha (ícone | data/cat/sub | valor) ──────── */
+@media (max-width: 768px) {
+  .dashboard-hub__tx-panel { padding: 14px 14px; }
+  .dashboard-hub__tx-panel .ref-tx-list-head { display: none; }
+  .dashboard-hub__tx-panel .ref-tx-row {
+    grid-template-columns: 34px 1fr auto;
+    grid-template-areas:
+      "icon meta val"
+      "icon cat  val"
+      "icon sub  val";
+    gap: 2px 10px;
+    padding: 12px 2px;
+  }
+  .dashboard-hub__tx-panel .ref-tx-icon-cell { grid-area: icon; align-self: start; }
+  .dashboard-hub__tx-panel .ref-tx-meta-cell { grid-area: meta; }
+  .dashboard-hub__tx-panel .ref-tx-cat-cell  { grid-area: cat; min-width: 0; }
+  .dashboard-hub__tx-panel .ref-tx-sub-cell  { grid-area: sub; min-width: 0; }
+  .dashboard-hub__tx-panel .ref-tx-rec-cell  { display: none; }
+  .dashboard-hub__tx-panel .ref-tx-val-cell  { grid-area: val; align-self: center; }
+  .dashboard-hub__tx-panel .ref-tx-sub-text  { font-size: 0.75rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .dashboard-hub__date::before { animation: none; }
+  .dashboard-hub__tx-panel .ref-tx-row { transition: none; }
 }

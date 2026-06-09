@@ -484,6 +484,7 @@ export default function Dashboard() {
                         <span className="dashboard-hub__bar-fill" style={{ width: `${d.pct}%` }} />
                       </span>
                       <span className={`dashboard-hub__bar-val ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(d.valor)}</span>
+                      <span className="dashboard-hub__bar-pct">{totalDespesas > 0 ? Math.round((d.valor / totalDespesas) * 100) : 0}%</span>
                     </li>
                   ))}
                 </ul>
