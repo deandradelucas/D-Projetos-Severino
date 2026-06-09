@@ -176,7 +176,14 @@ export default function Dashboard() {
     )
   }, [transacoes])
 
-  const txRecentes = useMemo(() => transacoes.slice(0, 8), [transacoes])
+  // Data efetiva da transação: parcela exibe/ordena pela data da COMPRA (data_compra),
+  // não pelo vencimento (data_transacao). Mesma regra do TransacaoRow / transacoesDerived.
+  const txRecentes = useMemo(() => {
+    const dataEfetiva = (t) => (t.recorrente_index && t.data_compra ? t.data_compra : t.data_transacao)
+    return [...transacoes]
+      .sort((a, b) => String(dataEfetiva(b) ?? '').localeCompare(String(dataEfetiva(a) ?? '')))
+      .slice(0, 8)
+  }, [transacoes])
 
   // Despesas por categoria (top 5) para o mini-gráfico de barras
   const despesasPorCategoria = useMemo(() => {
@@ -538,7 +545,8 @@ export default function Dashboard() {
                     const isRecorrente = !isParcela && Boolean(t.recorrencia_mensal_id)
                     const isPendente = t.status === 'PENDENTE'
                     const isRec = t.tipo === 'RECEITA'
-                    const { line: dateLine, dateTimeAttr } = formatTransacaoListDateTime(t.data_transacao)
+                    const dataExibir = isParcela && t.data_compra ? t.data_compra : t.data_transacao
+                    const { line: dateLine, dateTimeAttr } = formatTransacaoListDateTime(dataExibir)
                     const catNome = (t.categorias?.nome && String(t.categorias.nome).trim()) || '—'
                     const subRaw = t.subcategorias
                     const subNome =
