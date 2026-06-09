@@ -104,8 +104,12 @@
   cursor: pointer; transition: background 140ms var(--ease), border-color 140ms var(--ease);
 }
 .agenda-calendar-day:hover { background: var(--surface-2); }
-.agenda-calendar-day.today { border-color: var(--accent); }
-.agenda-calendar-day.selected { background: var(--accent-muted); border-color: var(--accent); }
+/* dias fora do mês exibido: mais fracos */
+.agenda-calendar-day--muted { background: var(--surface-sunken); border-color: transparent; }
+.agenda-calendar-day--muted .agenda-calendar-day__num { color: var(--text-muted); opacity: 0.5; }
+.agenda-calendar-day--today { border-color: var(--accent); }
+.agenda-calendar-day--selected { background: var(--accent-muted); border-color: var(--accent); }
+.agenda-calendar-day--selected .agenda-calendar-day__num { color: var(--accent); }
 .agenda-calendar-day__weekday { font-size: 0.6rem; color: var(--text-muted); }
 .agenda-calendar-day__num { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
 .agenda-calendar-day__count { font-size: 0.62rem; color: var(--accent); font-weight: 700; }
