@@ -13,3 +13,6 @@
 
 /* Componentes */
 @import '../styles/components/insights-strip.css';
+
+/* Páginas */
+@import '../styles/pages/dashboard.css';

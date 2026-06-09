@@ -1,0 +1,236 @@
+/* =============================================================================
+   pages/dashboard.css — HERO do Dashboard  ·  3 tiers (mobile/tablet/desktop)
+   Tokens globais: --neu-* (relevo), --accent (gold), --success/--error, --text-*.
+   ============================================================================= */
+
+.dashboard-hub { width: 100%; }
+
+/* ── Hero card (relevo neumórfico) ─────────────────────────────────────────── */
+.dashboard-hub__hero {
+  width: 100%;
+  margin: 0 0 16px;
+  padding: 20px;
+  border-radius: var(--neu-r-card);
+  background: linear-gradient(180deg, var(--neu-raised) 0%, var(--neu-base) 100%);
+  box-shadow:
+    8px 8px 24px var(--neu-shadow),
+    -6px -6px 18px var(--neu-light),
+    inset 1px 1px 1px var(--neu-edge-hi),
+    inset -1px -1px 1px var(--neu-edge-lo);
+}
+
+.dashboard-hub__hero-row { display: flex; align-items: flex-start; gap: 12px; }
+.dashboard-hub__hero-main { flex: 1; min-width: 0; }
+.dashboard-hub__hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.dashboard-hub__hero-text { min-width: 0; }
+
+/* Título: saudação + nome em dourado */
+.dashboard-hub__title {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 1.6vw + 0.8rem, 2.125rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+}
+.dashboard-hub__title > span { font-weight: 700; color: var(--accent); }
+
+/* Data com pontinho dourado pulsante */
+.dashboard-hub__date {
+  position: relative;
+  display: inline-block;
+  margin-top: 4px;
+  padding-left: 18px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.dashboard-hub__date::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.6);
+  animation: hubDatePulse 2.4s ease-in-out infinite;
+}
+@keyframes hubDatePulse {
+  0%, 100% { opacity: 0.7; transform: translateY(-50%) scale(1); }
+  50%      { opacity: 1;   transform: translateY(-50%) scale(1.15); }
+}
+
+/* ── Ações do hero (CTA + ícones + avatar) ─────────────────────────────────── */
+.dashboard-hub__hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* CTA "+ Nova transação" — relevo neumórfico, vira dourado no hover */
+.dashboard-hub__btn--primary {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: -0.005em;
+  color: var(--text-primary);
+  background: linear-gradient(155deg, var(--neu-raised) 0%, var(--neu-base) 100%);
+  box-shadow:
+    5px 5px 12px var(--neu-shadow-soft),
+    -3px -3px 8px var(--neu-light),
+    inset 1px 1px 1px var(--neu-edge-hi);
+  cursor: pointer;
+  transition: transform 220ms var(--neu-ease), box-shadow 220ms var(--neu-ease), color 220ms var(--neu-ease);
+}
+.dashboard-hub__btn--primary:hover {
+  transform: translateY(-2px);
+  color: var(--accent);
+  box-shadow:
+    7px 9px 16px var(--neu-shadow),
+    -4px -4px 10px var(--neu-light),
+    0 0 0 1px rgba(var(--accent-rgb), 0.25),
+    inset 1px 1px 1px var(--neu-edge-hi);
+}
+.dashboard-hub__btn--primary:active {
+  transform: translateY(0);
+  box-shadow: inset 3px 3px 8px var(--neu-shadow), inset -2px -2px 5px var(--neu-light);
+}
+
+/* Botões de ícone (WhatsApp, privacidade) */
+.dashboard-hub__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  background: linear-gradient(155deg, var(--neu-raised) 0%, var(--neu-base) 100%);
+  box-shadow:
+    5px 5px 12px var(--neu-shadow-soft),
+    -3px -3px 8px var(--neu-light),
+    inset 1px 1px 1px var(--neu-edge-hi);
+  cursor: pointer;
+  transition: transform 220ms var(--neu-ease), box-shadow 220ms var(--neu-ease), color 220ms var(--neu-ease);
+}
+.dashboard-hub__icon-btn:hover { transform: translateY(-2px); color: var(--accent); }
+.dashboard-hub__icon-btn:active {
+  transform: translateY(0);
+  box-shadow: inset 3px 3px 8px var(--neu-shadow), inset -2px -2px 5px var(--neu-light);
+}
+.dashboard-hub__icon-btn--wa:hover { color: #25d366; }
+.dashboard-hub__icon-btn--disabled { opacity: 0.45; cursor: not-allowed; }
+.dashboard-hub__icon-btn--privacy-on { color: var(--accent); }
+
+/* Avatar */
+.dashboard-hub__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid var(--neu-edge-hi);
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--neu-sunken);
+  box-shadow: inset 2px 2px 4px var(--neu-shadow-soft), inset -1px -1px 2px var(--neu-light);
+  cursor: pointer;
+}
+.dashboard-hub__avatar-img { width: 100%; height: 100%; object-fit: cover; }
+.dashboard-hub__avatar-initials {
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--accent);
+}
+
+/* ── Linha de saldo ────────────────────────────────────────────────────────── */
+.dashboard-hub__balance-line--hero {
+  display: flex;
+  flex-direction: column;
+  margin-top: 18px;
+}
+.dashboard-hub__balance-line-label {
+  margin: 0 0 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.dashboard-hub__balance-line--hero strong {
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(2.25rem, 3.4vw + 0.9rem, 4rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--text-primary);
+}
+.dashboard-hub__balance-value--positive { color: var(--success) !important; }
+.dashboard-hub__balance-value--negative { color: var(--error) !important; }
+body[data-theme='dark'] .dashboard-hub__balance-value--positive { text-shadow: 0 0 32px rgba(34, 197, 94, 0.35); }
+body[data-theme='dark'] .dashboard-hub__balance-value--negative { text-shadow: 0 0 32px rgba(239, 68, 68, 0.30); }
+
+/* Delta (placeholder + shimmer enquanto carrega) */
+.dashboard-hub__balance-delta--placeholder {
+  width: 110px;
+  height: 26px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  background: var(--neu-sunken);
+  overflow: hidden;
+  box-shadow: inset 2px 2px 4px var(--neu-shadow-soft), inset -1px -1px 2px var(--neu-light);
+}
+.dashboard-hub__balance-delta-shimmer {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--accent-rgb), 0.20) 50%, transparent 100%);
+  animation: hubShimmer 1.4s ease-in-out infinite;
+}
+@keyframes hubShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ── TABLET (769–1023) ─────────────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .dashboard-hub__hero { padding: 22px 24px; }
+}
+
+/* ── DESKTOP (>=1024) ──────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .dashboard-hub__hero { padding: 26px 32px 28px; }
+}
+
+/* ── MOBILE (<=768) ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dashboard-hub__hero-top { flex-direction: column; gap: 14px; }
+  .dashboard-hub__hero-actions { width: 100%; flex-wrap: wrap; }
+  .dashboard-hub__btn--primary { flex: 1; min-width: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-hub__date::before,
+  .dashboard-hub__balance-delta-shimmer { animation: none; }
+}
