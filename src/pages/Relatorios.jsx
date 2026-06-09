@@ -553,7 +553,7 @@ export default function Relatorios() {
             <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
             <div className="rel-ed__heading">
               <h1 className="rel-ed__title">Relatórios</h1>
-              <p className="rel-ed__period">{periodLabel} · {selectedCategoryName}</p>
+              <p className="rel-ed__period">{periodLabel}{filters.categoria_id ? ` · ${selectedCategoryName}` : ''}</p>
             </div>
             <div className="rel-ed__actions" role="toolbar" aria-label="Exportar relatório">
                   <button
