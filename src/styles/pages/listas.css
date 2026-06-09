@@ -1,0 +1,338 @@
+/* =============================================================================
+   pages/listas.css — Página Listas (compras/tarefas) · Flat Soft-Cards
+   -----------------------------------------------------------------------------
+   Chrome da página + ItemRow (item compacto 1-linha, stepper, swipe) +
+   ModoComprando (tela cheia de compra) + ListaModais (overlay e modal próprios).
+   FAB usa .dashboard-mobile-tx-fab (dashboard.css). Escopado em .page-lista-compras
+   e .modo-comprando. Tokens only. Sem !important.
+   ============================================================================= */
+
+.page-lista-compras-wrap { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Cabeçalho da lista + menu ─────────────────────────────────────────────── */
+.page-lista-compras__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.page-lista-compras__header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.page-lista-compras__title { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.page-lista-compras__lista-gasto-tag { padding: 2px 9px; border-radius: var(--r-pill); background: var(--accent-muted); color: var(--accent); font-size: 0.66rem; font-weight: 700; }
+.page-lista-compras__lista-gasto-tag--tarefas { background: var(--surface-sunken); color: var(--text-secondary); }
+.page-lista-compras__recorrencia-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-sunken); color: var(--text-secondary); font-size: 0.66rem; font-weight: 600; }
+
+.page-lista-compras__list-menu { position: relative; }
+.page-lista-compras__list-menu-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: var(--r-sm);
+  border: 1px solid var(--hairline-strong); background: var(--surface); color: var(--text-secondary); cursor: pointer;
+}
+.page-lista-compras__list-menu-btn:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-lista-compras__list-dropdown {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 200px;
+  border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-3); padding: 4px;
+}
+.page-lista-compras__list-dropdown-item {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 10px 12px; border: none; border-radius: var(--r-sm); background: transparent;
+  color: var(--text-primary); font-size: 0.88rem; text-align: left; cursor: pointer;
+  transition: background 120ms var(--ease);
+}
+.page-lista-compras__list-dropdown-item:hover { background: var(--surface-2); }
+.page-lista-compras__list-dropdown-item--accent { color: var(--accent); }
+.page-lista-compras__list-dropdown-item--danger { color: var(--error); }
+
+/* ── Abas (Compras | Tarefas) + escopo (pessoal | família) ─────────────────── */
+.page-lista-compras__tabs,
+.page-lista-compras__escopo-toggle { display: inline-flex; gap: 4px; padding: 4px; border-radius: var(--r-md); background: var(--surface-sunken); border: 1px solid var(--hairline); }
+.page-lista-compras__tab,
+.page-lista-compras__escopo-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border: none; border-radius: var(--r-sm);
+  background: transparent; color: var(--text-muted);
+  font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease);
+}
+.page-lista-compras__tab--active,
+.page-lista-compras__escopo-btn--active { background: var(--surface); color: var(--accent); box-shadow: var(--elev-1); }
+.page-lista-compras__tab-count { font-size: 0.72rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+/* ── Orçamento (barra) ─────────────────────────────────────────────────────── */
+.page-lista-compras__orcamento { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1); }
+.page-lista-compras__orcamento-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.page-lista-compras__orcamento-label { font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.page-lista-compras__orcamento-valor { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.page-lista-compras__orcamento-bar { height: 8px; border-radius: var(--r-pill); background: var(--surface-sunken); overflow: hidden; }
+.page-lista-compras__orcamento-fill { height: 100%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--accent), var(--accent-subtle)); }
+.page-lista-compras__orcamento--excedido .page-lista-compras__orcamento-fill { background: var(--error); }
+.page-lista-compras__orcamento-restante { font-size: 0.76rem; color: var(--text-secondary); }
+.page-lista-compras__orcamento--excedido .page-lista-compras__orcamento-restante { color: var(--error); }
+
+/* ── Grupo de categoria ────────────────────────────────────────────────────── */
+.page-lista-compras__category-group { display: flex; flex-direction: column; gap: 4px; }
+
+/* ── Item da lista (compacto, 1 linha ~34px) ───────────────────────────────── */
+.page-lista-compras__item {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  min-height: 44px; padding: 6px 10px;
+  border-radius: var(--r-md); background: var(--surface);
+  border: 1px solid var(--hairline);
+  transition: background 140ms var(--ease);
+}
+.page-lista-compras__item--checked { opacity: 0.6; }
+.page-lista-compras__item-check {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; flex-shrink: 0;
+  border-radius: 6px; border: 1.5px solid var(--hairline-strong);
+  background: var(--surface); color: transparent; cursor: pointer;
+  transition: background 140ms var(--ease), border-color 140ms var(--ease);
+}
+.page-lista-compras__item-check--checked { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
+.page-lista-compras__item-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.page-lista-compras__item-fg { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.page-lista-compras__item-name { font-size: 0.9rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.page-lista-compras__item--checked .page-lista-compras__item-name { text-decoration: line-through; color: var(--text-muted); }
+.page-lista-compras__item-units,
+.page-lista-compras__item-autor,
+.page-lista-compras__item-prazo { font-size: 0.72rem; color: var(--text-muted); }
+.page-lista-compras__item-price { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.page-lista-compras__item-qty { font-size: 0.8rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; min-width: 22px; text-align: center; }
+
+/* stepper de quantidade */
+.page-lista-compras__item-stepper { display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.page-lista-compras__item-step {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: var(--r-sm);
+  border: 1px solid var(--hairline-strong); background: var(--surface);
+  color: var(--text-secondary); font-size: 1rem; line-height: 1; cursor: pointer;
+}
+.page-lista-compras__item-step:hover { background: var(--surface-2); color: var(--text-primary); }
+
+/* ações (editar/excluir) — reveladas no swipe (mobile) / hover (desktop) */
+.page-lista-compras__item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.page-lista-compras__item-edit,
+.page-lista-compras__item-delete {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: var(--r-sm);
+  border: 1px solid var(--hairline-strong); background: var(--surface); color: var(--text-muted); cursor: pointer;
+  transition: color 150ms var(--ease), border-color 150ms var(--ease), background 150ms var(--ease);
+}
+.page-lista-compras__item-edit:hover { color: var(--accent); border-color: var(--accent-border); }
+.page-lista-compras__item-delete:hover { color: var(--error); border-color: var(--error); background: var(--error-muted); }
+
+/* seção de itens marcados (colapsável) */
+.page-lista-compras__checked-section { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.page-lista-compras__checked-toggle { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 4px; border: none; background: transparent; color: var(--text-muted); font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+.page-lista-compras__checked-chevron { transition: transform 200ms var(--ease); }
+.page-lista-compras__checked-chevron--open { transform: rotate(180deg); }
+
+/* ── Footer (total + ações) ────────────────────────────────────────────────── */
+.page-lista-compras__footer {
+  position: sticky; bottom: 0; z-index: 5;
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 14px 16px; border-radius: var(--r-lg) var(--r-lg) 0 0;
+  background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-2);
+}
+.page-lista-compras__footer-main { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.page-lista-compras__footer-total-row { display: flex; flex-direction: column; gap: 1px; }
+.page-lista-compras__total-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.page-lista-compras__total,
+.page-lista-compras__total-value { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.page-lista-compras__footer-actions { display: flex; gap: 8px; }
+.page-lista-compras__footer-novo,
+.page-lista-compras__cta-btn,
+.page-lista-compras__wa-btn,
+.page-lista-compras__nova-btn,
+.page-lista-compras__novo-item-fab {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 16px; border-radius: var(--r-md);
+  border: none; background: var(--accent); color: var(--accent-foreground);
+  font-size: 0.88rem; font-weight: 700; cursor: pointer;
+  transition: background 150ms var(--ease);
+}
+.page-lista-compras__footer-novo:hover,
+.page-lista-compras__cta-btn:hover,
+.page-lista-compras__nova-btn:hover { background: var(--accent-hover); }
+.page-lista-compras__wa-btn { background: var(--surface); border: 1px solid var(--hairline-strong); color: var(--text-secondary); }
+.page-lista-compras__wa-btn:hover { color: #25d366; border-color: #25d366; }
+
+/* ── Onboarding / overview hint ────────────────────────────────────────────── */
+.page-lista-compras__onboarding {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 28px 20px; text-align: center;
+  border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--hairline);
+}
+.page-lista-compras__onboarding-icon { color: var(--accent); }
+.page-lista-compras__onboarding-title { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.page-lista-compras__onboarding-desc { font-size: 0.88rem; color: var(--text-secondary); margin: 0; max-width: 40ch; }
+.page-lista-compras__onboarding-btn {
+  margin-top: 6px; padding: 10px 18px; border-radius: var(--r-md);
+  border: none; background: var(--accent); color: var(--accent-foreground); font-weight: 700; font-size: 0.88rem; cursor: pointer;
+}
+.page-lista-compras__overview-hint {
+  display: flex; align-items: center; gap: 8px;
+  margin: 4px 0; padding: 12px 14px; border-radius: var(--r-md);
+  font-size: 0.86rem; line-height: 1.4; color: var(--text-secondary);
+  background: var(--accent-muted); border: 1px solid var(--accent-border);
+}
+
+/* ── Estados vazios + shimmer ──────────────────────────────────────────────── */
+.page-lista-compras__empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 36px 16px; text-align: center; }
+.page-lista-compras__empty-icon { color: var(--text-muted); }
+.page-lista-compras__empty-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.page-lista-compras__empty-desc { font-size: 0.86rem; color: var(--text-secondary); margin: 0; }
+.page-lista-compras__shimmer { display: flex; flex-direction: column; gap: 8px; }
+.page-lista-compras__shimmer-item { height: 44px; border-radius: var(--r-md); background: var(--surface-sunken); animation: listaShimmer 1.4s var(--ease) infinite; }
+@keyframes listaShimmer { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+/* =============================================================================
+   Modais da Lista (overlay e modal PRÓPRIOS — não usam .modal-content)
+   ============================================================================= */
+.page-lista-compras__modal-overlay {
+  position: fixed; inset: 0; z-index: 1200;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(15, 23, 42, 0.55);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  animation: listaOverlayIn 180ms var(--ease);
+}
+@keyframes listaOverlayIn { from { opacity: 0; } to { opacity: 1; } }
+.page-lista-compras__modal {
+  display: flex; flex-direction: column; width: 100%; max-width: 460px; max-height: 90vh; overflow: hidden;
+  border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-3);
+  animation: listaModalIn 220ms var(--ease);
+}
+@keyframes listaModalIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+.page-lista-compras__modal-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 16px 20px 0; }
+.page-lista-compras__modal-title { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+.page-lista-compras__modal-close {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--hairline);
+  background: var(--surface-sunken); color: var(--text-secondary); cursor: pointer;
+}
+.page-lista-compras__modal-close:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-lista-compras__modal-field { display: flex; flex-direction: column; gap: 6px; padding: 10px 20px; }
+.page-lista-compras__modal-row { display: flex; gap: 12px; padding: 0 20px; }
+.page-lista-compras__modal-row > * { flex: 1; }
+.page-lista-compras__modal-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+.page-lista-compras__modal-label--optional { font-weight: 400; color: var(--text-muted); }
+.page-lista-compras__modal-input,
+.page-lista-compras__modal-select {
+  width: 100%; box-sizing: border-box; padding: 11px 14px;
+  border-radius: var(--r-md); border: 1px solid var(--hairline-strong);
+  background: var(--surface); color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 0.95rem;
+}
+.page-lista-compras__modal-input:focus,
+.page-lista-compras__modal-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+.page-lista-compras__modal-input--qty { text-align: center; }
+.page-lista-compras__modal-subhint { font-size: 0.74rem; color: var(--text-muted); }
+.page-lista-compras__modal-subhint--warn { color: var(--error); }
+.page-lista-compras__modal-total-display { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.page-lista-compras__preco-hint { font-size: 0.74rem; color: var(--text-muted); }
+.page-lista-compras__preco-hint--btn { color: var(--accent); cursor: pointer; background: none; border: none; padding: 0; font-weight: 600; }
+
+/* autocomplete */
+.page-lista-compras__autocomplete {
+  position: absolute; left: 20px; right: 20px; z-index: 10;
+  border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-3);
+  max-height: 200px; overflow-y: auto; padding: 4px;
+}
+.page-lista-compras__autocomplete-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 12px; border: none; border-radius: var(--r-sm); background: transparent; color: var(--text-primary); font-size: 0.88rem; text-align: left; cursor: pointer; }
+.page-lista-compras__autocomplete-item:hover { background: var(--surface-2); }
+.page-lista-compras__autocomplete-icon { color: var(--text-muted); }
+
+/* toggle tipo (compras/tarefas) + recorrência */
+.page-lista-compras__tipo-toggle,
+.page-lista-compras__recorrencia-opcoes { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 20px; }
+.page-lista-compras__tipo-btn,
+.page-lista-compras__recorrencia-opt {
+  flex: 1; min-width: 90px; padding: 9px; border-radius: var(--r-md);
+  border: 1px solid var(--hairline-strong); background: var(--surface);
+  color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.page-lista-compras__tipo-btn--active,
+.page-lista-compras__recorrencia-opt--active { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
+.page-lista-compras__tipo-hint { font-size: 0.76rem; color: var(--text-muted); padding: 0 20px; }
+
+/* resumo no modal */
+.page-lista-compras__modal-resumo { display: flex; align-items: center; gap: 12px; margin: 10px 20px; padding: 12px 14px; border-radius: var(--r-md); background: var(--surface-sunken); }
+.page-lista-compras__modal-resumo-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.page-lista-compras__modal-resumo-nome { font-weight: 600; color: var(--text-primary); }
+.page-lista-compras__modal-resumo-meta { font-size: 0.76rem; color: var(--text-muted); }
+.page-lista-compras__modal-resumo-total { font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.page-lista-compras__modal-resumo-placeholder { color: var(--text-muted); font-size: 0.85rem; }
+
+/* ações do modal */
+.page-lista-compras__modal-actions { display: flex; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--hairline); margin-top: 8px; }
+.page-lista-compras__modal-cancel,
+.page-lista-compras__modal-confirm { flex: 1; padding: 11px; border-radius: var(--r-md); font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+.page-lista-compras__modal-cancel { background: transparent; border: 1px solid var(--hairline-strong); color: var(--text-secondary); }
+.page-lista-compras__modal-cancel:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-lista-compras__modal-confirm { background: var(--accent); border: 1px solid var(--accent); color: var(--accent-foreground); }
+.page-lista-compras__modal-confirm:hover { background: var(--accent-hover); }
+
+/* =============================================================================
+   Modo Comprando (tela cheia)
+   ============================================================================= */
+.modo-comprando {
+  position: fixed; inset: 0; z-index: 1250;
+  display: flex; flex-direction: column;
+  background: var(--surface);
+  padding-top: var(--safe-top, 0px); padding-bottom: var(--safe-bottom, 0px);
+}
+.modo-comprando__header { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--hairline); }
+.modo-comprando__header-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.modo-comprando__lista-nome { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+.modo-comprando__close {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--hairline);
+  background: var(--surface-sunken); color: var(--text-secondary); cursor: pointer;
+}
+.modo-comprando__progresso { display: flex; flex-direction: column; gap: 4px; padding: 12px 18px; }
+.modo-comprando__progress-bar { height: 8px; border-radius: var(--r-pill); background: var(--surface-sunken); overflow: hidden; }
+.modo-comprando__progress-fill { height: 100%; border-radius: var(--r-pill); background: var(--success); }
+.modo-comprando__scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 18px; display: flex; flex-direction: column; gap: 8px; }
+.modo-comprando__cart-section { display: flex; flex-direction: column; gap: 6px; }
+.modo-comprando__cart-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.modo-comprando__item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px; border-radius: var(--r-md);
+  background: var(--surface); border: 1px solid var(--hairline);
+  cursor: pointer; transition: background 140ms var(--ease);
+}
+.modo-comprando__item--done { opacity: 0.55; }
+.modo-comprando__check {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; flex-shrink: 0;
+  border-radius: 50%; border: 2px solid var(--hairline-strong);
+  background: var(--surface); color: transparent;
+}
+.modo-comprando__check--on { background: var(--success); border-color: var(--success); color: #fff; }
+.modo-comprando__item-nome { flex: 1; min-width: 0; font-size: 0.95rem; color: var(--text-primary); }
+.modo-comprando__item--done .modo-comprando__item-nome { text-decoration: line-through; color: var(--text-muted); }
+.modo-comprando__item-meta { font-size: 0.78rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.modo-comprando__footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-top: 1px solid var(--hairline); }
+.modo-comprando__total { display: flex; flex-direction: column; gap: 1px; }
+.modo-comprando__total-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.modo-comprando__total-value { font-size: 1.25rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.modo-comprando__finish,
+.modo-comprando__done {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 20px; border-radius: var(--r-md);
+  border: none; background: var(--accent); color: var(--accent-foreground); font-weight: 700; font-size: 0.9rem; cursor: pointer;
+}
+.modo-comprando__done { flex-direction: column; align-items: center; gap: 6px; background: transparent; color: var(--text-primary); }
+.modo-comprando__done-emoji { font-size: 2rem; }
+.modo-comprando__done-text { font-size: 0.95rem; color: var(--text-secondary); }
+
+/* =============================================================================
+   MOBILE (<=768)
+   ============================================================================= */
+@media (max-width: 768px) {
+  .page-lista-compras__modal-input,
+  .page-lista-compras__modal-select { font-size: 16px; }
+  .page-lista-compras__modal-row { flex-direction: column; gap: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-lista-compras__shimmer-item { animation: none; }
+  .page-lista-compras__item { transition: none; }
+}
