@@ -31,6 +31,7 @@ import {
   computeStatusBadge,
 } from '../lib/pagamentoUi'
 import './dashboard.css'
+import '../styles/pages/pagamento.css'
 
 const POLL_ASSINATURA_MS = 18_000
 const POLL_ASSINATURA_MAX_MS = 4 * 60_000
