@@ -93,7 +93,7 @@ export default function InvestimentoComparadorModal({ open, onClose, cdiAa }) {
               />
             </div>
             <div className="page-investimentos-comparador__field">
-              <label className="page-investimentos-modal__section-label">Prazo (data de resgate)</label>
+              <label className="page-investimentos-modal__section-label">Prazo de resgate</label>
               <div className="page-investimentos-modal__date-field-wrap">
                 <input
                   type="text"

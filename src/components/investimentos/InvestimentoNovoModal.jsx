@@ -618,7 +618,7 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
             {/* Taxa */}
             <div className="page-investimentos-modal__section">
               <span className="page-investimentos-modal__section-label">
-                {tipoIndexador === 'PREFIXADO' ? 'Taxa pré-fixada a.a.' : '% do CDI contratada'}
+                Taxa contratada
               </span>
               <div className="page-investimentos-modal__indexador-toggle" role="group" aria-label="Tipo de taxa">
                 <button

@@ -9,6 +9,8 @@
 
 /* ── Hero: linha de taxas (Selic / CDI) ────────────────────────────────────── */
 .page-investimentos .page-investimentos-hero__rates-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+/* empurra os botões (Comparar + Novo investimento) p/ o canto direito do hero */
+.page-investimentos .dashboard-hub__hero-actions { margin-left: auto; }
 /* badges de taxa (estavam sem CSS — label e valor colavam: "Selic14,50%") */
 .page-investimentos .taxa-selic-badge--hero,
 .page-investimentos .taxa-cdi-badge--hero {
@@ -39,7 +41,7 @@
   box-shadow: var(--elev-1);
   margin-bottom: 16px;
 }
-.page-investimentos-resumo__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; margin-bottom: 14px; }
+.page-investimentos-resumo__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--hairline); }
 /* "Simular carteira até + data" ao lado do título (no desktop); no mobile quebra abaixo */
 .page-investimentos-resumo__head-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .page-investimentos-resumo__head-badges { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -277,7 +279,7 @@
    ============================================================================= */
 .page-investimentos-modal { max-width: 520px; }
 /* header com título: título à esquerda, X no topo-direita (estava empilhando) */
-.page-investimentos-modal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.page-investimentos-modal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px 6px; }
 .page-investimentos-modal .modal-header .close-btn { flex-shrink: 0; }
 .page-investimentos-modal__body { padding: 8px 20px 18px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
 .page-investimentos-modal__lead { font-size: 0.88rem; color: var(--text-secondary); }
@@ -292,7 +294,7 @@
 .page-investimentos-modal__valor-field { display: flex; flex-direction: column; gap: 6px; }
 
 .page-investimentos-modal__input {
-  width: 100%; box-sizing: border-box; padding: 11px 14px;
+  width: 100%; box-sizing: border-box; padding: 9px 14px;
   border-radius: var(--r-md); border: 1px solid var(--hairline-strong);
   background: var(--surface); color: var(--text-primary);
   font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 0.95rem;
@@ -391,13 +393,14 @@
 .page-investimentos-aportes-modal__footer { padding: 16px 20px; border-top: 1px solid var(--hairline); display: flex; justify-content: flex-end; }
 
 /* comparador */
-.page-investimentos-comparador { display: flex; flex-direction: column; gap: 14px; padding: 8px 20px 18px; }
+.page-investimentos-comparador { display: flex; flex-direction: column; gap: 12px; padding: 8px 20px 18px; }
 /* comparador é mais largo (3 opções lado a lado no desktop) */
 @media (min-width: 769px) {
   .page-investimentos-comparador.modal-content { max-width: 820px; }
 }
-.page-investimentos-comparador__controls { display: flex; flex-wrap: wrap; gap: 10px; }
-.page-investimentos-comparador__field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
+/* valor + prazo sempre na mesma linha (encolhem em vez de quebrar) */
+.page-investimentos-comparador__controls { display: flex; flex-wrap: nowrap; gap: 10px; }
+.page-investimentos-comparador__field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
 .page-investimentos-comparador__select,
 .page-investimentos-comparador__taxa-input {
   padding: 9px 12px; border-radius: var(--r-md);
@@ -408,11 +411,11 @@
 .page-investimentos-comparador__taxa-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
 .page-investimentos-comparador__taxa-suf { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
 /* slots: colunas que se ajustam à largura (sem estourar / scroll horizontal) */
-.page-investimentos-comparador__slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.page-investimentos-comparador__slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
 .page-investimentos-comparador__slot {
-  display: flex; flex-direction: column; gap: 8px; min-width: 0;
-  padding: 14px; border-radius: var(--r-md);
-  background: var(--surface-sunken); border: 1px solid var(--hairline);
+  display: flex; flex-direction: column; gap: 6px; min-width: 0;
+  padding: 12px; border-radius: var(--r-md);
+  background: var(--surface); border: 1px solid var(--hairline);
 }
 .page-investimentos-comparador__slot--melhor { border-color: var(--success); background: var(--success-muted); }
 /* selects empilhados (cada um na largura toda do slot — sem cortar "Pré-fixado a.a." / "Personalizado") */
@@ -448,6 +451,9 @@
 
   .page-investimentos-cards { grid-template-columns: 1fr; }
   .page-investimentos-comparador__slots { grid-template-columns: 1fr; }
+  /* slot full-width no mobile: selects lado a lado (compacta a altura, cabe sem truncar) */
+  .page-investimentos-comparador__slot-head { flex-direction: row; flex-wrap: wrap; }
+  .page-investimentos-comparador__slot-head > .page-investimentos-comparador__select { flex: 1 1 120px; width: auto; }
   .page-investimentos-modal__input,
   .page-investimentos-resumo__projecao-input,
   .page-investimentos-comparador__select,
@@ -534,11 +540,12 @@
 .page-investimentos-card--collapsed { gap: 0; }
 
 /* ── Modais: seções e campos extras ────────────────────────────────────────── */
-.page-investimentos-modal__section { display: flex; flex-direction: column; gap: 12px; }
+.page-investimentos-modal__section { display: flex; flex-direction: column; gap: 6px; }
 .page-investimentos-modal__section--row { flex-direction: row; gap: 10px; flex-wrap: wrap; }
 .page-investimentos-modal__section--row > * { flex: 1; min-width: 120px; }
-.page-investimentos-modal__section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
-.page-investimentos-modal__surface { padding: 12px 14px; border-radius: var(--r-md); background: var(--surface-sunken); border: 1px solid var(--hairline); }
+.page-investimentos-modal__section-label { margin: 0; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+/* sem fundo cinza: campos direto no modal branco, mais leve e compacto */
+.page-investimentos-modal__surface { display: flex; flex-direction: column; gap: 12px; }
 .page-investimentos-modal__label-optional { font-weight: 400; color: var(--text-muted); }
 .page-investimentos-modal__toggle-link { border: none; background: transparent; color: var(--accent); font-weight: 600; font-size: 0.82rem; cursor: pointer; padding: 0; text-align: left; }
 .page-investimentos-modal__input--select { appearance: none; background-image: none; cursor: pointer; }

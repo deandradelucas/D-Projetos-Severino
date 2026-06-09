@@ -284,20 +284,8 @@ export default function Investimentos() {
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} aria-label="Abrir menu" />
                   <div className="dashboard-hub__hero-text">
                     <h1 className="dashboard-hub__title">Investimentos</h1>
-                    <div className="page-investimentos-hero__rates-row" aria-label="Taxas de referência BCB">
-                      <TaxaSelicBadge variant="hero" />
-                      <TaxaCdiBadge variant="hero" />
-                    </div>
                   </div>
                   <div className="dashboard-hub__hero-actions" role="toolbar">
-                    <button
-                      type="button"
-                      className="dashboard-hub__btn dashboard-hub__btn--primary"
-                      onClick={() => { setEditTarget(null); setModalResetKey((k) => k + 1); setModalOpen(true) }}
-                      disabled={!uid}
-                    >
-                      + Novo
-                    </button>
                     <button
                       type="button"
                       className="dashboard-hub__btn dashboard-hub__btn--secondary"
@@ -314,7 +302,19 @@ export default function Investimentos() {
                       </svg>
                       <span className="dashboard-hub__btn-label">Comparar</span>
                     </button>
+                    <button
+                      type="button"
+                      className="dashboard-hub__btn dashboard-hub__btn--primary"
+                      onClick={() => { setEditTarget(null); setModalResetKey((k) => k + 1); setModalOpen(true) }}
+                      disabled={!uid}
+                    >
+                      + Novo investimento
+                    </button>
                   </div>
+                </div>
+                <div className="page-investimentos-hero__rates-row" aria-label="Taxas de referência BCB">
+                  <TaxaSelicBadge variant="hero" />
+                  <TaxaCdiBadge variant="hero" />
                 </div>
               </section>
 
