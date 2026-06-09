@@ -17,6 +17,10 @@
 .page-lista-compras__lista-gasto-tag--tarefas { background: var(--surface-sunken); color: var(--text-secondary); }
 .page-lista-compras__recorrencia-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-sunken); color: var(--text-secondary); font-size: 0.66rem; font-weight: 600; }
 
+/* cabeçalho da lista ativa (tags de tipo/recorrência + menu de opções) */
+.page-lista-compras__active-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.page-lista-compras__active-head-tags { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
+
 .page-lista-compras__list-menu { position: relative; }
 .page-lista-compras__list-menu-btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -56,7 +60,9 @@
 /* ── Orçamento (barra) ─────────────────────────────────────────────────────── */
 .page-lista-compras__orcamento { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1); }
 .page-lista-compras__orcamento-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.page-lista-compras__orcamento-label { font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.page-lista-compras__orcamento-label { display: inline-flex; align-items: center; gap: 5px; font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.page-lista-compras__orcamento--excedido .page-lista-compras__orcamento-label { color: var(--error); }
+.page-lista-compras__item-prazo { display: inline-flex; align-items: center; gap: 4px; }
 .page-lista-compras__orcamento-valor { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .page-lista-compras__orcamento-bar { height: 8px; border-radius: var(--r-pill); background: var(--surface-sunken); overflow: hidden; }
 .page-lista-compras__orcamento-fill { height: 100%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--accent), var(--accent-subtle)); }

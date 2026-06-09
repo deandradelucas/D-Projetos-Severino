@@ -861,8 +861,8 @@ export default function ListaDeCompras() {
 
                 {/* Cabeçalho da lista ativa com opções */}
                 {listaAtivaDados && (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flexWrap: 'wrap' }}>
+                  <div className="page-lista-compras__active-head">
+                    <div className="page-lista-compras__active-head-tags">
                       {listaAtivaDados?.tipo === 'tarefas' ? (
                         <span className="page-lista-compras__lista-gasto-tag page-lista-compras__lista-gasto-tag--tarefas">
                           <IconChecklist />
@@ -1045,7 +1045,15 @@ export default function ListaDeCompras() {
                 <div className={`page-lista-compras__orcamento${orcamentoExcedido ? ' page-lista-compras__orcamento--excedido' : ''}`}>
                   <div className="page-lista-compras__orcamento-top">
                     <span className="page-lista-compras__orcamento-label">
-                      {orcamentoExcedido ? '⚠️ Acima do orçamento' : 'Orçamento'}
+                      {orcamentoExcedido ? (
+                        <>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                            <path d="M12 9v4" /><path d="M12 17h.01" />
+                          </svg>
+                          Acima do orçamento
+                        </>
+                      ) : 'Orçamento'}
                     </span>
                     <span className="page-lista-compras__orcamento-valor">
                       {formatarMoeda(totalEstimado)} / {formatarMoeda(orcamento)}

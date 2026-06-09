@@ -29,7 +29,12 @@ export function ItemRow({ item, onToggle, onRemover, onEditar, mostrarMedida = t
       <div className="page-lista-compras__item-body">
         <span className="page-lista-compras__item-name">{item.nome}</span>
         {prazoFmt && (
-          <span className="page-lista-compras__item-prazo" title="Lembrete na agenda">📅 {prazoFmt}</span>
+          <span className="page-lista-compras__item-prazo" title="Lembrete na agenda">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" />
+            </svg>
+            {prazoFmt}
+          </span>
         )}
         {mostrarAutor && item.checked && item.checked_por_nome && (
           <span className="page-lista-compras__item-autor" title={`Marcado por ${item.checked_por_nome}`}>
