@@ -143,11 +143,14 @@
 .page-transacoes-tx-filter-hint { color: var(--accent); font-weight: 500; }
 
 /* ── Busca rápida ──────────────────────────────────────────────────────────── */
-.tx-quick-search { position: relative; display: flex; align-items: center; }
+.tx-quick-search { position: relative; display: flex; align-items: center; width: 100%; }
+/* ícone de busca (svg direto) fixo à esquerda */
+.tx-quick-search > svg { position: absolute; left: 13px; color: var(--text-muted); pointer-events: none; }
 .tx-quick-search input {
+  flex: 1;
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 36px 10px 14px;
+  padding: 11px 38px 11px 38px;
   border-radius: var(--r-md);
   border: 1px solid var(--hairline-strong);
   background: var(--surface-sunken);
