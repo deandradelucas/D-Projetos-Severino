@@ -279,6 +279,8 @@
     padding-bottom: var(--safe-bottom, 0px);
   }
   .horizon-chat-window.chat-window-open { transform: translateY(0); }
+  /* >=16px impede o zoom automático do iOS ao focar o campo do chat */
+  .horizon-chat-input { font-size: 16px; }
   /* mesma base do FAB "+ Nova transação" (canto inferior direito, ao lado do
      pill centralizado). Posição determinística por CSS — sem pulo na carga. */
   .horizon-chat-fab { right: 16px; bottom: max(78px, calc(70px + var(--safe-bottom, 0px))); }
