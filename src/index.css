@@ -6,6 +6,8 @@
 @layer theme, base, components, utilities, app, app-top;
 @import "tailwindcss";
 @import "./styles/responsive.css";
+@import "./styles/components/transaction-modal.css";
+@import "./styles/components/date-popover.css";
 
 /* ===== GLOBAL (tokens, cores, dark, neumorfismo) — antes em styles/global.css ===== */
 /* ============================================================

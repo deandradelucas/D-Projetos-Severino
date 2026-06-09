@@ -1,0 +1,176 @@
+/* =============================================================================
+   components/date-popover.css — DatePickerBrPopover (calendario pt-BR)
+   -----------------------------------------------------------------------------
+   Componente compartilhado (modal de transacao, investimentos, etc).
+   Posicao (fixed/top/left/width) vem inline do componente; aqui so o visual flat.
+   ============================================================================= */
+.page-investimentos-date-popover {
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--elev-3);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  color: var(--text-primary);
+  animation: ntxSlideDown 150ms var(--ease) both;
+}
+
+/* ── Cabecalho (mes/ano + navegacao) ───────────────────────────────────────── */
+.page-investimentos-date-popover__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.page-investimentos-date-popover__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease);
+}
+.page-investimentos-date-popover__nav:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-investimentos-date-popover__title {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.page-investimentos-date-popover__title-month { text-transform: capitalize; color: var(--text-primary); }
+.page-investimentos-date-popover__title-year-btn {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--r-sm);
+}
+.page-investimentos-date-popover__title-year-btn:hover { background: var(--accent-muted); }
+
+/* ── Painel de anos ────────────────────────────────────────────────────────── */
+.page-investimentos-date-popover__year-panel {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 4px;
+}
+.page-investimentos-date-popover__year-cell {
+  padding: 9px 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 120ms var(--ease), color 120ms var(--ease);
+}
+.page-investimentos-date-popover__year-cell:hover { background: var(--surface-2); }
+.page-investimentos-date-popover__year-cell--selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-foreground);
+  font-weight: 700;
+}
+
+/* ── Dias da semana ────────────────────────────────────────────────────────── */
+.page-investimentos-date-popover__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+}
+.page-investimentos-date-popover__weekday {
+  text-align: center;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+/* ── Grade de dias ─────────────────────────────────────────────────────────── */
+.page-investimentos-date-popover__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.page-investimentos-date-popover__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 120ms var(--ease), color 120ms var(--ease);
+}
+.page-investimentos-date-popover__cell--empty { cursor: default; }
+.page-investimentos-date-popover__cell--day:hover { background: var(--surface-2); }
+.page-investimentos-date-popover__cell--today {
+  font-weight: 700;
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent-border);
+}
+.page-investimentos-date-popover__cell--selected {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-weight: 700;
+}
+.page-investimentos-date-popover__cell--disabled {
+  color: var(--text-muted);
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.page-investimentos-date-popover__cell--disabled:hover { background: transparent; }
+
+/* ── Rodape (Limpar / Hoje) ────────────────────────────────────────────────── */
+.page-investimentos-date-popover__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--hairline);
+}
+.page-investimentos-date-popover__footer-btn {
+  padding: 7px 14px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease);
+}
+.page-investimentos-date-popover__footer-btn:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-investimentos-date-popover__footer-btn--primary {
+  background: var(--accent-muted);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+.page-investimentos-date-popover__footer-btn--primary:hover { background: var(--accent); color: var(--accent-foreground); }
+.page-investimentos-date-popover__footer-btn:disabled { opacity: 0.5; cursor: not-allowed; }

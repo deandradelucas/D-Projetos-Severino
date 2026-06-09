@@ -1,0 +1,591 @@
+/* =============================================================================
+   components/transaction-modal.css — Modal "Nova transação" (Flat Soft-Cards)
+   -----------------------------------------------------------------------------
+   Reconstrução flat do modal (antes neumorfico, espalhado em 4 partials).
+   Cobre: backdrop, content (modal desktop / bottom-sheet mobile), header,
+   form/body/actions, inputs (input-premium), type-toggle, datas, calculadora,
+   switch, parcelamento, e o dropdown CategorySelector (.custom-select).
+   Importado global no index.css (o modal abre de varias paginas).
+   ============================================================================= */
+
+/* ── Backdrop ──────────────────────────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: ntxBackdropIn 180ms var(--ease);
+}
+@keyframes ntxBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── Content (modal centrado no desktop) ───────────────────────────────────── */
+.modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--elev-3);
+  animation: ntxModalIn 220ms var(--ease);
+}
+@keyframes ntxModalIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Header minimal (so o botao fechar) ────────────────────────────────────── */
+.modal-header--minimal {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 12px 0;
+  flex-shrink: 0;
+}
+.modal-content .close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.modal-content .close-btn:hover { background: var(--surface-2); color: var(--text-primary); }
+.modal-content .close-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.modal-content .close-btn svg { width: 18px; height: 18px; }
+
+/* ── Form / body / actions ─────────────────────────────────────────────────── */
+.modal-form { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
+.modal-actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--hairline);
+  background: var(--surface);
+}
+.modal-actions .btn-primary,
+.modal-actions .btn-secondary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: var(--r-md);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms var(--ease), border-color 150ms var(--ease), opacity 150ms var(--ease);
+}
+.modal-actions .btn-secondary {
+  background: transparent;
+  border: 1px solid var(--hairline-strong);
+  color: var(--text-secondary);
+}
+.modal-actions .btn-secondary:hover { background: var(--surface-2); color: var(--text-primary); }
+.modal-actions .btn-primary {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: var(--accent-foreground);
+}
+.modal-actions .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.modal-actions .btn-primary.loading,
+.modal-actions .btn-primary:disabled,
+.modal-actions .btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Secao + titulo ────────────────────────────────────────────────────────── */
+.nova-tx-section { padding-top: 6px; }
+.nova-tx-section + .nova-tx-section { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--hairline); }
+.nova-tx-section__title {
+  margin: 0 0 12px;
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+/* ── Form group (label + controle) ─────────────────────────────────────────── */
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.form-group:last-child { margin-bottom: 0; }
+.form-group > label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.modal-label-optional { font-weight: 400; color: var(--text-muted); }
+
+/* ── Input premium (campo padrao do app) ───────────────────────────────────── */
+.input-premium {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+.input-premium::placeholder { color: var(--text-muted); }
+.input-premium:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-muted);
+}
+.input-valor-novo-tx {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+/* estado de erro de validacao */
+.modal-form--validated .input-premium:invalid { border-color: var(--error); }
+
+/* ── Type toggle (Despesa / Receita) ───────────────────────────────────────── */
+.type-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--r-md);
+  background: var(--surface-sunken);
+  border: 1px solid var(--hairline);
+}
+.type-btn {
+  padding: 9px 12px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+.type-btn:hover:not(.active) { color: var(--text-secondary); }
+.type-btn.active { background: var(--surface); box-shadow: var(--elev-1); }
+.type-btn.despesa.active { color: var(--error); }
+.type-btn.receita.active { color: var(--success); }
+
+/* ── Toolbar de data (label + atalhos Hoje/Ontem) ──────────────────────────── */
+.modal-date-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.modal-date-toolbar > label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+.date-shortcuts { display: flex; gap: 6px; }
+.date-shortcut-btn {
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.date-shortcut-btn:hover { background: var(--accent-muted); color: var(--accent); border-color: var(--accent-border); }
+
+/* ── Linha valor: label + botao calculadora ────────────────────────────────── */
+.ntx-valor-label-row { display: flex; align-items: center; justify-content: space-between; }
+.ntx-valor-label-row > label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+.ntx-calc-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.ntx-calc-toggle:hover,
+.ntx-calc-toggle--open { background: var(--accent-muted); color: var(--accent); border-color: var(--accent-border); }
+
+/* ── Severino IA (autopreenche) ────────────────────────────────────────────── */
+.ntx-ai-quick { margin-bottom: 16px; }
+.ntx-ai-quick__head { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+.ntx-ai-quick__spark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  color: var(--accent-foreground);
+  background: var(--accent);
+}
+.ntx-ai-quick__title { font-weight: 700; font-size: 0.84rem; letter-spacing: -0.01em; color: var(--text-primary); }
+.ntx-ai-quick__sub { font-size: 0.74rem; color: var(--text-muted); }
+.ntx-ai-quick__field { position: relative; }
+.ntx-ai-quick__field .input-premium {
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 1px var(--accent-muted);
+}
+.ntx-ai-quick__field .input-premium:focus { box-shadow: 0 0 0 3px var(--accent-muted); border-color: var(--accent); }
+.ntx-ai-quick__field .input-premium::placeholder { font-style: italic; }
+.ntx-ai-quick__spin {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--accent);
+}
+.ntx-ai-quick__spin .spinner { width: 16px; height: 16px; opacity: 0.75; }
+.ntx-ai-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* ── Templates recentes (chips) ────────────────────────────────────────────── */
+.ntx-templates { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+.ntx-templates__label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.ntx-template-chip {
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.ntx-template-chip:hover { background: var(--surface-2); color: var(--text-primary); }
+.ntx-template-chip--receita::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--success); margin-right: 6px; vertical-align: middle; }
+.ntx-template-chip--despesa::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--error); margin-right: 6px; vertical-align: middle; }
+
+/* ── Data + hora (gatilho custom + campo de hora) ──────────────────────────── */
+.ntx-datetime-row { display: flex; gap: 8px; align-items: stretch; }
+.ntx-date-trigger {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  padding-right: 42px;
+}
+.ntx-date-trigger__text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ntx-date-trigger .ntx-date-cal {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
+  color: var(--accent);
+  display: inline-flex;
+}
+.ntx-time-field { flex: 0 0 108px; width: 108px; min-width: 0; text-align: center; }
+.modal-content--nova-tx input[type="time"].ntx-time-field::-webkit-calendar-picker-indicator {
+  filter: invert(72%) sepia(38%) saturate(560%) hue-rotate(2deg) brightness(92%);
+  cursor: pointer;
+}
+
+/* ── Calculadora do campo Valor ────────────────────────────────────────────── */
+.ntx-calc { margin-top: 8px; animation: ntxCalcIn 180ms var(--ease) both; }
+@keyframes ntxCalcIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.ntx-calc__display {
+  text-align: right;
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  background: var(--surface-sunken);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  min-height: 24px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.ntx-calc__pad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+.ntx-calc__key {
+  padding: 13px 0;
+  border-radius: var(--r-md);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 80ms ease, background 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.ntx-calc__key:active { transform: scale(0.95); background: var(--surface-2); }
+.ntx-calc__key--op { color: var(--accent); font-weight: 700; }
+.ntx-calc__key--del { color: var(--text-secondary); }
+.ntx-calc__key--clear { color: var(--error); font-weight: 700; }
+.ntx-calc__key--eq {
+  grid-column: span 3;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-foreground);
+  font-weight: 800;
+}
+.ntx-calc__key--eq:active { background: var(--accent-hover); }
+
+/* ── Switch flat (parcelado / prazo indeterminado) ─────────────────────────── */
+.modal-recorrencia-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.modal-recorrencia-toggle-row__iconWrap { display: inline-flex; color: var(--text-muted); }
+.modal-recorrencia-toggle-row__text { flex: 1; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+.modal-recorrencia-toggle-row__checkbox--hidden,
+.rec-vezes-row input[type="checkbox"].modal-recorrencia-toggle-row__checkbox--hidden {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.ntx-switch {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 42px;
+  height: 24px;
+  border-radius: var(--r-pill);
+  background: var(--hairline-strong);
+  transition: background 180ms var(--ease);
+}
+.ntx-switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--elev-1);
+  transition: transform 180ms var(--ease);
+}
+.ntx-switch--on { background: var(--accent); }
+.ntx-switch--on .ntx-switch__thumb { transform: translateX(18px); }
+
+/* ── Sub-opcoes de parcelamento ────────────────────────────────────────────── */
+.rec-sub-opts { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.rec-vezes-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.rec-vezes-row--toggle { cursor: pointer; }
+.rec-vezes-row__label { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); }
+.rec-vezes-row__input { width: 96px; flex-shrink: 0; text-align: center; }
+.rec-vezes-row__input--date { width: 150px; text-align: left; }
+
+/* ── Preview de parcelas ───────────────────────────────────────────────────── */
+.ntx-parc-preview {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 12px 0 4px;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  background: var(--accent-muted);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+}
+.ntx-parc-preview__count { font-weight: 800; color: var(--accent); }
+.ntx-parc-preview__value { font-weight: 700; color: var(--text-primary); }
+.ntx-parc-preview__sep { color: var(--text-muted); }
+.ntx-parc-preview__total { font-weight: 700; color: var(--text-primary); margin-left: auto; }
+
+.ntx-parc-calendar { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.ntx-parc-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 46px;
+  padding: 6px 4px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--hairline);
+  background: var(--surface-sunken);
+  line-height: 1.2;
+}
+.ntx-parc-cell__idx { font-size: 0.68rem; font-weight: 700; color: var(--accent); }
+.ntx-parc-cell__month { font-size: 0.72rem; font-weight: 600; color: var(--text-primary); text-transform: capitalize; }
+.ntx-parc-cell__year { font-size: 0.62rem; color: var(--text-muted); }
+.ntx-parc-cell--overflow { justify-content: center; font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); }
+
+.parcelamento-preview { margin: 6px 0 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
+.parcelamento-preview--hint { font-style: italic; }
+.parcelamento-preview--cartao { color: var(--text-secondary); font-weight: 500; }
+
+/* animacao de revelar (subcategoria, sub-opcoes) */
+.slide-down { animation: ntxSlideDown 200ms var(--ease) both; }
+@keyframes ntxSlideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+/* =============================================================================
+   CategorySelector (.custom-select) — dropdown de categoria/subcategoria/cartao
+   ============================================================================= */
+.custom-select { position: relative; width: 100%; }
+.custom-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+.custom-select-trigger:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+.custom-select-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow: hidden;
+  border-radius: var(--r-md);
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  box-shadow: var(--elev-3);
+  animation: ntxSlideDown 160ms var(--ease) both;
+}
+.custom-select-search {
+  flex: 0 0 auto;
+  margin: 8px;
+  padding: 9px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+.custom-select-search:focus { outline: none; border-color: var(--accent); }
+.custom-select-options { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 4px; }
+.custom-select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms var(--ease);
+}
+.custom-select-option:hover,
+.custom-select-option.active { background: var(--surface-2); }
+.custom-select-option[aria-selected='true'] { background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+.custom-select-option--action { color: var(--accent); font-weight: 600; border-top: 1px solid var(--hairline); border-radius: 0; }
+.custom-select-no-results { padding: 16px 12px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+/* =============================================================================
+   MOBILE (<= 768px): modal vira bottom-sheet; selects viram sheet acima do teclado
+   ============================================================================= */
+@media (max-width: 768px) {
+  .modal-backdrop { padding: 0; align-items: flex-end; }
+  .modal-content {
+    max-width: none;
+    max-height: 92vh;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    border-bottom: none;
+    animation: ntxSheetUp 280ms var(--ease);
+    padding-bottom: var(--safe-bottom, 0px);
+  }
+  @keyframes ntxSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-body { padding: 8px 18px 18px; }
+  .modal-actions { padding: 14px 18px; }
+  .ntx-time-field { flex-basis: 96px; width: 96px; }
+  .rec-vezes-row__input--date { width: 140px; }
+
+  /* CategorySelector como bottom-sheet */
+  .custom-select--cs-mobile .custom-select-dropdown {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    max-height: 70vh;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    box-shadow: 0 -16px 50px -12px rgba(0, 0, 0, 0.45);
+    animation: ntxSheetUp 260ms var(--ease) both;
+  }
+  .custom-select--cs-mobile .custom-select-dropdown::before {
+    content: '';
+    display: block;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 4px;
+    margin: 8px auto 2px;
+    border-radius: var(--r-pill);
+    background: var(--text-muted);
+    opacity: 0.4;
+  }
+  .custom-select--cs-mobile .custom-select-options { max-height: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop,
+  .modal-content,
+  .ntx-calc,
+  .slide-down,
+  .custom-select-dropdown { animation: none; }
+}
