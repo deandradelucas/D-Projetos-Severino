@@ -114,7 +114,7 @@ export function AgendaCalendarPanel({
   return (
     <section className="agenda-calendar-panel" aria-label="Calendário da agenda">
       <div className="agenda-calendar-head">
-        <div>
+        <div className="agenda-calendar-title">
           <strong>{formatMonthTitle(calendarMonthKey)}</strong>
           <span>
             {plural(statsToday, 'item hoje', 'itens hoje')} · {plural(statsReminders, 'notificação', 'notificações')} no dia

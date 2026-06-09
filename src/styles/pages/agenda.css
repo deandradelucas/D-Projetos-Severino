@@ -7,7 +7,7 @@
    Tudo escopado em .agenda-page. Tokens only. Sem !important.
    ============================================================================= */
 
-.agenda-shell { display: flex; flex-direction: column; gap: 16px; }
+.agenda-shell { display: flex; flex-direction: column; gap: 20px; }
 
 /* ── Hero próprio (cabeçalho da agenda) ─────────────────────────────────────── */
 .agenda-hero {
@@ -82,7 +82,10 @@
   padding: 16px 18px; border-radius: var(--r-lg);
   background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
 }
-.agenda-calendar-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.agenda-calendar-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.agenda-calendar-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.agenda-calendar-title > strong { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: -0.01em; color: var(--text-primary); }
+.agenda-calendar-title > span { font-size: 0.76rem; color: var(--text-muted); }
 .agenda-calendar-controls { display: flex; align-items: center; gap: 8px; }
 .agenda-calendar-nav {
   display: inline-flex; align-items: center; justify-content: center;
@@ -263,6 +266,8 @@
   .agenda-hero__week { gap: 4px; }
   .agenda-hero__week-day { padding: 7px 2px; }
   .agenda-hero__week-num { font-size: 1rem; }
+  /* No mobile o FAB ja cobre "adicionar" — esconde o "+" redundante do header da lista. */
+  .agenda-list-panel__header .agenda-floating-add { display: none; }
   .agenda-field input,
   .agenda-field select,
   .agenda-field textarea { font-size: 16px; }
