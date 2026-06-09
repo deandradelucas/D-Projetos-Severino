@@ -92,15 +92,24 @@ export default function ListaDeCompras() {
       })
       if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) return
-      const data = await res.json()
+      let data = await res.json()
+      // A última lista editada (id persistido) vai para o primeiro lugar das abas.
+      let saved = null
+      try { saved = localStorage.getItem(LISTA_ULTIMA_KEY) } catch { /* indisponível */ }
+      if (saved && Array.isArray(data)) {
+        const idx = data.findIndex((l) => String(l.id) === String(saved))
+        if (idx > 0) {
+          const arr = data.slice()
+          const [it] = arr.splice(idx, 1)
+          arr.unshift(it)
+          data = arr
+        }
+      }
       setListas(data)
       // Abre a ÚLTIMA lista que o usuário editou (id persistido em localStorage);
       // fallback: a mais recente (data[0], que o server ordena por criada_em desc).
       let alvoId = null
-      try {
-        const saved = localStorage.getItem(LISTA_ULTIMA_KEY)
-        if (saved && data.some((l) => String(l.id) === String(saved))) alvoId = saved
-      } catch { /* localStorage indisponível */ }
+      if (saved && data.some((l) => String(l.id) === String(saved))) alvoId = saved
       if (!alvoId && data.length > 0) alvoId = String(data[0].id)
       const alvo = alvoId ? data.find((l) => String(l.id) === String(alvoId)) : null
       setListaAtiva(alvo ? alvo.id : null)

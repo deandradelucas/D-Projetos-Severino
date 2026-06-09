@@ -61,6 +61,14 @@
 .page-lista-compras__escopo-btn--active { background: var(--surface); color: var(--accent); box-shadow: var(--elev-1); }
 .page-lista-compras__tab-count { font-size: 0.72rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
+/* abas rolam para o lado (em vez de quebrar linha) */
+.page-lista-compras__tabs {
+  display: flex; flex-wrap: nowrap; max-width: 100%;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.page-lista-compras__tabs::-webkit-scrollbar { display: none; }
+.page-lista-compras__tab { flex-shrink: 0; white-space: nowrap; }
+
 /* ── Orçamento (barra) ─────────────────────────────────────────────────────── */
 .page-lista-compras__orcamento { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1); }
 .page-lista-compras__orcamento-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
