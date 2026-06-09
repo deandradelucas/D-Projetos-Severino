@@ -8,6 +8,7 @@
 @import "./styles/responsive.css";
 @import "./styles/components/transaction-modal.css";
 @import "./styles/components/date-popover.css";
+@import "./styles/components/horizon-chat.css";
 
 /* ===== GLOBAL (tokens, cores, dark, neumorfismo) — antes em styles/global.css ===== */
 /* ============================================================

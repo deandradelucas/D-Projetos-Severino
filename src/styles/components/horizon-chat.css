@@ -1,0 +1,281 @@
+/* =============================================================================
+   components/horizon-chat.css — Severino IA (chat flutuante) · Flat Soft-Cards
+   -----------------------------------------------------------------------------
+   FAB circular (canto inferior direito) que abre uma janela de chat.
+   Posicao do FAB/janela pode vir inline (useHorizonShellDock) — aqui ficam o
+   visual flat + o estado aberto/fechado (a janela NASCE escondida).
+   Importado global no index.css.
+   ============================================================================= */
+
+/* ── FAB ───────────────────────────────────────────────────────────────────── */
+.horizon-chat-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1050;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  box-shadow: var(--elev-3);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 200ms var(--ease), background 150ms var(--ease);
+}
+.horizon-chat-fab:hover { transform: scale(1.05); }
+.horizon-chat-fab.chat-fab-active { background: var(--accent-hover); }
+.horizon-fab-logo { width: 100%; height: 100%; object-fit: cover; }
+.horizon-fab-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.5);
+  animation: horizonFabPulse 2.2s var(--ease) infinite;
+  pointer-events: none;
+}
+@keyframes horizonFabPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.45); }
+  70%  { box-shadow: 0 0 0 14px rgba(var(--accent-rgb), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
+}
+
+/* ── Janela de chat (nasce escondida) ──────────────────────────────────────── */
+.horizon-chat-window {
+  position: fixed;
+  right: 24px;
+  bottom: 92px;
+  z-index: 1049;
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  height: 560px;
+  max-height: calc(100vh - 140px);
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--elev-3);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(12px) scale(0.98);
+  transform-origin: bottom right;
+  transition: opacity 200ms var(--ease), transform 200ms var(--ease), visibility 200ms var(--ease);
+}
+.horizon-chat-window.chat-window-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.horizon-chat-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--hairline);
+}
+.horizon-chat-header-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.horizon-avatar-dot {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--surface-sunken);
+}
+.horizon-avatar-dot img { width: 100%; height: 100%; object-fit: cover; }
+.horizon-chat-name { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 0.92rem; font-weight: 700; color: var(--text-primary); }
+.horizon-chat-status { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-muted); }
+.horizon-status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+.horizon-chat-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease);
+}
+.horizon-chat-close:hover { background: var(--surface-2); color: var(--text-primary); }
+
+/* ── Mensagens ─────────────────────────────────────────────────────────────── */
+.horizon-chat-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+.horizon-msg { display: flex; gap: 8px; align-items: flex-end; max-width: 100%; }
+.horizon-msg-user { justify-content: flex-end; }
+.horizon-msg-model { justify-content: flex-start; }
+.horizon-msg-avatar {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--surface-sunken);
+}
+.horizon-msg-avatar__img { width: 100%; height: 100%; object-fit: cover; }
+.horizon-msg-bubble {
+  max-width: 78%;
+  padding: 10px 13px;
+  border-radius: var(--r-md);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+.horizon-msg-model .horizon-msg-bubble {
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border-bottom-left-radius: var(--r-sm);
+}
+.horizon-msg-user .horizon-msg-bubble {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-bottom-right-radius: var(--r-sm);
+}
+.horizon-msg-time { margin-top: 4px; font-size: 0.64rem; opacity: 0.6; }
+.horizon-msg-user .horizon-msg-time { text-align: right; }
+
+/* Digitando (3 pontos) */
+.horizon-typing { display: inline-flex; gap: 4px; align-items: center; }
+.horizon-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: horizonTyping 1.2s var(--ease) infinite;
+}
+.horizon-typing span:nth-child(2) { animation-delay: 0.15s; }
+.horizon-typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes horizonTyping {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+
+.horizon-error-msg {
+  align-self: center;
+  padding: 8px 12px;
+  border-radius: var(--r-md);
+  background: var(--error-muted);
+  color: var(--error);
+  font-size: 0.8rem;
+}
+
+/* ── Sugestões rápidas ─────────────────────────────────────────────────────── */
+.horizon-suggestions {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 0 16px 12px;
+}
+.horizon-suggestion-chip {
+  padding: 7px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.horizon-suggestion-chip:hover { background: var(--accent-muted); color: var(--accent); border-color: var(--accent-border); }
+
+/* ── Campo de mensagem ─────────────────────────────────────────────────────── */
+.horizon-chat-input-area {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--hairline);
+}
+.horizon-chat-input {
+  flex: 1;
+  min-width: 0;
+  max-height: 96px;
+  padding: 10px 14px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  resize: none;
+  transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+.horizon-chat-input::placeholder { color: var(--text-muted); }
+.horizon-chat-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+.horizon-send-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  cursor: pointer;
+  transition: background 150ms var(--ease), opacity 150ms var(--ease);
+}
+.horizon-send-btn:hover { background: var(--accent-hover); }
+.horizon-send-disabled { opacity: 0.45; cursor: not-allowed; }
+.horizon-send-btn .spin { animation: horizonSpin 0.8s linear infinite; }
+@keyframes horizonSpin { to { transform: rotate(360deg); } }
+
+/* ── Mobile: janela vira bottom-sheet full-width ───────────────────────────── */
+@media (max-width: 768px) {
+  .horizon-chat-window,
+  .horizon-chat-window--mobile-sheet {
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: none;
+    height: 88vh;
+    max-height: 88vh;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    transform-origin: bottom center;
+    transform: translateY(100%);
+    padding-bottom: var(--safe-bottom, 0px);
+  }
+  .horizon-chat-window.chat-window-open { transform: translateY(0); }
+  /* acima do FAB de nova transacao (52px) pra nao colidir */
+  .horizon-chat-fab { right: 16px; bottom: calc(72px + var(--safe-bottom, 0px) + 12px + 64px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .horizon-chat-fab,
+  .horizon-chat-window { transition: none; }
+  .horizon-fab-pulse,
+  .horizon-typing span { animation: none; }
+}
