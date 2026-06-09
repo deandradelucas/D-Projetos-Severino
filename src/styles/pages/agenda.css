@@ -7,7 +7,7 @@
    Tudo escopado em .agenda-page. Tokens only. Sem !important.
    ============================================================================= */
 
-.agenda-shell { display: flex; flex-direction: column; gap: 24px; }
+.agenda-shell { display: flex; flex-direction: column; gap: 16px; }
 
 /* ── Hero próprio (cabeçalho da agenda) ─────────────────────────────────────── */
 .agenda-hero {
@@ -81,6 +81,7 @@
 .agenda-calendar-panel {
   padding: 16px 18px; border-radius: var(--r-lg);
   background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
+  margin-bottom: 20px; /* respiro entre o calendario e a lista do dia */
 }
 .agenda-calendar-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
 .agenda-calendar-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
