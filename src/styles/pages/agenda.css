@@ -35,10 +35,22 @@
 .agenda-hero__summary { margin: 4px 0 0; font-size: 0.86rem; color: var(--text-secondary); position: relative; }
 .agenda-hero__stats { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 14px; position: relative; }
 .agenda-hero__stat { display: flex; flex-direction: column; gap: 1px; font-size: 0.84rem; color: var(--text-secondary); }
-.agenda-hero__week { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; padding: 8px 14px; border-radius: var(--r-md); background: var(--surface-sunken); }
-.agenda-hero__week-wd { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
-.agenda-hero__week-num { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
-.agenda-hero__week-count { font-size: 0.68rem; color: var(--accent); font-weight: 600; }
+/* mini-semana: linha de 7 dias clicáveis */
+.agenda-hero__week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 16px; position: relative; }
+.agenda-hero__week-day {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 4px; border-radius: var(--r-md);
+  border: 1px solid var(--hairline); background: var(--surface); cursor: pointer;
+  transition: background 150ms var(--ease), border-color 150ms var(--ease);
+}
+.agenda-hero__week-day:hover { background: var(--surface-2); }
+.agenda-hero__week-day--today { border-color: var(--accent); }
+.agenda-hero__week-day--selected { background: var(--accent-muted); border-color: var(--accent); }
+.agenda-hero__week-wd { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.agenda-hero__week-num { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+.agenda-hero__week-count { min-height: 0.9rem; font-size: 0.66rem; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+.agenda-hero__week-day--selected .agenda-hero__week-wd,
+.agenda-hero__week-day--selected .agenda-hero__week-num { color: var(--accent); }
 
 .agenda-section-eyebrow { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 0 0 8px; }
 
@@ -241,6 +253,9 @@
   .agenda-modal__grid { grid-template-columns: 1fr; }
   .agenda-hero { padding: 16px; }
   .agenda-hero__stats { gap: 14px; }
+  .agenda-hero__week { gap: 4px; }
+  .agenda-hero__week-day { padding: 7px 2px; }
+  .agenda-hero__week-num { font-size: 1rem; }
   .agenda-field input,
   .agenda-field select,
   .agenda-field textarea { font-size: 16px; }

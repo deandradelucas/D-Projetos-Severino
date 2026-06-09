@@ -567,20 +567,22 @@ export default function Agenda() {
     </div>
 
     {!modalOpen && (
-      <button
-        type="button"
-        className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
-        onClick={openNew}
-        aria-label="Criar novo item na agenda"
-      >
-        <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 5v14" />
-            <path d="M5 12h14" />
-          </svg>
-        </span>
-        <span className="dashboard-mobile-tx-fab__label">Nova agenda</span>
-      </button>
+      <div className="dashboard-mobile-fabs">
+        <button
+          type="button"
+          className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
+          onClick={openNew}
+          aria-label="Criar novo item na agenda"
+        >
+          <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+          </span>
+          <span className="dashboard-mobile-tx-fab__label">Novo item</span>
+        </button>
+      </div>
     )}
     </>
   )
