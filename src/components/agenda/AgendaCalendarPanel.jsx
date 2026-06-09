@@ -86,6 +86,9 @@ export function AgendaCalendarPanel({
         {opts.week && hasEvent ? (
           <span className="agenda-calendar-day__count">{dayEvents.length}</span>
         ) : null}
+        {!opts.week && hasEvent ? (
+          <span className={`agenda-calendar-day__event-dot${dayKind ? ` agenda-calendar-day__event-dot--${dayKind}` : ''}`} aria-hidden="true" />
+        ) : null}
 
         {/* Hover preview (feature 5) — só na visão mensal.
             Na primeira linha do grid o preview vai PARA BAIXO da célula

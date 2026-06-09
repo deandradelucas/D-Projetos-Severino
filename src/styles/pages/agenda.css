@@ -87,13 +87,15 @@
 .agenda-calendar-title > strong { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: -0.01em; color: var(--text-primary); }
 .agenda-calendar-title > span { font-size: 0.76rem; color: var(--text-muted); }
 .agenda-calendar-controls { display: flex; align-items: center; gap: 8px; }
-.agenda-calendar-nav {
+.agenda-calendar-nav { display: inline-flex; align-items: center; gap: 4px; }
+.agenda-calendar-nav > button {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; border-radius: var(--r-sm);
+  width: 32px; height: 32px; padding: 0; border-radius: var(--r-sm);
   border: 1px solid var(--hairline-strong); background: var(--surface);
   color: var(--text-secondary); cursor: pointer; font-size: 1.1rem; line-height: 1;
+  transition: background 150ms var(--ease), color 150ms var(--ease);
 }
-.agenda-calendar-nav:hover { background: var(--surface-2); color: var(--text-primary); }
+.agenda-calendar-nav > button:hover { background: var(--surface-2); color: var(--text-primary); }
 .agenda-calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
 .agenda-calendar-weekdays > span { text-align: center; font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding: 4px 0; }
 .agenda-calendar-grid, .agenda-week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -113,6 +115,9 @@
 .agenda-calendar-day__weekday { font-size: 0.6rem; color: var(--text-muted); }
 .agenda-calendar-day__num { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
 .agenda-calendar-day__count { font-size: 0.62rem; color: var(--accent); font-weight: 700; }
+/* ponto sempre visível nos dias com compromisso (visão mensal) */
+.agenda-calendar-day__event-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); align-self: center; margin-top: auto; }
+.agenda-calendar-day__event-dot--done { background: var(--text-muted); }
 .agenda-calendar-drag-hint { font-size: 0.74rem; color: var(--text-muted); margin-top: 8px; text-align: center; }
 
 /* preview de eventos no dia do calendário */
