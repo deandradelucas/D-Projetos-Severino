@@ -8,3 +8,6 @@
 
 /* Layout */
 @import '../styles/layout/sidebar.css';
+
+/* Componentes */
+@import '../styles/components/insights-strip.css';

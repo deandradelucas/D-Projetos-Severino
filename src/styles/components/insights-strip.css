@@ -1,5 +1,6 @@
 /* =============================================================================
-   Severino IA — faixa de insights proativos no Dashboard. Vars de tema (light/dark).
+   components/insights-strip.css — "Severino IA: o que percebi nas suas finanças"
+   Faixa de insights proativos no Dashboard. Tema via tokens globais (light/dark).
    ============================================================================= */
 
 .ai-insights {
