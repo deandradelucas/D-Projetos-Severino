@@ -294,18 +294,18 @@
   color: var(--text-muted);
 }
 
-/* Despesas por categoria — barras (mini-relatório) */
-.dashboard-hub__bars { display: flex; flex-direction: column; gap: 12px; }
-.dashboard-hub__bar-row { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 10px; }
+/* Despesas por categoria — barras (mini-relatório) · compacto */
+.dashboard-hub__bars { display: flex; flex-direction: column; gap: 7px; }
+.dashboard-hub__bar-row { display: grid; grid-template-columns: 88px 1fr; align-items: center; gap: 8px; }
 .dashboard-hub__bar-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .dashboard-hub__bar-track {
-  height: 8px;
+  height: 5px;
   border-radius: 999px;
   background: var(--surface-sunken);
   overflow: hidden;
@@ -316,6 +316,9 @@
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent), var(--accent-subtle));
 }
+/* Card de Despesas (o que tem barras) mais compacto que o de compromisso */
+.dashboard-hub__insight-card:has(.dashboard-hub__bars) { padding: 14px 16px; }
+.dashboard-hub__insight-card:has(.dashboard-hub__bars) .ref-panel__head { margin-bottom: 10px; }
 
 /* ============================================================================
    SEVERINO IA — faixa de insights ("o que percebi nas suas finanças")
