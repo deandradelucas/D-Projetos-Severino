@@ -1,0 +1,332 @@
+/* =============================================================================
+   pages/configuracoes.css — Página Configurações · Flat Soft-Cards
+   -----------------------------------------------------------------------------
+   Cards de seção, campos, action-buttons, preferências (switch-apple),
+   família/convite, modal de excluir conta (overlay próprio) e logout.
+   Classes namespeadas config-* / page-configuracoes. Tokens only. Sem !important.
+   ============================================================================= */
+
+.config-page .page-configuracoes__hero,
+.config-hero-text { display: flex; flex-direction: column; gap: 2px; }
+
+/* ── Navegação por seção (pílulas) ─────────────────────────────────────────── */
+.config-section-nav { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+.config-section-nav__pill {
+  padding: 6px 13px; border-radius: var(--r-pill);
+  border: 1px solid var(--hairline-strong); background: var(--surface);
+  color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.config-section-nav__pill:hover { background: var(--surface-2); color: var(--text-primary); }
+
+/* ── Layout em grade de cards ──────────────────────────────────────────────── */
+.config-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+.config-layout--clean { gap: 16px; }
+.config-layout__full-span { grid-column: 1 / -1; }
+
+/* ── Card de seção ─────────────────────────────────────────────────────────── */
+.config-card,
+.config-admin-card {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 18px 20px; border-radius: var(--r-lg);
+  background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
+}
+.config-card--full { grid-column: 1 / -1; }
+.config-card-head { display: flex; flex-direction: column; gap: 2px; }
+.config-card-head--row { flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
+.config-card-kicker { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); }
+.config-card-title-clean { margin: 0; font-size: 1.02rem; font-weight: 700; color: var(--text-primary); }
+.config-card-subtitle { margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+.config-preferencias-heading { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+
+/* ── Campos ────────────────────────────────────────────────────────────────── */
+.config-field { display: flex; flex-direction: column; gap: 6px; }
+.config-field--stretch { flex: 1; }
+.config-field--with-action { gap: 8px; }
+.config-field__value-row { display: flex; align-items: center; gap: 8px; }
+.config-field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.config-field-grid--single { grid-template-columns: 1fr; }
+.config-field > label,
+.config-pref-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+.config-input {
+  width: 100%; box-sizing: border-box; padding: 11px 14px;
+  border-radius: var(--r-md); border: 1px solid var(--hairline-strong);
+  background: var(--surface); color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 0.95rem;
+}
+.config-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+.config-input--compact { padding: 8px 12px; font-size: 0.88rem; }
+
+/* edição de nome inline */
+.config-nome-edit { display: flex; align-items: center; gap: 8px; }
+.config-nome-edit-btn { border: none; background: transparent; color: var(--accent); font-weight: 600; font-size: 0.82rem; cursor: pointer; padding: 0; }
+
+/* ── Botões de ação ────────────────────────────────────────────────────────── */
+.config-action-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 16px; border-radius: var(--r-md);
+  border: 1px solid var(--hairline-strong); background: var(--surface);
+  color: var(--text-secondary); font-size: 0.88rem; font-weight: 600; cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.config-action-btn:hover { background: var(--surface-2); color: var(--text-primary); }
+.config-action-btn--inline { padding: 7px 12px; font-size: 0.82rem; }
+.config-action-btn--primary { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
+.config-action-btn--primary:hover { background: var(--accent-hover); color: var(--accent-foreground); }
+.config-action-btn--whatsapp { color: var(--text-secondary); }
+.config-action-btn--whatsapp:hover { color: #25d366; border-color: #25d366; }
+.config-action-btn--danger { color: var(--error); border-color: var(--hairline-strong); }
+.config-action-btn--danger:hover { color: #fff; background: var(--error); border-color: var(--error); }
+.config-action-btn--danger-solid { background: var(--error); border-color: var(--error); color: #fff; }
+.config-action-btn--danger-solid:hover { filter: brightness(0.94); }
+
+.config-quick-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ── Preferências (linha + switch-apple) ───────────────────────────────────── */
+.config-preference-list { display: flex; flex-direction: column; }
+.config-pref-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--hairline);
+}
+.config-pref-row:last-child { border-bottom: none; }
+.config-pref-label { display: flex; flex-direction: column; gap: 2px; }
+.config-pref-desc { font-size: 0.74rem; font-weight: 400; color: var(--text-muted); }
+
+/* toggle estilo iOS (checkbox) */
+.switch-apple {
+  appearance: none; -webkit-appearance: none;
+  position: relative; flex-shrink: 0;
+  width: 44px; height: 26px; border-radius: var(--r-pill);
+  background: var(--hairline-strong); cursor: pointer; margin: 0;
+  transition: background 180ms var(--ease);
+}
+.switch-apple::before {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; box-shadow: var(--elev-1);
+  transition: transform 180ms var(--ease);
+}
+.switch-apple:checked { background: var(--accent); }
+.switch-apple:checked::before { transform: translateX(18px); }
+.switch-apple:disabled { opacity: 0.5; cursor: not-allowed; }
+.switch-apple:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── Biometria ─────────────────────────────────────────────────────────────── */
+.config-bio-list { display: flex; flex-direction: column; gap: 8px; }
+.config-bio-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 12px; border-radius: var(--r-md);
+  background: var(--surface-sunken); border: 1px solid var(--hairline);
+}
+.config-bio-item__actions { display: flex; gap: 6px; }
+.config-empty-note { font-size: 0.82rem; color: var(--text-muted); }
+
+/* ── Família / convite ─────────────────────────────────────────────────────── */
+.config-familia-group { display: flex; flex-direction: column; gap: 12px; }
+.config-familia-intro { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45; }
+.config-familia-titular-card { padding: 12px 14px; border-radius: var(--r-md); background: var(--accent-muted); border: 1px solid var(--accent-border); }
+.config-familia-membros { display: flex; flex-direction: column; gap: 8px; }
+.config-familia-membro,
+.config-membro-familia-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--r-md);
+  background: var(--surface-sunken); border: 1px solid var(--hairline);
+}
+.config-familia-membro__avatar {
+  display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0;
+  border-radius: 50%; background: var(--accent-muted); color: var(--accent); font-weight: 700; overflow: hidden;
+}
+.config-familia-membro__txt,
+.config-membro-familia-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.config-familia-membro__id { font-size: 0.74rem; color: var(--text-muted); }
+.config-membro-familia-nome { font-weight: 600; color: var(--text-primary); }
+.config-membro-familia-sair { border: 1px solid var(--hairline-strong); background: var(--surface); color: var(--error); border-radius: var(--r-sm); padding: 6px 10px; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+.config-membro-familia-sair:hover { background: var(--error-muted); border-color: var(--error); }
+.config-familia-vagas-line,
+.config-familia-limite-note { font-size: 0.78rem; color: var(--text-muted); }
+.config-familia-generate-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.config-familia-generate-row__cta {
+  padding: 10px 16px; border-radius: var(--r-md);
+  border: none; background: var(--accent); color: var(--accent-foreground); font-weight: 700; font-size: 0.86rem; cursor: pointer;
+}
+.config-papel-chip { padding: 2px 9px; border-radius: var(--r-pill); background: var(--surface-sunken); color: var(--text-secondary); font-size: 0.66rem; font-weight: 700; }
+.config-papel-chip--titular { background: var(--accent-muted); color: var(--accent); }
+
+/* convite (código + QR + share) */
+.config-invite-panel { display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: var(--r-md); background: var(--surface-sunken); border: 1px solid var(--hairline); }
+.config-invite-grid { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+.config-invite-qr { display: grid; place-items: center; padding: 8px; background: #fff; border-radius: var(--r-sm); }
+.config-invite-qr__hint { font-size: 0.72rem; color: var(--text-muted); text-align: center; }
+.config-invite-code-line { display: flex; align-items: center; gap: 8px; font-family: ui-monospace, monospace; font-size: 1rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.08em; }
+.config-invite-code-warn { font-size: 0.74rem; color: var(--error); }
+.config-invite-share { display: flex; flex-wrap: wrap; gap: 8px; }
+.config-invite-secondary { font-size: 0.8rem; color: var(--text-secondary); }
+.config-invite-copiado { font-size: 0.78rem; color: var(--success); opacity: 0; transition: opacity 150ms var(--ease); }
+.config-invite-copiado--visible { opacity: 1; }
+.config-familia-convite-interno,
+.config-familia-convite-shell__field { display: flex; flex-direction: column; gap: 6px; }
+.config-familia-convite-shell__textarea {
+  width: 100%; box-sizing: border-box; min-height: 80px; resize: vertical;
+  padding: 11px 14px; border-radius: var(--r-md); border: 1px solid var(--hairline-strong);
+  background: var(--surface); color: var(--text-primary); font-size: 0.9rem; line-height: 1.4;
+}
+.config-familia-convite-shell__textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+.config-familia-convite-shell__hint { font-size: 0.76rem; color: var(--text-muted); }
+
+/* ── Admin strip ───────────────────────────────────────────────────────────── */
+.config-admin-strip { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* ── Zona de logout ────────────────────────────────────────────────────────── */
+.config-logout-zone { display: flex; justify-content: center; padding: 8px 0 4px; }
+.config-logout-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 22px; border-radius: var(--r-md);
+  border: 1px solid var(--hairline-strong); background: var(--surface);
+  color: var(--text-secondary); font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: color 150ms var(--ease), border-color 150ms var(--ease), background 150ms var(--ease);
+}
+.config-logout-btn:hover { color: var(--error); border-color: var(--error); background: var(--error-muted); }
+
+/* ── Modal de excluir conta (overlay próprio) ──────────────────────────────── */
+.config-excluir-overlay {
+  position: fixed; inset: 0; z-index: 1300;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(15, 23, 42, 0.55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+.config-excluir-modal {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
+  width: 100%; max-width: 420px; padding: 24px;
+  border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-3);
+}
+.config-excluir-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--error-muted); color: var(--error); margin-bottom: 8px; }
+.config-excluir-title { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+.config-excluir-body { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; }
+.config-excluir-label { font-size: 0.8rem; color: var(--text-secondary); align-self: stretch; text-align: left; margin-top: 8px; }
+.config-excluir-input {
+  width: 100%; box-sizing: border-box; padding: 11px 14px;
+  border-radius: var(--r-md); border: 1px solid var(--hairline-strong);
+  background: var(--surface); color: var(--text-primary); font-size: 0.95rem;
+}
+.config-excluir-input:focus { outline: none; border-color: var(--error); box-shadow: 0 0 0 3px var(--error-muted); }
+.config-excluir-actions { display: flex; gap: 10px; width: 100%; margin-top: 16px; }
+.config-excluir-actions > button { flex: 1; }
+
+/* =============================================================================
+   MOBILE (<=768)
+   ============================================================================= */
+@media (max-width: 768px) {
+  .config-layout { grid-template-columns: 1fr; }
+  .config-field-grid { grid-template-columns: 1fr; }
+  .config-invite-grid { grid-template-columns: 1fr; justify-items: center; }
+  .config-input,
+  .config-excluir-input,
+  .config-familia-convite-shell__textarea { font-size: 16px; }
+}
+
+/* =============================================================================
+   Cobertura adicional (QA): perfil, aparência/tema, select custom, telefone, etc.
+   ============================================================================= */
+
+/* ── Card de perfil + avatar ───────────────────────────────────────────────── */
+.config-profile-card { display: flex; flex-direction: column; gap: 14px; }
+.config-profile-main { display: flex; align-items: center; gap: 14px; }
+.config-profile-avatar-wrap { position: relative; flex-shrink: 0; }
+.config-profile-avatar {
+  display: grid; place-items: center; width: 64px; height: 64px;
+  border-radius: 50%; overflow: hidden;
+  background: var(--accent-muted); color: var(--accent);
+}
+.config-profile-avatar__img { width: 100%; height: 100%; object-fit: cover; }
+.config-profile-avatar__initials { font-size: 1.4rem; font-weight: 800; }
+.config-profile-avatar__cam {
+  position: absolute; right: -2px; bottom: -2px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--surface); background: var(--accent); color: var(--accent-foreground); cursor: pointer;
+}
+.config-profile-avatar__remove {
+  position: absolute; right: -2px; top: -2px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--surface); background: var(--error); color: #fff; cursor: pointer;
+}
+.config-profile-copy { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.config-profile-name { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+.config-profile-email { font-size: 0.84rem; color: var(--text-muted); }
+
+/* ── Subseções ─────────────────────────────────────────────────────────────── */
+.config-subsection { display: flex; flex-direction: column; gap: 10px; padding-top: 14px; border-top: 1px solid var(--hairline); }
+.config-subsection__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.config-subsection__title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+
+/* ── Form de telefone ──────────────────────────────────────────────────────── */
+.config-telefone-form { display: flex; flex-direction: column; gap: 10px; }
+.config-telefone-form__actions { display: flex; gap: 8px; }
+.config-telefone-form__hint { font-size: 0.76rem; color: var(--text-muted); }
+
+/* ── Chips de verificação ──────────────────────────────────────────────────── */
+.config-verif-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.config-verif-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: var(--r-pill);
+  background: var(--surface-sunken); color: var(--text-secondary); font-size: 0.72rem; font-weight: 600;
+}
+.config-verif-chip--ok { background: var(--success-muted); color: var(--success); }
+.config-verif-chip--pendente { background: var(--accent-muted); color: var(--accent); }
+
+.config-share-wa { color: var(--text-secondary); }
+.config-share-wa:hover { color: #25d366; }
+
+/* ── Segurança ─────────────────────────────────────────────────────────────── */
+.config-security-card { display: flex; flex-direction: column; gap: 12px; }
+.config-security-panel { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: var(--r-md); background: var(--surface-sunken); border: 1px solid var(--hairline); }
+
+/* ── Aparência / seletor de tema ───────────────────────────────────────────── */
+.config-themes { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+.config-theme-card {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 12px; border-radius: var(--r-md);
+  border: 1px solid var(--hairline-strong); background: var(--surface); cursor: pointer;
+  transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+.config-theme-card:hover { box-shadow: var(--elev-1); }
+.config-theme-card--active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-muted); }
+.config-theme-preview { height: 48px; border-radius: var(--r-sm); border: 1px solid var(--hairline); overflow: hidden; }
+.config-theme-body { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.config-theme-icon { display: inline-flex; color: var(--text-secondary); }
+.config-theme-status { font-size: 0.72rem; font-weight: 700; color: var(--accent); }
+
+/* ── Select custom (dropdown) ──────────────────────────────────────────────── */
+.config-select-custom { position: relative; }
+.config-select-custom__trigger {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  width: 100%; box-sizing: border-box; padding: 11px 14px;
+  border-radius: var(--r-md); border: 1px solid var(--hairline-strong);
+  background: var(--surface); color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 0.95rem;
+  text-align: left; cursor: pointer;
+}
+.config-select-custom__trigger:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+.config-select-custom__value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.config-select-custom__chevron { flex-shrink: 0; color: var(--text-muted); transition: transform 200ms var(--ease); }
+.config-select-custom__menu {
+  position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 20;
+  max-height: 240px; overflow-y: auto;
+  border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-3); padding: 4px;
+}
+.config-select-custom__option {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 10px 12px; border: none; border-radius: var(--r-sm); background: transparent;
+  color: var(--text-primary); font-size: 0.9rem; text-align: left; cursor: pointer;
+  transition: background 120ms var(--ease);
+}
+.config-select-custom__option:hover,
+.config-select-custom__option--active { background: var(--surface-2); }
+
+@media (max-width: 768px) {
+  .config-themes { grid-template-columns: 1fr 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-apple, .switch-apple::before { transition: none; }
+}
