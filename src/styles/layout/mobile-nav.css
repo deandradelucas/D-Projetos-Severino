@@ -75,7 +75,9 @@
   background: var(--bg-card);
   border-top: 1px solid var(--border-default);
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
-  padding-bottom: var(--safe-bottom, 0px);
+  /* metade da safe-area: abaixa o menu (menos espaço abaixo dos itens) mantendo
+     uma folga mínima do home indicator do iPhone */
+  padding-bottom: max(4px, calc(var(--safe-bottom, 0px) * 0.5));
 }
 .mobile-bottom-nav__bar {
   display: flex;
