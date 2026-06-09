@@ -256,6 +256,7 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
           <button type="button" className="page-cartoes__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
 
+        <div className="page-cartoes__fatura-scroll">
         <div className="page-cartoes__abas" role="tablist">
           <button type="button" role="tab" aria-selected={aba === 'fatura'} className={`page-cartoes__aba${aba === 'fatura' ? ' is-ativa' : ''}`} onClick={() => setAba('fatura')}>Fatura</button>
           <button type="button" role="tab" aria-selected={aba === 'parceladas'} className={`page-cartoes__aba${aba === 'parceladas' ? ' is-ativa' : ''}`} onClick={() => setAba('parceladas')}>Parceladas</button>
@@ -366,6 +367,7 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
         </div>
         </>
         )}
+        </div>
       </div>
     </div>
   )
