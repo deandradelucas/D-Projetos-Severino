@@ -34,7 +34,8 @@
 }
 .horizon-chat-fab:hover { transform: scale(1.05); background: rgba(15, 18, 24, 0.68); }
 .horizon-chat-fab.chat-fab-active { background: rgba(15, 18, 24, 0.68); }
-.horizon-fab-logo { width: 60%; height: 60%; object-fit: contain; }
+/* S = currentColor (branco); o grafico fica dourado (fill fixo no SVG) */
+.horizon-fab-logo { width: 60%; height: 60%; object-fit: contain; color: #fff; }
 .horizon-fab-pulse {
   position: absolute;
   inset: 0;
