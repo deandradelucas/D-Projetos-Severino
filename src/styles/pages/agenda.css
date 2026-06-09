@@ -243,6 +243,13 @@
 .agenda-modal__actions { display: flex; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--hairline); }
 .agenda-modal__actions-main { display: flex; gap: 10px; flex: 1; justify-content: flex-end; }
 
+/* Desktop: titulo ocupa o espaco e empurra o botao "+ Nova agenda" para o
+   canto direito do hero; os stats (Hoje/Semana) ficam logo apos o titulo. */
+@media (min-width: 769px) {
+  .agenda-hero__title { flex: 1; min-width: 0; }
+  .agenda-hero__title-row { justify-content: flex-start; gap: 20px; }
+}
+
 /* =============================================================================
    MOBILE (<=768)
    ============================================================================= */
