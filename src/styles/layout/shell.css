@@ -75,6 +75,10 @@
   /* sidebar vira drawer (position:fixed em sidebar.css) → sai do fluxo */
   /* Mobile usa SCROLL NATURAL do documento (html/body) — sem altura travada nem
      scroll interno do main-content (modelo do desktop quebrava a rolagem aqui). */
+  /* html tem height:100% (index.css) — no desktop o scroll é interno, mas no
+     mobile isso TRAVA o html na viewport e o conteúdo que transborda não rola.
+     Libera a altura pro documento crescer e rolar naturalmente. */
+  html, body, #root { height: auto; min-height: 100svh; }
   .dashboard-container.app-horizon-shell {
     height: auto;
     min-height: 0;
