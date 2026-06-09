@@ -394,7 +394,7 @@ export default function HorizonChat() {
             <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
           </svg>
         ) : (
-          <SeverinoMark className="horizon-fab-logo" aria-hidden />
+          <SeverinoMark className="horizon-fab-logo" gold="#f0c25a" aria-hidden />
         )}
         {!aberto && (
           <span className="horizon-fab-pulse" />
