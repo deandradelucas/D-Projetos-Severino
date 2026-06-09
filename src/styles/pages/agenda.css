@@ -134,15 +134,16 @@
   padding: 16px 18px; border-radius: var(--r-lg);
   background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
 }
-.agenda-list-panel__header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.agenda-list-panel__header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.agenda-list-panel__header h2 { margin: 2px 0 0; font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em; color: var(--text-primary); }
 .agenda-groups { display: flex; flex-direction: column; gap: 18px; }
 
 /* grupos por período (manhã/tarde/noite) */
-.agenda-period-group { display: flex; flex-direction: column; gap: 8px; }
+.agenda-period-group { display: flex; flex-direction: column; gap: 10px; }
 .agenda-period-group__head { display: flex; align-items: center; gap: 8px; }
-.agenda-period-group__icon { display: inline-flex; color: var(--accent); }
+.agenda-period-group__icon { display: grid; place-items: center; width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%; background: var(--accent-muted); color: var(--accent); }
 .agenda-period-group__label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
-.agenda-period-group__count { font-size: 0.7rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.agenda-period-group__count { margin-left: auto; min-width: 20px; padding: 1px 8px; border-radius: var(--r-pill); background: var(--surface-sunken); font-size: 0.7rem; font-weight: 700; color: var(--text-muted); font-variant-numeric: tabular-nums; text-align: center; }
 
 /* ── Lista de itens do período ─────────────────────────────────────────────── */
 .agenda-timeline { display: flex; flex-direction: column; gap: 8px; }
@@ -150,17 +151,26 @@
 
 /* ── Item de compromisso (day-item) ────────────────────────────────────────── */
 .agenda-day-item {
+  --ag-tone: var(--accent); --ag-tone-muted: var(--accent-muted);
+  position: relative; overflow: hidden;
   display: flex; align-items: flex-start; gap: 12px;
-  padding: 12px 14px; border-radius: var(--r-md);
+  padding: 13px 14px 13px 18px; border-radius: var(--r-md);
   background: var(--surface); border: 1px solid var(--hairline);
   transition: box-shadow 160ms var(--ease), border-color 160ms var(--ease);
 }
-.agenda-day-item:hover { box-shadow: var(--elev-1); }
+/* tom por tipo de item */
+.agenda-day-item--reminder { --ag-tone: var(--info); --ag-tone-muted: var(--info-muted); }
+.agenda-day-item--milestone { --ag-tone: var(--success); --ag-tone-muted: var(--success-muted); }
+.agenda-day-item--done { --ag-tone: var(--text-muted); --ag-tone-muted: var(--surface-sunken); }
+/* faixa colorida à esquerda */
+.agenda-day-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--ag-tone); }
+.agenda-day-item:hover { box-shadow: var(--elev-2); border-color: color-mix(in srgb, var(--ag-tone) 40%, var(--hairline)); }
 .agenda-day-item__icon {
   display: grid; place-items: center; width: 38px; height: 38px; flex-shrink: 0;
-  border-radius: var(--r-md); background: var(--accent-muted); color: var(--accent);
+  border-radius: var(--r-md); background: var(--ag-tone-muted); color: var(--ag-tone);
 }
 .agenda-day-item__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.agenda-day-item__main h3 { margin: 0; font-size: 0.98rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.25; color: var(--text-primary); }
 .agenda-day-item__top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .agenda-day-item__time { font-size: 0.8rem; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .agenda-day-item__type { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
@@ -181,7 +191,10 @@
 .agenda-day-item__delete-icon { display: inline-flex; }
 
 /* badge de status */
-.agenda-status-badge { padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-sunken); color: var(--text-secondary); font-size: 0.64rem; font-weight: 700; }
+.agenda-status-badge { padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-sunken); color: var(--text-secondary); font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.agenda-status-badge--confirmed { background: var(--success-muted); color: var(--success); }
+.agenda-status-badge--done { background: var(--surface-sunken); color: var(--text-muted); }
+.agenda-status-badge--cancelled { background: var(--error-muted); color: var(--error); }
 
 /* ── Estados vazios ────────────────────────────────────────────────────────── */
 .agenda-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 36px 16px; text-align: center; }
