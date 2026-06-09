@@ -227,6 +227,11 @@
 /* =============================================================================
    Linha de transação v2 (TransacaoRow) — redefine o grid (vence o dashboard)
    ============================================================================= */
+/* O cabeçalho de colunas (DATA/CATEGORIA/SUBCATEGORIA/VALOR/AÇÕES) é do layout
+   antigo de tabela; as linhas v2 são título+meta inline agrupadas por dia, então
+   o cabeçalho fica órfão/desalinhado — escondido nesta página. */
+.page-transacoes-ref-table .ref-tx-list-head { display: none; }
+
 .page-transacoes-ref-table .ref-tx-row--v2 {
   position: relative;
   display: grid;
