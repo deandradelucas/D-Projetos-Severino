@@ -455,8 +455,6 @@ export default function Agenda() {
                 eventDateKeys={eventDateKeys}
                 eventDateKinds={eventDateKinds}
                 calendarMonthKey={calendarMonthKey}
-                statsToday={stats.today}
-                statsReminders={stats.reminders}
                 draggingEvent={draggingEvent}
                 onDropDay={(dateKey) => {
                   if (draggingEvent) rescheduleEvent(draggingEvent, dateKey)

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { saoPauloDateKey, formatMonthTitle, plural, formatTime, agendaItemKind, AGENDA_KIND_META } from '../../lib/agendaDateUtils'
+import { saoPauloDateKey, formatMonthTitle, formatTime, agendaItemKind, AGENDA_KIND_META } from '../../lib/agendaDateUtils'
 
 /**
  * Grid do calendário mensal/semanal da Agenda.
@@ -14,8 +14,6 @@ import { saoPauloDateKey, formatMonthTitle, plural, formatTime, agendaItemKind, 
  *   eventDateKeys     — Set<string>
  *   eventDateKinds    — Map<string, string>
  *   calendarMonthKey  — string 'YYYY-MM'
- *   statsToday        — number
- *   statsReminders    — number
  *   onSelectDay       — fn(dateKey)
  *   onNavigateMonth   — fn(amount)
  *   draggingEvent     — evento|null (drag-to-reschedule)
@@ -31,8 +29,6 @@ export function AgendaCalendarPanel({
   eventDateKeys,
   eventDateKinds,
   calendarMonthKey,
-  statsToday,
-  statsReminders,
   onSelectDay,
   onNavigateMonth,
   draggingEvent,
@@ -131,9 +127,6 @@ export function AgendaCalendarPanel({
       <div className="agenda-calendar-head">
         <div className="agenda-calendar-title">
           <strong>{formatMonthTitle(calendarMonthKey)}</strong>
-          <span>
-            {plural(statsToday, 'item hoje', 'itens hoje')} · {plural(statsReminders, 'notificação', 'notificações')} no dia
-          </span>
         </div>
         <div className="agenda-calendar-controls">
           {/* Toggle visão (feature 10) */}
