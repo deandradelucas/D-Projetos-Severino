@@ -510,7 +510,22 @@
      fica embaixo ocupando a largura toda (não quebra mais em 3 linhas). */
   .dashboard-hub__hero { padding: 14px 16px; margin-bottom: 12px; }
   .dashboard-hub__hero-top { flex-direction: column; align-items: stretch; gap: 4px; }
-  .dashboard-hub__hero-actions { order: -1; align-self: flex-end; width: auto; flex-wrap: nowrap; flex-shrink: 0; gap: 8px; }
+  /* WhatsApp à esquerda, avatar em cima e privacidade (olho) abaixo do avatar */
+  .dashboard-hub__hero-actions {
+    order: -1;
+    align-self: flex-end;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      "wa avatar"
+      ".  privacy";
+    gap: 8px;
+    justify-items: center;
+    align-items: center;
+  }
+  .dashboard-hub__hero-actions .dashboard-hub__icon-btn--wa { grid-area: wa; }
+  .dashboard-hub__hero-actions .dashboard-hub__avatar { grid-area: avatar; }
+  .dashboard-hub__hero-actions .dashboard-hub__icon-btn--privacy { grid-area: privacy; }
   .dashboard-hub__hero-text { min-width: 0; }
   .dashboard-hub__title { font-size: 1.4rem; line-height: 1.1; }
   .dashboard-hub__date { white-space: nowrap; margin-top: 3px; }
