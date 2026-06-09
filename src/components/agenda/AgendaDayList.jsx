@@ -182,13 +182,6 @@ export function AgendaDayList({
                       }}
                       onDragEnd={() => onDragEndEvent?.()}
                     >
-                      <time className="agenda-timeline-item__time" dateTime={evento.inicio}>
-                        {formatTime(evento.inicio)}
-                      </time>
-                      <div className={`agenda-timeline-item__track agenda-timeline-item__track--${meta.tone}`} aria-hidden="true">
-                        <span className="agenda-timeline-item__dot" />
-                        <span className="agenda-timeline-item__line" />
-                      </div>
                       <article
                         className={`agenda-day-item agenda-day-item--${meta.tone} agenda-event--${eventTone(evento.status)}`}
                       >
