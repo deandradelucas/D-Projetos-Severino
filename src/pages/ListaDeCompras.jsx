@@ -979,6 +979,13 @@ export default function ListaDeCompras() {
                     <p className="page-lista-compras__empty-desc">
                       Toque em <strong>Novo item</strong> para adicionar o primeiro.
                     </p>
+                    <button
+                      type="button"
+                      className="page-lista-compras__empty-btn"
+                      onClick={() => setModalNovoItem(true)}
+                    >
+                      + Novo item
+                    </button>
                   </div>
                 )}
 
@@ -1038,8 +1045,9 @@ export default function ListaDeCompras() {
             </RefDashboardScroll>
           </div>
 
-          {/* Footer unificado: Total + Novo item + Registrar como gasto */}
-          {listaAtiva && (
+          {/* Footer unificado: Total + Novo item + Registrar como gasto.
+              Só com itens — lista vazia usa o FAB padrão (sem footer p/ colidir). */}
+          {listaAtiva && itens.length > 0 && (
             <div className={`page-lista-compras__footer${temPreco ? '' : ' page-lista-compras__footer--solo'}`}>
               {orcamento != null && (
                 <div className={`page-lista-compras__orcamento${orcamentoExcedido ? ' page-lista-compras__orcamento--excedido' : ''}`}>
@@ -1142,6 +1150,26 @@ export default function ListaDeCompras() {
               </svg>
             </span>
             <span className="dashboard-mobile-tx-fab__label">Nova lista</span>
+          </button>
+        </div>
+      )}
+
+      {/* FAB padrão «Novo item» — lista ativa porém vazia (sem footer p/ colidir) */}
+      {!loading && listaAtiva && !loadingItens && itens.length === 0 && !modoComprando && !modalNovoItem && !modalNovaLista && (
+        <div className="dashboard-mobile-fabs">
+          <button
+            type="button"
+            className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
+            onClick={() => setModalNovoItem(true)}
+            aria-label="Adicionar novo item à lista"
+          >
+            <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+              </svg>
+            </span>
+            <span className="dashboard-mobile-tx-fab__label">Novo item</span>
           </button>
         </div>
       )}

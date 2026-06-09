@@ -198,6 +198,14 @@
 .page-lista-compras__empty-icon { color: var(--text-muted); }
 .page-lista-compras__empty-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .page-lista-compras__empty-desc { font-size: 0.86rem; color: var(--text-secondary); margin: 0; }
+.page-lista-compras__empty-btn {
+  margin-top: 8px; display: inline-flex; align-items: center; gap: 6px;
+  height: 44px; padding: 0 20px; border-radius: var(--r-pill);
+  border: none; background: var(--accent); color: var(--accent-foreground);
+  font-size: 0.9rem; font-weight: 800; cursor: pointer; box-shadow: var(--elev-1);
+  transition: background 150ms var(--ease);
+}
+.page-lista-compras__empty-btn:hover { background: var(--accent-hover); }
 .page-lista-compras__shimmer { display: flex; flex-direction: column; gap: 8px; }
 .page-lista-compras__shimmer-item { height: 44px; border-radius: var(--r-md); background: var(--surface-sunken); animation: listaShimmer 1.4s var(--ease) infinite; }
 @keyframes listaShimmer { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
@@ -353,6 +361,8 @@
   /* o footer fica sticky em bottom:0 (atras da bottom-nav fixa). Folga extra
      embaixo levanta o conteudo (orcamento + Novo item + acoes) acima da nav. */
   .page-lista-compras__footer { padding-bottom: calc(72px + var(--safe-bottom, 0px)); }
+  /* no mobile o FAB padrao cobre "Novo item" no estado vazio — esconde o CTA. */
+  .page-lista-compras__empty-btn { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
