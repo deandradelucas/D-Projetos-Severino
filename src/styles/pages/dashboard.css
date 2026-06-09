@@ -687,9 +687,9 @@
     padding: 0 22px 0 16px;
     overflow: hidden;
     /* vidro branco translúcido (sem borda); ícone e texto na cor da marca */
-    background: rgba(255, 255, 255, 0.72);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-    backdrop-filter: blur(14px) saturate(140%);
+    background: rgba(255, 255, 255, 0.45);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
     border: none;
     border-radius: var(--r-pill);
     color: var(--accent);
