@@ -58,6 +58,8 @@
 .rel-ed__stat { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--hairline); }
 .rel-ed__stat--wide { grid-column: span 2; }
 .rel-ed__stat-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.rel-ed__stat-labelrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.rel-ed__stat-chip { flex-shrink: 0; padding: 2px 8px; border-radius: var(--r-pill); background: var(--accent-muted); color: var(--accent); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.01em; }
 .rel-ed__stat-value { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .rel-ed__stat-value--pos { color: var(--success); }
 .rel-ed__stat-value--neg { color: var(--error); }

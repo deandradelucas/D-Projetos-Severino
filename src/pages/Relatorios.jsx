@@ -745,7 +745,12 @@ export default function Relatorios() {
               )}
               {projecao && (
                 <div className="rel-ed__stat rel-ed__stat--wide">
-                  <p className="rel-ed__stat-label">Projeção de fim do período</p>
+                  <div className="rel-ed__stat-labelrow">
+                    <p className="rel-ed__stat-label">Projeção de fim do período</p>
+                    <span className="rel-ed__stat-chip">
+                      {projecao.diasRestantes === 1 ? 'falta 1 dia' : `faltam ${projecao.diasRestantes} dias`}
+                    </span>
+                  </div>
                   <p className={`rel-ed__stat-value ${privacyMode ? 'privacy-blur' : ''} ${projecao.saldoProj >= 0 ? 'rel-ed__stat-value--pos' : 'rel-ed__stat-value--neg'}`}>
                     Saldo ~ {formatCurrency(projecao.saldoProj)}
                   </p>
