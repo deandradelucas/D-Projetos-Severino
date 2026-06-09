@@ -73,12 +73,10 @@
 /* ── MOBILE (<= 768px) ─────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   /* sidebar vira drawer (position:fixed em sidebar.css) → sai do fluxo */
-  /* Mobile usa SCROLL NATURAL do documento (html/body) — sem altura travada nem
-     scroll interno do main-content (modelo do desktop quebrava a rolagem aqui). */
-  /* html tem height:100% (index.css) — no desktop o scroll é interno, mas no
-     mobile isso TRAVA o html na viewport e o conteúdo que transborda não rola.
-     Libera a altura pro documento crescer e rolar naturalmente. */
-  html, body, #root { height: auto; min-height: 100svh; }
+  /* Mobile = SCROLL INTERNO no .main-content (igual ao desktop e ao 1.0.3
+     original). O .main-content é o contêiner rolável com altura = viewport
+     (100dvh, robusto no iOS/PWA); o documento (html/body) não rola — evita o
+     conflito com overflow-x:clip do html/body. */
   .dashboard-container.app-horizon-shell {
     height: auto;
     min-height: 0;
@@ -87,7 +85,11 @@
   }
   .app-horizon-inner { display: block; }
   .main-content {
-    overflow: visible;
+    height: 100svh;
+    height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
     padding: 16px;
     /* respiro pro bottom nav (altura + safe-area do iPhone) */
     padding-bottom: calc(72px + var(--safe-bottom, 0px));
