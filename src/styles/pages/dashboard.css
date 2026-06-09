@@ -353,9 +353,12 @@ body[data-theme='dark'] .dashboard-hub__balance-value--negative { text-shadow: 0
 
 .ai-insight__icon {
   flex-shrink: 0;
-  font-size: 1.3rem;
-  line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ai-accent, var(--accent));
 }
+.ai-insight__icon svg { width: 22px; height: 22px; }
 .ai-insight__body { min-width: 0; }
 .ai-insight__title {
   margin: 0 0 3px;

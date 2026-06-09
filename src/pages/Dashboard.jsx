@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
-import DashboardInsightsStrip from '../components/DashboardInsightsStrip'
 import OnboardingChecklist from '../components/OnboardingChecklist'
 import RecorrenciaArrowIcon from '../components/RecorrenciaArrowIcon'
 import Sidebar from '../components/Sidebar'
@@ -31,6 +30,25 @@ import { useFabCompact } from '../hooks/useFabCompact'
 import TutorialDashboard from '../components/onboarding/TutorialDashboard'
 import { tutorialDashboardFoiVisto } from '../components/onboarding/tutorialDashboardState'
 
+/* Ícone SVG do insight da Severino IA, por tom (substitui os emojis do backend). */
+function InsightIcon({ tom }) {
+  const common = {
+    width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none',
+    stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round',
+    'aria-hidden': true,
+  }
+  switch (tom) {
+    case 'positivo':
+      return (<svg {...common}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></svg>)
+    case 'alerta':
+      return (<svg {...common}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>)
+    case 'destaque':
+      return (<svg {...common}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>)
+    default: /* neutro */
+      return (<svg {...common}><path d="M9 18h6" /><path d="M10 22h4" /><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" /></svg>)
+  }
+}
+
 export default function Dashboard() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -44,6 +62,22 @@ export default function Dashboard() {
   const fabCompact = useFabCompact(fabScrollRef)
   const [proximoCompromisso, setProximoCompromisso] = useState(null)
   const [showTutorial, setShowTutorial] = useState(() => !tutorialDashboardFoiVisto())
+
+  /* Severino IA — insights proativos (regras determinísticas no backend, sem custo de IA) */
+  const [insights, setInsights] = useState([])
+  useEffect(() => {
+    let cancel = false
+    ;(async () => {
+      try {
+        const res = await apiFetch(apiUrl('/api/insights'), { cache: 'no-store' })
+        const data = res.ok ? await res.json() : []
+        if (!cancel) setInsights(Array.isArray(data) ? data : [])
+      } catch {
+        /* silencioso — feature não-crítica */
+      }
+    })()
+    return () => { cancel = true }
+  }, [])
 
   // Consome a store de cache compartilhada — sem fetch local duplicado
   const {
@@ -368,7 +402,30 @@ export default function Dashboard() {
           </div>
         )}
 
-        <DashboardInsightsStrip />
+        {insights.length > 0 && (
+          <section className="ai-insights" aria-label="Insights da Severino IA">
+            <div className="ai-insights__head">
+              <span className="ai-insights__spark" aria-hidden>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 3 14.5 8.5 20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5L12 3z" />
+                </svg>
+              </span>
+              <span className="ai-insights__title">Severino IA</span>
+              <span className="ai-insights__sub">o que percebi nas suas finanças</span>
+            </div>
+            <div className="ai-insights__track">
+              {insights.map((it) => (
+                <article key={it.id} className={`ai-insight ai-insight--${it.tom || 'neutro'}`}>
+                  <span className="ai-insight__icon"><InsightIcon tom={it.tom || 'neutro'} /></span>
+                  <div className="ai-insight__body">
+                    <h3 className="ai-insight__title">{it.titulo}</h3>
+                    <p className="ai-insight__text">{it.texto}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
 
         {!loading && (
           <section className="dashboard-hub__insights" aria-label="Próximo compromisso e despesas">
