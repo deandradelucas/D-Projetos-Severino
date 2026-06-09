@@ -29,6 +29,7 @@ import {
   computeVariacaoCategorias,
 } from '../lib/relatoriosDerived'
 import './dashboard.css'
+import '../styles/pages/relatorios.css'
 
 // Lazy: o bloco de gráficos (recharts ~pesado) carrega só depois do shell pintar.
 const RelatoriosCharts = lazy(() => import('./relatorios/RelatoriosCharts'))
