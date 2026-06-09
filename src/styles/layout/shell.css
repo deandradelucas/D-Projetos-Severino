@@ -73,13 +73,17 @@
 /* ── MOBILE (<= 768px) ─────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   /* sidebar vira drawer (position:fixed em sidebar.css) → sai do fluxo */
+  /* Mobile usa SCROLL NATURAL do documento (html/body) — sem altura travada nem
+     scroll interno do main-content (modelo do desktop quebrava a rolagem aqui). */
   .dashboard-container.app-horizon-shell {
-    height: 100%;
+    height: auto;
     min-height: 0;
+    overflow: visible;
     box-sizing: border-box;
   }
   .app-horizon-inner { display: block; }
   .main-content {
+    overflow: visible;
     padding: 16px;
     /* respiro pro bottom nav (altura + safe-area do iPhone) */
     padding-bottom: calc(72px + var(--safe-bottom, 0px));

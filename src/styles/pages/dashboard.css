@@ -512,14 +512,16 @@
   .dashboard-hub__hero-actions { width: auto; flex-wrap: nowrap; flex-shrink: 0; gap: 8px; }
   .dashboard-hub__hero { padding: 18px; }
   .dashboard-hub__balance-line--hero { margin-top: 14px; }
+  /* KPIs em 1 coluna no mobile (lado a lado estourava a largura) */
   .dashboard-hub__kpis,
-  .ref-dashboard-kpi-strip { gap: 12px; }
-  .ref-kpi-card { gap: 12px; padding: 14px; }
+  .ref-dashboard-kpi-strip { grid-template-columns: 1fr; gap: 12px; }
+  .ref-kpi-card { gap: 14px; padding: 16px 18px; min-width: 0; }
   .ref-kpi-card__icon { width: 44px; height: 44px; }
-  .ref-kpi-card__value { font-size: clamp(1.05rem, 4.5vw, 1.35rem); }
-  .ref-kpi-card__pct-label { display: none; }
-  .ref-kpi-card__pct-value { font-size: 0.95rem; }
-  .ai-insight { width: 240px; }
+  .ref-kpi-card__value { font-size: 1.35rem; }
+  .ref-kpi-card__pct-value { font-size: 1rem; }
+  /* contem o scroll horizontal dos cards da Severino IA dentro do grid */
+  .dashboard-hub__band, .dashboard-hub__band > *, .ai-insights { min-width: 0; }
+  .ai-insight { width: 260px; max-width: 78vw; }
   .dashboard-hub__insights { grid-template-columns: 1fr; gap: 12px; }
   .dashboard-hub__bar-row { grid-template-columns: minmax(70px, 1fr) 2fr auto 32px; gap: 8px; }
   .dashboard-hub__bar-label { font-size: 0.75rem; }
