@@ -363,14 +363,9 @@ export default function Dashboard() {
             <>
               <article className="ref-kpi-card ref-kpi-card--expense">
                 <div className="ref-kpi-card__icon" aria-hidden>
-                  <img
-                    className="ref-kpi-card__icon-img"
-                    src="/images/icons/setabaixo.png"
-                    alt=""
-                    width={22}
-                    height={22}
-                    decoding="async"
-                  />
+                  <svg className="ref-kpi-card__icon-img" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <path d="M12 5v13.5M12 18.5l-6-6M12 18.5l6-6" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </div>
                 <div className="ref-kpi-card__body">
                   <p className="ref-kpi-card__label">Saída</p>
@@ -385,14 +380,9 @@ export default function Dashboard() {
               </article>
               <article className="ref-kpi-card ref-kpi-card--income">
                 <div className="ref-kpi-card__icon" aria-hidden>
-                  <img
-                    className="ref-kpi-card__icon-img"
-                    src="/images/icons/setacima.png"
-                    alt=""
-                    width={22}
-                    height={22}
-                    decoding="async"
-                  />
+                  <svg className="ref-kpi-card__icon-img" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <path d="M12 19V5.5M12 5.5l-6 6M12 5.5l6 6" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </div>
                 <div className="ref-kpi-card__body">
                   <p className="ref-kpi-card__label">Entrada</p>
