@@ -504,9 +504,14 @@
 }
 /* ── MOBILE (<=768) ────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .dashboard-hub__hero-top { flex-direction: column; gap: 14px; }
-  .dashboard-hub__hero-actions { width: 100%; flex-wrap: wrap; }
-  .dashboard-hub__btn--primary { flex: 1; min-width: 0; justify-content: center; }
+  /* CTA "+ Nova transação" sai no mobile — o FAB flutuante cobre a ação */
+  .dashboard-hub__btn--primary { display: none; }
+  /* saudação à esquerda, ícones (whatsapp/privacidade/avatar) à direita */
+  .dashboard-hub__hero-top { flex-direction: row; align-items: flex-start; gap: 12px; }
+  .dashboard-hub__hero-text { flex: 1; min-width: 0; }
+  .dashboard-hub__hero-actions { width: auto; flex-wrap: nowrap; flex-shrink: 0; gap: 8px; }
+  .dashboard-hub__hero { padding: 18px; }
+  .dashboard-hub__balance-line--hero { margin-top: 14px; }
   .dashboard-hub__kpis,
   .ref-dashboard-kpi-strip { gap: 12px; }
   .ref-kpi-card { gap: 12px; padding: 14px; }
