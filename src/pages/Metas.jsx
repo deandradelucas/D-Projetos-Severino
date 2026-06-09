@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import './dashboard.css'
 import '../styles/pages/metas.css'
 import { useFabCompact } from '../hooks/useFabCompact'
@@ -6,6 +6,8 @@ import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
+import MetaIcon from '../components/MetaIcon'
+import { META_ICON_KEYS, metaIconKey } from '../lib/metaIcons'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
 import { redirectSeAuthBloqueada } from '../lib/authRedirect'
@@ -18,7 +20,7 @@ function IconUser() { return (<svg viewBox="0 0 24 24" aria-hidden="true" width=
 function IconMoreVertical() { return (<svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>) }
 function IconTarget() { return (<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" strokeWidth="1.6" fill="none"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>) }
 
-const ICONES = ['🎯', '✈️', '🏠', '🚗', '💍', '🎓', '🏖️', '💻', '🛡️', '🎁', '👶', '💰']
+const ICONES = META_ICON_KEYS
 const CORES = ['gold', 'green', 'blue', 'purple', 'red', 'teal']
 
 function pct(meta) {
@@ -51,7 +53,7 @@ function formatPrazoBr(prazo) {
 function ModalMeta({ onClose, onSalvar, salvando, metaEdit = null }) {
   const editando = Boolean(metaEdit)
   const [nome, setNome] = useState(metaEdit?.nome || '')
-  const [icone, setIcone] = useState(metaEdit?.icone || '🎯')
+  const [icone, setIcone] = useState(() => metaIconKey(metaEdit?.icone))
   const [cor, setCor] = useState(metaEdit?.cor || 'gold')
   const [valorInput, setValorInput] = useState(metaEdit?.valor_alvo ? valorToMaskedBRL(Number(metaEdit.valor_alvo)) : '')
   const [prazo, setPrazo] = useState(metaEdit?.prazo ? String(metaEdit.prazo).slice(0, 10) : '')
@@ -92,11 +94,11 @@ function ModalMeta({ onClose, onSalvar, salvando, metaEdit = null }) {
                 <button
                   key={ic}
                   type="button"
-                  className={`page-metas__icon-opt${icone === ic ? ' page-metas__icon-opt--active' : ''}`}
+                  className={`page-metas__icon-opt${metaIconKey(icone) === ic ? ' page-metas__icon-opt--active' : ''}`}
                   onClick={() => setIcone(ic)}
                   aria-label={`Ícone ${ic}`}
                 >
-                  {ic}
+                  <MetaIcon name={ic} size={20} />
                 </button>
               ))}
             </div>
@@ -223,7 +225,7 @@ function MetaCard({ meta, onGuardar, onEditar, onExcluir }) {
   return (
     <article className={`page-metas__card page-metas__card--${meta.cor || 'gold'}${concluida ? ' page-metas__card--done' : ''}`}>
       <div className="page-metas__card-head">
-        <span className="page-metas__card-icon">{meta.icone || '🎯'}</span>
+        <span className="page-metas__card-icon"><MetaIcon name={meta.icone} size={22} /></span>
         <div className="page-metas__card-titles">
           <h3 className="page-metas__card-name">{meta.nome}</h3>
           {meta.prazo && <span className="page-metas__card-prazo">até {formatPrazoBr(meta.prazo)}</span>}
@@ -318,11 +320,6 @@ export default function Metas() {
 
   useEffect(() => { void carregar(pessoalParam) }, [escopo]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const totais = useMemo(() => {
-    const alvo = metas.reduce((s, m) => s + (Number(m.valor_alvo) || 0), 0)
-    const guardado = metas.reduce((s, m) => s + (Number(m.valor_guardado) || 0), 0)
-    return { alvo, guardado, qtd: metas.length }
-  }, [metas])
 
   async function salvarMeta(payload) {
     setSalvando(true)
@@ -394,15 +391,6 @@ export default function Metas() {
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                   <div className="dashboard-hub__hero-text">
                     <h1 className="dashboard-hub__title">Metas</h1>
-                    <div className="dashboard-hub__balance-line" aria-live="polite">
-                      <span>
-                        {loading
-                          ? 'Carregando…'
-                          : totais.qtd === 0
-                            ? 'Nenhuma meta ainda'
-                            : `${formatCurrencyBRL(totais.guardado)} guardados de ${formatCurrencyBRL(totais.alvo)}`}
-                      </span>
-                    </div>
                   </div>
                   <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações">
                     <button
