@@ -244,11 +244,14 @@
   .relatorios-pie-layout { flex-direction: column; }
   .relatorios-pie-layout__legend { width: 100%; }
 
-  /* Hero mais organizado no mobile: toolbar separado do bloco de saldo por
-     divisória, e receitas/despesas em 2 colunas iguais com separador. */
+  /* Hero mais organizado no mobile: titulo ao lado do menu, icones de export
+     no canto sup. direito (mesma linha do titulo); receitas/despesas em 2
+     colunas iguais com separador. */
   .rel-ed__hero { padding: 16px; }
-  .rel-ed__hero-top { align-items: flex-start; }
-  .rel-ed__actions { margin-top: 14px; }
+  .rel-ed__hero-top { align-items: flex-start; flex-wrap: nowrap; gap: 10px; }
+  .rel-ed__heading { flex: 1; min-width: 0; }
+  .rel-ed__actions { margin-top: 0; flex-shrink: 0; gap: 6px; }
+  .rel-ed__action { padding: 8px; }
   .rel-ed__balance { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--hairline); }
   .rel-ed__totals { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 14px; }
   .rel-ed__total { min-width: 0; }
