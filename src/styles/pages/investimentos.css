@@ -375,6 +375,100 @@
   .page-investimentos-comparador__taxa-input { font-size: 16px; }
 }
 
+/* =============================================================================
+   Cobertura adicional (gaps apontados no QA): stats do resumo, bloco primary do
+   card, chips, seções dos modais.
+   ============================================================================= */
+
+/* ── Resumo: grade de stats ────────────────────────────────────────────────── */
+.page-investimentos-resumo__stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin: 0; }
+.page-investimentos-resumo__stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin: 0; }
+.page-investimentos-resumo__stat-value { margin: 2px 0 0; font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 1.35rem; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.page-investimentos-resumo__stat--accent .page-investimentos-resumo__stat-value { color: var(--accent); }
+.page-investimentos-resumo__stat--muted .page-investimentos-resumo__stat-value { color: var(--text-secondary); }
+.page-investimentos-resumo__stat-value--pos { color: var(--success); }
+.page-investimentos-resumo__donut-legend-text { color: var(--text-secondary); }
+
+/* ── Chips (badges do card) ────────────────────────────────────────────────── */
+.page-investimentos-chip {
+  display: inline-flex; align-items: center;
+  padding: 2px 9px; border-radius: var(--r-pill);
+  background: var(--surface-sunken); color: var(--text-secondary);
+  font-size: 0.66rem; font-weight: 700; white-space: nowrap;
+}
+.page-investimentos-chip--inst { background: var(--accent-muted); color: var(--accent); }
+.page-investimentos-chip--tipo { background: var(--surface-sunken); color: var(--text-secondary); }
+.page-investimentos-chip--taxa { background: var(--surface-sunken); color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.page-investimentos-chip--custom { background: var(--surface-sunken); color: var(--text-secondary); }
+.page-investimentos-chip--isento { background: var(--success-muted); color: var(--success); }
+.page-investimentos-chip--vencido { background: var(--error-muted); color: var(--error); }
+.page-investimentos-chip--vencimento-urgente { background: var(--error-muted); color: var(--error); }
+.page-investimentos-chip--vencimento-proximo { background: var(--accent-muted); color: var(--accent); }
+.page-investimentos-chip--vencimento { background: var(--surface-sunken); color: var(--text-secondary); }
+
+/* ── Card: cabeçalho + bloco primary + métricas ────────────────────────────── */
+.page-investimentos-card__top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.page-investimentos-card__title { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+.page-investimentos-card__missing-date-banner {
+  margin: 0; padding: 8px 12px; border-radius: var(--r-md);
+  background: var(--accent-muted); color: var(--accent); font-size: 0.8rem;
+}
+.page-investimentos-card__primary { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.page-investimentos-card__primary-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-investimentos-card__primary-block--right { align-items: flex-end; text-align: right; }
+.page-investimentos-card__primary-label { margin: 0; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.page-investimentos-card__primary-value { margin: 0; font-size: 1.3rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.page-investimentos-card__primary-rendimento { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--success); font-variant-numeric: tabular-nums; }
+.page-investimentos-card__primary-pct { margin: 0; font-size: 0.82rem; font-weight: 600; color: var(--success); font-variant-numeric: tabular-nums; }
+.page-investimentos-card__primary-sublabel { margin: 0; font-size: 0.7rem; color: var(--text-muted); }
+
+.page-investimentos-card__metric-value--date { font-weight: 600; color: var(--text-secondary); }
+.page-investimentos-card__metric-value--muted { color: var(--text-muted); font-weight: 500; }
+.page-investimentos-card__metrics-rule-wrap { grid-column: 1 / -1; padding: 2px 0; }
+.page-investimentos-card__metrics-rule-line { height: 1px; background: var(--hairline); margin: 0; }
+
+/* projeção no card */
+.page-investimentos-card__projecao { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--hairline); }
+.page-investimentos-card__projecao-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.page-investimentos-card__projecao-label { font-size: 0.76rem; color: var(--text-secondary); }
+.page-investimentos-card__projecao-input {
+  width: 84px; padding: 7px 10px; border-radius: var(--r-md);
+  border: 1px solid var(--hairline-strong); background: var(--surface);
+  color: var(--text-primary); font-size: 0.88rem; text-align: center;
+}
+.page-investimentos-card__projecao-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+.page-investimentos-card__projecao-erro { font-size: 0.74rem; color: var(--error); }
+
+/* progresso de vencimento */
+.page-investimentos-card__venc-progress { height: 6px; border-radius: var(--r-pill); background: var(--surface-sunken); overflow: hidden; }
+.page-investimentos-card__venc-progress-bar { height: 100%; border-radius: var(--r-pill); background: var(--accent); }
+
+.page-investimentos-card__notas { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; }
+.page-investimentos-card__remove {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: var(--r-sm);
+  border: 1px solid var(--hairline); background: var(--surface); color: var(--text-muted); cursor: pointer;
+}
+.page-investimentos-card__remove:hover { color: var(--error); border-color: var(--error); background: var(--error-muted); }
+.page-investimentos-card--collapsed { gap: 0; }
+
+/* ── Modais: seções e campos extras ────────────────────────────────────────── */
+.page-investimentos-modal__section { display: flex; flex-direction: column; gap: 12px; }
+.page-investimentos-modal__section--row { flex-direction: row; gap: 10px; flex-wrap: wrap; }
+.page-investimentos-modal__section--row > * { flex: 1; min-width: 120px; }
+.page-investimentos-modal__section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.page-investimentos-modal__surface { padding: 12px 14px; border-radius: var(--r-md); background: var(--surface-sunken); border: 1px solid var(--hairline); }
+.page-investimentos-modal__label-optional { font-weight: 400; color: var(--text-muted); }
+.page-investimentos-modal__toggle-link { border: none; background: transparent; color: var(--accent); font-weight: 600; font-size: 0.82rem; cursor: pointer; padding: 0; text-align: left; }
+.page-investimentos-modal__input--select { appearance: none; background-image: none; cursor: pointer; }
+.page-investimentos-modal__input--textarea { min-height: 72px; resize: vertical; line-height: 1.4; }
+.page-investimentos-modal__perc-input-wrap { position: relative; display: flex; align-items: center; }
+.page-investimentos-modal__perc-suffix { position: absolute; right: 14px; color: var(--text-muted); font-weight: 600; pointer-events: none; }
+
+@media (max-width: 768px) {
+  .page-investimentos-card__projecao-input { font-size: 16px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .page-investimentos-skeleton__row { animation: none; }
 }
