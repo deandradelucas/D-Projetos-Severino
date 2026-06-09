@@ -645,7 +645,54 @@
   .dashboard-hub__tx-panel .ref-tx-sub-text  { font-size: 0.75rem; }
 }
 
+/* ============================================================================
+   FAB mobile "Nova transação" — flutuante no mobile, OCULTO no desktop
+   (no desktop o hero ja tem o botao "+ Nova transação")
+   ============================================================================ */
+.dashboard-mobile-fabs { display: none; }
+
+@media (max-width: 768px) {
+  .dashboard-mobile-fabs {
+    display: block;
+    position: fixed;
+    right: 16px;
+    bottom: calc(72px + var(--safe-bottom, 0px) + 12px);
+    z-index: 900;
+  }
+  .dashboard-mobile-tx-fab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 52px;
+    padding: 0 20px;
+    border: none;
+    border-radius: var(--r-pill);
+    background: var(--accent);
+    color: var(--accent-foreground);
+    box-shadow: var(--elev-3);
+    font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: padding 220ms var(--ease), background 150ms var(--ease);
+  }
+  .dashboard-mobile-tx-fab:active { background: var(--accent-hover); }
+  .dashboard-mobile-tx-fab__icon { display: inline-flex; flex-shrink: 0; }
+  .dashboard-mobile-tx-fab__label {
+    max-width: 160px;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: max-width 220ms var(--ease), opacity 180ms var(--ease), margin 220ms var(--ease);
+  }
+  /* compacto (ao rolar): vira so o circulo com o + */
+  .dashboard-mobile-tx-fab--compact { padding: 0; width: 52px; justify-content: center; }
+  .dashboard-mobile-tx-fab--compact .dashboard-mobile-tx-fab__label { max-width: 0; opacity: 0; margin: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dashboard-hub__date::before { animation: none; }
   .dashboard-hub__tx-panel .ref-tx-row { transition: none; }
+  .dashboard-mobile-tx-fab,
+  .dashboard-mobile-tx-fab__label { transition: none; }
 }
