@@ -423,6 +423,10 @@ body {
 /* Modo privacidade — borra valores/nome (botão do olho no hero). Utilitário
    global: aplicado via classe `privacy-blur` em qualquer valor sensível. */
 .privacy-blur {
+  display: inline-block;
+  padding: 0 0.3em;
+  border-radius: 10px;
+  background: color-mix(in srgb, currentColor 10%, transparent);
   filter: blur(8px);
   -webkit-user-select: none;
   user-select: none;
