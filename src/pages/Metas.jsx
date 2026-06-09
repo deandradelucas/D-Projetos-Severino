@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './dashboard.css'
 import '../styles/pages/metas.css'
 import { useFabCompact } from '../hooks/useFabCompact'
@@ -164,6 +164,12 @@ function ModalAporte({ meta, onClose, onConfirmar, salvando }) {
   const valorNum = parseCurrencyBRLMasked(valorInput)
   const podeConfirmar = Number.isFinite(valorNum) && valorNum >= 0.01
 
+  const alvo = Number(meta.valor_alvo) || 0
+  const guardado = Number(meta.valor_guardado) || 0
+  const falta = Math.max(0, Math.round((alvo - guardado) * 100) / 100)
+  const meses = mesesAte(meta.prazo)
+  const porMes = meses && meses > 0 && falta > 0 ? Math.ceil((falta / meses) * 100) / 100 : null
+
   function handleSubmit(e) {
     e.preventDefault()
     if (!podeConfirmar || salvando) return
@@ -174,7 +180,7 @@ function ModalAporte({ meta, onClose, onConfirmar, salvando }) {
     <div className="page-metas__modal-overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="page-metas__modal page-metas__modal--sm" role="dialog" aria-modal="true" aria-labelledby="aporte-modal-title">
         <div className="page-metas__modal-head">
-          <h2 id="aporte-modal-title" className="page-metas__modal-title"><span aria-hidden="true">{meta.icone}</span> {meta.nome}</h2>
+          <h2 id="aporte-modal-title" className="page-metas__modal-title"><MetaIcon name={meta.icone} size={18} /> {meta.nome}</h2>
           <button type="button" className="page-metas__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
         </div>
         <form onSubmit={handleSubmit} className="page-metas__modal-body">
@@ -194,8 +200,17 @@ function ModalAporte({ meta, onClose, onConfirmar, salvando }) {
               autoFocus
             />
           </label>
+          {tipo === 'guardar' && (
+            <div className="page-metas__sugestoes">
+              {porMes ? <button type="button" className="page-metas__sugestao" onClick={() => setValorInput(valorToMaskedBRL(porMes))}>{formatCurrencyBRL(porMes)}/mês</button> : null}
+              {[50, 100].map((v) => (
+                <button key={v} type="button" className="page-metas__sugestao" onClick={() => setValorInput(valorToMaskedBRL(v))}>+ {formatCurrencyBRL(v)}</button>
+              ))}
+              {falta > 0 ? <button type="button" className="page-metas__sugestao page-metas__sugestao--full" onClick={() => setValorInput(valorToMaskedBRL(falta))}>Completar</button> : null}
+            </div>
+          )}
           <p className="page-metas__aporte-hint">
-            Guardado hoje: <strong>{formatCurrencyBRL(Number(meta.valor_guardado) || 0)}</strong> de {formatCurrencyBRL(Number(meta.valor_alvo) || 0)}
+            Guardado hoje: <strong>{formatCurrencyBRL(guardado)}</strong> de {formatCurrencyBRL(alvo)}
           </p>
           <div className="page-metas__modal-actions">
             <button type="button" className="page-metas__btn-ghost" onClick={onClose}>Cancelar</button>
@@ -223,14 +238,21 @@ function MetaCard({ meta, onGuardar, onEditar, onExcluir }) {
   const porMes = meses && meses > 0 && falta > 0 ? falta / meses : null
 
   return (
-    <article className={`page-metas__card page-metas__card--${meta.cor || 'gold'}${concluida ? ' page-metas__card--done' : ''}`}>
+    <article
+      className={`page-metas__card page-metas__card--${meta.cor || 'gold'}${concluida ? ' page-metas__card--done' : ''}`}
+      role="button"
+      tabIndex={0}
+      onClick={() => onGuardar(meta)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onGuardar(meta) } }}
+      aria-label={`Guardar valor em ${meta.nome}`}
+    >
       <div className="page-metas__card-head">
         <span className="page-metas__card-icon"><MetaIcon name={meta.icone} size={22} /></span>
         <div className="page-metas__card-titles">
           <h3 className="page-metas__card-name">{meta.nome}</h3>
           {meta.prazo && <span className="page-metas__card-prazo">até {formatPrazoBr(meta.prazo)}</span>}
         </div>
-        <div className="page-metas__card-menu-wrap">
+        <div className="page-metas__card-menu-wrap" onClick={(e) => e.stopPropagation()}>
           <button type="button" className="page-metas__card-menu-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="Opções">{<IconMoreVertical />}</button>
           {menuOpen && (
             <>
@@ -257,18 +279,20 @@ function MetaCard({ meta, onGuardar, onEditar, onExcluir }) {
       <p className="page-metas__card-status">
         {concluida ? (
           <span className="page-metas__done-tag">✓ Meta concluída!</span>
-        ) : porMes ? (
-          <>Guarde <strong>{formatCurrencyBRL(porMes)}/mês</strong> pra chegar lá</>
         ) : (
-          <>Faltam <strong>{formatCurrencyBRL(falta)}</strong></>
+          <>
+            Faltam <strong>{formatCurrencyBRL(falta)}</strong>
+            {porMes ? <> · {formatCurrencyBRL(porMes)}/mês</> : null}
+            {meses ? <> · {meses} {meses === 1 ? 'mês' : 'meses'}</> : null}
+          </>
         )}
       </p>
 
       {!concluida && (
-        <button type="button" className="page-metas__card-cta" onClick={() => onGuardar(meta)}>Guardar valor</button>
+        <button type="button" className="page-metas__card-cta" onClick={(e) => { e.stopPropagation(); onGuardar(meta) }}>+ Guardar valor</button>
       )}
       {concluida && (
-        <button type="button" className="page-metas__card-cta page-metas__card-cta--ghost" onClick={() => onGuardar(meta)}>Ajustar valor</button>
+        <button type="button" className="page-metas__card-cta page-metas__card-cta--ghost" onClick={(e) => { e.stopPropagation(); onGuardar(meta) }}>Ajustar valor</button>
       )}
     </article>
   )
@@ -289,9 +313,42 @@ export default function Metas() {
   const [aporteTarget, setAporteTarget] = useState(null)
   const [aporteSalvando, setAporteSalvando] = useState(false)
   const [excluirTarget, setExcluirTarget] = useState(null)
+  const [filtro, setFiltro] = useState('ativas') // 'ativas' | 'concluidas' | 'todas'
+  const [ordenar, setOrdenar] = useState('progresso') // 'progresso' | 'prazo' | 'valor'
   // FAB padrão: encolhe ao rolar (ver useFabCompact / AGENTS.md «FAB padrão»)
   const fabScrollRef = useRef(null)
   const fabCompact = useFabCompact(fabScrollRef)
+
+  const metaConcluida = (m) => Boolean(m.concluida_em) || (Number(m.valor_guardado) || 0) >= (Number(m.valor_alvo) || 0)
+
+  // Resumo agregado (total guardado, total das metas, % geral, próxima a concluir)
+  const resumo = useMemo(() => {
+    if (!metas.length) return null
+    let guardado = 0, alvo = 0
+    for (const m of metas) { guardado += Number(m.valor_guardado) || 0; alvo += Number(m.valor_alvo) || 0 }
+    const ativas = metas.filter((m) => !metaConcluida(m))
+    const proxima = ativas.length
+      ? [...ativas].sort((a, b) => pct(b) - pct(a))[0]
+      : null
+    return {
+      guardado, alvo,
+      pctGeral: alvo > 0 ? Math.round((guardado / alvo) * 100) : 0,
+      concluidas: metas.length - ativas.length,
+      proxima,
+    }
+  }, [metas])
+
+  // Filtro + ordenação
+  const metasVisiveis = useMemo(() => {
+    let arr = metas
+    if (filtro === 'ativas') arr = metas.filter((m) => !metaConcluida(m))
+    else if (filtro === 'concluidas') arr = metas.filter(metaConcluida)
+    arr = [...arr]
+    if (ordenar === 'valor') arr.sort((a, b) => (Number(b.valor_alvo) || 0) - (Number(a.valor_alvo) || 0))
+    else if (ordenar === 'prazo') arr.sort((a, b) => String(a.prazo || '9999-99-99').localeCompare(String(b.prazo || '9999-99-99')))
+    else arr.sort((a, b) => pct(b) - pct(a))
+    return arr
+  }, [metas, filtro, ordenar])
 
   const pessoalParam = isMembroConta && escopo === 'pessoal' ? '?pessoal=1' : ''
 
@@ -422,17 +479,54 @@ export default function Metas() {
                     <button type="button" className="page-metas__empty-btn" onClick={() => { setMetaEdit(null); setModalMeta(true) }}>+ Criar meta</button>
                   </div>
                 ) : (
-                  <div className="page-metas__grid">
-                    {metas.map((m) => (
-                      <MetaCard
-                        key={m.id}
-                        meta={m}
-                        onGuardar={(meta) => setAporteTarget(meta)}
-                        onEditar={(meta) => { setMetaEdit(meta); setModalMeta(true) }}
-                        onExcluir={(meta) => setExcluirTarget(meta)}
-                      />
-                    ))}
-                  </div>
+                  <>
+                    {resumo && (
+                      <div className="page-metas__resumo">
+                        <div className="page-metas__resumo-item">
+                          <span className="page-metas__resumo-label">Total guardado</span>
+                          <strong className="page-metas__resumo-valor">{formatCurrencyBRL(resumo.guardado)}<span className="page-metas__resumo-sub"> de {formatCurrencyBRL(resumo.alvo)}</span></strong>
+                        </div>
+                        <div className="page-metas__resumo-item">
+                          <span className="page-metas__resumo-label">Progresso geral</span>
+                          <strong className="page-metas__resumo-valor">{resumo.pctGeral}%</strong>
+                        </div>
+                        <div className="page-metas__resumo-item">
+                          <span className="page-metas__resumo-label">{resumo.proxima ? 'Mais perto de concluir' : 'Metas concluídas'}</span>
+                          <strong className="page-metas__resumo-valor">{resumo.proxima ? <>{resumo.proxima.nome} <span className="page-metas__resumo-sub">{pct(resumo.proxima)}%</span></> : `${resumo.concluidas}/${metas.length}`}</strong>
+                        </div>
+                      </div>
+                    )}
+                    {metas.length > 1 && (
+                      <div className="page-metas__controls">
+                        <div className="page-metas__sort" role="group" aria-label="Filtrar metas">
+                          {[['ativas', 'Ativas'], ['concluidas', 'Concluídas'], ['todas', 'Todas']].map(([v, l]) => (
+                            <button key={v} type="button" className={`page-metas__sort-btn${filtro === v ? ' page-metas__sort-btn--active' : ''}`} onClick={() => setFiltro(v)}>{l}</button>
+                          ))}
+                        </div>
+                        <div className="page-metas__sort" role="group" aria-label="Ordenar metas">
+                          <span className="page-metas__sort-label">Ordenar:</span>
+                          {[['progresso', 'Progresso'], ['prazo', 'Prazo'], ['valor', 'Valor']].map(([v, l]) => (
+                            <button key={v} type="button" className={`page-metas__sort-btn${ordenar === v ? ' page-metas__sort-btn--active' : ''}`} onClick={() => setOrdenar(v)}>{l}</button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {metasVisiveis.length === 0 ? (
+                      <p className="page-metas__muted">Nenhuma meta {filtro === 'concluidas' ? 'concluída' : 'ativa'} no momento.</p>
+                    ) : (
+                      <div className="page-metas__grid">
+                        {metasVisiveis.map((m) => (
+                          <MetaCard
+                            key={m.id}
+                            meta={m}
+                            onGuardar={(meta) => setAporteTarget(meta)}
+                            onEditar={(meta) => { setMetaEdit(meta); setModalMeta(true) }}
+                            onExcluir={(meta) => setExcluirTarget(meta)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </section>
             </RefDashboardScroll>
