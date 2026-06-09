@@ -249,7 +249,7 @@ const CategorySelector = ({ name, value, onChange, options, placeholder, isOpen,
         <div className="custom-select-trigger" ref={triggerRef} onClick={() => onToggle(isOpen ? null : name)}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {selected?.cor && <div className="category-dot" style={{ backgroundColor: selected.cor }} />}
-            <span className={selected ? 'text-white' : 'text-placeholder'}>
+            <span className={selected ? 'custom-select-value' : 'custom-select-placeholder'}>
               {selected ? selected.nome : placeholder}
             </span>
           </div>
