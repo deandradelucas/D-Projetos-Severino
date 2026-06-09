@@ -659,19 +659,32 @@
 .dashboard-mobile-fabs { display: none; }
 
 @media (max-width: 768px) {
+  /* Container fixo, centrado acima do bottom-nav; reserva folga à direita pro
+     FAB do chat (Severino IA). Botão dentro = static (layout original). */
   .dashboard-mobile-fabs {
-    display: block;
+    display: flex;
     position: fixed;
+    left: 16px;
     right: 16px;
-    bottom: calc(72px + var(--safe-bottom, 0px) + 12px);
+    bottom: max(78px, calc(70px + var(--safe-bottom, 0px)));
     z-index: 900;
+    align-items: center;
+    justify-content: center;
+    padding-inline-end: max(60px, calc(52px + var(--safe-right, 0px)));
+    pointer-events: none;
   }
+  .dashboard-mobile-fabs > * { pointer-events: auto; }
+
   .dashboard-mobile-tx-fab {
+    position: static;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    height: 52px;
-    padding: 0 20px;
+    min-width: 176px;
+    height: 50px;
+    padding: 0 20px 0 14px;
+    overflow: hidden;
     border: none;
     border-radius: var(--r-pill);
     background: var(--accent);
@@ -681,19 +694,25 @@
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
+    touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
-    transition: padding 220ms var(--ease), background 150ms var(--ease);
+    transition: width 240ms var(--ease), min-width 240ms var(--ease), padding 240ms var(--ease), gap 240ms var(--ease), background 150ms var(--ease), transform 160ms ease;
   }
-  .dashboard-mobile-tx-fab:active { background: var(--accent-hover); }
+  .dashboard-mobile-tx-fab:active { transform: scale(0.97); }
   .dashboard-mobile-tx-fab__icon { display: inline-flex; flex-shrink: 0; }
   .dashboard-mobile-tx-fab__label {
-    max-width: 160px;
+    max-width: 180px;
     overflow: hidden;
     white-space: nowrap;
-    transition: max-width 220ms var(--ease), opacity 180ms var(--ease), margin 220ms var(--ease);
+    transition: max-width 240ms var(--ease), opacity 180ms var(--ease), margin 240ms var(--ease);
   }
-  /* compacto (ao rolar): vira so o circulo com o + */
-  .dashboard-mobile-tx-fab--compact { padding: 0; width: 52px; justify-content: center; }
+  /* compacto (ao rolar): pill → círculo só com o "+" */
+  .dashboard-mobile-tx-fab--compact {
+    min-width: 0;
+    width: 54px;
+    padding: 0;
+    gap: 0;
+  }
   .dashboard-mobile-tx-fab--compact .dashboard-mobile-tx-fab__label { max-width: 0; opacity: 0; margin: 0; }
 }
 

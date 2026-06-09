@@ -22,23 +22,31 @@ export function useFabCompact(scrollRef, { threshold = 36 } = {}) {
     if (typeof window === 'undefined') return
     const isMobile = window.matchMedia('(max-width: 768px)').matches
     if (!isMobile) return
+    // No mobile o scroll é do DOCUMENTO (window); mantém o elemento como fallback
+    // caso alguma página ainda use scroll interno no container.
     const root = scrollRef.current
-    if (!root) return
 
     let raf = 0
+    const read = () => {
+      const winTop = window.scrollY || document.documentElement.scrollTop || 0
+      const elTop = root ? root.scrollTop : 0
+      setCompact(Math.max(winTop, elTop) > threshold)
+    }
     const onScroll = () => {
       if (raf) return
       raf = requestAnimationFrame(() => {
         raf = 0
-        setCompact(root.scrollTop > threshold)
+        read()
       })
     }
 
-    onScroll()
-    root.addEventListener('scroll', onScroll, { passive: true })
+    read()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    if (root) root.addEventListener('scroll', onScroll, { passive: true })
     return () => {
       if (raf) cancelAnimationFrame(raf)
-      root.removeEventListener('scroll', onScroll)
+      window.removeEventListener('scroll', onScroll)
+      if (root) root.removeEventListener('scroll', onScroll)
     }
   }, [scrollRef, threshold])
 
