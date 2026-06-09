@@ -18,7 +18,7 @@
   box-shadow: var(--elev-2);
 }
 
-.dashboard-hub__hero-row { display: flex; align-items: flex-start; gap: 12px; }
+.dashboard-hub__hero-row { display: flex; align-items: stretch; gap: 20px; }
 .dashboard-hub__hero-main { flex: 1; min-width: 0; }
 .dashboard-hub__hero-top {
   display: flex;
@@ -174,9 +174,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
     flex-shrink: 0;
-    align-self: center;
+    padding-left: 24px;
+    margin-left: 4px;
+    border-left: 1px solid var(--hairline);
   }
 }
 .dashboard-hub__donut {
