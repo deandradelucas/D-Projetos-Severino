@@ -3,7 +3,12 @@
    3 tiers (mobile/tablet/desktop). Tokens: surface, hairline, elev, accent.
    ============================================================================= */
 
+/* #2 Bento: layout contido (não estica em telas largas) + ritmo consistente.
+   Conteúdo do dashboard é dinâmico, então usamos card-grid fluido (não tiles fixos). */
 .dashboard-hub { width: 100%; }
+@media (min-width: 1024px) {
+  .dashboard-hub { max-width: 1440px; margin-inline: auto; }
+}
 
 /* ── Hero card ─────────────────────────────────────────────────────────────── */
 .dashboard-hub__hero {
@@ -223,7 +228,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin: 0 0 20px;
+  margin: 0 0 16px;
 }
 .ref-kpi-card {
   display: flex;
@@ -303,7 +308,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin: 0 0 20px;
+  margin: 0 0 16px;
 }
 .dashboard-hub__insight-card {
   display: flex;
