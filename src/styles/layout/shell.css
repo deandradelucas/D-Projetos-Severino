@@ -84,14 +84,18 @@
     box-sizing: border-box;
   }
   .app-horizon-inner { display: block; }
-  .main-content {
+  /* main-content NÃO rola no mobile — quem rola é o .ref-dashboard-scroll (é o
+     elemento observado pelo useFabCompact p/ compactar o FAB, e era o scroller
+     no 1.0.3). */
+  .main-content { overflow: visible; height: auto; padding: 0; }
+  .ref-dashboard-scroll {
     height: 100svh;
     height: 100dvh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     padding: 16px;
-    /* respiro pro bottom nav (altura + safe-area do iPhone) */
-    padding-bottom: calc(72px + var(--safe-bottom, 0px));
+    /* respiro pro bottom nav (~60px) + FAB flutuante (não cobrir o último item) */
+    padding-bottom: calc(140px + var(--safe-bottom, 0px));
   }
 }
