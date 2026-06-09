@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { AgendaKindIcon } from './AgendaKindIcon'
 import {
   formatSelectedDayTitle,
@@ -10,13 +10,6 @@ import {
   AGENDA_KIND_META,
   AGENDA_STATUS_BADGE,
 } from '../../lib/agendaDateUtils'
-
-const FILTROS = [
-  { key: 'todos', label: 'Tudo' },
-  { key: 'event', label: 'Compromissos' },
-  { key: 'reminder', label: 'Notificações' },
-  { key: 'milestone', label: 'Marcos' },
-]
 
 const PERIODOS = ['manha', 'tarde', 'noite', 'dia']
 const PERIODO_LABEL = { manha: 'Manhã', tarde: 'Tarde', noite: 'Noite', dia: 'Dia' }
@@ -44,34 +37,10 @@ export function AgendaDayList({
   onDragStartEvent,
   onDragEndEvent,
 }) {
-  const [filtro, setFiltro] = useState('todos')
-
-  // Contagem por tipo (para badges nos pills de filtro)
-  const counts = useMemo(() => {
-    const c = { todos: selectedEvents.length, event: 0, reminder: 0, milestone: 0 }
-    for (const ev of selectedEvents) {
-      const k = agendaItemKind(ev)
-      if (k === 'event') c.event++
-      else if (k === 'reminder') c.reminder++
-      else if (k === 'milestone') c.milestone++
-      else if (k === 'done') c.event++ // concluídos contam como compromissos para o filtro
-    }
-    return c
-  }, [selectedEvents])
-
-  const filtrados = useMemo(() => {
-    if (filtro === 'todos') return selectedEvents
-    return selectedEvents.filter((ev) => {
-      const k = agendaItemKind(ev)
-      if (filtro === 'event') return k === 'event' || k === 'done'
-      return k === filtro
-    })
-  }, [selectedEvents, filtro])
-
   // Agrupa por período do dia (Manhã/Tarde/Noite), ordenado por horário
   const grupos = useMemo(() => {
     const map = new Map()
-    for (const ev of filtrados) {
+    for (const ev of selectedEvents) {
       const p = agendaPeriodoDoDia(ev.inicio)
       if (!map.has(p.key)) map.set(p.key, [])
       map.get(p.key).push(ev)
@@ -80,7 +49,7 @@ export function AgendaDayList({
       arr.sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime())
     }
     return PERIODOS.filter((k) => map.has(k)).map((k) => ({ key: k, label: PERIODO_LABEL[k], itens: map.get(k) }))
-  }, [filtrados])
+  }, [selectedEvents])
 
   return (
     <section className="agenda-list-panel agenda-list-panel--daily" aria-label="Lista do dia selecionado">
@@ -98,28 +67,6 @@ export function AgendaDayList({
           +
         </button>
       </div>
-
-      {/* Filtro por tipo (feature 2) */}
-      {!loading && !error && selectedEvents.length > 0 && (
-        <div className="agenda-filter-pills" role="group" aria-label="Filtrar por tipo">
-          {FILTROS.map((f) => {
-            const n = counts[f.key] ?? 0
-            if (f.key !== 'todos' && n === 0) return null
-            return (
-              <button
-                key={f.key}
-                type="button"
-                className={`agenda-filter-pill${filtro === f.key ? ' agenda-filter-pill--active' : ''}${f.key !== 'todos' ? ` agenda-filter-pill--${f.key}` : ''}`}
-                onClick={() => setFiltro(f.key)}
-                aria-pressed={filtro === f.key}
-              >
-                {f.label}
-                <span className="agenda-filter-pill__count">{n}</span>
-              </button>
-            )
-          })}
-        </div>
-      )}
 
       {loading ? (
         <div className="agenda-empty">Carregando agenda...</div>
@@ -145,10 +92,6 @@ export function AgendaDayList({
               + Notificação
             </button>
           </div>
-        </div>
-      ) : filtrados.length === 0 ? (
-        <div className="agenda-empty">
-          <span>Nenhum item desse tipo neste dia.</span>
         </div>
       ) : (
         <div className="agenda-groups">
