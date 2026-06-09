@@ -526,8 +526,9 @@
   .dashboard-hub__hero-actions .dashboard-hub__icon-btn--privacy { order: 2; }
   .dashboard-hub__hero-actions .dashboard-hub__icon-btn--wa { order: 3; }
   .dashboard-hub__icon-btn, .dashboard-hub__avatar { width: 40px; height: 40px; }
-  /* texto e saldo fluem à esquerda, com folga p/ não passar sob os ícones */
-  .dashboard-hub__hero-main { padding-right: 52px; }
+  /* texto e saldo fluem à esquerda, com folga p/ não passar sob os ícones.
+     min-height garante que o card contenha a coluna de 3 ícones (WhatsApp). */
+  .dashboard-hub__hero-main { padding-right: 52px; min-height: 132px; }
   .dashboard-hub__hero-top { display: block; }
   .dashboard-hub__hero-text { min-width: 0; }
   .dashboard-hub__title { font-size: 1.4rem; line-height: 1.1; }
@@ -535,7 +536,7 @@
   /* saldo sobe, logo abaixo da data */
   .dashboard-hub__balance-line--hero { margin-top: 12px; }
   .dashboard-hub__balance-line-label { margin-bottom: 2px; }
-  .dashboard-hub__balance-line--hero strong { font-size: 1.95rem; }
+  .dashboard-hub__balance-line--hero strong { font-size: 2.5rem; }
   /* KPIs em 1 coluna no mobile (lado a lado estourava a largura) */
   .dashboard-hub__kpis,
   .ref-dashboard-kpi-strip { grid-template-columns: 1fr; gap: 12px; }
