@@ -152,7 +152,6 @@
 .page-lista-compras__total,
 .page-lista-compras__total-value { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .page-lista-compras__footer-actions { display: flex; gap: 8px; }
-.page-lista-compras__footer-novo,
 .page-lista-compras__cta-btn,
 .page-lista-compras__wa-btn,
 .page-lista-compras__nova-btn {
@@ -162,9 +161,10 @@
   font-size: 0.88rem; font-weight: 700; cursor: pointer;
   transition: background 150ms var(--ease);
 }
-.page-lista-compras__footer-novo:hover,
 .page-lista-compras__cta-btn:hover,
 .page-lista-compras__nova-btn:hover { background: var(--accent-hover); }
+/* wrapper do "Novo item" — sem estilo de botao (so o pill interno e estilizado) */
+.page-lista-compras__footer-novo { display: inline-flex; }
 .page-lista-compras__nova-btn { white-space: nowrap; flex-shrink: 0; }
 
 /* "Novo item" — mesma linguagem do FAB padrão de criar (pill + icone "+") */
