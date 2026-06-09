@@ -41,6 +41,18 @@ export function AgendaCalendarPanel({
   const [hoverKey, setHoverKey] = useState(null)
   const [dragOverKey, setDragOverKey] = useState(null)
 
+  // Remove a última semana quando ela é toda de dias fora do mês exibido
+  // (linha inteira esmaecida) — meses que precisam da 6ª linha com dias do
+  // próprio mês mantêm-na.
+  const monthDays = (() => {
+    const days = calendarDays || []
+    if (days.length >= 14 && days.length % 7 === 0) {
+      const lastWeek = days.slice(-7)
+      if (lastWeek.every((d) => d.isCurrentMonth === false)) return days.slice(0, -7)
+    }
+    return days
+  })()
+
   const renderDay = (day, opts = {}) => {
     const isSelected = day.key === selectedDateKey
     const hasEvent = eventDateKeys.has(day.key)
@@ -162,7 +174,7 @@ export function AgendaCalendarPanel({
             ))}
           </div>
           <div className="agenda-calendar-grid">
-            {calendarDays.map((day, i) => renderDay(day, { firstRow: i < 7 }))}
+            {monthDays.map((day, i) => renderDay(day, { firstRow: i < 7 }))}
           </div>
         </>
       )}
