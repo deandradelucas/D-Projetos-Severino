@@ -1,0 +1,58 @@
+/* =============================================================================
+   responsive.css — SISTEMA RESPONSIVO (3 tiers)  ·  importado pelo index.css
+   -----------------------------------------------------------------------------
+   CONVENÇÃO (mobile-first — escreva o mobile como base, suba com min-width):
+
+     Mobile   : <= 768px              @media (max-width: 768px)
+     Tablet   : 769px – 1023px        @media (min-width: 769px) and (max-width: 1023px)
+     Desktop  : >= 1024px             @media (min-width: 1024px)
+
+     Atalhos úteis:
+     Tablet+  : >= 769px              @media (min-width: 769px)   (= fronteira do JS matchMedia)
+     Até tablet: <= 1023px            @media (max-width: 1023px)
+
+   Toda página/componente novo DEVE usar exatamente estes breakpoints.
+   ============================================================================= */
+
+/* ── Container responsivo (largura + padding por tier) ─────────────────────── */
+.app-container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 16px;
+}
+@media (min-width: 769px) {
+  .app-container { padding-inline: 24px; max-width: 1024px; }
+}
+@media (min-width: 1024px) {
+  .app-container { padding-inline: 32px; max-width: 1280px; }
+}
+@media (min-width: 1440px) {
+  .app-container { max-width: 1360px; }
+}
+
+/* ── Visibilidade por tier ─────────────────────────────────────────────────
+   Na faixa ativa o elemento mantém seu display natural; nas outras, some.    */
+@media (min-width: 769px)                          { .only-mobile  { display: none !important; } }
+@media (max-width: 768px)                          { .only-tablet  { display: none !important; } }
+@media (min-width: 1024px)                         { .only-tablet  { display: none !important; } }
+@media (max-width: 1023px)                         { .only-desktop { display: none !important; } }
+
+.hide-mobile  { }
+.hide-tablet  { }
+.hide-desktop { }
+@media (max-width: 768px)                          { .hide-mobile  { display: none !important; } }
+@media (min-width: 769px) and (max-width: 1023px)  { .hide-tablet  { display: none !important; } }
+@media (min-width: 1024px)                         { .hide-desktop { display: none !important; } }
+
+/* Compat: .desktop-only = inline no desktop, escondido no mobile (comportamento legado). */
+.desktop-only { display: inline; }
+@media (max-width: 768px)                          { .desktop-only { display: none !important; } }
+
+/* ── Utilitário de touch-target (use em botões/áreas clicáveis no mobile) ──── */
+.touch-target { min-height: 44px; min-width: 44px; }
+
+/* ── Bases responsivas globais ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* iOS: input < 16px dispara zoom ao focar — garante 16px no mobile */
+  input, select, textarea { font-size: 16px; }
+}

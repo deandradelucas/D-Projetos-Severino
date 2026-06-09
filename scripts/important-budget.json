@@ -1,7 +1,8 @@
 {
-  "total": 10,
+  "total": 18,
   "files": {
     "src/styles/legacy/from-index.css": 9,
-    "src/styles/legacy/PwaInstallPrompt.css": 1
+    "src/styles/legacy/PwaInstallPrompt.css": 1,
+    "src/styles/responsive.css": 8
   }
 }

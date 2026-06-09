@@ -5,6 +5,7 @@
    migração invertiam precedência (genérico vencendo específico de página). */
 @layer theme, base, components, utilities, app, app-top;
 @import "tailwindcss";
+@import "./styles/responsive.css";
 
 /* ===== GLOBAL (tokens, cores, dark, neumorfismo) — antes em styles/global.css ===== */
 /* ============================================================
@@ -201,15 +202,7 @@ body[data-theme='dark'] {
   --transacoes-balance-pos: #3b82f6;
 }
 
-.desktop-only {
-  display: inline;
-}
-
-@media (max-width: 768px) {
-  .desktop-only {
-    display: none;
-  }
-}
+/* (.desktop-only + sistema responsivo → src/styles/responsive.css) */
 
 /* ============================================================
    NEUMORFISMO GLOBAL — vocabulário único de relevo soft-UI
