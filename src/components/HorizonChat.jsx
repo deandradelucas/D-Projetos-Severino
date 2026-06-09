@@ -6,6 +6,7 @@ import { apiFetch } from '../lib/apiFetch'
 import { parseApiJsonResponse } from '../lib/apiErrors'
 import { readHorizonteUserProfile } from '../lib/horizonteSession'
 import { BRAND_ASSETS } from '../lib/brandAssets'
+import SeverinoMark from './SeverinoMark'
 /* Estilos do FAB/janela (.horizon-*). Deve carregar no bundle principal: antes do lazy Dashboard,
    AppSessionOutlet pode bloquear a rota e o import em Dashboard.jsx não roda — chat ficava sem CSS. */
 import '../pages/dashboard.css'
@@ -393,15 +394,7 @@ export default function HorizonChat() {
             <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
           </svg>
         ) : (
-          <img
-            src={BRAND_ASSETS.appIcon}
-            alt=""
-            className="horizon-fab-logo"
-            width={32}
-            height={32}
-            decoding="async"
-            aria-hidden
-          />
+          <SeverinoMark className="horizon-fab-logo" aria-hidden />
         )}
         {!aberto && (
           <span className="horizon-fab-pulse" />
