@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './dashboard.css'
 import '../styles/pages/cartoes.css'
 import { useFabCompact } from '../hooks/useFabCompact'
@@ -42,6 +42,35 @@ function fmtDataMed(iso) {
   const d = new Date(`${String(iso).slice(0, 10)}T12:00:00`)
   if (Number.isNaN(d.getTime())) return ''
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: '2-digit' })
+}
+// dias até uma data ISO (a partir de hoje, meia-noite local)
+function diasAteIso(iso) {
+  if (!iso) return null
+  const d = new Date(`${String(iso).slice(0, 10)}T00:00:00`)
+  if (Number.isNaN(d.getTime())) return null
+  const hoje = new Date()
+  hoje.setHours(0, 0, 0, 0)
+  return Math.round((d - hoje) / 86400000)
+}
+// rótulo de vencimento com urgência relativa
+function vencimentoLabel(iso) {
+  const dias = diasAteIso(iso)
+  if (dias === null) return ''
+  if (dias < 0) return `venceu ${fmtDataCurta(iso)}`
+  if (dias === 0) return 'vence hoje'
+  if (dias === 1) return 'vence amanhã'
+  if (dias <= 3) return `vence em ${dias} dias`
+  return `vence ${fmtDataCurta(iso)}`
+}
+function labelBandeira(b) {
+  const m = BANDEIRAS.find((x) => x.v === String(b || '').toLowerCase())
+  return m ? m.l : (b ? String(b) : '')
+}
+// melhor dia de compra = dia seguinte ao fechamento (maior prazo até pagar)
+function melhorDiaCompra(diaFech) {
+  const f = Number(diaFech)
+  if (!Number.isFinite(f) || f < 1) return null
+  return f >= 28 ? 1 : f + 1
 }
 function refLabel(ref) {
   const m = /^(\d{4})-(\d{2})$/.exec(String(ref || ''))
@@ -351,15 +380,28 @@ function CartaoCard({ cartao, onVerFatura, onEditar, onExcluir }) {
   const total = Number(fatura.total) || 0
   const limite = Number(cartao.limite) || 0
   const usoPct = limite > 0 ? Math.min(100, Math.round((total / limite) * 100)) : null
+  const dias = diasAteIso(fatura.vencimento)
+  const vencUrgente = dias !== null && dias >= 0 && dias <= 3
+  const bandeira = labelBandeira(cartao.bandeira)
+  const melhorDia = melhorDiaCompra(cartao.dia_fechamento)
+  const abrirFatura = () => onVerFatura(cartao)
 
   return (
-    <article className={`page-cartoes__card page-cartoes__card--${cartao.cor || 'gold'}`}>
+    <article
+      className={`page-cartoes__card page-cartoes__card--${cartao.cor || 'gold'}`}
+      role="button"
+      tabIndex={0}
+      onClick={abrirFatura}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirFatura() } }}
+      aria-label={`Ver fatura de ${cartao.nome}`}
+    >
       <div className="page-cartoes__card-top">
         <div className="page-cartoes__card-brand">
           <span className="page-cartoes__card-chip" aria-hidden />
           <span className="page-cartoes__card-nome">{cartao.nome}</span>
+          {bandeira && <span className="page-cartoes__card-bandeira">{bandeira}</span>}
         </div>
-        <div className="page-cartoes__card-menu-wrap">
+        <div className="page-cartoes__card-menu-wrap" onClick={(e) => e.stopPropagation()}>
           <button type="button" className="page-cartoes__card-menu-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="Opções">{<IconMoreVertical />}</button>
           {menuOpen && (
             <>
@@ -376,17 +418,27 @@ function CartaoCard({ cartao, onVerFatura, onEditar, onExcluir }) {
       <div className="page-cartoes__card-fatura">
         <span className="page-cartoes__card-fatura-label">Fatura atual</span>
         <span className="page-cartoes__card-fatura-total">{formatCurrencyBRL(total)}</span>
-        {fatura.vencimento && <span className="page-cartoes__card-venc">vence {fmtDataCurta(fatura.vencimento)}</span>}
+        {fatura.vencimento && (
+          <span className={`page-cartoes__card-venc${vencUrgente ? ' page-cartoes__card-venc--urgente' : ''}`}>
+            {vencimentoLabel(fatura.vencimento)}
+          </span>
+        )}
       </div>
 
       {usoPct !== null && (
         <div className="page-cartoes__limite">
           <div className="page-cartoes__limite-bar"><span className="page-cartoes__limite-fill" style={{ width: `${usoPct}%` }} /></div>
-          <span className="page-cartoes__limite-txt">{usoPct}% de {formatCurrencyBRL(limite)}</span>
+          <span className="page-cartoes__limite-txt">Usado {formatCurrencyBRL(total)} de {formatCurrencyBRL(limite)} · {usoPct}%</span>
         </div>
       )}
 
-      <button type="button" className="page-cartoes__card-cta" onClick={() => onVerFatura(cartao)}>Ver fatura</button>
+      {cartao.dia_fechamento ? (
+        <span className="page-cartoes__card-fech">
+          Fecha dia {cartao.dia_fechamento}{melhorDia ? ` · melhor compra dia ${melhorDia}` : ''}
+        </span>
+      ) : null}
+
+      <button type="button" className="page-cartoes__card-cta" onClick={(e) => { e.stopPropagation(); abrirFatura() }}>Ver fatura</button>
     </article>
   )
 }
@@ -405,9 +457,36 @@ export default function Cartoes() {
   const [salvando, setSalvando] = useState(false)
   const [faturaTarget, setFaturaTarget] = useState(null)
   const [excluirTarget, setExcluirTarget] = useState(null)
+  const [ordenar, setOrdenar] = useState('vencimento') // 'vencimento' | 'valor'
   // FAB padrão: encolhe ao rolar (ver useFabCompact / AGENTS.md «FAB padrão»)
   const fabScrollRef = useRef(null)
   const fabCompact = useFabCompact(fabScrollRef)
+
+  // Resumo agregado de todos os cartões (total a pagar, limite usado, próximo vencimento)
+  const resumo = useMemo(() => {
+    if (!cartoes.length) return null
+    let totalPagar = 0, totalLimite = 0, totalUsado = 0, proxVenc = null
+    for (const c of cartoes) {
+      const t = Number(c.fatura_atual?.total) || 0
+      totalPagar += t
+      const lim = Number(c.limite) || 0
+      if (lim > 0) { totalLimite += lim; totalUsado += t }
+      const v = c.fatura_atual?.vencimento
+      if (v && (!proxVenc || v < proxVenc)) proxVenc = v
+    }
+    return { totalPagar, totalLimite, pctUso: totalLimite > 0 ? Math.round((totalUsado / totalLimite) * 100) : null, proxVenc }
+  }, [cartoes])
+
+  // Ordenação dos cartões (vencimento mais próximo ou maior fatura)
+  const cartoesOrdenados = useMemo(() => {
+    const arr = [...cartoes]
+    if (ordenar === 'valor') {
+      arr.sort((a, b) => (Number(b.fatura_atual?.total) || 0) - (Number(a.fatura_atual?.total) || 0))
+    } else {
+      arr.sort((a, b) => String(a.fatura_atual?.vencimento || '9999-99-99').localeCompare(String(b.fatura_atual?.vencimento || '9999-99-99')))
+    }
+    return arr
+  }, [cartoes, ordenar])
 
   const pessoalParam = isMembroConta && escopo === 'pessoal' ? '?pessoal=1' : ''
 
@@ -483,9 +562,13 @@ export default function Cartoes() {
                 <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                   <div className="dashboard-hub__hero-text">
-                    <h1 className="dashboard-hub__title">Cartões</h1>
-                    <div className="dashboard-hub__balance-line" aria-live="polite">
-                      <span>{loading ? 'Carregando…' : cartoes.length === 0 ? 'Nenhum cartão ainda' : `${cartoes.length} ${cartoes.length === 1 ? 'cartão' : 'cartões'}`}</span>
+                    <div className="page-cartoes__title-row">
+                      <h1 className="dashboard-hub__title">Cartões</h1>
+                      {!loading && cartoes.length > 0 && (
+                        <span className="page-cartoes__count-badge" aria-label={`${cartoes.length} ${cartoes.length === 1 ? 'cartão' : 'cartões'}`}>
+                          {cartoes.length}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações">
@@ -512,17 +595,46 @@ export default function Cartoes() {
                     <button type="button" className="page-cartoes__empty-btn" onClick={() => { setCartaoEdit(null); setModalCartao(true) }}>+ Adicionar cartão</button>
                   </div>
                 ) : (
-                  <div className="page-cartoes__grid">
-                    {cartoes.map((c) => (
-                      <CartaoCard
-                        key={c.id}
-                        cartao={c}
-                        onVerFatura={(cartao) => setFaturaTarget(cartao)}
-                        onEditar={(cartao) => { setCartaoEdit(cartao); setModalCartao(true) }}
-                        onExcluir={(cartao) => setExcluirTarget(cartao)}
-                      />
-                    ))}
-                  </div>
+                  <>
+                    {resumo && (
+                      <div className="page-cartoes__resumo">
+                        <div className="page-cartoes__resumo-item">
+                          <span className="page-cartoes__resumo-label">Total a pagar</span>
+                          <strong className="page-cartoes__resumo-valor">{formatCurrencyBRL(resumo.totalPagar)}</strong>
+                        </div>
+                        {resumo.pctUso !== null && (
+                          <div className="page-cartoes__resumo-item">
+                            <span className="page-cartoes__resumo-label">Limite usado</span>
+                            <strong className="page-cartoes__resumo-valor">{resumo.pctUso}%<span className="page-cartoes__resumo-sub"> de {formatCurrencyBRL(resumo.totalLimite)}</span></strong>
+                          </div>
+                        )}
+                        {resumo.proxVenc && (
+                          <div className="page-cartoes__resumo-item">
+                            <span className="page-cartoes__resumo-label">Próximo vencimento</span>
+                            <strong className="page-cartoes__resumo-valor">{vencimentoLabel(resumo.proxVenc)}</strong>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {cartoes.length > 1 && (
+                      <div className="page-cartoes__sort" role="group" aria-label="Ordenar cartões">
+                        <span className="page-cartoes__sort-label">Ordenar:</span>
+                        <button type="button" className={`page-cartoes__sort-btn${ordenar === 'vencimento' ? ' page-cartoes__sort-btn--active' : ''}`} onClick={() => setOrdenar('vencimento')}>Vencimento</button>
+                        <button type="button" className={`page-cartoes__sort-btn${ordenar === 'valor' ? ' page-cartoes__sort-btn--active' : ''}`} onClick={() => setOrdenar('valor')}>Valor</button>
+                      </div>
+                    )}
+                    <div className="page-cartoes__grid">
+                      {cartoesOrdenados.map((c) => (
+                        <CartaoCard
+                          key={c.id}
+                          cartao={c}
+                          onVerFatura={(cartao) => setFaturaTarget(cartao)}
+                          onEditar={(cartao) => { setCartaoEdit(cartao); setModalCartao(true) }}
+                          onExcluir={(cartao) => setExcluirTarget(cartao)}
+                        />
+                      ))}
+                    </div>
+                  </>
                 )}
               </section>
             </RefDashboardScroll>
@@ -531,20 +643,22 @@ export default function Cartoes() {
       </div>
 
       {!modalCartao && !faturaTarget && (
-        <button
-          type="button"
-          className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
-          onClick={() => { setCartaoEdit(null); setModalCartao(true) }}
-          aria-label="Criar novo cartão"
-        >
-          <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 5v14" />
-              <path d="M5 12h14" />
-            </svg>
-          </span>
-          <span className="dashboard-mobile-tx-fab__label">Novo cartão</span>
-        </button>
+        <div className="dashboard-mobile-fabs">
+          <button
+            type="button"
+            className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
+            onClick={() => { setCartaoEdit(null); setModalCartao(true) }}
+            aria-label="Criar novo cartão"
+          >
+            <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+              </svg>
+            </span>
+            <span className="dashboard-mobile-tx-fab__label">Novo cartão</span>
+          </button>
+        </div>
       )}
 
       {modalCartao && (
