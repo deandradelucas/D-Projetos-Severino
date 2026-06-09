@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext'
 import { TransactionCacheProvider } from './context/TransactionCacheContext'
 import AppErrorBoundary from './components/AppErrorBoundary'
@@ -29,6 +29,12 @@ import {
   TermosUso,
 } from './lazyRoutes'
 
+// Chat Horizon IA só no Dashboard (não monta nas demais rotas)
+function HorizonChatGate() {
+  const { pathname } = useLocation()
+  return pathname === '/dashboard' ? <HorizonChat /> : null
+}
+
 function App() {
   return (
     <AppErrorBoundary>
@@ -43,7 +49,7 @@ function App() {
         <div className="app-layout-shell">
           <Background />
           <PwaInstallPrompt />
-          <HorizonChat />
+          <HorizonChatGate />
           <div className="app-routes-grow" id="app-main" tabIndex={-1}>
             <Suspense fallback={<RoutePageFallback />}>
               <Routes>
