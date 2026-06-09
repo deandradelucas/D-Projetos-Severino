@@ -34,6 +34,26 @@ import '../styles/pages/relatorios.css'
 // Lazy: o bloco de gráficos (recharts ~pesado) carrega só depois do shell pintar.
 const RelatoriosCharts = lazy(() => import('./relatorios/RelatoriosCharts'))
 
+// Seta de tendência (substitui os glifos ▲▼ por SVG — padrão anti-emoji).
+function TrendArrow({ up }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width="11"
+      height="11"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ transform: up ? 'none' : 'rotate(180deg)' }}
+    >
+      <path d="M12 19V5" /><path d="m5 12 7-7 7 7" />
+    </svg>
+  )
+}
+
 /**
  * Markdown leve para a análise da IA: escapa HTML (nomes de categoria são
  * conteúdo do usuário → evita XSS) e converte **negrito** + quebras de linha.
@@ -600,7 +620,7 @@ export default function Relatorios() {
                         className={`rel-ed__delta ${deltaReceitas >= 0 ? 'rel-ed__delta--good' : 'rel-ed__delta--bad'}`}
                         aria-label={`${deltaReceitas >= 0 ? 'Alta de' : 'Queda de'} ${Math.abs(deltaReceitas).toFixed(0)}% vs período anterior`}
                       >
-                        <span aria-hidden="true">{deltaReceitas >= 0 ? '▲' : '▼'}</span>{' '}{Math.abs(deltaReceitas).toFixed(0)}% vs anterior
+                        <TrendArrow up={deltaReceitas >= 0} />{' '}{Math.abs(deltaReceitas).toFixed(0)}% vs anterior
                       </span>
                     )}
                   </div>
@@ -612,7 +632,7 @@ export default function Relatorios() {
                         className={`rel-ed__delta ${deltaDespesas > 0 ? 'rel-ed__delta--bad' : 'rel-ed__delta--good'}`}
                         aria-label={`${deltaDespesas >= 0 ? 'Alta de' : 'Queda de'} ${Math.abs(deltaDespesas).toFixed(0)}% vs período anterior`}
                       >
-                        <span aria-hidden="true">{deltaDespesas >= 0 ? '▲' : '▼'}</span>{' '}{Math.abs(deltaDespesas).toFixed(0)}% vs anterior
+                        <TrendArrow up={deltaDespesas >= 0} />{' '}{Math.abs(deltaDespesas).toFixed(0)}% vs anterior
                       </span>
                     )}
                   </div>
@@ -845,12 +865,6 @@ export default function Relatorios() {
             hidden={!filtrosAbertos}
           >
             <div className="relatorios-filter-grid page-relatorios-filter-grid">
-              <div className="relatorios-shortcuts-row">
-                <button type="button" onClick={() => setPeriodShortcut('thisMonth')} className="relatorios-shortcut-btn">Mês atual</button>
-                <button type="button" onClick={() => setPeriodShortcut('lastMonth')} className="relatorios-shortcut-btn">Mês passado</button>
-                <button type="button" onClick={() => setPeriodShortcut('last90')} className="relatorios-shortcut-btn">90 dias</button>
-                <button type="button" onClick={() => setPeriodShortcut('thisYear')} className="relatorios-shortcut-btn">Ano</button>
-              </div>
               <div className="filter-group">
                 <label htmlFor="rel-ini">Início</label>
                 <input id="rel-ini" type="date" name="dataInicio" className="filter-input" value={filters.dataInicio} onChange={handleFilterChange} />

@@ -21,8 +21,11 @@
 
 .rel-ed__balance { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
 .rel-ed__balance-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+.rel-ed__balance-value,
 .rel-ed__balance .rel-ed__total-value,
-.rel-ed__balance > strong { font-size: 2rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.rel-ed__balance > strong { font-size: clamp(1.7rem, 1vw + 1.4rem, 2.1rem); font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.rel-ed__balance-value.dashboard-hub__balance-value--positive { color: var(--success); }
+.rel-ed__balance-value.dashboard-hub__balance-value--negative { color: var(--error); }
 .rel-ed__balance-skel,
 .rel-ed__total--skel { width: 140px; height: 28px; border-radius: var(--r-sm); background: var(--surface-sunken); animation: relSkel 1.4s var(--ease) infinite; }
 @keyframes relSkel { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
@@ -109,6 +112,15 @@
 .rel-ed__action--primary { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
 .rel-ed__action--primary:hover { background: var(--accent-hover); color: var(--accent-foreground); }
 
+/* Desktop: saldo (destaque, esquerda) e receitas/despesas (direita) na mesma
+   linha — hero mais horizontal e respirado, menos coluna alta. */
+@media (min-width: 769px) {
+  .rel-ed__hero { display: grid; grid-template-columns: minmax(0, auto) 1fr; align-items: end; column-gap: 36px; row-gap: 0; }
+  .rel-ed__hero-top { grid-column: 1 / -1; }
+  .rel-ed__balance { margin-top: 16px; }
+  .rel-ed__totals { margin-top: 16px; justify-content: flex-end; align-self: end; gap: 28px; }
+}
+
 /* ── Filtros ───────────────────────────────────────────────────────────────── */
 .page-relatorios-ref-filters {
   padding: 16px 18px; border-radius: var(--r-lg);
@@ -125,13 +137,6 @@
 .relatorios-filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 14px; }
 .relatorios-filter-grid__wide { grid-column: 1 / -1; }
 .relatorios-filter-summary { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
-.relatorios-shortcuts-row { display: flex; flex-wrap: wrap; gap: 7px; }
-.relatorios-shortcut-btn {
-  padding: 6px 12px; border-radius: var(--r-pill);
-  border: 1px solid var(--hairline-strong); background: var(--surface);
-  color: var(--text-secondary); font-size: 0.78rem; font-weight: 600; cursor: pointer;
-}
-.relatorios-shortcut-btn:hover { background: var(--surface-2); color: var(--text-primary); }
 
 /* ── Gráficos ──────────────────────────────────────────────────────────────── */
 .relatorios-charts { display: flex; flex-direction: column; gap: 16px; }
@@ -181,7 +186,7 @@
 .relatorios-var__delta { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 0.84rem; font-variant-numeric: tabular-nums; }
 .relatorios-var__delta--up { color: var(--error); }
 .relatorios-var__delta--down { color: var(--success); }
-.relatorios-var__arrow { display: inline-flex; }
+.relatorios-var__arrow { display: inline-flex; flex-shrink: 0; }
 .relatorios-var__pct { font-variant-numeric: tabular-nums; }
 
 /* ── Orçado vs real ────────────────────────────────────────────────────────── */
@@ -214,8 +219,10 @@
 @media (max-width: 768px) {
   .relatorios-charts__pair { grid-template-columns: 1fr; }
   .relatorios-charts__section-grid { grid-template-columns: 1fr; }
-  .rel-ed__stat--wide { grid-column: auto; }
+  /* Stats largos (barras/legendas) ocupam a linha toda; KPIs pequenos ficam 2-up. */
+  .rel-ed__stat--wide { grid-column: 1 / -1; }
   .relatorios-pie-layout { flex-direction: column; }
+  .relatorios-pie-layout__legend { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

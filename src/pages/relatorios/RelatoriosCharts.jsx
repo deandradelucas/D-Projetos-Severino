@@ -394,7 +394,7 @@ export default function RelatoriosCharts({
                           <li key={v.name} className="relatorios-var__item">
                             <span className="relatorios-var__cat" title={v.name}>{v.name}</span>
                             <span className={`relatorios-var__delta ${up ? 'relatorios-var__delta--up' : 'relatorios-var__delta--down'}`}>
-                              <span className="relatorios-var__arrow" aria-hidden="true">{up ? '▲' : '▼'}</span>
+                              <svg className="relatorios-var__arrow" aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ transform: up ? 'none' : 'rotate(180deg)' }}><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></svg>
                               <span className={privacyMode ? 'privacy-blur' : ''}>{up ? '+' : '−'}{formatCurrency(Math.abs(v.diff))}</span>
                               <span className="relatorios-var__pct">
                                 {v.pct != null ? `${up ? '+' : ''}${Math.round(v.pct)}%` : 'novo'}
