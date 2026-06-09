@@ -1,22 +1,19 @@
 /* =============================================================================
-   pages/dashboard.css — HERO do Dashboard  ·  3 tiers (mobile/tablet/desktop)
-   Tokens globais: --neu-* (relevo), --accent (gold), --success/--error, --text-*.
+   pages/dashboard.css — Dashboard (HERO + KPIs + Severino IA) · Flat Soft-Cards
+   3 tiers (mobile/tablet/desktop). Tokens: surface, hairline, elev, accent.
    ============================================================================= */
 
 .dashboard-hub { width: 100%; }
 
-/* ── Hero card (relevo neumórfico) ─────────────────────────────────────────── */
+/* ── Hero card ─────────────────────────────────────────────────────────────── */
 .dashboard-hub__hero {
   width: 100%;
   margin: 0 0 16px;
   padding: 20px;
-  border-radius: var(--neu-r-card);
-  background: linear-gradient(180deg, var(--neu-raised) 0%, var(--neu-base) 100%);
-  box-shadow:
-    8px 8px 24px var(--neu-shadow),
-    -6px -6px 18px var(--neu-light),
-    inset 1px 1px 1px var(--neu-edge-hi),
-    inset -1px -1px 1px var(--neu-edge-lo);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--elev-2);
 }
 
 .dashboard-hub__hero-row { display: flex; align-items: flex-start; gap: 12px; }
@@ -72,47 +69,32 @@
   50%      { opacity: 1;   transform: translateY(-50%) scale(1.15); }
 }
 
-/* ── Ações do hero (CTA + ícones + avatar) ─────────────────────────────────── */
-.dashboard-hub__hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
+/* ── Ações do hero ─────────────────────────────────────────────────────────── */
+.dashboard-hub__hero-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
-/* CTA "+ Nova transação" — relevo neumórfico, vira dourado no hover */
+/* CTA "+ Nova transação" — dourado preenchido (estilo fintech moderno) */
 .dashboard-hub__btn--primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 12px 22px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   font-family: inherit;
   font-weight: 600;
   font-size: 0.9375rem;
   letter-spacing: -0.005em;
-  color: var(--text-primary);
-  background: linear-gradient(155deg, var(--neu-raised) 0%, var(--neu-base) 100%);
-  box-shadow:
-    5px 5px 12px var(--neu-shadow-soft),
-    -3px -3px 8px var(--neu-light),
-    inset 1px 1px 1px var(--neu-edge-hi);
+  color: var(--accent-foreground);
+  background: var(--accent);
+  box-shadow: var(--elev-1);
   cursor: pointer;
-  transition: transform 220ms var(--neu-ease), box-shadow 220ms var(--neu-ease), color 220ms var(--neu-ease);
+  transition: background 180ms var(--ease), transform 180ms var(--ease), box-shadow 180ms var(--ease);
 }
-.dashboard-hub__btn--primary:hover {
-  transform: translateY(-2px);
-  color: var(--accent);
-  box-shadow:
-    7px 9px 16px var(--neu-shadow),
-    -4px -4px 10px var(--neu-light),
-    0 0 0 1px rgba(var(--accent-rgb), 0.25),
-    inset 1px 1px 1px var(--neu-edge-hi);
-}
-.dashboard-hub__btn--primary:active {
-  transform: translateY(0);
-  box-shadow: inset 3px 3px 8px var(--neu-shadow), inset -2px -2px 5px var(--neu-light);
-}
+.dashboard-hub__btn--primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: var(--elev-2); }
+.dashboard-hub__btn--primary:active { transform: translateY(0); box-shadow: var(--elev-1); }
+.dashboard-hub__btn--primary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* Botões de ícone (WhatsApp, privacidade) */
+/* Botões de ícone (WhatsApp, privacidade) — flat */
 .dashboard-hub__icon-btn {
   display: inline-flex;
   align-items: center;
@@ -120,25 +102,18 @@
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  border: none;
+  border: 1px solid var(--hairline);
   border-radius: 50%;
   color: var(--text-secondary);
-  background: linear-gradient(155deg, var(--neu-raised) 0%, var(--neu-base) 100%);
-  box-shadow:
-    5px 5px 12px var(--neu-shadow-soft),
-    -3px -3px 8px var(--neu-light),
-    inset 1px 1px 1px var(--neu-edge-hi);
+  background: var(--surface-2);
   cursor: pointer;
-  transition: transform 220ms var(--neu-ease), box-shadow 220ms var(--neu-ease), color 220ms var(--neu-ease);
+  transition: background 180ms var(--ease), color 180ms var(--ease), border-color 180ms var(--ease);
 }
-.dashboard-hub__icon-btn:hover { transform: translateY(-2px); color: var(--accent); }
-.dashboard-hub__icon-btn:active {
-  transform: translateY(0);
-  box-shadow: inset 3px 3px 8px var(--neu-shadow), inset -2px -2px 5px var(--neu-light);
-}
-.dashboard-hub__icon-btn--wa:hover { color: #25d366; }
+.dashboard-hub__icon-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--surface); }
+.dashboard-hub__icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dashboard-hub__icon-btn--wa:hover { color: #25d366; border-color: #25d366; }
 .dashboard-hub__icon-btn--disabled { opacity: 0.45; cursor: not-allowed; }
-.dashboard-hub__icon-btn--privacy-on { color: var(--accent); }
+.dashboard-hub__icon-btn--privacy-on { color: var(--accent); border-color: var(--accent); }
 
 /* Avatar */
 .dashboard-hub__avatar {
@@ -149,11 +124,10 @@
   height: 44px;
   flex-shrink: 0;
   padding: 0;
-  border: 1px solid var(--neu-edge-hi);
+  border: 1px solid var(--hairline);
   border-radius: 50%;
   overflow: hidden;
-  background: var(--neu-sunken);
-  box-shadow: inset 2px 2px 4px var(--neu-shadow-soft), inset -1px -1px 2px var(--neu-light);
+  background: var(--surface-sunken);
   cursor: pointer;
 }
 .dashboard-hub__avatar-img { width: 100%; height: 100%; object-fit: cover; }
@@ -165,11 +139,7 @@
 }
 
 /* ── Linha de saldo ────────────────────────────────────────────────────────── */
-.dashboard-hub__balance-line--hero {
-  display: flex;
-  flex-direction: column;
-  margin-top: 18px;
-}
+.dashboard-hub__balance-line--hero { display: flex; flex-direction: column; margin-top: 18px; }
 .dashboard-hub__balance-line-label {
   margin: 0 0 4px;
   font-size: 0.6875rem;
@@ -188,11 +158,8 @@
 }
 .dashboard-hub__balance-value--positive { color: var(--success) !important; }
 .dashboard-hub__balance-value--negative { color: var(--error) !important; }
-body[data-theme='dark'] .dashboard-hub__balance-value--positive { text-shadow: 0 0 32px rgba(34, 197, 94, 0.35); }
-body[data-theme='dark'] .dashboard-hub__balance-value--negative { text-shadow: 0 0 32px rgba(239, 68, 68, 0.30); }
 
-/* Delta — barra placeholder/shimmer REMOVIDA a pedido do CEO (a luz correndo abaixo
-   do saldo). Some por completo; o delta real (quando houver) continua aparecendo. */
+/* Delta — placeholder/shimmer removido (pedido CEO) */
 .dashboard-hub__balance-delta--placeholder { display: none; }
 
 /* ── KPIs: Entrada / Saída ─────────────────────────────────────────────────── */
@@ -208,33 +175,26 @@ body[data-theme='dark'] .dashboard-hub__balance-value--negative { text-shadow: 0
   align-items: center;
   gap: 16px;
   padding: 20px 22px;
-  border-radius: var(--neu-r-card);
-  background: linear-gradient(155deg, var(--neu-raised) 0%, var(--neu-base) 100%);
-  border: 1px solid var(--neu-edge-hi);
-  box-shadow:
-    6px 6px 18px var(--neu-shadow),
-    -4px -4px 12px var(--neu-light),
-    inset 1px 1px 1px var(--neu-edge-hi);
-  transition: transform 280ms var(--neu-ease), box-shadow 280ms var(--neu-ease);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--elev-1);
+  transition: transform 200ms var(--ease), box-shadow 200ms var(--ease), border-color 200ms var(--ease);
 }
-.ref-kpi-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 8px 10px 22px var(--neu-shadow), -5px -5px 14px var(--neu-light), inset 1px 1px 1px var(--neu-edge-hi);
-}
+.ref-kpi-card:hover { transform: translateY(-2px); box-shadow: var(--elev-2); }
 .ref-kpi-card__icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
-  border-radius: 14px;
-  background: var(--neu-sunken);
-  box-shadow: inset 2px 2px 5px var(--neu-shadow-soft), inset -1px -1px 3px var(--neu-light);
+  border-radius: var(--r-md);
+  background: var(--surface-sunken);
 }
 .ref-kpi-card__icon-img { width: 24px; height: 24px; }
-.ref-kpi-card--expense .ref-kpi-card__icon { color: var(--error); }
-.ref-kpi-card--income .ref-kpi-card__icon { color: var(--success); }
+.ref-kpi-card--expense .ref-kpi-card__icon { color: var(--error); background: var(--error-muted); }
+.ref-kpi-card--income .ref-kpi-card__icon { color: var(--success); background: var(--success-muted); }
 .ref-kpi-card__body { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
 .ref-kpi-card__label {
   margin: 0;
@@ -255,71 +215,26 @@ body[data-theme='dark'] .dashboard-hub__balance-value--negative { text-shadow: 0
 }
 .ref-kpi-card--expense .ref-kpi-card__value { color: var(--error); }
 .ref-kpi-card--income .ref-kpi-card__value { color: var(--success); }
-/* placeholders animados (delta/spark shimmer) removidos — consistente com o saldo */
 .ref-kpi-card__delta--placeholder,
 .ref-kpi-card__spark,
 .ref-kpi-card__spark--placeholder { display: none; }
 
-/* ── TABLET (769–1023) ─────────────────────────────────────────────────────── */
-@media (min-width: 769px) and (max-width: 1023px) {
-  .dashboard-hub__hero { padding: 22px 24px; }
-}
-
-/* ── DESKTOP (>=1024) ──────────────────────────────────────────────────────── */
-@media (min-width: 1024px) {
-  .dashboard-hub__hero { padding: 26px 32px 28px; }
-}
-
-/* ── MOBILE (<=768) ────────────────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .dashboard-hub__hero-top { flex-direction: column; gap: 14px; }
-  .dashboard-hub__hero-actions { width: 100%; flex-wrap: wrap; }
-  .dashboard-hub__btn--primary { flex: 1; min-width: 0; }
-  /* KPIs compactos no celular (Saída | Entrada lado a lado) */
-  .dashboard-hub__kpis,
-  .ref-dashboard-kpi-strip { gap: 12px; }
-  .ref-kpi-card { gap: 12px; padding: 14px; }
-  .ref-kpi-card__icon { width: 44px; height: 44px; border-radius: 12px; }
-  .ref-kpi-card__value { font-size: clamp(1.05rem, 4.5vw, 1.35rem); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .dashboard-hub__date::before { animation: none; }
-}
-
-/* ============================================================================= 
+/* ============================================================================
    SEVERINO IA — faixa de insights ("o que percebi nas suas finanças")
-   (consolidado aqui, antes em components/insights-strip.css) 
-   ============================================================================= */
-.ai-insights {
-  margin: 0 0 16px;
-}
-
-.ai-insights__head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
+   ============================================================================ */
+.ai-insights { margin: 0 0 16px; }
+.ai-insights__head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .ai-insights__spark {
   display: grid;
   place-items: center;
   width: 24px;
   height: 24px;
-  border-radius: 8px;
+  border-radius: var(--r-sm);
   color: var(--accent-foreground);
   background: var(--accent);
-  box-shadow: var(--shadow-accent, 0 2px 8px rgba(212, 168, 75, 0.35));
 }
-.ai-insights__title {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-}
-.ai-insights__sub {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-}
+.ai-insights__title { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); }
+.ai-insights__sub { font-size: 0.78rem; color: var(--text-muted); }
 
 .ai-insights__track {
   display: flex;
@@ -330,7 +245,7 @@ body[data-theme='dark'] .dashboard-hub__balance-value--negative { text-shadow: 0
   scrollbar-width: thin;
 }
 .ai-insights__track::-webkit-scrollbar { height: 6px; }
-.ai-insights__track::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 999px; }
+.ai-insights__track::-webkit-scrollbar-thumb { background: var(--hairline-strong); border-radius: 999px; }
 
 .ai-insight {
   scroll-snap-align: start;
@@ -340,14 +255,14 @@ body[data-theme='dark'] .dashboard-hub__balance-value--negative { text-shadow: 0
   display: flex;
   gap: 12px;
   padding: 14px;
-  border-radius: 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
   border-left: 3px solid var(--ai-accent, var(--accent));
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--elev-1);
 }
-.ai-insight--alerta { --ai-accent: #ef4444; }
-.ai-insight--positivo { --ai-accent: #22c55e; }
+.ai-insight--alerta { --ai-accent: var(--error); }
+.ai-insight--positivo { --ai-accent: var(--success); }
 .ai-insight--neutro { --ai-accent: var(--accent); }
 .ai-insight--destaque { --ai-accent: #8b5cf6; }
 
@@ -367,13 +282,29 @@ body[data-theme='dark'] .dashboard-hub__balance-value--negative { text-shadow: 0
   color: var(--text-primary);
   line-height: 1.25;
 }
-.ai-insight__text {
-  margin: 0;
-  font-size: 0.8rem;
-  line-height: 1.4;
-  color: var(--text-secondary);
+.ai-insight__text { margin: 0; font-size: 0.8rem; line-height: 1.4; color: var(--text-secondary); }
+
+/* ── TABLET (769–1023) ─────────────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .dashboard-hub__hero { padding: 22px 24px; }
+}
+/* ── DESKTOP (>=1024) ──────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .dashboard-hub__hero { padding: 26px 32px 28px; }
+}
+/* ── MOBILE (<=768) ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dashboard-hub__hero-top { flex-direction: column; gap: 14px; }
+  .dashboard-hub__hero-actions { width: 100%; flex-wrap: wrap; }
+  .dashboard-hub__btn--primary { flex: 1; min-width: 0; justify-content: center; }
+  .dashboard-hub__kpis,
+  .ref-dashboard-kpi-strip { gap: 12px; }
+  .ref-kpi-card { gap: 12px; padding: 14px; }
+  .ref-kpi-card__icon { width: 44px; height: 44px; }
+  .ref-kpi-card__value { font-size: clamp(1.05rem, 4.5vw, 1.35rem); }
+  .ai-insight { width: 240px; }
 }
 
-@media (max-width: 768px) {
-  .ai-insight { width: 240px; }
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-hub__date::before { animation: none; }
 }

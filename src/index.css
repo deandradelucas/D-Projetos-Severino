@@ -205,40 +205,39 @@ body[data-theme='dark'] {
 /* (.desktop-only + sistema responsivo → src/styles/responsive.css) */
 
 /* ============================================================
-   NEUMORFISMO GLOBAL — vocabulário único de relevo soft-UI
-   Use estes tokens em qualquer card/superfície/botão neumórfico.
-   Trocar o relevo do app inteiro = mudar AQUI.
+   SUPERFÍCIE & ELEVAÇÃO — vocabulário Flat Soft-Cards (2026)
+   Substitui o neumorfismo. Superfície sólida + borda hairline +
+   sombra de elevação suave (1 direção). Mudar a "pele" do app = aqui.
    ============================================================ */
 :root {
-  /* Superfícies de relevo (light) */
-  --neu-base:    #eef1f6;
-  --neu-raised:  #ffffff;
-  --neu-sunken:  #e4e8ee;
-  /* Luz e sombra (light) */
-  --neu-light:        rgba(255, 255, 255, 0.90);
-  --neu-light-strong: rgba(255, 255, 255, 1);
-  --neu-shadow:       rgba(166, 180, 200, 0.45);
-  --neu-shadow-soft:  rgba(166, 180, 200, 0.28);
-  --neu-edge-hi:      rgba(255, 255, 255, 0.95);
-  --neu-edge-lo:      rgba(140, 156, 178, 0.20);
-  /* Raios e easing padrão do relevo */
-  --neu-r-card: 18px;
-  --neu-r-item: 12px;
-  --neu-ease:   cubic-bezier(0.22, 1, 0.36, 1);
+  /* Superfícies (light) */
+  --surface:        #ffffff;   /* card padrão */
+  --surface-2:      #f8fafc;   /* hover / sutil destaque */
+  --surface-sunken: #f1f4f8;   /* inputs, trilhas, "wells" */
+  /* Bordas hairline */
+  --hairline:        rgba(15, 23, 42, 0.08);
+  --hairline-strong: rgba(15, 23, 42, 0.14);
+  /* Elevação (sombra suave, 1 direção) */
+  --elev-1: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.08);
+  --elev-2: 0 2px 4px rgba(15, 23, 42, 0.04), 0 8px 20px rgba(15, 23, 42, 0.08);
+  --elev-3: 0 12px 32px rgba(15, 23, 42, 0.12);
+  /* Raios e easing */
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-pill: 999px;
+  --ease:   cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body[data-theme='dark'] {
-  /* Superfícies de relevo (dark) */
-  --neu-base:    #0a0c11;
-  --neu-raised:  #11141a;
-  --neu-sunken:  #07090d;
-  /* Luz e sombra (dark) */
-  --neu-light:        rgba(255, 255, 255, 0.040);
-  --neu-light-strong: rgba(255, 255, 255, 0.065);
-  --neu-shadow:       rgba(0, 0, 0, 0.72);
-  --neu-shadow-soft:  rgba(0, 0, 0, 0.45);
-  --neu-edge-hi:      rgba(255, 255, 255, 0.055);
-  --neu-edge-lo:      rgba(0, 0, 0, 0.55);
+  --surface:        #14181f;
+  --surface-2:      #1b2129;
+  --surface-sunken: #0e1117;
+  --hairline:        rgba(255, 255, 255, 0.08);
+  --hairline-strong: rgba(255, 255, 255, 0.14);
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.40);
+  --elev-2: 0 4px 14px rgba(0, 0, 0, 0.50);
+  --elev-3: 0 12px 32px rgba(0, 0, 0, 0.55);
 }
 
 

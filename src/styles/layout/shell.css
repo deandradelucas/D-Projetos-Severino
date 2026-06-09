@@ -53,7 +53,7 @@
     gap: 24px;
   }
   .app-horizon-inner { gap: 24px; }
-  .main-content { padding: 4px; border-radius: var(--neu-r-card); }
+  .main-content { padding: 4px; border-radius: var(--r-lg); }
 }
 
 /* ── TABLET (769–1023px) ───────────────────────────────────────────────────── */
@@ -65,7 +65,7 @@
     gap: 16px;
   }
   .app-horizon-inner { gap: 16px; }
-  .main-content { padding: 2px; border-radius: var(--neu-r-card); }
+  .main-content { padding: 2px; border-radius: var(--r-lg); }
 }
 
 /* ── MOBILE (<= 768px) ─────────────────────────────────────────────────────── */
