@@ -145,8 +145,7 @@
 .page-lista-compras__footer-novo,
 .page-lista-compras__cta-btn,
 .page-lista-compras__wa-btn,
-.page-lista-compras__nova-btn,
-.page-lista-compras__novo-item-fab {
+.page-lista-compras__nova-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   padding: 10px 16px; border-radius: var(--r-md);
   border: none; background: var(--accent); color: var(--accent-foreground);
@@ -156,6 +155,21 @@
 .page-lista-compras__footer-novo:hover,
 .page-lista-compras__cta-btn:hover,
 .page-lista-compras__nova-btn:hover { background: var(--accent-hover); }
+
+/* "Novo item" — mesma linguagem do FAB padrão de criar (pill + icone "+") */
+.page-lista-compras__novo-item-fab {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 46px; padding: 0 22px; border-radius: var(--r-pill);
+  border: none; background: var(--accent); color: var(--accent-foreground);
+  font-size: 0.92rem; font-weight: 800; cursor: pointer; box-shadow: var(--elev-1);
+  transition: background 150ms var(--ease);
+}
+.page-lista-compras__novo-item-fab:hover { background: var(--accent-hover); }
+.page-lista-compras__novo-item-fab__icon { display: inline-flex; flex-shrink: 0; }
+/* quando e a unica acao do footer (lista sem precos), ocupa a largura toda */
+.page-lista-compras__footer--solo .page-lista-compras__footer-total-row,
+.page-lista-compras__footer--solo .page-lista-compras__footer-novo { width: 100%; }
+.page-lista-compras__footer--solo .page-lista-compras__novo-item-fab { width: 100%; }
 .page-lista-compras__wa-btn { background: var(--surface); border: 1px solid var(--hairline-strong); color: var(--text-secondary); }
 .page-lista-compras__wa-btn:hover { color: #25d366; border-color: #25d366; }
 

@@ -1088,7 +1088,7 @@ export default function ListaDeCompras() {
                       aria-label="Adicionar novo item à lista"
                     >
                       <span className="page-lista-compras__novo-item-fab__icon" aria-hidden="true">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M12 5v14" />
                           <path d="M5 12h14" />
                         </svg>
