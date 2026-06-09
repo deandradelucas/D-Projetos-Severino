@@ -406,7 +406,7 @@ export default function Agenda() {
                   </div>
                   <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações da agenda">
                     <button type="button" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={openNew}>
-                      + Novo
+                      + Nova agenda
                     </button>
                   </div>
                 </div>
@@ -580,7 +580,7 @@ export default function Agenda() {
               <path d="M5 12h14" />
             </svg>
           </span>
-          <span className="dashboard-mobile-tx-fab__label">Novo item</span>
+          <span className="dashboard-mobile-tx-fab__label">Nova agenda</span>
         </button>
       </div>
     )}
