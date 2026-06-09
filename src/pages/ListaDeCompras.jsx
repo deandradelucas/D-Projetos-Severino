@@ -1120,20 +1120,22 @@ export default function ListaDeCompras() {
       {/* FAB padrão «Nova lista» — só na visão geral (sem lista ativa, sem footer p/ colidir).
           `!loading` evita o flash/encolhe no carregamento (listaAtiva ainda é null antes da lista chegar). */}
       {!loading && !listaAtiva && !modoComprando && !modalNovaLista && (
-        <button
-          type="button"
-          className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
-          onClick={() => setModalNovaLista(true)}
-          aria-label="Criar nova lista"
-        >
-          <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 5v14" />
-              <path d="M5 12h14" />
-            </svg>
-          </span>
-          <span className="dashboard-mobile-tx-fab__label">Nova lista</span>
-        </button>
+        <div className="dashboard-mobile-fabs">
+          <button
+            type="button"
+            className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
+            onClick={() => setModalNovaLista(true)}
+            aria-label="Criar nova lista"
+          >
+            <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+              </svg>
+            </span>
+            <span className="dashboard-mobile-tx-fab__label">Nova lista</span>
+          </button>
+        </div>
       )}
 
       {/* Modal nova lista */}
