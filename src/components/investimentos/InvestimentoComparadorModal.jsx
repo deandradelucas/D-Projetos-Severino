@@ -195,12 +195,6 @@ export default function InvestimentoComparadorModal({ open, onClose, cdiAa }) {
             ))}
           </div>
         </div>
-        <div className="page-investimentos-modal__footer">
-          <p className="page-investimentos-modal__footer-hint">Estimativas — consulte as regras do produto antes de investir.</p>
-          <div className="page-investimentos-modal__footer-actions">
-            <button type="button" className="btn-secondary" onClick={onClose}>Fechar</button>
-          </div>
-        </div>
       </div>
     </div>
 

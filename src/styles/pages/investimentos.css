@@ -39,7 +39,9 @@
   box-shadow: var(--elev-1);
   margin-bottom: 16px;
 }
-.page-investimentos-resumo__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.page-investimentos-resumo__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; margin-bottom: 14px; }
+/* "Simular carteira até + data" ao lado do título (no desktop); no mobile quebra abaixo */
+.page-investimentos-resumo__head-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .page-investimentos-resumo__head-badges { display: flex; gap: 6px; flex-wrap: wrap; }
 .page-investimentos-resumo__badge {
   padding: 3px 9px; border-radius: var(--r-pill);
@@ -85,7 +87,7 @@
 .page-investimentos-resumo__meta-sep { color: var(--text-muted); }
 
 /* projeção — input inline */
-.page-investimentos-resumo__projecao { display: flex; flex-direction: column; gap: 6px; padding-top: 12px; border-top: 1px solid var(--hairline); }
+.page-investimentos-resumo__projecao { display: flex; flex-direction: column; gap: 6px; }
 .page-investimentos-resumo__projecao-label { font-size: 0.78rem; color: var(--text-secondary); }
 .page-investimentos-resumo__projecao-row { display: flex; align-items: center; gap: 8px; }
 .page-investimentos-resumo__projecao-input {
@@ -155,7 +157,9 @@
   transition: box-shadow 200ms var(--ease), border-color 200ms var(--ease);
 }
 .page-investimentos-card:hover { box-shadow: var(--elev-2); }
-.page-investimentos-card__main { display: flex; align-items: center; gap: 12px; }
+/* conteúdo do card empilha na vertical (top-row, primary, métricas, notas).
+   Sem column, o expandido jogava tudo lado a lado e o texto colapsava. */
+.page-investimentos-card__main { display: flex; flex-direction: column; gap: 12px; }
 .page-investimentos-card__bank-avatar {
   display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0;
   border-radius: var(--r-md); background: var(--surface-sunken); overflow: hidden;
@@ -182,8 +186,8 @@
 .page-investimentos-card__aporte { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
 .page-investimentos-card__edit:hover { color: var(--accent); border-color: var(--accent-border); }
 .page-investimentos-card__collapse-area { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-shrink: 0; }
-/* card recolhido: a linha principal preenche a largura → valor + chevron à direita */
-.page-investimentos-card--collapsed .page-investimentos-card__top-row { flex: 1; min-width: 0; }
+/* recolhido: top-row estica (column stretch) e o valor+chevron vão à direita */
+.page-investimentos-card--collapsed .page-investimentos-card__top-row { min-width: 0; }
 .page-investimentos-card__collapse-btn { width: 32px; padding: 0; }
 .page-investimentos-card__collapse-chevron { transition: transform 200ms var(--ease); }
 /* recolhido aponta p/ baixo (expandir); expandido fica "^" (recolher) */
@@ -213,6 +217,7 @@
 .page-investimentos-panel {
   padding: 16px 18px; border-radius: var(--r-lg);
   background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
+  margin-bottom: 16px;
 }
 .page-investimentos-panel__head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
 .page-investimentos-panel__count { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
@@ -228,6 +233,10 @@
   display: flex; align-items: center; gap: 12px; width: 100%;
   padding: 14px 18px; border: none; background: transparent; cursor: pointer; text-align: left;
 }
+/* compacto: só o toggle pagina o padding (head não dobra) e o h2 sem margem */
+.page-investimentos-ir-panel__head { padding: 0; }
+.page-investimentos-ir-panel__heading { margin: 0; }
+.page-investimentos-ir-panel__toggle { padding: 12px 18px; }
 .page-investimentos-ir-panel__heading,
 .page-investimentos-ir-panel__toggle-title { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); }
 .page-investimentos-ir-panel__toggle-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
@@ -267,6 +276,9 @@
    Campos page-investimentos-modal__* + comboboxes + tabela de aportes + comparador.
    ============================================================================= */
 .page-investimentos-modal { max-width: 520px; }
+/* header com título: título à esquerda, X no topo-direita (estava empilhando) */
+.page-investimentos-modal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.page-investimentos-modal .modal-header .close-btn { flex-shrink: 0; }
 .page-investimentos-modal__body { padding: 8px 20px 18px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
 .page-investimentos-modal__lead { font-size: 0.88rem; color: var(--text-secondary); }
 .page-investimentos-modal__fieldset { display: flex; flex-direction: column; gap: 12px; border: none; padding: 0; margin: 0; }
@@ -320,8 +332,26 @@
 
 .page-investimentos-modal__footer { display: flex; flex-direction: column; gap: 8px; padding: 16px 20px; border-top: 1px solid var(--hairline); }
 .page-investimentos-modal__footer-actions { display: flex; gap: 10px; }
+/* botões do footer (estavam sem estilo — só "flex: 1" → viravam texto puro) */
 .page-investimentos-modal__footer-actions .btn-primary,
-.page-investimentos-modal__footer-actions .btn-secondary { flex: 1; }
+.page-investimentos-modal__footer-actions .btn-secondary {
+  flex: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 18px; border-radius: var(--r-md);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  font-size: 0.92rem; font-weight: 600; cursor: pointer;
+  transition: background 150ms var(--ease), border-color 150ms var(--ease), opacity 150ms var(--ease);
+}
+.page-investimentos-modal__footer-actions .btn-secondary {
+  background: transparent; border: 1px solid var(--hairline-strong); color: var(--text-secondary);
+}
+.page-investimentos-modal__footer-actions .btn-secondary:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-investimentos-modal__footer-actions .btn-primary {
+  background: var(--accent); border: 1px solid var(--accent); color: var(--accent-foreground);
+}
+.page-investimentos-modal__footer-actions .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.page-investimentos-modal__footer-actions .btn-primary:disabled,
+.page-investimentos-modal__footer-actions .btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
 .page-investimentos-modal__footer-hint { font-size: 0.76rem; color: var(--text-muted); text-align: center; }
 
 /* combobox de instituição */
@@ -362,6 +392,10 @@
 
 /* comparador */
 .page-investimentos-comparador { display: flex; flex-direction: column; gap: 14px; padding: 8px 20px 18px; }
+/* comparador é mais largo (3 opções lado a lado no desktop) */
+@media (min-width: 769px) {
+  .page-investimentos-comparador.modal-content { max-width: 820px; }
+}
 .page-investimentos-comparador__controls { display: flex; flex-wrap: wrap; gap: 10px; }
 .page-investimentos-comparador__field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
 .page-investimentos-comparador__select,
@@ -372,16 +406,20 @@
 }
 .page-investimentos-comparador__select:focus,
 .page-investimentos-comparador__taxa-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
-.page-investimentos-comparador__taxa-suf { font-size: 0.8rem; color: var(--text-muted); }
-.page-investimentos-comparador__slots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.page-investimentos-comparador__taxa-suf { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+/* slots: colunas que se ajustam à largura (sem estourar / scroll horizontal) */
+.page-investimentos-comparador__slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
 .page-investimentos-comparador__slot {
-  display: flex; flex-direction: column; gap: 8px;
+  display: flex; flex-direction: column; gap: 8px; min-width: 0;
   padding: 14px; border-radius: var(--r-md);
   background: var(--surface-sunken); border: 1px solid var(--hairline);
 }
 .page-investimentos-comparador__slot--melhor { border-color: var(--success); background: var(--success-muted); }
-.page-investimentos-comparador__slot-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 600; color: var(--text-primary); }
-.page-investimentos-comparador__slot-taxa { font-size: 0.8rem; color: var(--text-secondary); }
+/* selects empilhados (cada um na largura toda do slot — sem cortar "Pré-fixado a.a." / "Personalizado") */
+.page-investimentos-comparador__slot-head { display: flex; flex-direction: column; gap: 8px; font-weight: 600; color: var(--text-primary); }
+.page-investimentos-comparador__slot-head > .page-investimentos-comparador__select { width: 100%; min-width: 0; }
+.page-investimentos-comparador__slot-taxa { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); }
+.page-investimentos-comparador__slot-taxa .page-investimentos-comparador__taxa-input { flex: 1; min-width: 0; }
 .page-investimentos-comparador__melhor-badge { padding: 2px 8px; border-radius: var(--r-pill); background: var(--success); color: #fff; font-size: 0.64rem; font-weight: 700; }
 .page-investimentos-comparador__resultado { display: flex; flex-direction: column; gap: 6px; }
 .page-investimentos-comparador__res-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 0.85rem; color: var(--text-secondary); }
@@ -473,9 +511,9 @@
 .page-investimentos-card__projecao-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .page-investimentos-card__projecao-label { font-size: 0.76rem; color: var(--text-secondary); }
 .page-investimentos-card__projecao-input {
-  width: 84px; padding: 7px 10px; border-radius: var(--r-md);
+  width: 150px; padding: 7px 10px; border-radius: var(--r-md);
   border: 1px solid var(--hairline-strong); background: var(--surface);
-  color: var(--text-primary); font-size: 0.88rem; text-align: center;
+  color: var(--text-primary); font-size: 0.88rem;
 }
 .page-investimentos-card__projecao-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
 .page-investimentos-card__projecao-erro { font-size: 0.74rem; color: var(--error); }
@@ -487,8 +525,10 @@
 .page-investimentos-card__notas { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; }
 .page-investimentos-card__remove {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; border-radius: var(--r-sm);
-  border: 1px solid var(--hairline); background: var(--surface); color: var(--text-muted); cursor: pointer;
+  min-height: 32px; padding: 0 12px; border-radius: var(--r-sm);
+  border: 1px solid var(--hairline); background: var(--surface); color: var(--text-muted);
+  font-size: 0.78rem; font-weight: 600; cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
 }
 .page-investimentos-card__remove:hover { color: var(--error); border-color: var(--error); background: var(--error-muted); }
 .page-investimentos-card--collapsed { gap: 0; }

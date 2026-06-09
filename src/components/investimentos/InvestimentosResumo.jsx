@@ -195,43 +195,44 @@ export default function InvestimentosResumo({ lista, cdiAa, cdiLoading }) {
         <h2 id="inv-resumo-title" className="ref-panel__title">
           Resumo da carteira
         </h2>
-        <div className="page-investimentos-resumo__head-badges">
-          {stats.parcial && (
-            <span className="page-investimentos-resumo__badge">est. parcial</span>
-          )}
-          {stats.simulacaoAtiva ? (
-            <span className="page-investimentos-resumo__badge page-investimentos-resumo__badge--sim">
-              simulação
-            </span>
+        <div className="page-investimentos-resumo__head-right">
+          {cdiDisponivel ? (
+            <div className="page-investimentos-resumo__projecao">
+              <div className="page-investimentos-resumo__projecao-row">
+                <label className="page-investimentos-resumo__projecao-label" htmlFor="inv-resumo-proj-data">
+                  Simular carteira até
+                </label>
+                <input
+                  id="inv-resumo-proj-data"
+                  type="date"
+                  lang="pt-BR"
+                  className="page-investimentos-resumo__projecao-input"
+                  min={hojeYmdInput}
+                  max={maxYmdInput}
+                  value={projecaoYmd}
+                  onChange={(e) => setProjecaoYmd(e.target.value)}
+                  aria-describedby={stats.projecaoErroMsg ? 'inv-resumo-proj-err' : undefined}
+                />
+              </div>
+              {stats.projecaoErroMsg ? (
+                <p id="inv-resumo-proj-err" className="page-investimentos-resumo__projecao-erro" role="alert">
+                  {stats.projecaoErroMsg}
+                </p>
+              ) : null}
+            </div>
           ) : null}
+          <div className="page-investimentos-resumo__head-badges">
+            {stats.parcial && (
+              <span className="page-investimentos-resumo__badge">est. parcial</span>
+            )}
+            {stats.simulacaoAtiva ? (
+              <span className="page-investimentos-resumo__badge page-investimentos-resumo__badge--sim">
+                simulação
+              </span>
+            ) : null}
+          </div>
         </div>
       </div>
-
-      {cdiDisponivel ? (
-        <div className="page-investimentos-resumo__projecao">
-          <div className="page-investimentos-resumo__projecao-row">
-            <label className="page-investimentos-resumo__projecao-label" htmlFor="inv-resumo-proj-data">
-              Simular carteira até
-            </label>
-            <input
-              id="inv-resumo-proj-data"
-              type="date"
-              lang="pt-BR"
-              className="page-investimentos-resumo__projecao-input"
-              min={hojeYmdInput}
-              max={maxYmdInput}
-              value={projecaoYmd}
-              onChange={(e) => setProjecaoYmd(e.target.value)}
-              aria-describedby={stats.projecaoErroMsg ? 'inv-resumo-proj-err' : undefined}
-            />
-          </div>
-          {stats.projecaoErroMsg ? (
-            <p id="inv-resumo-proj-err" className="page-investimentos-resumo__projecao-erro" role="alert">
-              {stats.projecaoErroMsg}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
 
       <div className="page-investimentos-resumo__body">
         <dl className="page-investimentos-resumo__stats">
