@@ -1,6 +1,7 @@
 import React from 'react'
 
-export default function ConfigAparenciaCard({ theme, setTheme, privacyMode, togglePrivacy, id }) {
+export default function ConfigAparenciaCard({ theme, themePref, setTheme, privacyMode, togglePrivacy, id }) {
+  const autoOn = themePref === 'system'
   return (
     <section id={id} className="config-card config-card--preferences" aria-labelledby="config-preferencias-heading">
       <div className="config-card-head">
@@ -11,43 +12,49 @@ export default function ConfigAparenciaCard({ theme, setTheme, privacyMode, togg
         <p className="config-card-subtitle">Escolha o tema e o nível de privacidade da interface.</p>
       </div>
 
-      <div className="config-themes config-themes--compact" role="group" aria-label="Tema da interface">
-        <button
-          type="button"
-          className={`config-theme-card config-theme-card--light ${theme === 'light' ? 'is-active' : ''}`}
-          onClick={() => setTheme('light')}
-          aria-pressed={theme === 'light'}
-        >
-          <div className="config-theme-preview config-theme-preview--light" aria-hidden="true">
-            <span className="config-theme-icon">
-              <i className="la la-sun" aria-hidden="true" />
-            </span>
-          </div>
-          <div className="config-theme-body">
-            <h4>Claro</h4>
-            <span className="config-theme-status">Ativo</span>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          className={`config-theme-card config-theme-card--dark ${theme === 'dark' ? 'is-active' : ''}`}
-          onClick={() => setTheme('dark')}
-          aria-pressed={theme === 'dark'}
-        >
-          <div className="config-theme-preview config-theme-preview--dark" aria-hidden="true">
-            <span className="config-theme-icon">
-              <i className="la la-moon" aria-hidden="true" />
-            </span>
-          </div>
-          <div className="config-theme-body">
-            <h4>Escuro</h4>
-            <span className="config-theme-status">Ativo</span>
-          </div>
-        </button>
-      </div>
-
       <div className="config-preference-list">
+        <div className="config-pref-row config-pref-row--clean">
+          <span className="config-pref-label">
+            <strong>Tema</strong>
+            <span>
+              {autoOn
+                ? `Seguindo o sistema (${theme === 'dark' ? 'escuro' : 'claro'}).`
+                : theme === 'dark' ? 'Modo escuro ativo.' : 'Modo claro ativo.'}
+            </span>
+          </span>
+          <button
+            type="button"
+            className={`config-theme-switch ${theme === 'dark' ? 'is-dark' : ''}`}
+            role="switch"
+            aria-checked={theme === 'dark'}
+            aria-label="Alternar entre tema claro e escuro"
+            disabled={autoOn}
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          >
+            <span className="config-theme-switch__thumb" aria-hidden="true">
+              {theme === 'dark' ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              )}
+            </span>
+          </button>
+        </div>
+
+        <label className="config-pref-row config-pref-row--clean">
+          <span className="config-pref-label">
+            <strong>Seguir o sistema</strong>
+            <span>Usa o tema claro/escuro do seu aparelho automaticamente.</span>
+          </span>
+          <input
+            type="checkbox"
+            className="switch-apple"
+            checked={autoOn}
+            onChange={() => setTheme(autoOn ? theme : 'system')}
+            aria-label="Seguir o tema do sistema"
+          />
+        </label>
+
         <label className="config-pref-row config-pref-row--clean">
           <span className="config-pref-label">
             <strong>Modo privacidade</strong>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './dashboard.css'
 import TransactionModal from '../components/TransactionModal'
@@ -27,8 +27,6 @@ import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon'
 import PwaInstallBanner from '../components/PwaInstallBanner'
 import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
 import { useFabCompact } from '../hooks/useFabCompact'
-import TutorialDashboard from '../components/onboarding/TutorialDashboard'
-import { tutorialDashboardFoiVisto } from '../components/onboarding/tutorialDashboardState'
 
 /* Ícone SVG do insight da Severino IA, por tom (substitui os emojis do backend). */
 function InsightIcon({ tom }) {
@@ -61,7 +59,6 @@ export default function Dashboard() {
   const fabScrollRef = useRef(null)
   const fabCompact = useFabCompact(fabScrollRef)
   const [proximoCompromisso, setProximoCompromisso] = useState(null)
-  const [showTutorial, setShowTutorial] = useState(() => !tutorialDashboardFoiVisto())
 
   /* Severino IA — insights proativos (regras determinísticas no backend, sem custo de IA) */
   const [insights, setInsights] = useState([])
@@ -77,6 +74,46 @@ export default function Dashboard() {
       }
     })()
     return () => { cancel = true }
+  }, [])
+
+  // Navegação por setas no track de insights da Severino IA (sem barra de rolagem)
+  const iaTrackRef = useRef(null)
+  const [iaNav, setIaNav] = useState({ prev: false, next: false })
+  const updateIaNav = useCallback(() => {
+    const el = iaTrackRef.current
+    if (!el) return
+    const max = el.scrollWidth - el.clientWidth
+    setIaNav({ prev: el.scrollLeft > 4, next: el.scrollLeft < max - 4 })
+  }, [])
+  useEffect(() => {
+    const el = iaTrackRef.current
+    if (!el) return undefined
+    updateIaNav()
+    // roda do mouse (vertical) rola o track na horizontal — só sequestra quando
+    // ainda dá pra rolar pro lado; nas pontas, deixa a página rolar normal.
+    const onWheel = (e) => {
+      if (el.scrollWidth <= el.clientWidth) return
+      const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX
+      if (!delta) return
+      const max = el.scrollWidth - el.clientWidth
+      if ((delta < 0 && el.scrollLeft <= 0) || (delta > 0 && el.scrollLeft >= max - 1)) return
+      e.preventDefault()
+      el.scrollLeft += delta
+    }
+    el.addEventListener('scroll', updateIaNav, { passive: true })
+    el.addEventListener('wheel', onWheel, { passive: false })
+    window.addEventListener('resize', updateIaNav)
+    return () => {
+      el.removeEventListener('scroll', updateIaNav)
+      el.removeEventListener('wheel', onWheel)
+      window.removeEventListener('resize', updateIaNav)
+    }
+  }, [updateIaNav, insights.length])
+  const scrollIa = useCallback((dir) => {
+    const el = iaTrackRef.current
+    if (!el) return
+    const amount = Math.max(el.clientWidth * 0.8, 280)
+    el.scrollBy({ left: dir * amount, behavior: 'smooth' })
   }, [])
 
   // Consome a store de cache compartilhada — sem fetch local duplicado
@@ -420,16 +457,28 @@ export default function Dashboard() {
               <span className="ai-insights__title">Severino IA</span>
               <span className="ai-insights__sub">o que percebi nas suas finanças</span>
             </div>
-            <div className="ai-insights__track">
-              {insights.map((it) => (
-                <article key={it.id} className={`ai-insight ai-insight--${it.tom || 'neutro'}`}>
-                  <span className="ai-insight__icon"><InsightIcon tom={it.tom || 'neutro'} /></span>
-                  <div className="ai-insight__body">
-                    <h3 className="ai-insight__title">{it.titulo}</h3>
-                    <p className="ai-insight__text">{it.texto}</p>
-                  </div>
-                </article>
-              ))}
+            <div className="ai-insights__track-wrap">
+              <div className="ai-insights__track" ref={iaTrackRef}>
+                {insights.map((it) => (
+                  <article key={it.id} className={`ai-insight ai-insight--${it.tom || 'neutro'}`}>
+                    <span className="ai-insight__icon"><InsightIcon tom={it.tom || 'neutro'} /></span>
+                    <div className="ai-insight__body">
+                      <h3 className="ai-insight__title">{it.titulo}</h3>
+                      <p className="ai-insight__text">{it.texto}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              {iaNav.prev && (
+                <button type="button" className="ai-insights__nav ai-insights__nav--prev" onClick={() => scrollIa(-1)} aria-label="Ver anteriores">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m15 18-6-6 6-6" /></svg>
+                </button>
+              )}
+              {iaNav.next && (
+                <button type="button" className="ai-insights__nav ai-insights__nav--next" onClick={() => scrollIa(1)} aria-label="Ver próximos">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m9 18 6-6-6-6" /></svg>
+                </button>
+              )}
             </div>
             </section>
           )}
@@ -665,12 +714,6 @@ export default function Dashboard() {
       onSave={fetchTransacoes}
       usuarioId={readHorizonteUser()?.id || usuario.id}
     />
-    {showTutorial && (
-      <TutorialDashboard
-        onDismiss={() => setShowTutorial(false)}
-        isModalOpen={isModalOpen}
-      />
-    )}
     </>
   )
 }

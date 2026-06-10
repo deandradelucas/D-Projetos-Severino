@@ -31,29 +31,40 @@
 .page-pagamento .btn-danger-ghost:hover { background: var(--error-muted); border-color: var(--error); }
 
 /* ── Layout ────────────────────────────────────────────────────────────────── */
-.page-pagamento-header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.page-pagamento-header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
 /* título + chip de status na mesma linha do hero */
-.page-pagamento-header__titlerow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.page-pagamento-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; align-items: start; }
+.page-pagamento-header__titlerow { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; }
+.page-pagamento-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }
 /* coluna única (assinatura ativa/trial/paga) — largura cheia, no padrão do sistema */
 .page-pagamento-layout--sem-lateral { grid-template-columns: 1fr; }
-.page-pagamento-layout__primary { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-.page-pagamento-meio { display: flex; flex-direction: column; gap: 16px; }
+.page-pagamento-layout__primary { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.page-pagamento-meio { display: flex; flex-direction: column; gap: 12px; }
+
+/* ── Oferta (planos + value stack) ─────────────────────────────────────────── */
+/* mobile: empilhado. desktop: lado a lado, com os preços em coluna. */
+.page-pagamento-oferta { display: flex; flex-direction: column; gap: 12px; }
 
 /* ── Planos ────────────────────────────────────────────────────────────────── */
 .page-pagamento-planos {
-  display: flex; flex-direction: column; gap: 12px;
-  padding: 18px 20px; border-radius: var(--r-lg);
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 16px 18px; border-radius: var(--r-lg);
   background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
 }
 .page-pagamento-planos__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .page-pagamento-planos__option {
   position: relative; display: flex; flex-direction: column; gap: 4px;
-  padding: 16px 14px; border-radius: var(--r-md);
+  padding: 13px 14px; border-radius: var(--r-md);
   border: 1.5px solid var(--hairline-strong); background: var(--surface);
   cursor: pointer; transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
 }
 .page-pagamento-planos__option--active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+/* desktop: planos e value stack lado a lado; preços (Anual/Mensal) em coluna */
+@media (min-width: 769px) {
+  .page-pagamento-oferta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+  .page-pagamento-oferta .page-pagamento-planos__grid { grid-template-columns: 1fr; }
+  /* centraliza o conteúdo do card de features no espaço extra */
+  .page-pagamento-oferta .page-pagamento-valor { justify-content: center; }
+}
 .page-pagamento-planos__option--anual { border-color: var(--accent-border); }
 .page-pagamento-planos__option-title { font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
 .page-pagamento-planos__option-price { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
@@ -71,26 +82,35 @@
 .page-pagamento-planos__badge { right: 12px; }
 .page-pagamento-planos__economia { font-size: 0.78rem; color: var(--success); font-weight: 600; }
 .page-pagamento-planos__eq { font-size: 0.74rem; color: var(--text-muted); }
-.page-pagamento-planos__legend { font-size: 0.76rem; color: var(--text-muted); }
-.page-pagamento-planos__meios { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.page-pagamento-planos__legend { font-size: 0.98rem; font-weight: 700; color: var(--text-primary); text-align: center; }
+.page-pagamento-planos__meios { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .page-pagamento-planos__meios-label { font-size: 0.74rem; color: var(--text-muted); }
+/* chip de meio (ícone + rótulo na mesma linha) */
+.page-pagamento-meio { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+.page-pagamento-meio svg { flex-shrink: 0; }
 
 /* ── Proposta de valor ─────────────────────────────────────────────────────── */
 .page-pagamento-valor {
-  display: flex; flex-direction: column; gap: 10px;
-  padding: 18px 20px; border-radius: var(--r-lg);
+  display: flex; flex-direction: column; gap: 9px;
+  padding: 16px 18px; border-radius: var(--r-lg);
   background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
 }
 .page-pagamento-valor__title { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
-.page-pagamento-valor__list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.page-pagamento-valor__list { display: flex; flex-direction: column; gap: 7px; margin: 0; padding: 0; list-style: none; }
 .page-pagamento-valor__item { display: flex; align-items: flex-start; gap: 8px; font-size: 0.88rem; color: var(--text-secondary); }
 .page-pagamento-valor__check { display: inline-flex; flex-shrink: 0; color: var(--success); margin-top: 1px; }
 
-/* ── Detalhes da assinatura ("Sua assinatura") ─────────────────────────────── */
-.pagamento-detalhes-dl { display: flex; flex-direction: column; margin: 14px 0 0; }
+/* ── Detalhes da assinatura ("Sua assinatura") + Histórico ─────────────────── */
+/* invólucro de card (mesmo padrão das demais seções: surface + hairline + sombra) */
+.page-pagamento-detalhes,
+.page-pagamento-historico {
+  padding: 16px 18px; border-radius: var(--r-lg);
+  background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
+}
+.pagamento-detalhes-dl { display: flex; flex-direction: column; margin: 12px 0 0; }
 .pagamento-detalhes-dl__row {
   display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
-  padding: 10px 0; border-bottom: 1px solid var(--hairline);
+  padding: 9px 0; border-bottom: 1px solid var(--hairline);
 }
 .pagamento-detalhes-dl__row:last-child { border-bottom: none; padding-bottom: 0; }
 .pagamento-detalhes-dl__row dt { margin: 0; font-size: 0.82rem; color: var(--text-muted); flex-shrink: 0; }
@@ -102,12 +122,12 @@
 .pagamento-hist-cards { display: none; }
 .page-pagamento-historico .data-table { width: 100%; border-collapse: collapse; }
 .page-pagamento-historico .data-table th {
-  text-align: left; padding: 8px 12px; white-space: nowrap;
+  text-align: left; padding: 7px 12px; white-space: nowrap;
   font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
   color: var(--text-muted); border-bottom: 1px solid var(--hairline);
 }
 .page-pagamento-historico .data-table td {
-  padding: 11px 12px; font-size: 0.86rem; color: var(--text-primary);
+  padding: 9px 12px; font-size: 0.86rem; color: var(--text-primary);
   border-bottom: 1px solid var(--hairline); vertical-align: middle;
 }
 .page-pagamento-historico .data-table tr:last-child td { border-bottom: none; }
@@ -132,8 +152,14 @@
 .pagamento-empty-state__text { margin: 0; font-size: 0.84rem; color: var(--text-secondary); }
 
 /* ── Trust badges ──────────────────────────────────────────────────────────── */
-.page-pagamento-trust { display: flex; flex-wrap: wrap; gap: 12px 18px; }
-.page-pagamento-trust__item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-muted); }
+.page-pagamento-trust { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--hairline); }
+.page-pagamento-trust__item {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px; border-radius: var(--r-pill);
+  background: var(--success-muted); color: var(--success);
+  font-size: 0.76rem; font-weight: 700;
+}
+.page-pagamento-trust__item svg { flex-shrink: 0; }
 
 /* ── Banners ───────────────────────────────────────────────────────────────── */
 .pagamento-banner {
@@ -153,9 +179,14 @@
 
 /* ── Painel de checkout (CPF) ──────────────────────────────────────────────── */
 .pagamento-checkout-panel {
-  display: flex; flex-direction: column; gap: 14px;
-  padding: 18px 20px; border-radius: var(--r-lg);
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 16px 18px; border-radius: var(--r-lg);
   background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-2);
+}
+.pagamento-checkout-panel__col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+/* desktop: resumo/lead à esquerda, CPF + botões à direita */
+@media (min-width: 769px) {
+  .pagamento-checkout-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
 }
 .pagamento-checkout-panel__lead { display: flex; flex-direction: column; gap: 2px; }
 .pagamento-checkout-panel__lead-title { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
@@ -188,11 +219,11 @@
 .pagamento-resumo__row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 0.86rem; color: var(--text-secondary); }
 .pagamento-resumo__row--total { padding-top: 8px; border-top: 1px solid var(--hairline); font-weight: 700; color: var(--text-primary); }
 .pagamento-resumo__plan { font-weight: 600; color: var(--text-primary); }
-.pagamento-resumo__ciclo { font-size: 0.78rem; color: var(--text-muted); }
+.pagamento-resumo__ciclo { margin-left: 4px; font-size: 0.78rem; color: var(--text-muted); }
 .pagamento-resumo__label { color: var(--text-secondary); }
 .pagamento-resumo__total { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
-.pagamento-resumo__save { font-size: 0.78rem; color: var(--success); font-weight: 600; }
-.pagamento-pix-cta__save { font-size: 0.78rem; color: var(--success); font-weight: 600; }
+.pagamento-resumo__save { margin-left: 6px; font-size: 0.78rem; color: var(--success); font-weight: 600; }
+.pagamento-pix-cta__save { margin-left: 8px; font-size: 0.78rem; color: var(--success); font-weight: 600; }
 
 /* ── Trial urgência ────────────────────────────────────────────────────────── */
 .pagamento-trial-urgencia {
@@ -217,12 +248,15 @@
 .pagamento-retencao__nota { font-size: 0.78rem; color: var(--text-muted); }
 
 /* ── Status chip ───────────────────────────────────────────────────────────── */
-.pagamento-status-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: var(--r-pill); background: var(--surface-sunken); color: var(--text-secondary); font-size: 0.74rem; font-weight: 700; }
+.pagamento-status-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: var(--r-pill); background: var(--surface-sunken); color: var(--text-secondary); font-size: 0.74rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
 .pagamento-status-chip__dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.pagamento-status-chip--ativo,
 .pagamento-status-chip--ativa,
 .pagamento-status-chip--paga { background: var(--success-muted); color: var(--success); }
+.pagamento-status-chip--trial,
 .pagamento-status-chip--pendente,
-.pagamento-status-chip--trial { background: var(--accent-muted); color: var(--accent); }
+.pagamento-status-chip--aviso { background: var(--accent-muted); color: var(--accent); }
+.pagamento-status-chip--expirado,
 .pagamento-status-chip--vencida,
 .pagamento-status-chip--cancelada { background: var(--error-muted); color: var(--error); }
 
@@ -279,6 +313,10 @@
 @media (max-width: 768px) {
   .page-pagamento-layout { grid-template-columns: 1fr; }
   .page-pagamento-planos__grid { grid-template-columns: 1fr; }
+  /* hero: hambúrguer + "Pagamento" + chip de status na mesma linha, título centralizado */
+  .page-pagamento .dashboard-hub__hero-row { align-items: center; gap: 10px; }
+  .page-pagamento .dashboard-hub__hero-text { flex: 1; min-width: 0; }
+  .page-pagamento .page-pagamento-header__titlerow { justify-content: center; flex-wrap: nowrap; gap: 8px; }
   .pagamento-checkout-panel__input,
   .pagamento-modal__field input { font-size: 16px; }
   /* histórico: esconde a tabela, mostra os cards */

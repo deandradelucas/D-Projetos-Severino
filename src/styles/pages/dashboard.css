@@ -310,8 +310,11 @@
 /* ── Faixa: Severino IA | Próximo compromisso (lado a lado no desktop) ───────── */
 .dashboard-hub__band { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 0 0 16px; }
 .dashboard-hub__band .ai-insights { margin: 0; }
+/* colunas do band podem encolher (min-width:0) → o track da Severino IA rola
+   horizontalmente em vez de empurrar o card "Próximo compromisso" pra fora. */
+.dashboard-hub__band > *, .dashboard-hub__band .ai-insights { min-width: 0; }
 @media (min-width: 1024px) {
-  .dashboard-hub__band { grid-template-columns: 1.5fr 1fr; align-items: stretch; }
+  .dashboard-hub__band { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: stretch; }
 }
 
 /* ── Cards de insight: Próximo compromisso (agenda) + Despesas (relatório) ──── */
@@ -451,16 +454,29 @@
 .ai-insights__title { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); }
 .ai-insights__sub { font-size: 0.78rem; color: var(--text-muted); }
 
+.ai-insights__track-wrap { position: relative; }
 .ai-insights__track {
   display: flex;
   gap: 12px;
   overflow-x: auto;
-  padding-bottom: 4px;
   scroll-snap-type: x proximity;
-  scrollbar-width: thin;
+  scrollbar-width: none; /* Firefox — esconde a barra */
+  -ms-overflow-style: none;
 }
-.ai-insights__track::-webkit-scrollbar { height: 6px; }
-.ai-insights__track::-webkit-scrollbar-thumb { background: var(--hairline-strong); border-radius: 999px; }
+.ai-insights__track::-webkit-scrollbar { display: none; } /* WebKit — esconde a barra */
+
+/* setas de navegação (clicar p/ rolar os cards sem barra) */
+.ai-insights__nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  display: grid; place-items: center;
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--hairline); background: var(--surface); color: var(--text-secondary);
+  box-shadow: var(--elev-2); cursor: pointer;
+  transition: background 150ms var(--ease), color 150ms var(--ease);
+}
+.ai-insights__nav:hover { background: var(--surface-2); color: var(--text-primary); }
+.ai-insights__nav--prev { left: 4px; }
+.ai-insights__nav--next { right: 4px; }
 
 .ai-insight {
   scroll-snap-align: start;

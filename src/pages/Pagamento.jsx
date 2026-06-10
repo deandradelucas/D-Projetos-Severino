@@ -622,6 +622,7 @@ export default function Pagamento() {
                 ) : null}
 
                 {!config.isento_pagamento && !loading ? (
+                  <div className="page-pagamento-oferta">
                   <div className="ref-panel page-pagamento-planos" role="radiogroup" aria-label="Plano de assinatura">
                     <p className="page-pagamento-planos__legend">Escolha o plano</p>
                     <div className="page-pagamento-planos__grid">
@@ -674,15 +675,13 @@ export default function Pagamento() {
                         Cartão
                       </span>
                       <span className="page-pagamento-meio" title="Pix">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2 2 12l10 10 10-10z"/></svg>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M5.283 18.36a3.505 3.505 0 0 0 2.493-1.032l3.6-3.6a.684.684 0 0 1 .946 0l3.613 3.613a3.504 3.504 0 0 0 2.493 1.032h.71l-4.56 4.56a3.647 3.647 0 0 1-5.156 0L4.85 18.36ZM18.428 5.627a3.505 3.505 0 0 0-2.493 1.032l-3.613 3.614a.67.67 0 0 1-.946 0l-3.6-3.6A3.505 3.505 0 0 0 5.283 5.64h-.434l4.573-4.572a3.646 3.646 0 0 1 5.156 0l4.559 4.559ZM1.068 9.422 3.79 6.699h1.492a2.483 2.483 0 0 1 1.744.722l3.6 3.6a1.73 1.73 0 0 0 2.443 0l3.614-3.613a2.482 2.482 0 0 1 1.744-.723h1.767l2.737 2.737a3.646 3.646 0 0 1 0 5.156l-2.736 2.736h-1.768a2.482 2.482 0 0 1-1.744-.722l-3.613-3.613a1.77 1.77 0 0 0-2.444 0l-3.6 3.6a2.483 2.483 0 0 1-1.744.722H3.791l-2.723-2.723a3.646 3.646 0 0 1 0-5.156"/></svg>
                         Pix
                       </span>
                     </div>
                   </div>
-                ) : null}
 
-                {/* Value stack + selos de confiança (features 3 e 4) */}
-                {!config.isento_pagamento && !loading ? (
+                  {/* Value stack + selos de confiança (features 3 e 4) */}
                   <div className="ref-panel page-pagamento-valor">
                     <p className="page-pagamento-valor__title">Tudo isto incluso na sua assinatura</p>
                     <ul className="page-pagamento-valor__list">
@@ -708,10 +707,12 @@ export default function Pagamento() {
                       </span>
                     </div>
                   </div>
+                  </div>
                 ) : null}
 
                 {!config.isento_pagamento && config.ready && !loading ? (
                   <div id="pagamento-checkout" className="ref-panel pagamento-checkout-panel">
+                    <div className="pagamento-checkout-panel__col">
                     <div className="pagamento-checkout-panel__lead">
                       <p className="pagamento-checkout-panel__lead-title">Finalizar assinatura</p>
                       <p className="pagamento-checkout-panel__lead-text">
@@ -737,7 +738,9 @@ export default function Pagamento() {
                         </span>
                       </div>
                     </div>
+                    </div>
 
+                    <div className="pagamento-checkout-panel__col">
                     <div className="pagamento-checkout-panel__field">
                       <label htmlFor="cpf-checkout" className="pagamento-checkout-panel__label">
                         CPF ou CNPJ <span className="pagamento-checkout-panel__label-req">*</span>
@@ -794,7 +797,7 @@ export default function Pagamento() {
                           setPixModalOpen(true)
                         }}
                       >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 2 2 12l10 10 10-10z"/></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M5.283 18.36a3.505 3.505 0 0 0 2.493-1.032l3.6-3.6a.684.684 0 0 1 .946 0l3.613 3.613a3.504 3.504 0 0 0 2.493 1.032h.71l-4.56 4.56a3.647 3.647 0 0 1-5.156 0L4.85 18.36ZM18.428 5.627a3.505 3.505 0 0 0-2.493 1.032l-3.613 3.614a.67.67 0 0 1-.946 0l-3.6-3.6A3.505 3.505 0 0 0 5.283 5.64h-.434l4.573-4.572a3.646 3.646 0 0 1 5.156 0l4.559 4.559ZM1.068 9.422 3.79 6.699h1.492a2.483 2.483 0 0 1 1.744.722l3.6 3.6a1.73 1.73 0 0 0 2.443 0l3.614-3.613a2.482 2.482 0 0 1 1.744-.723h1.767l2.737 2.737a3.646 3.646 0 0 1 0 5.156l-2.736 2.736h-1.768a2.482 2.482 0 0 1-1.744-.722l-3.613-3.613a1.77 1.77 0 0 0-2.444 0l-3.6 3.6a2.483 2.483 0 0 1-1.744.722H3.791l-2.723-2.723a3.646 3.646 0 0 1 0-5.156"/></svg>
                         <span>Pagar à vista no Pix
                           {economiaAnual > 0 ? <span className="pagamento-pix-cta__save">economia de {formatCurrency(economiaAnual)}</span> : null}
                         </span>
@@ -809,6 +812,7 @@ export default function Pagamento() {
                     >
                       Atualizar status
                     </button>
+                    </div>
                   </div>
                 ) : null}
 

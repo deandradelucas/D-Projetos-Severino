@@ -127,6 +127,24 @@
   line-height: 1.4;
 }
 
+/* ícone "Compartilhar" inline na instrução do iOS */
+.pwa-install-sheet__ios-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  vertical-align: -5px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent);
+}
+body[data-theme='light'] .pwa-install-sheet__ios-share {
+  border-color: rgba(15, 23, 42, 0.1);
+  background: rgba(15, 23, 42, 0.04);
+}
+
 .pwa-install-sheet__benefits {
   display: flex;
   flex-wrap: wrap;

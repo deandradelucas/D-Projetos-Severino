@@ -1,7 +1,7 @@
 import ConfigSelectCustom from '../ConfigSelectCustom.jsx'
 import FamiliaConviteColarBlock from '../FamiliaConviteColarBlock'
 import { showToast } from '../../lib/toastStore'
-import { PAPEL_CONVITE_OPCOES, papelFamiliaLabel, papelTone, inicial } from '../../lib/familiaUi'
+import { PAPEL_CONVITE_OPCOES, papelConviteDesc, papelFamiliaLabel, papelTone, inicial } from '../../lib/familiaUi'
 
 // Seção "Conta familiar" das Configurações — convite, membros, papéis.
 // Extraída de pages/Configuracoes.jsx (relocação pura).
@@ -88,6 +88,7 @@ export default function ConfigFamiliaCard({
                     options={PAPEL_CONVITE_OPCOES}
                     disabled={familiaBusy}
                   />
+                  <span className="config-familia-papel-hint">{papelConviteDesc(novoConvitePapel)}</span>
                 </label>
                 <div className="config-familia-generate-row__cta">
                   <button

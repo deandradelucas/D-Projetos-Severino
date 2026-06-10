@@ -47,6 +47,9 @@
 /* ── DESKTOP (>= 1024px) ───────────────────────────────────────────────────── */
 @media (min-width: 1024px) {
   .dashboard-container.app-horizon-shell {
+    /* flex:none p/ o height:100vh ser honrado (o flex:1 base zera o basis e
+       anula a altura → a janela rolaria junto com a sidebar). */
+    flex: none;
     height: 100vh;
     overflow: hidden;
     padding: 24px;
@@ -69,6 +72,7 @@
 /* ── TABLET (769–1023px) ───────────────────────────────────────────────────── */
 @media (min-width: 769px) and (max-width: 1023px) {
   .dashboard-container.app-horizon-shell {
+    flex: none;
     height: 100vh;
     overflow: hidden;
     padding: 16px;

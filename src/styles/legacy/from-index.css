@@ -542,6 +542,10 @@ html:has(body[data-theme='light']:has(.auth-shell-glass--split)) {
   overflow-x: clip;
 }
 
+/* Páginas de leitura (docs legais) precisam rolar: o shell clipa o overflow
+   (quem rola no app é o scroller interno), mas a legal não tem scroller próprio. */
+.app-routes-grow:has(.legal-doc-page) { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
 /*
  * Desktop / PWA em janela larga: encadeia altura como no mobile e permite centralizar o shell
  * (.dashboard-container.app-horizon-shell usa margin auto + largura máxima em dashboard.css).

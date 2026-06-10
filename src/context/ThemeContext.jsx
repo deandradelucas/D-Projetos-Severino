@@ -4,7 +4,10 @@ const ThemeContext = createContext()
 
 const STORAGE_KEY = 'horizonte_theme'
 
+/** Temas efetivos aplicados ao documento. */
 const VALID_THEMES = ['light', 'dark']
+/** Preferências que o usuário pode escolher (system = seguir o sistema). */
+const VALID_PREFS = ['light', 'dark', 'system']
 
 /** Cor da UI do sistema (PWA / Chrome). Claro = branco para alinhar ao shell e evitar faixa escura na área do gesto (Android). */
 const THEME_COLOR_META = {
@@ -12,11 +15,22 @@ const THEME_COLOR_META = {
   dark: '#000000',
 }
 
-/** Remove valores legados (temas antigos não suportados). */
+const prefersDarkQuery = () =>
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-color-scheme: dark)')
+    : null
+
+/** Resolve a preferência para um tema efetivo (light/dark). */
+function resolveTheme(pref) {
+  if (pref === 'system') return prefersDarkQuery()?.matches ? 'dark' : 'light'
+  return VALID_THEMES.includes(pref) ? pref : 'light'
+}
+
+/** Remove valores legados (não suportados). */
 function purgeLegacyThemeStorage() {
   try {
     const v = localStorage.getItem(STORAGE_KEY)
-    if (v && !VALID_THEMES.includes(v)) {
+    if (v && !VALID_PREFS.includes(v)) {
       localStorage.removeItem(STORAGE_KEY)
     }
   } catch {
@@ -24,11 +38,11 @@ function purgeLegacyThemeStorage() {
   }
 }
 
-function readStoredTheme() {
+function readStoredPref() {
   purgeLegacyThemeStorage()
   try {
     const v = localStorage.getItem(STORAGE_KEY)
-    if (v && VALID_THEMES.includes(v)) return v
+    if (v && VALID_PREFS.includes(v)) return v
   } catch {
     /* ignore */
   }
@@ -38,11 +52,6 @@ function readStoredTheme() {
 function applyThemeToDocument(theme) {
   if (typeof document === 'undefined') return
   document.body.setAttribute('data-theme', theme)
-  try {
-    localStorage.setItem(STORAGE_KEY, theme)
-  } catch {
-    /* ignore */
-  }
   const meta = document.querySelector('meta[name="theme-color"]')
   if (meta) {
     meta.setAttribute('content', THEME_COLOR_META[theme] ?? THEME_COLOR_META.light)
@@ -50,7 +59,8 @@ function applyThemeToDocument(theme) {
 }
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState(() => readStoredTheme())
+  const [themePref, setThemePrefState] = useState(() => readStoredPref())
+  const [theme, setThemeEffective] = useState(() => resolveTheme(readStoredPref()))
   const [privacyMode, setPrivacyMode] = useState(() => {
     try {
       return localStorage.getItem('horizonte_privacy') === 'true'
@@ -58,6 +68,26 @@ export function ThemeProvider({ children }) {
       return false
     }
   })
+
+  // Persiste a preferência e recalcula o tema efetivo.
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, themePref)
+    } catch {
+      /* ignore */
+    }
+    setThemeEffective(resolveTheme(themePref))
+  }, [themePref])
+
+  // Quando a preferência é "system", acompanha mudanças do sistema operacional.
+  useEffect(() => {
+    if (themePref !== 'system') return undefined
+    const mq = prefersDarkQuery()
+    if (!mq) return undefined
+    const onChange = () => setThemeEffective(mq.matches ? 'dark' : 'light')
+    mq.addEventListener?.('change', onChange)
+    return () => mq.removeEventListener?.('change', onChange)
+  }, [themePref])
 
   useLayoutEffect(() => {
     applyThemeToDocument(theme)
@@ -71,19 +101,20 @@ export function ThemeProvider({ children }) {
     }
   }, [privacyMode])
 
+  // setTheme aceita 'light' | 'dark' | 'system' (mantém compatibilidade com chamadas antigas).
   const setTheme = (t) => {
-    if (!VALID_THEMES.includes(t)) return
-    setThemeState(t)
+    if (!VALID_PREFS.includes(t)) return
+    setThemePrefState(t)
   }
 
   const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'))
+    setThemePrefState((prev) => (resolveTheme(prev) === 'light' ? 'dark' : 'light'))
   }
 
   const togglePrivacy = () => setPrivacyMode((prev) => !prev)
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, privacyMode, togglePrivacy }}>
+    <ThemeContext.Provider value={{ theme, themePref, setTheme, toggleTheme, privacyMode, togglePrivacy }}>
       {children}
     </ThemeContext.Provider>
   )

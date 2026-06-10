@@ -29,9 +29,70 @@ import { PAPEL_CONVITE_OPCOES } from '../lib/familiaUi'
 
 const SUPORTE_WA = 'https://wa.me/5554996994482'
 
+const ICON_SVG = {
+  conta: <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM5.5 20a6.5 6.5 0 0 1 13 0" />,
+  aparencia: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>,
+  familia: <><path d="M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1" /><circle cx="9.5" cy="7" r="3.2" /><path d="M21 20v-1a4 4 0 0 0-3-3.85" /><path d="M16.5 4.15a3.2 3.2 0 0 1 0 6" /></>,
+  seguranca: <path d="M12 21s7-3.5 7-9V5.5L12 3 5 5.5V12c0 5.5 7 9 7 9z" />,
+  privacidade: <><rect x="4" y="10.5" width="16" height="10" rx="2" /><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" /></>,
+}
+function pillIcon(key) {
+  return (
+    <svg className="config-section-nav__ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      {ICON_SVG[key]}
+    </svg>
+  )
+}
+const SECOES_CONFIG = [
+  { id: 'config-secao-conta', label: 'Conta', ico: 'conta' },
+  { id: 'config-secao-aparencia', label: 'Aparência', ico: 'aparencia' },
+  { id: 'config-secao-familia', label: 'Família', ico: 'familia' },
+  { id: 'config-secao-seguranca', label: 'Segurança', ico: 'seguranca' },
+  { id: 'config-secao-privacidade', label: 'Privacidade', ico: 'privacidade' },
+]
+
 export default function Configuracoes() {
-  const { theme, setTheme, privacyMode, togglePrivacy } = useTheme()
+  const { theme, themePref, setTheme, privacyMode, togglePrivacy } = useTheme()
   const [menuAberto, setMenuAberto] = useState(false)
+  const [activeSection, setActiveSection] = useState(SECOES_CONFIG[0].id)
+
+  // Scroll-spy: destaca a pílula da seção atual conforme rola (qualquer scroller via capture).
+  useEffect(() => {
+    const ids = SECOES_CONFIG.map((s) => s.id)
+    const onScroll = () => {
+      const offset = 100
+      let current = ids[0]
+      for (const id of ids) {
+        const el = document.getElementById(id)
+        if (el && el.getBoundingClientRect().top - offset <= 0) current = id
+      }
+      // a última seção pode não alcançar o topo (pouco conteúdo abaixo) —
+      // ao chegar ao fim do scroll, ativa-a mesmo assim. Só vale pro elemento
+      // que REALMENTE rola (no mobile é o .ref-dashboard-scroll, não a janela).
+      const sc = document.querySelector('.ref-dashboard-scroll')
+      const scRola = sc && sc.scrollHeight > sc.clientHeight + 1
+      const scFim = scRola && sc.scrollHeight - sc.scrollTop - sc.clientHeight < 4
+      const docEl = document.documentElement
+      const winRola = docEl.scrollHeight > window.innerHeight + 1
+      const winFim = winRola && window.innerHeight + window.scrollY >= docEl.scrollHeight - 4
+      if (scFim || winFim) current = ids[ids.length - 1]
+      setActiveSection(current)
+    }
+    onScroll()
+    document.addEventListener('scroll', onScroll, { passive: true, capture: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      document.removeEventListener('scroll', onScroll, { capture: true })
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+
+  // Mantém a pílula ativa visível na faixa (que rola pro lado).
+  useEffect(() => {
+    document
+      .querySelector(`.config-section-nav__pill[data-id="${activeSection}"]`)
+      ?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+  }, [activeSection])
 
   const [perfil, setPerfil] = useState(() => {
     const saved = localStorage.getItem('horizonte_user')
@@ -42,6 +103,61 @@ export default function Configuracoes() {
       return { id: null, nome: 'Usuário', email: '', telefone: null, role: 'USER' }
     }
   })
+
+  // Verificação de e-mail/telefone (OTP) a partir das Configurações
+  const [verif, setVerif] = useState({ canal: null, codigo: '', busy: false, erro: '', destino: '' })
+
+  const enviarOtpVerificacao = useCallback(async (canal) => {
+    setVerif((v) => ({ ...v, canal, busy: true, erro: '' }))
+    try {
+      const url = canal === 'email'
+        ? '/api/usuarios/perfil/email/enviar-otp'
+        : '/api/usuarios/perfil/telefone/enviar-otp'
+      const res = await apiFetch(apiUrl(url), { method: 'POST' })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data?.message || 'Não foi possível enviar o código.')
+      setVerif({ canal, codigo: '', busy: false, erro: '', destino: data?.destino || '' })
+    } catch (e) {
+      setVerif((v) => ({ ...v, canal, busy: false, erro: e.message || 'Erro ao enviar o código.' }))
+    }
+  }, [])
+
+  const confirmarOtpVerificacao = useCallback(async () => {
+    const canal = verif.canal
+    if (!canal) return
+    setVerif((v) => ({ ...v, busy: true, erro: '' }))
+    try {
+      const url = canal === 'email'
+        ? '/api/usuarios/perfil/email/verificar'
+        : '/api/usuarios/perfil/telefone/verificar'
+      const res = await apiFetch(apiUrl(url), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo: verif.codigo }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data?.message || 'Código inválido.')
+      const campo = canal === 'email' ? 'email_verificado' : 'telefone_verificado'
+      setPerfil((p) => ({ ...p, [campo]: true }))
+      try {
+        const raw = localStorage.getItem('horizonte_user')
+        const u = raw ? JSON.parse(raw) : {}
+        localStorage.setItem('horizonte_user', JSON.stringify({ ...u, [campo]: true }))
+        window.dispatchEvent(new Event('horizonte-session-refresh'))
+      } catch { /* ignore */ }
+      setVerif({ canal: null, codigo: '', busy: false, erro: '', destino: '' })
+      showToast(canal === 'email' ? 'E-mail verificado!' : 'Telefone verificado!')
+    } catch (e) {
+      setVerif((v) => ({ ...v, busy: false, erro: e.message || 'Erro ao verificar o código.' }))
+    }
+  }, [verif.canal, verif.codigo])
+
+  const cancelarVerificacao = useCallback(() => {
+    setVerif({ canal: null, codigo: '', busy: false, erro: '', destino: '' })
+  }, [])
+  const setVerifCodigo = useCallback((codigo) => {
+    setVerif((v) => ({ ...v, codigo: String(codigo).replace(/\D/g, '').slice(0, 6) }))
+  }, [])
 
   const [familiaTitular, setFamiliaTitular] = useState(null)
   const [familiaMembros, setFamiliaMembros] = useState([])
@@ -241,6 +357,27 @@ export default function Configuracoes() {
       showToast('Erro ao apagar transações.')
     }
   }, [])
+
+  // Alterar senha (form inline)
+  const [senhaForm, setSenhaForm] = useState({ aberto: false, atual: '', nova: '', confirma: '', busy: false, erro: '' })
+  const alterarSenha = useCallback(async () => {
+    if (senhaForm.nova.length < 6) { setSenhaForm((s) => ({ ...s, erro: 'A nova senha deve ter no mínimo 6 caracteres.' })); return }
+    if (senhaForm.nova !== senhaForm.confirma) { setSenhaForm((s) => ({ ...s, erro: 'A confirmação não confere.' })); return }
+    setSenhaForm((s) => ({ ...s, busy: true, erro: '' }))
+    try {
+      const res = await apiFetch(apiUrl('/api/usuarios/perfil/senha'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senhaAtual: senhaForm.atual, novaSenha: senhaForm.nova }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data?.message || 'Erro ao alterar a senha.')
+      setSenhaForm({ aberto: false, atual: '', nova: '', confirma: '', busy: false, erro: '' })
+      showToast('Senha alterada com sucesso.')
+    } catch (e) {
+      setSenhaForm((s) => ({ ...s, busy: false, erro: e.message || 'Erro ao alterar a senha.' }))
+    }
+  }, [senhaForm.atual, senhaForm.nova, senhaForm.confirma])
 
   // Carrega contagem de sessões ativas
   useEffect(() => {
@@ -617,28 +754,26 @@ export default function Configuracoes() {
               <h1 className="dashboard-hub__title">Ajustes</h1>
             </div>
           </div>
-          <nav className="config-section-nav" aria-label="Seções de ajustes">
-            {[
-              { id: 'config-secao-conta', label: 'Conta' },
-              { id: 'config-secao-aparencia', label: 'Aparência' },
-              { id: 'config-secao-familia', label: 'Família' },
-              { id: 'config-secao-seguranca', label: 'Segurança' },
-              { id: 'config-secao-privacidade', label: 'Privacidade' },
-            ].map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                className="config-section-nav__pill"
-                onClick={() => {
-                  const el = document.getElementById(s.id)
-                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                }}
-              >
-                {s.label}
-              </button>
-            ))}
-          </nav>
         </section>
+
+        <nav className="config-section-nav" aria-label="Seções de ajustes">
+          {SECOES_CONFIG.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              data-id={s.id}
+              className={`config-section-nav__pill${activeSection === s.id ? ' is-active' : ''}`}
+              aria-current={activeSection === s.id ? 'true' : undefined}
+              onClick={() => {
+                const el = document.getElementById(s.id)
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }}
+            >
+              {pillIcon(s.ico)}
+              {s.label}
+            </button>
+          ))}
+        </nav>
 
 
         <div className="config-layout config-layout--clean">
@@ -665,11 +800,18 @@ export default function Configuracoes() {
             telefoneSaving={telefoneSaving}
             salvarTelefone={salvarTelefone}
             cancelarEditarTelefone={cancelarEditarTelefone}
+            verif={verif}
+            onVerificar={enviarOtpVerificacao}
+            onConfirmarVerif={confirmarOtpVerificacao}
+            onReenviarVerif={() => enviarOtpVerificacao(verif.canal)}
+            onCancelarVerif={cancelarVerificacao}
+            onVerifCodigo={setVerifCodigo}
           />
 
           <ConfigAparenciaCard
             id="config-secao-aparencia"
             theme={theme}
+            themePref={themePref}
             setTheme={setTheme}
             privacyMode={privacyMode}
             togglePrivacy={togglePrivacy}
@@ -730,14 +872,14 @@ export default function Configuracoes() {
               </p>
             </div>
             <div className="config-quick-actions">
-              <a
-                href={`${SUPORTE_WA}?text=${encodeURIComponent('Olá, quero trocar a senha da minha conta Severino.')}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
                 className="config-action-btn"
+                onClick={() => setSenhaForm((s) => ({ ...s, aberto: !s.aberto, erro: '' }))}
+                aria-expanded={senhaForm.aberto}
               >
-                Trocar minha senha
-              </a>
+                {senhaForm.aberto ? 'Cancelar troca' : 'Trocar minha senha'}
+              </button>
               <button
                 type="button"
                 className="config-action-btn"
@@ -747,6 +889,38 @@ export default function Configuracoes() {
                 {sessoesBusy ? 'Encerrando…' : 'Sair de outros dispositivos'}
               </button>
             </div>
+
+            {senhaForm.aberto ? (
+              <div className="config-senha-form">
+                <div className="config-field">
+                  <label htmlFor="senha-atual">Senha atual</label>
+                  <input id="senha-atual" type="password" className="config-input" autoComplete="current-password"
+                    value={senhaForm.atual} disabled={senhaForm.busy}
+                    onChange={(e) => setSenhaForm((s) => ({ ...s, atual: e.target.value }))} />
+                </div>
+                <div className="config-field">
+                  <label htmlFor="senha-nova">Nova senha</label>
+                  <input id="senha-nova" type="password" className="config-input" autoComplete="new-password"
+                    value={senhaForm.nova} disabled={senhaForm.busy}
+                    onChange={(e) => setSenhaForm((s) => ({ ...s, nova: e.target.value }))} />
+                </div>
+                <div className="config-field">
+                  <label htmlFor="senha-confirma">Confirmar nova senha</label>
+                  <input id="senha-confirma" type="password" className="config-input" autoComplete="new-password"
+                    value={senhaForm.confirma} disabled={senhaForm.busy}
+                    onChange={(e) => setSenhaForm((s) => ({ ...s, confirma: e.target.value }))} />
+                </div>
+                {senhaForm.erro ? <p className="config-senha-form__err">{senhaForm.erro}</p> : null}
+                <button
+                  type="button"
+                  className="config-action-btn config-action-btn--primary"
+                  disabled={senhaForm.busy || !senhaForm.atual || !senhaForm.nova || !senhaForm.confirma}
+                  onClick={() => void alterarSenha()}
+                >
+                  {senhaForm.busy ? 'Salvando…' : 'Salvar nova senha'}
+                </button>
+              </div>
+            ) : null}
           </section>
 
           {/* Privacidade e dados (LGPD) */}
@@ -774,6 +948,11 @@ export default function Configuracoes() {
               >
                 Excluir minha conta
               </button>
+            </div>
+            <div className="config-legal-links">
+              <Link to="/politica-de-privacidade" className="config-legal-link">Política de Privacidade</Link>
+              <span className="config-legal-sep" aria-hidden>·</span>
+              <Link to="/termos" className="config-legal-link">Termos de Uso</Link>
             </div>
           </section>
 
@@ -877,6 +1056,7 @@ export default function Configuracoes() {
         title="Apagar todas as transações?"
         message="Todas as suas transações serão excluídas permanentemente. Esta ação não pode ser desfeita. Sua conta e configurações permanecem."
         confirmLabel="Apagar tudo"
+        requireText="APAGAR"
         onConfirm={() => apagarTodasTransacoes()}
         onClose={() => setApagarTxOpen(false)}
       />

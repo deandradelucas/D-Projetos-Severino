@@ -100,14 +100,17 @@
   color: #64748b;
 }
 
-.bemvindo-skip {
+/* Botão secundário "Começar a usar agora" — outline visível (caminho de ativação) */
+.bemvindo-secondary {
   background: transparent;
-  border: none;
-  color: #64748b;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #475569;
+  cursor: pointer;
 }
 
-.bemvindo-skip:hover {
-  color: #334155;
+.bemvindo-secondary:hover {
+  background: rgba(15, 23, 42, 0.03);
+  color: #1e293b;
 }
 
 /* ─── Botão de suporte (WhatsApp) ─── */

@@ -25,6 +25,12 @@ export default function ConfigPerfilCard({
   telefoneSaving,
   salvarTelefone,
   cancelarEditarTelefone,
+  verif,
+  onVerificar,
+  onConfirmarVerif,
+  onReenviarVerif,
+  onCancelarVerif,
+  onVerifCodigo,
 }) {
   return (
     <section className="config-card config-profile-card" id="config-secao-conta">
@@ -50,8 +56,15 @@ export default function ConfigPerfilCard({
             </span>
           </button>
           {perfil.avatar_url && (
-            <button type="button" className="config-profile-avatar__remove" onClick={removerFoto} disabled={avatarSaving}>
-              Remover
+            <button
+              type="button"
+              className="config-profile-avatar__remove"
+              onClick={removerFoto}
+              disabled={avatarSaving}
+              aria-label="Remover foto"
+              title="Remover foto"
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           )}
           <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handleAvatarFile} />
@@ -91,7 +104,7 @@ export default function ConfigPerfilCard({
           )}
           <p className="config-profile-email">{perfil.email || 'E-mail não informado'}</p>
           <div className="config-verif-chips">
-            <span className={`config-verif-chip${perfil.email_verificado ? ' config-verif-chip--ok' : ''}`}>
+            <span className={`config-verif-chip${perfil.email_verificado ? ' config-verif-chip--ok' : ' config-verif-chip--pendente'}`}>
               {perfil.email_verificado ? (
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5"/></svg>
               ) : (
@@ -99,7 +112,12 @@ export default function ConfigPerfilCard({
               )}
               E-mail {perfil.email_verificado ? 'verificado' : 'não verificado'}
             </span>
-            <span className={`config-verif-chip${perfil.telefone_verificado ? ' config-verif-chip--ok' : ''}`}>
+            {!perfil.email_verificado ? (
+              <button type="button" className="config-verif-action" onClick={() => onVerificar?.('email')} disabled={verif?.busy}>
+                Verificar agora
+              </button>
+            ) : null}
+            <span className={`config-verif-chip${perfil.telefone_verificado ? ' config-verif-chip--ok' : ' config-verif-chip--pendente'}`}>
               {perfil.telefone_verificado ? (
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5"/></svg>
               ) : (
@@ -107,9 +125,59 @@ export default function ConfigPerfilCard({
               )}
               Telefone {perfil.telefone_verificado ? 'verificado' : 'não verificado'}
             </span>
+            {!perfil.telefone_verificado && perfil.telefone ? (
+              <button type="button" className="config-verif-action" onClick={() => onVerificar?.('telefone')} disabled={verif?.busy}>
+                Verificar agora
+              </button>
+            ) : null}
           </div>
+          {perfil.created_at ? (
+            <p className="config-profile-since">
+              Membro desde {new Date(perfil.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+            </p>
+          ) : null}
         </div>
       </div>
+
+      {verif?.canal ? (
+        <div className="config-verif-panel" role="group" aria-label="Confirmar código de verificação">
+          <p className="config-verif-panel__lead">
+            {verif.canal === 'email'
+              ? `Enviamos um código para ${verif.destino || 'seu e-mail'}. Digite os 6 dígitos abaixo.`
+              : 'Enviamos um código pelo seu WhatsApp. Digite os 6 dígitos abaixo.'}
+          </p>
+          <div className="config-verif-panel__row">
+            <input
+              className="config-input config-input--compact config-verif-panel__input"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              value={verif.codigo}
+              onChange={(e) => onVerifCodigo?.(e.target.value)}
+              placeholder="000000"
+              disabled={verif.busy}
+              aria-label="Código de verificação"
+            />
+            <button
+              type="button"
+              className="config-action-btn config-action-btn--primary"
+              onClick={() => onConfirmarVerif?.()}
+              disabled={verif.busy || verif.codigo.length !== 6}
+            >
+              {verif.busy ? '…' : 'Confirmar'}
+            </button>
+          </div>
+          {verif.erro ? <p className="config-verif-panel__err">{verif.erro}</p> : null}
+          <div className="config-verif-panel__actions">
+            <button type="button" className="config-nome-edit-btn" onClick={() => onReenviarVerif?.()} disabled={verif.busy}>
+              Reenviar código
+            </button>
+            <button type="button" className="config-nome-edit-btn" onClick={() => onCancelarVerif?.()} disabled={verif.busy}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <div className="config-field-grid config-field-grid--single" aria-label="Dados do perfil">
         <div className="config-field config-field--with-action">

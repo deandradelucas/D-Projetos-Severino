@@ -1,6 +1,10 @@
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { clearHorizonteAccessToken } from '../lib/horizonteAccessToken'
+import { apiUrl } from '../lib/apiUrl'
+import { apiFetch } from '../lib/apiFetch'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
 import '../styles/legacy/trial-expirado.css'
 
 function readUser() {
@@ -30,19 +34,68 @@ export default function TrialExpirado() {
   const primeiroNome = (user?.nome || '').trim().split(/\s+/)[0] || ''
   const dias = Number(user?.trial_dias_gratis) || 7
 
+  // Preço real do catálogo (âncora de valor no CTA).
+  const [precos, setPrecos] = useState({ mensal: 10, anual: 100 })
+  useEffect(() => {
+    let cancel = false
+    ;(async () => {
+      try {
+        const res = await apiFetch(apiUrl('/api/pagamentos/config'))
+        if (!res.ok || cancel) return
+        const c = await res.json()
+        const m = Number(c.preco_mensal)
+        const a = Number(c.preco_anual)
+        setPrecos({
+          mensal: Number.isFinite(m) && m > 0 ? m : 10,
+          anual: Number.isFinite(a) && a > 0 ? a : 100,
+        })
+      } catch {
+        /* mantém fallback */
+      }
+    })()
+    return () => { cancel = true }
+  }, [])
+  const porDia = precos.mensal / 30
+
+  // "Já assinei" → revalida o status em vez de mandar pro checkout.
+  const [revalBusy, setRevalBusy] = useState(false)
+  const [revalMsg, setRevalMsg] = useState('')
+  const revalidarAcesso = async () => {
+    setRevalBusy(true)
+    setRevalMsg('')
+    try {
+      const res = await apiFetch(apiUrl('/api/assinatura/status'), { cache: 'no-store' })
+      if (res.ok) {
+        const a = await res.json()
+        const u = readUser() || {}
+        localStorage.setItem('horizonte_user', JSON.stringify({ ...u, ...a }))
+        window.dispatchEvent(new Event('horizonte-session-refresh'))
+        if (a.acesso_app_liberado !== false) {
+          navigate('/dashboard', { replace: true })
+          return
+        }
+      }
+      setRevalMsg('Ainda não identificamos um pagamento ativo. Se você acabou de pagar, aguarde 1 minuto e tente de novo.')
+    } catch {
+      setRevalMsg('Não foi possível verificar agora. Tente de novo em instantes.')
+    } finally {
+      setRevalBusy(false)
+    }
+  }
+
   return (
-    <div className="trial-screen relative flex min-h-[100dvh] min-h-[100svh] w-full items-center justify-center overflow-y-auto px-4 py-3">
-      <div className="relative w-full max-w-[400px]">
+    <div className="trial-screen relative flex min-h-[100dvh] min-h-[100svh] w-full items-center justify-center overflow-y-auto px-4 py-2 sm:py-3">
+      <div className="relative w-full max-w-[400px] lg:max-w-[480px]">
         <div className="trial-topline absolute -top-px left-10 right-10 h-px" aria-hidden />
 
-        <div className="trial-card relative rounded-[22px] px-5 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-5">
+        <div className="trial-card relative rounded-[22px] px-5 pb-3.5 pt-3.5 sm:px-6 sm:pb-5 sm:pt-5 lg:px-8 lg:pb-6 lg:pt-6">
           {/* Logo */}
-          <div className="mb-2.5 flex justify-center">
-            <img src={BRAND_ASSETS.loginSeverinoLight} alt="Severino" className="h-auto w-full max-w-[108px] object-contain" />
+          <div className="mb-2.5 flex justify-center lg:mb-3.5">
+            <img src={BRAND_ASSETS.loginSeverinoLight} alt="Severino" className="h-auto w-full max-w-[104px] object-contain sm:max-w-[108px] lg:max-w-[124px]" />
           </div>
 
           {/* Badge */}
-          <div className="mb-3 flex justify-center">
+          <div className="mb-2.5 flex justify-center lg:mb-3.5">
             <span className="trial-badge inline-flex items-center gap-1.5 rounded-full px-2.5 py-[3px] text-[9.5px] font-semibold uppercase tracking-widest">
               <span className="trial-badge-dot h-[5px] w-[5px] shrink-0 rounded-full" />
               Seu período gratuito acabou
@@ -50,26 +103,26 @@ export default function TrialExpirado() {
           </div>
 
           {/* Headline */}
-          <h1 className="trial-title mb-1.5 text-center text-[18px] font-bold leading-[1.18] tracking-tight sm:text-[19px]">
+          <h1 className="trial-title mb-1.5 text-center text-[18px] font-bold leading-[1.18] tracking-tight sm:text-[19px] lg:text-[23px]">
             {primeiroNome ? `Foram ${dias} dias de clareza, ${primeiroNome}. ` : `Foram ${dias} dias de clareza. `}
             <span className="trial-title-accent">Não deixe acabar aqui.</span>
           </h1>
 
           {/* Sub-headline */}
-          <p className="trial-subtitle mb-3 text-center text-[11.5px] leading-snug sm:text-[12px]">
+          <p className="trial-subtitle mb-2.5 text-center text-[11.5px] leading-snug sm:text-[12px] lg:mb-3.5 lg:text-[13.5px]">
             Por uma semana você soube exatamente pra onde ia cada real — sem planilha, sem chute.{' '}
             <span className="trial-subtitle-strong">Assine e continue de onde parou.</span>
           </p>
 
-          <div className="trial-divider mb-3 h-px" aria-hidden />
+          <div className="trial-divider mb-2.5 h-px lg:mb-3.5" aria-hidden />
 
           {/* Perda */}
-          <p className="trial-loss-label mb-1.5 text-[9.5px] font-semibold uppercase tracking-widest">
+          <p className="trial-loss-label mb-1.5 text-[9.5px] font-semibold uppercase tracking-widest lg:text-[10.5px]">
             O que você perde se parar agora
           </p>
-          <ul className="mb-3 space-y-1">
+          <ul className="mb-2.5 space-y-1 lg:mb-3.5 lg:space-y-1.5">
             {PERDAS.map((item) => (
-              <li key={item} className="trial-loss-item flex items-center gap-2.5 text-[12px] leading-snug">
+              <li key={item} className="trial-loss-item flex items-center gap-2.5 text-[12px] leading-snug lg:text-[13.5px]">
                 <span className="trial-loss-icon flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full">
                   <svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden>
                     <path d="M2 5.5l2 2 4-4" stroke="#b8832a" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
@@ -80,18 +133,17 @@ export default function TrialExpirado() {
             ))}
           </ul>
 
-          {/* Urgência */}
-          <div className="trial-urgency mb-3 rounded-[12px] px-3.5 py-2">
-            <p className="trial-urgency-text text-center text-[11.5px] leading-snug">
-              Quem saiu da névoa financeira sabe:{' '}
-              <span className="trial-urgency-strong">não vale a pena voltar pra ela.</span>
+          {/* Âncora de preço + urgência concreta */}
+          <div className="trial-urgency mb-2.5 rounded-[12px] px-3.5 py-2 lg:mb-3.5 lg:py-2.5">
+            <p className="trial-urgency-text text-center text-[11.5px] leading-snug lg:text-[12.5px]">
+              Continue por <span className="trial-urgency-strong">{formatCurrencyBRL(precos.mensal)}/mês</span> — menos de {formatCurrencyBRL(porDia)} por dia pra não voltar a perder de vista pra onde vai o seu dinheiro.
             </p>
           </div>
 
           {/* CTA principal */}
           <Link
             to="/pagamento"
-            className="trial-cta flex w-full items-center justify-center gap-2 rounded-[13px] py-2.5 text-[13px] font-semibold no-underline transition-all duration-200 hover:brightness-[1.04] active:scale-[0.98] sm:text-[13.5px]"
+            className="trial-cta flex w-full items-center justify-center gap-2 rounded-[13px] py-2.5 text-[13px] font-semibold no-underline transition-all duration-200 hover:brightness-[1.04] active:scale-[0.98] sm:text-[13.5px] lg:py-3 lg:text-[15px]"
           >
             Quero manter meu acesso
             <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden>
@@ -99,13 +151,18 @@ export default function TrialExpirado() {
             </svg>
           </Link>
 
-          {/* CTA secundário */}
-          <Link
-            to="/pagamento"
-            className="trial-cta-2 mt-1.5 flex w-full items-center justify-center rounded-[13px] py-2 text-[12px] font-medium no-underline transition-colors duration-200 active:scale-[0.98]"
+          {/* CTA secundário — revalida assinatura (não vai pro checkout) */}
+          <button
+            type="button"
+            onClick={() => void revalidarAcesso()}
+            disabled={revalBusy}
+            className="trial-cta-2 mt-1.5 flex w-full items-center justify-center rounded-[13px] py-2 text-[12px] font-medium no-underline transition-colors duration-200 active:scale-[0.98] disabled:opacity-60 lg:text-[13px]"
           >
-            Já assinei — liberar meu acesso
-          </Link>
+            {revalBusy ? 'Verificando…' : 'Já assinei — liberar meu acesso'}
+          </button>
+          {revalMsg && (
+            <p className="trial-reval-msg mt-1.5 text-center text-[11px] leading-snug">{revalMsg}</p>
+          )}
 
           {/* Suporte WhatsApp */}
           <a
@@ -121,7 +178,7 @@ export default function TrialExpirado() {
           </a>
 
           {/* Trust */}
-          <div className="mt-3 flex items-center justify-center gap-1.5">
+          <div className="mt-2.5 flex items-center justify-center gap-1.5 lg:mt-3.5">
             <svg width="10" height="10" viewBox="0 0 11 11" fill="none" aria-hidden className="trial-trust-icon">
               <rect x="1.5" y="4.5" width="8" height="5.5" rx="1.5" stroke="currentColor" strokeWidth="1" />
               <path d="M3.5 4.5V3a2 2 0 0 1 4 0v1.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />

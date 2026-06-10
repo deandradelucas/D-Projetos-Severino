@@ -2,10 +2,15 @@
 // Extraídos de pages/Configuracoes.jsx — sem dependência de React/DOM.
 
 export const PAPEL_CONVITE_OPCOES = [
-  { value: 'MEMBER', label: 'Membro — pode lançar e editar (exceto pagamento do titular)' },
-  { value: 'VIEWER', label: 'Só leitura — não altera transações nem agenda' },
-  { value: 'ADMIN', label: 'Administrador familiar — mesmo nível de escrita que membro' },
+  { value: 'MEMBER', label: 'Membro', desc: 'Pode lançar e editar (exceto pagamento do titular).' },
+  { value: 'VIEWER', label: 'Só leitura', desc: 'Não altera transações nem agenda.' },
+  { value: 'ADMIN', label: 'Administrador', desc: 'Mesmo nível de escrita que membro.' },
 ]
+
+/** Descrição do papel para exibir como dica. */
+export function papelConviteDesc(p) {
+  return PAPEL_CONVITE_OPCOES.find((o) => o.value === String(p || '').toUpperCase())?.desc || ''
+}
 
 /** Rótulo legível do papel familiar. */
 export function papelFamiliaLabel(p) {

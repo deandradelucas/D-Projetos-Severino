@@ -104,6 +104,10 @@
   color: #1e293b;
 }
 
+.trial-reval-msg {
+  color: #9a6c16;
+}
+
 /* ─── Botão de suporte (WhatsApp) ─── */
 .trial-support {
   background: rgba(37, 211, 102, 0.07);

@@ -27,14 +27,24 @@ export default function ConfigBiometriaCard({
           className="config-action-btn config-action-btn--primary"
           disabled={!usuarioIdHeader || bioRegistering || !biometricSupported}
           onClick={handleRegisterBiometric}
+          title={!biometricSupported ? 'Disponível só em conexão segura (HTTPS)' : undefined}
         >
           {bioRegistering ? 'Ativando…' : 'Ativar'}
         </button>
       </div>
 
+      {!biometricSupported ? (
+        <p className="config-bio-unsupported">
+          A biometria só funciona em <strong>conexão segura (HTTPS)</strong> ou em <strong>localhost</strong>. No app publicado funciona normalmente; ao abrir pelo IP da rede (http://…) o navegador bloqueia por segurança.
+        </p>
+      ) : null}
+
       <div className="config-security-panel">
         {webauthnLoading ? (
-          <p className="config-empty-note">Carregando dispositivos…</p>
+          <ul className="config-bio-list" aria-busy="true" aria-label="Carregando dispositivos">
+            <li className="config-skeleton-row" />
+            <li className="config-skeleton-row" />
+          </ul>
         ) : webauthnError ? (
           <div className="config-empty-note">
             <span>{webauthnError}</span>
@@ -51,16 +61,15 @@ export default function ConfigBiometriaCard({
             {webauthnList.map((row) => (
               <li key={row.id} className="config-bio-item">
                 <span>
-                  <strong>
+                  <strong>{row.friendly_name || 'Dispositivo'}</strong>
+                  <small>
                     {row.created_at
-                      ? new Date(row.created_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
-                      : 'Dispositivo cadastrado'}
-                  </strong>
-                  {row.last_used_at ? (
-                    <small>
-                      Último uso: {new Date(row.last_used_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
-                    </small>
-                  ) : null}
+                      ? `Cadastrado em ${new Date(row.created_at).toLocaleDateString('pt-BR', { dateStyle: 'short' })}`
+                      : 'Cadastrado'}
+                    {row.last_used_at
+                      ? ` · último uso ${new Date(row.last_used_at).toLocaleDateString('pt-BR', { dateStyle: 'short' })}`
+                      : ''}
+                  </small>
                 </span>
                 <button type="button" className="config-action-btn" onClick={() => setConfirmBiometricRemoval(row.id)}>
                   Remover

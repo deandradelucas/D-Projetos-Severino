@@ -7,6 +7,8 @@ export default function ConfirmDialog({
   confirmLabel = 'Confirmar',
   cancelLabel = 'Cancelar',
   tone = 'danger',
+  /** Se definido, exige digitar exatamente esta palavra para liberar o Confirmar. */
+  requireText,
   onConfirm,
   onClose,
 }) {
@@ -14,6 +16,13 @@ export default function ConfirmDialog({
   const messageId = useId()
   const confirmButtonRef = useRef(null)
   const [pending, setPending] = useState(false)
+  const [typed, setTyped] = useState('')
+
+  useEffect(() => {
+    if (!open) setTyped('')
+  }, [open])
+
+  const matches = !requireText || typed.trim().toUpperCase() === String(requireText).toUpperCase()
 
   useEffect(() => {
     if (!open) return undefined
@@ -76,6 +85,21 @@ export default function ConfirmDialog({
         <div className="confirm-dialog__body">
           <h2 id={titleId}>{title}</h2>
           <p id={messageId}>{message}</p>
+          {requireText ? (
+            <label className="confirm-dialog__require">
+              <span>Digite <strong>{requireText}</strong> para confirmar</span>
+              <input
+                type="text"
+                className="confirm-dialog__require-input"
+                value={typed}
+                onChange={(e) => setTyped(e.target.value)}
+                placeholder={requireText}
+                autoComplete="off"
+                disabled={pending}
+                aria-label={`Digite ${requireText} para confirmar`}
+              />
+            </label>
+          ) : null}
         </div>
         <div className="confirm-dialog__actions">
           <button type="button" className="confirm-dialog__btn confirm-dialog__btn--secondary" onClick={onClose} disabled={pending}>
@@ -86,7 +110,7 @@ export default function ConfirmDialog({
             type="button"
             className="confirm-dialog__btn confirm-dialog__btn--danger"
             onClick={handleConfirm}
-            disabled={pending}
+            disabled={pending || !matches}
           >
             {pending ? 'Aguarde...' : confirmLabel}
           </button>

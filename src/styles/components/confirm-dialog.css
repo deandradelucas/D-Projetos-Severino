@@ -48,6 +48,16 @@
 }
 .confirm-dialog__body p { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary); }
 
+/* campo de confirmação por digitação (ações destrutivas que exigem confirmar) */
+.confirm-dialog__require { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 16px; text-align: left; }
+.confirm-dialog__require > span { font-size: 0.8rem; color: var(--text-secondary); }
+.confirm-dialog__require-input {
+  width: 100%; box-sizing: border-box; padding: 10px 12px;
+  border-radius: var(--r-md); border: 1px solid var(--hairline-strong);
+  background: var(--surface); color: var(--text-primary); font-size: 0.95rem; letter-spacing: 0.04em;
+}
+.confirm-dialog__require-input:focus { outline: none; border-color: var(--error); box-shadow: 0 0 0 3px var(--error-muted); }
+
 .confirm-dialog__actions { display: flex; gap: 10px; width: 100%; margin-top: 22px; }
 .confirm-dialog__btn {
   flex: 1;

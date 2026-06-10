@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BRAND_ASSETS } from '../lib/brandAssets'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
 import '../styles/legacy/bem-vindo-assinatura.css'
 
 function readUser() {
@@ -48,6 +49,29 @@ export default function BemVindoAssinatura() {
     trialEnd && !Number.isNaN(trialEnd.getTime())
       ? trialEnd.toLocaleString('pt-BR', { dateStyle: 'long' })
       : null
+
+  // Preço real do catálogo (âncora de valor — mostrado como "depois do teste").
+  const [precos, setPrecos] = useState({ mensal: 10, anual: 100 })
+  useEffect(() => {
+    let cancel = false
+    ;(async () => {
+      try {
+        const res = await apiFetch(apiUrl('/api/pagamentos/config'))
+        if (!res.ok || cancel) return
+        const c = await res.json()
+        const m = Number(c.preco_mensal)
+        const a = Number(c.preco_anual)
+        setPrecos({
+          mensal: Number.isFinite(m) && m > 0 ? m : 10,
+          anual: Number.isFinite(a) && a > 0 ? a : 100,
+        })
+      } catch {
+        /* mantém fallback */
+      }
+    })()
+    return () => { cancel = true }
+  }, [])
+  const mensalEquivAnual = precos.anual / 12
 
   useEffect(() => {
     if (previewMode) return
@@ -117,17 +141,17 @@ export default function BemVindoAssinatura() {
   }
 
   return (
-    <div className="bemvindo-screen relative flex min-h-[100dvh] min-h-[100svh] w-full items-center justify-center overflow-y-auto px-4 py-3">
-      <div className="relative w-full max-w-[400px]">
+    <div className="bemvindo-screen relative flex min-h-[100dvh] min-h-[100svh] w-full items-center justify-center overflow-y-auto px-4 py-2 sm:py-3">
+      <div className="relative w-full max-w-[400px] lg:max-w-[480px]">
         <div className="bemvindo-topline absolute -top-px left-10 right-10 h-px" aria-hidden />
 
-        <div className="bemvindo-card relative rounded-[22px] px-5 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-5">
+        <div className="bemvindo-card relative rounded-[22px] px-5 pb-3.5 pt-3.5 sm:px-6 sm:pb-5 sm:pt-5 lg:px-8 lg:pb-6 lg:pt-6">
           {/* Topo: logo + badge */}
-          <div className="mb-3 text-center">
+          <div className="mb-2.5 text-center lg:mb-3.5">
             <img
               src={BRAND_ASSETS.loginSeverinoLight}
               alt="Severino"
-              className="mx-auto mb-2 h-auto w-full max-w-[108px] object-contain"
+              className="mx-auto mb-2 h-auto w-full max-w-[104px] object-contain lg:max-w-[124px]"
             />
             <span className="bemvindo-badge inline-flex items-center gap-1.5 rounded-full px-2.5 py-[3px] text-[9.5px] font-semibold uppercase tracking-widest">
               <span className="relative flex h-[5px] w-[5px] shrink-0">
@@ -139,24 +163,24 @@ export default function BemVindoAssinatura() {
           </div>
 
           {/* Headline */}
-          <div className="mb-3 text-center">
-            <h1 className="bemvindo-title mb-1.5 text-[18px] font-bold leading-[1.18] tracking-tight sm:text-[19px]">
+          <div className="mb-2.5 text-center lg:mb-3.5">
+            <h1 className="bemvindo-title mb-1.5 text-[18px] font-bold leading-[1.18] tracking-tight sm:text-[19px] lg:text-[23px]">
               {primeiroNome ? `${primeiroNome}, em 2 minutos por dia você assume o ` : 'Em 2 minutos por dia você assume o '}
               <span className="bemvindo-title-accent">controle total</span> do seu dinheiro.
             </h1>
-            <p className="bemvindo-subtitle text-[11.5px] leading-snug sm:text-[12px]">
-              Lança o gasto pelo WhatsApp, o Severino organiza tudo, te avisa antes da conta vencer e mostra pra onde cada real está indo.{' '}
+            <p className="bemvindo-subtitle text-[11.5px] leading-snug sm:text-[12px] lg:text-[13.5px]">
+              Lança pelo WhatsApp, o Severino organiza, avisa antes de vencer e mostra pra onde vai cada real.{' '}
               <span className="bemvindo-subtitle-accent">Sem planilha, sem esforço.</span>
             </p>
           </div>
 
           {/* Bullets */}
-          <p className="bemvindo-bullets-label mb-1.5 text-[9.5px] font-semibold uppercase tracking-widest">
+          <p className="bemvindo-bullets-label mb-1.5 text-[9.5px] font-semibold uppercase tracking-widest lg:text-[10.5px]">
             O que você desbloqueia agora
           </p>
-          <ul className="mb-2.5 space-y-1">
+          <ul className="mb-2.5 space-y-1 lg:space-y-1.5">
             {TRANSFORMACOES.map((item) => (
-              <li key={item} className="bemvindo-bullet flex items-center gap-2.5 text-[12px] leading-snug">
+              <li key={item} className="bemvindo-bullet flex items-center gap-2.5 text-[12px] leading-snug lg:text-[13.5px]">
                 <span className="bemvindo-bullet-icon flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full">
                   <svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden>
                     <path d="M2 5.5l2 2 4-4" stroke="#b8832a" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
@@ -168,12 +192,13 @@ export default function BemVindoAssinatura() {
           </ul>
 
           {/* Trial */}
-          <div className="bemvindo-trial mb-3 rounded-[12px] px-3.5 py-2">
-            <p className="bemvindo-trial-title text-[12px] font-semibold">
+          <div className="bemvindo-trial mb-2.5 rounded-[12px] px-3.5 py-2 lg:mb-3.5 lg:py-2.5">
+            <p className="bemvindo-trial-title text-[12px] font-semibold lg:text-[13.5px]">
               {dias} dias com tudo liberado. Você não paga nada agora.
             </p>
-            <p className="bemvindo-trial-text text-[11px] leading-snug">
-              Testa o Severino inteiro. Não curtiu? Cancela em 1 clique, sem pegadinha — você só paga se decidir continuar.
+            <p className="bemvindo-trial-text text-[11px] leading-snug lg:text-[12.5px]">
+              Testa o Severino inteiro. Não curtiu? Cancela em 1 clique — você só paga se continuar:{' '}
+              <strong className="bemvindo-trial-strong">{formatCurrencyBRL(mensalEquivAnual)}/mês</strong> no plano anual (ou {formatCurrencyBRL(precos.mensal)}/mês).
               {trialEndStr && (
                 <> Acesso até <strong className="bemvindo-trial-strong">{trialEndStr}</strong>.</>
               )}
@@ -189,7 +214,7 @@ export default function BemVindoAssinatura() {
           <div className="flex flex-col gap-1">
             <Link
               to="/pagamento"
-              className="bemvindo-cta flex w-full items-center justify-center gap-2 rounded-[13px] py-2.5 text-[13px] font-semibold no-underline transition-all duration-200 hover:brightness-[1.04] active:scale-[0.98] sm:text-[13.5px]"
+              className="bemvindo-cta flex w-full items-center justify-center gap-2 rounded-[13px] py-2.5 text-[13px] font-semibold no-underline transition-all duration-200 hover:brightness-[1.04] active:scale-[0.98] sm:text-[13.5px] lg:py-3 lg:text-[15px]"
             >
               Quero o controle completo agora
               <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden>
@@ -205,9 +230,9 @@ export default function BemVindoAssinatura() {
               type="button"
               disabled={busy}
               onClick={handleEntrarNoApp}
-              className="bemvindo-skip w-full py-1 text-center text-[12px] font-medium transition-colors hover:underline disabled:cursor-not-allowed disabled:opacity-40"
+              className="bemvindo-secondary mt-0.5 flex w-full items-center justify-center rounded-[13px] py-2 text-[12px] font-medium transition-colors duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 lg:text-[13px]"
             >
-              {busy ? 'Entrando…' : 'Agora não, quero só explorar'}
+              {busy ? 'Entrando…' : 'Começar a usar agora'}
             </button>
 
             <a
