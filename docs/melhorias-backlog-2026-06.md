@@ -22,7 +22,7 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 
 | # | Item | Evidência | Esforço | Impacto |
 |---|------|-----------|---------|---------|
-| P1 | **`vendor-jspdf` (~431KB) com `modulepreload` p/ 100% dos usuários** | `dist/index.html` ainda tem o preload (confirmado hoje); causa = artefato do `manualChunks` | Médio (cirurgia no manualChunks do vite.config) | Alto — caminho crítico |
+| P1 | ✅ **FEITO (10/jun)** Removida a regra `id.includes('jspdf')` do manualChunks — ela arrastava um módulo compartilhado pro chunk e o entry passava a importá-lo estaticamente. Verificado no dist: zero modulepreload de jspdf, entry limpo, jspdf virou chunk assíncrono (~130KB gzip) carregado só ao exportar PDF. **−139KB gzip do caminho crítico de 100% dos usuários.** | `vite.config.js` | — | — |
 | P2 | ✅ **FEITO (10/jun)** `pwa-app-icon.png` 558KB→17KB (1254px→512px) + `Severino Tema Claro.png` 272KB→94KB (sharp, palette q90) — conferir visual do logo no login | `public/` | — | — |
 | P3 | ✅ **JÁ ESTAVA RESOLVIDO** (verificado 10/jun): o polling só roda com `visibilityState === 'visible'` e pula /pagamento, /investimentos e rotas de auth (`TransactionCacheContext.jsx:99-130`). Mantido como está — ampliar o skip arriscaria dados velhos no Dashboard. | — | — | — |
 | P4 | `line-awesome.min.css` 89KB no main — **A8 do squad foi marcado inválido** (fallback de ícones de categoria usa `las la-*`), mas dá pra subsetar a fonte só com os glifos usados | `TransacaoCategoriaIcon` | Médio | Baixo-médio |
@@ -57,7 +57,7 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 
 | # | Item | Por quê |
 |---|------|---------|
-| T1 | **Testes para `parcelas-pendentes.mjs` e `import/import-service.mjs`** | Únicas lógicas de dinheiro sem cobertura (pendência 06/jun); o resto da lógica financeira já tem |
+| T1 | ✅ **FEITO (10/jun)** +14 testes: `parcelas-pendentes.test.mjs` (5 — corte fim-do-dia BRT, filtros, contagem, propagação de erro) e `import-service.test.mjs` (9 — dedup intra-lote com counter, dedup vs banco, FITID, fallback Outros, meio-dia UTC, erros parciais, resumo/período) | — |
 | T2 | Teste dos novos rate limits + revogação de sessão pós-senha | Acabaram de entrar (commit 02f0390) |
 | T3 | `exportarDadosUsuario` (LGPD) e `agenda_eventos` sem limit/paginação | BACKEND-6/12 squad — crescem sem teto |
 | T4 | Fuzzy lookup em `payer_email` (viola rule data-lookup-safety) | `pagamentos-asaas.mjs:272` |

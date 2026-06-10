@@ -83,7 +83,10 @@ export default defineConfig(({ mode }) => {
               return 'vendor-react'
             }
             if (id.includes('recharts')) return 'vendor-recharts'
-            if (id.includes('jspdf')) return 'vendor-jspdf'
+            /* SEM regra para jspdf: forçar `id.includes('jspdf')` arrastava um módulo
+             * compartilhado pro chunk e o entry passava a importá-lo estaticamente —
+             * 431KB com modulepreload para 100% dos usuários (auditoria C5/P1).
+             * O `import('jspdf')` dinâmico em relatorioExportPdf já separa o chunk. */
           },
         },
       },
