@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useModalA11y } from '../../hooks/useModalA11y'
 import { useSheetDragClose } from '../../hooks/useSheetDragClose'
 import { useKeyboardOffset } from '../../hooks/useKeyboardOffset'
-import { IconX } from './ListaIcons'
+import { IconX, IconSupermercado, IconChecklist } from './ListaIcons'
 import {
   formatarMoeda, CATEGORIA_EMOJI, dataHojeIso, detectarCategoria,
   encontrarSubcategoriaMercado,
@@ -90,7 +90,7 @@ export function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
                 onClick={() => setTipo('compras')}
                 aria-pressed={tipo === 'compras'}
               >
-                🛒 Compras
+                <IconSupermercado /> Compras
               </button>
               <button
                 type="button"
@@ -98,7 +98,7 @@ export function ModalNovaLista({ onClose, onCriada, pessoalParam = '' }) {
                 onClick={() => setTipo('tarefas')}
                 aria-pressed={tipo === 'tarefas'}
               >
-                ✓ Tarefas
+                <IconChecklist /> Tarefas
               </button>
             </div>
             <p className="page-lista-compras__tipo-hint">

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { IconX, IconCheck } from './ListaIcons'
+import { IconX, IconCheck, IconSparkles, IconSupermercado } from './ListaIcons'
 import { formatarMoeda } from '../../lib/listaCompras'
 
 // Modo Comprando — tela fullscreen para o mercado. Extraído de pages/ListaDeCompras.jsx.
@@ -70,7 +70,7 @@ export function ModoComprando({ lista, itens, onToggle, onClose }) {
       <div className="modo-comprando__scroll">
         {pendentes.length === 0 && (
           <div className="modo-comprando__done">
-            <span className="modo-comprando__done-emoji" aria-hidden="true">🎉</span>
+            <span className="modo-comprando__done-icon" aria-hidden="true"><IconSparkles /></span>
             <p className="modo-comprando__done-text">Tudo no carrinho!</p>
           </div>
         )}
@@ -111,7 +111,7 @@ export function ModoComprando({ lista, itens, onToggle, onClose }) {
 
       <footer className="modo-comprando__footer">
         <div className="modo-comprando__total">
-          <span className="modo-comprando__total-label">🛒 No carrinho</span>
+          <span className="modo-comprando__total-label"><IconSupermercado /> No carrinho</span>
           <span className="modo-comprando__total-value">{formatarMoeda(totalCarrinho)}</span>
         </div>
         <button type="button" className="modo-comprando__finish" onClick={onClose}>

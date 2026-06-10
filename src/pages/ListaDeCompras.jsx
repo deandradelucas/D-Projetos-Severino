@@ -69,6 +69,7 @@ export default function ListaDeCompras() {
   const [checkedAberto, setCheckedAberto] = useState(true)
   const [menuListaAberto, setMenuListaAberto] = useState(false)
   const [adicionando, setAdicionando] = useState(false)
+  const [quickNome, setQuickNome] = useState('') // adição rápida (nome só, 1un, sem preço)
   // { title, message, confirmLabel, tone, onConfirm } — null = fechado
   const [confirmacao, setConfirmacao] = useState(null)
   // Conta familiar
@@ -297,6 +298,15 @@ export default function ListaDeCompras() {
       setAdicionando(false)
     }
   }, [listaAtiva, historico, pessoalParam, carregarItens])
+
+  // Adição rápida: só o nome → 1 unidade, sem preço (não abre modal)
+  const adicionarRapido = useCallback(async (e) => {
+    e?.preventDefault()
+    const nome = quickNome.trim()
+    if (!nome || adicionando) return
+    setQuickNome('')
+    await adicionarItem({ nome, quantidade: 1, unidade: 'un', unidades: 1, preco_estimado: null, prazo: null })
+  }, [quickNome, adicionando, adicionarItem])
 
   // -------------------------------------------------------------------------
   // Iniciar edição (abre o modal pré-preenchido)
@@ -836,6 +846,7 @@ export default function ListaDeCompras() {
 
                 {/* Abas de listas */}
                 {!loading && listas.length > 0 && (
+                  <div className="page-lista-compras__tabs-wrap">
                   <div className="page-lista-compras__tabs" role="tablist" aria-label="Suas listas de compras">
                     {listas.map((lista) => {
                       const contUnchecked = (lista.itens || []).filter((i) => !i.checked).length
@@ -859,6 +870,7 @@ export default function ListaDeCompras() {
                       )
                     })}
                   </div>
+                  </div>
                 )}
 
                 {/* Visão geral: nenhuma lista aberta, mas há listas — orienta o toque */}
@@ -871,6 +883,8 @@ export default function ListaDeCompras() {
                 {/* Cabeçalho da lista ativa com opções */}
                 {listaAtivaDados && (
                   <div className="page-lista-compras__active-head">
+                    <div className="page-lista-compras__active-head-main">
+                    <h2 className="page-lista-compras__active-name">{listaAtivaDados.nome}</h2>
                     <div className="page-lista-compras__active-head-tags">
                       {listaAtivaDados?.tipo === 'tarefas' ? (
                         <span className="page-lista-compras__lista-gasto-tag page-lista-compras__lista-gasto-tag--tarefas">
@@ -889,6 +903,25 @@ export default function ListaDeCompras() {
                         </span>
                       )}
                     </div>
+                    </div>
+                    {itens.length > 0 && (() => {
+                      const feitos = itens.filter((i) => i.checked).length
+                      const ehTarefas = listaAtivaDados?.tipo === 'tarefas'
+                      return (
+                        <span
+                          className="page-lista-compras__active-progress"
+                          aria-label={`${feitos} de ${itens.length} ${ehTarefas ? 'concluídas' : 'no carrinho'}`}
+                        >
+                          <span className="page-lista-compras__active-progress-bar" aria-hidden="true">
+                            <span
+                              className="page-lista-compras__active-progress-fill"
+                              style={{ width: `${itens.length ? (feitos / itens.length) * 100 : 0}%` }}
+                            />
+                          </span>
+                          {feitos} de {itens.length}
+                        </span>
+                      )
+                    })()}
                     <div className="page-lista-compras__list-menu" ref={menuListaRef}>
                       <button
                         type="button"
@@ -909,6 +942,26 @@ export default function ListaDeCompras() {
                               onClick={() => { setMenuListaAberto(false); setModoComprando(true) }}
                             >
                               <IconSupermercado /> Modo comprando
+                            </button>
+                          )}
+                          {temPreco && (
+                            <button
+                              type="button"
+                              role="menuitem"
+                              className="page-lista-compras__list-dropdown-item page-lista-compras__list-dropdown-item--accent"
+                              onClick={() => { setMenuListaAberto(false); setModalGasto(true) }}
+                            >
+                              <IconWallet /> Registrar como gasto
+                            </button>
+                          )}
+                          {temPreco && (
+                            <button
+                              type="button"
+                              role="menuitem"
+                              className="page-lista-compras__list-dropdown-item"
+                              onClick={() => { setMenuListaAberto(false); enviarWhatsApp() }}
+                            >
+                              <IconWhatsApp /> Enviar no WhatsApp
                             </button>
                           )}
                           <button
@@ -998,6 +1051,17 @@ export default function ListaDeCompras() {
                   </div>
                 )}
 
+                {/* Tudo comprado/concluído — todos os itens marcados */}
+                {!loadingItens && itensAgrupados.unchecked.length === 0 && itensAgrupados.checked.length > 0 && (
+                  <div className="page-lista-compras__concluida" role="status">
+                    <span className="page-lista-compras__concluida-icon" aria-hidden="true"><IconCheck /></span>
+                    <div className="page-lista-compras__concluida-text">
+                      <strong>{listaAtivaDados?.tipo === 'tarefas' ? 'Tudo concluído!' : 'Tudo comprado!'}</strong>
+                      <span>{itensAgrupados.checked.length} {itensAgrupados.checked.length === 1 ? 'item' : 'itens'} {listaAtivaDados?.tipo === 'tarefas' ? 'concluídos' : 'no carrinho'}</span>
+                    </div>
+                  </div>
+                )}
+
                 {/* Itens (unchecked) — lista única, sem cabeçalhos de categoria */}
                 {!loadingItens && itensAgrupados.unchecked.length > 0 && (
                   <div className="page-lista-compras__category-group">
@@ -1050,14 +1114,35 @@ export default function ListaDeCompras() {
                   </div>
                 )}
 
-              </div>
-            </RefDashboardScroll>
-          </div>
+                {/* Adição rápida — só o nome, vira item com 1un e sem preço */}
+                {listaAtiva && !loadingItens && itens.length > 0 && (
+                  <form className="page-lista-compras__quick-add" onSubmit={adicionarRapido}>
+                    <span className="page-lista-compras__quick-add-icon" aria-hidden="true"><IconPlus /></span>
+                    <input
+                      type="text"
+                      className="page-lista-compras__quick-add-input"
+                      value={quickNome}
+                      onChange={(e) => setQuickNome(e.target.value)}
+                      placeholder="Adicionar rápido"
+                      aria-label="Adicionar item rápido (só o nome, 1 unidade, sem preço)"
+                      maxLength={200}
+                    />
+                    {quickNome.trim() && (
+                      <button
+                        type="submit"
+                        className="page-lista-compras__quick-add-btn"
+                        disabled={adicionando}
+                        aria-label="Adicionar item"
+                      >
+                        Adicionar
+                      </button>
+                    )}
+                  </form>
+                )}
 
-          {/* Footer unificado: Total + Novo item + Registrar como gasto.
-              Só com itens — lista vazia usa o FAB padrão (sem footer p/ colidir). */}
-          {listaAtiva && itens.length > 0 && (
-            <div className={`page-lista-compras__footer${temPreco ? '' : ' page-lista-compras__footer--solo'}`}>
+                {/* Footer em fluxo — abaixo do último item da lista (não mais sticky) */}
+                {listaAtiva && itens.length > 0 && (
+                  <div className={`page-lista-compras__footer${temPreco ? '' : ' page-lista-compras__footer--solo'}`}>
               {orcamento != null && (
                 <div className={`page-lista-compras__orcamento${orcamentoExcedido ? ' page-lista-compras__orcamento--excedido' : ''}`}>
                   <div className="page-lista-compras__orcamento-top">
@@ -1089,55 +1174,34 @@ export default function ListaDeCompras() {
                   </span>
                 </div>
               )}
-              <div className="page-lista-compras__footer-main">
-                <div className="page-lista-compras__footer-total-row">
-                  {temPreco && (
-                    <p className="page-lista-compras__total">
-                      <span className="page-lista-compras__total-label">Total:</span>
-                      <span className="page-lista-compras__total-value">{formatarMoeda(totalEstimado)}</span>
-                    </p>
-                  )}
-                  <div className="page-lista-compras__footer-novo">
-                    <button
-                      type="button"
-                      className="page-lista-compras__novo-item-fab"
-                      onClick={() => setModalNovoItem(true)}
-                      aria-label="Adicionar novo item à lista"
-                    >
-                      <span className="page-lista-compras__novo-item-fab__icon" aria-hidden="true">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M12 5v14" />
-                          <path d="M5 12h14" />
-                        </svg>
-                      </span>
-                      <span className="page-lista-compras__novo-item-fab__label">Novo item</span>
-                    </button>
+              <div className="page-lista-compras__footer-actions">
+                <button
+                  type="button"
+                  className="page-lista-compras__novo-item-fab"
+                  onClick={() => setModalNovoItem(true)}
+                  aria-label="Adicionar novo item à lista"
+                >
+                  <span className="page-lista-compras__novo-item-fab__icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 5v14" />
+                      <path d="M5 12h14" />
+                    </svg>
+                  </span>
+                  <span className="page-lista-compras__novo-item-fab__label">Novo item</span>
+                </button>
+                {temPreco && (
+                  <p className="page-lista-compras__total">
+                    <span className="page-lista-compras__total-label">Total:</span>
+                    <span className="page-lista-compras__total-value">{formatarMoeda(totalEstimado)}</span>
+                  </p>
+                )}
                   </div>
                 </div>
+                )}
+
               </div>
-              {temPreco && (
-                <div className="page-lista-compras__footer-actions">
-                  <button
-                    type="button"
-                    className="page-lista-compras__wa-btn"
-                    onClick={enviarWhatsApp}
-                    aria-label="Enviar lista pelo WhatsApp"
-                    title="Enviar lista pelo WhatsApp"
-                  >
-                    <IconWhatsApp />
-                    <span className="page-lista-compras__wa-btn__label">WhatsApp</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="page-lista-compras__cta-btn"
-                    onClick={() => setModalGasto(true)}
-                  >
-                    Registrar como gasto
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+            </RefDashboardScroll>
+          </div>
 
         </main>
       </div>

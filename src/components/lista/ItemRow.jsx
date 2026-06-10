@@ -9,6 +9,9 @@ export function ItemRow({ item, onToggle, onRemover, onEditar, mostrarMedida = t
     ? new Date(item.prazo).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
     : null
   const { ref: swipeRef, closeIfOpen } = useSwipeReveal({ reveal: 72 })
+  // Medida só faz sentido quando é uma unidade real (kg, g, L…). Quando é "un"
+  // genérico, o stepper de unidades já comunica a contagem — esconde p/ não duplicar.
+  const medidaReal = item.unidade && item.unidade !== 'un'
   return (
     <div
       ref={swipeRef}
@@ -38,10 +41,10 @@ export function ItemRow({ item, onToggle, onRemover, onEditar, mostrarMedida = t
         )}
         {mostrarAutor && item.checked && item.checked_por_nome && (
           <span className="page-lista-compras__item-autor" title={`Marcado por ${item.checked_por_nome}`}>
-            ✓ {item.checked_por_nome}
+            <IconCheck /> {item.checked_por_nome}
           </span>
         )}
-        {mostrarMedida && (
+        {mostrarMedida && medidaReal && (
         <span className="page-lista-compras__item-qty">{Number(item.quantidade)} {item.unidade}</span>
         )}
         {mostrarMedida && onAjustarUnidades && (
@@ -73,6 +76,11 @@ export function ItemRow({ item, onToggle, onRemover, onEditar, mostrarMedida = t
           </span>
         )}
       </div>
+      <span className="page-lista-compras__item-swipe-hint" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </span>
       </div>
 
       <div className="page-lista-compras__item-actions">
