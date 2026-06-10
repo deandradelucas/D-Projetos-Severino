@@ -26,6 +26,7 @@ export default function ConfigPerfilCard({
   salvarTelefone,
   cancelarEditarTelefone,
   verif,
+  verifCooldown = 0,
   onVerificar,
   onConfirmarVerif,
   onReenviarVerif,
@@ -169,8 +170,8 @@ export default function ConfigPerfilCard({
           </div>
           {verif.erro ? <p className="config-verif-panel__err">{verif.erro}</p> : null}
           <div className="config-verif-panel__actions">
-            <button type="button" className="config-nome-edit-btn" onClick={() => onReenviarVerif?.()} disabled={verif.busy}>
-              Reenviar código
+            <button type="button" className="config-nome-edit-btn" onClick={() => onReenviarVerif?.()} disabled={verif.busy || verifCooldown > 0}>
+              {verifCooldown > 0 ? `Reenviar código (${verifCooldown}s)` : 'Reenviar código'}
             </button>
             <button type="button" className="config-nome-edit-btn" onClick={() => onCancelarVerif?.()} disabled={verif.busy}>
               Cancelar

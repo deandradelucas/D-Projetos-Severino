@@ -2,6 +2,7 @@ import crypto from 'node:crypto'
 import { log } from './logger.mjs'
 import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { sendEmail, smtpConfigured } from './email-sender.mjs'
+import { safeEqualStr } from './safe-equal.mjs'
 
 const OTP_WINDOW_MS = 15 * 60 * 1000
 const OTP_LENGTH = 6
@@ -9,7 +10,11 @@ const OTP_LENGTH = 6
 export { smtpConfigured as emailOtpEnabled }
 
 function pepper() {
-  return String(process.env.PASSWORD_OTP_PEPPER || process.env.HORIZONTE_OTP_PEPPER || 'horizonte-otp-v1')
+  const env = process.env.PASSWORD_OTP_PEPPER || process.env.HORIZONTE_OTP_PEPPER
+  if (!env && process.env.NODE_ENV === 'production') {
+    throw new Error('PASSWORD_OTP_PEPPER não configurado em produção.')
+  }
+  return String(env || 'horizonte-otp-v1')
 }
 
 function hashOtp(userId, otp) {
@@ -121,7 +126,7 @@ export async function verifyEmailOtp(userId, otpRaw) {
   }
 
   const expectedHash = hashOtp(userId, otp)
-  if (expectedHash !== user.email_otp_hash) {
+  if (!safeEqualStr(expectedHash, user.email_otp_hash)) {
     const e = new Error('Código incorreto. Verifique e tente novamente.')
     e.statusCode = 400
     throw e

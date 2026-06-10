@@ -17,6 +17,7 @@ import { sendRegistrationOtp, verifyRegistrationOtp } from '../lib/registration-
 import bcrypt from 'bcryptjs'
 import { authenticateUser } from '../lib/password-reset.mjs'
 import { getSupabaseAdmin } from '../lib/supabase-admin.mjs'
+import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 
 function validarCelularBr(raw) {
   const digits = String(raw || '').replace(/\D/g, '')
@@ -152,6 +153,9 @@ export function registerUsuarioPerfilRoutes(app) {
     try {
       const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const ipOk = await rateLimitTake(`perfil-otp-email-send:${clientKeyFromHono(c)}`, 10, 60 * 60_000)
+      const userOk = await rateLimitTake(`perfil-otp-email-send:${usuarioId}`, 5, 60 * 60_000)
+      if (!ipOk || !userOk) return c.json({ message: 'Muitos envios. Aguarde antes de pedir outro código.' }, 429)
       const perfil = await getPerfilUsuario(usuarioId)
       if (!perfil?.email) return c.json({ message: 'Nenhum e-mail cadastrado.' }, 400)
       if (perfil.email_verificado) return c.json({ message: 'E-mail já verificado.', jaVerificado: true })
@@ -169,6 +173,8 @@ export function registerUsuarioPerfilRoutes(app) {
     try {
       const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const verifOk = await rateLimitTake(`perfil-otp-email-verify:${usuarioId}`, 5, 15 * 60_000)
+      if (!verifOk) return c.json({ message: 'Muitas tentativas. Aguarde 15 minutos e solicite um novo código.' }, 429)
       let body
       try { body = await c.req.json() } catch { return c.json({ message: 'Corpo inválido.' }, 400) }
       await verifyEmailOtp(usuarioId, body?.codigo)
@@ -186,6 +192,9 @@ export function registerUsuarioPerfilRoutes(app) {
     try {
       const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const ipOk = await rateLimitTake(`perfil-otp-tel-send:${clientKeyFromHono(c)}`, 10, 60 * 60_000)
+      const userOk = await rateLimitTake(`perfil-otp-tel-send:${usuarioId}`, 5, 60 * 60_000)
+      if (!ipOk || !userOk) return c.json({ message: 'Muitos envios. Aguarde antes de pedir outro código.' }, 429)
       const perfil = await getPerfilUsuario(usuarioId)
       if (!perfil?.telefone) return c.json({ message: 'Nenhum telefone cadastrado.' }, 400)
       if (perfil.telefone_verificado) return c.json({ message: 'Telefone já verificado.', jaVerificado: true })
@@ -203,6 +212,8 @@ export function registerUsuarioPerfilRoutes(app) {
     try {
       const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const verifOk = await rateLimitTake(`perfil-otp-tel-verify:${usuarioId}`, 5, 15 * 60_000)
+      if (!verifOk) return c.json({ message: 'Muitas tentativas. Aguarde 15 minutos e solicite um novo código.' }, 429)
       let body
       try { body = await c.req.json() } catch { return c.json({ message: 'Corpo inválido.' }, 400) }
       await verifyRegistrationOtp(usuarioId, body?.codigo)
@@ -220,6 +231,8 @@ export function registerUsuarioPerfilRoutes(app) {
     try {
       const usuarioId = resolveRequestUserId(c)
       if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const senhaOk = await rateLimitTake(`perfil-senha:${usuarioId}`, 5, 15 * 60_000)
+      if (!senhaOk) return c.json({ message: 'Muitas tentativas. Aguarde 15 minutos.' }, 429)
       let body
       try { body = await c.req.json() } catch { return c.json({ message: 'Corpo inválido.' }, 400) }
       const senhaAtual = String(body?.senhaAtual || '')
@@ -240,7 +253,10 @@ export function registerUsuarioPerfilRoutes(app) {
         .update({ senha: senhaHash })
         .eq('id', usuarioId)
       if (error) throw error
-      return c.json({ message: 'Senha alterada com sucesso.' })
+      // Revoga refresh tokens: sessões antigas (inclusive de um eventual invasor)
+      // não sobrevivem à troca de senha. O access token atual segue até expirar.
+      try { await revogarSessoesUsuario(usuarioId) } catch (e) { log.error('revogar sessoes pos-senha failed', e) }
+      return c.json({ message: 'Senha alterada com sucesso. Os outros dispositivos precisarão fazer login novamente.' })
     } catch (error) {
       log.error('alterar senha failed', error)
       return c.json({ message: 'Erro ao alterar a senha.' }, 500)

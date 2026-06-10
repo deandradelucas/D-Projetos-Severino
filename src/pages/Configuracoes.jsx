@@ -106,8 +106,19 @@ export default function Configuracoes() {
 
   // Verificação de e-mail/telefone (OTP) a partir das Configurações
   const [verif, setVerif] = useState({ canal: null, codigo: '', busy: false, erro: '', destino: '' })
+  // Cooldown de reenvio (segundos restantes) — evita toques repetidos dispararem
+  // múltiplos envios de e-mail/WhatsApp antes do rate limit do servidor.
+  const [verifCooldown, setVerifCooldown] = useState(0)
+  useEffect(() => {
+    if (verifCooldown <= 0) return undefined
+    const t = setTimeout(() => setVerifCooldown((s) => s - 1), 1000)
+    return () => clearTimeout(t)
+  }, [verifCooldown])
 
+  const verifEnviandoRef = useRef(false)
   const enviarOtpVerificacao = useCallback(async (canal) => {
+    if (verifEnviandoRef.current) return
+    verifEnviandoRef.current = true
     setVerif((v) => ({ ...v, canal, busy: true, erro: '' }))
     try {
       const url = canal === 'email'
@@ -117,8 +128,11 @@ export default function Configuracoes() {
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data?.message || 'Não foi possível enviar o código.')
       setVerif({ canal, codigo: '', busy: false, erro: '', destino: data?.destino || '' })
+      setVerifCooldown(30)
     } catch (e) {
       setVerif((v) => ({ ...v, canal, busy: false, erro: e.message || 'Erro ao enviar o código.' }))
+    } finally {
+      verifEnviandoRef.current = false
     }
   }, [])
 
@@ -801,6 +815,7 @@ export default function Configuracoes() {
             salvarTelefone={salvarTelefone}
             cancelarEditarTelefone={cancelarEditarTelefone}
             verif={verif}
+            verifCooldown={verifCooldown}
             onVerificar={enviarOtpVerificacao}
             onConfirmarVerif={confirmarOtpVerificacao}
             onReenviarVerif={() => enviarOtpVerificacao(verif.canal)}
