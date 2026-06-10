@@ -23,7 +23,7 @@ import { getSaudacao } from '../lib/getSaudacao'
 import { getWhatsappContactUrl } from '../lib/whatsappContactUrl.js'
 import { SkeletonKpi, SkeletonTxRow } from '../components/dashboard/DashboardSkeletons'
 import RefDashboardScroll from '../components/RefDashboardScroll'
-import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon'
+import { TransacaoCategoriaIcon, getCategoriaIconChipStyle } from '../components/TransacaoCategoriaIcon'
 import PwaInstallBanner from '../components/PwaInstallBanner'
 import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
 import { useFabCompact } from '../hooks/useFabCompact'
@@ -595,7 +595,11 @@ export default function Dashboard() {
                     return (
                       <div key={t.id} className="ref-tx-row">
                         <div className="ref-tx-icon-cell">
-                          <div className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}`} aria-hidden>
+                          <div
+                            className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}`}
+                            style={getCategoriaIconChipStyle(catNome, subNome) || undefined}
+                            aria-hidden
+                          >
                             <TransacaoCategoriaIcon
                               categoriaNome={catNome}
                               subcategoriaNome={subNome}

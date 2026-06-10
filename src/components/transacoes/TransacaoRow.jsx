@@ -1,6 +1,6 @@
 import React from 'react'
 import RecorrenciaArrowIcon from '../RecorrenciaArrowIcon'
-import { TransacaoCategoriaIcon } from '../TransacaoCategoriaIcon'
+import { TransacaoCategoriaIcon, getCategoriaIconChipStyle } from '../TransacaoCategoriaIcon'
 import { formatCurrencyBRL } from '../../lib/formatCurrency'
 import { formatTransacaoListDateTime } from '../../lib/transacaoDateDisplay'
 import { transacaoDescricaoEfetiva } from '../../lib/transacaoUtils'
@@ -164,7 +164,11 @@ export function TransacaoRow({
             </span>
           </label>
         ) : null}
-        <div className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}`} aria-hidden>
+        <div
+          className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}`}
+          style={getCategoriaIconChipStyle(catNome, subNome || undefined) || undefined}
+          aria-hidden
+        >
           <TransacaoCategoriaIcon
             categoriaNome={catNome}
             subcategoriaNome={subNome || undefined}

@@ -1,7 +1,7 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
 import { formatCurrencyBRL } from '../../lib/formatCurrency'
-import { TransacaoCategoriaIcon } from '../TransacaoCategoriaIcon'
+import { TransacaoCategoriaIcon, getCategoriaIconChipStyle } from '../TransacaoCategoriaIcon'
 import { transacaoDescricaoEfetiva } from '../../lib/transacaoUtils'
 import { useSheetDragClose } from '../../hooks/useSheetDragClose'
 import { useModalA11y } from '../../hooks/useModalA11y'
@@ -69,7 +69,11 @@ export function TransacaoDetalheModal({ tx, onClose, onEdit, onDelete, privacyMo
         </div>
 
         <div className="tx-detalhe-modal__hero">
-          <span className="tx-detalhe-modal__icon" aria-hidden>
+          <span
+            className="tx-detalhe-modal__icon"
+            style={getCategoriaIconChipStyle(catNome, subNome || undefined) || undefined}
+            aria-hidden
+          >
             <TransacaoCategoriaIcon
               categoriaNome={catNome}
               subcategoriaNome={subNome || undefined}
