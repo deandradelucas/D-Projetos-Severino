@@ -11,9 +11,9 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 | # | Item | Evidência | Esforço | Impacto |
 |---|------|-----------|---------|---------|
 | S1 | **Refresh token em `localStorage`** → migrar p/ cookie `HttpOnly; Secure; SameSite=Strict` | `horizonteAccessToken.js:23` (confirmado hoje) | Médio-alto (mexe no fluxo login/refresh, testar bem) | Alto — XSS hoje rouba sessão de 30d |
-| S2 | **CORS aceita `http://` p/ mestredamente.com** | `app.mjs:35` (comentário diz que é intencional p/ Hostinger sem TLS) | Baixo — confirmar HTTPS forçado no Traefik e trocar regex p/ `https` | Médio (MITM) |
-| S3 | **`REDIS_URL` não configurada** → rate limit in-memory zera a cada restart PM2 + cooldowns Asaas em `Map()` | `.env*` sem REDIS_URL (confirmado hoje); rate-limit.mjs já suporta Redis | Baixo (subir Redis na VPS + 1 env) | Médio |
-| S4 | **`X-Forwarded-For` confiável sem validação** → bypass de rate limit por IP | `rate-limit.mjs:62` | Baixo (trustedIPs no Traefik) | Médio |
+| S2 | ✅ **FEITO (10/jun, commit 8251ffa)** CORS de mestredamente.com agora é https-only (Traefik já redireciona http globalmente; exceções via `CORS_ORIGINS`) | `app.mjs` | — | — |
+| S3 | **`REDIS_URL` não configurada** → rate limit in-memory zera a cada restart PM2 + cooldowns Asaas em `Map()` — **PENDENTE: rodar roteiro na VPS** (instalar redis-server + env + restart) | rate-limit.mjs já suporta Redis | Baixo | Médio |
+| S4 | ✅ **FEITO (10/jun, commit 8251ffa)** resolvido no código (sem mexer no Traefik/Easypanel): `clientKeyFromHono` usa o ÚLTIMO IP do XFF (acrescentado pelo nosso proxy) em vez do primeiro (forjável) + 4 testes | `rate-limit.mjs` | — | — |
 | S5 | ✅ **FEITO (10/jun)** Senha mínima 8 chars onde se CRIA senha (cadastro, troca, recuperação WhatsApp, front) — login continua aceitando 6 p/ contas antigas | `register-auth.mjs`, `register-usuario-perfil.mjs`, `password-otp-whatsapp.mjs`, `Cadastro/Login/Configuracoes.jsx` | — | — |
 | S6 | Token do webhook WhatsApp no path da URL (vaza em logs) | SEC-10 squad | Baixo | Baixo |
 | S7 | Rotação das chaves Asaas/N8N (C1 squad — **depende do CEO nos painéis**) | guard anti-segredo já instalado | — | Alto se nunca rotacionou |
@@ -87,7 +87,17 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 ## Sugestão de pacotes de execução
 
 1. ✅ **Pacote "1 tarde" (quick wins) — CONCLUÍDO em 10/jun:** S5, P2, B1-B4, U6 feitos; U4 já estava resolvido; P5 não-aplicável.
-2. **Pacote "infra de produção":** S3 (Redis) + S4 (trustedIPs) + S2 (CORS https) + S7 (rotação de chaves) — sobe a nota de segurança de uma vez.
+2. 🟡 **Pacote "infra de produção" — parte de código FEITA (10/jun):** S2 e S4 corrigidos no código (commit 8251ffa). **Resta na VPS:** S3 (Redis + REDIS_URL), PASSWORD_OTP_PEPPER no .env (pré-requisito do commit 02f0390!), e S7 rotação de chaves Asaas/N8N (manual, painéis). Roteiro:
+   ```bash
+   # na VPS (root):
+   apt-get update && apt-get install -y redis-server && systemctl enable --now redis-server
+   cd /home/lucas/severino
+   tail -c1 .env | read -r _ || echo >> .env   # garante newline no fim
+   echo "REDIS_URL=redis://127.0.0.1:6379" >> .env
+   echo "PASSWORD_OTP_PEPPER=$(openssl rand -hex 32)" >> .env
+   pm2 restart severino
+   curl -s http://localhost:3001/api/health
+   ```
 3. **Pacote "mobile polish":** U1 (touch targets) + U2 (emoji→SVG) + U5 (focus) + U8 + P3 — o app inteiro no padrão da Lista/Agenda.
 4. **Pacote "a11y modais":** U3 — `<Modal>` wrapper + rollout.
 5. **Epic produto:** F1 (escala da IA) → F2 (gamificação MVP) → F3 (push PWA) — nessa ordem; F7 de carona no F1.
