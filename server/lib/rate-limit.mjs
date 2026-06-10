@@ -60,7 +60,10 @@ export async function rateLimitTake(key, max = 30, windowMs = 60_000) {
 }
 
 export function clientKeyFromHono(c) {
+  /* Último IP do X-Forwarded-For: é o que o NOSSO proxy (Traefik) acrescenta.
+   * O primeiro é controlado pelo cliente — usar ele permite forjar o IP e
+   * contornar o rate limit enviando um XFF falso. */
   const xf = c.req.header('x-forwarded-for')
-  const first = xf ? xf.split(',')[0].trim() : ''
-  return first || c.req.header('x-real-ip') || c.req.header('cf-connecting-ip') || 'unknown'
+  const last = xf ? xf.split(',').pop().trim() : ''
+  return last || c.req.header('x-real-ip') || c.req.header('cf-connecting-ip') || 'unknown'
 }

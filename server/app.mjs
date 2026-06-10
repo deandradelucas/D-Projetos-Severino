@@ -31,8 +31,9 @@ function corsAllowedOrigin(origin) {
       return origin
     }
   }
-  /* http + https: evita preflight bloqueado se o front abrir sem TLS (Hostinger em HTTP). */
-  if (/^https?:\/\/([a-z0-9-]+\.)*mestredamente\.com$/i.test(origin)) return origin
+  /* Só https em produção: o Traefik redireciona http→https globalmente, então
+   * nenhum browser legítimo chega aqui com Origin http. Exceção via CORS_ORIGINS. */
+  if (/^https:\/\/([a-z0-9-]+\.)*mestredamente\.com$/i.test(origin)) return origin
   const extra = (process.env.CORS_ORIGINS || '')
     .split(',')
     .map((s) => s.trim())
