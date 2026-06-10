@@ -95,6 +95,7 @@
 .tx-parceladas-chip svg { flex-shrink: 0; }
 .tx-parceladas-chip:hover { background: var(--surface-2); color: var(--text-primary); }
 .tx-parceladas-chip--active { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
+.tx-parceladas-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* Contador ao lado do título: total normal; "X de Y" quando há filtro ativo */
 .tx-title-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -177,6 +178,7 @@
   cursor: pointer;
 }
 .page-transacoes-recorrencia-row__stop:hover { color: var(--error); border-color: var(--error); }
+.page-transacoes-recorrencia-row__stop:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ── Cabeçalho do painel da lista ──────────────────────────────────────────── */
 .page-transacoes-tx-panel-head { flex-direction: column; align-items: stretch; gap: 12px; }
@@ -215,6 +217,13 @@
   font-size: 0.8rem;
   cursor: pointer;
 }
+/* WCAG: hit area ≥44px sem alterar o visual circular de 22px */
+.tx-quick-search__clear::before {
+  content: '';
+  position: absolute;
+  inset: -11px;
+}
+.tx-quick-search__clear:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ── Chips de filtro rápido ────────────────────────────────────────────────── */
 /* linha única com rolagem horizontal (sem quebra em 2 linhas no mobile) */
@@ -246,6 +255,7 @@
 .tx-quick-chip--active { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
 .tx-quick-chip--reset { color: var(--text-muted); }
 .tx-quick-chip--reset:hover { color: var(--error); border-color: var(--error); background: var(--error-muted); }
+.tx-quick-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ── Resumo do filtro (Entradas / Saídas / Saldo) ──────────────────────────── */
 .tx-quick-summary {
@@ -352,6 +362,23 @@
 .transacoes-actions .btn-edit:hover { color: var(--accent); border-color: var(--accent-border); background: var(--accent-muted); }
 .transacoes-actions .btn-delete:hover { color: var(--error); border-color: var(--error); background: var(--error-muted); }
 
+/* ── WCAG touch targets ≥44×44 (hit area via ::before; visual mantido) ─────── */
+.transacoes-actions .btn-edit,
+.transacoes-actions .btn-delete { position: relative; }
+.transacoes-actions .btn-edit::before,
+.transacoes-actions .btn-delete::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+}
+
+/* ── focus-visible ring nos botões de ação ─────────────────────────────────── */
+.transacoes-actions .btn-edit:focus-visible,
+.transacoes-actions .btn-delete:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 @media (min-width: 769px) {
   .page-transacoes-ref-table .ref-tx-actions-cell { opacity: 0; transition: opacity 150ms var(--ease); }
   .page-transacoes-ref-table .ref-tx-row--v2:hover .ref-tx-actions-cell,
@@ -423,6 +450,40 @@
 .page-transacoes-parcelado-parcela__status--pendente { color: var(--accent); }
 .page-transacoes-parcelado-parcela__valor { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
 .page-transacoes-parcelado-parcela__acoes { display: flex; gap: 6px; }
+/* botões de parcela: sem dimensões explícitas → garantir ≥44px via hit area */
+.page-transacoes-parcelado-parcela__acoes .btn-edit,
+.page-transacoes-parcelado-parcela__acoes .btn-delete,
+.page-transacoes-parcelado-parcela__acoes .btn-marcar-paga {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  min-height: 30px;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+}
+.page-transacoes-parcelado-parcela__acoes .btn-edit::before,
+.page-transacoes-parcelado-parcela__acoes .btn-delete::before,
+.page-transacoes-parcelado-parcela__acoes .btn-marcar-paga::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+}
+.page-transacoes-parcelado-parcela__acoes .btn-edit { color: var(--text-secondary); }
+.page-transacoes-parcelado-parcela__acoes .btn-edit:hover { color: var(--accent); }
+.page-transacoes-parcelado-parcela__acoes .btn-delete { color: var(--text-secondary); }
+.page-transacoes-parcelado-parcela__acoes .btn-delete:hover { color: var(--error); }
+.page-transacoes-parcelado-parcela__acoes .btn-marcar-paga { color: var(--success); }
+.page-transacoes-parcelado-parcela__acoes .btn-edit:focus-visible,
+.page-transacoes-parcelado-parcela__acoes .btn-delete:focus-visible,
+.page-transacoes-parcelado-parcela__acoes .btn-marcar-paga:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 /* ── Footer de totais (aba Parceladas) ─────────────────────────────────────── */
 .page-transacoes-parcelados-footer {
@@ -460,6 +521,7 @@
   transition: background 150ms var(--ease), color 150ms var(--ease);
 }
 .page-transacoes-load-more:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-transacoes-load-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ── Estados vazios ────────────────────────────────────────────────────────── */
 .ref-empty-state { padding: 32px 12px; text-align: center; }

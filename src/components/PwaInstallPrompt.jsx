@@ -28,6 +28,12 @@ function isIosDevice() {
   return /iphone|ipad|ipod/i.test(ua) || (window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1)
 }
 
+/** Chrome/Firefox/Edge/Opera no iOS: o passo a passo do Safari não se aplica
+ * (o ícone de compartilhar fica em outro lugar). */
+function isIosNonSafari() {
+  return /CriOS|FxiOS|EdgiOS|OPiOS|OPT\//i.test(window.navigator.userAgent || '')
+}
+
 function shouldSuppress() {
   try {
     const count = Number(window.localStorage.getItem(DISMISS_COUNT_KEY) || 0)
@@ -154,13 +160,20 @@ export default function PwaInstallPrompt() {
           <div className="pwa-install-sheet__body">
             <p className="pwa-install-sheet__eyebrow">Instale no iPhone</p>
             <h2 className="pwa-install-sheet__title" id="pwa-install-title">Severino na tela inicial</h2>
-            <p className="pwa-install-sheet__text">
-              No Safari, toque em{' '}
-              <span className="pwa-install-sheet__ios-share" aria-hidden>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 15V3M8 7l4-4 4 4" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" /></svg>
-              </span>{' '}
-              Compartilhar e depois em <strong>Adicionar à Tela de Início</strong>.
-            </p>
+            {isIosNonSafari() ? (
+              <p className="pwa-install-sheet__text">
+                Toque no menu de <strong>Compartilhar</strong> do navegador e depois em{' '}
+                <strong>Adicionar à Tela de Início</strong> — ou abra este site no <strong>Safari</strong>.
+              </p>
+            ) : (
+              <p className="pwa-install-sheet__text">
+                No Safari, toque em{' '}
+                <span className="pwa-install-sheet__ios-share" aria-hidden>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 15V3M8 7l4-4 4 4" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" /></svg>
+                </span>{' '}
+                Compartilhar e depois em <strong>Adicionar à Tela de Início</strong>.
+              </p>
+            )}
             {benefits}
           </div>
         </div>

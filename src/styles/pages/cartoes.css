@@ -47,6 +47,7 @@
   transition: background 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
 }
 .page-cartoes__sort-btn--active { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
+.page-cartoes__sort-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ── Abas + escopo + busca ─────────────────────────────────────────────────── */
 .page-cartoes__abas,
@@ -60,6 +61,8 @@
 }
 .page-cartoes__aba--active,
 .page-cartoes__escopo-btn--active { background: var(--surface); color: var(--accent); box-shadow: var(--elev-1); }
+.page-cartoes__aba:focus-visible,
+.page-cartoes__escopo-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .page-cartoes__busca { position: relative; display: flex; align-items: center; }
 .page-cartoes__busca-input {
   width: 100%; box-sizing: border-box; padding: 10px 14px;
@@ -67,6 +70,7 @@
   background: var(--surface-sunken); color: var(--text-primary); font-size: 0.9rem;
 }
 .page-cartoes__busca-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); background: var(--surface); }
+.page-cartoes__busca-input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); background: var(--surface); }
 
 /* ── Botões ────────────────────────────────────────────────────────────────── */
 .page-cartoes__btn-primary {
@@ -76,6 +80,7 @@
   font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: background 150ms var(--ease);
 }
 .page-cartoes__btn-primary:hover { background: var(--accent-hover); }
+.page-cartoes__btn-primary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .page-cartoes__btn-ghost {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 9px 14px; border-radius: var(--r-md);
@@ -83,6 +88,7 @@
   color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer;
 }
 .page-cartoes__btn-ghost:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-cartoes__btn-ghost:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ── Grid de cartões ───────────────────────────────────────────────────────── */
 .page-cartoes__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
@@ -130,13 +136,17 @@
   color: var(--card-accent); font-size: 0.84rem; font-weight: 600; cursor: pointer;
 }
 .page-cartoes__card-cta:hover { background: color-mix(in srgb, var(--card-accent) 12%, transparent); border-color: var(--card-accent); }
+.page-cartoes__card-cta:focus-visible { outline: 2px solid var(--card-accent); outline-offset: 2px; }
 .page-cartoes__card-menu-wrap { position: relative; }
 .page-cartoes__card-menu-btn {
   display: inline-flex; align-items: center; justify-content: center;
+  /* visual 32×32; área de toque expandida para ≥44×44 via padding + margem negativa */
   width: 32px; height: 32px; border-radius: var(--r-sm);
   border: 1px solid var(--hairline); background: var(--surface); color: var(--text-muted); cursor: pointer;
+  padding: 6px; margin: -6px;
 }
 .page-cartoes__card-menu-btn:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-cartoes__card-menu-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* limite (barra de uso) */
 .page-cartoes__limite { display: flex; flex-direction: column; gap: 5px; }
@@ -157,10 +167,20 @@
   transition: background 120ms var(--ease);
 }
 .page-cartoes__menu > button:hover { background: var(--surface-2); }
+.page-cartoes__menu > button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; background: var(--surface-2); }
 .page-cartoes__menu--danger { color: var(--error); }
 
 /* ── Fatura (modal/painel) ─────────────────────────────────────────────────── */
 .page-cartoes__fatura-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.page-cartoes__fatura-nav button {
+  /* hit area ≥44×44 — visual do ícone (18px) + padding 13px = 44px */
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; min-height: 44px;
+  border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: var(--r-sm);
+  transition: background 120ms var(--ease), color 120ms var(--ease);
+}
+.page-cartoes__fatura-nav button:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-cartoes__fatura-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .page-cartoes__fatura-mes { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
 /* conteúdo do modal de fatura: afastado das bordas + rolável */
 .page-cartoes__fatura-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 20px 18px; display: flex; flex-direction: column; gap: 14px; }
@@ -203,27 +223,38 @@
   font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 0.95rem;
 }
 .page-cartoes__input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+.page-cartoes__input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
 .page-cartoes__muted { color: var(--text-muted); font-size: 0.8rem; }
 
 /* seletor de cor */
-.page-cartoes__cor-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-.page-cartoes__cor-opt { width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; box-shadow: inset 0 0 0 1px var(--hairline); }
-.page-cartoes__cor-opt--active { border-color: var(--text-primary); }
-/* cores dos cartões (faltavam no flat — círculos apareciam vazios) */
-.page-cartoes__cor-opt--gold { background: var(--accent); }
-.page-cartoes__cor-opt--green { background: #22c55e; }
-.page-cartoes__cor-opt--blue { background: #3b82f6; }
-.page-cartoes__cor-opt--purple { background: #8b5cf6; }
-.page-cartoes__cor-opt--red { background: #ef4444; }
-.page-cartoes__cor-opt--teal { background: #14b8a6; }
-.page-cartoes__cor-opt--dark { background: #374151; }
-
+.page-cartoes__cor-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+.page-cartoes__cor-opt {
+  /* hit area 44×44; círculo colorido visual via ::after (32×32 centralizado) */
+  position: relative; width: 44px; height: 44px;
+  border-radius: 50%; border: none; background: transparent; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.page-cartoes__cor-opt::after {
+  content: ''; width: 32px; height: 32px; border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--hairline); border: 2px solid transparent;
+  background: var(--_cor, var(--accent));
+}
+.page-cartoes__cor-opt--active::after { border-color: var(--text-primary); }
+.page-cartoes__cor-opt--gold { --_cor: var(--accent); }
+.page-cartoes__cor-opt--green { --_cor: #22c55e; }
+.page-cartoes__cor-opt--blue { --_cor: #3b82f6; }
+.page-cartoes__cor-opt--purple { --_cor: #8b5cf6; }
+.page-cartoes__cor-opt--red { --_cor: #ef4444; }
+.page-cartoes__cor-opt--teal { --_cor: #14b8a6; }
+.page-cartoes__cor-opt--dark { --_cor: #374151; }
+.page-cartoes__cor-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* ── Estados vazios ────────────────────────────────────────────────────────── */
 .page-cartoes__empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 16px; text-align: center; }
 .page-cartoes__empty-icon { color: var(--text-muted); }
 .page-cartoes__empty-title { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .page-cartoes__empty-desc { font-size: 0.88rem; color: var(--text-secondary); margin: 0; }
 .page-cartoes__empty-btn { margin-top: 6px; padding: 10px 18px; border-radius: var(--r-md); border: none; background: var(--accent); color: var(--accent-foreground); font-weight: 700; font-size: 0.86rem; cursor: pointer; }
+.page-cartoes__empty-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ── Modal próprio ─────────────────────────────────────────────────────────── */
 .page-cartoes__modal-overlay {
@@ -244,6 +275,7 @@
   background: var(--surface-sunken); color: var(--text-secondary); cursor: pointer;
 }
 .page-cartoes__modal-close:hover { background: var(--surface-2); color: var(--text-primary); }
+.page-cartoes__modal-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .page-cartoes__modal-body { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 20px; display: flex; flex-direction: column; gap: 14px; }
 .page-cartoes__modal-actions { display: flex; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--hairline); }
 .page-cartoes__modal-actions > button { flex: 1; }

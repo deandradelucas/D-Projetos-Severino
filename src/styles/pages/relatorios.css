@@ -44,6 +44,7 @@
 .rel-ed__quick-chip:hover { background: var(--surface-2); color: var(--text-primary); }
 .rel-ed__quick-chip--active { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
 .rel-ed__quick-chip--reset { color: var(--text-muted); }
+.rel-ed__quick-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* totais entradas/saídas */
 .rel-ed__totals { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 14px; }
@@ -121,6 +122,7 @@
 .rel-ed__action:hover { background: var(--surface-2); color: var(--text-primary); }
 .rel-ed__action--primary { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
 .rel-ed__action--primary:hover { background: var(--accent-hover); color: var(--accent-foreground); }
+.rel-ed__action:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* Desktop: saldo (destaque, esquerda) e receitas/despesas (direita) na mesma
    linha — hero mais horizontal e respirado, menos coluna alta. */
@@ -232,6 +234,7 @@
 .relatorios-empty__title { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .relatorios-empty__text { font-size: 0.88rem; color: var(--text-secondary); margin: 0; }
 .relatorios-empty__btn { margin-top: 6px; padding: 9px 18px; border-radius: var(--r-md); border: none; background: var(--accent); color: var(--accent-foreground); font-weight: 700; font-size: 0.86rem; cursor: pointer; }
+.relatorios-empty__btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* =============================================================================
    MOBILE (<=768)

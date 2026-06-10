@@ -24,7 +24,7 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 |---|------|-----------|---------|---------|
 | P1 | **`vendor-jspdf` (~431KB) com `modulepreload` p/ 100% dos usuários** | `dist/index.html` ainda tem o preload (confirmado hoje); causa = artefato do `manualChunks` | Médio (cirurgia no manualChunks do vite.config) | Alto — caminho crítico |
 | P2 | ✅ **FEITO (10/jun)** `pwa-app-icon.png` 558KB→17KB (1254px→512px) + `Severino Tema Claro.png` 272KB→94KB (sharp, palette q90) — conferir visual do logo no login | `public/` | — | — |
-| P3 | **Polling global de 45s** roda mesmo em páginas não-financeiras | `TransactionCacheContext.jsx:100,118` (confirmado hoje) | Baixo (pausar quando rota não usa transações / `visibilitychange`) | Médio — bateria/dados móveis |
+| P3 | ✅ **JÁ ESTAVA RESOLVIDO** (verificado 10/jun): o polling só roda com `visibilityState === 'visible'` e pula /pagamento, /investimentos e rotas de auth (`TransactionCacheContext.jsx:99-130`). Mantido como está — ampliar o skip arriscaria dados velhos no Dashboard. | — | — | — |
 | P4 | `line-awesome.min.css` 89KB no main — **A8 do squad foi marcado inválido** (fallback de ícones de categoria usa `las la-*`), mas dá pra subsetar a fonte só com os glifos usados | `TransacaoCategoriaIcon` | Médio | Baixo-médio |
 | P5 | ❌ **NÃO-APLICÁVEL** (verificado 10/jun): o front não fala com Supabase — só com a API, mesma origem em prod. Preconnect não ajuda. | PERF-10 squad partia de premissa errada | — | — |
 
@@ -32,14 +32,14 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 
 | # | Item | Esforço | Impacto |
 |---|------|---------|---------|
-| U1 | **Touch targets <44px** — Transações (editar/excluir 32px), Cartões (swatch/kebab 30px), Metas (kebab 30px) — padrão hit-area já existe na Lista | Baixo (CSS) | Alto — uso diário mobile |
-| U2 | **Emoji→SVG** no chrome da UI: Cartões/Metas (toggles, kebab, chevrons, empty), Dashboard 🎉, Relatórios 📊▲▼ — reusar `ListaIcons` | Baixo-médio | Médio |
+| U1 | ✅ **FEITO (10/jun)** Touch targets ≥44px via hit-area (pseudo-elemento/padding+margin): Transações (editar/excluir, parcelas, limpar busca), Cartões (kebab, swatch, nav fatura), Metas (kebab, swatch, ícones) | — | — |
+| U2 | ✅ **JÁ ESTAVA MIGRADO** (verificado 10/jun): emojis do chrome já eram SVG (IconUsers/IconMoreVertical/chevrons/TrendArrow; até o seletor de ícones das Metas virou MetaIcon). Só faltavam width/height nos ícones de empty-state (IconCard/IconTarget) — adicionados (anti-sumiço iOS) | — | — |
 | U3 | **`useModalA11y` nos modais restantes** — hoje só TransactionModal, Cartões e ListaModais têm (confirmado); faltam **Metas, Agenda, Pagamento, Investimentos (3), Admin** → ou criar `<Modal>` wrapper | Médio | Médio — teclado/leitor de tela |
 | U4 | ✅ **JÁ ESTAVA RESOLVIDO** (verificado 10/jun): `TransacaoRow` tem `role="button"`, `tabIndex` e `onKeyDown` | — | — |
-| U5 | `focus-visible` padronizado (remover `outline:none` órfãos; ring de marca) + ring desktop preso em `@media min-width:769` | Baixo | Médio |
+| U5 | ✅ **FEITO (10/jun)** `:focus-visible` com ring accent em ~35 componentes de Cartões/Metas/Transações/Relatórios. O "ring global preso em @media 769px" não existe mais (partial 13 foi refatorado) | — | — |
 | U6 | ✅ **FEITO (10/jun)** — `alertdialog` no ConfirmDialog, `aria-label` em Encerrar recorrência e Remover convite, `role=progressbar` nas barras de Metas/Relatórios. Sidebar (`aria-current`+Sair), MobileBottomNav e InvestimentoCard já estavam ok. | — | — |
 | U7 | Skeletons em Cartões/Metas (content-jumping no load) | Baixo | Baixo |
-| U8 | **PwaInstallPrompt mostra instrução do Safari em Chrome/Firefox iOS** (da auditoria de hoje) | Baixo | Baixo-médio |
+| U8 | ✅ **FEITO (10/jun)** `isIosNonSafari()` (CriOS/FxiOS/EdgiOS/Opera) → instrução genérica do menu Compartilhar + sugestão de abrir no Safari | — | — |
 | U9 | Contrastes <4.5:1 (tokens `--neu-text-lo`, `--m-accent-fg`) — ajuste fino de token | Baixo | Baixo |
 
 ## 4️⃣ Bugs baixos conhecidos (auditoria 10/jun)
@@ -98,7 +98,7 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
    pm2 restart severino
    curl -s http://localhost:3001/api/health
    ```
-3. **Pacote "mobile polish":** U1 (touch targets) + U2 (emoji→SVG) + U5 (focus) + U8 + P3 — o app inteiro no padrão da Lista/Agenda.
+3. ✅ **Pacote "mobile polish" — CONCLUÍDO em 10/jun:** U1, U5, U8 feitos; U2 e P3 já estavam resolvidos (verificado).
 4. **Pacote "a11y modais":** U3 — `<Modal>` wrapper + rollout.
 5. **Epic produto:** F1 (escala da IA) → F2 (gamificação MVP) → F3 (push PWA) — nessa ordem; F7 de carona no F1.
 6. **Quando sobrar fôlego:** S1 (cookie httpOnly — o item de segurança mais valioso, mas o mais delicado), P1 (manualChunks), T1-T4.
