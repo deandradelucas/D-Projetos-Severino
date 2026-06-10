@@ -142,8 +142,8 @@ export function registerAuthRoutes(app) {
       if (!isValidEmail(email)) {
         return c.json({ message: 'Informe um e-mail válido.' }, 400)
       }
-      if (senha.length < 6) {
-        return c.json({ message: 'A senha deve ter pelo menos 6 caracteres.' }, 400)
+      if (senha.length < 8) {
+        return c.json({ message: 'A senha deve ter pelo menos 8 caracteres.' }, 400)
       }
       /* LGPD: consentimento explícito à Política de Privacidade/Termos é obrigatório. */
       if (body?.consentimento !== true) {

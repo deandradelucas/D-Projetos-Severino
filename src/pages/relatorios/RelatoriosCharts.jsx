@@ -429,8 +429,15 @@ export default function RelatoriosCharts({
                               {formatCurrency(r.gasto)} <span className="relatorios-orcado__limite">/ {formatCurrency(r.limite)}</span>
                             </span>
                           </div>
-                          <div className="relatorios-orcado__bar" aria-hidden="true">
-                            <span className="relatorios-orcado__fill" style={{ width: `${r.excedido ? 100 : r.pct}%` }} />
+                          <div
+                            className="relatorios-orcado__bar"
+                            role="progressbar"
+                            aria-valuenow={Math.round(r.pct)}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-label={`${r.nome}: ${Math.round(r.pct)}% do limite usado`}
+                          >
+                            <span className="relatorios-orcado__fill" style={{ width: `${r.excedido ? 100 : r.pct}%` }} aria-hidden />
                           </div>
                         </div>
                       ))}

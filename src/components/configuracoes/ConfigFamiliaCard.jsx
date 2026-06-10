@@ -182,7 +182,12 @@ export default function ConfigFamiliaCard({
                             : '—'}
                         </small>
                       </span>
-                      <button type="button" className="config-action-btn" onClick={() => setFamiliaConfirm({ type: 'revoke', id: c.id })}>
+                      <button
+                        type="button"
+                        className="config-action-btn"
+                        onClick={() => setFamiliaConfirm({ type: 'revoke', id: c.id })}
+                        aria-label={`Remover convite de ${papelFamiliaLabel(c.papel_convite)}`}
+                      >
                         Remover
                       </button>
                     </li>

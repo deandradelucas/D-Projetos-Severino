@@ -266,8 +266,15 @@ function MetaCard({ meta, onGuardar, onEditar, onExcluir }) {
         </div>
       </div>
 
-      <div className="page-metas__bar" aria-hidden>
-        <span className="page-metas__bar-fill" style={{ width: `${progresso}%` }} />
+      <div
+        className="page-metas__bar"
+        role="progressbar"
+        aria-valuenow={progresso}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Progresso da meta: ${progresso}%`}
+      >
+        <span className="page-metas__bar-fill" style={{ width: `${progresso}%` }} aria-hidden />
       </div>
 
       <div className="page-metas__card-values">

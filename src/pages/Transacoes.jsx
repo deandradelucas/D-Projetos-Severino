@@ -694,6 +694,7 @@ export default function Transacoes() {
                         type="button"
                         className="page-transacoes-recorrencia-row__stop"
                         onClick={() => handleEncerrarRecorrencia(r.id)}
+                        aria-label={`Encerrar repetição de ${label}`}
                       >
                         Encerrar
                       </button>

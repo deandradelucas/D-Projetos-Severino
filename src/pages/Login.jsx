@@ -198,8 +198,8 @@ export default function Login() {
       setRecoveryMsg({ text: 'Digite o código de 6 dígitos recebido no WhatsApp.', type: 'error' })
       return
     }
-    if (novaSenha.length < 6) {
-      setRecoveryMsg({ text: 'A nova senha deve ter no mínimo 6 caracteres.', type: 'error' })
+    if (novaSenha.length < 8) {
+      setRecoveryMsg({ text: 'A nova senha deve ter no mínimo 8 caracteres.', type: 'error' })
       return
     }
     if (novaSenha !== confirmarNovaSenha) {
@@ -478,7 +478,7 @@ export default function Login() {
                   type="password"
                   value={novaSenha}
                   onChange={(e) => setNovaSenha(e.target.value)}
-                  placeholder="Nova senha (mín. 6 caracteres)"
+                  placeholder="Nova senha (mín. 8 caracteres)"
                   minLength={6}
                   className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
                   autoComplete="new-password"

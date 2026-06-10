@@ -293,9 +293,13 @@ export default function Configuracoes() {
       if (redirectSe401(res)) return
       if (!res.ok) throw new Error(data.message || 'Erro.')
       setPerfil((p) => ({ ...p, nome }))
-      const u = { ...JSON.parse(localStorage.getItem('horizonte_user') || '{}'), nome }
-      localStorage.setItem('horizonte_user', JSON.stringify(u))
-      window.dispatchEvent(new Event('horizonte-session-refresh'))
+      // localStorage corrompido não pode abortar o caminho de sucesso (o servidor já salvou)
+      try {
+        const raw = localStorage.getItem('horizonte_user')
+        const u = { ...(raw ? JSON.parse(raw) : {}), nome }
+        localStorage.setItem('horizonte_user', JSON.stringify(u))
+        window.dispatchEvent(new Event('horizonte-session-refresh'))
+      } catch { /* ignore */ }
       setNomeEditando(false)
       showToast('Nome atualizado.')
     } catch (e) {
@@ -355,6 +359,7 @@ export default function Configuracoes() {
       logoutHorizonte()
     } catch {
       showToast('Erro ao excluir conta.')
+    } finally {
       setExcluirBusy(false)
     }
   }, [excluirInput])
@@ -375,7 +380,7 @@ export default function Configuracoes() {
   // Alterar senha (form inline)
   const [senhaForm, setSenhaForm] = useState({ aberto: false, atual: '', nova: '', confirma: '', busy: false, erro: '' })
   const alterarSenha = useCallback(async () => {
-    if (senhaForm.nova.length < 6) { setSenhaForm((s) => ({ ...s, erro: 'A nova senha deve ter no mínimo 6 caracteres.' })); return }
+    if (senhaForm.nova.length < 8) { setSenhaForm((s) => ({ ...s, erro: 'A nova senha deve ter no mínimo 8 caracteres.' })); return }
     if (senhaForm.nova !== senhaForm.confirma) { setSenhaForm((s) => ({ ...s, erro: 'A confirmação não confere.' })); return }
     setSenhaForm((s) => ({ ...s, busy: true, erro: '' }))
     try {

@@ -669,8 +669,9 @@ export default function ListaDeCompras() {
       if (redirectSe401(resLista) || redirectAssinaturaExpiradaSe403(resLista)) return
       if (!resLista.ok) { showToast('Erro ao duplicar.', 'error'); return }
       const nova = await resLista.json()
+      let falhas = 0
       for (const it of itens) {
-        await apiFetch(apiUrl(`/api/lista-compras/${nova.id}/itens${pessoalParam}`), {
+        const resItem = await apiFetch(apiUrl(`/api/lista-compras/${nova.id}/itens${pessoalParam}`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           cache: 'no-store',
@@ -681,12 +682,14 @@ export default function ListaDeCompras() {
             unidades: it.unidades,
             preco_estimado: it.preco_estimado || null,
           }),
-        })
+        }).catch(() => null)
+        if (!resItem?.ok) falhas += 1
       }
       setListas((prev) => [nova, ...prev])
       setListaAtiva(nova.id)
       carregarItens(nova.id, pessoalParam)
-      showToast('Lista duplicada!', 'success')
+      if (falhas > 0) showToast(`Lista duplicada, mas ${falhas} ${falhas === 1 ? 'item não foi copiado' : 'itens não foram copiados'}.`, 'error')
+      else showToast('Lista duplicada!', 'success')
     } catch {
       showToast('Erro ao duplicar lista.', 'error')
     }

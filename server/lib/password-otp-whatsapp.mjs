@@ -139,8 +139,8 @@ export async function confirmPasswordOtpWhatsApp(email, otpRaw, newPassword) {
     e.statusCode = 400
     throw e
   }
-  if (password.length < 6) {
-    const e = new Error('A senha deve ter no mínimo 6 caracteres.')
+  if (password.length < 8) {
+    const e = new Error('A senha deve ter no mínimo 8 caracteres.')
     e.statusCode = 400
     throw e
   }

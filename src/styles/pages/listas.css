@@ -266,6 +266,7 @@
 /* ── Estados vazios + shimmer ──────────────────────────────────────────────── */
 .page-lista-compras__empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 36px 16px; text-align: center; }
 .page-lista-compras__empty-icon { color: var(--text-muted); }
+.page-lista-compras__empty-icon svg { width: 40px; height: 40px; }
 .page-lista-compras__empty-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .page-lista-compras__empty-desc { font-size: 0.86rem; color: var(--text-secondary); margin: 0; }
 .page-lista-compras__empty-btn {

@@ -70,7 +70,7 @@ export default function ConfirmDialog({
     >
       <section
         className={`confirm-dialog confirm-dialog--${tone}`}
-        role="dialog"
+        role="alertdialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={messageId}

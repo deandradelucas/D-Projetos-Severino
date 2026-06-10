@@ -237,8 +237,8 @@ export function registerUsuarioPerfilRoutes(app) {
       try { body = await c.req.json() } catch { return c.json({ message: 'Corpo inválido.' }, 400) }
       const senhaAtual = String(body?.senhaAtual || '')
       const novaSenha = String(body?.novaSenha || '')
-      if (novaSenha.length < 6) {
-        return c.json({ message: 'A nova senha deve ter no mínimo 6 caracteres.' }, 400)
+      if (novaSenha.length < 8) {
+        return c.json({ message: 'A nova senha deve ter no mínimo 8 caracteres.' }, 400)
       }
       if (novaSenha === senhaAtual) {
         return c.json({ message: 'A nova senha deve ser diferente da atual.' }, 400)

@@ -15,9 +15,9 @@ import { maskPhoneBRMobile, validatePhoneBRMobile } from '../lib/formatPhoneBR'
 
 // 1 = fraca, 2 = média, 3 = forte
 function senhaForca(s) {
-  if (!s || s.length < 6) return 0
+  if (!s || s.length < 8) return 0
   if (s.length >= 10 && /\d/.test(s) && /[^a-zA-Z0-9]|[A-Z]/.test(s)) return 3
-  if (s.length >= 8 && /[\d\W_]/.test(s)) return 2
+  if (/[\d\W_]/.test(s)) return 2
   return 1
 }
 
@@ -67,7 +67,7 @@ export default function Cadastro() {
   const validateStep2 = () => {
     const newErrors = {}
     if (!validateEmail(email.trim())) newErrors.email = 'E-mail inválido'
-    if (senha.length < 6) newErrors.senha = 'Mínimo 6 caracteres'
+    if (senha.length < 8) newErrors.senha = 'Mínimo 8 caracteres'
     if (!consentimento) newErrors.consentimento = 'É necessário aceitar a Política de Privacidade e os Termos de Uso.'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
