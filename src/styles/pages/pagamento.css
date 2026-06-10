@@ -32,8 +32,11 @@
 
 /* ── Layout ────────────────────────────────────────────────────────────────── */
 .page-pagamento-header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+/* título + chip de status na mesma linha do hero */
+.page-pagamento-header__titlerow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .page-pagamento-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; align-items: start; }
-.page-pagamento-layout--sem-lateral { grid-template-columns: 1fr; max-width: 560px; margin-inline: auto; }
+/* coluna única (assinatura ativa/trial/paga) — largura cheia, no padrão do sistema */
+.page-pagamento-layout--sem-lateral { grid-template-columns: 1fr; }
 .page-pagamento-layout__primary { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .page-pagamento-meio { display: flex; flex-direction: column; gap: 16px; }
 
@@ -58,10 +61,14 @@
 .page-pagamento-planos__option-hint { font-size: 0.74rem; color: var(--success); font-weight: 600; }
 .page-pagamento-planos__ribbon,
 .page-pagamento-planos__badge {
-  position: absolute; top: -10px; right: 12px;
+  position: absolute; top: -10px; z-index: 1;
   padding: 2px 10px; border-radius: var(--r-pill);
   background: var(--accent); color: var(--accent-foreground); font-size: 0.64rem; font-weight: 800; letter-spacing: 0.03em;
+  white-space: nowrap;
 }
+/* ribbon "★ Mais popular" na esquerda; badge "-X%" na direita — sem colidir */
+.page-pagamento-planos__ribbon { left: 12px; }
+.page-pagamento-planos__badge { right: 12px; }
 .page-pagamento-planos__economia { font-size: 0.78rem; color: var(--success); font-weight: 600; }
 .page-pagamento-planos__eq { font-size: 0.74rem; color: var(--text-muted); }
 .page-pagamento-planos__legend { font-size: 0.76rem; color: var(--text-muted); }
@@ -78,6 +85,51 @@
 .page-pagamento-valor__list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .page-pagamento-valor__item { display: flex; align-items: flex-start; gap: 8px; font-size: 0.88rem; color: var(--text-secondary); }
 .page-pagamento-valor__check { display: inline-flex; flex-shrink: 0; color: var(--success); margin-top: 1px; }
+
+/* ── Detalhes da assinatura ("Sua assinatura") ─────────────────────────────── */
+.pagamento-detalhes-dl { display: flex; flex-direction: column; margin: 14px 0 0; }
+.pagamento-detalhes-dl__row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  padding: 10px 0; border-bottom: 1px solid var(--hairline);
+}
+.pagamento-detalhes-dl__row:last-child { border-bottom: none; padding-bottom: 0; }
+.pagamento-detalhes-dl__row dt { margin: 0; font-size: 0.82rem; color: var(--text-muted); flex-shrink: 0; }
+.pagamento-detalhes-dl__row dd { margin: 0; font-size: 0.92rem; font-weight: 600; color: var(--text-primary); text-align: right; }
+.pagamento-detalhes-dl__muted { font-weight: 400; color: var(--text-muted); font-size: 0.82rem; }
+
+/* ── Histórico de cobranças (tabela no desktop · cards no mobile) ───────────── */
+.pagamento-hist-table-wrap { margin-top: 12px; overflow-x: auto; }
+.pagamento-hist-cards { display: none; }
+.page-pagamento-historico .data-table { width: 100%; border-collapse: collapse; }
+.page-pagamento-historico .data-table th {
+  text-align: left; padding: 8px 12px; white-space: nowrap;
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--text-muted); border-bottom: 1px solid var(--hairline);
+}
+.page-pagamento-historico .data-table td {
+  padding: 11px 12px; font-size: 0.86rem; color: var(--text-primary);
+  border-bottom: 1px solid var(--hairline); vertical-align: middle;
+}
+.page-pagamento-historico .data-table tr:last-child td { border-bottom: none; }
+.pagamento-hist-cell--muted { color: var(--text-secondary); white-space: nowrap; }
+.pagamento-hist-status-detail { display: block; margin-top: 3px; font-size: 0.76rem; color: var(--text-muted); }
+.pagamento-hist-cell--ref {
+  max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 0.8rem; color: var(--text-muted);
+}
+
+/* cards (mobile) */
+.pagamento-hist-card { display: flex; flex-direction: column; gap: 7px; padding: 12px 14px; border-radius: var(--r-md); background: var(--surface-sunken); border: 1px solid var(--hairline); }
+.pagamento-hist-card__row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-width: 0; }
+.pagamento-hist-card__label { font-size: 0.76rem; color: var(--text-muted); flex-shrink: 0; }
+.pagamento-hist-card__val { font-size: 0.86rem; font-weight: 600; color: var(--text-primary); text-align: right; min-width: 0; }
+.pagamento-hist-card__val--status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.pagamento-hist-card__val--detail { font-weight: 400; font-size: 0.8rem; color: var(--text-muted); word-break: break-all; }
+
+/* empty state */
+.pagamento-empty-state { padding: 28px 16px; text-align: center; }
+.pagamento-empty-state__title { margin: 0 0 4px; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.pagamento-empty-state__text { margin: 0; font-size: 0.84rem; color: var(--text-secondary); }
 
 /* ── Trust badges ──────────────────────────────────────────────────────────── */
 .page-pagamento-trust { display: flex; flex-wrap: wrap; gap: 12px 18px; }
@@ -229,6 +281,9 @@
   .page-pagamento-planos__grid { grid-template-columns: 1fr; }
   .pagamento-checkout-panel__input,
   .pagamento-modal__field input { font-size: 16px; }
+  /* histórico: esconde a tabela, mostra os cards */
+  .pagamento-hist-table-wrap { display: none; }
+  .pagamento-hist-cards { display: flex; flex-direction: column; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -466,6 +466,9 @@ export default function Pagamento() {
       ? 'Pix ou cartão de crédito no checkout Asaas'
       : 'Cartão de crédito no checkout Asaas'
 
+  // Sem painel lateral (coluna única centrada) — alinha header e conteúdo na mesma largura.
+  const semLateral = isentaOrientacaoAbaixoHistorico || painelAssinatura.situacao === 'trial' || (painelAssinatura.situacao === 'ativo' && painelAssinatura.paga)
+
   return (
     <div className="dashboard-container page-pagamento ref-dashboard app-horizon-shell">
       <div className="app-horizon-inner">
@@ -478,20 +481,20 @@ export default function Pagamento() {
               <div className="dashboard-hub__hero-row">
                 <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                 <div className="dashboard-hub__hero-text">
-                  <h1 className="dashboard-hub__title">Pagamento</h1>
-                  {statusBadge && (
-                    <span className={`pagamento-status-chip pagamento-status-chip--${statusBadge.tone}`}>
-                      <span className="pagamento-status-chip__dot" aria-hidden />
-                      {statusBadge.label}
-                    </span>
-                  )}
+                  <div className="page-pagamento-header__titlerow">
+                    <h1 className="dashboard-hub__title">Pagamento</h1>
+                    {statusBadge && (
+                      <span className={`pagamento-status-chip pagamento-status-chip--${statusBadge.tone}`}>
+                        <span className="pagamento-status-chip__dot" aria-hidden />
+                        {statusBadge.label}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </section>
 
-            <div
-              className={`page-pagamento-layout${isentaOrientacaoAbaixoHistorico || painelAssinatura.situacao === 'trial' || (painelAssinatura.situacao === 'ativo' && painelAssinatura.paga) ? ' page-pagamento-layout--sem-lateral' : ''}`}
-            >
+            <div className={`page-pagamento-layout${semLateral ? ' page-pagamento-layout--sem-lateral' : ''}`}>
               <div className="page-pagamento-layout__primary">
                 {diasRestantesTrial !== null && trialUrgenciaVariant && (
                   <div className={`pagamento-trial-urgencia pagamento-trial-urgencia--${trialUrgenciaVariant}`} role="alert">
