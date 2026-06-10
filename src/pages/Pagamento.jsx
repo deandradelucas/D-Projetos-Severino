@@ -428,6 +428,16 @@ export default function Pagamento() {
   const valorCicloSelecionado = planoCheckout === 'anual' ? precosCatalogo.anual : precosCatalogo.mensal
   const unidadeCiclo = planoCheckout === 'anual' ? 'ano' : 'mês'
 
+  // Valor/ciclo REAL da assinatura ativa (card "Sua assinatura"): usa o último
+  // pagamento aprovado e infere o ciclo pelo catálogo. Só o checkout (escolha de
+  // plano) usa valorCicloSelecionado; aqui mostramos o que o usuário de fato paga.
+  const valorPagamentoReal = ultimo?.amount != null ? Number(ultimo.amount) : null
+  const temValorRealAssinatura = painelAssinatura.paga && valorPagamentoReal != null && valorPagamentoReal > 0
+  const valorAssinaturaDetalhe = temValorRealAssinatura ? valorPagamentoReal : valorCicloSelecionado
+  const cicloAssinaturaDetalhe = temValorRealAssinatura
+    ? (Math.abs(valorPagamentoReal - precosCatalogo.anual) < Math.abs(valorPagamentoReal - precosCatalogo.mensal) ? 'ano' : 'mês')
+    : unidadeCiclo
+
   // Economia e equivalência do plano anual (feature 2)
   const economiaAnual = useMemo(() => computeEconomiaAnual(precosCatalogo), [precosCatalogo])
   const mensalEquivalenteAnual = useMemo(() => precosCatalogo.anual / 12, [precosCatalogo])
@@ -810,8 +820,8 @@ export default function Pagamento() {
 
                 <PagamentoDetalhesCard
                   tituloPlano={titulo}
-                  valorCicloSelecionado={valorCicloSelecionado}
-                  unidadeCiclo={unidadeCiclo}
+                  valorCicloSelecionado={valorAssinaturaDetalhe}
+                  unidadeCiclo={cicloAssinaturaDetalhe}
                   meiosPagamentoResumo={meiosDetalhes}
                   painel={painelAssinatura}
                   proximaCobranca={proximaCobranca}
