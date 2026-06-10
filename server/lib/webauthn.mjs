@@ -137,6 +137,27 @@ export async function beginRegistration({ c, usuarioId, userEmail, userName }) {
 /**
  * @returns {Promise<{ verified: boolean, usuarioId?: string }>}
  */
+/** Nome amigável do dispositivo a partir do User-Agent (ex: "iPhone · Safari"). */
+export function deviceLabelFromUA(uaRaw) {
+  const ua = String(uaRaw || '')
+  if (!ua) return 'Dispositivo'
+  let os = 'Dispositivo'
+  if (/iPhone/i.test(ua)) os = 'iPhone'
+  else if (/iPad/i.test(ua)) os = 'iPad'
+  else if (/Android/i.test(ua)) os = 'Android'
+  else if (/Macintosh|Mac OS X/i.test(ua)) os = 'Mac'
+  else if (/Windows/i.test(ua)) os = 'Windows'
+  else if (/Linux/i.test(ua)) os = 'Linux'
+  let browser = ''
+  if (/Edg\//i.test(ua)) browser = 'Edge'
+  else if (/OPR\/|Opera/i.test(ua)) browser = 'Opera'
+  else if (/SamsungBrowser/i.test(ua)) browser = 'Samsung Internet'
+  else if (/CriOS|Chrome/i.test(ua)) browser = 'Chrome'
+  else if (/FxiOS|Firefox/i.test(ua)) browser = 'Firefox'
+  else if (/Safari/i.test(ua)) browser = 'Safari'
+  return browser ? `${os} · ${browser}` : os
+}
+
 export async function finishRegistration({ c, usuarioId, challengeId, credential, log }) {
   const row = await getChallengeRow(challengeId)
   if (!row || row.kind !== 'registration') {
@@ -177,6 +198,7 @@ export async function finishRegistration({ c, usuarioId, challengeId, credential
     public_key: publicKeyB64,
     counter: cred.counter,
     transports: cred.transports || [],
+    friendly_name: deviceLabelFromUA(c?.req?.header?.('user-agent')),
   })
 
   if (insErr) {
@@ -357,7 +379,7 @@ export async function deleteCredentialForUser({ usuarioId, credentialId }) {
 export async function listCredentialSummariesForUser(usuarioId) {
   const { data, error } = await supabase()
     .from('webauthn_credentials')
-    .select('id, created_at, last_used_at')
+    .select('id, created_at, last_used_at, friendly_name')
     .eq('usuario_id', usuarioId)
     .order('created_at', { ascending: false })
 

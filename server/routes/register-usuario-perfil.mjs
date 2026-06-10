@@ -12,6 +12,11 @@ import {
   contarSessoesUsuario,
 } from '../lib/usuarios.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
+import { sendEmailOtp, verifyEmailOtp } from '../lib/email-otp.mjs'
+import { sendRegistrationOtp, verifyRegistrationOtp } from '../lib/registration-otp.mjs'
+import bcrypt from 'bcryptjs'
+import { authenticateUser } from '../lib/password-reset.mjs'
+import { getSupabaseAdmin } from '../lib/supabase-admin.mjs'
 
 function validarCelularBr(raw) {
   const digits = String(raw || '').replace(/\D/g, '')
@@ -139,6 +144,106 @@ export function registerUsuarioPerfilRoutes(app) {
     } catch (error) {
       log.error('patch perfil preferencias failed', error)
       return c.json({ message: 'Erro ao salvar preferências.' }, 500)
+    }
+  })
+
+  // ── Verificação de e-mail (usuário logado) ──────────────────────────────
+  app.post('/api/usuarios/perfil/email/enviar-otp', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const perfil = await getPerfilUsuario(usuarioId)
+      if (!perfil?.email) return c.json({ message: 'Nenhum e-mail cadastrado.' }, 400)
+      if (perfil.email_verificado) return c.json({ message: 'E-mail já verificado.', jaVerificado: true })
+      const r = await sendEmailOtp(usuarioId, perfil.email)
+      return c.json({ message: 'Código enviado por e-mail.', destino: r.masked })
+    } catch (error) {
+      const status = error?.statusCode || 500
+      if (status !== 500) return c.json({ message: error.message }, status)
+      log.error('enviar otp email failed', error)
+      return c.json({ message: 'Erro ao enviar código.' }, 500)
+    }
+  })
+
+  app.post('/api/usuarios/perfil/email/verificar', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      let body
+      try { body = await c.req.json() } catch { return c.json({ message: 'Corpo inválido.' }, 400) }
+      await verifyEmailOtp(usuarioId, body?.codigo)
+      return c.json({ message: 'E-mail verificado com sucesso.' })
+    } catch (error) {
+      const status = error?.statusCode || 500
+      if (status !== 500) return c.json({ message: error.message }, status)
+      log.error('verificar otp email failed', error)
+      return c.json({ message: 'Erro ao verificar código.' }, 500)
+    }
+  })
+
+  // ── Verificação de telefone via WhatsApp (usuário logado) ───────────────
+  app.post('/api/usuarios/perfil/telefone/enviar-otp', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      const perfil = await getPerfilUsuario(usuarioId)
+      if (!perfil?.telefone) return c.json({ message: 'Nenhum telefone cadastrado.' }, 400)
+      if (perfil.telefone_verificado) return c.json({ message: 'Telefone já verificado.', jaVerificado: true })
+      await sendRegistrationOtp(usuarioId, perfil.telefone)
+      return c.json({ message: 'Código enviado pelo WhatsApp.' })
+    } catch (error) {
+      const status = error?.statusCode || 500
+      if (status !== 500) return c.json({ message: error.message }, status)
+      log.error('enviar otp telefone failed', error)
+      return c.json({ message: 'Erro ao enviar código.' }, 500)
+    }
+  })
+
+  app.post('/api/usuarios/perfil/telefone/verificar', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      let body
+      try { body = await c.req.json() } catch { return c.json({ message: 'Corpo inválido.' }, 400) }
+      await verifyRegistrationOtp(usuarioId, body?.codigo)
+      return c.json({ message: 'Telefone verificado com sucesso.' })
+    } catch (error) {
+      const status = error?.statusCode || 500
+      if (status !== 500) return c.json({ message: error.message }, status)
+      log.error('verificar otp telefone failed', error)
+      return c.json({ message: 'Erro ao verificar código.' }, 500)
+    }
+  })
+
+  // ── Alterar senha (usuário logado) ──────────────────────────────────────
+  app.post('/api/usuarios/perfil/senha', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      if (!usuarioId) return c.json({ message: 'Não autorizado.' }, 401)
+      let body
+      try { body = await c.req.json() } catch { return c.json({ message: 'Corpo inválido.' }, 400) }
+      const senhaAtual = String(body?.senhaAtual || '')
+      const novaSenha = String(body?.novaSenha || '')
+      if (novaSenha.length < 6) {
+        return c.json({ message: 'A nova senha deve ter no mínimo 6 caracteres.' }, 400)
+      }
+      if (novaSenha === senhaAtual) {
+        return c.json({ message: 'A nova senha deve ser diferente da atual.' }, 400)
+      }
+      const perfil = await getPerfilUsuario(usuarioId)
+      if (!perfil?.email) return c.json({ message: 'Perfil não encontrado.' }, 404)
+      const ok = await authenticateUser(perfil.email, senhaAtual)
+      if (!ok) return c.json({ message: 'Senha atual incorreta.' }, 400)
+      const senhaHash = await bcrypt.hash(novaSenha, 10)
+      const { error } = await getSupabaseAdmin()
+        .from('usuarios')
+        .update({ senha: senhaHash })
+        .eq('id', usuarioId)
+      if (error) throw error
+      return c.json({ message: 'Senha alterada com sucesso.' })
+    } catch (error) {
+      log.error('alterar senha failed', error)
+      return c.json({ message: 'Erro ao alterar a senha.' }, 500)
     }
   })
 
