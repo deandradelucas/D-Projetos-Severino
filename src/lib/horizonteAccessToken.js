@@ -1,5 +1,7 @@
 /* Access token: mantido apenas em memória (não persiste entre reloads — XSS não pode roubá-lo via localStorage).
- * Refresh token: persiste em localStorage; usado para reobter o access token silenciosamente na inicialização. */
+ * Refresh token: vive em cookie HttpOnly setado pelo servidor (Story S1) — invisível ao JS.
+ * As funções de localStorage abaixo existem só para MIGRAR tokens legados (sessões
+ * de antes do cookie): lidos uma última vez no /refresh e então apagados. */
 
 const REFRESH_STORAGE_KEY = 'horizonte_refresh_token'
 

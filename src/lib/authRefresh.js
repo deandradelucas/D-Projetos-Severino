@@ -2,7 +2,6 @@ import { apiUrl } from './apiUrl'
 import {
   readHorizonteRefreshToken,
   writeHorizonteAccessToken,
-  writeHorizonteRefreshToken,
   clearHorizonteAccessToken,
   clearHorizonteRefreshToken,
 } from './horizonteAccessToken'
@@ -11,21 +10,23 @@ import {
 let _inflightRefresh = null
 
 /**
- * Tenta renovar o access token usando o refresh token armazenado.
- * Retorna true se bem-sucedido, false se sessão expirada (deve redirecionar para login).
+ * Tenta renovar o access token. O refresh token vive em cookie HttpOnly
+ * (Story S1) — o browser o envia sozinho para /api/auth/refresh (same-origin).
+ * Tokens legados ainda no localStorage são enviados uma única vez no body e,
+ * com sucesso, migram para o cookie (o localStorage é limpo).
+ * Retorna true se bem-sucedido, false se sessão expirada.
  */
 export async function tryRefreshToken() {
   if (_inflightRefresh) return _inflightRefresh
 
   _inflightRefresh = (async () => {
     try {
-      const refreshToken = readHorizonteRefreshToken()
-      if (!refreshToken) return false
+      const legacyToken = readHorizonteRefreshToken()
 
       const res = await fetch(apiUrl('/api/auth/refresh'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
+        body: JSON.stringify(legacyToken ? { refreshToken: legacyToken } : {}),
       })
 
       if (!res.ok) {
@@ -35,14 +36,15 @@ export async function tryRefreshToken() {
       }
 
       const data = await res.json()
-      if (!data.accessToken || !data.refreshToken) {
+      if (!data.accessToken) {
         clearHorizonteAccessToken()
         clearHorizonteRefreshToken()
         return false
       }
 
       writeHorizonteAccessToken(data.accessToken)
-      writeHorizonteRefreshToken(data.refreshToken)
+      // Migração concluída: o servidor rotacionou o token legado para o cookie.
+      if (legacyToken) clearHorizonteRefreshToken()
       window.dispatchEvent(new Event('horizonte-token-refreshed'))
       return true
     } catch {

@@ -3,20 +3,18 @@ import { clearHorizonteAccessToken, clearHorizonteRefreshToken, readHorizonteRef
 import { horizonteApiAuthHeaders } from './apiAuthHeaders'
 
 /**
- * Logout completo: revoga o refresh token no servidor e limpa a sessão local.
- * Fire-and-forget no servidor — nunca bloqueia o redirect.
+ * Logout completo: revoga o refresh token no servidor (cookie HttpOnly vai
+ * junto no request same-origin; token legado do localStorage vai no body) e
+ * limpa a sessão local. Fire-and-forget — nunca bloqueia o redirect.
  */
 export async function logoutHorizonte() {
-  const refreshToken = readHorizonteRefreshToken()
+  const legacyToken = readHorizonteRefreshToken()
 
-  // Revogar no servidor em background (não bloquear o redirect)
-  if (refreshToken) {
-    fetch(apiUrl('/api/auth/logout'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...horizonteApiAuthHeaders() },
-      body: JSON.stringify({ refreshToken }),
-    }).catch(() => {})
-  }
+  fetch(apiUrl('/api/auth/logout'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...horizonteApiAuthHeaders() },
+    body: JSON.stringify(legacyToken ? { refreshToken: legacyToken } : {}),
+  }).catch(() => {})
 
   clearHorizonteAccessToken()
   clearHorizonteRefreshToken()

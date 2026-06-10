@@ -8,7 +8,7 @@ import FamiliaConviteColarBlock from '../components/FamiliaConviteColarBlock'
 import { AUTH_SHELL_INPUT_CLASS, AUTH_SHELL_ERROR_BOX_CLASS, AUTH_SHELL_FIELD_ERROR_CLASS } from '../lib/authFormClasses'
 import SeverinoLogo from '../components/SeverinoLogo'
 import { apiUrl } from '../lib/apiUrl'
-import { writeHorizonteAccessToken, writeHorizonteRefreshToken } from '../lib/horizonteAccessToken'
+import { writeHorizonteAccessToken } from '../lib/horizonteAccessToken'
 import { showToast } from '../lib/toastStore'
 import { validateEmail } from '../lib/validateEmail'
 import { maskPhoneBRMobile, validatePhoneBRMobile } from '../lib/formatPhoneBR'
@@ -154,7 +154,6 @@ export default function Cadastro() {
       }
 
       if (data.accessToken) writeHorizonteAccessToken(data.accessToken)
-      if (data.refreshToken) writeHorizonteRefreshToken(data.refreshToken)
       window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
       navigateAfterLogin(data.user)
     } catch {
@@ -191,7 +190,6 @@ export default function Cadastro() {
         return
       }
       if (data.accessToken) writeHorizonteAccessToken(data.accessToken)
-      if (data.refreshToken) writeHorizonteRefreshToken(data.refreshToken)
       window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
       navigateAfterLogin(data.user)
     } catch {
@@ -248,7 +246,6 @@ export default function Cadastro() {
         return
       }
       if (data.accessToken) writeHorizonteAccessToken(data.accessToken)
-      if (data.refreshToken) writeHorizonteRefreshToken(data.refreshToken)
       window.localStorage.setItem('horizonte_user', JSON.stringify(data.user))
       navigateAfterLogin(data.user)
     } catch {

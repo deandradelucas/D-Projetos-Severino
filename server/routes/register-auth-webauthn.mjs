@@ -18,6 +18,7 @@ import {
 } from '../lib/webauthn.mjs'
 import { signAccessToken } from '../lib/auth-access-token.mjs'
 import { createRefreshToken } from '../lib/refresh-token.mjs'
+import { setRefreshCookie } from '../lib/auth-cookie.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 import { parseJsonBody } from '../lib/http/parse-body.mjs'
 
@@ -165,7 +166,9 @@ export function registerAuthWebAuthnRoutes(app) {
         signAccessToken(out.user.id),
         createRefreshToken(out.user.id),
       ])
-      return c.json({ ...out, accessToken, refreshToken })
+      /* Story S1: refresh token só em cookie HttpOnly. */
+      setRefreshCookie(c, refreshToken)
+      return c.json({ ...out, accessToken })
     } catch (error) {
       log.error('webauthn login verify', error)
       const mapped = mapSupabaseOrNetworkError(error)

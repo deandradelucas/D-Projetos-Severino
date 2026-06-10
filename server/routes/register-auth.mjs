@@ -14,6 +14,7 @@ import { normalizeUsuarioRow, stripSenha } from '../lib/usuario-schema.mjs'
 import { signAccessToken } from '../lib/auth-access-token.mjs'
 import { Alerts } from '../lib/notify-telegram.mjs'
 import { createRefreshToken, rotateRefreshToken, revokeRefreshToken } from '../lib/refresh-token.mjs'
+import { setRefreshCookie, readRefreshCookie, clearRefreshCookie } from '../lib/auth-cookie.mjs'
 import { parseJsonBody } from '../lib/http/parse-body.mjs'
 import { registerAuthWebAuthnRoutes } from './register-auth-webauthn.mjs'
 import { registerAuthPasswordRoutes } from './register-auth-password.mjs'
@@ -102,11 +103,12 @@ export function registerAuthRoutes(app) {
         signAccessToken(user.id),
         createRefreshToken(user.id),
       ])
+      /* Story S1: refresh token só em cookie HttpOnly — nunca no body (XSS não exfiltra). */
+      setRefreshCookie(c, refreshToken)
       return c.json({
         message: 'Login realizado com sucesso.',
         user: payloadUser,
         accessToken,
-        refreshToken,
       })
     } catch (error) {
       log.error('login failed', error)
@@ -332,7 +334,8 @@ export function registerAuthRoutes(app) {
         signAccessToken(newUser.id),
         createRefreshToken(newUser.id),
       ])
-      return c.json({ message: 'Conta criada com sucesso.', user: payloadUser, accessToken, refreshToken })
+      setRefreshCookie(c, refreshToken)
+      return c.json({ message: 'Conta criada com sucesso.', user: payloadUser, accessToken })
     } catch (error) {
       log.error('register failed', error)
       const mapped = mapSupabaseOrNetworkError(error)
@@ -399,11 +402,11 @@ export function registerAuthRoutes(app) {
         signAccessToken(payloadUser.id),
         createRefreshToken(payloadUser.id),
       ])
+      setRefreshCookie(c, refreshToken)
       return c.json({
         message: 'Telefone confirmado com sucesso.',
         user: payloadUser,
         accessToken,
-        refreshToken,
       })
     } catch (error) {
       log.error('verify-registration failed', error)
@@ -503,11 +506,11 @@ export function registerAuthRoutes(app) {
         signAccessToken(payloadUser.id),
         createRefreshToken(payloadUser.id),
       ])
+      setRefreshCookie(c, refreshToken)
       return c.json({
         message: 'E-mail confirmado com sucesso.',
         user: payloadUser,
         accessToken,
-        refreshToken,
       })
     } catch (error) {
       log.error('verify-email-otp failed', error)
@@ -566,14 +569,28 @@ export function registerAuthRoutes(app) {
       const parsed7 = await parseJsonBody(c)
       if (!parsed7.ok) return parsed7.response
       const body = parsed7.body
-      const plainToken = String(body?.refreshToken || '').trim()
+
+      /* Story S1: caminho novo = cookie HttpOnly. O body (legado) continua aceito
+       * para (a) bundles antigos abertos em aba e (b) migrar tokens que ainda
+       * vivem no localStorage — nesses casos a resposta repete o token no body
+       * (o front antigo exige) E seta o cookie, completando a migração. */
+      const cookieToken = readRefreshCookie(c)
+      const bodyToken = String(body?.refreshToken || '').trim()
+      const plainToken = cookieToken || bodyToken
       if (!plainToken) return c.json({ message: 'refreshToken é obrigatório.' }, 400)
 
       const result = await rotateRefreshToken(plainToken)
-      if (!result) return c.json({ message: 'Sessão expirada. Faça login novamente.' }, 401)
+      if (!result) {
+        clearRefreshCookie(c)
+        return c.json({ message: 'Sessão expirada. Faça login novamente.' }, 401)
+      }
 
       const accessToken = signAccessToken(result.usuarioId)
-      return c.json({ accessToken, refreshToken: result.newRefreshToken })
+      setRefreshCookie(c, result.newRefreshToken)
+      if (!cookieToken && bodyToken) {
+        return c.json({ accessToken, refreshToken: result.newRefreshToken })
+      }
+      return c.json({ accessToken })
     } catch (error) {
       log.error('auth refresh failed', error)
       return c.json({ message: 'Não foi possível renovar a sessão.' }, 500)
@@ -589,11 +606,15 @@ export function registerAuthRoutes(app) {
       } catch {
         body = {}
       }
-      const plainToken = String(body?.refreshToken || '').trim()
-      if (plainToken) await revokeRefreshToken(plainToken)
+      const cookieToken = readRefreshCookie(c)
+      const bodyToken = String(body?.refreshToken || '').trim()
+      if (cookieToken) await revokeRefreshToken(cookieToken)
+      if (bodyToken && bodyToken !== cookieToken) await revokeRefreshToken(bodyToken)
+      clearRefreshCookie(c)
       return c.json({ ok: true })
     } catch (error) {
       log.error('auth logout failed', error)
+      try { clearRefreshCookie(c) } catch { /* ignore */ }
       return c.json({ ok: true }) // logout nunca falha para o cliente
     }
   })
