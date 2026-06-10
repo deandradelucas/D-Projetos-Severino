@@ -58,9 +58,9 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 | # | Item | Por quê |
 |---|------|---------|
 | T1 | ✅ **FEITO (10/jun)** +14 testes: `parcelas-pendentes.test.mjs` (5 — corte fim-do-dia BRT, filtros, contagem, propagação de erro) e `import-service.test.mjs` (9 — dedup intra-lote com counter, dedup vs banco, FITID, fallback Outros, meio-dia UTC, erros parciais, resumo/período) | — |
-| T2 | Teste dos novos rate limits + revogação de sessão pós-senha | Acabaram de entrar (commit 02f0390) |
-| T3 | `exportarDadosUsuario` (LGPD) e `agenda_eventos` sem limit/paginação | BACKEND-6/12 squad — crescem sem teto |
-| T4 | Fuzzy lookup em `payer_email` (viola rule data-lookup-safety) | `pagamentos-asaas.mjs:272` |
+| T2 | ✅ **FEITO (10/jun)** +8 testes de rota (`usuario-perfil-otp-senha.test.mjs`): rate limit IP+usuário no envio, 429 não envia e-mail, chaves separadas por canal, revogação de sessões pós-senha, senha errada não revoga, mínimo 8 | — |
+| T3 | ✅ **FEITO (10/jun)** export LGPD paginado com `.range()` (corte silencioso de 1000 do PostgREST — mesmo bug do backup C4) + `.limit(1000)` explícito na listagem da agenda | — |
+| T4 | ✅ **FEITO (10/jun)** fuzzy no `payer_email` como DIAGNÓSTICO: se a busca exata falha, procura localpart similar e loga warning p/ reconciliação manual. NÃO concede acesso por similaridade (seria liberar com pagamento de outra pessoa) — a rule pede fuzzy p/ diagnóstico, não p/ concessão. | — |
 
 ## 6️⃣ Produto (maior retorno segundo a re-auditoria de arquitetura)
 

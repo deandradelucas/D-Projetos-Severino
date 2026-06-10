@@ -108,8 +108,22 @@ export async function exportarDadosUsuario(usuarioId) {
   ]
   for (const [tabela, chave] of tabelas) {
     try {
-      const { data } = await sb.from(tabela).select('*').eq('usuario_id', usuarioId)
-      out[chave] = data || []
+      /* Paginação obrigatória: o PostgREST corta em 1000 linhas SEM erro — sem o
+       * .range() o export LGPD sairia incompleto silenciosamente (mesmo bug do
+       * backup, corrigido na auditoria C4 de jun/2026). */
+      const PAGE = 1000
+      const linhas = []
+      for (let fromIdx = 0; ; fromIdx += PAGE) {
+        const { data, error } = await sb
+          .from(tabela)
+          .select('*')
+          .eq('usuario_id', usuarioId)
+          .range(fromIdx, fromIdx + PAGE - 1)
+        if (error) throw error
+        linhas.push(...(data || []))
+        if (!data || data.length < PAGE) break
+      }
+      out[chave] = linhas
     } catch {
       out[chave] = []
     }

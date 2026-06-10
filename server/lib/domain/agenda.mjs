@@ -195,6 +195,9 @@ export async function listarAgendaEventos(usuarioId, filters = {}) {
     .gte('inicio_em', from)
     .lte('inicio_em', to)
     .order('inicio_em', { ascending: true })
+    /* Teto de segurança: janela default é 120 dias; sem limit, o PostgREST corta
+     * silenciosamente em 1000 — explícito é melhor que implícito. */
+    .limit(1000)
 
   if (filters.status) {
     q = q.eq('situacao', STATUS_TO_DB[normalizeStatus(filters.status)])

@@ -297,7 +297,32 @@ export async function usuarioTemPagamentoAprovado(usuario_id, payerEmail = null)
     const candidatos = (r2.data || []).filter(
       (row) => linhaPagamentoAprovada(row) && (!row.usuario_id || String(row.usuario_id).trim() === uid)
     )
-    if (candidatos.length === 0) return false
+    if (candidatos.length === 0) {
+      /* Diagnóstico fuzzy (rule data-lookup-safety): "não encontrado" pode ser typo
+       * no e-mail do pagador. NÃO concede acesso por similaridade (risco de liberar
+       * com pagamento de outra pessoa) — só loga para reconciliação manual. */
+      try {
+        const localpart = em.split('@')[0]
+        if (localpart.length >= 5) {
+          const esc = localpart.replace(/[%_\\]/g, (ch) => `\\${ch}`)
+          const fz = await supabase
+            .from('pagamentos_asaas')
+            .select('id, status, payer_email')
+            .ilike('payer_email', `%${esc}%`)
+            .neq('payer_email', em)
+            .limit(5)
+          const similares = (fz.data || []).filter(linhaPagamentoAprovada)
+          if (similares.length > 0) {
+            log.warn('[usuarioTemPagamentoAprovado] possível typo no payer_email — pagamento aprovado com e-mail SIMILAR encontrado; reconciliar manualmente', {
+              usuarioId: uid,
+              emailBuscado: em,
+              similares: similares.map((r) => ({ id: r.id, payer_email: r.payer_email })),
+            })
+          }
+        }
+      } catch { /* diagnóstico nunca derruba o fluxo */ }
+      return false
+    }
 
     const semVinculo = candidatos.find((row) => !row.usuario_id && row.id)
     if (semVinculo) {
