@@ -12,7 +12,7 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 |---|------|-----------|---------|---------|
 | S1 | **Refresh token em `localStorage`** → migrar p/ cookie `HttpOnly; Secure; SameSite=Strict` | `horizonteAccessToken.js:23` (confirmado hoje) | Médio-alto (mexe no fluxo login/refresh, testar bem) | Alto — XSS hoje rouba sessão de 30d |
 | S2 | ✅ **FEITO (10/jun, commit 8251ffa)** CORS de mestredamente.com agora é https-only (Traefik já redireciona http globalmente; exceções via `CORS_ORIGINS`) | `app.mjs` | — | — |
-| S3 | **`REDIS_URL` não configurada** → rate limit in-memory zera a cada restart PM2 + cooldowns Asaas em `Map()` — **PENDENTE: rodar roteiro na VPS** (instalar redis-server + env + restart) | rate-limit.mjs já suporta Redis | Baixo | Médio |
+| S3 | ✅ **FEITO (10/jun, na VPS)** redis-server instalado + `REDIS_URL` no .env + restart; validado em produção (chaves `rl:login-email:*` criadas após logins de teste). `PASSWORD_OTP_PEPPER` também já setado (pré-requisito do deploy resolvido). | VPS | — | — |
 | S4 | ✅ **FEITO (10/jun, commit 8251ffa)** resolvido no código (sem mexer no Traefik/Easypanel): `clientKeyFromHono` usa o ÚLTIMO IP do XFF (acrescentado pelo nosso proxy) em vez do primeiro (forjável) + 4 testes | `rate-limit.mjs` | — | — |
 | S5 | ✅ **FEITO (10/jun)** Senha mínima 8 chars onde se CRIA senha (cadastro, troca, recuperação WhatsApp, front) — login continua aceitando 6 p/ contas antigas | `register-auth.mjs`, `register-usuario-perfil.mjs`, `password-otp-whatsapp.mjs`, `Cadastro/Login/Configuracoes.jsx` | — | — |
 | S6 | Token do webhook WhatsApp no path da URL (vaza em logs) | SEC-10 squad | Baixo | Baixo |
