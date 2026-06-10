@@ -16,7 +16,7 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 | S4 | ✅ **FEITO (10/jun, commit 8251ffa)** resolvido no código (sem mexer no Traefik/Easypanel): `clientKeyFromHono` usa o ÚLTIMO IP do XFF (acrescentado pelo nosso proxy) em vez do primeiro (forjável) + 4 testes | `rate-limit.mjs` | — | — |
 | S5 | ✅ **FEITO (10/jun)** Senha mínima 8 chars onde se CRIA senha (cadastro, troca, recuperação WhatsApp, front) — login continua aceitando 6 p/ contas antigas | `register-auth.mjs`, `register-usuario-perfil.mjs`, `password-otp-whatsapp.mjs`, `Cadastro/Login/Configuracoes.jsx` | — | — |
 | S6 | Token do webhook WhatsApp no path da URL (vaza em logs) | SEC-10 squad | Baixo | Baixo |
-| S7 | 🟡 **Asaas ROTACIONADA (10/jun)** — chave nova com whitelist de IP (só a VPS; chamadas locais dão 403 not_allowed_ip por design). Incidente: cópias truncadas deixaram ~2h de prod sem Asaas; corrigido via SFTP + validado HTTP 200 da VPS. **Resta rotacionar a chave do n8n** (a atual é antiga e ficou exposta em nota). | painéis | — | — |
+| S7 | ✅ **CONCLUÍDO (10/jun)** — Asaas rotacionada com whitelist de IP (só VPS; local dá 403 not_allowed_ip por design; incidente de cópias truncadas corrigido via SFTP, validado HTTP 200 da VPS). n8n rotacionada (nova 200, antiga revogada 401, sincronizada nos .env locais, removida de notas em texto plano). | — | — | — |
 
 ## 2️⃣ Performance — ganhos rápidos
 
