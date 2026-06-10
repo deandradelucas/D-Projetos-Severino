@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
+import { useModalA11y } from '../hooks/useModalA11y'
 import './dashboard.css'
 import '../styles/pages/configuracoes.css'
 import Sidebar from '../components/Sidebar'
@@ -201,6 +202,8 @@ export default function Configuracoes() {
   const [excluirModalOpen, setExcluirModalOpen] = useState(false)
   const [excluirInput, setExcluirInput] = useState('')
   const [excluirBusy, setExcluirBusy] = useState(false)
+  const excluirModalRef = useRef(null)
+  useModalA11y({ open: excluirModalOpen, onClose: () => { if (!excluirBusy) setExcluirModalOpen(false) }, containerRef: excluirModalRef, blockClose: excluirBusy })
 
   const prefs = (perfil && typeof perfil.preferencias === 'object' && perfil.preferencias) || {}
 
@@ -1031,8 +1034,8 @@ export default function Configuracoes() {
       </div>
 
       {excluirModalOpen && createPortal(
-        <div className="config-excluir-overlay" role="dialog" aria-modal="true" aria-labelledby="excluir-title" onMouseDown={(e) => { if (e.target === e.currentTarget && !excluirBusy) setExcluirModalOpen(false) }}>
-          <div className="config-excluir-modal">
+        <div className="config-excluir-overlay" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget && !excluirBusy) setExcluirModalOpen(false) }}>
+          <div className="config-excluir-modal" role="dialog" aria-modal="true" aria-labelledby="excluir-title" ref={excluirModalRef}>
             <span className="config-excluir-icon" aria-hidden>
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </span>

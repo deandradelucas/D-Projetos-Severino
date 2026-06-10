@@ -1,4 +1,5 @@
 ﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useModalA11y } from '../hooks/useModalA11y'
 import { createPortal } from 'react-dom'
 import './dashboard.css'
 import '../styles/pages/agenda.css'
@@ -66,6 +67,7 @@ export default function Agenda() {
   const fabCompact = useFabCompact(fabScrollRef)
   const closeAgendaSheet = useCallback(() => { if (!savingRef.current) setModalOpen(false) }, [])
   useSheetDragClose(agendaSheetRef, { open: modalOpen, onClose: closeAgendaSheet })
+  useModalA11y({ open: modalOpen, onClose: closeAgendaSheet, containerRef: agendaSheetRef, blockClose: saving, autoFocus: false })
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   /** Exclusão direta na lista do dia (confirmação em `ConfirmDialog`). */
   const [pendingDelete, setPendingDelete] = useState(null)
@@ -112,26 +114,6 @@ export default function Agenda() {
     void loadAgenda()
   }, [loadAgenda])
 
-  useEffect(() => {
-    if (!modalOpen) return undefined
-
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    document.body.classList.add('horizon-modal-open')
-
-    const onKeyDown = (event) => {
-      if (event.key === 'Escape' && !saving) {
-        setModalOpen(false)
-      }
-    }
-    window.addEventListener('keydown', onKeyDown)
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-      document.body.classList.remove('horizon-modal-open')
-      window.removeEventListener('keydown', onKeyDown)
-    }
-  }, [modalOpen, saving])
 
   const activeEventos = useMemo(
     () =>

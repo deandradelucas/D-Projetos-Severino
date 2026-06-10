@@ -34,7 +34,7 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 |---|------|---------|---------|
 | U1 | ✅ **FEITO (10/jun)** Touch targets ≥44px via hit-area (pseudo-elemento/padding+margin): Transações (editar/excluir, parcelas, limpar busca), Cartões (kebab, swatch, nav fatura), Metas (kebab, swatch, ícones) | — | — |
 | U2 | ✅ **JÁ ESTAVA MIGRADO** (verificado 10/jun): emojis do chrome já eram SVG (IconUsers/IconMoreVertical/chevrons/TrendArrow; até o seletor de ícones das Metas virou MetaIcon). Só faltavam width/height nos ícones de empty-state (IconCard/IconTarget) — adicionados (anti-sumiço iOS) | — | — |
-| U3 | **`useModalA11y` nos modais restantes** — hoje só TransactionModal, Cartões e ListaModais têm (confirmado); faltam **Metas, Agenda, Pagamento, Investimentos (3), Admin** → ou criar `<Modal>` wrapper | Médio | Médio — teclado/leitor de tela |
+| U3 | ✅ **FEITO (10/jun)** `useModalA11y` aplicado em 10 modais: Metas (2), Pagamento (cancelar + PixQr), Configurações (excluir conta), TransacaoDetalhe, Agenda, Investimentos (Novo c/ blockClose p/ preservar Escape do dropdown, Aporte, AportesDetalhe, Comparador). Listeners de Escape duplicados removidos. HorizonChat (trap próprio), ModoComprando e DatePicker ficam como estão. | — | — |
 | U4 | ✅ **JÁ ESTAVA RESOLVIDO** (verificado 10/jun): `TransacaoRow` tem `role="button"`, `tabIndex` e `onKeyDown` | — | — |
 | U5 | ✅ **FEITO (10/jun)** `:focus-visible` com ring accent em ~35 componentes de Cartões/Metas/Transações/Relatórios. O "ring global preso em @media 769px" não existe mais (partial 13 foi refatorado) | — | — |
 | U6 | ✅ **FEITO (10/jun)** — `alertdialog` no ConfirmDialog, `aria-label` em Encerrar recorrência e Remover convite, `role=progressbar` nas barras de Metas/Relatórios. Sidebar (`aria-current`+Sair), MobileBottomNav e InvestimentoCard já estavam ok. | — | — |
@@ -99,6 +99,6 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
    curl -s http://localhost:3001/api/health
    ```
 3. ✅ **Pacote "mobile polish" — CONCLUÍDO em 10/jun:** U1, U5, U8 feitos; U2 e P3 já estavam resolvidos (verificado).
-4. **Pacote "a11y modais":** U3 — `<Modal>` wrapper + rollout.
+4. ✅ **Pacote "a11y modais" — CONCLUÍDO em 10/jun:** rollout do `useModalA11y` em 10 modais (wrapper `<Modal>` descartado — o hook já é o padrão do projeto, IDS: reuse > create).
 5. **Epic produto:** F1 (escala da IA) → F2 (gamificação MVP) → F3 (push PWA) — nessa ordem; F7 de carona no F1.
 6. **Quando sobrar fôlego:** S1 (cookie httpOnly — o item de segurança mais valioso, mas o mais delicado), P1 (manualChunks), T1-T4.

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useModalA11y } from '../hooks/useModalA11y'
 import './dashboard.css'
 import '../styles/pages/metas.css'
 import { useFabCompact } from '../hooks/useFabCompact'
@@ -57,6 +58,8 @@ function ModalMeta({ onClose, onSalvar, salvando, metaEdit = null }) {
   const [cor, setCor] = useState(metaEdit?.cor || 'gold')
   const [valorInput, setValorInput] = useState(metaEdit?.valor_alvo ? valorToMaskedBRL(Number(metaEdit.valor_alvo)) : '')
   const [prazo, setPrazo] = useState(metaEdit?.prazo ? String(metaEdit.prazo).slice(0, 10) : '')
+  const modalRef = useRef(null)
+  useModalA11y({ open: true, onClose, containerRef: modalRef, blockClose: salvando, autoFocus: false })
 
   const valorNum = parseCurrencyBRLMasked(valorInput)
   const podeSalvar = nome.trim().length >= 1 && Number.isFinite(valorNum) && valorNum >= 0.01
@@ -69,7 +72,7 @@ function ModalMeta({ onClose, onSalvar, salvando, metaEdit = null }) {
 
   return (
     <div className="page-metas__modal-overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-metas__modal" role="dialog" aria-modal="true" aria-labelledby="meta-modal-title">
+      <div className="page-metas__modal" role="dialog" aria-modal="true" aria-labelledby="meta-modal-title" ref={modalRef}>
         <div className="page-metas__modal-head">
           <h2 id="meta-modal-title" className="page-metas__modal-title">{editando ? 'Editar meta' : 'Nova meta'}</h2>
           <button type="button" className="page-metas__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>
@@ -160,6 +163,8 @@ function ModalMeta({ onClose, onSalvar, salvando, metaEdit = null }) {
 function ModalAporte({ meta, onClose, onConfirmar, salvando }) {
   const [tipo, setTipo] = useState('guardar') // 'guardar' | 'resgatar'
   const [valorInput, setValorInput] = useState('')
+  const modalRef = useRef(null)
+  useModalA11y({ open: true, onClose, containerRef: modalRef, blockClose: salvando, autoFocus: false })
 
   const valorNum = parseCurrencyBRLMasked(valorInput)
   const podeConfirmar = Number.isFinite(valorNum) && valorNum >= 0.01
@@ -178,7 +183,7 @@ function ModalAporte({ meta, onClose, onConfirmar, salvando }) {
 
   return (
     <div className="page-metas__modal-overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-metas__modal page-metas__modal--sm" role="dialog" aria-modal="true" aria-labelledby="aporte-modal-title">
+      <div className="page-metas__modal page-metas__modal--sm" role="dialog" aria-modal="true" aria-labelledby="aporte-modal-title" ref={modalRef}>
         <div className="page-metas__modal-head">
           <h2 id="aporte-modal-title" className="page-metas__modal-title"><MetaIcon name={meta.icone} size={18} /> {meta.nome}</h2>
           <button type="button" className="page-metas__modal-close" onClick={onClose} aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg></button>

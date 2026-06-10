@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSearchParams } from 'react-router-dom'
 import Sidebar from '@components/Sidebar'
@@ -30,6 +30,7 @@ import {
   computeEconomiaAnual,
   computeStatusBadge,
 } from '../lib/pagamentoUi'
+import { useModalA11y } from '../hooks/useModalA11y'
 import './dashboard.css'
 import '../styles/pages/pagamento.css'
 
@@ -68,6 +69,8 @@ export default function Pagamento() {
   const [cancelModalOpen, setCancelModalOpen] = useState(false)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [cancelError, setCancelError] = useState('')
+  const cancelModalRef = useRef(null)
+  useModalA11y({ open: cancelModalOpen, onClose: () => { if (!cancelLoading) setCancelModalOpen(false) }, containerRef: cancelModalRef, blockClose: cancelLoading })
 
   useEffect(() => {
     const saved = localStorage.getItem('horizonte_cpf_cnpj')
@@ -871,8 +874,8 @@ export default function Pagamento() {
                 ) : null}
 
                 {cancelModalOpen ? createPortal(
-                  <div className="pagamento-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title">
-                    <div className="pagamento-modal">
+                  <div className="pagamento-modal-overlay" role="presentation">
+                    <div className="pagamento-modal" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title" ref={cancelModalRef}>
                       <h2 id="cancel-modal-title" className="pagamento-modal__title">Antes de cancelar…</h2>
 
                       {/* Retenção: lembra o que perde + acesso até o fim do período (feature 13) */}

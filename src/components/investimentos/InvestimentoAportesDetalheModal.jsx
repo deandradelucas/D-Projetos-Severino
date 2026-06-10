@@ -1,4 +1,5 @@
-import React, { useEffect, useId } from 'react'
+import React, { useId, useRef } from 'react'
+import { useModalA11y } from '../../hooks/useModalA11y'
 import {
   aliquotaIrRendaFixaPfPorPrazoDias,
   contarDiasUteisComJurosDesdeIso,
@@ -33,13 +34,8 @@ export default function InvestimentoAportesDetalheModal({
   removendoAporteId,
 }) {
   const titleId = useId()
-
-  useEffect(() => {
-    if (!open) return
-    const handleKey = (e) => { if (e.key === 'Escape') onClose() }
-    document.addEventListener('keydown', handleKey)
-    return () => document.removeEventListener('keydown', handleKey)
-  }, [open, onClose])
+  const modalRef = useRef(null)
+  useModalA11y({ open, onClose, containerRef: modalRef })
 
   if (!open || !investimento) return null
 
@@ -55,12 +51,10 @@ export default function InvestimentoAportesDetalheModal({
   return (
     <div
       className="modal-backdrop page-investimentos-modal-backdrop"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
+      role="presentation"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="modal-content page-investimentos-modal page-investimentos-aportes-modal">
+      <div className="modal-content page-investimentos-modal page-investimentos-aportes-modal" role="dialog" aria-modal="true" aria-labelledby={titleId} ref={modalRef}>
         <div className="modal-header">
           <h3 id={titleId} className="modal-title">
             Aportes — {investimento.nome ?? 'Investimento'}

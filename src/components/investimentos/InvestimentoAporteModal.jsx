@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useModalA11y } from '../../hooks/useModalA11y'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked } from '../../lib/currencyMaskBr'
 import { useSheetDragClose } from '../../hooks/useSheetDragClose'
 import DatePickerBrPopover from './DatePickerBrPopover'
@@ -17,6 +18,7 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
   const sheetRef = useRef(null)
   const btnCalRef = useRef(null)
   useSheetDragClose(sheetRef, { open, onClose })
+  useModalA11y({ open, onClose, containerRef: sheetRef, autoFocus: false })
 
   const [valorInput, setValorInput] = useState('')
   const [dataBr, setDataBr] = useState(() => ymdToDdMmYyyy(localDateToday()))
@@ -34,13 +36,6 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
     const focusTimer = window.setTimeout(() => valorInputRef.current?.focus(), 60)
     return () => window.clearTimeout(focusTimer)
   }, [open])
-
-  useEffect(() => {
-    if (!open) return
-    const handleKey = (e) => { if (e.key === 'Escape') onClose() }
-    document.addEventListener('keydown', handleKey)
-    return () => document.removeEventListener('keydown', handleKey)
-  }, [open, onClose])
 
   if (!open) return null
 
@@ -70,12 +65,10 @@ export default function InvestimentoAporteModal({ open, onClose, onSubmit, submi
     <>
     <div
       className="modal-backdrop page-investimentos-modal-backdrop"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
+      role="presentation"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="modal-content page-investimentos-modal page-investimentos-aporte-modal" ref={sheetRef}>
+      <div className="modal-content page-investimentos-modal page-investimentos-aporte-modal" role="dialog" aria-modal="true" aria-labelledby={titleId} ref={sheetRef}>
         <div className="modal-header">
           <h3 id={titleId} className="modal-title">
             Novo aporte{investimentoNome ? ` — ${investimentoNome}` : ''}

@@ -1,5 +1,6 @@
-import React, { useId } from 'react'
+import React, { useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { useModalA11y } from '../../hooks/useModalA11y'
 
 /**
  * Modal com QR Code Pix (Asaas) + copia e cola.
@@ -18,6 +19,8 @@ export default function PagamentoPixQrModal({
   onGerar,
 }) {
   const titleId = useId()
+  const modalRef = useRef(null)
+  useModalA11y({ open, onClose, containerRef: modalRef })
   if (!open) return null
 
   const imgSrc =
@@ -32,6 +35,7 @@ export default function PagamentoPixQrModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        ref={modalRef}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="pagamento-pix-modal__head">

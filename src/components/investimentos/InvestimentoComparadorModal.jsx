@@ -1,5 +1,6 @@
 import React, { useId, useMemo, useRef, useState } from 'react'
 import { useSheetDragClose } from '../../hooks/useSheetDragClose'
+import { useModalA11y } from '../../hooks/useModalA11y'
 import DatePickerBrPopover from './DatePickerBrPopover'
 import { maskDateBrInput, parseDdMmYyyyStrict, ymdToDdMmYyyy } from '../../lib/dateInputBr'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../../lib/currencyMaskBr'
@@ -36,6 +37,7 @@ export default function InvestimentoComparadorModal({ open, onClose, cdiAa }) {
   const sheetRef = useRef(null)
   const btnCalRef = useRef(null)
   useSheetDragClose(sheetRef, { open, onClose })
+  useModalA11y({ open, onClose, containerRef: sheetRef })
   const [valorInput, setValorInput] = useState(valorToMaskedBRL(10000))
   const [prazoBr, setPrazoBr] = useState('')
   const [pickerOpen, setPickerOpen] = useState(false)

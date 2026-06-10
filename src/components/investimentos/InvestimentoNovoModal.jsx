@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useSheetDragClose } from '../../hooks/useSheetDragClose'
+import { useModalA11y } from '../../hooks/useModalA11y'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../../lib/currencyMaskBr'
 import DatePickerBrPopover from './DatePickerBrPopover'
 import { maskDateBrInput, parseDdMmYyyyStrict, ymdToDdMmYyyy } from '../../lib/dateInputBr'
@@ -93,6 +94,10 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
   const btnCalVencimentoRef = useRef(null)
   const sheetRef = useRef(null)
   useSheetDragClose(sheetRef, { open, onClose })
+  // blockClose: true — ganha scroll-lock + focus-trap sem Escape do hook;
+  // o listener de Escape próprio (abaixo, ~linha 165) permanece para respeitar
+  // o estado `submitting` e coexistir com os Escapes internos do dropdown de instituições.
+  useModalA11y({ open, onClose, containerRef: sheetRef, blockClose: true, autoFocus: false })
 
   const [instQuery, setInstQuery] = useState(() => String(initialEdit?.instituicao_nome ?? '').trim())
   const [instChosen, setInstChosen] = useState(() => {
@@ -156,20 +161,17 @@ export default function InvestimentoNovoModal({ open, onClose, onSubmit, submitt
     if (item) item.scrollIntoView({ block: 'nearest' })
   }, [activeIndex, instListId])
 
+  // Escape próprio do modal — respeita `submitting` e coexiste com os Escapes
+  // internos do dropdown de instituições (que chamam stopPropagation não, mas
+  // fecham só o dropdown via setInstListOpen). O hook usa blockClose:true, logo
+  // não registra Escape — este listener é o único responsável por fechar o modal.
   useEffect(() => {
     if (!open) return undefined
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    document.body.classList.add('horizon-modal-open')
     const onKey = (e) => {
       if (e.key === 'Escape' && !submitting) onClose()
     }
     window.addEventListener('keydown', onKey)
-    return () => {
-      document.body.style.overflow = prev
-      document.body.classList.remove('horizon-modal-open')
-      window.removeEventListener('keydown', onKey)
-    }
+    return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose, submitting])
 
   useEffect(() => {

@@ -4,6 +4,7 @@ import { formatCurrencyBRL } from '../../lib/formatCurrency'
 import { TransacaoCategoriaIcon } from '../TransacaoCategoriaIcon'
 import { transacaoDescricaoEfetiva } from '../../lib/transacaoUtils'
 import { useSheetDragClose } from '../../hooks/useSheetDragClose'
+import { useModalA11y } from '../../hooks/useModalA11y'
 
 /**
  * Modal/bottom-sheet de detalhes de uma transação.
@@ -11,12 +12,7 @@ import { useSheetDragClose } from '../../hooks/useSheetDragClose'
  */
 export function TransacaoDetalheModal({ tx, onClose, onEdit, onDelete, privacyMode }) {
   const sheetRef = React.useRef(null)
-  React.useEffect(() => {
-    if (!tx) return undefined
-    const onKey = (e) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [tx, onClose])
+  useModalA11y({ open: Boolean(tx), onClose, containerRef: sheetRef })
   useSheetDragClose(sheetRef, { open: Boolean(tx), onClose })
 
   if (!tx) return null
