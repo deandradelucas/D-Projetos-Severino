@@ -1,6 +1,15 @@
 # Story S1 — Refresh token em cookie HttpOnly
 
-**Status:** InReview (aguardando smoke em produção) · **Origem:** Auditoria squad 07/jun (A1/SEC-03) + backlog `docs/melhorias-backlog-2026-06.md`
+**Status:** Done — deployada e validada em produção (10/jun, commit 978e100)
+
+## Smoke em produção (10/jun)
+- Login → `Set-Cookie: horizonte_rt=<token>; Max-Age=2592000; Path=/api/auth; HttpOnly; Secure; SameSite=Strict`; body sem refreshToken ✅
+- Refresh via cookie → 200 + accessToken + rotação ✅ · refresh com token rotacionado → 200 ✅
+- Logout → cookie expirado (`Max-Age=0`) ✅ · refresh pós-logout → rejeitado ✅
+- Token legado inválido no body → 401 ✅
+
+## Incidente descoberto e corrigido durante o smoke
+O cookie veio sem `Secure` → investigação revelou que **`NODE_ENV` e `HORIZONTE_ACCESS_TOKEN_SECRET` não existiam no .env da VPS**: produção assinava JWTs com o fallback de dev (público no repo) — access tokens forjáveis. Corrigido com aprovação do CEO: secret aleatório gerado na VPS + `NODE_ENV=production` + restart. **Prova:** token forjado com o secret de dev agora retorna 401. Access tokens antigos morreram no restart; o refresh automático reemitiu sem deslogar ninguém. Backup do .env em `/home/lucas/severino/.env.bak-jwt` (chmod 600). · **Origem:** Auditoria squad 07/jun (A1/SEC-03) + backlog `docs/melhorias-backlog-2026-06.md`
 
 ## Problema
 O refresh token (sessão de 30 dias) vive em `localStorage` (`horizonteAccessToken.js`). Qualquer XSS o exfiltra e ganha a conta por 30 dias, mesmo com o access token só em memória.

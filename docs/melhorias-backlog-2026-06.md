@@ -10,7 +10,7 @@ Consolidação das 5 auditorias de junho (full-stack 06/jun, UI/UX, arquitetura,
 
 | # | Item | Evidência | Esforço | Impacto |
 |---|------|-----------|---------|---------|
-| S1 | **Refresh token em `localStorage`** → migrar p/ cookie `HttpOnly; Secure; SameSite=Strict` | `horizonteAccessToken.js:23` (confirmado hoje) | Médio-alto (mexe no fluxo login/refresh, testar bem) | Alto — XSS hoje rouba sessão de 30d |
+| S1 | ✅ **FEITO+DEPLOYADO (10/jun, commit 978e100)** Refresh token em cookie `HttpOnly; Secure; SameSite=Strict; Path=/api/auth` com migração transparente do localStorage (caminho legado por body mantido p/ transição). Smoke completo em prod ✅. **Bônus crítico descoberto no smoke:** VPS não tinha `NODE_ENV` nem `HORIZONTE_ACCESS_TOKEN_SECRET` — JWTs eram assinados com o fallback de dev público no repo (forjáveis!). Corrigido + provado (token forjado → 401). Story: `docs/stories/s1-refresh-token-httponly-cookie.story.md` | — | — | — |
 | S2 | ✅ **FEITO (10/jun, commit 8251ffa)** CORS de mestredamente.com agora é https-only (Traefik já redireciona http globalmente; exceções via `CORS_ORIGINS`) | `app.mjs` | — | — |
 | S3 | ✅ **FEITO (10/jun, na VPS)** redis-server instalado + `REDIS_URL` no .env + restart; validado em produção (chaves `rl:login-email:*` criadas após logins de teste). `PASSWORD_OTP_PEPPER` também já setado (pré-requisito do deploy resolvido). | VPS | — | — |
 | S4 | ✅ **FEITO (10/jun, commit 8251ffa)** resolvido no código (sem mexer no Traefik/Easypanel): `clientKeyFromHono` usa o ÚLTIMO IP do XFF (acrescentado pelo nosso proxy) em vez do primeiro (forjável) + 4 testes | `rate-limit.mjs` | — | — |
