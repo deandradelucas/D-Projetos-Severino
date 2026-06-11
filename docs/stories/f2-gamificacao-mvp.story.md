@@ -1,6 +1,6 @@
 # Story F2 — Gamificação MVP (Fase 1)
 
-**Status:** InProgress · **Origem:** Backlog pacote 5 / [[project-gamificacao-plan]]
+**Status:** Done — deployado (commit d5cf285, 10/jun). Smoke prod (conta João): 1ª chamada desbloqueou `meta_criada`+`guardado_1k` com `novo:true`; 2ª virou `novo:false` (idempotente). Migration 74 aplicada, advisor INFO (deny-all padrão). · **Origem:** Backlog pacote 5 / [[project-gamificacao-plan]]
 
 ## Decisões do CEO (10/jun)
 - **Narrador:** só na tela por agora (zero IA/WhatsApp). Ligar o WhatsApp depois sem retrabalho.
