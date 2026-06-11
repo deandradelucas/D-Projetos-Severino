@@ -269,6 +269,12 @@
   color: var(--accent);
 }
 .ntx-ai-quick__spin .spinner { width: 16px; height: 16px; opacity: 0.75; }
+.ntx-ai-quick__notice {
+  margin: 6px 0 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--accent);
+}
 .ntx-ai-chip {
   display: inline-flex;
   align-items: center;

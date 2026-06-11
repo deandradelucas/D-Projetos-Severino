@@ -126,11 +126,12 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
     setFormData((prev) => ({ ...prev, data_transacao: dStr }))
   }, [])
 
+  // Retorna true quando a transação foi salva com sucesso (false em validação/erro).
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     if (!formData.valor || parseFloat(formData.valor) <= 0) {
       showToast('Informe um valor válido maior que zero.', 'error')
-      return
+      return false
     }
 
     const numParcelas = parseInt(formData.num_parcelas, 10)
@@ -140,7 +141,7 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
       (!Number.isInteger(numParcelas) || numParcelas < 2 || numParcelas > 120)
     ) {
       showToast('Número de parcelas deve ser entre 2 e 120.', 'error')
-      return
+      return false
     }
     const parcelaInicial = parseInt(formData.parcela_inicial, 10) || 1
     if (
@@ -149,7 +150,18 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
       (parcelaInicial < 1 || parcelaInicial >= numParcelas)
     ) {
       showToast(`Parcela inicial deve ser entre 1 e ${numParcelas - 1}.`, 'error')
-      return
+      return false
+    }
+
+    // Edição de parcelada: o input tem min/max, mas type=number não impede digitar
+    // fora da faixa — valida aqui antes de montar o payload.
+    if (isEditMode && formData.recorrente_total) {
+      const rt = parseInt(formData.recorrente_total, 10)
+      const ri = parseInt(formData.recorrente_index, 10)
+      if (rt > 0 && (!Number.isInteger(ri) || ri < 1 || ri > rt)) {
+        showToast(`Parcela deve ser entre 1 e ${rt}.`, 'error')
+        return false
+      }
     }
 
     const descricao = String(formData.descricao || '').trim()
@@ -177,6 +189,10 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
         if (ri > 0 && rt > 0) {
           payload.recorrente_index = ri
           payload.descricao = descricao ? `${descricao} (${ri}/${rt})` : `Parcela ${ri}/${rt}`
+        } else {
+          // Transação não parcelada: o spread do formData traz recorrente_index: ''
+          // — não pode ir ao backend (risco de zerar o campo no registro).
+          delete payload.recorrente_index
         }
         delete payload.recorrente_total
       }
@@ -229,12 +245,14 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
         showToast(json.message || (isEditMode ? 'Alterações salvas!' : 'Transação registrada!'))
         onSave()
         onClose()
-      } else {
-        const error = await res.json().catch(() => ({}))
-        showToast(error.message || 'Não foi possível salvar a transação.', 'error')
+        return true
       }
+      const error = await res.json().catch(() => ({}))
+      showToast(error.message || 'Não foi possível salvar a transação.', 'error')
+      return false
     } catch {
       showToast('Sem conexão. Tente de novo.', 'error')
+      return false
     } finally {
       setSaving(false)
     }

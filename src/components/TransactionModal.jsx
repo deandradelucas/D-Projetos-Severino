@@ -35,6 +35,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   // Severino IA — linguagem natural ("gastei 45 com gasolina") autopreenche o form
   const [aiText, setAiText] = useState('')
   const [aiParsing, setAiParsing] = useState(false)
+  const [aiNotice, setAiNotice] = useState('')
 
   const valorInputRef = useRef(null)
   const modalSheetRef = useRef(null)
@@ -97,6 +98,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     setAiSuggestedCat(false)
     setValidationAttempted(false)
     setAiText('')
+    setAiNotice('')
     // Sem auto-focus no campo valor: o foco inicial fica no botão Fechar
     // (via useModalA11y, que foca o primeiro elemento focável). Evita que o
     // cursor caia direto no valor ao abrir o modal — mesmo comportamento no
@@ -124,10 +126,13 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   useEffect(() => { onCloseSafeRef.current = onCloseSafe }, [onCloseSafe])
 
   // Wrap handleSubmit para marcar validação visual + persistir template
-  const handleSubmitWithValidation = useCallback((e) => {
+  const handleSubmitWithValidation = useCallback(async (e) => {
     e.preventDefault?.()
     setValidationAttempted(true)
-    // Persiste template (R) — top 3 mais usados em localStorage
+    const saved = await handleSubmit(e)
+    if (!saved) return
+    // Persiste template (R) — top 3 mais usados em localStorage.
+    // Só após salvar com sucesso: submit inválido/falho não polui os "Recentes".
     try {
       if (!isEditMode && formData?.descricao && formData?.categoria_id) {
         const key = 'ntx_recent_templates_v1'
@@ -146,7 +151,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
     } catch {
       // ignora — localStorage pode estar bloqueado
     }
-    return handleSubmit(e)
   }, [handleSubmit, formData, isEditMode])
 
   // (R) Templates rápidos — top 3 do localStorage
@@ -363,16 +367,36 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   }, [formData.descricao, formData.tipo, formData.categoria_id, isOpen, isEditMode, usuarioId, setFormData])
 
   // ─── Severino IA: aplica a transação extraída no formulário ───
+  // O parse chega com debounce (850ms) e pode aterrissar DEPOIS de o usuário já
+  // ter mexido no form — por isso só preenche campos ainda vazios (mesma proteção
+  // da sugestão de categoria por descrição).
+  const jaTemValor = parseFloat(formData.valor) > 0
+  const jaTemCategoria = Boolean(formData.categoria_id)
   const applyAiTransaction = useCallback((data) => {
-    if (data.valor != null && Number(data.valor) > 0) {
+    if (data.valor != null && Number(data.valor) > 0 && !jaTemValor) {
       const cents = Math.round(Number(data.valor) * 100)
       handleCurrencyChange({ target: { name: 'valorDisplay', value: String(cents) } })
     }
     setFormData((prev) => {
       const next = { ...prev }
-      if (data.tipo === 'DESPESA' || data.tipo === 'RECEITA') next.tipo = data.tipo
-      if (data.categoria_id) next.categoria_id = data.categoria_id
-      next.subcategoria_id = data.subcategoria_id || ''
+      // Categoria escolhida manualmente trava tipo/categoria/subcategoria:
+      // trocar o tipo aqui invalidaria a categoria já selecionada.
+      if (!prev.categoria_id) {
+        if (data.tipo === 'DESPESA' || data.tipo === 'RECEITA') next.tipo = data.tipo
+        if (data.categoria_id) {
+          next.categoria_id = data.categoria_id
+          next.subcategoria_id = data.subcategoria_id || ''
+        }
+      }
+      // Parcelamento dito no texto ("comprei TV em 10x") liga o toggle — só se o
+      // usuário ainda não mexeu na seção e o lançamento é despesa.
+      const np = parseInt(data?.parcelamento?.num_parcelas, 10)
+      if (!prev.parcelado && Number.isInteger(np) && np >= 2 && np <= 120 && next.tipo === 'DESPESA') {
+        next.parcelado = true
+        next.num_parcelas = String(np)
+        next.parcela_inicial = '1'
+        next.prazo_indeterminado = false
+      }
       // Descrição fica em branco de propósito — o usuário preenche com o que quiser
       // (ex.: o local da compra). A IA já preencheu tipo/valor/categoria.
       if (data.data_transacao) {
@@ -384,14 +408,15 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       }
       return next
     })
-    if (data.categoria_id) setAiSuggestedCat(true)
-  }, [handleCurrencyChange, setFormData])
+    if (data.categoria_id && !jaTemCategoria) setAiSuggestedCat(true)
+  }, [handleCurrencyChange, setFormData, jaTemValor, jaTemCategoria])
 
   // Chama o endpoint de parse e autopreenche (silencioso se não for transação)
   const runAiParse = useCallback(async (texto) => {
     const t = String(texto || '').trim()
     if (t.length < 4) return
     setAiParsing(true)
+    setAiNotice('')
     try {
       const res = await apiFetch(apiUrl('/api/ai/parse-transaction'), {
         method: 'POST',
@@ -400,7 +425,17 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
       })
       if (res.ok) {
         const data = await res.json()
-        if (data.tipo === 'DESPESA' || data.tipo === 'RECEITA') applyAiTransaction(data)
+        if (data.tipo === 'DESPESA' || data.tipo === 'RECEITA') {
+          applyAiTransaction(data)
+        } else if (data.tipo === 'MULTIPLO' && Array.isArray(data.transacoes) && data.transacoes.length > 0) {
+          // O form lança uma transação por vez: preenche a 1ª e avisa sobre as demais.
+          applyAiTransaction(data.transacoes[0])
+          setAiNotice(
+            data.transacoes.length === 1
+              ? ''
+              : `Encontrei ${data.transacoes.length} lançamentos — preenchi o 1º. Salve e lance os outros em seguida.`,
+          )
+        }
       }
     } catch {
       // best-effort: o formulário manual continua funcionando
@@ -518,6 +553,11 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                     </span>
                   )}
                 </div>
+                {aiNotice && (
+                  <p className="ntx-ai-quick__notice" role="status" aria-live="polite">
+                    {aiNotice}
+                  </p>
+                )}
               </div>
             )}
 
@@ -858,28 +898,46 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                       </div>
                     )}
 
-                    {/* (T) Calendário visual das parcelas */}
+                    {/* (T) Calendário visual das parcelas — mostra as datas de vencimento REAIS:
+                        com cartão segue o dia de vencimento dele (regra "próximo vencimento");
+                        sem cartão parte do vencimento da 1ª parcela (ou da data da compra). */}
                     {formData.parcelado && !formData.prazo_indeterminado && numParcelas >= 2 && (
                       (() => {
-                        const inicio = formData.data_transacao ? new Date(formData.data_transacao) : new Date()
-                        if (Number.isNaN(inicio.getTime())) return null
-                        const dia = inicio.getDate()
+                        const toCell = (dt, idx) => ({
+                          day: dt.getDate(),
+                          month: dt.toLocaleDateString('pt-BR', { month: 'short' }).replace(/\.$/, ''),
+                          year: String(dt.getFullYear()).slice(-2),
+                          idx,
+                        })
+                        const max = Math.min(numParcelas, 12)
                         const meses = []
-                        for (let i = 0; i < Math.min(numParcelas, 12); i++) {
-                          // Cria a data com o mesmo dia da transação. Se o mês não tem aquele dia
-                          // (ex: 31/jan → fev), JS rola para o próximo mês — ajustamos para o último dia válido.
-                          const targetMonth = inicio.getMonth() + i
-                          const tentativa = new Date(inicio.getFullYear(), targetMonth, dia)
-                          if (tentativa.getMonth() !== ((targetMonth % 12) + 12) % 12) {
-                            // dia inválido nesse mês — usa último dia do mês alvo
-                            tentativa.setDate(0)
+                        if (selectedCartao) {
+                          for (let i = 0; i < max; i++) {
+                            const v = vencimentoCartaoParaData(formData.data_transacao, selectedCartao.dia_vencimento, i)
+                            if (!v) break
+                            const [vy, vm, vd] = v.split('-').map(Number)
+                            meses.push(toCell(new Date(vy, vm - 1, vd), i + 1))
                           }
-                          meses.push({
-                            day: tentativa.getDate(),
-                            month: tentativa.toLocaleDateString('pt-BR', { month: 'short' }).replace(/\.$/, ''),
-                            year: String(tentativa.getFullYear()).slice(-2),
-                            idx: i + 1,
-                          })
+                        }
+                        if (meses.length === 0) {
+                          // Parse manual (local) — new Date('YYYY-MM-DD') interpreta como UTC
+                          // e deslocaria o dia no fuso BRT.
+                          const baseStr = String(formData.data_pagamento || formData.data_transacao || '')
+                          const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(baseStr)
+                          const inicio = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date()
+                          if (Number.isNaN(inicio.getTime())) return null
+                          const dia = inicio.getDate()
+                          for (let i = 0; i < max; i++) {
+                            // Cria a data com o mesmo dia base. Se o mês não tem aquele dia
+                            // (ex: 31/jan → fev), JS rola para o próximo mês — ajustamos para o último dia válido.
+                            const targetMonth = inicio.getMonth() + i
+                            const tentativa = new Date(inicio.getFullYear(), targetMonth, dia)
+                            if (tentativa.getMonth() !== ((targetMonth % 12) + 12) % 12) {
+                              // dia inválido nesse mês — usa último dia do mês alvo
+                              tentativa.setDate(0)
+                            }
+                            meses.push(toCell(tentativa, i + 1))
+                          }
                         }
                         const overflow = numParcelas - meses.length
                         return (
@@ -888,7 +946,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                               <div
                                 key={m.idx}
                                 className={`ntx-parc-cell${m.idx === 1 ? ' ntx-parc-cell--first' : ''}${m.idx === numParcelas ? ' ntx-parc-cell--last' : ''}`}
-                                title={`${m.idx}ª parcela · ${m.month}/'${m.year}`}
+                                title={`${m.idx}ª parcela · ${String(m.day).padStart(2, '0')}/${m.month}/'${m.year}`}
                               >
                                 <span className="ntx-parc-cell__idx">{m.idx}ª</span>
                                 <span className="ntx-parc-cell__month">{m.month}</span>

@@ -167,17 +167,34 @@ export function registerAiRoutes(app) {
       const categorias = await getCategorias(parsed.dataUsuarioId)
       const extracted = await parseWhatsAppMessageWithAI(texto, categorias, parsed.dataUsuarioId)
 
+      const toTransacaoDto = (t) => ({
+        tipo: t.tipo,
+        valor: t.valor ?? null,
+        categoria_id: t.categoria_id ?? null,
+        subcategoria_id: t.subcategoria_id ?? null,
+        descricao: t.descricao ?? '',
+        data_transacao: t.data_transacao ?? null,
+      })
+
+      // Várias transações na mesma frase: o modal preenche a 1ª e avisa o usuário
+      // (o form é de uma transação por vez; itens já vêm validados pelo sanitize).
+      if (extracted?.tipo === 'MULTIPLO' && Array.isArray(extracted.transacoes) && extracted.transacoes.length > 0) {
+        return c.json({
+          tipo: 'MULTIPLO',
+          transacoes: extracted.transacoes.map(toTransacaoDto),
+        })
+      }
+
       if (!extracted || (extracted.tipo !== 'DESPESA' && extracted.tipo !== 'RECEITA')) {
         return c.json({ tipo: 'CHAT' })
       }
 
       return c.json({
-        tipo: extracted.tipo,
-        valor: extracted.valor ?? null,
-        categoria_id: extracted.categoria_id ?? null,
-        subcategoria_id: extracted.subcategoria_id ?? null,
-        descricao: extracted.descricao ?? '',
-        data_transacao: extracted.data_transacao ?? null,
+        ...toTransacaoDto(extracted),
+        // "comprei TV em 10x" → o modal liga o toggle de parcelado (sanitize já clampa 2-120)
+        parcelamento: extracted.parcelamento?.num_parcelas
+          ? { num_parcelas: extracted.parcelamento.num_parcelas }
+          : null,
       })
     } catch (error) {
       log.warn('ai parse-transaction failed', error?.message || error)
