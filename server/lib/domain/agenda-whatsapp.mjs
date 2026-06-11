@@ -3,11 +3,13 @@ import {
   atualizarAgendaStatus,
   criarAgendaEvento,
   formatAgendaDateTime,
+  formatAgendaTime,
   listarAgendaEventos,
   registrarInteracaoAgendaWhatsApp,
   ultimoEventoAgendaCriadoRecentemente,
   AGENDA_TZ,
 } from './agenda.mjs'
+import { log } from '../logger.mjs'
 import { assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 import { groqChatCompletion } from '../ai/groq-client.mjs'
 import { geminiPostGenerateContent, resolveGeminiModelCandidates, buildGeminiGenerationConfig } from '../ai/gemini-client.mjs'
@@ -364,6 +366,124 @@ function messageHasExplicitTime(message) {
   return /\b(?:daqui\s+a|em)\s+\d{1,3}\s*(?:min|minuto|minutos|hora|horas|h)\b/.test(text)
 }
 
+// ---------------------------------------------------------------------------
+// Recorrência (A1): "todo dia", "toda segunda", "todo mês", "todo dia 5".
+// A agenda não tem engine de recorrência (coluna `recorrencia` é decorativa),
+// então criamos uma SÉRIE de eventos individuais — mesma filosofia das
+// transações parceladas. Horizonte default conservador, ajustável com
+// "por N dias/semanas/meses/vezes".
+// ---------------------------------------------------------------------------
+const RECORRENCIA_DEFAULTS = { DIARIA: 14, SEMANAL: 8, MENSAL: 6 }
+const RECORRENCIA_CAPS = { DIARIA: 31, SEMANAL: 26, MENSAL: 12 }
+
+function recorrenciaCount(freq, porMatch) {
+  let n = null
+  if (porMatch) {
+    const qtd = Number.parseInt(porMatch[1], 10)
+    const unit = porMatch[2]
+    if (Number.isFinite(qtd) && qtd > 0) {
+      if (unit.startsWith('vez')) n = qtd
+      else if (unit.startsWith('dia')) n = freq === 'DIARIA' ? qtd : Math.ceil(qtd / (freq === 'SEMANAL' ? 7 : 30))
+      else if (unit.startsWith('semana')) n = freq === 'DIARIA' ? qtd * 7 : freq === 'SEMANAL' ? qtd : Math.ceil(qtd / 4)
+      else if (unit.startsWith('mes')) n = freq === 'DIARIA' ? qtd * 30 : freq === 'SEMANAL' ? qtd * 4 : qtd
+    }
+  }
+  if (!Number.isFinite(n) || n == null || n < 2) n = RECORRENCIA_DEFAULTS[freq]
+  return Math.min(n, RECORRENCIA_CAPS[freq])
+}
+
+/**
+ * Detecta pedido de recorrência na mensagem.
+ * @returns {null | { freq: 'DIARIA'|'SEMANAL'|'MENSAL', count: number, diaMes?: number }}
+ */
+export function parseAgendaRecorrencia(message) {
+  const raw = normalizeTypos(String(message || ''))
+  const text = normalizeWordTime(stripAccents(raw.toLowerCase()))
+  const porMatch = text.match(/\bpor\s+(\d{1,3})\s*(dia|dias|semana|semanas|mes|meses|vez|vezes)\b/)
+
+  // "todo dia 5" → mensal no dia 5 (checar ANTES de "todo dia" diário)
+  const diaMesMatch = text.match(/\btodo\s+dia\s+(\d{1,2})\b/)
+  if (diaMesMatch) {
+    const diaMes = Number.parseInt(diaMesMatch[1], 10)
+    if (diaMes >= 1 && diaMes <= 31) {
+      return { freq: 'MENSAL', count: recorrenciaCount('MENSAL', porMatch), diaMes }
+    }
+  }
+  if (/\btodos?\s+(?:os\s+)?dias\b/.test(text) || /\btodo\s+(?:o\s+)?dia\b/.test(text) || /\b(?:diariamente|todo\s+santo\s+dia)\b/.test(text)) {
+    return { freq: 'DIARIA', count: recorrenciaCount('DIARIA', porMatch) }
+  }
+  if (
+    /\btodas?\s+(?:as?\s+)?(?:segunda|terca|quarta|quinta|sexta|sabado|domingo)s?(?:[-\s]feiras?)?\b/.test(text) ||
+    /\b(?:semanalmente|toda\s+semana|todas\s+as\s+semanas)\b/.test(text)
+  ) {
+    return { freq: 'SEMANAL', count: recorrenciaCount('SEMANAL', porMatch) }
+  }
+  if (/\btodo\s+(?:o\s+)?mes\b|\btodos\s+os\s+meses\b|\bmensalmente\b/.test(text)) {
+    return { freq: 'MENSAL', count: recorrenciaCount('MENSAL', porMatch) }
+  }
+  return null
+}
+
+function spHourMinute(date) {
+  const s = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: AGENDA_TZ, hour: '2-digit', minute: '2-digit', hour12: false,
+  }).format(date)
+  const [hour, minute] = s.split(':').map((v) => Number.parseInt(v, 10))
+  return { hour, minute }
+}
+
+/** Avança N meses preservando o dia (clamp p/ último dia do mês) no calendário SP. */
+function addMonthsSp(date, months, diaPreferido = null) {
+  const p = saoPauloParts(date)
+  const hm = spHourMinute(date)
+  let monthIdx = p.month - 1 + months
+  const year = p.year + Math.floor(monthIdx / 12)
+  monthIdx = ((monthIdx % 12) + 12) % 12
+  const lastDay = new Date(Date.UTC(year, monthIdx + 1, 0)).getUTCDate()
+  const day = Math.min(diaPreferido ?? p.day, lastDay)
+  return saoPauloDateFromParts({ year, month: monthIdx + 1, day, hour: hm.hour, minute: hm.minute })
+}
+
+/**
+ * Primeira ocorrência quando o parse normal não resolve a data ("todo dia 5",
+ * "me lembra todo dia" sem data). Horário: o dito na mensagem, senão 9h.
+ */
+function primeiraOcorrenciaRecorrente(recorrencia, message, base = new Date()) {
+  const raw = normalizeTypos(String(message || ''))
+  const text = normalizeWordTime(stripAccents(raw.toLowerCase()))
+  const time = parseTime(text) ?? { hour: 9, minute: 0 }
+  const parts = saoPauloParts(base)
+  if (recorrencia.freq === 'MENSAL' && recorrencia.diaMes) {
+    const ultimoDiaDoMes = new Date(Date.UTC(parts.year, parts.month, 0)).getUTCDate()
+    const day = Math.min(recorrencia.diaMes, ultimoDiaDoMes)
+    let d = saoPauloDateFromParts({ ...parts, day, hour: time.hour, minute: time.minute })
+    if (d.getTime() <= base.getTime()) d = addMonthsSp(d, 1, recorrencia.diaMes)
+    return d
+  }
+  let d = saoPauloDateFromParts({ ...parts, hour: time.hour, minute: time.minute })
+  if (d.getTime() <= base.getTime()) d = addDays(d, recorrencia.freq === 'SEMANAL' ? 7 : 1)
+  return d
+}
+
+function gerarOcorrenciasRecorrencia(inicio, recorrencia) {
+  const datas = [inicio]
+  for (let i = 1; i < recorrencia.count; i++) {
+    if (recorrencia.freq === 'DIARIA') datas.push(addDays(inicio, i))
+    else if (recorrencia.freq === 'SEMANAL') datas.push(addDays(inicio, i * 7))
+    else datas.push(addMonthsSp(inicio, i, recorrencia.diaMes ?? null))
+  }
+  return datas
+}
+
+function recorrenciaLabel(recorrencia, primeiraOcorrencia) {
+  if (recorrencia.freq === 'DIARIA') return 'todo dia'
+  if (recorrencia.freq === 'SEMANAL') {
+    const dia = new Intl.DateTimeFormat('pt-BR', { timeZone: AGENDA_TZ, weekday: 'long' }).format(primeiraOcorrencia)
+    return `toda ${dia}`
+  }
+  return `todo dia ${recorrencia.diaMes ?? saoPauloParts(primeiraOcorrencia).day}`
+}
+
 /** Indica que "… para/as HH horas antes …" é horário (às HH), não pedido de aviso "HH horas antes". */
 function isLikelyClockAtPhraseBeforeHourOffset(before) {
   const b = String(before || '').trimEnd()
@@ -415,6 +535,13 @@ function stripDateTime(text) {
   t = t.replace(/\b\d{1,2}\s+h(?!\w)/gi, '')
   t = t.replace(/\b(?:da|de|pela)\s+(?:manh[aã]|tarde|noite)(?!\w)/gi, '')
   t = t.replace(/\b(?:pr[oó]xim[ao]s?)\b/gi, '')
+  // Marcadores de recorrência (a frequência vai na resposta, não no título)
+  t = t.replace(/\btodos?\s+(?:os\s+)?(?:santo\s+)?dias?(?:\s+\d{1,2})?\b/gi, '')
+  t = t.replace(/\btodas?\s+(?:as?\s+)?(?:segunda|ter[cç]a|quarta|quinta|sexta|s[aá]bado|domingo)s?(?:[-\s]feiras?)?\b/gi, '')
+  t = t.replace(/\btodo\s+(?:o\s+)?m[eê]s\b|\btodos\s+os\s+meses\b/gi, '')
+  t = t.replace(/\btoda\s+semana\b|\btodas\s+as\s+semanas\b/gi, '')
+  t = t.replace(/\b(?:diariamente|semanalmente|mensalmente)\b/gi, '')
+  t = t.replace(/\bpor\s+\d{1,3}\s*(?:dias?|semanas?|m[eê]s|meses|vez(?:es)?)\b/gi, '')
   return t
 }
 
@@ -769,8 +896,18 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
 
     const text = stripAccents(message.toLowerCase())
 
-    const createIntent = hasCreateIntent(message)
-    const inicioParaCriar = parseAgendaDateTime(message)
+    const recorrencia = parseAgendaRecorrencia(message)
+    // Recorrência + verbo de lembrete = intenção de criar, mesmo sem data
+    // parseável ("me lembra de tomar remédio todo dia"). Cancel/confirm/done
+    // já retornaram acima, então não há risco de sequestrar essas ações.
+    const createIntent = hasCreateIntent(message) || (Boolean(recorrencia) && isReminderCreateMessage(message))
+    let inicioParaCriar = parseAgendaDateTime(message)
+    if (!inicioParaCriar && recorrencia && createIntent) {
+      inicioParaCriar = primeiraOcorrenciaRecorrente(recorrencia, message)
+    } else if (recorrencia?.freq === 'MENSAL' && recorrencia.diaMes && createIntent) {
+      // "todo dia 5": o parse normal não entende "dia 5" — força a 1ª ocorrência correta
+      inicioParaCriar = primeiraOcorrenciaRecorrente(recorrencia, message)
+    }
 
     if (/\b(minha agenda|agenda hoje|compromissos hoje|hoje)\b/.test(text) && !createIntent) {
       intent = 'agenda_list_today'
@@ -890,6 +1027,45 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
 
       const explicitReminder = parseReminderMinutes(message)
       const reminderCreate = isReminderCreateMessage(message)
+
+      // A1: recorrência → série de eventos individuais (sem menu 1-5; o aviso
+      // vale para todos e configurar um a um pelo menu seria enganoso)
+      if (recorrencia) {
+        const datas = gerarOcorrenciasRecorrencia(inicio, recorrencia)
+        const lembrarMin = explicitReminder !== null ? explicitReminder : 15
+        const criados = []
+        for (const dataOcorrencia of datas) {
+          try {
+            const ev = await criarAgendaEvento(uid, {
+              titulo: tituloFinal,
+              descricao: 'Série recorrente criada pelo WhatsApp.',
+              inicio: dataOcorrencia.toISOString(),
+              lembrar_minutos_antes: lembrarMin,
+              whatsapp_notificar: true,
+            })
+            criados.push(ev)
+          } catch (e) {
+            log.warn('[agenda-wa] criar ocorrência recorrente falhou', e?.message)
+          }
+        }
+        if (criados.length === 0) throw new Error('Não consegui criar a série recorrente.')
+        logTituloExtracao(uid, rawMessage, criados[0].titulo, tituloFonte, criados[0].id).catch(() => {})
+
+        const hora = formatAgendaTime(criados[0].inicio, criados[0].timezone || AGENDA_TZ)
+        const primeira = formatAgendaDateTime(criados[0].inicio, criados[0].timezone || AGENDA_TZ)
+        const ultima = formatAgendaDateTime(criados[criados.length - 1].inicio, criados[criados.length - 1].timezone || AGENDA_TZ)
+        const notaHorario = !messageHasExplicitTime(message)
+          ? `\n_Você não disse o horário, usei *${hora}*._`
+          : ''
+        reply =
+          `🔁 *Lembrete recorrente criado!*\n\n*${criados[0].titulo}*\n` +
+          `${recorrenciaLabel(recorrencia, new Date(criados[0].inicio))} às ${hora} — *${criados.length}x*\n` +
+          `1ª: ${primeira}\nÚltima: ${ultima}\n` +
+          `⏰ Aviso: ${formatReminderLabel(lembrarMin)} (em todos)${avisoConflito}${notaHorario}\n\n` +
+          `_Para estender: "...por 3 meses". Para cancelar um: "cancelar ${criados[0].titulo}"._`
+        return { ok: true, reply }
+      }
+
       const data = await criarAgendaEvento(uid, {
         titulo: tituloFinal,
         descricao: reminderCreate ? 'Notificação criada pelo WhatsApp.' : undefined,

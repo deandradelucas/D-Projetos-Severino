@@ -2,6 +2,7 @@ import { log } from '../logger.mjs'
 import { buscarUsuarioPorTelefone } from '../usuarios.mjs'
 import { getCategorias, inserirTransacao, atualizarTransacao, deletarTransacao } from '../transacoes.mjs'
 import { TransactionService } from '../services/transaction-service.mjs'
+import { lerHistoricoConversa, registrarTrocaConversa } from './wa-conversa.mjs'
 import { askHorizon, parseWhatsAppMessageWithAI, parseWhatsAppAudioDirectWithAI } from '../ai.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
@@ -291,7 +292,20 @@ function formatAssistantReplyForWhatsApp(text) {
  * Ponto central do bot — recebe telefone + mensagem bruta do n8n e retorna o texto de resposta.
  * options.audioBytes + options.mimeHint: áudio raw; usa parse combinado (áudio → JSON direto).
  */
+/**
+ * Processa a mensagem e registra a troca na memória conversacional curta
+ * (contexto de sessão p/ follow-ups no chat). Registro é fire-and-forget.
+ */
 export async function processarMensagemBot(phone, rawMessage, options = {}) {
+  const result = await processarMensagemBotInterno(phone, rawMessage, options)
+  if (result?.reply) {
+    const userText = options?.audioBytes ? '[mensagem de áudio]' : String(rawMessage || '')
+    registrarTrocaConversa(phone, userText, result.reply).catch(() => {})
+  }
+  return result
+}
+
+async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
   const message = String(rawMessage || '').trim()
   if (!message && !options.audioBytes) return { ok: false, reply: '❌ Mensagem vazia.' }
 
@@ -659,7 +673,10 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
   if (parsed.tipo === 'CHAT') {
     if (!options.audioBytes) {
       try {
-        const full = await askHorizon(message, dataUsuarioId, [], usuario.nome || null)
+        // T1: memória conversacional curta (Redis, 15 min) — follow-ups
+        // ("e ontem?", "quanto foi mesmo?") passam a ter contexto.
+        const historico = await lerHistoricoConversa(phone).catch(() => [])
+        const full = await askHorizon(message, dataUsuarioId, historico, usuario.nome || null)
         return { ok: true, reply: formatAssistantReplyForWhatsApp(full) }
       } catch (e) {
         log.warn('[whatsapp-bot] askHorizon (WhatsApp CHAT)', e?.message || e)
