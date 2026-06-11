@@ -589,6 +589,10 @@
 @media (max-width: 768px) {
   /* CTA "+ Nova transação" sai no mobile — o FAB flutuante cobre a ação */
   .dashboard-hub__btn--primary { display: none; }
+  /* REGRA GLOBAL: no mobile, o título do hero alinha verticalmente com o menu
+     sanduíche (align-items: center). No dashboard, o hero-row com avatar vira
+     `display: block` mais abaixo, então esta regra fica inerte lá. */
+  .dashboard-hub__hero-row { align-items: center; }
   /* ícones (whatsapp/privacidade/avatar) vão pra CIMA (top-right); a saudação
      fica embaixo ocupando a largura toda (não quebra mais em 3 linhas). */
   .dashboard-hub__hero { padding: 14px 16px; margin-bottom: 12px; }
