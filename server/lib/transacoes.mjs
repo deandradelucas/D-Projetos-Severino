@@ -419,6 +419,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
       lancado_por_usuario_id,
       categorias(nome, cor),
       subcategorias(nome),
+      cartoes(nome, dia_vencimento),
       lancado_por:usuarios!lancado_por_usuario_id(nome)
     `
 

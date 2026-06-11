@@ -54,6 +54,18 @@ function primeiroDiaMesMidMorningIso(ym) {
   return new Date(Date.UTC(y, m - 1, 1, 12, 0, 0)).toISOString()
 }
 
+/**
+ * Dia `dia` do mês YYYY-MM (clampado ao último dia do mês), ~09:00 BR → 12:00 UTC.
+ * Usado quando a recorrência está vinculada a um cartão: o débito cai no dia de
+ * vencimento do cartão, não no dia 1.
+ */
+function diaMesMidMorningIso(ym, dia) {
+  const [y, m] = ym.split('-').map(Number)
+  const ultimoDia = new Date(Date.UTC(y, m, 0)).getUTCDate()
+  const d = Math.min(Math.max(1, Number(dia) || 1), ultimoDia)
+  return new Date(Date.UTC(y, m - 1, d, 12, 0, 0)).toISOString()
+}
+
 async function inserirTransacaoGerada(supabase, usuarioId, rule, dataIso) {
   const { error } = await supabase.from('transacoes').insert({
     usuario_id: usuarioId,
@@ -194,6 +206,20 @@ export async function processarRecorrenciasPendentes(usuarioIdFilter = null) {
   if (error) throw error
   if (!rules?.length) return { regras: 0, inseridas: 0 }
 
+  // Recorrência vinculada a cartão debita no dia de vencimento do cartão (não dia 1).
+  const cartaoIds = [...new Set(rules.map((r) => r.cartao_id).filter(Boolean))]
+  const venctoPorCartao = new Map()
+  if (cartaoIds.length) {
+    const { data: cartoes, error: cErr } = await supabase
+      .from('cartoes')
+      .select('id, dia_vencimento')
+      .in('id', cartaoIds)
+    if (cErr) throw cErr
+    for (const c of cartoes || []) {
+      if (c.dia_vencimento) venctoPorCartao.set(c.id, c.dia_vencimento)
+    }
+  }
+
   let inseridas = 0
 
   for (const rule of rules) {
@@ -221,7 +247,10 @@ export async function processarRecorrenciasPendentes(usuarioIdFilter = null) {
         }
       }
 
-      const dataIso = primeiroDiaMesMidMorningIso(proximoMes)
+      const diaVencCartao = rule.cartao_id ? venctoPorCartao.get(rule.cartao_id) : null
+      const dataIso = diaVencCartao
+        ? diaMesMidMorningIso(proximoMes, diaVencCartao)
+        : primeiroDiaMesMidMorningIso(proximoMes)
       await inserirTransacaoGerada(supabase, rule.usuario_id, rule, dataIso)
       inseridas++
 
