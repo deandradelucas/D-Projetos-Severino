@@ -93,7 +93,7 @@
 .page-investimentos-resumo__projecao-label { font-size: 0.78rem; color: var(--text-secondary); }
 .page-investimentos-resumo__projecao-row { display: flex; align-items: center; gap: 8px; }
 .page-investimentos-resumo__projecao-input {
-  width: 150px; padding: 8px 10px; border-radius: var(--r-md);
+  flex: 1; min-width: 110px; max-width: 180px; padding: 8px 10px; border-radius: var(--r-md);
   border: 1px solid var(--hairline-strong); background: var(--surface);
   color: var(--text-primary); font-size: 0.9rem;
 }
@@ -517,7 +517,7 @@
 .page-investimentos-card__projecao-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .page-investimentos-card__projecao-label { font-size: 0.76rem; color: var(--text-secondary); }
 .page-investimentos-card__projecao-input {
-  width: 150px; padding: 7px 10px; border-radius: var(--r-md);
+  flex: 1; min-width: 110px; max-width: 180px; padding: 7px 10px; border-radius: var(--r-md);
   border: 1px solid var(--hairline-strong); background: var(--surface);
   color: var(--text-primary); font-size: 0.88rem;
 }

@@ -151,7 +151,7 @@
 
 /* limite (barra de uso) */
 .page-cartoes__limite { display: flex; flex-direction: column; gap: 5px; }
-.page-cartoes__limite-txt { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 0.78rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.page-cartoes__limite-txt { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 8px; overflow-wrap: anywhere; font-size: 0.78rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 .page-cartoes__limite-bar { height: 7px; border-radius: var(--r-pill); background: var(--surface-sunken); overflow: hidden; }
 .page-cartoes__limite-fill { height: 100%; border-radius: var(--r-pill); background: var(--card-accent); }
 
@@ -199,7 +199,7 @@
 .page-cartoes__tx-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .page-cartoes__tx-desc { font-size: 0.88rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .page-cartoes__tx-meta { font-size: 0.74rem; color: var(--text-muted); }
-.page-cartoes__tx-valor { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.page-cartoes__tx-valor { flex-shrink: 0; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .page-cartoes__tx-valor--in { color: var(--success); }
 
 /* ── Parcelamentos ─────────────────────────────────────────────────────────── */

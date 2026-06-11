@@ -232,7 +232,7 @@
   background: var(--accent-muted); border: 1px solid var(--accent-border);
 }
 .pagamento-trial-urgencia__title { font-size: 0.95rem; font-weight: 700; color: var(--accent); }
-.pagamento-trial-urgencia__body { display: flex; align-items: center; gap: 14px; }
+.pagamento-trial-urgencia__body { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .pagamento-trial-urgencia__dias-box { display: flex; flex-direction: column; align-items: center; padding: 8px 14px; border-radius: var(--r-md); background: var(--surface); }
 .pagamento-trial-urgencia__num { font-size: 1.6rem; font-weight: 800; color: var(--accent); line-height: 1; }
 .pagamento-trial-urgencia__label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }

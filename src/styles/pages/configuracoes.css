@@ -350,7 +350,7 @@
   background: var(--surface-sunken); border: 1px solid var(--hairline);
 }
 .config-verif-panel__lead { margin: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; }
-.config-verif-panel__row { display: flex; gap: 8px; align-items: center; }
+.config-verif-panel__row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .config-verif-panel__input {
   flex: 0 0 130px; max-width: 130px;
   font-variant-numeric: tabular-nums; letter-spacing: 0.18em; font-weight: 700; text-align: center;

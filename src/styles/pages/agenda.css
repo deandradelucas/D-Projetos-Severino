@@ -292,6 +292,8 @@
      alinhadas a direita — evita transbordar para cima, colado no horario. */
   .agenda-day-item { flex-wrap: wrap; }
   .agenda-day-item__actions { flex-basis: 100%; justify-content: flex-end; margin-top: 4px; }
+  /* botoes de acao viram alvos de toque cheios no mobile (>=44px HIG) */
+  .agenda-day-item__btn { min-height: 44px; padding: 0 14px; }
   .agenda-field input,
   .agenda-field select,
   .agenda-field textarea { font-size: 16px; }

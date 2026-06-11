@@ -449,7 +449,7 @@ export default function Login() {
                   value={recoveryEmail}
                   onChange={(e) => setRecoveryEmail(e.target.value)}
                   placeholder="E-mail da conta"
-                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[16px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
                   autoComplete="email"
                 />
                 <button
@@ -469,7 +469,7 @@ export default function Login() {
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="Código (6 dígitos)"
-                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] tracking-widest text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[16px] tracking-widest text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
                   autoComplete="one-time-code"
                 />
                 <input
@@ -478,7 +478,7 @@ export default function Login() {
                   onChange={(e) => setNovaSenha(e.target.value)}
                   placeholder="Nova senha (mín. 8 caracteres)"
                   minLength={6}
-                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[16px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
                   autoComplete="new-password"
                 />
                 <input
@@ -487,7 +487,7 @@ export default function Login() {
                   onChange={(e) => setConfirmarNovaSenha(e.target.value)}
                   placeholder="Confirmar nova senha"
                   minLength={6}
-                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[12px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
+                  className="w-full rounded-[12px] border border-neutral-200/95 bg-white px-3 py-2.5 text-[16px] text-neutral-900 outline-none placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[var(--accent-border)]"
                   autoComplete="new-password"
                 />
                 <button
