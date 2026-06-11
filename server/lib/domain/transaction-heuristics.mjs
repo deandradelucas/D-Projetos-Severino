@@ -364,7 +364,13 @@ function _somarChunk(s) {
   let soma = 0
   for (const tok of s.split(/\s+/)) {
     const v = _BR_NUM_MAP[tok]
-    if (v !== undefined) soma += v
+    if (v !== undefined) { soma += v; continue }
+    // Token numérico (dígitos, aceita decimal com ponto ou vírgula): "21", "21.5",
+    // "21,5" — permite "21 mil", "5 mil", "2 mil e 500", "21.5 mil".
+    if (/^\d{1,3}(?:[.,]\d{1,3})?$/.test(tok)) {
+      const n = parseFloat(tok.replace(',', '.'))
+      if (isFinite(n)) soma += n
+    }
   }
   return soma
 }

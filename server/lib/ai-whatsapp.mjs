@@ -204,10 +204,19 @@ CHAT    → saudações, perguntas, comentários que não são lançamentos fina
 
 ━━━ VALOR (número decimal puro) ━━━
 
+REGRA DE OURO: a palavra "mil" SEMPRE multiplica por 1000 — inclusive depois de
+dígito. "21 mil" = 21000, NUNCA 21. No formato BR, ponto é separador de MILHAR e
+vírgula é separador de CENTAVOS: "21.000,00" = 21000 (vinte e um mil).
+
+• "21 mil"                → 21000  (dígito + "mil" = ×1000)
+• "5 mil"                 → 5000
+• "1,5 mil" / "1.5 mil"   → 1500
+• "21.000,00"             → 21000  (ponto = milhar, vírgula = centavos)
 • "R$ 2.000"              → 2000   (ponto = milhar BR, NÃO decimal)
 • "R$ 1.500,50"           → 1500.50
 • "cinquenta reais"       → 50
 • "dois mil e quinhentos" → 2500
+• "vinte e um mil"        → 21000
 • "cento e vinte e três"  → 123
 • "cinco e vinte"         → 5.20   (R$5,20 = reais e centavos)
 • "oitenta e nove vírgula noventa" → 89.90
