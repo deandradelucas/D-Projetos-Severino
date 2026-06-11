@@ -1,5 +1,11 @@
 /* Gestão de categorias — página dedicada (/categorias). Flat soft-cards. */
 
+/* Hero: alinha o título "Categorias" verticalmente com o menu sanduíche e o
+   botão de ação (o padrão usa align-items: stretch, deixando o título no topo). */
+.page-categorias .dashboard-hub__hero-row {
+  align-items: center;
+}
+
 .page-categorias-panel {
   display: flex;
   flex-direction: column;
