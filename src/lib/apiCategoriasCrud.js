@@ -49,12 +49,25 @@ export const atualizarSubcategoria = (id, body) =>
   mutate(`/api/subcategorias/${id}`, { method: 'PUT', body })
 export const removerSubcategoria = (id) => mutate(`/api/subcategorias/${id}`, { method: 'DELETE' })
 
-/** Conjunto de ícones selecionáveis (mesmas chaves do backend / public/icons/categorias). */
+/** Ícones selecionáveis (mesmas chaves do backend / public/icons/categorias), por tema. */
 export const ICONES_CATEGORIA = [
-  'utensils', 'fuel', 'car', 'home', 'health', 'education', 'leisure',
-  'shopping', 'tech', 'subscription', 'fitness', 'receipt', 'pet', 'plane',
-  'gift', 'wallet', 'work', 'investment', 'child', 'bank', 'sparkles',
-  'percent', 'coins', 'handCoins', 'dollarCircle', 'building', 'scale', 'pix',
+  // finanças
+  'wallet', 'coins', 'handCoins', 'dollarCircle', 'dollar', 'moneybag', 'salary', 'piggy',
+  'bank', 'creditcard', 'investment', 'chart', 'bitcoin', 'crypto', 'percent', 'scale', 'receipt', 'tax', 'idcard',
+  // alimentação
+  'utensils', 'restaurant', 'coffee', 'pizza', 'beer', 'wine', 'cake', 'groceries',
+  // transporte
+  'car', 'fuel', 'gas', 'bus', 'train', 'taxi', 'motorcycle', 'bicycle', 'parking', 'plane', 'luggage',
+  // casa
+  'home', 'building', 'hotel', 'plant', 'flower', 'tools', 'paint', 'bolt', 'electricity', 'water', 'broom', 'trash', 'lock',
+  // saúde / cuidados
+  'health', 'hospital', 'pharmacy', 'tooth', 'fitness', 'dumbbell', 'running', 'yoga', 'spa', 'scissors', 'makeup',
+  // compras
+  'shopping', 'tshirt', 'shoes', 'ring',
+  // lazer / tecnologia
+  'leisure', 'tech', 'phone', 'internet', 'wifi', 'tv', 'camera', 'music', 'movie', 'book', 'newspaper', 'beach', 'umbrella', 'star', 'heart', 'sparkles', 'gift',
+  // pessoas / diversos
+  'child', 'baby', 'dog', 'cat', 'pet', 'education', 'graduation', 'work', 'church', 'charity', 'calendar', 'subscription', 'pix',
 ]
 
 /** Paleta de cores sugeridas (consistente com o seed). */
