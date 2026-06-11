@@ -522,11 +522,6 @@ export default function Categorias() {
                   <div className="dashboard-hub__hero-text">
                     <h1 className="dashboard-hub__title">Categorias</h1>
                   </div>
-                  <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações">
-                    <button type="button" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={() => setCatModal({ categoria: null })}>
-                      + Nova categoria
-                    </button>
-                  </div>
                 </div>
               </section>
 
@@ -537,6 +532,10 @@ export default function Categorias() {
                   <>
                     {renderGrupo('Despesas', despesas)}
                     {renderGrupo('Receitas', receitas)}
+                    {/* Botão no fim da lista — visível em desktop e mobile. */}
+                    <button type="button" className="page-categorias__nova" onClick={() => setCatModal({ categoria: null })}>
+                      {SvgPlus} Nova categoria
+                    </button>
                   </>
                 )}
               </section>
