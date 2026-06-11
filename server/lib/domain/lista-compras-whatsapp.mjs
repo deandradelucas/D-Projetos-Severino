@@ -126,6 +126,32 @@ function fmtItemAdicionado(item) {
   return `${qty}${un} de ${item.nome}`
 }
 
+// Monta a resposta de "ver lista": título + itens pendentes + rodapé de comprados.
+// Usado tanto pelo intent VER_LISTA quanto pela resposta numérica de seleção.
+async function montarRespostaVerLista(lista, usuarioId) {
+  let itensLista
+  try {
+    itensLista = await listarItensLista(lista.id, usuarioId)
+  } catch (e) {
+    log.error('[lista-compras-wa] listarItensLista error', e)
+    return { ok: false, reply: '❌ Erro ao buscar itens da lista.' }
+  }
+  const pendentes = itensLista.filter((i) => !i.checked)
+  const comprados = itensLista.filter((i) => i.checked)
+  if (itensLista.length === 0) {
+    return {
+      ok: true,
+      reply: `🛒 *Lista "${lista.nome}"* está vazia.\n\nAdicione itens com:\n"adiciona leite na lista ${lista.nome}"`,
+    }
+  }
+  const linhasPendentes = pendentes.map(fmtItem).join('\n')
+  const rodape = comprados.length > 0 ? `\n\n✅ ${comprados.length} item(ns) já comprado(s)` : ''
+  return {
+    ok: true,
+    reply: `🛒 *Lista "${lista.nome}"* — ${pendentes.length} pendente(s)\n\n${linhasPendentes}${rodape}`,
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Adiciona uma lista de itens a uma lista existente. Best-effort: itens que
 // falharem entram em `erros` sem abortar os demais.
@@ -251,6 +277,7 @@ export async function responderPendenteLista(usuarioId, phone, message) {
   const lista = listas.find((l) => l.id === escolha.id)
   if (!lista) return { ok: true, reply: '🛒 Essa lista não existe mais.' }
 
+  if (pend.intent === 'VER_LISTA') return montarRespostaVerLista(lista, usuarioId)
   if (pend.intent === 'ADICIONAR_ITENS') return executarAdicionarItens(lista, usuarioId, pend.itens)
   return executarRemoverOuMarcar(lista, usuarioId, pend.itens, pend.intent === 'MARCAR_COMPRADO')
 }
@@ -334,47 +361,45 @@ export async function processarMensagemListaCompras(usuarioId, message, phone = 
   // VER_LISTA
   // ---------------------------------------------------------------------------
   if (intent === 'VER_LISTA') {
-    const lista = encontrarListaPorNome(listas, lista_nome)
-    if (!lista) {
-      const nomes = listas.map((l) => `"${l.nome}"`).join(', ')
+    // Nome citado e resolvido → mostra direto os itens daquela lista.
+    if (lista_nome) {
+      const lista = encontrarListaPorNome(listas, lista_nome)
+      if (lista) return montarRespostaVerLista(lista, usuarioId)
+      // não encontrado: cai no fluxo de opções abaixo (não some silenciosamente)
+    }
+
+    if (listas.length === 0) {
       return {
         ok: true,
-        reply: nomes
-          ? `🛒 Lista "${lista_nome}" não encontrada.\n\nSuas listas: ${nomes}`
-          : `🛒 Você ainda não tem listas de compras.\n\nCrie com: "cria uma lista chamada Mercado"`,
+        reply: `🛒 Você ainda não tem listas de compras.\n\nCrie com: "cria uma lista chamada Mercado"`,
       }
     }
 
-    let itensLista
-    try {
-      itensLista = await listarItensLista(lista.id, usuarioId)
-    } catch (e) {
-      log.error('[lista-compras-wa] listarItensLista error', e)
-      return { ok: false, reply: '❌ Erro ao buscar itens da lista.' }
+    // Uma lista só → mostra direto, sem perguntar.
+    if (listas.length === 1) return montarRespostaVerLista(listas[0], usuarioId)
+
+    // Várias listas (ou nome não encontrado) → opções numeradas + estado pendente.
+    // Ao responder o número, `responderPendenteLista` devolve o título + itens.
+    const ops = listas.slice(0, 9)
+    if (phone) {
+      await setPendente(phone, {
+        tipo: 'lista_escolha',
+        intent: 'VER_LISTA',
+        itens: [],
+        candidatas: ops.map((l) => ({ id: l.id, nome: l.nome })),
+      }).catch(() => {})
     }
-
-    const pendentes = itensLista.filter((i) => !i.checked)
-    const comprados = itensLista.filter((i) => i.checked)
-
-    if (itensLista.length === 0) {
-      return {
-        ok: true,
-        reply: `🛒 *Lista "${lista.nome}"* está vazia.\n\nAdicione itens com:\n"adiciona leite na lista ${lista.nome}"`,
-      }
-    }
-
-    const linhasPendentes = pendentes.map(fmtItem).join('\n')
-    const rodape =
-      comprados.length > 0
-        ? `\n\n✅ ${comprados.length} item(ns) já comprado(s)`
-        : ''
-
+    const linhas = ops
+      .map((l, i) => {
+        const itens = Array.isArray(l.itens) ? l.itens : []
+        const pend = itens.filter((it) => !it.checked).length
+        return `*${i + 1}* – ${l.nome} (${pend} ${pend === 1 ? 'item' : 'itens'})`
+      })
+      .join('\n')
+    const aviso = lista_nome ? `🛒 Não achei a lista "${lista_nome}". Suas listas:\n\n` : '🛒 *Suas listas:*\n\n'
     return {
       ok: true,
-      reply:
-        `🛒 *Lista "${lista.nome}"* — ${pendentes.length} pendente(s)\n\n` +
-        linhasPendentes +
-        rodape,
+      reply: `${aviso}${linhas}\n\n_Responda o número para ver os itens (ex.: 2)._`,
     }
   }
 
