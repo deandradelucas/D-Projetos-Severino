@@ -185,6 +185,28 @@
 .dashboard-hub__streak:hover { background: color-mix(in srgb, #f59e0b 26%, var(--surface)); border-color: #f59e0b; }
 .dashboard-hub__streak svg { flex-shrink: 0; }
 
+/* ── Pull-to-refresh (mobile): indicador que desce ao arrastar o topo ──────── */
+.dashboard-ptr {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+  color: var(--accent);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.dashboard-ptr__spin--active { animation: dashboard-ptr-spin 0.7s linear infinite; transform-origin: center; }
+@keyframes dashboard-ptr-spin { to { transform: rotate(360deg); } }
+
 /* #1 Donut Entrada × Saída do mês (preenche a direita do hero). Mobile: oculto. */
 .dashboard-hub__hero-chart { display: none; }
 @media (min-width: 769px) {
@@ -423,15 +445,30 @@
 }
 
 /* Despesas por categoria — barras (full-width: rótulo | barra | valor em linha) */
-.dashboard-hub__bars { display: flex; flex-direction: column; gap: 9px; }
-.dashboard-hub__bar-row { display: grid; grid-template-columns: minmax(110px, 1.4fr) 3fr auto 40px; align-items: center; gap: 12px; }
+.dashboard-hub__bars { display: flex; flex-direction: column; gap: 13px; }
+/* Nome da categoria fica ACIMA (linha cheia, sem corte) e a barra ocupa toda a
+   largura na linha de baixo, com valor e % à direita. */
+.dashboard-hub__bar-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas:
+    "label label label"
+    "track val   pct";
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 5px;
+}
 .dashboard-hub__bar-label {
-  font-size: 0.8rem;
+  grid-area: label;
+  font-size: 0.74rem;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.dashboard-hub__bar-track { grid-area: track; }
+.dashboard-hub__bar-val   { grid-area: val; }
+.dashboard-hub__bar-pct   { grid-area: pct; }
 .dashboard-hub__bar-val {
   font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
   font-size: 0.8rem;
@@ -579,14 +616,32 @@
   /* texto e saldo fluem à esquerda, com folga p/ não passar sob os ícones.
      min-height garante que o card contenha a coluna de 3 ícones (WhatsApp). */
   .dashboard-hub__hero:has(.dashboard-hub__avatar) .dashboard-hub__hero-main { padding-right: 52px; min-height: 132px; }
+
+  /* Hambúrguer ABSOLUTO no topo-esquerda (espelha os ícones do topo-direita).
+     A coluna principal passa a ocupar a largura toda, então "Saldo disponível"
+     + valor descem para BAIXO do menu, alinhados à esquerda, com a MESMA
+     largura útil em qualquer celular — sem indentação variável, sem colisão. */
+  .dashboard-hub__hero:has(.dashboard-hub__avatar) .dashboard-hub__hero-row { display: block; }
+  .dashboard-hub__hero:has(.dashboard-hub__avatar) .mobile-menu-btn {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    z-index: 2;
+  }
+  /* só a saudação + data recuam p/ não passar sob o hambúrguer;
+     o bloco de saldo permanece full-width, começando sob o menu. */
+  .dashboard-hub__hero:has(.dashboard-hub__avatar) .dashboard-hub__hero-text { padding-left: 56px; }
+
   .dashboard-hub__hero-top { display: block; }
   .dashboard-hub__hero-text { min-width: 0; }
   .dashboard-hub__title { font-size: 1.4rem; line-height: 1.1; }
   .dashboard-hub__date { white-space: nowrap; margin-top: 3px; }
-  /* saldo sobe, logo abaixo da data */
+  /* saldo sobe, logo abaixo da data — full-width sob o hambúrguer */
   .dashboard-hub__balance-line--hero { margin-top: 12px; }
   .dashboard-hub__balance-line-label { margin-bottom: 2px; }
-  .dashboard-hub__balance-line--hero strong { font-size: 2.5rem; }
+  /* valor com fonte FLUIDA: nunca estoura, mesmo com saldo grande em tela
+     estreita; cresce até 2.5rem em celulares maiores. */
+  .dashboard-hub__balance-line--hero strong { font-size: clamp(1.8rem, 8vw, 2.5rem); }
   /* KPIs em 1 coluna no mobile (lado a lado estourava a largura) */
   .dashboard-hub__kpis,
   .ref-dashboard-kpi-strip { grid-template-columns: 1fr; gap: 12px; }
@@ -598,8 +653,8 @@
   .dashboard-hub__band, .dashboard-hub__band > *, .ai-insights { min-width: 0; }
   .ai-insight { width: 260px; max-width: 78vw; }
   .dashboard-hub__insights { grid-template-columns: 1fr; gap: 12px; }
-  .dashboard-hub__bar-row { grid-template-columns: minmax(70px, 1fr) 2fr auto 32px; gap: 8px; }
-  .dashboard-hub__bar-label { font-size: 0.75rem; }
+  .dashboard-hub__bar-row { grid-template-columns: 1fr auto auto; column-gap: 8px; }
+  .dashboard-hub__bar-label { font-size: 0.72rem; }
   .dashboard-hub__bar-pct { font-size: 0.68rem; }
 }
 
@@ -699,7 +754,7 @@
   font-variant-numeric: tabular-nums;
 }
 .dashboard-hub__tx-panel .ref-tx-val--pos { color: var(--success); }
-.dashboard-hub__tx-panel .ref-tx-val--neg { color: var(--text-primary); }
+.dashboard-hub__tx-panel .ref-tx-val--neg { color: var(--error); }
 
 /* skeleton + empty */
 .dashboard-hub__tx-panel .ref-empty-state { padding: 28px 8px; text-align: center; }

@@ -176,6 +176,72 @@ export default function Dashboard() {
     if (usuario?.id) void fetchProximoCompromisso()
   }, [usuario?.id, fetchProximoCompromisso])
 
+  // Recarrega todos os dados do painel de uma vez (usado pelo pull-to-refresh)
+  const refreshDashboard = useCallback(async () => {
+    await Promise.allSettled([
+      fetchTransacoes(),
+      fetchInsights(),
+      fetchGamificacao(),
+      fetchProximoCompromisso(),
+    ])
+  }, [fetchTransacoes, fetchInsights, fetchGamificacao, fetchProximoCompromisso])
+
+  // Pull-to-refresh: arrastar o topo para baixo recarrega o painel (mobile)
+  const [pullState, setPullState] = useState({ dist: 0, active: false })
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!window.matchMedia('(max-width: 768px)').matches) return
+    const root = fabScrollRef.current
+    if (!root) return
+
+    let startY = 0
+    let pulling = false
+    const MAX_PULL = 90
+    const TRIGGER = 64
+    const onTouchStart = (e) => {
+      if (root.scrollTop <= 0 && e.touches.length === 1) {
+        startY = e.touches[0].clientY
+        pulling = true
+      } else {
+        pulling = false
+      }
+    }
+    const onTouchMove = (e) => {
+      if (!pulling) return
+      const dy = e.touches[0].clientY - startY
+      if (dy <= 0) { setPullState((p) => (p.dist ? { dist: 0, active: false } : p)); return }
+      if (root.scrollTop > 0) { pulling = false; setPullState({ dist: 0, active: false }); return }
+      const dist = Math.min(dy * 0.5, MAX_PULL)
+      if (dist > 4 && e.cancelable) e.preventDefault()
+      setPullState({ dist, active: dist >= TRIGGER })
+    }
+    const onTouchEnd = () => {
+      if (!pulling) return
+      pulling = false
+      setPullState((p) => {
+        if (p.dist >= TRIGGER) {
+          void (async () => {
+            try { await refreshDashboard() }
+            finally { setPullState({ dist: 0, active: false }) }
+          })()
+          return { dist: 36, active: true } // mantém leve enquanto recarrega
+        }
+        return { dist: 0, active: false }
+      })
+    }
+
+    root.addEventListener('touchstart', onTouchStart, { passive: true })
+    root.addEventListener('touchmove', onTouchMove, { passive: false })
+    root.addEventListener('touchend', onTouchEnd, { passive: true })
+    root.addEventListener('touchcancel', onTouchEnd, { passive: true })
+    return () => {
+      root.removeEventListener('touchstart', onTouchStart)
+      root.removeEventListener('touchmove', onTouchMove)
+      root.removeEventListener('touchend', onTouchEnd)
+      root.removeEventListener('touchcancel', onTouchEnd)
+    }
+  }, [refreshDashboard])
+
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     if (params.get('acao') !== 'nova-transacao') return
@@ -244,7 +310,7 @@ export default function Dashboard() {
     const dataEfetiva = (t) => (t.recorrente_index && t.data_compra ? t.data_compra : t.data_transacao)
     return [...transacoes]
       .sort((a, b) => String(dataEfetiva(b) ?? '').localeCompare(String(dataEfetiva(a) ?? '')))
-      .slice(0, 8)
+      .slice(0, 5)
   }, [transacoes])
 
   // Despesas por categoria (top 5) para o mini-gráfico de barras.
@@ -342,6 +408,17 @@ export default function Dashboard() {
         <main className="main-content relative z-10 ref-dashboard-main">
         <div className="ref-dashboard-inner dashboard-hub">
         <RefDashboardScroll ref={fabScrollRef}>
+        {pullState.dist > 0 && (
+          <div
+            className="dashboard-ptr"
+            style={{ transform: `translateX(-50%) translateY(${pullState.dist}px)`, opacity: Math.min(1, pullState.dist / 56) }}
+            aria-hidden
+          >
+            <svg className={`dashboard-ptr__spin${pullState.active ? ' dashboard-ptr__spin--active' : ''}`} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+          </div>
+        )}
         <section className="dashboard-hub__hero" aria-label="Painel e ações rápidas">
           <div className="dashboard-hub__hero-row">
             <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
@@ -475,26 +552,6 @@ export default function Dashboard() {
             </>
           ) : (
             <>
-              <article className="ref-kpi-card ref-kpi-card--expense">
-                <div className="ref-kpi-card__icon" aria-hidden>
-                  <svg className="ref-kpi-card__icon-img" viewBox="0 0 24 24" fill="none" aria-hidden>
-                    <path d="M12 5v13.5M12 18.5l-6-6M12 18.5l6-6" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Saída no mês</p>
-                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(mes.despesas)}</p>
-                </div>
-                {deltaDespesas != null && (
-                  // Saída: subir é ruim (--bad), cair é bom (--good)
-                  <div className="ref-kpi-card__pct" aria-label={`Variação de ${deltaDespesas}% sobre o mês passado`}>
-                    <span className={`ref-kpi-card__pct-value ref-kpi-card__pct-value--${deltaDespesas > 0 ? 'bad' : deltaDespesas < 0 ? 'good' : 'flat'}`}>
-                      {deltaDespesas > 0 ? '▲' : deltaDespesas < 0 ? '▼' : ''} {Math.abs(deltaDespesas)}%
-                    </span>
-                    <span className="ref-kpi-card__pct-label">vs mês passado</span>
-                  </div>
-                )}
-              </article>
               <article className="ref-kpi-card ref-kpi-card--income">
                 <div className="ref-kpi-card__icon" aria-hidden>
                   <svg className="ref-kpi-card__icon-img" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -510,6 +567,26 @@ export default function Dashboard() {
                   <div className="ref-kpi-card__pct" aria-label={`Variação de ${deltaReceitas}% sobre o mês passado`}>
                     <span className={`ref-kpi-card__pct-value ref-kpi-card__pct-value--${deltaReceitas > 0 ? 'good' : deltaReceitas < 0 ? 'bad' : 'flat'}`}>
                       {deltaReceitas > 0 ? '▲' : deltaReceitas < 0 ? '▼' : ''} {Math.abs(deltaReceitas)}%
+                    </span>
+                    <span className="ref-kpi-card__pct-label">vs mês passado</span>
+                  </div>
+                )}
+              </article>
+              <article className="ref-kpi-card ref-kpi-card--expense">
+                <div className="ref-kpi-card__icon" aria-hidden>
+                  <svg className="ref-kpi-card__icon-img" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <path d="M12 5v13.5M12 18.5l-6-6M12 18.5l6-6" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <div className="ref-kpi-card__body">
+                  <p className="ref-kpi-card__label">Saída no mês</p>
+                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(mes.despesas)}</p>
+                </div>
+                {deltaDespesas != null && (
+                  // Saída: subir é ruim (--bad), cair é bom (--good)
+                  <div className="ref-kpi-card__pct" aria-label={`Variação de ${deltaDespesas}% sobre o mês passado`}>
+                    <span className={`ref-kpi-card__pct-value ref-kpi-card__pct-value--${deltaDespesas > 0 ? 'bad' : deltaDespesas < 0 ? 'good' : 'flat'}`}>
+                      {deltaDespesas > 0 ? '▲' : deltaDespesas < 0 ? '▼' : ''} {Math.abs(deltaDespesas)}%
                     </span>
                     <span className="ref-kpi-card__pct-label">vs mês passado</span>
                   </div>
@@ -588,7 +665,7 @@ export default function Dashboard() {
                   </span>
                 </Link>
               ) : (
-                <p className="dashboard-hub__insight-empty">Nenhum compromisso à vista. <span aria-hidden="true">🎉</span></p>
+                <p className="dashboard-hub__insight-empty">Nenhum compromisso à vista.</p>
               )}
             </article>
           )}
