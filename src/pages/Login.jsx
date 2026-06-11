@@ -19,6 +19,7 @@ import { AUTH_SHELL_INPUT_CLASS, AUTH_SHELL_ERROR_BOX_CLASS } from '../lib/authF
 import { validateEmail } from '../lib/validateEmail'
 import { horizonteApiAuthHeaders } from '../lib/apiAuthHeaders'
 import { writeHorizonteAccessToken } from '../lib/horizonteAccessToken'
+import { startTransacoesPrefetch } from '../lib/dashboardPrefetch'
 
 const REMEMBER_EMAIL_KEY = 'horizonte_financeiro_remember_email'
 
@@ -310,6 +311,9 @@ export default function Login() {
     } else if (u.acesso_app_liberado === false) {
       navigate('/trial-expirado', navOpts)
     } else {
+      // Dispara a busca das transações já (request em voo) — o provider do
+      // dashboard consome o resultado em vez de iniciar outro fetch no mount.
+      if (u?.id) startTransacoesPrefetch(u.id)
       navigate('/dashboard', navOpts)
     }
   }

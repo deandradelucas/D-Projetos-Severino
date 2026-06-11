@@ -19,6 +19,7 @@ import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { redirectSeAuthBloqueada } from '../lib/authRedirect'
 import { readHorizonteUser, subscribeHorizonteSessionRefresh } from '../lib/horizonteSession'
 import { readTxCache, writeTxCache, clearTxCache } from '../lib/txCachePersist'
+import { takeTransacoesPrefetch } from '../lib/dashboardPrefetch'
 import { TransactionCacheContext, TRANSACOES_REVALIDATED_EVENT } from './transactionCacheStore'
 
 /**
@@ -71,6 +72,23 @@ export function TransactionCacheProvider({ children }) {
 
     try {
       void syncRecorrenciasMensais(session.id)
+
+      // Fast-path: consome o prefetch disparado no login (request já em voo
+      // enquanto o dashboard carregava) — evita iniciar outro fetch no mount.
+      const pre = takeTransacoesPrefetch(session.id)
+      if (pre) {
+        const data = await pre
+        if (Array.isArray(data)) {
+          setTransacoes(data)
+          writeTxCache(session.id, data)
+          hasDataRef.current = true
+          setError('')
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent(TRANSACOES_REVALIDATED_EVENT))
+          }
+          return true
+        }
+      }
 
       const res = await fetchWithRetry(
         apiUrl('/api/transacoes'),
