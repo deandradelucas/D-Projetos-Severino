@@ -259,3 +259,159 @@
 @media (prefers-reduced-motion: reduce) {
   .page-metas__card { transition: none; }
 }
+
+/* =============================================================================
+   Gamificação — bloco de conquistas + streak + modal de celebração
+   Escopado em .conquista-* para não vazar para outros contextos.
+   ============================================================================= */
+
+/* ── Bloco principal ───────────────────────────────────────────────────────── */
+.conquista-bloco {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 18px 20px;
+  border-radius: var(--r-lg);
+  background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
+}
+.conquista-bloco__header { display: flex; align-items: center; }
+
+/* ── Streak ─────────────────────────────────────────────────────────────────── */
+.conquista-streak {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: var(--r-pill);
+}
+.conquista-streak--ativo {
+  background: rgba(234, 88, 12, 0.1); color: #ea580c;
+  border: 1px solid rgba(234, 88, 12, 0.25);
+}
+.conquista-streak--inativo {
+  background: var(--surface-sunken); color: var(--text-muted);
+  border: 1px solid var(--hairline);
+}
+.conquista-streak__icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.conquista-streak__valor { font-size: 1.1rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.conquista-streak__label { font-size: 0.82rem; font-weight: 600; }
+.conquista-streak__label-incentivo { font-size: 0.8rem; font-weight: 500; }
+
+/* ── Grade de selos ────────────────────────────────────────────────────────── */
+.conquista-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+/* ── Selo individual ───────────────────────────────────────────────────────── */
+.conquista-selo {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 8px; border-radius: var(--r-md);
+  border: 1px solid var(--hairline);
+  text-align: center; cursor: default;
+  transition: box-shadow 160ms var(--ease);
+}
+.conquista-selo--on {
+  background: var(--accent-muted);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.conquista-selo--off {
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  opacity: 0.42;
+  filter: grayscale(1);
+}
+.conquista-selo--on:hover { box-shadow: var(--elev-2); }
+.conquista-selo__icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: var(--r-md);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.conquista-selo--off .conquista-selo__icon { background: transparent; }
+.conquista-selo__nome {
+  font-size: 0.72rem; font-weight: 700; line-height: 1.2;
+  color: inherit;
+}
+
+/* ── Modal de celebração ───────────────────────────────────────────────────── */
+.conquista-celebracao__overlay {
+  position: fixed; inset: 0; z-index: 1300;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(15, 23, 42, 0.6);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.conquista-celebracao__modal {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  width: 100%; max-width: 380px;
+  padding: 32px 24px 24px;
+  border-radius: var(--r-lg);
+  background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-3);
+  text-align: center;
+}
+
+/* micro-confetti decorativo (CSS puro, sem JS) */
+.conquista-celebracao__confetti {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+}
+.conquista-celebracao__dot {
+  position: absolute;
+  width: 8px; height: 8px; border-radius: 2px;
+  animation: confetti-fall 1.2s ease-out forwards;
+  opacity: 0;
+}
+.conquista-celebracao__dot--0 { left: 10%;  top: -10px; background: #f59e0b; animation-delay: 0.0s; }
+.conquista-celebracao__dot--1 { left: 25%;  top: -10px; background: #10b981; animation-delay: 0.1s; }
+.conquista-celebracao__dot--2 { left: 40%;  top: -10px; background: #3b82f6; animation-delay: 0.2s; }
+.conquista-celebracao__dot--3 { left: 55%;  top: -10px; background: #ec4899; animation-delay: 0.1s; }
+.conquista-celebracao__dot--4 { left: 70%;  top: -10px; background: #8b5cf6; animation-delay: 0.0s; }
+.conquista-celebracao__dot--5 { left: 85%;  top: -10px; background: var(--accent); animation-delay: 0.2s; }
+@keyframes confetti-fall {
+  0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(160px) rotate(180deg); }
+}
+
+.conquista-celebracao__title {
+  margin: 0;
+  font-size: 1.25rem; font-weight: 800; color: var(--text-primary);
+}
+.conquista-celebracao__list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 12px; width: 100%;
+}
+.conquista-celebracao__item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 14px; border-radius: var(--r-md);
+  background: var(--accent-muted); border: 1px solid var(--accent);
+  text-align: left;
+}
+.conquista-celebracao__item-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: var(--r-md);
+  background: var(--surface); color: var(--accent); flex-shrink: 0;
+}
+.conquista-celebracao__item-text { display: flex; flex-direction: column; gap: 2px; }
+.conquista-celebracao__item-nome { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.conquista-celebracao__item-desc { font-size: 0.8rem; color: var(--text-secondary); }
+
+.conquista-celebracao__btn {
+  width: 100%; padding: 11px 16px;
+  border: none; border-radius: var(--r-md);
+  background: var(--accent); color: var(--accent-foreground);
+  font-size: 0.9rem; font-weight: 700; cursor: pointer;
+  transition: background 150ms var(--ease);
+}
+.conquista-celebracao__btn:hover { background: var(--accent-hover); }
+.conquista-celebracao__btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── Mobile ─────────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .conquista-grade { grid-template-columns: repeat(3, 1fr); }
+  .conquista-celebracao__overlay { padding: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conquista-celebracao__dot { animation: none; }
+  .conquista-selo { transition: none; }
+}

@@ -8,6 +8,7 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import MetaIcon from '../components/MetaIcon'
+import GamificacaoBloco from '../components/GamificacaoBloco'
 import { META_ICON_KEYS, metaIconKey } from '../lib/metaIcons'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
@@ -480,6 +481,8 @@ export default function Metas() {
                     <button type="button" className={`page-metas__escopo-btn${escopo === 'pessoal' ? ' page-metas__escopo-btn--active' : ''}`} onClick={() => setEscopo('pessoal')}><IconUser /> Pessoal</button>
                   </div>
                 )}
+
+                <GamificacaoBloco pessoalParam={pessoalParam} />
 
                 {loading ? (
                   <p className="page-metas__loading">Carregando suas metas…</p>
