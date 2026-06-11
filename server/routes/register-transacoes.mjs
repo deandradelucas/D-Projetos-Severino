@@ -3,6 +3,7 @@ import { clientIpFromHono } from '../lib/http/client-ip.mjs'
 import {
   getCategorias,
   getTransacoes,
+  getTransacoesVersion,
   atualizarTransacao,
   deletarTransacao,
   deletarGrupoParcelado,
@@ -82,6 +83,28 @@ export function registerTransacoesRoutes(app) {
     } catch (error) {
       log.error('get transactions failed', error)
       return c.json({ message: 'Erro ao buscar transações.' }, 500)
+    }
+  })
+
+  // Sinal leve de versão ("mudou algo?") — o front consulta no poll periódico e
+  // só baixa a lista completa quando count/atualizado_em mudam. Evita re-baixar e
+  // re-renderizar tudo a cada 45s quando nada mudou.
+  app.get('/api/transacoes/version', async (c) => {
+    try {
+      const usuarioId = resolveRequestUserId(c)
+      const parsed = await parseUsuarioEscopoApi(usuarioId, { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+
+      const ip = clientIpFromHono(c)
+      if (!await rateLimitTake(`tx-version:${parsed.actorId}:${ip}`, 240, 60_000)) {
+        return c.json({ message: 'Muitas consultas. Aguarde um momento.' }, 429)
+      }
+
+      const v = await getTransacoesVersion(parsed.dataUsuarioId)
+      return c.json(v)
+    } catch (error) {
+      log.error('get transactions version failed', error)
+      return c.json({ message: 'Erro ao verificar versão.' }, 500)
     }
   })
 

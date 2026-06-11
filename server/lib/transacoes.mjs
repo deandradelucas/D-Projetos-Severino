@@ -498,6 +498,39 @@ export async function getTransacoes(usuarioId, filters = {}) {
   })
 }
 
+/**
+ * Sinal leve de versão das transações do usuário — para o front decidir se vale
+ * baixar a lista completa no poll periódico ("mudou algo?").
+ *
+ * Combina contagem total (pega inserts/deletes) com o máximo de `atualizado_em`
+ * (pega edições in-place). Duas queries indexadas e minúsculas, sem trazer linhas.
+ *
+ * @returns {Promise<{ count: number, latest: string|null }>}
+ */
+export async function getTransacoesVersion(usuarioId) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const uid = String(usuarioId || '').trim()
+  if (!uid) return { count: 0, latest: null }
+
+  const [{ count, error: cErr }, { data: top, error: tErr }] = await Promise.all([
+    supabaseAdmin
+      .from('transacoes')
+      .select('id', { count: 'exact', head: true })
+      .eq('usuario_id', uid),
+    supabaseAdmin
+      .from('transacoes')
+      .select('atualizado_em')
+      .eq('usuario_id', uid)
+      .order('atualizado_em', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ])
+  if (cErr) throw cErr
+  if (tErr) throw tErr
+
+  return { count: count ?? 0, latest: top?.atualizado_em ?? null }
+}
+
 export async function atualizarTransacao(id, usuarioId, body) {
   const supabaseAdmin = getSupabaseAdmin()
   const uid = String(usuarioId || '').trim()
@@ -514,6 +547,8 @@ export async function atualizarTransacao(id, usuarioId, body) {
     status: body.status || 'EFETIVADA',
     categoria_id: body.categoria_id || null,
     subcategoria_id: body.subcategoria_id || null,
+    // Marca a edição para o sinal de versão (poll leve "mudou algo?") detectar.
+    atualizado_em: new Date().toISOString(),
   }
   // Só altera o cartão se o campo veio no body (evita desvincular sem querer).
   if ('cartao_id' in body) update.cartao_id = body.cartao_id || null

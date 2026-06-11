@@ -43,6 +43,9 @@ export function TransactionCacheProvider({ children }) {
   const fetchingRef = useRef(false)
   // Indica se já carregou dados ao menos uma vez (true se hidratou do cache)
   const hasDataRef = useRef(transacoes.length > 0)
+  // Última versão conhecida das transações ("count:atualizado_em") — o poll só
+  // baixa a lista completa quando este sinal muda.
+  const versionRef = useRef(null)
   // Timer compartilhado pelas mutações otimistas (debounce de revalidação)
   const optimisticRevalidateTimerRef = useRef(0)
 
@@ -87,7 +90,7 @@ export function TransactionCacheProvider({ children }) {
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent(TRANSACOES_REVALIDATED_EVENT))
         }
-        return
+        return true
       }
 
       const errBody = await res.json().catch(() => ({}))
@@ -99,6 +102,7 @@ export function TransactionCacheProvider({ children }) {
       setRevalidating(false)
       fetchingRef.current = false
     }
+    return false
   }, [])
 
   /**
@@ -118,8 +122,40 @@ export function TransactionCacheProvider({ children }) {
   }, [])
 
   /**
+   * Consulta o sinal leve de versão. Retorna "count:atualizado_em" ou null se a
+   * sessão/endpoint não responderem (nesse caso o chamador simplesmente não age).
+   */
+  const fetchTxVersionSig = useCallback(async () => {
+    const session = readHorizonteUser()
+    if (!session?.id) return null
+    try {
+      const res = await apiFetch(apiUrl('/api/transacoes/version'), { cache: 'no-store' })
+      if (!res.ok) return null
+      const v = await res.json().catch(() => null)
+      if (!v || typeof v !== 'object') return null
+      return `${v.count ?? 0}:${v.latest ?? ''}`
+    } catch {
+      return null
+    }
+  }, [])
+
+  /**
+   * Revalida a lista SOMENTE se o sinal de versão mudou desde a última vez —
+   * evita baixar ~centenas de linhas e re-renderizar tudo a cada 45s à toa.
+   * Falha do endpoint de versão → não age (correção fica a cargo do fetch de
+   * montagem / pull-to-refresh; é só uma otimização de background).
+   */
+  const revalidateIfChanged = useCallback(async () => {
+    const sig = await fetchTxVersionSig()
+    if (sig == null || versionRef.current === sig) return
+    const ok = await fetchTransacoes({ silent: true })
+    if (ok) versionRef.current = sig // só fixa após sucesso real (rede pode falhar)
+  }, [fetchTxVersionSig, fetchTransacoes])
+
+  /**
    * Lançamentos pelo WhatsApp não chegam por push ao browser (API custom + Bearer).
-   * Revalidamos ao voltar ao separador e em intervalo curto com o app visível.
+   * Revalidamos ao voltar ao separador e em intervalo curto com o app visível —
+   * sempre atrás do gate de versão (poll leve antes de baixar tudo).
    */
   useEffect(() => {
     const POLL_MS = 45_000
@@ -137,7 +173,7 @@ export function TransactionCacheProvider({ children }) {
       const session = readHorizonteUser()
       if (!session?.id) return
       clearTimeout(debounceVis)
-      debounceVis = window.setTimeout(() => void fetchTransacoes({ silent: true }), 450)
+      debounceVis = window.setTimeout(() => void revalidateIfChanged(), 450)
     }
     document.addEventListener('visibilitychange', onVisible)
     const intervalId = window.setInterval(() => {
@@ -145,14 +181,14 @@ export function TransactionCacheProvider({ children }) {
       if (!shouldPollTransacoesPath()) return
       const session = readHorizonteUser()
       if (!session?.id) return
-      void fetchTransacoes({ silent: true })
+      void revalidateIfChanged()
     }, POLL_MS)
     return () => {
       document.removeEventListener('visibilitychange', onVisible)
       clearInterval(intervalId)
       clearTimeout(debounceVis)
     }
-  }, [fetchTransacoes])
+  }, [revalidateIfChanged])
 
   /**
    * Agenda a revalidação silenciosa após uma mutação otimista. Usa um único
@@ -206,6 +242,7 @@ export function TransactionCacheProvider({ children }) {
    */
   const invalidateCache = useCallback(() => {
     hasDataRef.current = false
+    versionRef.current = null
     const u = readHorizonteUser()
     if (u?.id) clearTxCache(u.id)
     setTransacoes([])
