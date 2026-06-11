@@ -331,3 +331,56 @@
   .pagamento-skeleton-line,
   .pagamento-skeleton-option { animation: none; }
 }
+
+/* =============================================================================
+   Modal Pix (PagamentoPixQrModal) — overlay proprio via portal.
+   Classes eram orfas (sem CSS) -> o modal renderizava cru. Tokens, scroll
+   interno, input 16px (anti-zoom iOS).
+   ============================================================================= */
+.pagamento-pix-modal-overlay {
+  position: fixed; inset: 0; z-index: 1200;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(15, 23, 42, 0.55);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+.pagamento-pix-modal {
+  display: flex; flex-direction: column; gap: 12px;
+  width: 100%; max-width: 420px; max-height: 90dvh; overflow: hidden auto;
+  overscroll-behavior: contain;
+  padding: 20px; border-radius: var(--r-lg);
+  background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-3);
+}
+.pagamento-pix-modal__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.pagamento-pix-modal__title { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-primary); min-width: 0; }
+.pagamento-pix-modal__close {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--hairline); background: var(--surface-sunken); color: var(--text-secondary); cursor: pointer;
+}
+.pagamento-pix-modal__close:hover { background: var(--surface-2); color: var(--text-primary); }
+.pagamento-pix-modal__intro { margin: 0; font-size: 0.84rem; line-height: 1.45; color: var(--text-secondary); }
+.pagamento-pix-modal__field { display: flex; flex-direction: column; gap: 5px; }
+.pagamento-pix-modal__label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+.pagamento-pix-modal__input {
+  width: 100%; box-sizing: border-box; padding: 10px 12px;
+  border-radius: var(--r-md); border: 1px solid var(--hairline-strong);
+  background: var(--surface); color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 16px;
+}
+.pagamento-pix-modal__input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+.pagamento-pix-modal__error { margin: 0; font-size: 0.8rem; font-weight: 600; color: var(--error); }
+.pagamento-pix-modal__actions { display: flex; gap: 10px; }
+.pagamento-pix-modal__actions > * { flex: 1; }
+.pagamento-pix-modal__meta { margin: 0; font-size: 0.74rem; color: var(--text-muted); overflow-wrap: anywhere; }
+.pagamento-pix-modal__meta code { font-family: ui-monospace, monospace; word-break: break-all; }
+.pagamento-pix-modal__qr { display: flex; justify-content: center; padding: 8px; }
+.pagamento-pix-modal__qr img { width: 220px; max-width: 100%; height: auto; border-radius: var(--r-md); }
+.pagamento-pix-modal__payload { display: flex; flex-direction: column; gap: 6px; }
+.pagamento-pix-modal__textarea {
+  width: 100%; box-sizing: border-box; padding: 10px 12px; resize: vertical;
+  border-radius: var(--r-md); border: 1px solid var(--hairline-strong);
+  background: var(--surface-sunken); color: var(--text-primary);
+  font-family: ui-monospace, monospace; font-size: 0.78rem; line-height: 1.4;
+  word-break: break-all;
+}
+.pagamento-pix-modal__copy { align-self: flex-start; }
