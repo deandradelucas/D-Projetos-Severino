@@ -36,7 +36,7 @@
 .agenda-hero__stats { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 14px; position: relative; }
 .agenda-hero__stat { display: flex; flex-direction: column; gap: 1px; font-size: 0.84rem; color: var(--text-secondary); }
 /* mini-semana: linha de 7 dias clicáveis */
-.agenda-hero__week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 16px; position: relative; }
+.agenda-hero__week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 16px; position: relative; }
 .agenda-hero__week-day {
   display: flex; flex-direction: column; align-items: center; gap: 3px;
   padding: 8px 4px; border-radius: var(--r-md);
@@ -97,9 +97,9 @@
   transition: background 150ms var(--ease), color 150ms var(--ease);
 }
 .agenda-calendar-nav > button:hover { background: var(--surface-2); color: var(--text-primary); }
-.agenda-calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+.agenda-calendar-weekdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin-bottom: 4px; }
 .agenda-calendar-weekdays > span { text-align: center; font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding: 4px 0; }
-.agenda-calendar-grid, .agenda-week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.agenda-calendar-grid, .agenda-week-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .agenda-calendar-day {
   display: flex; flex-direction: column; gap: 2px;
   min-height: 64px; padding: 6px; border-radius: var(--r-sm);
@@ -231,8 +231,9 @@
   flex-direction: column;
   width: 100%;
   max-width: 500px;
-  max-height: 90vh;
-  overflow: hidden;
+  max-height: 90dvh;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
   border-radius: var(--r-lg);
   background: var(--surface);
   border: 1px solid var(--hairline);
@@ -247,7 +248,7 @@
   border: 1px solid var(--hairline); background: var(--surface-sunken); color: var(--text-secondary); cursor: pointer;
 }
 .agenda-modal__close:hover { background: var(--surface-2); color: var(--text-primary); }
-.agenda-modal__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 20px; }
+.agenda-modal__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; padding: 12px 20px; }
 .agenda-field { display: flex; flex-direction: column; gap: 6px; }
 .agenda-field--full { grid-column: 1 / -1; }
 .agenda-field > label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }

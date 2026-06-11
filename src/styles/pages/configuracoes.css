@@ -61,7 +61,7 @@
 .config-field--stretch { flex: 1; min-width: 0; }
 .config-field--with-action { gap: 8px; }
 .config-field__value-row { display: flex; align-items: center; gap: 8px; }
-.config-field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.config-field-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
 .config-field-grid--single { grid-template-columns: 1fr; }
 .config-field > label,
 .config-pref-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
@@ -233,7 +233,7 @@
 }
 .config-excluir-modal {
   display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
-  width: 100%; max-width: 420px; padding: 24px;
+  width: 100%; max-width: 420px; padding: 24px; max-height: 90dvh; overflow-y: auto; overscroll-behavior: contain;
   border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-3);
 }
 .config-excluir-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--error-muted); color: var(--error); margin-bottom: 8px; }

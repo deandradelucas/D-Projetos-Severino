@@ -273,7 +273,7 @@
 .dashboard-hub__kpis,
 .ref-dashboard-kpi-strip {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
   margin: 0 0 16px;
 }
@@ -370,7 +370,7 @@
 /* ── Cards de insight: Próximo compromisso (agenda) + Despesas (relatório) ──── */
 .dashboard-hub__insights {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
   margin: 0 0 16px;
 }
@@ -450,7 +450,7 @@
    largura na linha de baixo, com valor e % à direita. */
 .dashboard-hub__bar-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   grid-template-areas:
     "label label label"
     "track val   pct";
@@ -653,7 +653,7 @@
   .dashboard-hub__band, .dashboard-hub__band > *, .ai-insights { min-width: 0; }
   .ai-insight { width: 260px; max-width: 78vw; }
   .dashboard-hub__insights { grid-template-columns: 1fr; gap: 12px; }
-  .dashboard-hub__bar-row { grid-template-columns: 1fr auto auto; column-gap: 8px; }
+  .dashboard-hub__bar-row { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 8px; }
   .dashboard-hub__bar-label { font-size: 0.72rem; }
   .dashboard-hub__bar-pct { font-size: 0.68rem; }
 }
@@ -765,7 +765,7 @@
   .dashboard-hub__tx-panel { padding: 14px 14px; }
   .dashboard-hub__tx-panel .ref-tx-list-head { display: none; }
   .dashboard-hub__tx-panel .ref-tx-row {
-    grid-template-columns: 34px 1fr auto;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
     grid-template-areas:
       "icon meta val"
       "icon cat  val"

@@ -230,7 +230,7 @@
   background: rgba(15, 23, 42, 0.55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
 }
 .page-metas__modal {
-  display: flex; flex-direction: column; width: 100%; max-width: 480px; max-height: 90vh; overflow: hidden;
+  display: flex; flex-direction: column; width: 100%; max-width: 480px; max-height: 90dvh; overflow: hidden;
   border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-3);
 }
 .page-metas__modal--sm { max-width: 400px; }
@@ -407,7 +407,7 @@
 
 /* ── Mobile ─────────────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .conquista-grade { grid-template-columns: repeat(3, 1fr); }
+  .conquista-grade { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .conquista-celebracao__overlay { padding: 16px; }
 }
 

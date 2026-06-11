@@ -156,7 +156,7 @@
 .relatorios-charts__section { display: flex; flex-direction: column; gap: 10px; }
 .relatorios-charts__section-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
 .relatorios-charts__section-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
-.relatorios-charts__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.relatorios-charts__pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
 
 .relatorios-chart-card,
 .page-relatorios-chart-panel {
@@ -256,7 +256,7 @@
   .rel-ed__actions { margin-top: 0; flex-shrink: 0; gap: 6px; }
   .rel-ed__action { padding: 8px; }
   .rel-ed__balance { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--hairline); }
-  .rel-ed__totals { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 14px; }
+  .rel-ed__totals { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; margin-top: 14px; }
   .rel-ed__total { min-width: 0; }
   .rel-ed__total + .rel-ed__total { border-left: 1px solid var(--hairline); padding-left: 16px; }
 }

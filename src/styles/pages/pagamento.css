@@ -34,7 +34,7 @@
 .page-pagamento-header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
 /* título + chip de status na mesma linha do hero */
 .page-pagamento-header__titlerow { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; }
-.page-pagamento-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }
+.page-pagamento-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: start; }
 /* coluna única (assinatura ativa/trial/paga) — largura cheia, no padrão do sistema */
 .page-pagamento-layout--sem-lateral { grid-template-columns: 1fr; }
 .page-pagamento-layout__primary { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
@@ -50,7 +50,7 @@
   padding: 16px 18px; border-radius: var(--r-lg);
   background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-1);
 }
-.page-pagamento-planos__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.page-pagamento-planos__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
 .page-pagamento-planos__option {
   position: relative; display: flex; flex-direction: column; gap: 4px;
   padding: 13px 14px; border-radius: var(--r-md);
@@ -60,7 +60,7 @@
 .page-pagamento-planos__option--active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
 /* desktop: planos e value stack lado a lado; preços (Anual/Mensal) em coluna */
 @media (min-width: 769px) {
-  .page-pagamento-oferta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+  .page-pagamento-oferta { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
   .page-pagamento-oferta .page-pagamento-planos__grid { grid-template-columns: 1fr; }
   /* centraliza o conteúdo do card de features no espaço extra */
   .page-pagamento-oferta .page-pagamento-valor { justify-content: center; }
@@ -186,7 +186,7 @@
 .pagamento-checkout-panel__col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 /* desktop: resumo/lead à esquerda, CPF + botões à direita */
 @media (min-width: 769px) {
-  .pagamento-checkout-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+  .pagamento-checkout-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
 }
 .pagamento-checkout-panel__lead { display: flex; flex-direction: column; gap: 2px; }
 .pagamento-checkout-panel__lead-title { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
@@ -276,6 +276,7 @@
 .pagamento-modal {
   display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 440px;
   padding: 22px; border-radius: var(--r-lg);
+  max-height: 90dvh; overflow-y: auto; overscroll-behavior: contain;
   background: var(--surface); border: 1px solid var(--hairline); box-shadow: var(--elev-3);
 }
 .pagamento-modal__title { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
