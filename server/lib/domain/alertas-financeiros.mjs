@@ -98,6 +98,31 @@ export async function listarLimitesOrcamento(usuarioId) {
   return data || []
 }
 
+export async function removerLimiteOrcamento(usuarioId, categoriaId) {
+  const supabase = getSupabaseAdmin()
+  const { error } = await supabase
+    .from('limites_orcamento')
+    .delete()
+    .eq('usuario_id', usuarioId)
+    .eq('categoria_id', categoriaId)
+  if (error) throw error
+}
+
+/** Limites + gasto do mês atual por categoria orçada (para a UI de orçamento). */
+export async function getOrcamentosComGasto(usuarioId) {
+  const limites = await listarLimitesOrcamento(usuarioId)
+  const out = []
+  for (const l of limites) {
+    const gasto = await somarDespesasMes(usuarioId, l.categoria_id)
+    out.push({
+      categoria_id: l.categoria_id,
+      limite_mensal: Number(l.limite_mensal) || 0,
+      gasto_mes: Number(gasto) || 0,
+    })
+  }
+  return out
+}
+
 async function somarDespesasMes(usuarioId, categoriaId) {
   const supabase = getSupabaseAdmin()
   const { inicio, fimExclusivo } = mesAtualRange()

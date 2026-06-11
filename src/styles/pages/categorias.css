@@ -118,6 +118,69 @@
   transform: rotate(180deg);
 }
 
+/* ── Orçamento por categoria (#3) ──────────────────────────────────────── */
+.page-categorias__orc {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-top: 1px solid var(--hairline);
+  background: var(--surface-sunken);
+  padding: 9px 14px 11px 64px;
+  cursor: pointer;
+}
+.page-categorias__orc-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.page-categorias__orc-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.page-categorias__orc-val {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.page-categorias__orc-val.is-over { color: var(--error); }
+.page-categorias__orc-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--hairline);
+  overflow: hidden;
+}
+.page-categorias__orc-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.3s var(--ease, ease);
+}
+.page-categorias__orc-fill.is-over { background: var(--error); }
+
+.page-categorias__definir-orc {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 7px 10px;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--accent);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+}
+.page-categorias__definir-orc:hover { background: var(--accent-muted); }
+
 /* ── Subcategorias ─────────────────────────────────────────────────────── */
 .page-categorias__subs {
   border-top: 1px solid var(--hairline);

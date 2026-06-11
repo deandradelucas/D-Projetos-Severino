@@ -26,6 +26,12 @@ async function get(path, fallback) {
 }
 
 export const getUsoCategorias = () => get('/api/categorias/uso', { categorias: {}, subcategorias: {} })
+
+// Orçamento por categoria (#3) — limite mensal + gasto do mês.
+export const getOrcamentos = () => get('/api/limites-orcamento/status', [])
+export const setOrcamento = (categoriaId, limiteMensal) =>
+  mutate('/api/limites-orcamento', { method: 'POST', body: { categoria_id: categoriaId, limite_mensal: limiteMensal } })
+export const removerOrcamento = (categoriaId) => mutate(`/api/limites-orcamento/${categoriaId}`, { method: 'DELETE' })
 export const listarSubcategoriasArquivadas = (categoriaId) =>
   get(`/api/categorias/${categoriaId}/subcategorias-arquivadas`, [])
 export const restaurarSubcategoria = (id) => mutate(`/api/subcategorias/${id}/restaurar`, { method: 'POST' })

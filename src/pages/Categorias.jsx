@@ -9,10 +9,13 @@ import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon.jsx
 import { useFabCompact } from '../hooks/useFabCompact'
 import { showToast } from '../lib/toastStore'
 import { fetchCategorias } from '../lib/apiCategorias'
+import { formatCurrencyBRL } from '../lib/formatCurrency'
+import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../lib/currencyMaskBr'
 import {
   criarCategoria, atualizarCategoria, removerCategoria, fundirCategoria,
   criarSubcategoria, atualizarSubcategoria, removerSubcategoria,
   getUsoCategorias, listarSubcategoriasArquivadas, restaurarSubcategoria, podarSubcategoriasSemUso,
+  getOrcamentos, setOrcamento, removerOrcamento,
   ICONES_CATEGORIA, CORES_CATEGORIA,
 } from '../lib/apiCategoriasCrud'
 
@@ -229,14 +232,88 @@ function FundirModal({ origem, candidatos, onClose, onSaved }) {
   )
 }
 
+// ── Modal: orçamento mensal da categoria ────────────────────────────────────
+function OrcamentoModal({ categoria, atual, onClose, onSaved }) {
+  const [valor, setValor] = useState(atual?.limite_mensal ? valorToMaskedBRL(Number(atual.limite_mensal)) : '')
+  const [salvando, setSalvando] = useState(false)
+
+  const submit = async (e) => {
+    e.preventDefault()
+    const num = parseCurrencyBRLMasked(valor)
+    if (!num || num <= 0) { showToast('Informe um valor maior que zero.', 'warning'); return }
+    setSalvando(true)
+    try {
+      await setOrcamento(categoria.id, num)
+      showToast('Orçamento definido.', 'success')
+      onSaved()
+    } catch (err) {
+      showToast(err.message || 'Não foi possível salvar.', 'error')
+    } finally {
+      setSalvando(false)
+    }
+  }
+  const remover = async () => {
+    setSalvando(true)
+    try {
+      await removerOrcamento(categoria.id)
+      showToast('Orçamento removido.', 'success')
+      onSaved()
+    } catch (err) {
+      showToast(err.message || 'Não foi possível remover.', 'error')
+    } finally {
+      setSalvando(false)
+    }
+  }
+
+  return (
+    <div className="page-categorias__overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="page-categorias__modal page-categorias__modal--sm" role="dialog" aria-modal="true" aria-label="Orçamento mensal">
+        <div className="page-categorias__modal-head">
+          <h2 className="page-categorias__modal-title">Orçamento — {categoria.nome}</h2>
+          <button type="button" className="page-categorias__modal-close" onClick={onClose} aria-label="Fechar">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7" /></svg>
+          </button>
+        </div>
+        <form onSubmit={submit} className="page-categorias__modal-body">
+          <label className="page-categorias__field">
+            <span className="page-categorias__label">Limite mensal</span>
+            <input
+              className="page-categorias__input" inputMode="decimal" autoFocus
+              value={valor} onChange={(e) => setValor(maskCurrencyBRLInput(e.target.value))} placeholder="R$ 0,00"
+            />
+          </label>
+          <p className="page-categorias__hint">
+            Você é avisado no WhatsApp ao se aproximar/estourar, e acompanha “Orçado vs Real” em Relatórios.
+          </p>
+          <div className="page-categorias__modal-actions">
+            {atual && (
+              <button type="button" className="page-categorias__btn page-categorias__btn--ghost" onClick={remover} disabled={salvando} style={{ marginRight: 'auto' }}>
+                Remover
+              </button>
+            )}
+            <button type="button" className="page-categorias__btn page-categorias__btn--ghost" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="page-categorias__btn page-categorias__btn--primary" disabled={salvando}>
+              {salvando ? 'Salvando…' : 'Salvar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 // ── Linha de categoria ──────────────────────────────────────────────────────
-function CategoriaRow({ cat, usoSub, onEdit, onMerge, onRemove, onPrune, onAddSub, onEditSub, onRemoveSub, onReload }) {
+function CategoriaRow({ cat, usoSub, orcamento, onEdit, onMerge, onRemove, onPrune, onOrcamento, onAddSub, onEditSub, onRemoveSub, onReload }) {
   const [aberto, setAberto] = useState(false)
   const [arquivadas, setArquivadas] = useState(null) // null=não carregou; []=carregou vazio
   const [verArquivadas, setVerArquivadas] = useState(false)
   const subs = cat.subcategorias || []
   const usoDe = (id) => (usoSub && usoSub[id]) || 0
   const semUso = subs.filter((s) => usoDe(s.id) === 0).length
+  const isDespesa = cat.tipo === 'DESPESA'
+  const temOrc = isDespesa && orcamento && orcamento.limite_mensal > 0
+  const orcPct = temOrc ? Math.round((orcamento.gasto_mes / orcamento.limite_mensal) * 100) : 0
+  const orcOver = temOrc && orcamento.gasto_mes > orcamento.limite_mensal
 
   const toggleArquivadas = async () => {
     const novo = !verArquivadas
@@ -279,8 +356,26 @@ function CategoriaRow({ cat, usoSub, onEdit, onMerge, onRemove, onPrune, onAddSu
           </button>
         </div>
       </div>
+      {temOrc && (
+        <button type="button" className="page-categorias__orc" onClick={() => onOrcamento(cat, orcamento)}>
+          <div className="page-categorias__orc-top">
+            <span className="page-categorias__orc-label">Orçamento do mês</span>
+            <span className={`page-categorias__orc-val${orcOver ? ' is-over' : ''}`}>
+              {formatCurrencyBRL(orcamento.gasto_mes)} / {formatCurrencyBRL(orcamento.limite_mensal)} · {orcPct}%
+            </span>
+          </div>
+          <div className="page-categorias__orc-track">
+            <div className={`page-categorias__orc-fill${orcOver ? ' is-over' : ''}`} style={{ width: `${Math.min(100, orcPct)}%` }} />
+          </div>
+        </button>
+      )}
       {aberto && (
         <div className="page-categorias__subs">
+          {isDespesa && !temOrc && (
+            <button type="button" className="page-categorias__definir-orc" onClick={() => onOrcamento(cat, null)}>
+              {SvgPlus} Definir orçamento mensal
+            </button>
+          )}
           {semUso > 0 && (
             <button type="button" className="page-categorias__prune" onClick={() => onPrune(cat, semUso)}>
               Ocultar {semUso} {semUso === 1 ? 'subcategoria sem uso' : 'subcategorias sem uso'}
@@ -331,6 +426,7 @@ export default function Categorias() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [categorias, setCategorias] = useState([])
   const [uso, setUso] = useState({ categorias: {}, subcategorias: {} })
+  const [orcamentos, setOrcamentos] = useState({}) // categoria_id -> { limite_mensal, gasto_mes }
   const [loading, setLoading] = useState(true)
   const fabScrollRef = useRef(null)
   useFabCompact(fabScrollRef)
@@ -339,14 +435,20 @@ export default function Categorias() {
   const [catModal, setCatModal] = useState(null) // { categoria } | { criar:true }
   const [subModal, setSubModal] = useState(null) // { categoriaId, sub }
   const [fundirModal, setFundirModal] = useState(null) // { origem }
+  const [orcModal, setOrcModal] = useState(null) // { categoria, atual }
   const [confirmar, setConfirmar] = useState(null) // { tipo:'cat'|'sub'|'prune', ... }
 
   const carregar = useCallback(async () => {
     setLoading(true)
     try {
-      const [data, usoData] = await Promise.all([fetchCategorias(), getUsoCategorias()])
+      const [data, usoData, orcData] = await Promise.all([fetchCategorias(), getUsoCategorias(), getOrcamentos()])
       if (data) setCategorias(data)
       if (usoData) setUso(usoData)
+      if (Array.isArray(orcData)) {
+        const map = {}
+        for (const o of orcData) map[o.categoria_id] = { limite_mensal: Number(o.limite_mensal) || 0, gasto_mes: Number(o.gasto_mes) || 0 }
+        setOrcamentos(map)
+      }
     } finally {
       setLoading(false)
     }
@@ -381,7 +483,7 @@ export default function Categorias() {
     }
   }
 
-  const onSaved = () => { setCatModal(null); setSubModal(null); setFundirModal(null); void carregar() }
+  const onSaved = () => { setCatModal(null); setSubModal(null); setFundirModal(null); setOrcModal(null); void carregar() }
 
   const renderGrupo = (titulo, lista) => (
     <section className="page-categorias__grupo" aria-label={titulo}>
@@ -392,11 +494,13 @@ export default function Categorias() {
         <CategoriaRow
           key={cat.id} cat={cat}
           usoSub={uso.subcategorias}
+          orcamento={orcamentos[cat.id]}
           onReload={carregar}
           onEdit={(c) => setCatModal({ categoria: c })}
           onMerge={(c) => setFundirModal({ origem: c })}
           onRemove={(c) => setConfirmar({ tipo: 'cat', id: c.id, nome: c.nome })}
           onPrune={(c, n) => setConfirmar({ tipo: 'prune', id: c.id, nome: c.nome, count: n })}
+          onOrcamento={(c, atual) => setOrcModal({ categoria: c, atual })}
           onAddSub={(c) => setSubModal({ categoriaId: c.id, sub: null })}
           onEditSub={(c, s) => setSubModal({ categoriaId: c.id, sub: s })}
           onRemoveSub={(c, s) => setConfirmar({ tipo: 'sub', id: s.id, nome: s.nome })}
@@ -449,6 +553,9 @@ export default function Categorias() {
       )}
       {fundirModal && (
         <FundirModal origem={fundirModal.origem} candidatos={candidatosFusao(fundirModal.origem)} onClose={() => setFundirModal(null)} onSaved={onSaved} />
+      )}
+      {orcModal && (
+        <OrcamentoModal categoria={orcModal.categoria} atual={orcModal.atual} onClose={() => setOrcModal(null)} onSaved={onSaved} />
       )}
       {confirmar && (
         <ConfirmDialog
