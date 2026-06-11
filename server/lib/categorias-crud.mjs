@@ -254,6 +254,96 @@ export async function atualizarSubcategoria(uid, subId, body) {
   return data
 }
 
+/**
+ * Contagem de uso (nº de transações) por categoria e por subcategoria do usuário.
+ * Lê só 2 colunas e conta em memória (volume por usuário é pequeno). Usado na
+ * tela de gestão para mostrar o que é peso morto e permitir podar.
+ * @returns {Promise<{ categorias: Record<string,number>, subcategorias: Record<string,number> }>}
+ */
+export async function getUsoCategorias(uid) {
+  const db = getSupabaseAdmin()
+  const categorias = {}, subcategorias = {}
+  const pageSize = 1000
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await db
+      .from('transacoes')
+      .select('categoria_id, subcategoria_id')
+      .eq('usuario_id', uid)
+      .range(from, from + pageSize - 1)
+    if (error) throw error
+    const rows = data || []
+    for (const r of rows) {
+      if (r.categoria_id) categorias[r.categoria_id] = (categorias[r.categoria_id] || 0) + 1
+      if (r.subcategoria_id) subcategorias[r.subcategoria_id] = (subcategorias[r.subcategoria_id] || 0) + 1
+    }
+    if (rows.length < pageSize) break
+  }
+  return { categorias, subcategorias }
+}
+
+/** Lista as subcategorias ARQUIVADAS de uma categoria (para restaurar). */
+export async function listarSubcategoriasArquivadas(uid, categoriaId) {
+  const db = getSupabaseAdmin()
+  await getCategoriaDoUsuario(db, uid, categoriaId)
+  const { data, error } = await db
+    .from('subcategorias')
+    .select('id, nome')
+    .eq('categoria_id', categoriaId)
+    .not('arquivada_em', 'is', null)
+    .order('nome', { ascending: true })
+  if (error) throw error
+  return data || []
+}
+
+/** Restaura (desarquiva) uma subcategoria. */
+export async function restaurarSubcategoria(uid, subId) {
+  const db = getSupabaseAdmin()
+  await getSubDoUsuario(db, uid, subId)
+  const { data, error } = await db
+    .from('subcategorias')
+    .update({ arquivada_em: null })
+    .eq('id', subId)
+    .select('id, categoria_id, nome')
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
+/**
+ * Arquiva (oculta) todas as subcategorias ATIVAS da categoria que não têm
+ * nenhuma transação. Reversível via restaurarSubcategoria. Retorna quantas.
+ */
+export async function podarSubcategoriasSemUso(uid, categoriaId) {
+  const db = getSupabaseAdmin()
+  await getCategoriaDoUsuario(db, uid, categoriaId)
+
+  const { data: subs, error: eSubs } = await db
+    .from('subcategorias')
+    .select('id')
+    .eq('categoria_id', categoriaId)
+    .is('arquivada_em', null)
+  if (eSubs) throw eSubs
+  const ids = (subs || []).map((s) => s.id)
+  if (!ids.length) return { arquivadas: 0 }
+
+  const { data: usadas, error: eUso } = await db
+    .from('transacoes')
+    .select('subcategoria_id')
+    .eq('usuario_id', uid)
+    .in('subcategoria_id', ids)
+  if (eUso) throw eUso
+  const comUso = new Set((usadas || []).map((r) => r.subcategoria_id).filter(Boolean))
+  const semUso = ids.filter((id) => !comUso.has(id))
+  if (!semUso.length) return { arquivadas: 0 }
+
+  const { error } = await db
+    .from('subcategorias')
+    .update({ arquivada_em: new Date().toISOString() })
+    .in('id', semUso)
+  if (error) throw error
+  return { arquivadas: semUso.length }
+}
+
 /** Arquiva a sub se usada em transações; apaga se não usada. */
 export async function removerSubcategoria(uid, subId) {
   const db = getSupabaseAdmin()

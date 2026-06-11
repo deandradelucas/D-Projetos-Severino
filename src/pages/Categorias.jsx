@@ -12,6 +12,7 @@ import { fetchCategorias } from '../lib/apiCategorias'
 import {
   criarCategoria, atualizarCategoria, removerCategoria, fundirCategoria,
   criarSubcategoria, atualizarSubcategoria, removerSubcategoria,
+  getUsoCategorias, listarSubcategoriasArquivadas, restaurarSubcategoria, podarSubcategoriasSemUso,
   ICONES_CATEGORIA, CORES_CATEGORIA,
 } from '../lib/apiCategoriasCrud'
 
@@ -229,9 +230,33 @@ function FundirModal({ origem, candidatos, onClose, onSaved }) {
 }
 
 // ── Linha de categoria ──────────────────────────────────────────────────────
-function CategoriaRow({ cat, onEdit, onMerge, onRemove, onAddSub, onEditSub, onRemoveSub }) {
+function CategoriaRow({ cat, usoSub, onEdit, onMerge, onRemove, onPrune, onAddSub, onEditSub, onRemoveSub, onReload }) {
   const [aberto, setAberto] = useState(false)
+  const [arquivadas, setArquivadas] = useState(null) // null=não carregou; []=carregou vazio
+  const [verArquivadas, setVerArquivadas] = useState(false)
   const subs = cat.subcategorias || []
+  const usoDe = (id) => (usoSub && usoSub[id]) || 0
+  const semUso = subs.filter((s) => usoDe(s.id) === 0).length
+
+  const toggleArquivadas = async () => {
+    const novo = !verArquivadas
+    setVerArquivadas(novo)
+    if (novo && arquivadas == null) {
+      const data = await listarSubcategoriasArquivadas(cat.id)
+      setArquivadas(Array.isArray(data) ? data : [])
+    }
+  }
+  const restaurar = async (sub) => {
+    try {
+      await restaurarSubcategoria(sub.id)
+      showToast('Subcategoria restaurada.', 'success')
+      setArquivadas((prev) => (prev || []).filter((s) => s.id !== sub.id))
+      onReload()
+    } catch (err) {
+      showToast(err.message || 'Não foi possível restaurar.', 'error')
+    }
+  }
+
   return (
     <div className="page-categorias__cat">
       <div className="page-categorias__cat-head">
@@ -240,7 +265,10 @@ function CategoriaRow({ cat, onEdit, onMerge, onRemove, onAddSub, onEditSub, onR
         </span>
         <button type="button" className="page-categorias__cat-name" onClick={() => setAberto((v) => !v)} aria-expanded={aberto}>
           <span className="page-categorias__cat-title">{cat.nome}</span>
-          <span className="page-categorias__cat-count">{subs.length} {subs.length === 1 ? 'subcategoria' : 'subcategorias'}</span>
+          <span className="page-categorias__cat-count">
+            {subs.length} {subs.length === 1 ? 'subcategoria' : 'subcategorias'}
+            {semUso > 0 && <span className="page-categorias__cat-flag"> · {semUso} sem uso</span>}
+          </span>
         </button>
         <div className="page-categorias__cat-acts">
           <IconBtn label="Editar" onClick={() => onEdit(cat)}>{SvgEdit}</IconBtn>
@@ -253,18 +281,45 @@ function CategoriaRow({ cat, onEdit, onMerge, onRemove, onAddSub, onEditSub, onR
       </div>
       {aberto && (
         <div className="page-categorias__subs">
-          {subs.map((s) => (
-            <div key={s.id} className="page-categorias__sub">
-              <span className="page-categorias__sub-name">{s.nome}</span>
-              <div className="page-categorias__sub-acts">
-                <IconBtn label="Editar subcategoria" onClick={() => onEditSub(cat, s)}>{SvgEdit}</IconBtn>
-                <IconBtn label="Excluir subcategoria" onClick={() => onRemoveSub(cat, s)}>{SvgTrash}</IconBtn>
+          {semUso > 0 && (
+            <button type="button" className="page-categorias__prune" onClick={() => onPrune(cat, semUso)}>
+              Ocultar {semUso} {semUso === 1 ? 'subcategoria sem uso' : 'subcategorias sem uso'}
+            </button>
+          )}
+          {subs.map((s) => {
+            const n = usoDe(s.id)
+            return (
+              <div key={s.id} className={`page-categorias__sub${n === 0 ? ' is-unused' : ''}`}>
+                <span className="page-categorias__sub-name">{s.nome}</span>
+                <span className="page-categorias__sub-uso">{n > 0 ? `${n}×` : 'sem uso'}</span>
+                <div className="page-categorias__sub-acts">
+                  <IconBtn label="Editar subcategoria" onClick={() => onEditSub(cat, s)}>{SvgEdit}</IconBtn>
+                  <IconBtn label="Excluir subcategoria" onClick={() => onRemoveSub(cat, s)}>{SvgTrash}</IconBtn>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
           <button type="button" className="page-categorias__add-sub" onClick={() => onAddSub(cat)}>
             {SvgPlus} Adicionar subcategoria
           </button>
+
+          <button type="button" className="page-categorias__ver-arquivadas" onClick={toggleArquivadas}>
+            {verArquivadas ? 'Ocultar arquivadas' : 'Ver arquivadas'}
+          </button>
+          {verArquivadas && (
+            <div className="page-categorias__arquivadas">
+              {arquivadas == null ? (
+                <span className="page-categorias__sub-name">Carregando…</span>
+              ) : arquivadas.length === 0 ? (
+                <span className="page-categorias__sub-name page-categorias__sub-name--muted">Nenhuma subcategoria arquivada.</span>
+              ) : arquivadas.map((s) => (
+                <div key={s.id} className="page-categorias__sub">
+                  <span className="page-categorias__sub-name page-categorias__sub-name--muted">{s.nome}</span>
+                  <button type="button" className="page-categorias__restaurar" onClick={() => restaurar(s)}>Restaurar</button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -275,6 +330,7 @@ function CategoriaRow({ cat, onEdit, onMerge, onRemove, onAddSub, onEditSub, onR
 export default function Categorias() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [categorias, setCategorias] = useState([])
+  const [uso, setUso] = useState({ categorias: {}, subcategorias: {} })
   const [loading, setLoading] = useState(true)
   const fabScrollRef = useRef(null)
   useFabCompact(fabScrollRef)
@@ -283,13 +339,14 @@ export default function Categorias() {
   const [catModal, setCatModal] = useState(null) // { categoria } | { criar:true }
   const [subModal, setSubModal] = useState(null) // { categoriaId, sub }
   const [fundirModal, setFundirModal] = useState(null) // { origem }
-  const [confirmar, setConfirmar] = useState(null) // { tipo:'cat'|'sub', alvo, nome }
+  const [confirmar, setConfirmar] = useState(null) // { tipo:'cat'|'sub'|'prune', ... }
 
   const carregar = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await fetchCategorias()
+      const [data, usoData] = await Promise.all([fetchCategorias(), getUsoCategorias()])
       if (data) setCategorias(data)
+      if (usoData) setUso(usoData)
     } finally {
       setLoading(false)
     }
@@ -311,13 +368,16 @@ export default function Categorias() {
       if (alvo.tipo === 'cat') {
         const r = await removerCategoria(alvo.id)
         showToast(r.modo === 'arquivada' ? 'Categoria arquivada (histórico preservado).' : 'Categoria excluída.', 'success')
+      } else if (alvo.tipo === 'prune') {
+        const r = await podarSubcategoriasSemUso(alvo.id)
+        showToast(`${r.arquivadas} ${r.arquivadas === 1 ? 'subcategoria ocultada' : 'subcategorias ocultadas'}. Dá pra restaurar em "Ver arquivadas".`, 'success')
       } else {
         const r = await removerSubcategoria(alvo.id)
         showToast(r.modo === 'arquivada' ? 'Subcategoria arquivada.' : 'Subcategoria excluída.', 'success')
       }
       await carregar()
     } catch (err) {
-      showToast(err.message || 'Não foi possível remover.', 'error')
+      showToast(err.message || 'Não foi possível concluir.', 'error')
     }
   }
 
@@ -331,9 +391,12 @@ export default function Categorias() {
       ) : lista.map((cat) => (
         <CategoriaRow
           key={cat.id} cat={cat}
+          usoSub={uso.subcategorias}
+          onReload={carregar}
           onEdit={(c) => setCatModal({ categoria: c })}
           onMerge={(c) => setFundirModal({ origem: c })}
           onRemove={(c) => setConfirmar({ tipo: 'cat', id: c.id, nome: c.nome })}
+          onPrune={(c, n) => setConfirmar({ tipo: 'prune', id: c.id, nome: c.nome, count: n })}
           onAddSub={(c) => setSubModal({ categoriaId: c.id, sub: null })}
           onEditSub={(c, s) => setSubModal({ categoriaId: c.id, sub: s })}
           onRemoveSub={(c, s) => setConfirmar({ tipo: 'sub', id: s.id, nome: s.nome })}
@@ -390,9 +453,19 @@ export default function Categorias() {
       {confirmar && (
         <ConfirmDialog
           open
-          title={confirmar.tipo === 'cat' ? 'Excluir categoria?' : 'Excluir subcategoria?'}
-          message={`"${confirmar.nome}" ${confirmar.tipo === 'cat' ? 'será arquivada se tiver transações (histórico preservado) ou excluída se estiver vazia.' : 'será arquivada se estiver em uso ou excluída se não.'}`}
-          confirmLabel="Remover"
+          title={
+            confirmar.tipo === 'cat' ? 'Excluir categoria?'
+              : confirmar.tipo === 'prune' ? 'Ocultar subcategorias sem uso?'
+                : 'Excluir subcategoria?'
+          }
+          message={
+            confirmar.tipo === 'cat'
+              ? `"${confirmar.nome}" será arquivada se tiver transações (histórico preservado) ou excluída se estiver vazia.`
+              : confirmar.tipo === 'prune'
+                ? `As ${confirmar.count} subcategorias de "${confirmar.nome}" sem nenhuma transação serão ocultadas. Você pode restaurá-las depois em "Ver arquivadas".`
+                : `"${confirmar.nome}" será arquivada se estiver em uso ou excluída se não.`
+          }
+          confirmLabel={confirmar.tipo === 'prune' ? 'Ocultar' : 'Remover'}
           onConfirm={confirmarRemocao}
           onClose={() => setConfirmar(null)}
         />

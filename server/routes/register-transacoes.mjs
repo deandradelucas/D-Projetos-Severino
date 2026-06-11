@@ -31,6 +31,10 @@ import {
   criarSubcategoria,
   atualizarSubcategoria,
   removerSubcategoria,
+  getUsoCategorias,
+  listarSubcategoriasArquivadas,
+  restaurarSubcategoria,
+  podarSubcategoriasSemUso,
   CategoriaError,
 } from '../lib/categorias-crud.mjs'
 import { TransactionService } from '../lib/services/transaction-service.mjs'
@@ -52,6 +56,34 @@ export function registerTransacoesRoutes(app) {
     } catch (error) {
       log.error('get categories failed', error)
       return c.json({ message: 'Erro ao buscar categorias.' }, 500)
+    }
+  })
+
+  // Uso (nº de transações) por categoria/subcategoria — para a tela de gestão
+  // mostrar o que é peso morto e permitir podar. Registrado antes das rotas com
+  // :id para a palavra "uso" não cair num parâmetro.
+  app.get('/api/categorias/uso', async (c) => {
+    try {
+      const parsed = await parseUsuarioEscopoApi(resolveRequestUserId(c), { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+      return c.json(await getUsoCategorias(parsed.dataUsuarioId))
+    } catch (error) {
+      log.error('get uso categorias failed', error)
+      return c.json({ message: 'Erro ao calcular uso.' }, 500)
+    }
+  })
+
+  app.get('/api/categorias/:id/subcategorias-arquivadas', async (c) => {
+    try {
+      const parsed = await parseUsuarioEscopoApi(resolveRequestUserId(c), { write: false })
+      if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+      const id = c.req.param('id')
+      if (!isUuidString(id)) return c.json({ message: 'ID inválido.' }, 400)
+      return c.json(await listarSubcategoriasArquivadas(parsed.dataUsuarioId, id))
+    } catch (error) {
+      if (error instanceof CategoriaError) return c.json({ message: error.message }, error.status)
+      log.error('get subcategorias arquivadas failed', error)
+      return c.json({ message: 'Erro ao listar arquivadas.' }, 500)
     }
   })
 
@@ -104,6 +136,12 @@ export function registerTransacoesRoutes(app) {
 
   app.delete('/api/subcategorias/:id', (c) =>
     categoriaMut(c, (uid, _body, ctx) => removerSubcategoria(uid, paramUuid(ctx, 'id'))))
+
+  app.post('/api/subcategorias/:id/restaurar', (c) =>
+    categoriaMut(c, (uid, _body, ctx) => restaurarSubcategoria(uid, paramUuid(ctx, 'id'))))
+
+  app.post('/api/categorias/:id/podar-subcategorias', (c) =>
+    categoriaMut(c, (uid, _body, ctx) => podarSubcategoriasSemUso(uid, paramUuid(ctx, 'id'))))
 
   app.get('/api/transacoes', async (c) => {
     try {

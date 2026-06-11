@@ -169,6 +169,62 @@
   background: var(--accent-muted);
 }
 
+/* Uso / poda / arquivadas (#2 — enxugar subcategorias) */
+.page-categorias__cat-flag { color: var(--accent); }
+
+.page-categorias__sub-uso {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.page-categorias__sub.is-unused .page-categorias__sub-name { color: var(--text-muted); }
+
+.page-categorias__prune {
+  align-self: flex-start;
+  margin-bottom: 4px;
+  padding: 6px 10px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.page-categorias__prune:hover { background: var(--accent-muted); }
+
+.page-categorias__ver-arquivadas {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.page-categorias__arquivadas {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+}
+.page-categorias__sub-name--muted { color: var(--text-muted); font-style: italic; }
+
+.page-categorias__restaurar {
+  flex-shrink: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.page-categorias__restaurar:hover { text-decoration: underline; }
+
 /* ── Modais ────────────────────────────────────────────────────────────── */
 .page-categorias__overlay {
   position: fixed;

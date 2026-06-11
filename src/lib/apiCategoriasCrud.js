@@ -14,6 +14,24 @@ async function mutate(path, { method = 'POST', body } = {}) {
   return data
 }
 
+/** GET simples que devolve JSON ou um fallback em erro. */
+async function get(path, fallback) {
+  try {
+    const res = await apiFetch(apiUrl(path), { cache: 'no-store' })
+    if (!res.ok) return fallback
+    return await res.json()
+  } catch {
+    return fallback
+  }
+}
+
+export const getUsoCategorias = () => get('/api/categorias/uso', { categorias: {}, subcategorias: {} })
+export const listarSubcategoriasArquivadas = (categoriaId) =>
+  get(`/api/categorias/${categoriaId}/subcategorias-arquivadas`, [])
+export const restaurarSubcategoria = (id) => mutate(`/api/subcategorias/${id}/restaurar`, { method: 'POST' })
+export const podarSubcategoriasSemUso = (categoriaId) =>
+  mutate(`/api/categorias/${categoriaId}/podar-subcategorias`, { method: 'POST' })
+
 export const criarCategoria = (body) => mutate('/api/categorias', { method: 'POST', body })
 export const atualizarCategoria = (id, body) => mutate(`/api/categorias/${id}`, { method: 'PUT', body })
 export const removerCategoria = (id) => mutate(`/api/categorias/${id}`, { method: 'DELETE' })
