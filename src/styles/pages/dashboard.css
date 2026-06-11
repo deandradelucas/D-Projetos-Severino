@@ -627,7 +627,7 @@
 .dashboard-hub__tx-panel .ref-tx-icon-cell { display: flex; }
 .dashboard-hub__tx-panel .ref-tx-arrow-wrap {
   display: flex; align-items: center; justify-content: center;
-  width: 34px; height: 34px; border-radius: var(--r-md); flex-shrink: 0;
+  width: 38px; height: 38px; border-radius: var(--r-md); flex-shrink: 0;
 }
 .dashboard-hub__tx-panel .ref-tx-arrow-wrap--up { background: var(--success-muted); color: var(--success); }
 .dashboard-hub__tx-panel .ref-tx-arrow-wrap--down { background: var(--error-muted); color: var(--error); }

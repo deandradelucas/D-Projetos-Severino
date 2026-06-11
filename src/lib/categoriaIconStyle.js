@@ -67,15 +67,20 @@ function hexToRgba(hex, alpha) {
 }
 
 /**
- * Estilo do "chip" da categoria (fundo pastel + cor do ícone) para o wrapper
- * do consumidor (círculo da linha, hero do modal etc.). Retorna null quando a
- * transação não tem categoria reconhecida — o consumidor mantém o visual
- * padrão verde/vermelho de receita/despesa.
+ * Estilo do "chip" da categoria para o wrapper do consumidor (círculo da linha,
+ * hero do modal). Estilo "duotone renderizado" (escolha do CEO em 10-jun):
+ * gradiente suave na cor + sombra colorida (profundidade) + brilho superior.
+ * Retorna null quando a transação não tem categoria reconhecida — o consumidor
+ * mantém o visual padrão verde/vermelho de receita/despesa.
  */
 export function getCategoriaIconChipStyle(categoriaNome, subcategoriaNome) {
   const resolved = getTransacaoCategoriaIconKey(categoriaNome, subcategoriaNome)
   if (!resolved) return null
   const cor = COLOR_BY_ICON[CATEGORIA_ICON_ALIAS[resolved] || resolved]
   if (!cor) return null
-  return { color: cor, background: hexToRgba(cor, 0.13) }
+  return {
+    color: cor,
+    background: `linear-gradient(145deg, ${hexToRgba(cor, 0.20)}, ${hexToRgba(cor, 0.10)})`,
+    boxShadow: `0 2px 5px ${hexToRgba(cor, 0.22)}, inset 0 1px 0 rgba(255, 255, 255, 0.35)`,
+  }
 }

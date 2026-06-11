@@ -313,6 +313,11 @@
   background: var(--surface);
 }
 .page-transacoes-ref-table .ref-tx-icon-cell { display: flex; align-items: center; gap: 8px; grid-area: auto; }
+/* Chip da categoria — tamanho consistente (estilo duotone renderizado, jun/2026). */
+.page-transacoes-ref-table .ref-tx-arrow-wrap {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: var(--r-md); flex-shrink: 0;
+}
 .ref-tx-select { display: inline-flex; cursor: pointer; }
 .ref-tx-select input { position: absolute; opacity: 0; width: 0; height: 0; }
 .ref-tx-select__box {

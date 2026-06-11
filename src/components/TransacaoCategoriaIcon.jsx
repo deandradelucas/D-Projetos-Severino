@@ -74,19 +74,28 @@ const PATHS = {
  * line-icon temático da categoria. ALIAS + paleta vivem em lib/categoriaIconStyle
  * (Fast Refresh exige que este arquivo só exporte componente). */
 
-export function TransacaoCategoriaIcon({ categoriaNome, subcategoriaNome, isReceita, size = 16, className }) {
+/* Duotone: ícone ganha um preenchimento sutil (fill currentColor a 16%) por baixo
+ * do traço, dando "corpo"/profundidade. Estes 3 são formas de LINHA ABERTA — o
+ * fill criaria polígonos indevidos (verificado visualmente), então ficam só com
+ * traço. */
+const STROKE_ONLY = new Set(['investment', 'arrowUp', 'arrowDown'])
+
+export function TransacaoCategoriaIcon({ categoriaNome, subcategoriaNome, isReceita, size = 18, className }) {
   const resolved = getTransacaoCategoriaIconKey(categoriaNome, subcategoriaNome)
   const mapKey = resolved ?? (isReceita ? 'arrowUp' : 'arrowDown')
-  const paths = PATHS[CATEGORIA_ICON_ALIAS[mapKey] || mapKey] || PATHS[isReceita ? 'arrowUp' : 'arrowDown']
+  const iconName = CATEGORIA_ICON_ALIAS[mapKey] || mapKey
+  const paths = PATHS[iconName] || PATHS[isReceita ? 'arrowUp' : 'arrowDown']
+  const duotone = !STROKE_ONLY.has(iconName)
 
   const icon = (
     <svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
+      fill={duotone ? 'currentColor' : 'none'}
+      fillOpacity={duotone ? 0.16 : undefined}
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.9"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"

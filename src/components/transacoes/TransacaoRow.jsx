@@ -174,7 +174,7 @@ export function TransacaoRow({
             categoriaNome={catNome}
             subcategoriaNome={subNome || undefined}
             isReceita={isRec}
-            size={16}
+            size={20}
           />
         </div>
       </div>
