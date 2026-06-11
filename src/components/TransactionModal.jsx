@@ -10,7 +10,8 @@ import { vencimentoCartaoParaData, calcularParcelaAtual } from '../lib/cartaoVen
 import { useTransactionForm } from '../hooks/useTransactionForm'
 import { useModalA11y } from '../hooks/useModalA11y'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
-import { filtrarCategoriasPorTipo, safeEvalExpression } from '../lib/transacaoFormUtils'
+import { filtrarCategoriasPorTipo, ordenarSubcategoriasPorUso, safeEvalExpression } from '../lib/transacaoFormUtils'
+import { getUsoCategorias } from '../lib/apiCategoriasCrud'
 import CalcKeypad from './transaction/CalcKeypad'
 
 const ParcelamentoIcon = () => (
@@ -24,6 +25,7 @@ const ParcelamentoIcon = () => (
 export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, editingTransaction = null }) {
   const navigate = useNavigate()
   const [categorias, setCategorias] = useState([])
+  const [usoCategorias, setUsoCategorias] = useState({ categorias: {}, subcategorias: {} })
   const [cartoes, setCartoes] = useState([])
   const [loadingCats, setLoadingCats] = useState(false)
   const [activeSelect, setActiveSelect] = useState(null)
@@ -52,8 +54,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   const fetchCategorias = useCallback(async () => {
     setLoadingCats(true)
     try {
-      const data = await fetchCategoriasApi()
+      const [data, uso] = await Promise.all([fetchCategoriasApi(), getUsoCategorias()])
       if (data) setCategorias(data)
+      if (uso) setUsoCategorias(uso)
     } finally {
       setLoadingCats(false)
     }
@@ -481,14 +484,17 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
   }, [handleChange])
 
   const categoriasFiltradas = useMemo(
-    () => filtrarCategoriasPorTipo(categorias, formData.tipo),
-    [categorias, formData.tipo],
+    () => filtrarCategoriasPorTipo(categorias, formData.tipo, usoCategorias.categorias),
+    [categorias, formData.tipo, usoCategorias.categorias],
   )
 
   if (!isOpen) return null
 
   const selectedCategoria = categorias.find((c) => String(c.id) === String(formData.categoria_id))
-  const subcategorias = selectedCategoria ? selectedCategoria.subcategorias : []
+  const subcategorias = ordenarSubcategoriasPorUso(
+    selectedCategoria ? selectedCategoria.subcategorias : [],
+    usoCategorias.subcategorias,
+  )
 
   return (
     <div

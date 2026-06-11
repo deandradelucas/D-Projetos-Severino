@@ -5,13 +5,36 @@ export function tipoCategoriaIgual(tipoCampo, tipoAlvo) {
   return String(tipoCampo ?? '').trim().toUpperCase() === String(tipoAlvo ?? '').trim().toUpperCase()
 }
 
-/** Categorias do tipo selecionado, ordenadas por nome (pt, base). */
-export function filtrarCategoriasPorTipo(categorias, tipo) {
+/**
+ * Categorias do tipo selecionado. Sem `usoMap`: ordem alfabética (pt, base).
+ * Com `usoMap` (id → nº de usos): mais usadas primeiro, alfabético como desempate
+ * — coloca as categorias do dia a dia no topo, agilizando o lançamento.
+ */
+export function filtrarCategoriasPorTipo(categorias, tipo, usoMap = null) {
+  const usos = (c) => (usoMap && usoMap[c.id]) || 0
+  const porNome = (a, b) =>
+    String(a.nome ?? '').localeCompare(String(b.nome ?? ''), 'pt', { sensitivity: 'base' })
   return [...categorias]
     .filter((c) => tipoCategoriaIgual(c.tipo, tipo))
-    .sort((a, b) =>
-      String(a.nome ?? '').localeCompare(String(b.nome ?? ''), 'pt', { sensitivity: 'base' })
-    )
+    .sort((a, b) => {
+      if (usoMap) {
+        const d = usos(b) - usos(a)
+        if (d !== 0) return d
+      }
+      return porNome(a, b)
+    })
+}
+
+/** Subcategorias ordenadas por uso (mais usadas primeiro), alfabético no empate. */
+export function ordenarSubcategoriasPorUso(subcategorias, usoMap = null) {
+  const usos = (s) => (usoMap && usoMap[s.id]) || 0
+  return [...(subcategorias || [])].sort((a, b) => {
+    if (usoMap) {
+      const d = usos(b) - usos(a)
+      if (d !== 0) return d
+    }
+    return String(a.nome ?? '').localeCompare(String(b.nome ?? ''), 'pt', { sensitivity: 'base' })
+  })
 }
 
 /**
