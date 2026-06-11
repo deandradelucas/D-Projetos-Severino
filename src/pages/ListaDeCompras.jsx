@@ -7,6 +7,8 @@ import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
+import { readHorizonteUser } from '../lib/horizonteSession'
+import { readListasCache, writeListasCache } from '../lib/listasCachePersist'
 import { redirectSe401, redirectAssinaturaExpiradaSe403, redirectSeAuthBloqueada } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
 import ConfirmDialog from '../components/ConfirmDialog'
@@ -42,15 +44,52 @@ function ShimmerLista() {
 }
 
 // ---------------------------------------------------------------------------
+// Reordena as listas (última editada primeiro) e escolhe a lista ativa.
+// Mesma lógica usada na carga de rede e na hidratação do cache — uma só fonte.
+// ---------------------------------------------------------------------------
+function prepararListas(data) {
+  const arr0 = Array.isArray(data) ? data : []
+  let saved = null
+  try { saved = localStorage.getItem(LISTA_ULTIMA_KEY) } catch { /* indisponível */ }
+  let ordenadas = arr0
+  if (saved) {
+    const idx = arr0.findIndex((l) => String(l.id) === String(saved))
+    if (idx > 0) {
+      const a = arr0.slice()
+      const [it] = a.splice(idx, 1)
+      a.unshift(it)
+      ordenadas = a
+    }
+  }
+  let alvoId = null
+  if (saved && ordenadas.some((l) => String(l.id) === String(saved))) alvoId = saved
+  if (!alvoId && ordenadas.length > 0) alvoId = String(ordenadas[0].id)
+  const alvo = alvoId ? ordenadas.find((l) => String(l.id) === String(alvoId)) : null
+  return { ordenadas, alvo }
+}
+
+// ---------------------------------------------------------------------------
 // Componente principal
 // ---------------------------------------------------------------------------
 
 export default function ListaDeCompras() {
+  // Hidrata do cache persistido no cold start → pinta listas + itens na hora,
+  // sem spinner, e revalida em background. Calculado uma vez (ref).
+  const cacheInicialRef = useRef(undefined)
+  if (cacheInicialRef.current === undefined) {
+    const u = readHorizonteUser()
+    const cached = u?.id ? readListasCache(u.id) : null
+    cacheInicialRef.current =
+      Array.isArray(cached) && cached.length ? prepararListas(cached) : null
+  }
+  const cacheInicial = cacheInicialRef.current
+  const hidratadoRef = useRef(!!cacheInicial)
+
   const [menuAberto, setMenuAberto] = useState(false)
-  const [listas, setListas] = useState([])
-  const [listaAtiva, setListaAtiva] = useState(null)
-  const [itens, setItens] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [listas, setListas] = useState(cacheInicial ? cacheInicial.ordenadas : [])
+  const [listaAtiva, setListaAtiva] = useState(cacheInicial?.alvo ? cacheInicial.alvo.id : null)
+  const [itens, setItens] = useState(cacheInicial?.alvo?.itens || [])
+  const [loading, setLoading] = useState(!cacheInicial)
   const [loadingItens, setLoadingItens] = useState(false)
   const [historico, setHistorico] = useState([])
   const [historicoPrecos, setHistoricoPrecos] = useState({})
@@ -85,36 +124,27 @@ export default function ListaDeCompras() {
   // Carregar listas
   // -------------------------------------------------------------------------
 
-  const carregarListas = useCallback(async (pp = '') => {
-    setLoading(true)
+  const carregarListas = useCallback(async (pp = '', { silent = false } = {}) => {
+    // Com cache hidratado, revalida em background (sem flash de spinner).
+    if (!silent) setLoading(true)
     try {
       const res = await apiFetch(apiUrl(`/api/lista-compras${pp}`), {
         cache: 'no-store',
       })
       if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) return
-      let data = await res.json()
-      // A última lista editada (id persistido) vai para o primeiro lugar das abas.
-      let saved = null
-      try { saved = localStorage.getItem(LISTA_ULTIMA_KEY) } catch { /* indisponível */ }
-      if (saved && Array.isArray(data)) {
-        const idx = data.findIndex((l) => String(l.id) === String(saved))
-        if (idx > 0) {
-          const arr = data.slice()
-          const [it] = arr.splice(idx, 1)
-          arr.unshift(it)
-          data = arr
-        }
-      }
-      setListas(data)
-      // Abre a ÚLTIMA lista que o usuário editou (id persistido em localStorage);
-      // fallback: a mais recente (data[0], que o server ordena por criada_em desc).
-      let alvoId = null
-      if (saved && data.some((l) => String(l.id) === String(saved))) alvoId = saved
-      if (!alvoId && data.length > 0) alvoId = String(data[0].id)
-      const alvo = alvoId ? data.find((l) => String(l.id) === String(alvoId)) : null
+      const data = await res.json()
+      // Reordena (última editada primeiro) e escolhe a lista ativa — mesma lógica
+      // da hidratação do cache.
+      const { ordenadas, alvo } = prepararListas(data)
+      setListas(ordenadas)
       setListaAtiva(alvo ? alvo.id : null)
       setItens(alvo?.itens || [])
+      // Persiste só o snapshot do escopo padrão (sem ?pessoal=1) p/ cold start.
+      if (pp === '') {
+        const u = readHorizonteUser()
+        if (u?.id) writeListasCache(u.id, ordenadas)
+      }
     } catch {
       // silencioso
     } finally {
@@ -174,7 +204,9 @@ export default function ListaDeCompras() {
   }, [])
 
   useEffect(() => {
-    async function init() {
+    // meu-escopo NÃO bloqueia a carga das listas: a carga inicial usa '' de
+    // qualquer forma; o escopo só ajusta o toggle pessoal/família para depois.
+    ;(async () => {
       try {
         const res = await apiFetch(apiUrl('/api/familia/meu-escopo'), {
           cache: 'no-store',
@@ -187,11 +219,11 @@ export default function ListaDeCompras() {
       } catch {
         // silencioso — feature opcional
       }
-      carregarListas('')
-      carregarHistorico('')
-      carregarHistoricoPrecos('')
-    }
-    init()
+    })()
+    // Com cache hidratado, revalida silenciosamente (sem spinner).
+    carregarListas('', { silent: hidratadoRef.current })
+    carregarHistorico('')
+    carregarHistoricoPrecos('')
   }, [carregarListas, carregarHistorico, carregarHistoricoPrecos])
 
   // Recarregar ao mudar escopo (pessoal ↔ família)
