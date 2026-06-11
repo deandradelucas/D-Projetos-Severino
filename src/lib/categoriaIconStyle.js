@@ -61,15 +61,11 @@ export const COLOR_BY_ICON = {
   pix: '#0ca678',
 }
 
-function hexToRgba(hex, alpha) {
-  const n = parseInt(hex.slice(1), 16)
-  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`
-}
-
 /**
  * Estilo do "chip" da categoria para o wrapper do consumidor (círculo da linha,
- * hero do modal). Estilo "duotone renderizado" (escolha do CEO em 10-jun):
- * gradiente suave na cor + sombra colorida (profundidade) + brilho superior.
+ * hero do modal). Entrega apenas a COR via custom property — o visual
+ * (gradiente, sombra, variante dark) vive em styles/components/cat-chip.css,
+ * onde reage ao tema. O consumidor deve adicionar a classe `cat-chip` junto.
  * Retorna null quando a transação não tem categoria reconhecida — o consumidor
  * mantém o visual padrão verde/vermelho de receita/despesa.
  */
@@ -78,9 +74,5 @@ export function getCategoriaIconChipStyle(categoriaNome, subcategoriaNome) {
   if (!resolved) return null
   const cor = COLOR_BY_ICON[CATEGORIA_ICON_ALIAS[resolved] || resolved]
   if (!cor) return null
-  return {
-    color: cor,
-    background: `linear-gradient(145deg, ${hexToRgba(cor, 0.20)}, ${hexToRgba(cor, 0.10)})`,
-    boxShadow: `0 2px 5px ${hexToRgba(cor, 0.22)}, inset 0 1px 0 rgba(255, 255, 255, 0.35)`,
-  }
+  return { color: cor, '--cat-color': cor }
 }

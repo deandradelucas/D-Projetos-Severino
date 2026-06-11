@@ -10,6 +10,7 @@
 @import "./styles/components/date-popover.css";
 @import "./styles/components/horizon-chat.css";
 @import "./styles/components/confirm-dialog.css";
+@import "./styles/components/cat-chip.css";
 
 /* ===== GLOBAL (tokens, cores, dark, neumorfismo) — antes em styles/global.css ===== */
 /* ============================================================

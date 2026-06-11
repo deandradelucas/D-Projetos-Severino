@@ -166,7 +166,7 @@ export function TransacaoRow({
           </label>
         ) : null}
         <div
-          className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}`}
+          className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}${getCategoriaIconChipStyle(catNome, subNome || undefined) ? ' cat-chip' : ''}`}
           style={getCategoriaIconChipStyle(catNome, subNome || undefined) || undefined}
           aria-hidden
         >

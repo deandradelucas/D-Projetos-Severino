@@ -1,0 +1,32 @@
+/* =============================================================================
+   cat-chip — chip pastel do ícone de categoria (TransacaoRow, Dashboard,
+   TransacaoDetalheModal). A cor vem do consumidor via custom property
+   --cat-color (inline, de getCategoriaIconChipStyle); o visual fica AQUI para
+   reagir ao tema. Os PNGs Pulsar Color têm traço escuro fixo — no dark o chip
+   vira pastel CLARO (cor misturada com branco) p/ manter contraste do traço.
+   Classe triplicada: empata especificidade contra as variantes --up/--down dos
+   partials de página (0,3,0 > 0,2,0) sem !important.
+   ============================================================================= */
+
+.cat-chip.cat-chip.cat-chip {
+  color: var(--cat-color);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--cat-color) 20%, transparent),
+    color-mix(in srgb, var(--cat-color) 10%, transparent)
+  );
+  box-shadow:
+    0 2px 5px color-mix(in srgb, var(--cat-color) 22%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+body[data-theme='dark'] .cat-chip.cat-chip.cat-chip {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--cat-color) 24%, #f4f6fa),
+    color-mix(in srgb, var(--cat-color) 13%, #e8ebf2)
+  );
+  box-shadow:
+    0 2px 6px rgb(0 0 0 / 0.35),
+    inset 0 1px 0 rgb(255 255 255 / 0.45);
+}

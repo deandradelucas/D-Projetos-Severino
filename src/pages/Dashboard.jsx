@@ -597,7 +597,7 @@ export default function Dashboard() {
                       <div key={t.id} className="ref-tx-row">
                         <div className="ref-tx-icon-cell">
                           <div
-                            className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}`}
+                            className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}${getCategoriaIconChipStyle(catNome, subNome) ? ' cat-chip' : ''}`}
                             style={getCategoriaIconChipStyle(catNome, subNome) || undefined}
                             aria-hidden
                           >

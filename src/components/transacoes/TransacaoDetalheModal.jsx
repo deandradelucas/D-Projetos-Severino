@@ -71,7 +71,7 @@ export function TransacaoDetalheModal({ tx, onClose, onEdit, onDelete, privacyMo
 
         <div className="tx-detalhe-modal__hero">
           <span
-            className="tx-detalhe-modal__icon"
+            className={`tx-detalhe-modal__icon${getCategoriaIconChipStyle(catNome, subNome || undefined) ? ' cat-chip' : ''}`}
             style={getCategoriaIconChipStyle(catNome, subNome || undefined) || undefined}
             aria-hidden
           >
