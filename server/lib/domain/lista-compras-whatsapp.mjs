@@ -5,6 +5,8 @@ import {
   criarLista,
   criarItem,
   listarItensLista,
+  toggleChecked,
+  removerItem,
 } from '../lista-compras.mjs'
 
 // ---------------------------------------------------------------------------
@@ -34,6 +36,15 @@ const LISTA_PATTERNS = [
   'remove[r]?\\s+.{1,80}\\s+da\\s+lista',
   'tira[r]?\\s+.{1,80}\\s+da\\s+lista',
   'apaga[r]?\\s+.{1,80}\\s+da\\s+lista',
+  // marcar como comprado/concluído — exige contexto de lista ("da lista" ou
+  // verbo "riscar") para não sequestrar transações ("comprei 50 de arroz")
+  'risca[r]?\\s+.{1,80}\\s+(da\\s+|na\\s+)?lista',
+  'comprei\\s+.{1,80}\\s+da\\s+lista',
+  'conclu[ií]\\s+.{1,80}\\s+da\\s+lista',
+  'marca[r]?\\s+.{1,120}\\s+como\\s+(comprad|conclu[ií]d|feit)',
+  // criação de lista de tarefas
+  'lista\\s+de\\s+tarefas',
+  'lista\\s+de\\s+afazeres',
 ]
 // flag 's' (dotAll): permite que o `.` cruze quebras de linha em mensagens
 // com itens listados um por linha.
@@ -148,7 +159,7 @@ export async function processarMensagemListaCompras(usuarioId, message) {
     return { ok: false, reply: '⚠️ Não consegui interpretar sua mensagem de lista de compras. Tente novamente.' }
   }
 
-  const { intent, lista_nome, itens } = parsed
+  const { intent, lista_nome, tipo_lista, itens } = parsed
 
   // CHAT — não é sobre lista de compras (falso positivo do regex)
   if (intent === 'CHAT') return null
@@ -167,9 +178,10 @@ export async function processarMensagemListaCompras(usuarioId, message) {
   // ---------------------------------------------------------------------------
   if (intent === 'CRIAR_LISTA') {
     const nome = lista_nome || 'Minha lista'
+    const tipo = tipo_lista === 'tarefas' ? 'tarefas' : 'compras'
     let novaLista
     try {
-      novaLista = await criarLista(usuarioId, { nome, categoria_financeira: 'Alimentação' })
+      novaLista = await criarLista(usuarioId, { nome, tipo, categoria_financeira: 'Alimentação' })
     } catch (e) {
       log.error('[lista-compras-wa] criarLista error', e)
       return { ok: false, reply: `❌ Não consegui criar a lista. ${e.message || ''}` }
@@ -308,6 +320,88 @@ export async function processarMensagemListaCompras(usuarioId, message) {
       ok: true,
       reply:
         `✅ *Adicionado à lista "${lista.nome}":*\n\n${linhaItens}${sufixoErro}${notaPadrao}`,
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // REMOVER_ITENS / MARCAR_COMPRADO — resolve a lista, casa cada item citado
+  // com os itens existentes (fuzzy: exato → contém) e aplica a ação.
+  // ---------------------------------------------------------------------------
+  if (intent === 'REMOVER_ITENS' || intent === 'MARCAR_COMPRADO') {
+    const marcar = intent === 'MARCAR_COMPRADO'
+    if (!itens || itens.length === 0) {
+      return {
+        ok: false,
+        reply: marcar
+          ? '⚠️ Não identifiquei qual item marcar. Tente: "comprei o arroz da lista Mercado"'
+          : '⚠️ Não identifiquei qual item remover. Tente: "tira o leite da lista Mercado"',
+      }
+    }
+
+    if (listas.length === 0) {
+      return { ok: true, reply: '🛒 Você ainda não tem listas.' }
+    }
+
+    let lista = encontrarListaPorNome(listas, lista_nome)
+    if (!lista && !lista_nome) lista = encontrarUltimaListaUsada(listas)
+    if (!lista) {
+      const nomes = listas.map((l) => `"${l.nome}"`).join(', ')
+      return {
+        ok: true,
+        reply: `🛒 Lista "${lista_nome}" não encontrada.\n\nSuas listas: ${nomes}`,
+      }
+    }
+
+    let itensLista
+    try {
+      itensLista = await listarItensLista(lista.id, usuarioId)
+    } catch (e) {
+      log.error('[lista-compras-wa] listarItensLista error', e)
+      return { ok: false, reply: '❌ Erro ao buscar itens da lista.' }
+    }
+
+    // Ao marcar, só consideramos pendentes; ao remover, qualquer item.
+    const candidatos = marcar ? itensLista.filter((i) => !i.checked) : itensLista
+    const feitos = []
+    const naoEncontrados = []
+    for (const alvo of itens) {
+      const alvoNorm = normalizeNome(alvo.nome)
+      const item =
+        candidatos.find((i) => normalizeNome(i.nome) === alvoNorm) ||
+        candidatos.find((i) => normalizeNome(i.nome).includes(alvoNorm)) ||
+        candidatos.find((i) => alvoNorm.includes(normalizeNome(i.nome)))
+      if (!item) {
+        naoEncontrados.push(alvo.nome)
+        continue
+      }
+      try {
+        if (marcar) await toggleChecked(item.id, lista.id, usuarioId)
+        else await removerItem(item.id, lista.id, usuarioId)
+        feitos.push(item.nome)
+        // evita marcar/remover o mesmo item duas vezes na mesma mensagem
+        const idx = candidatos.indexOf(item)
+        if (idx >= 0) candidatos.splice(idx, 1)
+      } catch (e) {
+        log.warn('[lista-compras-wa] acao item error', { item: item.nome, err: String(e?.message || e).slice(0, 120) })
+        naoEncontrados.push(alvo.nome)
+      }
+    }
+
+    if (feitos.length === 0) {
+      const nomes = itens.map((i) => `"${i.nome}"`).join(', ')
+      return {
+        ok: true,
+        reply: `🛒 Não encontrei ${nomes} na lista "${lista.nome}".`,
+      }
+    }
+
+    const acao = marcar ? '✅ *Marcado como comprado:*' : '🗑️ *Removido da lista:*'
+    const sufixo = naoEncontrados.length > 0 ? `\n⚠️ Não encontrei: ${naoEncontrados.join(', ')}` : ''
+    const pendentes = candidatos.filter((i) => !i.checked).length
+    const rodape = marcar ? `\n\n${pendentes} item(ns) pendente(s) na "${lista.nome}"` : ''
+    return {
+      ok: true,
+      reply: `${acao}\n\n${feitos.map((n) => `• ${n}`).join('\n')}${sufixo}${rodape}`,
     }
   }
 

@@ -213,6 +213,17 @@ CHAT    → saudações, perguntas, comentários que não são lançamentos fina
 • "oitenta e nove vírgula noventa" → 89.90
 • "trezentos"             → 300
 
+━━━ PARCELAMENTO E RECORRÊNCIA (só quando o usuário diz EXPLICITAMENTE) ━━━
+
+• Compra parcelada — "em 3x", "parcelei em 10 vezes", "dividi em 6x":
+  → "parcelamento": {"num_parcelas": N}
+  → "valor" é SEMPRE o TOTAL da compra: "3x de 100" → valor 300; "TV de 3000 em 10x" → valor 3000
+• Lançamento que se repete com prazo — "aluguel de 1200 por 12 meses", "curso de 200 por 6 meses", "toda semana por 8 semanas":
+  → "recorrencia": {"quantidade": N, "frequencia": "MENSAL"|"SEMANAL"|"ANUAL"}
+  → "valor" é o valor de CADA ocorrência (não o total)
+• Sem número de vezes explícito ("assinei a Netflix", "pago todo mês" sem prazo) → NÃO retorne parcelamento nem recorrencia
+• NUNCA retorne os dois juntos
+
 ━━━ DESCRIÇÃO (específica, max 60 chars) ━━━
 
 • Nome do estabelecimento quando mencionado: "Uber", "iFood", "Drogasil", "Smart Fit"
@@ -245,7 +256,9 @@ ${catMap || 'Sem categorias — use categoria_id: null.'}
 
 ━━━ RETORNO: JSON PURO (sem markdown, sem texto extra) ━━━
 
-Transação: {"tipo":"DESPESA","valor":12.50,"descricao":"iFood","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null}
+Transação: {"tipo":"DESPESA","valor":12.50,"descricao":"iFood","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null,"parcelamento":null,"recorrencia":null}
+Parcelada:  {"tipo":"DESPESA","valor":300,"descricao":"Tênis","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null,"parcelamento":{"num_parcelas":3},"recorrencia":null}
+Recorrente: {"tipo":"DESPESA","valor":1200,"descricao":"Aluguel","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null,"parcelamento":null,"recorrencia":{"quantidade":12,"frequencia":"MENSAL"}}
 Agenda:    {"tipo":"AGENDA","transcricao":"texto completo e fiel do que foi dito, incluindo data e horário","titulo":"Título limpo do evento em 2-5 palavras sem data/hora. Ex: 'Reunião de equipe', 'Consulta médica', 'Pagar boleto do condomínio', 'Dentista'. Capitalizado, sem verbo de agendamento."}
 Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável","categoria_id":null,"subcategoria_id":null,"data_transacao":null}${fewShot}${catFewShot}`
 }
@@ -494,6 +507,7 @@ export function sanitizeTransacaoExtraidaIA(extractedData, categoriasUsuario) {
   if (!cat || cat.tipo !== tipo) {
     extractedData.categoria_id = null
     extractedData.subcategoria_id = null
+    sanitizeParcelamentoRecorrencia(extractedData)
     return extractedData
   }
 
@@ -501,5 +515,26 @@ export function sanitizeTransacaoExtraidaIA(extractedData, categoriasUsuario) {
     const subOk = cat.subcategorias?.some((s) => s.id === extractedData.subcategoria_id)
     if (!subOk) extractedData.subcategoria_id = null
   }
+  sanitizeParcelamentoRecorrencia(extractedData)
   return extractedData
+}
+
+/**
+ * Normaliza parcelamento/recorrência vindos da IA: clamp 2-120, frequência
+ * válida e exclusão mútua (parcelamento vence). Campos inválidos viram null.
+ */
+function sanitizeParcelamentoRecorrencia(extractedData) {
+  const np = parseInt(extractedData?.parcelamento?.num_parcelas, 10)
+  extractedData.parcelamento = Number.isFinite(np) && np >= 2 && np <= 120
+    ? { num_parcelas: np }
+    : null
+
+  const qt = parseInt(extractedData?.recorrencia?.quantidade, 10)
+  const freq = String(extractedData?.recorrencia?.frequencia || '').toUpperCase()
+  extractedData.recorrencia =
+    !extractedData.parcelamento &&
+    Number.isFinite(qt) && qt >= 2 && qt <= 120 &&
+    ['MENSAL', 'SEMANAL', 'ANUAL'].includes(freq)
+      ? { quantidade: qt, frequencia: freq }
+      : null
 }

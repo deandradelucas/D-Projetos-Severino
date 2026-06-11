@@ -352,6 +352,18 @@ export function parseAgendaDateTime(message, base = new Date()) {
   return result
 }
 
+/**
+ * True quando a mensagem traz horário explícito ("às 15h", "14:30", "daqui a
+ * 2 horas"). Usado para AVISAR o usuário quando o horário foi assumido (9h
+ * default) em vez de aplicar o default em silêncio.
+ */
+function messageHasExplicitTime(message) {
+  const raw = normalizeTypos(String(message || ''))
+  const text = normalizeWordTime(stripAccents(raw.toLowerCase()))
+  if (parseTime(text)) return true
+  return /\b(?:daqui\s+a|em)\s+\d{1,3}\s*(?:min|minuto|minutos|hora|horas|h)\b/.test(text)
+}
+
 /** Indica que "… para/as HH horas antes …" é horário (às HH), não pedido de aviso "HH horas antes". */
 function isLikelyClockAtPhraseBeforeHourOffset(before) {
   const b = String(before || '').trimEnd()
@@ -889,8 +901,18 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
       // Log para o @aprendizdaagenda analisar à noite — fire-and-forget
       logTituloExtracao(uid, rawMessage, data.titulo, tituloFonte, data.id).catch(() => {})
 
+      // A2: horário assumido (default 9h) é declarado — nunca em silêncio.
+      // Checa o instante criado (datas relativas "daqui a 2 dias" preservam a
+      // hora atual, não caem no default).
+      const hmSp = new Intl.DateTimeFormat('pt-BR', {
+        timeZone: AGENDA_TZ, hour: '2-digit', minute: '2-digit', hour12: false,
+      }).format(inicio)
+      const notaHoraDefault = !messageHasExplicitTime(message) && hmSp === '09:00'
+        ? `\n_Você não disse o horário, marquei *9h*. Para mudar: "reagendar ${data.titulo} para 15h"._`
+        : ''
+
       if (explicitReminder !== null) {
-        reply = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}${avisoConflito}`
+        reply = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}${avisoConflito}${notaHoraDefault}`
         return { ok: true, reply }
       }
 
@@ -898,7 +920,7 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
       const label = reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'
       return {
         ok: true,
-        reply: `✅ ${label}\n*${data.titulo}*\n${quando}${avisoConflito}\n\nQuando quer ser avisado? Responda com:\n*1* – Na hora\n*2* – 5 min antes\n*3* – 10 min antes\n*4* – 30 min antes\n*5* – 1 hora antes`,
+        reply: `✅ ${label}\n*${data.titulo}*\n${quando}${avisoConflito}${notaHoraDefault}\n\nQuando quer ser avisado? Responda com:\n*1* – Na hora\n*2* – 5 min antes\n*3* – 10 min antes\n*4* – 30 min antes\n*5* – 1 hora antes`,
       }
     }
 

@@ -1,6 +1,7 @@
 import { log } from '../logger.mjs'
 import { buscarUsuarioPorTelefone } from '../usuarios.mjs'
 import { getCategorias, inserirTransacao, atualizarTransacao, deletarTransacao } from '../transacoes.mjs'
+import { TransactionService } from '../services/transaction-service.mjs'
 import { askHorizon, parseWhatsAppMessageWithAI, parseWhatsAppAudioDirectWithAI } from '../ai.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
@@ -709,31 +710,58 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
     }
   }
 
+  const parcelamento = parsed.parcelamento || null
+  const recorrencia = parsed.recorrencia || null
+
   try {
     const actorUid = usuario?.id ? String(usuario.id).trim() : ''
     const lancadoPor =
       actorUid && actorUid !== String(dataUsuarioId || '').trim() ? actorUid : undefined
-    const transacaoInserida = await inserirTransacao({
-      usuario_id: dataUsuarioId,
-      tipo: parsed.tipo,
-      valor: parsed.valor,
-      descricao: parsed.descricao || message.slice(0, 100),
-      data_transacao: dataTransacaoIso,
-      status: 'EFETIVADA',
-      categoria_id: finalCategoriaId || undefined,
-      subcategoria_id: finalSubcategoriaId || undefined,
-      ...(lancadoPor ? { lancado_por_usuario_id: lancadoPor } : {}),
-    })
+
+    let transacaoIdAlerta = null
+    if (parcelamento) {
+      // Compra parcelada ("em 3x") — mesma engine do app: parcelas mensais,
+      // vencidas entram como pagas, futuras PENDENTE (transaction-service).
+      const resParc = await TransactionService.createParcelamento(
+        dataUsuarioId,
+        {
+          tipo: parsed.tipo,
+          valor: parsed.valor,
+          descricao: parsed.descricao || message.slice(0, 100),
+          data_transacao: dataTransacaoIso,
+          status: 'EFETIVADA',
+          categoria_id: finalCategoriaId || null,
+          subcategoria_id: finalSubcategoriaId || null,
+          parcelamento,
+        },
+        lancadoPor ? { lancadoPorUsuarioId: lancadoPor } : {},
+      )
+      transacaoIdAlerta = resParc?.parcelas?.[0]?.id ?? null
+    } else {
+      const transacaoInserida = await inserirTransacao({
+        usuario_id: dataUsuarioId,
+        tipo: parsed.tipo,
+        valor: parsed.valor,
+        descricao: parsed.descricao || message.slice(0, 100),
+        data_transacao: dataTransacaoIso,
+        status: 'EFETIVADA',
+        categoria_id: finalCategoriaId || undefined,
+        subcategoria_id: finalSubcategoriaId || undefined,
+        ...(recorrencia ? { recorrencia } : {}),
+        ...(lancadoPor ? { lancado_por_usuario_id: lancadoPor } : {}),
+      })
+      transacaoIdAlerta = transacaoInserida?.id ?? null
+    }
 
     // Alertas pós-insert (gasto alto + orçamento) — fire-and-forget, não bloqueia resposta
-    if (parsed.tipo === 'DESPESA' && finalCategoriaId && transacaoInserida?.id) {
+    if (parsed.tipo === 'DESPESA' && finalCategoriaId && transacaoIdAlerta) {
       const nomeCategoria = categorias.find(c => c.id === finalCategoriaId)?.nome
       dispararAlertasTransacao({
         usuarioId: dataUsuarioId,
         categoriaId: finalCategoriaId,
         nomeCategoria,
         valorAtual: parsed.valor,
-        transacaoId: transacaoInserida.id,
+        transacaoId: transacaoIdAlerta,
         phone,
         instance: process.env.EVOLUTION_INSTANCE,
       }).catch(e => log.warn('[alertas] dispararAlertasTransacao error', e?.message))
@@ -764,8 +792,32 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
     ? `\n📅 *Data:* ${formatDataTransacaoReplyPtBr(dataTransacaoIso)}`
     : ''
 
+  // Categoria visível na confirmação: usuário detecta erro na hora e aprende
+  // o comando de correção (alimenta o few-shot de categorias).
+  let categoriaLinha = ''
+  if (finalCategoriaId) {
+    const catObj = categorias.find((c) => c.id === finalCategoriaId)
+    const subObj = catObj?.subcategorias?.find((s) => s.id === finalSubcategoriaId)
+    if (catObj) {
+      const rotulo = subObj ? `${catObj.nome} › ${subObj.nome}` : catObj.nome
+      categoriaLinha = `\n🏷️ ${rotulo}`
+    }
+  }
+  const dicaCorrigir = categoriaLinha
+    ? `\n\n_Categoria errada? Responda "corrigir categoria <nome>"._`
+    : ''
+
+  let planoLinha = ''
+  if (parcelamento) {
+    const cada = fmt(Math.floor((parsed.valor / parcelamento.num_parcelas) * 100) / 100)
+    planoLinha = `\n💳 Parcelado em *${parcelamento.num_parcelas}x* de ~${cada}`
+  } else if (recorrencia) {
+    const freqLabel = { MENSAL: 'mês', SEMANAL: 'semana', ANUAL: 'ano' }[recorrencia.frequencia]
+    planoLinha = `\n🔁 Repete por *${recorrencia.quantidade}* ${freqLabel === 'mês' ? 'meses' : freqLabel + 's'} (${fmt(parsed.valor)} cada)`
+  }
+
   return {
     ok: true,
-    reply: `${emoji} *${acao} registrada!*\n\n💰 Valor: ${fmt(parsed.valor)}\n📝 ${parsed.descricao || message.slice(0, 60)}${dataLinha}${saldoLinha}`,
+    reply: `${emoji} *${acao} registrada!*\n\n💰 Valor: ${fmt(parsed.valor)}\n📝 ${parsed.descricao || message.slice(0, 60)}${categoriaLinha}${planoLinha}${dataLinha}${saldoLinha}${dicaCorrigir}`,
   }
 }

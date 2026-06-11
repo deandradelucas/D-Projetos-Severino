@@ -11,25 +11,30 @@ import { aiCacheKey, aiCacheGet, aiCacheSet, AI_CACHE_TTL } from './ai/ai-cache.
 import { recordAiCall, recordCache } from './ai/ai-telemetry.mjs'
 import { hojeYmdBrt } from './date-brt.mjs'
 
-const SYSTEM_PROMPT = `Você é um assistente que interpreta mensagens em português brasileiro sobre listas de compras.
+const SYSTEM_PROMPT = `Você é um assistente que interpreta mensagens em português brasileiro sobre listas (de compras ou de tarefas).
 
 Analise a mensagem e retorne APENAS um JSON com a estrutura abaixo — sem texto extra, sem markdown.
 
 INTENTS possíveis:
 - "ADICIONAR_ITENS": usuário quer adicionar item(ns) a uma lista existente
-- "CRIAR_LISTA": usuário quer criar uma nova lista de compras (PODE já incluir itens iniciais)
+- "CRIAR_LISTA": usuário quer criar uma nova lista (PODE já incluir itens iniciais)
 - "VER_LISTA": usuário quer ver o conteúdo de uma lista
-- "CHAT": mensagem não é sobre lista de compras
+- "REMOVER_ITENS": usuário quer remover/tirar/apagar item(ns) de uma lista
+- "MARCAR_COMPRADO": usuário diz que já comprou/concluiu/riscou item(ns) da lista
+- "CHAT": mensagem não é sobre listas
 
 CAMPOS:
-- "intent": string (um dos 4 acima)
+- "intent": string (um dos 6 acima)
 - "lista_nome": nome da lista mencionada (null se não mencionou)
-- "itens": array de itens (para ADICIONAR_ITENS e também para CRIAR_LISTA quando o usuário já cita itens)
+- "tipo_lista": "compras" | "tarefas" | null — APENAS em CRIAR_LISTA. "tarefas" quando o usuário fala em lista de tarefas/afazeres/to-do/pendências; senão "compras"; null se não der pra saber.
+- "itens": array de itens (para ADICIONAR_ITENS, REMOVER_ITENS, MARCAR_COMPRADO e também para CRIAR_LISTA quando o usuário já cita itens)
 
 REGRAS IMPORTANTES:
 - Os itens podem vir na mesma linha (separados por vírgula/"e") OU em linhas separadas (uma por linha). Capture TODOS.
 - Se o usuário NÃO mencionar o nome da lista, retorne "lista_nome": null — NÃO invente um nome.
 - Em CRIAR_LISTA, "lista_nome" é o nome da lista nova; os produtos citados vão em "itens".
+- Em REMOVER_ITENS e MARCAR_COMPRADO, "itens" só precisa do "nome" de cada item (quantidade/unidade são ignoradas).
+- MARCAR_COMPRADO exige contexto de LISTA na mensagem ("da lista", "na lista", "risca"). "comprei 50 de arroz" SEM mencionar lista é um gasto, não é sobre lista → CHAT.
 
 Cada item em "itens" deve ter:
 - "nome": string (nome do produto, sem quantidade/unidade)
@@ -53,7 +58,25 @@ Entrada: "adiciona 2kg de arroz e 1L de leite na lista Mercado"
 Saída: {"intent":"ADICIONAR_ITENS","lista_nome":"Mercado","itens":[{"nome":"arroz","quantidade":2,"unidade":"kg"},{"nome":"leite","quantidade":1,"unidade":"L"}]}
 
 Entrada: "cria uma lista chamada Farmácia"
-Saída: {"intent":"CRIAR_LISTA","lista_nome":"Farmácia","itens":[]}
+Saída: {"intent":"CRIAR_LISTA","lista_nome":"Farmácia","tipo_lista":"compras","itens":[]}
+
+Entrada: "cria uma lista de tarefas chamada Casa com lavar o carro e trocar a lâmpada"
+Saída: {"intent":"CRIAR_LISTA","lista_nome":"Casa","tipo_lista":"tarefas","itens":[{"nome":"lavar o carro","quantidade":1,"unidade":"un"},{"nome":"trocar a lâmpada","quantidade":1,"unidade":"un"}]}
+
+Entrada: "tira o leite da lista"
+Saída: {"intent":"REMOVER_ITENS","lista_nome":null,"itens":[{"nome":"leite","quantidade":1,"unidade":"un"}]}
+
+Entrada: "remove arroz e feijão da lista Mercado"
+Saída: {"intent":"REMOVER_ITENS","lista_nome":"Mercado","itens":[{"nome":"arroz","quantidade":1,"unidade":"un"},{"nome":"feijão","quantidade":1,"unidade":"un"}]}
+
+Entrada: "risca o sabão da lista, já comprei"
+Saída: {"intent":"MARCAR_COMPRADO","lista_nome":null,"itens":[{"nome":"sabão","quantidade":1,"unidade":"un"}]}
+
+Entrada: "comprei o arroz e o óleo da lista Mercado"
+Saída: {"intent":"MARCAR_COMPRADO","lista_nome":"Mercado","itens":[{"nome":"arroz","quantidade":1,"unidade":"un"},{"nome":"óleo","quantidade":1,"unidade":"un"}]}
+
+Entrada: "comprei 50 de arroz"
+Saída: {"intent":"CHAT","lista_nome":null,"itens":[]}
 
 Entrada: "cria a lista Feira com banana, maçã e 1kg de tomate"
 Saída: {"intent":"CRIAR_LISTA","lista_nome":"Feira","itens":[{"nome":"banana","quantidade":1,"unidade":"un"},{"nome":"maçã","quantidade":1,"unidade":"un"},{"nome":"tomate","quantidade":1,"unidade":"kg"}]}
@@ -84,6 +107,8 @@ function normalizeListaResult(parsed) {
   if (!parsed || typeof parsed !== 'object') return null
   const intent = String(parsed.intent || 'CHAT')
   const lista_nome = parsed.lista_nome ? String(parsed.lista_nome).trim() : null
+  const tipoRaw = parsed.tipo_lista ? String(parsed.tipo_lista).trim().toLowerCase() : null
+  const tipo_lista = tipoRaw === 'tarefas' ? 'tarefas' : tipoRaw === 'compras' ? 'compras' : null
   const itens = Array.isArray(parsed.itens)
     ? parsed.itens
         .filter((i) => i && typeof i.nome === 'string' && i.nome.trim())
@@ -95,7 +120,7 @@ function normalizeListaResult(parsed) {
             : 'un',
         }))
     : []
-  return { intent, lista_nome, itens }
+  return { intent, lista_nome, tipo_lista, itens }
 }
 
 /**
