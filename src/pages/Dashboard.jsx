@@ -782,6 +782,7 @@ export default function Dashboard() {
                               categoriaNome={catNome}
                               subcategoriaNome={subNome}
                               isReceita={isRec}
+                              iconeOverride={t.categorias?.icone || undefined}
                               size={24}
                             />
                           </div>

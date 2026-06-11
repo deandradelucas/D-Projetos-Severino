@@ -79,6 +79,7 @@ export function TransacaoDetalheModal({ tx, onClose, onEdit, onDelete, privacyMo
               categoriaNome={catNome}
               subcategoriaNome={subNome || undefined}
               isReceita={isRec}
+              iconeOverride={tx.categorias?.icone || undefined}
               size={34}
             />
           </span>

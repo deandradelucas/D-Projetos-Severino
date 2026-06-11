@@ -334,8 +334,8 @@ async function enrichTransacoesComCategorias(supabaseAdmin, rows, titularFallbac
   const catMap = new Map()
   const subMap = new Map()
   if (catIds.length) {
-    const { data: cats } = await supabaseAdmin.from('categorias').select('id, nome, cor').in('id', catIds)
-    for (const c of cats || []) catMap.set(c.id, { nome: c.nome, cor: c.cor })
+    const { data: cats } = await supabaseAdmin.from('categorias').select('id, nome, cor, icone').in('id', catIds)
+    for (const c of cats || []) catMap.set(c.id, { nome: c.nome, cor: c.cor, icone: c.icone ?? null })
   }
   if (subIds.length) {
     const { data: subs } = await supabaseAdmin.from('subcategorias').select('id, nome').in('id', subIds)
@@ -427,7 +427,7 @@ export async function getTransacoes(usuarioId, filters = {}) {
       cartao_id,
       recorrente_grupo_id, recorrente_index, recorrente_total, recorrencia_mensal_id,
       lancado_por_usuario_id,
-      categorias(nome, cor),
+      categorias(nome, cor, icone),
       subcategorias(nome),
       cartoes(nome, dia_vencimento),
       lancado_por:usuarios!lancado_por_usuario_id(nome)

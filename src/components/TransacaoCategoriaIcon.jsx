@@ -23,8 +23,10 @@ const PATHS = {
   arrowDown: <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>,
 }
 
-export function TransacaoCategoriaIcon({ categoriaNome, subcategoriaNome, isReceita, size = 18, className }) {
-  const resolved = getTransacaoCategoriaIconKey(categoriaNome, subcategoriaNome)
+export function TransacaoCategoriaIcon({ categoriaNome, subcategoriaNome, isReceita, iconeOverride, size = 18, className }) {
+  // Ícone escolhido pelo usuário (categoria.icone) tem precedência sobre a
+  // resolução por nome. As 28 chaves válidas já estão em ICON_PNG.
+  const resolved = iconeOverride || getTransacaoCategoriaIconKey(categoriaNome, subcategoriaNome)
   const mapKey = resolved ?? (isReceita ? 'arrowUp' : 'arrowDown')
   const iconName = CATEGORIA_ICON_ALIAS[mapKey] || mapKey
 

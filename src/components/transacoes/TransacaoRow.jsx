@@ -174,6 +174,7 @@ export function TransacaoRow({
             categoriaNome={catNome}
             subcategoriaNome={subNome || undefined}
             isReceita={isRec}
+            iconeOverride={t.categorias?.icone || undefined}
             size={26}
           />
         </div>
