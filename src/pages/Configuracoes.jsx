@@ -840,6 +840,20 @@ export default function Configuracoes() {
             togglePrivacy={togglePrivacy}
           />
 
+          {/* Gestão de categorias (página dedicada) */}
+          <section className="config-card config-card--full">
+            <div className="config-card-head">
+              <span className="config-card-kicker">Personalização</span>
+              <h2 className="config-card-title-clean">Categorias</h2>
+              <p className="config-card-subtitle">
+                Crie, renomeie, escolha ícone e cor, funda e organize suas categorias e subcategorias.
+              </p>
+            </div>
+            <Link to="/categorias" className="config-legal-link">
+              Gerenciar categorias →
+            </Link>
+          </section>
+
           {/* Central de notificações */}
           <ConfigNotificacoesCard prefs={prefs} prefsSaving={prefsSaving} onToggle={salvarPreferencia} />
 

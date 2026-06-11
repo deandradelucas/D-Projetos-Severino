@@ -13,10 +13,12 @@ export function normalizeTipoCategoria(t) {
   return u.length ? u : 'DESPESA'
 }
 
+// Retorna TODAS as categorias (incl. arquivadas) — o sync precisa enxergar as
+// arquivadas para não ressuscitá-las; getCategorias filtra as ativas na resposta.
 async function _fetchCategoriasUsuario(supabaseAdmin, usuario_id) {
   const { data, error } = await supabaseAdmin
     .from('categorias')
-    .select('id, nome, tipo, cor')
+    .select('id, nome, tipo, cor, icone, arquivada_em')
     .eq('usuario_id', usuario_id)
     .order('nome', { ascending: true })
   if (error) throw error
@@ -51,19 +53,26 @@ export async function getCategorias(usuarioId) {
 
   if (categorias.length === 0) return []
 
-  const categoriaIds = categorias.map((c) => c.id)
+  // Resposta só com ATIVAS (arquivadas preservam histórico mas saem da seleção).
+  const ativas = categorias.filter((c) => !c.arquivada_em)
+  if (ativas.length === 0) return []
+
+  const categoriaIds = ativas.map((c) => c.id)
   const { data: subcategorias, error: subError } = await supabaseAdmin
     .from('subcategorias')
-    .select('id, categoria_id, nome')
+    .select('id, categoria_id, nome, arquivada_em')
     .in('categoria_id', categoriaIds)
     .order('nome', { ascending: true })
 
   if (subError) throw subError
 
-  const comSubs = categorias.map((c) => ({
-    ...c,
+  const comSubs = ativas.map((c) => ({
+    id: c.id,
+    nome: c.nome,
     tipo: normalizeTipoCategoria(c.tipo),
-    subcategorias: (subcategorias || []).filter((sub) => sub.categoria_id === c.id),
+    cor: c.cor,
+    icone: c.icone ?? null,
+    subcategorias: (subcategorias || []).filter((sub) => sub.categoria_id === c.id && !sub.arquivada_em),
   }))
 
   /* Uma linha por (nome, tipo): evita duplicados no UI quando o banco tem categorias repetidas (ex.: RECEITA). */
@@ -191,6 +200,7 @@ async function _syncMissingDefaultCategories(usuario_id, supabaseAdmin, categori
   for (const cat of DEFAULT_CATEGORIES) {
     const categoriaAtual = categoriasPorChave.get(_categoriaChaveUnica(cat.nome, cat.tipo))
     if (!categoriaAtual?.id) continue
+    if (categoriaAtual.arquivada_em) continue // não ressuscitar subs de categoria que o usuário arquivou
     const existentes = subsPorCategoria.get(categoriaAtual.id) || new Set()
     const subsToInsert = cat.subcategorias
       .filter((nome) => !existentes.has(_subcategoriaChaveUnica(nome)))

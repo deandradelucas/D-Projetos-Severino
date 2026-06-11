@@ -23,6 +23,16 @@ import {
   validateTransacoesListQuery,
   isUuidString,
 } from '../lib/transacao-validate.mjs'
+import {
+  criarCategoria,
+  atualizarCategoria,
+  removerCategoria,
+  fundirCategoria,
+  criarSubcategoria,
+  atualizarSubcategoria,
+  removerSubcategoria,
+  CategoriaError,
+} from '../lib/categorias-crud.mjs'
 import { TransactionService } from '../lib/services/transaction-service.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
@@ -44,6 +54,56 @@ export function registerTransacoesRoutes(app) {
       return c.json({ message: 'Erro ao buscar categorias.' }, 500)
     }
   })
+
+  // ── Categorias: CRUD (criar, editar, arquivar/excluir, fundir, subcategorias) ──
+  // Escopo de escrita = titular dos dados (parsed.dataUsuarioId). CategoriaError
+  // carrega o status HTTP apropriado (400/404/409).
+  const categoriaMut = async (c, run) => {
+    const usuarioId = resolveRequestUserId(c)
+    const parsed = await parseUsuarioEscopoApi(usuarioId, { write: true })
+    if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+    if (!await rateLimitTake(`cat-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
+      return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
+    }
+    let body = {}
+    try { body = await c.req.json() } catch { body = {} }
+    try {
+      const data = await run(parsed.dataUsuarioId, body, c)
+      return c.json(data)
+    } catch (error) {
+      if (error instanceof CategoriaError) return c.json({ message: error.message }, error.status)
+      log.error('categoria mutation failed', error)
+      return c.json({ message: 'Erro ao processar categoria.' }, 500)
+    }
+  }
+  const paramUuid = (c, name) => {
+    const v = c.req.param(name)
+    if (!isUuidString(v)) throw new CategoriaError('ID inválido.')
+    return v
+  }
+
+  app.post('/api/categorias', (c) => categoriaMut(c, (uid, body) => criarCategoria(uid, body)))
+
+  app.put('/api/categorias/:id', (c) =>
+    categoriaMut(c, (uid, body, ctx) => atualizarCategoria(uid, paramUuid(ctx, 'id'), body)))
+
+  app.delete('/api/categorias/:id', (c) =>
+    categoriaMut(c, (uid, _body, ctx) => removerCategoria(uid, paramUuid(ctx, 'id'))))
+
+  app.post('/api/categorias/:id/fundir', (c) =>
+    categoriaMut(c, (uid, body, ctx) => {
+      if (!isUuidString(body?.destino_id)) throw new CategoriaError('Destino inválido.')
+      return fundirCategoria(uid, paramUuid(ctx, 'id'), body.destino_id)
+    }))
+
+  app.post('/api/categorias/:id/subcategorias', (c) =>
+    categoriaMut(c, (uid, body, ctx) => criarSubcategoria(uid, paramUuid(ctx, 'id'), body)))
+
+  app.put('/api/subcategorias/:id', (c) =>
+    categoriaMut(c, (uid, body, ctx) => atualizarSubcategoria(uid, paramUuid(ctx, 'id'), body)))
+
+  app.delete('/api/subcategorias/:id', (c) =>
+    categoriaMut(c, (uid, _body, ctx) => removerSubcategoria(uid, paramUuid(ctx, 'id'))))
 
   app.get('/api/transacoes', async (c) => {
     try {

@@ -1,0 +1,41 @@
+import { apiFetch } from './apiFetch'
+import { apiUrl } from './apiUrl'
+
+/** Executa uma mutação de categoria e devolve o JSON, ou lança Error com a mensagem da API. */
+async function mutate(path, { method = 'POST', body } = {}) {
+  const res = await apiFetch(apiUrl(path), {
+    method,
+    cache: 'no-store',
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(data?.message || 'Não foi possível completar a ação.')
+  return data
+}
+
+export const criarCategoria = (body) => mutate('/api/categorias', { method: 'POST', body })
+export const atualizarCategoria = (id, body) => mutate(`/api/categorias/${id}`, { method: 'PUT', body })
+export const removerCategoria = (id) => mutate(`/api/categorias/${id}`, { method: 'DELETE' })
+export const fundirCategoria = (id, destinoId) =>
+  mutate(`/api/categorias/${id}/fundir`, { method: 'POST', body: { destino_id: destinoId } })
+export const criarSubcategoria = (categoriaId, body) =>
+  mutate(`/api/categorias/${categoriaId}/subcategorias`, { method: 'POST', body })
+export const atualizarSubcategoria = (id, body) =>
+  mutate(`/api/subcategorias/${id}`, { method: 'PUT', body })
+export const removerSubcategoria = (id) => mutate(`/api/subcategorias/${id}`, { method: 'DELETE' })
+
+/** Conjunto de ícones selecionáveis (mesmas chaves do backend / public/icons/categorias). */
+export const ICONES_CATEGORIA = [
+  'utensils', 'fuel', 'car', 'home', 'health', 'education', 'leisure',
+  'shopping', 'tech', 'subscription', 'fitness', 'receipt', 'pet', 'plane',
+  'gift', 'wallet', 'work', 'investment', 'child', 'bank', 'sparkles',
+  'percent', 'coins', 'handCoins', 'dollarCircle', 'building', 'scale', 'pix',
+]
+
+/** Paleta de cores sugeridas (consistente com o seed). */
+export const CORES_CATEGORIA = [
+  '#ef4444', '#f97316', '#eab308', '#22c55e', '#10b981', '#14b8a6',
+  '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#ec4899', '#f43f5e',
+  '#d4a84b', '#94a3b8',
+]

@@ -22,6 +22,7 @@ import {
   ListaDeCompras,
   Metas,
   Cartoes,
+  Categorias,
   Pagamento,
   BemVindoAssinatura,
   TrialExpirado,
@@ -71,6 +72,7 @@ function App() {
                   <Route path="/lista-de-compras" element={<ListaDeCompras />} />
                   <Route path="/metas" element={<Metas />} />
                   <Route path="/cartoes" element={<Cartoes />} />
+                  <Route path="/categorias" element={<Categorias />} />
                   <Route path="/configuracoes" element={<Configuracoes />} />
                 </Route>
                 <Route path="/" element={<Login />} />
