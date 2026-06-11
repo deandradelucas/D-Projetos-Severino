@@ -303,6 +303,11 @@ export default function Dashboard() {
   const deltaDespesas = deltaPct(mes.despesas, mesAnterior.despesas)
   const deltaReceitas = deltaPct(mes.receitas, mesAnterior.receitas)
   const mesTotal = mes.receitas + mes.despesas
+  // Fallback quando não há mês anterior p/ comparar: fatia da entrada/saída no
+  // total movimentado do mês (sempre disponível se houve movimento).
+  const sharePct = (v) => (mesTotal > 0 ? Math.round((v / mesTotal) * 100) : null)
+  const shareReceitas = sharePct(mes.receitas)
+  const shareDespesas = sharePct(mes.despesas)
 
   // Data efetiva da transação: parcela exibe/ordena pela data da COMPRA (data_compra),
   // não pelo vencimento (data_transacao). Mesma regra do TransacaoRow / transacoesDerived.
@@ -562,7 +567,7 @@ export default function Dashboard() {
                   <p className="ref-kpi-card__label">Entrada no mês</p>
                   <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(mes.receitas)}</p>
                 </div>
-                {deltaReceitas != null && (
+                {deltaReceitas != null ? (
                   // Entrada: subir é bom (--good), cair é ruim (--bad)
                   <div className="ref-kpi-card__pct" aria-label={`Variação de ${deltaReceitas}% sobre o mês passado`}>
                     <span className={`ref-kpi-card__pct-value ref-kpi-card__pct-value--${deltaReceitas > 0 ? 'good' : deltaReceitas < 0 ? 'bad' : 'flat'}`}>
@@ -570,7 +575,13 @@ export default function Dashboard() {
                     </span>
                     <span className="ref-kpi-card__pct-label">vs mês passado</span>
                   </div>
-                )}
+                ) : shareReceitas != null ? (
+                  // Sem mês anterior: mostra a fatia da entrada no total do mês
+                  <div className="ref-kpi-card__pct" aria-label={`${shareReceitas}% do total movimentado no mês`}>
+                    <span className="ref-kpi-card__pct-value ref-kpi-card__pct-value--flat">{shareReceitas}%</span>
+                    <span className="ref-kpi-card__pct-label">do mês</span>
+                  </div>
+                ) : null}
               </article>
               <article className="ref-kpi-card ref-kpi-card--expense">
                 <div className="ref-kpi-card__icon" aria-hidden>
@@ -582,7 +593,7 @@ export default function Dashboard() {
                   <p className="ref-kpi-card__label">Saída no mês</p>
                   <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(mes.despesas)}</p>
                 </div>
-                {deltaDespesas != null && (
+                {deltaDespesas != null ? (
                   // Saída: subir é ruim (--bad), cair é bom (--good)
                   <div className="ref-kpi-card__pct" aria-label={`Variação de ${deltaDespesas}% sobre o mês passado`}>
                     <span className={`ref-kpi-card__pct-value ref-kpi-card__pct-value--${deltaDespesas > 0 ? 'bad' : deltaDespesas < 0 ? 'good' : 'flat'}`}>
@@ -590,7 +601,13 @@ export default function Dashboard() {
                     </span>
                     <span className="ref-kpi-card__pct-label">vs mês passado</span>
                   </div>
-                )}
+                ) : shareDespesas != null ? (
+                  // Sem mês anterior: mostra a fatia da saída no total do mês
+                  <div className="ref-kpi-card__pct" aria-label={`${shareDespesas}% do total movimentado no mês`}>
+                    <span className="ref-kpi-card__pct-value ref-kpi-card__pct-value--flat">{shareDespesas}%</span>
+                    <span className="ref-kpi-card__pct-label">do mês</span>
+                  </div>
+                ) : null}
               </article>
             </>
           )}
