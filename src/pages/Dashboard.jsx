@@ -63,19 +63,30 @@ export default function Dashboard() {
 
   /* Severino IA — insights proativos (regras determinísticas no backend, sem custo de IA) */
   const [insights, setInsights] = useState([])
-  useEffect(() => {
-    let cancel = false
-    ;(async () => {
-      try {
-        const res = await apiFetch(apiUrl('/api/insights'), { cache: 'no-store' })
-        const data = res.ok ? await res.json() : []
-        if (!cancel) setInsights(Array.isArray(data) ? data : [])
-      } catch {
-        /* silencioso — feature não-crítica */
-      }
-    })()
-    return () => { cancel = true }
+  const fetchInsights = useCallback(async () => {
+    try {
+      const res = await apiFetch(apiUrl('/api/insights'), { cache: 'no-store' })
+      const data = res.ok ? await res.json() : []
+      setInsights(Array.isArray(data) ? data : [])
+    } catch {
+      /* silencioso — feature não-crítica */
+    }
   }, [])
+  useEffect(() => { void fetchInsights() }, [fetchInsights])
+
+  /* Gamificação — streak de dias seguidos registrando (chip no hero) */
+  const [streak, setStreak] = useState(0)
+  const fetchGamificacao = useCallback(async () => {
+    try {
+      const res = await apiFetch(apiUrl('/api/gamificacao'), { cache: 'no-store' })
+      if (!res.ok) return
+      const data = await res.json().catch(() => null)
+      setStreak(Number(data?.streak?.atual) || 0)
+    } catch {
+      /* silencioso — feature não-crítica */
+    }
+  }, [])
+  useEffect(() => { void fetchGamificacao() }, [fetchGamificacao])
 
   // Navegação por setas no track de insights da Severino IA (sem barra de rolagem)
   const iaTrackRef = useRef(null)
@@ -144,27 +155,26 @@ export default function Dashboard() {
   }, [fetchTransacoes, usuario.id])
 
   // Próximo compromisso da agenda (próximos 60 dias)
+  const fetchProximoCompromisso = useCallback(async () => {
+    if (!readHorizonteUser()?.id) return
+    try {
+      const from = new Date()
+      const to = new Date(from)
+      to.setDate(to.getDate() + 60)
+      const params = new URLSearchParams({ from: from.toISOString(), to: to.toISOString() })
+      const res = await apiFetch(apiUrl(`/api/agenda?${params.toString()}`), { cache: 'no-store' })
+      if (!res.ok) return
+      const data = await res.json().catch(() => [])
+      const agora = Date.now() - 3600000 // tolerância de 1h (compromisso em andamento)
+      const prox = (Array.isArray(data) ? data : [])
+        .filter((e) => e?.inicio && new Date(e.inicio).getTime() >= agora)
+        .sort((a, b) => new Date(a.inicio) - new Date(b.inicio))[0] || null
+      setProximoCompromisso(prox)
+    } catch { /* silencioso — feature opcional */ }
+  }, [])
   useEffect(() => {
-    if (!usuario?.id) return undefined
-    let cancelled = false
-    ;(async () => {
-      try {
-        const from = new Date()
-        const to = new Date(from)
-        to.setDate(to.getDate() + 60)
-        const params = new URLSearchParams({ from: from.toISOString(), to: to.toISOString() })
-        const res = await apiFetch(apiUrl(`/api/agenda?${params.toString()}`), { cache: 'no-store' })
-        if (cancelled || !res.ok) return
-        const data = await res.json().catch(() => [])
-        const agora = Date.now() - 3600000 // tolerância de 1h (compromisso em andamento)
-        const prox = (Array.isArray(data) ? data : [])
-          .filter((e) => e?.inicio && new Date(e.inicio).getTime() >= agora)
-          .sort((a, b) => new Date(a.inicio) - new Date(b.inicio))[0] || null
-        if (!cancelled) setProximoCompromisso(prox)
-      } catch { /* silencioso — feature opcional */ }
-    })()
-    return () => { cancelled = true }
-  }, [usuario?.id])
+    if (usuario?.id) void fetchProximoCompromisso()
+  }, [usuario?.id, fetchProximoCompromisso])
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -195,24 +205,38 @@ export default function Dashboard() {
     }
   }, [fetchTransacoes, fetchError])
 
-  const { totalReceitas, totalDespesas, saldoTotal } = useMemo(() => {
-    return transacoes.reduce(
-      (acc, t) => {
-        // Parcelas futuras (PENDENTE) não entram no saldo realizado
-        if (t.status === 'PENDENTE') return acc
-        const valor = parseFloat(t.valor) || 0
-        if (t.tipo === 'RECEITA') {
-          acc.totalReceitas += valor
-          acc.saldoTotal += valor
-        } else {
-          acc.totalDespesas += valor
-          acc.saldoTotal -= valor
-        }
-        return acc
-      },
-      { totalReceitas: 0, totalDespesas: 0, saldoTotal: 0 }
-    )
+  // Saldo do hero = realizado HISTÓRICO (decisão registrada — não é o do mês).
+  // KPIs/donut = mês atual, com delta vs mês anterior. Tudo exclui PENDENTE
+  // (parcelas futuras). Mês resolvido em horário LOCAL (ISO UTC deslocaria a virada).
+  const { saldoTotal, mes, mesAnterior } = useMemo(() => {
+    const now = new Date()
+    const keyOf = (d) => d.getFullYear() * 12 + d.getMonth()
+    const atualKey = keyOf(now)
+    const acc = {
+      saldoTotal: 0,
+      mes: { receitas: 0, despesas: 0 },
+      mesAnterior: { receitas: 0, despesas: 0 },
+    }
+    for (const t of transacoes) {
+      if (t.status === 'PENDENTE') continue
+      const valor = Math.abs(parseFloat(t.valor) || 0)
+      const isRec = t.tipo === 'RECEITA'
+      acc.saldoTotal += isRec ? valor : -valor
+      const d = new Date(t.data_transacao)
+      if (Number.isNaN(d.getTime())) continue
+      const diff = atualKey - keyOf(d)
+      const bucket = diff === 0 ? acc.mes : diff === 1 ? acc.mesAnterior : null
+      if (bucket) bucket[isRec ? 'receitas' : 'despesas'] += valor
+    }
+    return acc
   }, [transacoes])
+
+  // Variação % vs mês anterior — null quando não há base de comparação
+  const deltaPct = (atual, anterior) =>
+    anterior > 0 ? Math.round(((atual - anterior) / anterior) * 100) : null
+  const deltaDespesas = deltaPct(mes.despesas, mesAnterior.despesas)
+  const deltaReceitas = deltaPct(mes.receitas, mesAnterior.receitas)
+  const mesTotal = mes.receitas + mes.despesas
 
   // Data efetiva da transação: parcela exibe/ordena pela data da COMPRA (data_compra),
   // não pelo vencimento (data_transacao). Mesma regra do TransacaoRow / transacoesDerived.
@@ -223,17 +247,22 @@ export default function Dashboard() {
       .slice(0, 8)
   }, [transacoes])
 
-  // Despesas por categoria (top 5) para o mini-gráfico de barras
+  // Despesas por categoria (top 5) para o mini-gráfico de barras.
+  // `total` sai do mesmo conjunto que as barras — o % de cada linha é coerente.
   const despesasPorCategoria = useMemo(() => {
     const map = {}
+    let total = 0
     for (const t of transacoes) {
       if (t.tipo !== 'DESPESA') continue
       const nome = (t.categorias?.nome && String(t.categorias.nome).trim()) || 'Sem categoria'
-      map[nome] = (map[nome] || 0) + Math.abs(parseFloat(t.valor) || 0)
+      const valor = Math.abs(parseFloat(t.valor) || 0)
+      map[nome] = (map[nome] || 0) + valor
+      total += valor
     }
-    const rows = Object.entries(map).map(([nome, valor]) => ({ nome, valor })).sort((a, b) => b.valor - a.valor)
-    const max = rows[0]?.valor || 1
-    return rows.slice(0, 5).map((r) => ({ ...r, pct: Math.max(4, Math.round((r.valor / max) * 100)) }))
+    const ordenadas = Object.entries(map).map(([nome, valor]) => ({ nome, valor })).sort((a, b) => b.valor - a.valor)
+    const max = ordenadas[0]?.valor || 1
+    const rows = ordenadas.slice(0, 5).map((r) => ({ ...r, pct: Math.max(4, Math.round((r.valor / max) * 100)) }))
+    return { rows, total }
   }, [transacoes])
 
   const nomeExibicao = useMemo(() => primeiroNomeExibicao(usuario), [usuario])
@@ -243,6 +272,14 @@ export default function Dashboard() {
   )
 
   const mostrarQuemLancou = useMemo(() => familiaMostrarQuemLancouNaUi(usuario), [usuario])
+
+  // Lançou transação → além das transações, insights/streak/compromisso reagem na hora
+  const handleTransacaoSalva = useCallback(() => {
+    void fetchTransacoes()
+    void fetchInsights()
+    void fetchGamificacao()
+    void fetchProximoCompromisso()
+  }, [fetchTransacoes, fetchInsights, fetchGamificacao, fetchProximoCompromisso])
 
   const whatsappContactUrl = useMemo(() => getWhatsappContactUrl(), [])
 
@@ -256,19 +293,38 @@ export default function Dashboard() {
     return `${data} · ${hora}`
   }
 
-  const dataHojeFormatada = useMemo(() => {
+  // Vira o dia sem reload (PWA aberto da noite pro dia) — checa a cada minuto
+  // e ao voltar a aba; só re-renderiza quando a data muda de fato.
+  const [hojeTick, setHojeTick] = useState(() => new Date().toDateString())
+  useEffect(() => {
+    const check = () => setHojeTick((prev) => {
+      const cur = new Date().toDateString()
+      return cur === prev ? prev : cur
+    })
+    const id = window.setInterval(check, 60_000)
+    document.addEventListener('visibilitychange', check)
+    return () => {
+      window.clearInterval(id)
+      document.removeEventListener('visibilitychange', check)
+    }
+  }, [])
+
+  const { label: dataHojeFormatada, ymd: hojeYmd } = useMemo(() => {
+    const hoje = new Date()
     const fmt = new Intl.DateTimeFormat('pt-BR', {
       weekday: 'long',
       day: 'numeric',
       month: 'short',
     })
-    const partes = fmt.formatToParts(new Date())
+    const partes = fmt.formatToParts(hoje)
     const weekday = (partes.find((p) => p.type === 'weekday')?.value || '').replace(/-feira/i, '')
     const day = partes.find((p) => p.type === 'day')?.value || ''
     const month = partes.find((p) => p.type === 'month')?.value?.replace('.', '') || ''
     const weekdayCap = weekday.charAt(0).toUpperCase() + weekday.slice(1)
-    return `${weekdayCap}, ${day} ${month}`
-  }, [])
+    const ymd = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`
+    return { label: `${weekdayCap}, ${day} ${month}`, ymd }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hojeTick])
 
   const saldoValorClass =
     saldoTotal > 0
@@ -295,9 +351,23 @@ export default function Dashboard() {
                   <h1 className="dashboard-hub__title">
                     {getSaudacao()}, <span className={privacyMode ? 'privacy-blur' : ''}>{nomeExibicao}</span>
                   </h1>
-                  <time className="dashboard-hub__date" dateTime={new Date().toISOString().slice(0, 10)}>
-                    {dataHojeFormatada}
-                  </time>
+                  <div className="dashboard-hub__date-row">
+                    <time className="dashboard-hub__date" dateTime={hojeYmd}>
+                      {dataHojeFormatada}
+                    </time>
+                    {streak >= 2 && (
+                      <Link
+                        to="/metas"
+                        className="dashboard-hub__streak"
+                        title={`${streak} dias seguidos registrando — ver conquistas`}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+                        </svg>
+                        {streak} dias
+                      </Link>
+                    )}
+                  </div>
                 </div>
                 <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos do painel">
                   <button type="button" data-tutorial-id="nova-transacao-btn" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={() => setIsModalOpen(true)}>
@@ -366,12 +436,18 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="dashboard-hub__hero-chart" aria-hidden>
-              <div
-                className="dashboard-hub__donut"
-                style={{ '--entrada-pct': `${totalDespesas + totalReceitas > 0 ? Math.round((totalReceitas / (totalDespesas + totalReceitas)) * 100) : 50}%` }}
-              >
-                <span className="dashboard-hub__donut-hole">no mês</span>
-              </div>
+              {mesTotal > 0 ? (
+                <div
+                  className="dashboard-hub__donut"
+                  style={{ '--entrada-pct': `${Math.round((mes.receitas / mesTotal) * 100)}%` }}
+                >
+                  <span className="dashboard-hub__donut-hole">no mês</span>
+                </div>
+              ) : (
+                <div className="dashboard-hub__donut dashboard-hub__donut--empty">
+                  <span className="dashboard-hub__donut-hole">sem dados no mês</span>
+                </div>
+              )}
               <div className="dashboard-hub__donut-legend">
                 <span className="dashboard-hub__donut-leg dashboard-hub__donut-leg--in">Entrada</span>
                 <span className="dashboard-hub__donut-leg dashboard-hub__donut-leg--out">Saída</span>
@@ -389,7 +465,7 @@ export default function Dashboard() {
 
         <section
           className={`ref-kpi-row ref-dashboard-kpi-strip dashboard-hub__kpis${refreshing ? ' page-panel--refreshing' : ''}`}
-          aria-label="Entrada e saída do período"
+          aria-label="Entrada e saída do mês"
           aria-busy={loading || refreshing}
         >
           {loading ? (
@@ -406,15 +482,18 @@ export default function Dashboard() {
                   </svg>
                 </div>
                 <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Saída</p>
-                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(totalDespesas)}</p>
+                  <p className="ref-kpi-card__label">Saída no mês</p>
+                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(mes.despesas)}</p>
                 </div>
-                <div className="ref-kpi-card__pct" aria-hidden>
-                  <span className="ref-kpi-card__pct-value">
-                    {totalDespesas + totalReceitas > 0 ? Math.round((totalDespesas / (totalDespesas + totalReceitas)) * 100) : 0}%
-                  </span>
-                  <span className="ref-kpi-card__pct-label">do total</span>
-                </div>
+                {deltaDespesas != null && (
+                  // Saída: subir é ruim (--bad), cair é bom (--good)
+                  <div className="ref-kpi-card__pct" aria-label={`Variação de ${deltaDespesas}% sobre o mês passado`}>
+                    <span className={`ref-kpi-card__pct-value ref-kpi-card__pct-value--${deltaDespesas > 0 ? 'bad' : deltaDespesas < 0 ? 'good' : 'flat'}`}>
+                      {deltaDespesas > 0 ? '▲' : deltaDespesas < 0 ? '▼' : ''} {Math.abs(deltaDespesas)}%
+                    </span>
+                    <span className="ref-kpi-card__pct-label">vs mês passado</span>
+                  </div>
+                )}
               </article>
               <article className="ref-kpi-card ref-kpi-card--income">
                 <div className="ref-kpi-card__icon" aria-hidden>
@@ -423,15 +502,18 @@ export default function Dashboard() {
                   </svg>
                 </div>
                 <div className="ref-kpi-card__body">
-                  <p className="ref-kpi-card__label">Entrada</p>
-                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(totalReceitas)}</p>
+                  <p className="ref-kpi-card__label">Entrada no mês</p>
+                  <p className={`ref-kpi-card__value ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(mes.receitas)}</p>
                 </div>
-                <div className="ref-kpi-card__pct" aria-hidden>
-                  <span className="ref-kpi-card__pct-value">
-                    {totalDespesas + totalReceitas > 0 ? Math.round((totalReceitas / (totalDespesas + totalReceitas)) * 100) : 0}%
-                  </span>
-                  <span className="ref-kpi-card__pct-label">do total</span>
-                </div>
+                {deltaReceitas != null && (
+                  // Entrada: subir é bom (--good), cair é ruim (--bad)
+                  <div className="ref-kpi-card__pct" aria-label={`Variação de ${deltaReceitas}% sobre o mês passado`}>
+                    <span className={`ref-kpi-card__pct-value ref-kpi-card__pct-value--${deltaReceitas > 0 ? 'good' : deltaReceitas < 0 ? 'bad' : 'flat'}`}>
+                      {deltaReceitas > 0 ? '▲' : deltaReceitas < 0 ? '▼' : ''} {Math.abs(deltaReceitas)}%
+                    </span>
+                    <span className="ref-kpi-card__pct-label">vs mês passado</span>
+                  </div>
+                )}
               </article>
             </>
           )}
@@ -522,16 +604,16 @@ export default function Dashboard() {
                   <svg className="ref-panel__link-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m9 18 6-6-6-6" /></svg>
                 </Link>
               </div>
-              {despesasPorCategoria.length > 0 ? (
+              {despesasPorCategoria.rows.length > 0 ? (
                 <ul className="dashboard-hub__bars">
-                  {despesasPorCategoria.map((d) => (
+                  {despesasPorCategoria.rows.map((d) => (
                     <li key={d.nome} className="dashboard-hub__bar-row">
                       <span className="dashboard-hub__bar-label" title={d.nome}>{d.nome}</span>
                       <span className="dashboard-hub__bar-track" aria-hidden>
                         <span className="dashboard-hub__bar-fill" style={{ width: `${d.pct}%` }} />
                       </span>
                       <span className={`dashboard-hub__bar-val ${privacyMode ? 'privacy-blur' : ''}`}>{formatCurrency(d.valor)}</span>
-                      <span className="dashboard-hub__bar-pct">{totalDespesas > 0 ? Math.round((d.valor / totalDespesas) * 100) : 0}%</span>
+                      <span className="dashboard-hub__bar-pct">{despesasPorCategoria.total > 0 ? Math.round((d.valor / despesasPorCategoria.total) * 100) : 0}%</span>
                     </li>
                   ))}
                 </ul>
@@ -593,12 +675,13 @@ export default function Dashboard() {
                       subRaw && typeof subRaw === 'object' && subRaw.nome && String(subRaw.nome).trim()
                         ? String(subRaw.nome).trim()
                         : '—'
+                    const chipStyle = getCategoriaIconChipStyle(catNome, subNome)
                     return (
                       <div key={t.id} className="ref-tx-row">
                         <div className="ref-tx-icon-cell">
                           <div
-                            className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}${getCategoriaIconChipStyle(catNome, subNome) ? ' cat-chip' : ''}`}
-                            style={getCategoriaIconChipStyle(catNome, subNome) || undefined}
+                            className={`ref-tx-arrow-wrap ${isRec ? 'ref-tx-arrow-wrap--up' : 'ref-tx-arrow-wrap--down'}${chipStyle ? ' cat-chip' : ''}`}
+                            style={chipStyle || undefined}
                             aria-hidden
                           >
                             <TransacaoCategoriaIcon
@@ -716,7 +799,7 @@ export default function Dashboard() {
     <TransactionModal
       isOpen={isModalOpen}
       onClose={() => setIsModalOpen(false)}
-      onSave={fetchTransacoes}
+      onSave={handleTransacaoSalva}
       usuarioId={readHorizonteUser()?.id || usuario.id}
     />
     </>

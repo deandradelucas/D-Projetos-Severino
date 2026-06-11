@@ -166,6 +166,25 @@
 /* Delta — placeholder/shimmer removido (pedido CEO) */
 .dashboard-hub__balance-delta--placeholder { display: none; }
 
+/* Linha data + streak no hero */
+.dashboard-hub__date-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dashboard-hub__streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: #b45309;
+  background: color-mix(in srgb, #f59e0b 16%, var(--surface));
+  border: 1px solid color-mix(in srgb, #f59e0b 32%, transparent);
+  transition: background 150ms var(--ease), border-color 150ms var(--ease);
+}
+.dashboard-hub__streak:hover { background: color-mix(in srgb, #f59e0b 26%, var(--surface)); border-color: #f59e0b; }
+.dashboard-hub__streak svg { flex-shrink: 0; }
+
 /* #1 Donut Entrada × Saída do mês (preenche a direita do hero). Mobile: oculto. */
 .dashboard-hub__hero-chart { display: none; }
 @media (min-width: 769px) {
@@ -206,6 +225,10 @@
   letter-spacing: 0.08em;
   color: var(--text-muted);
 }
+/* Mês sem lançamentos — anel neutro em vez de 50/50 inventado */
+.dashboard-hub__donut--empty { background: var(--surface-sunken); }
+.dashboard-hub__donut--empty .dashboard-hub__donut-hole { font-size: 0.52rem; padding: 0 6px; }
+
 .dashboard-hub__donut-legend { display: flex; gap: 14px; }
 .dashboard-hub__donut-leg {
   display: inline-flex;
@@ -297,6 +320,11 @@
 }
 .ref-kpi-card--expense .ref-kpi-card__pct-value { color: var(--error); }
 .ref-kpi-card--income .ref-kpi-card__pct-value { color: var(--success); }
+/* Delta vs mês anterior — cor pela SEMÂNTICA da variação (subir gasto = ruim),
+   não pelo tipo do card. Mesma especificidade das regras acima; depois vence. */
+.ref-kpi-card .ref-kpi-card__pct-value--good { color: var(--success); }
+.ref-kpi-card .ref-kpi-card__pct-value--bad { color: var(--error); }
+.ref-kpi-card .ref-kpi-card__pct-value--flat { color: var(--text-secondary); }
 .ref-kpi-card__pct-label {
   font-size: 0.625rem;
   text-transform: uppercase;
