@@ -6,7 +6,7 @@ import { lerHistoricoConversa, registrarTrocaConversa } from './wa-conversa.mjs'
 import { askHorizon, parseWhatsAppMessageWithAI, parseWhatsAppAudioDirectWithAI } from '../ai.mjs'
 import { getSupabaseAdmin } from '../supabase-admin.mjs'
 import { isAgendaMessage, processarMensagemAgenda } from './agenda-whatsapp.mjs'
-import { isListaComprasMessage, processarMensagemListaCompras } from './lista-compras-whatsapp.mjs'
+import { isListaComprasMessage, processarMensagemListaCompras, responderPendenteLista } from './lista-compras-whatsapp.mjs'
 import { detectExtratoPedido, montarRespostaExtratoWhatsApp } from './whatsapp-extrato.mjs'
 import { resolveEscopoUsuario, assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 import { resolverCategoriaPorCorrecao } from './transacao-categoria-logger.mjs'
@@ -202,6 +202,20 @@ function fmt(v) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)
 }
 
+/**
+ * "cinco e vinte" pode ser R$5,20 ou R$25 — quando a mensagem tem esse padrão
+ * verbal E a IA entendeu centavos, a confirmação declara a leitura (T2,
+ * confirmação passiva: registra e avisa, sem bloquear o fluxo).
+ */
+export function valorVerbalAmbiguo(messageText, valor) {
+  if (!Number.isFinite(valor) || Math.round(valor * 100) % 100 === 0) return false
+  const t = String(messageText || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+  return /\b(um|uma|dois|duas|tres|quatro|cinco|seis|sete|oito|nove)\s+e\s+(vinte|trinta|quarenta|cinquenta|sessenta|setenta|oitenta|noventa)\b/.test(t)
+}
+
 /** ISO para gravar na transação + se o utilizador mencionou data na mensagem (IA). */
 export function resolveDataTransacaoParaBot(parsed) {
   const raw = parsed?.data_transacao
@@ -371,6 +385,15 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
     // falha silenciosa — não bloqueia usuário por erro de verificação
   }
 
+  // T2: resposta a pergunta pendente do bot (ex.: "qual lista? 1 ou 2") tem
+  // prioridade sobre os menus numéricos da agenda. TTL 5 min.
+  try {
+    const pendReply = await responderPendenteLista(dataUsuarioId, phone, message)
+    if (pendReply) return pendReply
+  } catch (e) {
+    log.warn('[whatsapp-bot] responderPendenteLista error', e?.message)
+  }
+
   if (/^(ajuda|help|menu)$/i.test(message.replace(/\s+/g, ' ').trim())) {
     return { ok: true, reply: AJUDA }
   }
@@ -418,7 +441,7 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
   // Lista de compras — antes da IA financeira para não interpretar itens como transações
   if (isListaComprasMessage(message)) {
     try {
-      const resultado = await processarMensagemListaCompras(dataUsuarioId, message)
+      const resultado = await processarMensagemListaCompras(dataUsuarioId, message, phone)
       if (resultado !== null) return resultado
     } catch (e) {
       log.error('[whatsapp-bot] processarMensagemListaCompras error', e)
@@ -654,7 +677,7 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
       if (parsed?.transcricao && isListaComprasMessage(parsed.transcricao)) {
         log.info('[whatsapp-bot] audio: lista de compras detectada na transcrição')
         try {
-          const resultado = await processarMensagemListaCompras(dataUsuarioId, parsed.transcricao)
+          const resultado = await processarMensagemListaCompras(dataUsuarioId, parsed.transcricao, phone)
           if (resultado !== null) return resultado
         } catch (e) {
           log.error('[whatsapp-bot] audio: processarMensagemListaCompras error', e)
@@ -692,6 +715,87 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
       }
     }
     return { ok: true, reply: formatAssistantReplyForWhatsApp(respostaIA) }
+  }
+
+  // 4b. Múltiplas transações na mesma mensagem (X4) — insere em lote
+  if (parsed.tipo === 'MULTIPLO' && Array.isArray(parsed.transacoes) && parsed.transacoes.length) {
+    const bloqueioMulti = assertFamiliaPodeEscrever(familiaEscopo)
+    if (bloqueioMulti) return { ok: false, reply: `❌ ${bloqueioMulti.message}` }
+
+    const actorUid = usuario?.id ? String(usuario.id).trim() : ''
+    const lancadoPor =
+      actorUid && actorUid !== String(dataUsuarioId || '').trim() ? actorUid : undefined
+    const actorCorrecao = usuarioBot.familiaEscopo?.actorId ?? usuarioBot.id
+
+    const linhas = []
+    let inseridas = 0
+    for (const tx of parsed.transacoes) {
+      let catId = tx.categoria_id || null
+      let subId = tx.subcategoria_id || null
+      try {
+        const corr = await resolverCategoriaPorCorrecao(actorCorrecao, tx.descricao, categorias)
+        if (corr?.categoria_id) {
+          catId = corr.categoria_id
+          subId = corr.subcategoria_id ?? null
+        }
+      } catch { /* best-effort */ }
+      if (!catId && categorias?.length) {
+        const catOutros = categorias.find((c) => c.tipo === tx.tipo && c.nome.toLowerCase() === 'outros')
+        if (catOutros) {
+          catId = catOutros.id
+          subId = catOutros.subcategorias?.find((s) => s.nome.toLowerCase() === 'outros')?.id ?? null
+        }
+      }
+      const { iso } = resolveDataTransacaoParaBot(tx)
+      try {
+        const inserida = await inserirTransacao({
+          usuario_id: dataUsuarioId,
+          tipo: tx.tipo,
+          valor: tx.valor,
+          descricao: tx.descricao || message.slice(0, 100),
+          data_transacao: iso,
+          status: 'EFETIVADA',
+          categoria_id: catId || undefined,
+          subcategoria_id: subId || undefined,
+          ...(lancadoPor ? { lancado_por_usuario_id: lancadoPor } : {}),
+        })
+        inseridas++
+        const catNome = categorias.find((c) => c.id === catId)?.nome
+        const sinal = tx.tipo === 'RECEITA' ? '✅' : '💸'
+        linhas.push(`${sinal} ${fmt(tx.valor)} — ${tx.descricao}${catNome ? ` 🏷️ ${catNome}` : ''}`)
+        if (tx.tipo === 'DESPESA' && catId && inserida?.id) {
+          dispararAlertasTransacao({
+            usuarioId: dataUsuarioId,
+            categoriaId: catId,
+            nomeCategoria: catNome,
+            valorAtual: tx.valor,
+            transacaoId: inserida.id,
+            phone,
+            instance: process.env.EVOLUTION_INSTANCE,
+          }).catch(e => log.warn('[alertas] dispararAlertasTransacao error', e?.message))
+        }
+      } catch (e) {
+        log.error('[whatsapp-bot] inserirTransacao (lote) error', e)
+        linhas.push(`⚠️ ${fmt(tx.valor)} — ${tx.descricao} (falhou, envie de novo)`)
+      }
+    }
+
+    if (inseridas === 0) {
+      return { ok: false, reply: '❌ Erro ao salvar as transações. Tente novamente.' }
+    }
+
+    let saldoLote = ''
+    try {
+      const { saldo } = await calcularSaldo(dataUsuarioId, { total: true })
+      saldoLote = `\n\n📊 Saldo atual: *${fmt(saldo)}*`
+    } catch { /* não crítico */ }
+
+    return {
+      ok: true,
+      reply:
+        `📝 *${inseridas} transações registradas!*\n\n${linhas.join('\n')}${saldoLote}` +
+        `\n\n_Categoria errada em alguma? Responda "corrigir categoria <nome>" (vale para a última)._`,
+    }
   }
 
   // 5. Validação mínima
@@ -830,6 +934,11 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
     ? `\n\n_Categoria errada? Responda "corrigir categoria <nome>"._`
     : ''
 
+  // T2 (passiva): valor verbal estilo "cinco e vinte" → declara a leitura
+  const notaValor = valorVerbalAmbiguo(message, Number(parsed.valor))
+    ? `\n_Entendi ${fmt(parsed.valor)} (reais e centavos). Se foi outro valor: "corrigir valor <certo>"._`
+    : ''
+
   let planoLinha = ''
   if (parcelamento) {
     const cada = fmt(Math.floor((parsed.valor / parcelamento.num_parcelas) * 100) / 100)
@@ -841,6 +950,6 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
 
   return {
     ok: true,
-    reply: `${emoji} *${acao} registrada!*\n\n💰 Valor: ${fmt(parsed.valor)}\n📝 ${parsed.descricao || message.slice(0, 60)}${categoriaLinha}${planoLinha}${dataLinha}${saldoLinha}${dicaCorrigir}`,
+    reply: `${emoji} *${acao} registrada!*\n\n💰 Valor: ${fmt(parsed.valor)}\n📝 ${parsed.descricao || message.slice(0, 60)}${categoriaLinha}${planoLinha}${dataLinha}${notaValor}${saldoLinha}${dicaCorrigir}`,
   }
 }

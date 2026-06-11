@@ -8,6 +8,7 @@ import {
   toggleChecked,
   removerItem,
 } from '../lista-compras.mjs'
+import { setPendente, getPendente, clearPendente } from './wa-pendente.mjs'
 
 // ---------------------------------------------------------------------------
 // Detecção rápida (sem IA) — garante que só mensagens de lista de compras
@@ -65,19 +66,26 @@ function normalizeNome(s) {
     .trim()
 }
 
-function encontrarListaPorNome(listas, nomeBuscado) {
-  if (!nomeBuscado) return null
+/**
+ * Match de nome de lista: exato resolve direto; senão devolve TODAS as
+ * candidatas fuzzy (contém / contido) — quando há mais de uma, o chamador
+ * pergunta ao usuário em vez de adivinhar (T2: desambiguação seletiva).
+ */
+function encontrarListasCandidatas(listas, nomeBuscado) {
+  if (!nomeBuscado) return { exata: null, candidatas: [] }
   const alvo = normalizeNome(nomeBuscado)
-  // Match exato
-  const exato = listas.find((l) => normalizeNome(l.nome) === alvo)
-  if (exato) return exato
-  // Match parcial: nome da lista contém o termo buscado
-  const parcial = listas.find((l) => normalizeNome(l.nome).includes(alvo))
-  if (parcial) return parcial
-  // Match parcial inverso: termo buscado contém o nome da lista
-  const inverso = listas.find((l) => alvo.includes(normalizeNome(l.nome)))
-  if (inverso) return inverso
-  return null
+  const exata = listas.find((l) => normalizeNome(l.nome) === alvo) || null
+  if (exata) return { exata, candidatas: [exata] }
+  const candidatas = listas.filter((l) => {
+    const n = normalizeNome(l.nome)
+    return n.includes(alvo) || alvo.includes(n)
+  })
+  return { exata: null, candidatas }
+}
+
+function encontrarListaPorNome(listas, nomeBuscado) {
+  const { exata, candidatas } = encontrarListasCandidatas(listas, nomeBuscado)
+  return exata || candidatas[0] || null
 }
 
 // ---------------------------------------------------------------------------
@@ -143,14 +151,120 @@ async function adicionarItensNaLista(listaId, usuarioId, itens) {
 }
 
 // ---------------------------------------------------------------------------
+// Executores por intent (lista já resolvida) — usados pelo handler principal
+// e pela resposta a pergunta pendente de desambiguação.
+// ---------------------------------------------------------------------------
+async function executarAdicionarItens(lista, usuarioId, itens, notaPadrao = '') {
+  const { adicionados, erros } = await adicionarItensNaLista(lista.id, usuarioId, itens)
+  if (adicionados.length === 0) {
+    return { ok: false, reply: '❌ Não consegui adicionar os itens. Tente novamente.' }
+  }
+  const linhaItens = adicionados.map(fmtItemAdicionado).join(', ')
+  const sufixoErro = erros.length > 0 ? `\n⚠️ Não adicionei: ${erros.join(', ')}` : ''
+  return {
+    ok: true,
+    reply: `✅ *Adicionado à lista "${lista.nome}":*\n\n${linhaItens}${sufixoErro}${notaPadrao}`,
+  }
+}
+
+async function executarRemoverOuMarcar(lista, usuarioId, itens, marcar) {
+  let itensLista
+  try {
+    itensLista = await listarItensLista(lista.id, usuarioId)
+  } catch (e) {
+    log.error('[lista-compras-wa] listarItensLista error', e)
+    return { ok: false, reply: '❌ Erro ao buscar itens da lista.' }
+  }
+
+  // Ao marcar, só consideramos pendentes; ao remover, qualquer item.
+  const candidatos = marcar ? itensLista.filter((i) => !i.checked) : itensLista
+  const feitos = []
+  const naoEncontrados = []
+  for (const alvo of itens) {
+    const alvoNorm = normalizeNome(alvo.nome)
+    const item =
+      candidatos.find((i) => normalizeNome(i.nome) === alvoNorm) ||
+      candidatos.find((i) => normalizeNome(i.nome).includes(alvoNorm)) ||
+      candidatos.find((i) => alvoNorm.includes(normalizeNome(i.nome)))
+    if (!item) {
+      naoEncontrados.push(alvo.nome)
+      continue
+    }
+    try {
+      if (marcar) await toggleChecked(item.id, lista.id, usuarioId)
+      else await removerItem(item.id, lista.id, usuarioId)
+      feitos.push(item.nome)
+      // evita marcar/remover o mesmo item duas vezes na mesma mensagem
+      const idx = candidatos.indexOf(item)
+      if (idx >= 0) candidatos.splice(idx, 1)
+    } catch (e) {
+      log.warn('[lista-compras-wa] acao item error', { item: item.nome, err: String(e?.message || e).slice(0, 120) })
+      naoEncontrados.push(alvo.nome)
+    }
+  }
+
+  if (feitos.length === 0) {
+    const nomes = itens.map((i) => `"${i.nome}"`).join(', ')
+    return { ok: true, reply: `🛒 Não encontrei ${nomes} na lista "${lista.nome}".` }
+  }
+
+  const acao = marcar ? '✅ *Marcado como comprado:*' : '🗑️ *Removido da lista:*'
+  const sufixo = naoEncontrados.length > 0 ? `\n⚠️ Não encontrei: ${naoEncontrados.join(', ')}` : ''
+  const pendentes = candidatos.filter((i) => !i.checked).length
+  const rodape = marcar ? `\n\n${pendentes} item(ns) pendente(s) na "${lista.nome}"` : ''
+  return {
+    ok: true,
+    reply: `${acao}\n\n${feitos.map((n) => `• ${n}`).join('\n')}${sufixo}${rodape}`,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Resposta a pergunta pendente de desambiguação ("qual lista? 1 ou 2").
+// Retorna null quando não há pendência ou a mensagem não é um dígito —
+// o fluxo normal do bot segue. Chamar ANTES dos menus numéricos da agenda.
+// ---------------------------------------------------------------------------
+export async function responderPendenteLista(usuarioId, phone, message) {
+  const msg = String(message || '').trim()
+  if (!/^[1-9]$/.test(msg)) return null
+  let pend
+  try {
+    pend = await getPendente(phone)
+  } catch {
+    return null
+  }
+  if (!pend || pend.tipo !== 'lista_escolha') return null
+
+  const idx = Number.parseInt(msg, 10) - 1
+  const escolha = pend.candidatas?.[idx]
+  if (!escolha) {
+    return { ok: true, reply: `Responda um número de *1* a *${pend.candidatas?.length || 1}*.` }
+  }
+  await clearPendente(phone).catch(() => {})
+
+  let listas
+  try {
+    listas = await listarListasUsuario(usuarioId)
+  } catch (e) {
+    log.error('[lista-compras-wa] listarListasUsuario error', e)
+    return { ok: false, reply: '❌ Erro ao acessar suas listas. Tente novamente.' }
+  }
+  const lista = listas.find((l) => l.id === escolha.id)
+  if (!lista) return { ok: true, reply: '🛒 Essa lista não existe mais.' }
+
+  if (pend.intent === 'ADICIONAR_ITENS') return executarAdicionarItens(lista, usuarioId, pend.itens)
+  return executarRemoverOuMarcar(lista, usuarioId, pend.itens, pend.intent === 'MARCAR_COMPRADO')
+}
+
+// ---------------------------------------------------------------------------
 // Handler principal
 // ---------------------------------------------------------------------------
 /**
  * @param {string} usuarioId  — dataUsuarioId da conta (respeitando família)
  * @param {string} message
+ * @param {string} [phone]    — habilita pergunta de desambiguação (estado pendente)
  * @returns {Promise<{ ok: boolean, reply: string }>}
  */
-export async function processarMensagemListaCompras(usuarioId, message) {
+export async function processarMensagemListaCompras(usuarioId, message, phone = null) {
   let parsed
   try {
     parsed = await parseListaComprasMessage(message)
@@ -283,8 +397,26 @@ export async function processarMensagemListaCompras(usuarioId, message) {
       }
     }
 
-    // Encontrar lista pelo nome citado
-    let lista = encontrarListaPorNome(listas, lista_nome)
+    // Encontrar lista pelo nome citado — exato resolve; fuzzy com 2+ matches PERGUNTA
+    const { exata, candidatas } = encontrarListasCandidatas(listas, lista_nome)
+    let lista = exata || (candidatas.length === 1 ? candidatas[0] : null)
+
+    if (!lista && candidatas.length > 1 && phone) {
+      const ops = candidatas.slice(0, 4)
+      await setPendente(phone, {
+        tipo: 'lista_escolha',
+        intent,
+        itens,
+        candidatas: ops.map((l) => ({ id: l.id, nome: l.nome })),
+      }).catch(() => {})
+      return {
+        ok: true,
+        reply:
+          `🛒 Encontrei ${ops.length} listas parecidas com "${lista_nome}". Em qual?\n\n` +
+          ops.map((l, i) => `*${i + 1}* – ${l.nome}`).join('\n'),
+      }
+    }
+    if (!lista && candidatas.length > 1) lista = candidatas[0]
 
     // Sem nome citado → usa a última lista usada como destino padrão (#2)
     let usouPadrao = false
@@ -304,23 +436,9 @@ export async function processarMensagemListaCompras(usuarioId, message) {
       }
     }
 
-    // Adicionar itens
-    const { adicionados, erros } = await adicionarItensNaLista(lista.id, usuarioId, itens)
-
-    if (adicionados.length === 0) {
-      return { ok: false, reply: '❌ Não consegui adicionar os itens. Tente novamente.' }
-    }
-
-    const linhaItens = adicionados.map(fmtItemAdicionado).join(', ')
-    const sufixoErro = erros.length > 0 ? `\n⚠️ Não adicionei: ${erros.join(', ')}` : ''
     // Avisa qual lista foi usada quando o destino foi inferido entre várias
     const notaPadrao = usouPadrao ? `\n\n_Adicionei à sua lista mais recente. Para outra, diga "...na lista <nome>"._` : ''
-
-    return {
-      ok: true,
-      reply:
-        `✅ *Adicionado à lista "${lista.nome}":*\n\n${linhaItens}${sufixoErro}${notaPadrao}`,
-    }
+    return executarAdicionarItens(lista, usuarioId, itens, notaPadrao)
   }
 
   // ---------------------------------------------------------------------------
@@ -342,7 +460,24 @@ export async function processarMensagemListaCompras(usuarioId, message) {
       return { ok: true, reply: '🛒 Você ainda não tem listas.' }
     }
 
-    let lista = encontrarListaPorNome(listas, lista_nome)
+    const { exata, candidatas } = encontrarListasCandidatas(listas, lista_nome)
+    let lista = exata || (candidatas.length === 1 ? candidatas[0] : null)
+    if (!lista && candidatas.length > 1 && phone) {
+      const ops = candidatas.slice(0, 4)
+      await setPendente(phone, {
+        tipo: 'lista_escolha',
+        intent,
+        itens,
+        candidatas: ops.map((l) => ({ id: l.id, nome: l.nome })),
+      }).catch(() => {})
+      return {
+        ok: true,
+        reply:
+          `🛒 Encontrei ${ops.length} listas parecidas com "${lista_nome}". Em qual?\n\n` +
+          ops.map((l, i) => `*${i + 1}* – ${l.nome}`).join('\n'),
+      }
+    }
+    if (!lista && candidatas.length > 1) lista = candidatas[0]
     if (!lista && !lista_nome) lista = encontrarUltimaListaUsada(listas)
     if (!lista) {
       const nomes = listas.map((l) => `"${l.nome}"`).join(', ')
@@ -352,57 +487,7 @@ export async function processarMensagemListaCompras(usuarioId, message) {
       }
     }
 
-    let itensLista
-    try {
-      itensLista = await listarItensLista(lista.id, usuarioId)
-    } catch (e) {
-      log.error('[lista-compras-wa] listarItensLista error', e)
-      return { ok: false, reply: '❌ Erro ao buscar itens da lista.' }
-    }
-
-    // Ao marcar, só consideramos pendentes; ao remover, qualquer item.
-    const candidatos = marcar ? itensLista.filter((i) => !i.checked) : itensLista
-    const feitos = []
-    const naoEncontrados = []
-    for (const alvo of itens) {
-      const alvoNorm = normalizeNome(alvo.nome)
-      const item =
-        candidatos.find((i) => normalizeNome(i.nome) === alvoNorm) ||
-        candidatos.find((i) => normalizeNome(i.nome).includes(alvoNorm)) ||
-        candidatos.find((i) => alvoNorm.includes(normalizeNome(i.nome)))
-      if (!item) {
-        naoEncontrados.push(alvo.nome)
-        continue
-      }
-      try {
-        if (marcar) await toggleChecked(item.id, lista.id, usuarioId)
-        else await removerItem(item.id, lista.id, usuarioId)
-        feitos.push(item.nome)
-        // evita marcar/remover o mesmo item duas vezes na mesma mensagem
-        const idx = candidatos.indexOf(item)
-        if (idx >= 0) candidatos.splice(idx, 1)
-      } catch (e) {
-        log.warn('[lista-compras-wa] acao item error', { item: item.nome, err: String(e?.message || e).slice(0, 120) })
-        naoEncontrados.push(alvo.nome)
-      }
-    }
-
-    if (feitos.length === 0) {
-      const nomes = itens.map((i) => `"${i.nome}"`).join(', ')
-      return {
-        ok: true,
-        reply: `🛒 Não encontrei ${nomes} na lista "${lista.nome}".`,
-      }
-    }
-
-    const acao = marcar ? '✅ *Marcado como comprado:*' : '🗑️ *Removido da lista:*'
-    const sufixo = naoEncontrados.length > 0 ? `\n⚠️ Não encontrei: ${naoEncontrados.join(', ')}` : ''
-    const pendentes = candidatos.filter((i) => !i.checked).length
-    const rodape = marcar ? `\n\n${pendentes} item(ns) pendente(s) na "${lista.nome}"` : ''
-    return {
-      ok: true,
-      reply: `${acao}\n\n${feitos.map((n) => `• ${n}`).join('\n')}${sufixo}${rodape}`,
-    }
+    return executarRemoverOuMarcar(lista, usuarioId, itens, marcar)
   }
 
   // Fallback

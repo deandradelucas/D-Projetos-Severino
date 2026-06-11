@@ -237,6 +237,24 @@ export async function ultimoEventoAgendaCriadoRecentemente(usuarioId, windowMinu
   return data ? normalizeEvento(data) : null
 }
 
+/** Último evento CRIADO (sem janela de tempo), ignorando cancelados/concluídos. */
+export async function ultimoEventoAgendaCriado(usuarioId) {
+  const supabase = getSupabaseAdmin()
+  const uid = String(usuarioId || '').trim()
+  if (!uid) return null
+  const { data, error } = await supabase
+    .from('agenda_eventos')
+    .select('*')
+    .eq('usuario_id', uid)
+    .neq('situacao', 'cancelado')
+    .neq('situacao', 'concluido')
+    .order('criado_em', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (error) throw error
+  return data ? normalizeEvento(data) : null
+}
+
 export async function atualizarAgendaEvento(id, usuarioId, body) {
   const supabase = getSupabaseAdmin()
   const uid = String(usuarioId || '').trim()

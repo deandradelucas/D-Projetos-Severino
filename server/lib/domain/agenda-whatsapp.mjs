@@ -7,6 +7,7 @@ import {
   listarAgendaEventos,
   registrarInteracaoAgendaWhatsApp,
   ultimoEventoAgendaCriadoRecentemente,
+  ultimoEventoAgendaCriado,
   AGENDA_TZ,
 } from './agenda.mjs'
 import { log } from '../logger.mjs'
@@ -484,6 +485,42 @@ function recorrenciaLabel(recorrencia, primeiraOcorrencia) {
   return `todo dia ${recorrencia.diaMes ?? saoPauloParts(primeiraOcorrencia).day}`
 }
 
+/**
+ * "às 5" sem h/:/período → o parser assume TARDE (17h). Detecta o caso para a
+ * resposta DECLARAR a escolha (confirmação passiva, T2 do plano de IA).
+ * Retorna a hora baixa dita (1-6) ou null.
+ */
+function ambiguousLowHourSpoken(message) {
+  const raw = normalizeTypos(String(message || ''))
+  const text = normalizeWordTime(stripAccents(raw.toLowerCase()))
+  if (/\b(manha|madrugada|tarde|noite)\b/.test(text)) return null
+  const m = text.match(/\b(?:as|às)\s+([1-6])\b(?!\s*[:h\d])(?!\s+(?:e\s+meia|horas?\s+antes|dias?\b|semanas?\b|m[e]s\b|meses\b|min\b|minutos?\b))/)
+  if (!m) return null
+  const hora = Number.parseInt(m[1], 10)
+  return hora >= 1 && hora <= 6 ? hora : null
+}
+
+/**
+ * Notas de transparência sobre o horário do evento criado (nunca silencioso):
+ * — sem horário na mensagem e evento às 09:00 → declara o default;
+ * — "às 5" interpretado como 17h → declara a escolha e ensina a corrigir.
+ */
+function notaHorarioEvento(message, inicio, titulo) {
+  const hmSp = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: AGENDA_TZ, hour: '2-digit', minute: '2-digit', hour12: false,
+  }).format(inicio)
+  if (!messageHasExplicitTime(message)) {
+    return hmSp === '09:00'
+      ? `\n_Você não disse o horário, marquei *9h*. Para mudar: "reagendar ${titulo} para 15h"._`
+      : ''
+  }
+  const horaBaixa = ambiguousLowHourSpoken(message)
+  if (horaBaixa !== null && hmSp === `${String(horaBaixa + 12).padStart(2, '0')}:00`) {
+    return `\n_Entendi *${horaBaixa + 12}h* (tarde). Se era de manhã: "reagendar ${titulo} para ${horaBaixa}h da manhã"._`
+  }
+  return ''
+}
+
 /** Indica que "… para/as HH horas antes …" é horário (às HH), não pedido de aviso "HH horas antes". */
 function isLikelyClockAtPhraseBeforeHourOffset(before) {
   const b = String(before || '').trimEnd()
@@ -921,6 +958,21 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
       return { ok: true, reply }
     }
 
+    // "cancela o último (compromisso/lembrete)" — desfaz a criação mais recente
+    if (/\b(?:cancela|desmarca)\w*\b/.test(text) && /\bultim[oa]s?\b/.test(text)) {
+      const bloq = bloqueioEscritaViewer()
+      if (bloq) return { ok: false, reply: bloq }
+      intent = 'agenda_cancel_last'
+      const evento = await ultimoEventoAgendaCriado(uid)
+      if (!evento) {
+        reply = '🗓️ Você não tem compromissos ativos para cancelar.'
+        return { ok: true, reply }
+      }
+      await atualizarAgendaStatus(evento.id, uid, 'CANCELADO')
+      reply = `🗓️ Cancelado: *${evento.titulo}* — ${formatAgendaDateTime(evento.inicio, evento.timezone || AGENDA_TZ)}.`
+      return { ok: true, reply }
+    }
+
     const cancelToken = targetToken(message, 'cancelar|desmarcar')
     if (cancelToken) {
       const bloq = bloqueioEscritaViewer()
@@ -1054,9 +1106,7 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
         const hora = formatAgendaTime(criados[0].inicio, criados[0].timezone || AGENDA_TZ)
         const primeira = formatAgendaDateTime(criados[0].inicio, criados[0].timezone || AGENDA_TZ)
         const ultima = formatAgendaDateTime(criados[criados.length - 1].inicio, criados[criados.length - 1].timezone || AGENDA_TZ)
-        const notaHorario = !messageHasExplicitTime(message)
-          ? `\n_Você não disse o horário, usei *${hora}*._`
-          : ''
+        const notaHorario = notaHorarioEvento(message, new Date(criados[0].inicio), criados[0].titulo)
         reply =
           `🔁 *Lembrete recorrente criado!*\n\n*${criados[0].titulo}*\n` +
           `${recorrenciaLabel(recorrencia, new Date(criados[0].inicio))} às ${hora} — *${criados.length}x*\n` +
@@ -1077,15 +1127,8 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
       // Log para o @aprendizdaagenda analisar à noite — fire-and-forget
       logTituloExtracao(uid, rawMessage, data.titulo, tituloFonte, data.id).catch(() => {})
 
-      // A2: horário assumido (default 9h) é declarado — nunca em silêncio.
-      // Checa o instante criado (datas relativas "daqui a 2 dias" preservam a
-      // hora atual, não caem no default).
-      const hmSp = new Intl.DateTimeFormat('pt-BR', {
-        timeZone: AGENDA_TZ, hour: '2-digit', minute: '2-digit', hour12: false,
-      }).format(inicio)
-      const notaHoraDefault = !messageHasExplicitTime(message) && hmSp === '09:00'
-        ? `\n_Você não disse o horário, marquei *9h*. Para mudar: "reagendar ${data.titulo} para 15h"._`
-        : ''
+      // A2/T2: default 9h e "às 5"→17h são declarados — nunca em silêncio
+      const notaHoraDefault = notaHorarioEvento(message, inicio, data.titulo)
 
       if (explicitReminder !== null) {
         reply = `✅ ${reminderCreate ? 'Notificação criada!' : 'Compromisso criado!'}\n\n*${data.titulo}*\n${formatAgendaDateTime(data.inicio, data.timezone || AGENDA_TZ)}\n⏰ Aviso: ${formatReminderLabel(data.lembrar_minutos_antes)}${avisoConflito}${notaHoraDefault}`

@@ -224,6 +224,12 @@ CHAT    → saudações, perguntas, comentários que não são lançamentos fina
 • Sem número de vezes explícito ("assinei a Netflix", "pago todo mês" sem prazo) → NÃO retorne parcelamento nem recorrencia
 • NUNCA retorne os dois juntos
 
+━━━ VÁRIAS TRANSAÇÕES NA MESMA MENSAGEM ━━━
+
+• "gastei 50 no mercado e 30 na farmácia" → tipo "MULTIPLO" com TODAS no array "transacoes"
+• Cada item do array segue o formato de Transação (tipo DESPESA ou RECEITA, sem parcelamento/recorrencia)
+• Use MULTIPLO apenas com 2+ lançamentos de valores DISTINTOS na mesma mensagem; um lançamento só → formato normal
+
 ━━━ DESCRIÇÃO (específica, max 60 chars) ━━━
 
 • Nome do estabelecimento quando mencionado: "Uber", "iFood", "Drogasil", "Smart Fit"
@@ -259,8 +265,37 @@ ${catMap || 'Sem categorias — use categoria_id: null.'}
 Transação: {"tipo":"DESPESA","valor":12.50,"descricao":"iFood","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null,"parcelamento":null,"recorrencia":null}
 Parcelada:  {"tipo":"DESPESA","valor":300,"descricao":"Tênis","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null,"parcelamento":{"num_parcelas":3},"recorrencia":null}
 Recorrente: {"tipo":"DESPESA","valor":1200,"descricao":"Aluguel","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null,"parcelamento":null,"recorrencia":{"quantidade":12,"frequencia":"MENSAL"}}
+Múltiplas:  {"tipo":"MULTIPLO","transacoes":[{"tipo":"DESPESA","valor":50,"descricao":"Mercado","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null},{"tipo":"DESPESA","valor":30,"descricao":"Farmácia","categoria_id":"UUID","subcategoria_id":"UUID","data_transacao":null}]}
 Agenda:    {"tipo":"AGENDA","transcricao":"texto completo e fiel do que foi dito, incluindo data e horário","titulo":"Título limpo do evento em 2-5 palavras sem data/hora. Ex: 'Reunião de equipe', 'Consulta médica', 'Pagar boleto do condomínio', 'Dentista'. Capitalizado, sem verbo de agendamento."}
 Chat:      {"tipo":"CHAT","valor":null,"descricao":null,"resposta":"Resposta amigável","categoria_id":null,"subcategoria_id":null,"data_transacao":null}${fewShot}${catFewShot}`
+}
+
+/**
+ * Pós-processamento comum aos 3 caminhos de parse (Gemini texto, Groq texto,
+ * Gemini áudio): normaliza descrição, sanitiza e enriquece categoria. Para
+ * MULTIPLO, cada transação é enriquecida pela PRÓPRIA descrição (usar a
+ * mensagem inteira faria a heurística da 1ª compra contaminar as demais).
+ */
+function finalizeParsedTransacao(parsed, message, categoriasUsuario) {
+  if (!parsed) return parsed
+  if (parsed.descricao) parsed.descricao = normalizarDescricao(parsed.descricao)
+  const sanitized = sanitizeTransacaoExtraidaIA(parsed, categoriasUsuario)
+  if (sanitized?.tipo === 'MULTIPLO') {
+    sanitized.transacoes = (sanitized.transacoes || []).map((t) => {
+      if (t.descricao) t.descricao = normalizarDescricao(t.descricao)
+      return enriquecerCategoriaPorTexto(t.descricao || '', t, categoriasUsuario)
+    })
+    return sanitized
+  }
+  const textoEnriquecimento = [message, sanitized?.descricao].filter(Boolean).join(' ')
+  return enriquecerCategoriaPorTexto(textoEnriquecimento, sanitized, categoriasUsuario)
+}
+
+/** Resultado é cacheável/útil? (transação única válida ou lote não-vazio) */
+function isParsedResultUtil(result) {
+  if (!result || result.tipo === 'CHAT') return false
+  if (result.tipo === 'MULTIPLO') return Array.isArray(result.transacoes) && result.transacoes.length > 0
+  return result.valor != null && Boolean(result.descricao)
 }
 
 /**
@@ -322,16 +357,11 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario, usu
       const json = await response.json()
       const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''
 
-      const parsed = tryParseJsonBlock(text)
-      if (parsed?.descricao) parsed.descricao = normalizarDescricao(parsed.descricao)
-
-      const sanitized = sanitizeTransacaoExtraidaIA(parsed, categoriasUsuario)
-      const textoEnriquecimento = [message, parsed?.descricao].filter(Boolean).join(' ')
-      const result = enriquecerCategoriaPorTexto(textoEnriquecimento, sanitized, categoriasUsuario)
+      const result = finalizeParsedTransacao(tryParseJsonBlock(text), message, categoriasUsuario)
       recordAiCall('gemini', 'parse-tx', 'ok')
 
       // Só cacheia respostas úteis (não CHAT sem info, não erros)
-      if (result && result.tipo !== 'CHAT' && result.valor != null && result.descricao) {
+      if (isParsedResultUtil(result)) {
         try { await aiCacheSet(cacheKey, result, AI_CACHE_TTL.parseTransacao) } catch { /* noop */ }
       }
       return result
@@ -359,12 +389,9 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario, usu
         const groqParsed = tryParseJsonBlock(groqText)
         if (groqParsed && groqParsed.tipo) {
           log.info('[ai-whatsapp] groq fallback ok', { tipo: groqParsed.tipo })
-          if (groqParsed.descricao) groqParsed.descricao = normalizarDescricao(groqParsed.descricao)
-          const sanitized = sanitizeTransacaoExtraidaIA(groqParsed, categoriasUsuario)
-          const textoEnriq = [message, groqParsed?.descricao].filter(Boolean).join(' ')
-          const result = enriquecerCategoriaPorTexto(textoEnriq, sanitized, categoriasUsuario)
+          const result = finalizeParsedTransacao(groqParsed, message, categoriasUsuario)
           recordAiCall('groq', 'parse-tx', 'ok')
-          if (result && result.tipo !== 'CHAT' && result.valor != null && result.descricao) {
+          if (isParsedResultUtil(result)) {
             try { await aiCacheSet(cacheKey, result, AI_CACHE_TTL.parseTransacao) } catch { /* noop */ }
           }
           return result
@@ -452,10 +479,7 @@ export async function parseWhatsAppAudioDirectWithAI(audioBytes, mimeHint = '', 
           continue
         }
 
-        if (parsed.descricao) parsed.descricao = normalizarDescricao(parsed.descricao)
-        const sanitized = sanitizeTransacaoExtraidaIA(parsed, categoriasUsuario)
-        const textoEnriquecimento = [parsed?.descricao].filter(Boolean).join(' ')
-        return enriquecerCategoriaPorTexto(textoEnriquecimento, sanitized, categoriasUsuario)
+        return finalizeParsedTransacao(parsed, parsed?.transcricao || '', categoriasUsuario)
       } catch (e) {
         if (e?.message?.includes?.('401')) throw e
         lastErr = e
@@ -494,6 +518,13 @@ export function sanitizeTransacaoExtraidaIA(extractedData, categoriasUsuario) {
   if (!extractedData || typeof extractedData !== 'object') return extractedData
   const tipo = extractedData.tipo
   if (tipo === 'CHAT') return extractedData
+  if (tipo === 'MULTIPLO') {
+    const txs = Array.isArray(extractedData.transacoes) ? extractedData.transacoes : []
+    extractedData.transacoes = txs
+      .map((t) => sanitizeTransacaoExtraidaIA(t, categoriasUsuario))
+      .filter((t) => t && (t.tipo === 'DESPESA' || t.tipo === 'RECEITA') && Number(t.valor) > 0)
+    return extractedData
+  }
   if (tipo !== 'DESPESA' && tipo !== 'RECEITA') return extractedData
 
   if (extractedData.data_transacao != null && extractedData.data_transacao !== '') {
