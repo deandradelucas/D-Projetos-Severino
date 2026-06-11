@@ -633,6 +633,13 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                   isOpen={activeSelect === 'categoria_id'}
                   onToggle={setActiveSelect}
                   zIndex={10}
+                  actionItem={{
+                    label: 'Adicionar categoria',
+                    onClick: () => {
+                      onClose?.()
+                      navigate('/categorias')
+                    },
+                  }}
                 />
                 {aiSuggestedCat && (
                   <span className="ntx-ai-chip" role="status" aria-live="polite">

@@ -546,7 +546,7 @@
 .custom-select-option.active { background: var(--surface-2); }
 .custom-select-option.selected,
 .custom-select-option[aria-selected='true'] { background: var(--accent-muted); color: var(--accent); font-weight: 600; }
-.custom-select-option--action { color: var(--accent); font-weight: 600; border-top: 1px solid var(--hairline); border-radius: 0; }
+.custom-select-option--action { color: var(--accent); font-weight: 600; border-top: 1px solid var(--hairline); border-radius: 0; flex: 0 0 auto; background: var(--surface); }
 .custom-select-no-results { padding: 16px 12px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
 
 /* =============================================================================
