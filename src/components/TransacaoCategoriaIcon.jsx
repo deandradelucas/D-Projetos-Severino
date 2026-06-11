@@ -64,8 +64,9 @@ const PATHS = {
   building: <><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /><path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" /></>,
   // Saldo — balança
   scale: <><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" /><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" /><path d="M7 21h10" /><path d="M12 3v18" /><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" /></>,
-  // Pix — losango característico
-  pix: <><rect x="8.4" y="8.4" width="7.2" height="7.2" rx="1.6" transform="rotate(45 12 12)" /><path d="M12 5.2v1.6" /><path d="M12 17.2v1.6" /><path d="M5.2 12h1.6" /><path d="M17.2 12h1.6" /></>,
+  // Pix — símbolo oficial da marca (Simple Icons, CC0). Path sólido (fill),
+  // renderizado como SOLID_GLYPH (sem traço, sem fill-opacity duotone).
+  pix: <path d="M5.283 18.36a3.505 3.505 0 0 0 2.493-1.032l3.6-3.6a.684.684 0 0 1 .946 0l3.613 3.613a3.504 3.504 0 0 0 2.493 1.032h.71l-4.56 4.56a3.647 3.647 0 0 1-5.156 0L4.85 18.36ZM18.428 5.627a3.505 3.505 0 0 0-2.493 1.032l-3.613 3.614a.67.67 0 0 1-.946 0l-3.6-3.6A3.505 3.505 0 0 0 5.283 5.64h-.434l4.573-4.572a3.646 3.646 0 0 1 5.156 0l4.559 4.559ZM1.068 9.422 3.79 6.699h1.492a2.483 2.483 0 0 1 1.744.722l3.6 3.6a1.73 1.73 0 0 0 2.443 0l3.614-3.613a2.482 2.482 0 0 1 1.744-.723h1.767l2.737 2.737a3.646 3.646 0 0 1 0 5.156l-2.736 2.736h-1.768a2.482 2.482 0 0 1-1.744-.722l-3.613-3.613a1.77 1.77 0 0 0-2.444 0l-3.6 3.6a2.483 2.483 0 0 1-1.744.722H3.791l-2.723-2.723a3.646 3.646 0 0 1 0-5.156" />,
   arrowUp: <><path d="m5 12 7-7 7 7" /><path d="M12 19V5" /></>,
   arrowDown: <><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></>,
 }
@@ -79,15 +80,22 @@ const PATHS = {
  * fill criaria polígonos indevidos (verificado visualmente), então ficam só com
  * traço. */
 const STROKE_ONLY = new Set(['investment', 'arrowUp', 'arrowDown'])
+/* Glifos de marca já desenhados como forma preenchida (path sólido, sem traço). */
+const SOLID_GLYPH = new Set(['pix'])
 
 export function TransacaoCategoriaIcon({ categoriaNome, subcategoriaNome, isReceita, size = 18, className }) {
   const resolved = getTransacaoCategoriaIconKey(categoriaNome, subcategoriaNome)
   const mapKey = resolved ?? (isReceita ? 'arrowUp' : 'arrowDown')
   const iconName = CATEGORIA_ICON_ALIAS[mapKey] || mapKey
   const paths = PATHS[iconName] || PATHS[isReceita ? 'arrowUp' : 'arrowDown']
-  const duotone = !STROKE_ONLY.has(iconName)
+  const solid = SOLID_GLYPH.has(iconName)
+  const duotone = !solid && !STROKE_ONLY.has(iconName)
 
-  const icon = (
+  const icon = solid ? (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      {paths}
+    </svg>
+  ) : (
     <svg
       width={size}
       height={size}
