@@ -21,20 +21,15 @@
   margin-bottom: 16px;
 }
 /* orbs decorativos: círculos dourados suaves e desfocados */
-.agenda-hero__orb {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.18), transparent 70%);
-  pointer-events: none;
-  filter: blur(8px);
-}
-.agenda-hero__orb--one { width: 160px; height: 160px; top: -60px; right: -30px; }
-.agenda-hero__orb--two { width: 120px; height: 120px; bottom: -50px; left: -20px; opacity: 0.6; }
-.agenda-hero__title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; }
+/* Título "Agenda" alinhado verticalmente com o menu sanduíche (hero-row). */
+.agenda-page .dashboard-hub__hero-row { align-items: center; }
+.agenda-hero__title-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; position: relative; }
 .agenda-hero__title { margin: 0; font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: clamp(1.4rem, 1.4vw + 0.8rem, 1.9rem); font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); }
 .agenda-hero__summary { margin: 4px 0 0; font-size: 0.86rem; color: var(--text-secondary); position: relative; }
-.agenda-hero__stats { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 14px; position: relative; }
-.agenda-hero__stat { display: flex; flex-direction: column; gap: 1px; font-size: 0.84rem; color: var(--text-secondary); }
+.agenda-hero__stats { display: flex; flex-wrap: wrap; align-items: baseline; gap: 16px; position: relative; }
+/* "Hoje" e o número lado a lado (antes empilhado, label sobre número). */
+.agenda-hero__stat { display: flex; flex-direction: row; align-items: baseline; gap: 5px; font-size: 0.84rem; color: var(--text-secondary); }
+.agenda-hero__stat strong { color: var(--text-primary); font-weight: 700; }
 /* mini-semana: linha de 7 dias clicáveis */
 .agenda-hero__week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 16px; position: relative; }
 .agenda-hero__week-day {

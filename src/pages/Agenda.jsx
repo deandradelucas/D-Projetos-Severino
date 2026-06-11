@@ -391,8 +391,6 @@ export default function Agenda() {
           <div className="ref-dashboard-inner dashboard-hub agenda-shell">
             <RefDashboardScroll ref={fabScrollRef}>
               <section className="dashboard-hub__hero agenda-hero" aria-label="Agenda e lembretes">
-                <span className="agenda-hero__orb agenda-hero__orb--one" aria-hidden="true" />
-                <span className="agenda-hero__orb agenda-hero__orb--two" aria-hidden="true" />
                 <div className="dashboard-hub__hero-row">
                   <MobileMenuButton onClick={() => setMenuAberto((v) => !v)} isOpen={menuAberto} />
                   <div className="agenda-hero__title">
