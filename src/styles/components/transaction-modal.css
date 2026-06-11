@@ -584,9 +584,33 @@
   .modal-content .modal-header--minimal { padding-top: 18px; }
 
   /* Drag-to-close genérico (useSheetDragClose): vale p/ qualquer modal-sheet
-     que receba a ref do hook — .modal-content e os __modal das páginas. */
-  .sheet-dragging { transition: none; transform: translateY(var(--sheet-drag, 0px)); }
-  .sheet-closing { transition: transform 0.3s var(--ease); transform: translateY(var(--sheet-drag, 0px)); }
+     que receba a ref do hook — .modal-content e os __modal das páginas.
+     O sheet segue o dedo e esmaece levemente: "parece que vai fechar". */
+  .sheet-dragging {
+    transition: none;
+    transform: translateY(var(--sheet-drag, 0px));
+    opacity: 0.94;
+    animation: none;
+  }
+  .sheet-closing {
+    transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+    transform: translateY(var(--sheet-drag, 0px));
+    animation: none;
+  }
+
+  /* Drag próprio do modal Nova Transação (classes ntx-* + var --ntx-drag).
+     Esta CSS não existia — o JS setava a var mas nada a consumia (sem efeito). */
+  .modal-content.ntx-dragging {
+    transition: none;
+    transform: translateY(var(--ntx-drag, 0px));
+    opacity: 0.94;
+    animation: none;
+  }
+  .modal-content.ntx-closing {
+    transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+    transform: translateY(var(--ntx-drag, 0px));
+    animation: none;
+  }
   .modal-body { padding: 8px 18px 18px; }
   .modal-actions { padding: 14px 18px; }
   .ntx-time-field { flex-basis: 96px; width: 96px; }

@@ -3,15 +3,15 @@ import { normalizeTipoCategoria } from './transacoes.mjs'
 
 /** Chaves de ícone aceitas (PNGs em public/icons/categorias). NULL = automático por nome. */
 export const ICONES_VALIDOS = new Set([
-  'wallet', 'coins', 'handCoins', 'dollarCircle', 'dollar', 'moneybag', 'salary', 'piggy',
-  'bank', 'creditcard', 'investment', 'chart', 'bitcoin', 'crypto', 'percent', 'scale', 'receipt', 'tax', 'idcard',
-  'utensils', 'restaurant', 'coffee', 'pizza', 'beer', 'wine', 'cake', 'groceries',
+  'wallet', 'coins', 'handCoins', 'dollarCircle', 'moneybag', 'salary', 'piggy',
+  'bank', 'investment', 'chart', 'bitcoin', 'crypto', 'percent', 'scale', 'receipt', 'tax', 'idcard',
+  'utensils', 'coffee', 'pizza', 'beer', 'wine', 'cake', 'groceries',
   'car', 'fuel', 'gas', 'bus', 'train', 'taxi', 'motorcycle', 'bicycle', 'parking', 'plane', 'luggage',
   'home', 'building', 'hotel', 'plant', 'flower', 'tools', 'paint', 'bolt', 'electricity', 'water', 'broom', 'trash', 'lock',
-  'health', 'hospital', 'pharmacy', 'tooth', 'fitness', 'dumbbell', 'running', 'yoga', 'spa', 'scissors', 'makeup',
+  'health', 'hospital', 'pharmacy', 'tooth', 'fitness', 'running', 'yoga', 'spa', 'scissors', 'makeup',
   'shopping', 'tshirt', 'shoes', 'ring',
-  'leisure', 'tech', 'phone', 'internet', 'wifi', 'tv', 'camera', 'music', 'movie', 'book', 'newspaper', 'beach', 'umbrella', 'star', 'heart', 'sparkles', 'gift',
-  'child', 'baby', 'dog', 'cat', 'pet', 'education', 'graduation', 'work', 'church', 'charity', 'calendar', 'subscription', 'pix',
+  'leisure', 'tech', 'internet', 'wifi', 'tv', 'camera', 'music', 'movie', 'book', 'newspaper', 'beach', 'umbrella', 'star', 'heart', 'sparkles', 'gift',
+  'child', 'baby', 'dog', 'cat', 'pet', 'education', 'work', 'church', 'charity', 'calendar', 'subscription', 'pix',
 ])
 
 class CategoriaError extends Error {

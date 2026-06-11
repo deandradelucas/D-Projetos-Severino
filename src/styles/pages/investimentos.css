@@ -440,7 +440,7 @@
   /* Hero: título + taxas ocupam a largura; "+ Novo" some (vira FAB); "Comparar"
      vira botão-ícone p/ caber sem estourar a linha. */
   .page-investimentos .dashboard-hub__hero { padding: 14px 16px; margin-bottom: 12px; }
-  .page-investimentos .dashboard-hub__hero-row { gap: 10px; align-items: flex-start; }
+  .page-investimentos .dashboard-hub__hero-row { gap: 10px; align-items: center; }
   .page-investimentos .dashboard-hub__hero-text { flex: 1; min-width: 0; }
   .page-investimentos .dashboard-hub__title { font-size: 1.4rem; line-height: 1.15; }
   .page-investimentos .dashboard-hub__hero-actions { gap: 8px; }

@@ -25,6 +25,8 @@
     z-index: 3;
   }
   .page-categorias__modal-head { padding-top: 18px; }
+  /* No mobile o FAB flutuante cobre a ação — esconde o botão do fim da lista. */
+  .page-categorias__nova { display: none; }
 }
 
 /* Hero: alinha o título "Categorias" verticalmente com o menu sanduíche e o

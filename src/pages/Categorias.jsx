@@ -438,7 +438,7 @@ export default function Categorias() {
   const [orcamentos, setOrcamentos] = useState({}) // categoria_id -> { limite_mensal, gasto_mes }
   const [loading, setLoading] = useState(true)
   const fabScrollRef = useRef(null)
-  useFabCompact(fabScrollRef)
+  const fabCompact = useFabCompact(fabScrollRef)
 
   // Modais
   const [catModal, setCatModal] = useState(null) // { categoria } | { criar:true }
@@ -541,7 +541,7 @@ export default function Categorias() {
                   <>
                     {renderGrupo('Despesas', despesas)}
                     {renderGrupo('Receitas', receitas)}
-                    {/* Botão no fim da lista — visível em desktop e mobile. */}
+                    {/* Botão no fim da lista — desktop; no mobile o FAB cobre. */}
                     <button type="button" className="page-categorias__nova" onClick={() => setCatModal({ categoria: null })}>
                       {SvgPlus} Nova categoria
                     </button>
@@ -552,6 +552,26 @@ export default function Categorias() {
           </div>
         </main>
       </div>
+
+      {/* FAB padrão (mobile): flutua como o «+ Nova transação» do dashboard. */}
+      {!catModal && !subModal && !fundirModal && !orcModal && (
+        <div className="dashboard-mobile-fabs">
+          <button
+            type="button"
+            className={`dashboard-mobile-tx-fab${fabCompact ? ' dashboard-mobile-tx-fab--compact' : ''}`}
+            onClick={() => setCatModal({ categoria: null })}
+            aria-label="Criar nova categoria"
+          >
+            <span className="dashboard-mobile-tx-fab__icon" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+              </svg>
+            </span>
+            <span className="dashboard-mobile-tx-fab__label">Nova categoria</span>
+          </button>
+        </div>
+      )}
 
       {catModal && (
         <CategoriaModal categoria={catModal.categoria} onClose={() => setCatModal(null)} onSaved={onSaved} />

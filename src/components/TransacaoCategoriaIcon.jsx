@@ -12,22 +12,22 @@ import { CATEGORIA_ICON_ALIAS } from '../lib/categoriaIconStyle.js'
 /* Chaves com PNG em public/icons/categorias/{key}.png (Icons8 Pulsar Color, 128px) */
 const ICON_PNG = new Set([
   // finanças
-  'wallet', 'coins', 'handCoins', 'dollarCircle', 'dollar', 'moneybag', 'salary', 'piggy',
-  'bank', 'creditcard', 'investment', 'chart', 'bitcoin', 'crypto', 'percent', 'scale', 'receipt', 'tax', 'idcard',
+  'wallet', 'coins', 'handCoins', 'dollarCircle', 'moneybag', 'salary', 'piggy',
+  'bank', 'investment', 'chart', 'bitcoin', 'crypto', 'percent', 'scale', 'receipt', 'tax', 'idcard',
   // alimentação
-  'utensils', 'restaurant', 'coffee', 'pizza', 'beer', 'wine', 'cake', 'groceries',
+  'utensils', 'coffee', 'pizza', 'beer', 'wine', 'cake', 'groceries',
   // transporte
   'car', 'fuel', 'gas', 'bus', 'train', 'taxi', 'motorcycle', 'bicycle', 'parking', 'plane', 'luggage',
   // casa
   'home', 'building', 'hotel', 'plant', 'flower', 'tools', 'paint', 'bolt', 'electricity', 'water', 'broom', 'trash', 'lock',
   // saúde / cuidados
-  'health', 'hospital', 'pharmacy', 'tooth', 'fitness', 'dumbbell', 'running', 'yoga', 'spa', 'scissors', 'makeup',
+  'health', 'hospital', 'pharmacy', 'tooth', 'fitness', 'running', 'yoga', 'spa', 'scissors', 'makeup',
   // compras
   'shopping', 'tshirt', 'shoes', 'ring',
   // lazer / tecnologia
-  'leisure', 'tech', 'phone', 'internet', 'wifi', 'tv', 'camera', 'music', 'movie', 'book', 'newspaper', 'beach', 'umbrella', 'star', 'heart', 'sparkles', 'gift',
+  'leisure', 'tech', 'internet', 'wifi', 'tv', 'camera', 'music', 'movie', 'book', 'newspaper', 'beach', 'umbrella', 'star', 'heart', 'sparkles', 'gift',
   // pessoas / diversos
-  'child', 'baby', 'dog', 'cat', 'pet', 'education', 'graduation', 'work', 'church', 'charity', 'calendar', 'subscription', 'pix',
+  'child', 'baby', 'dog', 'cat', 'pet', 'education', 'work', 'church', 'charity', 'calendar', 'subscription', 'pix',
 ])
 
 /* Paths SVG remanescentes — viewBox 24. */
