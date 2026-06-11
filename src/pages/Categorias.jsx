@@ -7,6 +7,7 @@ import RefDashboardScroll from '../components/RefDashboardScroll'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon.jsx'
 import { useFabCompact } from '../hooks/useFabCompact'
+import { useSheetDragClose } from '../hooks/useSheetDragClose'
 import { showToast } from '../lib/toastStore'
 import { fetchCategorias } from '../lib/apiCategorias'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
@@ -49,6 +50,8 @@ const SvgChevron = <svg viewBox="0 0 24 24" width="16" height="16" fill="none" s
 // ── Modal: criar / editar categoria ─────────────────────────────────────────
 function CategoriaModal({ categoria, onClose, onSaved }) {
   const editando = !!categoria
+  const sheetRef = useRef(null)
+  useSheetDragClose(sheetRef, { open: true, onClose })
   const [nome, setNome] = useState(categoria?.nome || '')
   const [tipo, setTipo] = useState(categoria?.tipo || 'DESPESA')
   const [cor, setCor] = useState(categoria?.cor || CORES_CATEGORIA[12])
@@ -73,7 +76,7 @@ function CategoriaModal({ categoria, onClose, onSaved }) {
 
   return (
     <div className="page-categorias__overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-categorias__modal" role="dialog" aria-modal="true" aria-label={editando ? 'Editar categoria' : 'Nova categoria'}>
+      <div ref={sheetRef} className="page-categorias__modal" role="dialog" aria-modal="true" aria-label={editando ? 'Editar categoria' : 'Nova categoria'}>
         <div className="page-categorias__modal-head">
           <h2 className="page-categorias__modal-title">{editando ? 'Editar categoria' : 'Nova categoria'}</h2>
           <button type="button" className="page-categorias__modal-close" onClick={onClose} aria-label="Fechar">
@@ -136,6 +139,8 @@ function CategoriaModal({ categoria, onClose, onSaved }) {
 
 // ── Modal: criar / editar subcategoria ──────────────────────────────────────
 function SubcategoriaModal({ categoriaId, sub, onClose, onSaved }) {
+  const sheetRef = useRef(null)
+  useSheetDragClose(sheetRef, { open: true, onClose })
   const editando = !!sub
   const [nome, setNome] = useState(sub?.nome || '')
   const [salvando, setSalvando] = useState(false)
@@ -156,7 +161,7 @@ function SubcategoriaModal({ categoriaId, sub, onClose, onSaved }) {
   }
   return (
     <div className="page-categorias__overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-categorias__modal page-categorias__modal--sm" role="dialog" aria-modal="true" aria-label={editando ? 'Editar subcategoria' : 'Nova subcategoria'}>
+      <div ref={sheetRef} className="page-categorias__modal page-categorias__modal--sm" role="dialog" aria-modal="true" aria-label={editando ? 'Editar subcategoria' : 'Nova subcategoria'}>
         <div className="page-categorias__modal-head">
           <h2 className="page-categorias__modal-title">{editando ? 'Editar subcategoria' : 'Nova subcategoria'}</h2>
           <button type="button" className="page-categorias__modal-close" onClick={onClose} aria-label="Fechar">
@@ -182,6 +187,8 @@ function SubcategoriaModal({ categoriaId, sub, onClose, onSaved }) {
 
 // ── Modal: fundir categoria ─────────────────────────────────────────────────
 function FundirModal({ origem, candidatos, onClose, onSaved }) {
+  const sheetRef = useRef(null)
+  useSheetDragClose(sheetRef, { open: true, onClose })
   const [destino, setDestino] = useState('')
   const [salvando, setSalvando] = useState(false)
   const submit = async () => {
@@ -199,7 +206,7 @@ function FundirModal({ origem, candidatos, onClose, onSaved }) {
   }
   return (
     <div className="page-categorias__overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-categorias__modal page-categorias__modal--sm" role="dialog" aria-modal="true" aria-label="Fundir categoria">
+      <div ref={sheetRef} className="page-categorias__modal page-categorias__modal--sm" role="dialog" aria-modal="true" aria-label="Fundir categoria">
         <div className="page-categorias__modal-head">
           <h2 className="page-categorias__modal-title">Fundir “{origem.nome}”</h2>
           <button type="button" className="page-categorias__modal-close" onClick={onClose} aria-label="Fechar">
@@ -234,6 +241,8 @@ function FundirModal({ origem, candidatos, onClose, onSaved }) {
 
 // ── Modal: orçamento mensal da categoria ────────────────────────────────────
 function OrcamentoModal({ categoria, atual, onClose, onSaved }) {
+  const sheetRef = useRef(null)
+  useSheetDragClose(sheetRef, { open: true, onClose })
   const [valor, setValor] = useState(atual?.limite_mensal ? valorToMaskedBRL(Number(atual.limite_mensal)) : '')
   const [salvando, setSalvando] = useState(false)
 
@@ -267,7 +276,7 @@ function OrcamentoModal({ categoria, atual, onClose, onSaved }) {
 
   return (
     <div className="page-categorias__overlay" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="page-categorias__modal page-categorias__modal--sm" role="dialog" aria-modal="true" aria-label="Orçamento mensal">
+      <div ref={sheetRef} className="page-categorias__modal page-categorias__modal--sm" role="dialog" aria-modal="true" aria-label="Orçamento mensal">
         <div className="page-categorias__modal-head">
           <h2 className="page-categorias__modal-title">Orçamento — {categoria.nome}</h2>
           <button type="button" className="page-categorias__modal-close" onClick={onClose} aria-label="Fechar">

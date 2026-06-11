@@ -3,6 +3,7 @@ import './dashboard.css'
 import '../styles/pages/cartoes.css'
 import { useFabCompact } from '../hooks/useFabCompact'
 import { useModalA11y } from '../hooks/useModalA11y'
+import { useSheetDragClose } from '../hooks/useSheetDragClose'
 import Sidebar from '../components/Sidebar'
 import MobileMenuButton from '../components/MobileMenuButton'
 import RefDashboardScroll from '../components/RefDashboardScroll'
@@ -94,6 +95,7 @@ function ModalCartao({ cartaoEdit, onClose, onSalvar, salvando }) {
   const editando = Boolean(cartaoEdit)
   const modalRef = useRef(null)
   useModalA11y({ open: true, onClose, containerRef: modalRef })
+  useSheetDragClose(modalRef, { open: true, onClose })
   const [nome, setNome] = useState(cartaoEdit?.nome || '')
   const [bandeira, setBandeira] = useState(cartaoEdit?.bandeira || 'visa')
   const [cor, setCor] = useState(cartaoEdit?.cor || 'gold')
@@ -184,6 +186,7 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
   const [ref, setRef] = useState(cartao.fatura_atual?.ref || '')
   const modalRef = useRef(null)
   useModalA11y({ open: true, onClose, containerRef: modalRef })
+  useSheetDragClose(modalRef, { open: true, onClose })
   const [fatura, setFatura] = useState(null)
   const [loading, setLoading] = useState(true)
   const [busca, setBusca] = useState('')

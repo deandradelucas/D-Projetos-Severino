@@ -565,6 +565,28 @@
     padding-bottom: var(--safe-bottom, 0px);
   }
   @keyframes ntxSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  /* Alça (risco) no topo do sheet — sinaliza arrastar pra baixo p/ fechar. */
+  .modal-content::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--text-muted);
+    opacity: 0.4;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .modal-content .modal-header--minimal { padding-top: 18px; }
+
+  /* Drag-to-close genérico (useSheetDragClose): vale p/ qualquer modal-sheet
+     que receba a ref do hook — .modal-content e os __modal das páginas. */
+  .sheet-dragging { transition: none; transform: translateY(var(--sheet-drag, 0px)); }
+  .sheet-closing { transition: transform 0.3s var(--ease); transform: translateY(var(--sheet-drag, 0px)); }
   .modal-body { padding: 8px 18px 18px; }
   .modal-actions { padding: 14px 18px; }
   .ntx-time-field { flex-basis: 96px; width: 96px; }

@@ -1,5 +1,32 @@
 /* Gestão de categorias — página dedicada (/categorias). Flat soft-cards. */
 
+/* Mobile: modais viram bottom-sheet com alça (risco) + arrastar pra baixo fecha
+   (useSheetDragClose). Transform do drag é global (.sheet-dragging/.sheet-closing). */
+@media (max-width: 768px) {
+  .page-categorias__overlay { align-items: end; padding: 0; }
+  .page-categorias__modal {
+    position: relative;
+    max-width: none;
+    max-height: 92dvh;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+  }
+  .page-categorias__modal::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--text-muted);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .page-categorias__modal-head { padding-top: 18px; }
+}
+
 /* Hero: alinha o título "Categorias" verticalmente com o menu sanduíche e o
    botão de ação (o padrão usa align-items: stretch, deixando o título no topo). */
 .page-categorias .dashboard-hub__hero-row {

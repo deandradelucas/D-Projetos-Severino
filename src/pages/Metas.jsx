@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useModalA11y } from '../hooks/useModalA11y'
+import { useSheetDragClose } from '../hooks/useSheetDragClose'
 import './dashboard.css'
 import '../styles/pages/metas.css'
 import { useFabCompact } from '../hooks/useFabCompact'
@@ -63,6 +64,7 @@ function ModalMeta({ onClose, onSalvar, salvando, metaEdit = null }) {
   const [prazo, setPrazo] = useState(metaEdit?.prazo ? String(metaEdit.prazo).slice(0, 10) : '')
   const modalRef = useRef(null)
   useModalA11y({ open: true, onClose, containerRef: modalRef, blockClose: salvando, autoFocus: false })
+  useSheetDragClose(modalRef, { open: true, onClose })
 
   const valorNum = parseCurrencyBRLMasked(valorInput)
   const podeSalvar = nome.trim().length >= 1 && Number.isFinite(valorNum) && valorNum >= 0.01
@@ -168,6 +170,7 @@ function ModalAporte({ meta, onClose, onConfirmar, salvando }) {
   const [valorInput, setValorInput] = useState('')
   const modalRef = useRef(null)
   useModalA11y({ open: true, onClose, containerRef: modalRef, blockClose: salvando, autoFocus: false })
+  useSheetDragClose(modalRef, { open: true, onClose })
 
   const valorNum = parseCurrencyBRLMasked(valorInput)
   const podeConfirmar = Number.isFinite(valorNum) && valorNum >= 0.01
