@@ -139,7 +139,8 @@ export function registerAiRoutes(app) {
       }
 
       const categorias = await getCategorias(parsed.dataUsuarioId)
-      const result = await suggestCategoryForTransaction(descricao, tipo, categorias)
+      // actorId: correções são pessoais (a memória de comerciante é do usuário que lança).
+      const result = await suggestCategoryForTransaction(descricao, tipo, categorias, parsed.actorId)
       return c.json(result)
     } catch (error) {
       log.warn('ai suggest-category failed', error?.message || error)

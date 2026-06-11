@@ -733,7 +733,7 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
       let catId = tx.categoria_id || null
       let subId = tx.subcategoria_id || null
       try {
-        const corr = await resolverCategoriaPorCorrecao(actorCorrecao, tx.descricao, categorias)
+        const corr = await resolverCategoriaPorCorrecao(actorCorrecao, tx.descricao, categorias, tx.tipo)
         if (corr?.categoria_id) {
           catId = corr.categoria_id
           subId = corr.subcategoria_id ?? null
@@ -820,6 +820,7 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
     usuarioBot.familiaEscopo?.actorId ?? usuarioBot.id,
     parsed.descricao,
     categorias,
+    parsed.tipo,
   )
   if (correcao?.categoria_id) {
     finalCategoriaId = correcao.categoria_id

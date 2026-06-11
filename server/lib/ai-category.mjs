@@ -6,6 +6,7 @@ import {
 } from './ai/gemini-client.mjs'
 import { tryParseJsonBlock } from './ai/parsers.mjs'
 import { enriquecerCategoriaPorTexto } from './domain/transaction-heuristics.mjs'
+import { resolverCategoriaPorCorrecao } from './domain/transacao-categoria-logger.mjs'
 import { groqChatCompletion } from './ai/groq-client.mjs'
 import { aiCacheKey, aiCacheGet, aiCacheSet, AI_CACHE_TTL } from './ai/ai-cache.mjs'
 import { recordAiCall, recordCache } from './ai/ai-telemetry.mjs'
@@ -32,9 +33,18 @@ function validateCatResult(parsed, catsTipo) {
  * Sugere categoria e subcategoria para uma transação a partir da descrição.
  * Tenta heurísticas locais primeiro; Gemini só como fallback.
  */
-export async function suggestCategoryForTransaction(descricao, tipo, categoriasUsuario) {
+export async function suggestCategoryForTransaction(descricao, tipo, categoriasUsuario, usuarioId = null) {
   const texto = String(descricao || '').trim()
   if (!texto || texto.length < 2) return { categoria_id: null, subcategoria_id: null }
+
+  // Passo 0: memória de comerciante — se o usuário já corrigiu uma descrição
+  // parecida (mesmo comerciante/tipo), a escolha dele vence o LLM.
+  if (usuarioId) {
+    try {
+      const corr = await resolverCategoriaPorCorrecao(usuarioId, texto, categoriasUsuario, tipo)
+      if (corr?.categoria_id) return corr
+    } catch { /* best-effort */ }
+  }
 
   // Passo 1: heurísticas locais — zero custo de API
   const fakeExtracted = { tipo, categoria_id: null, subcategoria_id: null }
