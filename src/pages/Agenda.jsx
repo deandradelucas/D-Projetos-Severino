@@ -11,6 +11,7 @@ import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
 import { redirectSe401 } from '../lib/authRedirect'
 import { readHorizonteUser } from '../lib/horizonteSession'
+import { readAgendaCache, writeAgendaCache } from '../lib/agendaCachePersist'
 import { showToast } from '../lib/toastStore'
 import { useSheetDragClose } from '../hooks/useSheetDragClose'
 import { useFabCompact } from '../hooks/useFabCompact'
@@ -52,9 +53,22 @@ const STATUS_LABEL = {
 
 export default function Agenda() {
   const [usuario] = useState(() => readHorizonteUser())
+  // Hidrata os eventos do MÊS ATUAL do cache persistido → pinta a agenda na hora,
+  // sem spinner, e revalida em background. O mount usa sempre o mês corrente.
+  const agendaCacheRef = useRef(undefined)
+  if (agendaCacheRef.current === undefined) {
+    const u = readHorizonteUser()
+    const mk = saoPauloDateKey(new Date()).slice(0, 7)
+    const cached = u?.id ? readAgendaCache(u.id, mk) : null
+    agendaCacheRef.current = Array.isArray(cached) ? cached : null
+  }
+  const eventosCache = agendaCacheRef.current
+  const hidratadoRef = useRef(!!eventosCache)
+  const montadoRef = useRef(false)
+
   const [menuAberto, setMenuAberto] = useState(false)
-  const [eventos, setEventos] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [eventos, setEventos] = useState(eventosCache || [])
+  const [loading, setLoading] = useState(!eventosCache)
   const [error, setError] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
@@ -79,9 +93,10 @@ export default function Agenda() {
 
   const usuarioId = usuario?.id ? String(usuario.id).trim() : ''
 
-  const loadAgenda = useCallback(async () => {
+  const loadAgenda = useCallback(async ({ silent = false } = {}) => {
     if (!usuarioId) return
-    setLoading(true)
+    // Com cache hidratado, revalida em background (sem flash de spinner).
+    if (!silent) setLoading(true)
     setError('')
     try {
       const from = monthKeyToDate(calendarMonthKey)
@@ -102,7 +117,12 @@ export default function Agenda() {
       const data = await res.json().catch(() => [])
       if (redirectSe401(res)) return
       if (!res.ok) throw new Error(data?.message || 'Falha ao carregar agenda.')
-      setEventos(Array.isArray(data) ? data : [])
+      const lista = Array.isArray(data) ? data : []
+      setEventos(lista)
+      // Persiste só o snapshot do MÊS ATUAL (o único que o cold start hidrata).
+      if (usuarioId && calendarMonthKey === saoPauloDateKey(new Date()).slice(0, 7)) {
+        writeAgendaCache(usuarioId, calendarMonthKey, lista)
+      }
     } catch (err) {
       setError(err.message || 'Falha ao carregar agenda.')
     } finally {
@@ -110,8 +130,12 @@ export default function Agenda() {
     }
   }, [calendarMonthKey, usuarioId])
 
+  // 1ª carga (mount) revalida em silêncio se hidratou do cache; navegar entre
+  // meses mostra o loading normalmente.
   useEffect(() => {
-    void loadAgenda()
+    const silent = !montadoRef.current && hidratadoRef.current
+    montadoRef.current = true
+    void loadAgenda({ silent })
   }, [loadAgenda])
 
 
