@@ -975,8 +975,12 @@ export default function Transacoes() {
                     <React.Fragment key={grupo.key}>
                       <div className="tx-day-divider" role="separator" aria-label={`Transações de ${grupo.label}`}>
                         <span className="tx-day-divider__label">{grupo.label}</span>
-                        <span className="tx-day-divider__meta">
-                          {grupo.txs.length} {grupo.txs.length === 1 ? 'lançamento' : 'lançamentos'}
+                        <span
+                          className="tx-day-divider__count"
+                          title={`${grupo.txs.length} ${grupo.txs.length === 1 ? 'lançamento' : 'lançamentos'}`}
+                          aria-label={`${grupo.txs.length} ${grupo.txs.length === 1 ? 'lançamento' : 'lançamentos'}`}
+                        >
+                          {grupo.txs.length}
                         </span>
                         <span className="tx-day-divider__totals">
                           {grupo.totalReceitas > 0 ? (

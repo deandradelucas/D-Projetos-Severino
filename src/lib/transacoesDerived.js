@@ -29,6 +29,7 @@ export function construirGruposParcelados(transacoes) {
         recorrente_total: t.recorrente_total || null,
         categorias: t.categorias,
         subcategorias: t.subcategorias,
+        cartao: t.cartoes || null,
       })
     }
     const g = map.get(key)

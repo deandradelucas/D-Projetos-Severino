@@ -267,29 +267,90 @@
   border-radius: var(--r-md);
   background: var(--surface-sunken);
 }
-.tx-quick-summary__item { display: flex; flex-direction: column; gap: 2px; align-items: center; text-align: center; }
+.tx-quick-summary__item { display: flex; flex-direction: column; gap: 2px; align-items: center; text-align: center; min-width: 0; }
 /* separadores verticais entre Entradas · Saídas · Saldo */
 .tx-quick-summary__item + .tx-quick-summary__item { border-left: 1px solid var(--hairline-strong); }
 .tx-quick-summary__label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
-.tx-quick-summary__value { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-weight: 700; font-size: 0.98rem; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.tx-quick-summary__value { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-weight: 700; font-size: clamp(0.62rem, 2.9vw, 0.98rem); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; white-space: nowrap; color: var(--text-primary); }
 .tx-quick-summary__value--in { color: var(--success); }
 .tx-quick-summary__value--out { color: var(--error); }
 
 /* ── Chips de status (Parceladas) ──────────────────────────────────────────── */
-.parc-status-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+/* Controles da aba Parceladas: busca (linha cheia) + ordenar + expandir todas */
+.parc-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+.parc-controls .tx-quick-search { flex: 1 1 100%; }
+.parc-sort {
+  appearance: none; -webkit-appearance: none;
+  padding: 8px 30px 8px 13px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline-strong);
+  background-color: var(--surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23889' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  color: var(--text-secondary);
+  font-size: 0.8rem; font-weight: 600;
+  cursor: pointer;
+}
+.parc-sort:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.parc-expand-all {
+  margin-left: auto;
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  transition: background 150ms var(--ease), color 150ms var(--ease);
+}
+.parc-expand-all:hover { background: var(--surface-2); color: var(--text-primary); }
+.parc-expand-all:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* valor + total gasto empilhados à direita */
+.parc-valor-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.parc-total-gasto { font-size: 0.68rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* Filtros rápidos em 1 linha deslizável (antes quebrava 3+1 desalinhado) */
+.parc-status-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 7px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.parc-status-chips::-webkit-scrollbar { display: none; }
+.parc-status-chips .tx-quick-chip { flex-shrink: 0; white-space: nowrap; }
 .parc-segment-title { display: flex; align-items: center; gap: 8px; margin: 14px 0 8px; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
 .parc-segment-title__count { color: var(--text-secondary); font-weight: 600; }
 
 /* ── Divisória de dia ──────────────────────────────────────────────────────── */
 .tx-day-divider {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
   margin: 14px 0 8px;
   padding: 0 2px;
 }
 .tx-day-divider__label { font-size: 0.76rem; font-weight: 700; color: var(--text-secondary); text-transform: capitalize; }
-.tx-day-divider__meta { font-size: 0.7rem; color: var(--text-muted); }
+/* Contador de lançamentos: bolinha dourada (mesmo --accent da página) só com o nº */
+.tx-day-divider__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
 .tx-day-divider__totals { margin-left: auto; display: flex; gap: 8px; font-size: 0.74rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .tx-day-divider__total--pos { color: var(--success); }
 .tx-day-divider__total--neg { color: var(--error); }
@@ -345,6 +406,10 @@
 .ref-tx-recorrencia-ico-wrap { display: inline-flex; color: var(--accent); }
 
 .page-transacoes-ref-table .ref-tx-val-cell { grid-area: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; text-align: right; }
+/* Cor do valor na lista: receita verde, despesa vermelha (escopo da página
+   para não afetar o dashboard, onde a despesa é neutra de propósito). */
+.page-transacoes-ref-table .ref-tx-val--pos { color: var(--success); }
+.page-transacoes-ref-table .ref-tx-val--neg { color: var(--error); }
 .ref-tx-pendente-pill { padding: 1px 7px; border-radius: var(--r-pill); background: var(--accent-muted); color: var(--accent); font-size: 0.62rem; font-weight: 700; }
 
 /* Ações (editar / excluir) — visíveis no hover (desktop), swipe (mobile) */
@@ -416,11 +481,65 @@
   background: var(--surface-sunken);
   color: var(--text-secondary);
 }
-.page-transacoes-parcelado-grupo__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.page-transacoes-parcelado-grupo__desc { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.page-transacoes-parcelado-grupo__meta { font-size: 0.74rem; color: var(--text-muted); }
-.page-transacoes-parcelado-grupo__right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.page-transacoes-parcelado-grupo__valor { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.page-transacoes-parcelado-grupo__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.page-transacoes-parcelado-grupo__desc { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* meta em 1 linha com ellipsis — antes quebrava em 3 linhas no mobile */
+.page-transacoes-parcelado-grupo__meta { font-size: 0.74rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.page-transacoes-parcelado-grupo__right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.page-transacoes-parcelado-grupo__valor { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-primary); white-space: nowrap; }
+
+/* título (nome sozinho na linha — badge de status vai p/ a linha de chips) */
+.parc-grupo-title-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
+/* linha de chips: status + próxima parcela, quebram se faltar largura */
+.parc-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+
+/* chip do cartão vinculado, ao lado do título */
+.parc-cartao-chip {
+  display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0; max-width: 50%;
+  padding: 1px 7px; border-radius: var(--r-pill);
+  background: var(--surface-sunken); color: var(--text-secondary);
+  font-size: 0.64rem; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.parc-cartao-chip svg { flex-shrink: 0; }
+
+/* chip de próximo vencimento (assinatura mensal vinculada a cartão) */
+.parc-venc-chip {
+  display: inline-flex; align-items: center; gap: 4px; width: fit-content; max-width: 100%;
+  padding: 2px 9px; border-radius: var(--r-pill);
+  background: var(--accent-muted); color: var(--accent);
+  font-size: 0.7rem; font-weight: 600; white-space: nowrap;
+}
+.parc-venc-chip svg { flex-shrink: 0; }
+.parc-status-badge {
+  display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0;
+  padding: 1px 7px; border-radius: var(--r-pill);
+  font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+}
+.parc-status-badge svg { flex-shrink: 0; }
+.parc-status-badge--concluida { background: var(--success-muted); color: var(--success); }
+.parc-status-badge--atrasada { background: var(--error-muted); color: var(--error); }
+
+/* barra de progresso: track ocupa a largura, % à direita */
+.parc-progress { display: flex; align-items: center; gap: 8px; }
+.parc-progress__track { flex: 1; min-width: 0; height: 6px; border-radius: 999px; background: var(--surface-sunken); overflow: hidden; }
+.parc-progress__bar { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+.parc-progress__label { flex-shrink: 0; font-size: 0.72rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+/* "Pago X · Falta Y" */
+.parc-pago-restante { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; font-size: 0.74rem; color: var(--text-secondary); }
+.parc-pago-restante__sep { color: var(--text-muted); opacity: 0.6; }
+.parc-pago-restante__restante { color: var(--text-muted); }
+
+/* chip "Próxima: data · valor" */
+.parc-proxima-chip {
+  display: inline-flex; align-items: center; gap: 4px; width: fit-content; max-width: 100%;
+  padding: 2px 9px; border-radius: var(--r-pill);
+  background: var(--accent-muted); color: var(--accent);
+  font-size: 0.7rem; font-weight: 600; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.parc-proxima-chip svg { flex-shrink: 0; }
 .page-transacoes-parcelado-grupo__valor-suf { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; }
 .page-transacoes-parcelado-grupo__chev { color: var(--text-muted); transition: transform 200ms var(--ease); }
 .page-transacoes-parcelado-grupo--open .page-transacoes-parcelado-grupo__chev { transform: rotate(180deg); }
@@ -442,17 +561,20 @@
 
 .page-transacoes-parcelado-parcela {
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  /* índice + data + status juntos à esquerda; valor ocupa o resto (à direita) */
+  grid-template-columns: auto auto auto 1fr;
   align-items: center;
-  gap: 10px;
+  column-gap: 8px;
+  row-gap: 4px;
   padding: 9px 14px;
   font-size: 0.84rem;
 }
 .page-transacoes-parcelado-parcela + .page-transacoes-parcelado-parcela { border-top: 1px solid var(--hairline); }
-.page-transacoes-parcelado-parcela__idx { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
-.page-transacoes-parcelado-parcela__data { color: var(--text-secondary); }
-.page-transacoes-parcelado-parcela__status { font-size: 0.7rem; color: var(--text-muted); }
+.page-transacoes-parcelado-parcela__idx { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.page-transacoes-parcelado-parcela__data { color: var(--text-secondary); white-space: nowrap; }
+.page-transacoes-parcelado-parcela__status { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; }
 .page-transacoes-parcelado-parcela__status--pendente { color: var(--accent); }
+.page-transacoes-parcelado-parcela__status--pago { color: var(--success); font-weight: 600; }
 .page-transacoes-parcelado-parcela__valor { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
 .page-transacoes-parcelado-parcela__acoes { display: flex; gap: 6px; }
 /* botões de parcela: sem dimensões explícitas → garantir ≥44px via hit area */
@@ -509,6 +631,10 @@
 .page-transacoes-parcelados-footer__value--neg { color: var(--error); }
 .page-transacoes-parcelados-footer__value--warning { color: var(--accent); }
 .page-transacoes-parcelados-footer__divider { flex-basis: 100%; height: 0; }
+
+/* Footer de 4 totais: grid 2×2 (duas linhas) em vez de 4 linhas empilhadas. */
+.parc-footer-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+.parc-footer-4 .page-transacoes-parcelados-footer__divider { display: none; }
 
 /* ── Carregar mais ─────────────────────────────────────────────────────────── */
 .page-transacoes-load-more {
@@ -586,8 +712,9 @@
   }
   .page-transacoes-ref-table .transacoes-actions .btn-edit,
   .page-transacoes-ref-table .transacoes-actions .btn-delete { width: 36px; height: 36px; }
-  .tx-quick-summary { padding: 10px; }
-  .tx-quick-summary__value { font-size: 0.9rem; }
+  .tx-quick-summary { padding: 10px; gap: 6px; }
+  /* fonte do valor é fluida (clamp na regra base) — sem override fixo,
+     que reintroduziria o overflow em valores grandes no mobile. */
   .page-transacoes-tx-filter-hint { font-size: 0.78rem; }
 }
 
