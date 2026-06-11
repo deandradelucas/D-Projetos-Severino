@@ -12,6 +12,7 @@ import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { useRelatorioAggregates, computeRelatorioAggregates } from '../hooks/useRelatorioAggregates'
 import { useMatchMaxWidth } from '../hooks/useMatchMaxWidth'
 import { readHorizonteUserProfile, horizonteUserProfileTemId } from '../lib/horizonteSession'
+import { readRelatoriosCache, writeRelatoriosCache, relFiltersSig } from '../lib/relatoriosCachePersist'
 import { getRelatorioChartPalette } from '../lib/relatorioChartTokens'
 import { downloadRelatorioCsv } from '../lib/relatorioExportCsv'
 import { buildRelatorioPdfDoc, downloadRelatorioPdf } from '../lib/relatorioExportPdf'
@@ -71,40 +72,55 @@ function renderIaAnalise(text) {
   return `<p>${inner}</p>`
 }
 
+// Filtros iniciais: lembra o último usado (R11) ou cai no mês atual. Extraído
+// para ser reusado pela hidratação do cache (precisa da mesma assinatura).
+function computeInitialRelFilters() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('horizonte_relatorios_filtros') || 'null')
+    if (saved && saved.dataInicio && saved.dataFim) {
+      return { dataInicio: saved.dataInicio, dataFim: saved.dataFim, categoria_id: saved.categoria_id || '' }
+    }
+  } catch { /* ignore */ }
+  const today = new Date()
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]
+  return { dataInicio: firstDay, dataFim: lastDay, categoria_id: '' }
+}
+
 export default function Relatorios() {
   const { privacyMode, theme } = useTheme()
   const isDark = theme === 'dark'
   const chartMono = false
   const [usuario] = useState(() => readHorizonteUserProfile())
 
+  // Hidratação do cold start: calcula filtros iniciais + lê o snapshot do cache
+  // (válido só se a assinatura do filtro bater). Calculado uma vez.
+  const hydrateRef = useRef(undefined)
+  if (hydrateRef.current === undefined) {
+    const f = computeInitialRelFilters()
+    const prof = readHorizonteUserProfile()
+    const cached = prof?.id ? readRelatoriosCache(prof.id, relFiltersSig(f)) : null
+    hydrateRef.current = { filters: f, transacoes: Array.isArray(cached) ? cached : null }
+  }
+  const hydrate = hydrateRef.current
+
   // States
   const [menuAberto, setMenuAberto] = useState(false)
-  const [transacoes, setTransacoes] = useState([])
+  const [transacoes, setTransacoes] = useState(hydrate.transacoes || [])
   const [categorias, setCategorias] = useState([])
   const [recorrenciasAtivas, setRecorrenciasAtivas] = useState([])
-  const firstFetchDoneRef = useRef(false)
-  const [loading, setLoading] = useState(() => horizonteUserProfileTemId(readHorizonteUserProfile()))
+  // Hidratou → trata a 1ª carga como revalidação (refreshing, sem spinner).
+  const firstFetchDoneRef = useRef(!!hydrate.transacoes)
+  const [loading, setLoading] = useState(() =>
+    hydrate.transacoes ? false : horizonteUserProfileTemId(readHorizonteUserProfile())
+  )
   const [refreshing, setRefreshing] = useState(false)
   const [pdfExportLoading, setPdfExportLoading] = useState(false)
   const isMobile = useMatchMaxWidth(768)
 
-  // Filters State (default para o mês atual; R11 — lembra o último filtro usado)
-  const [filters, setFilters] = useState(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('horizonte_relatorios_filtros') || 'null')
-      if (saved && saved.dataInicio && saved.dataFim) {
-        return { dataInicio: saved.dataInicio, dataFim: saved.dataFim, categoria_id: saved.categoria_id || '' }
-      }
-    } catch { /* ignore */ }
-    const today = new Date()
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]
-    return {
-      dataInicio: firstDay,
-      dataFim: lastDay,
-      categoria_id: ''
-    }
-  })
+  // Filters State (default para o mês atual; R11 — lembra o último filtro usado).
+  // Mesma origem da hidratação acima (assinatura precisa bater).
+  const [filters, setFilters] = useState(hydrate.filters)
 
   // R11 — persiste o filtro escolhido
   useEffect(() => {
@@ -161,7 +177,10 @@ export default function Relatorios() {
       if (redirectSe401(res)) return
       if (res.ok) {
         const data = await res.json()
-        setTransacoes(data || [])
+        const lista = data || []
+        setTransacoes(lista)
+        // Persiste o snapshot chaveado pelo filtro atual, p/ cold start instantâneo.
+        if (usuario.id) writeRelatoriosCache(usuario.id, relFiltersSig(filters), lista)
       }
     } catch (err) {
       console.error('[Relatorios] fetchTransacoes:', err)
@@ -170,10 +189,16 @@ export default function Relatorios() {
       setRefreshing(false)
       firstFetchDoneRef.current = true
     }
-  }, [filters])
+  }, [filters, usuario.id])
 
+  // Reset só em TROCA real de usuário (não no mount) — preserva a hidratação do
+  // cache, que já marcou firstFetchDoneRef quando havia snapshot válido.
+  const prevUsuarioIdRef = useRef(usuario.id)
   useEffect(() => {
-    firstFetchDoneRef.current = false
+    if (prevUsuarioIdRef.current !== usuario.id) {
+      firstFetchDoneRef.current = false
+      prevUsuarioIdRef.current = usuario.id
+    }
   }, [usuario.id])
 
   // Carrega regras mensais ativas (assinaturas / "Prazo indeterminado") para

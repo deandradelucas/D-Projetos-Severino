@@ -12,6 +12,8 @@ import GamificacaoBloco from '../components/GamificacaoBloco'
 import { META_ICON_KEYS, metaIconKey } from '../lib/metaIcons'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
+import { readHorizonteUser } from '../lib/horizonteSession'
+import { readMetasCache, writeMetasCache } from '../lib/metasCachePersist'
 import { redirectSeAuthBloqueada } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
@@ -315,9 +317,21 @@ function MetaCard({ meta, onGuardar, onEditar, onExcluir }) {
 // Página
 // ──────────────────────────────────────────────────────────────────────────
 export default function Metas() {
+  // Hidrata do cache persistido no cold start → pinta as metas na hora, sem
+  // spinner, e revalida em background.
+  const cacheInicialRef = useRef(undefined)
+  if (cacheInicialRef.current === undefined) {
+    const u = readHorizonteUser()
+    const cached = u?.id ? readMetasCache(u.id) : null
+    cacheInicialRef.current = Array.isArray(cached) && cached.length ? cached : null
+  }
+  const metasCache = cacheInicialRef.current
+  const hidratadoRef = useRef(!!metasCache)
+  const montadoRef = useRef(false)
+
   const [menuAberto, setMenuAberto] = useState(false)
-  const [metas, setMetas] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [metas, setMetas] = useState(metasCache || [])
+  const [loading, setLoading] = useState(!metasCache)
   const [isMembroConta, setIsMembroConta] = useState(false)
   const [escopo, setEscopo] = useState('familia') // 'familia' | 'pessoal'
   const [modalMeta, setModalMeta] = useState(false)
@@ -365,14 +379,21 @@ export default function Metas() {
 
   const pessoalParam = isMembroConta && escopo === 'pessoal' ? '?pessoal=1' : ''
 
-  const carregar = useCallback(async (pp = pessoalParam) => {
-    setLoading(true)
+  const carregar = useCallback(async (pp = pessoalParam, { silent = false } = {}) => {
+    // Com cache hidratado, revalida em background (sem flash de spinner).
+    if (!silent) setLoading(true)
     try {
       const res = await apiFetch(apiUrl(`/api/metas${pp}`), { cache: 'no-store' })
       if (redirectSeAuthBloqueada(res)) return
       if (!res.ok) throw new Error('Não foi possível carregar as metas.')
       const data = await res.json()
-      setMetas(Array.isArray(data) ? data : [])
+      const lista = Array.isArray(data) ? data : []
+      setMetas(lista)
+      // Persiste só o snapshot do escopo padrão (sem ?pessoal=1) p/ cold start.
+      if (pp === '') {
+        const u = readHorizonteUser()
+        if (u?.id) writeMetasCache(u.id, lista)
+      }
     } catch (e) {
       showToast(e.message || 'Erro ao carregar metas.', 'error')
       setMetas([])
@@ -388,7 +409,13 @@ export default function Metas() {
       .catch(() => {})
   }, [])
 
-  useEffect(() => { void carregar(pessoalParam) }, [escopo]) // eslint-disable-line react-hooks/exhaustive-deps
+  // 1ª carga (mount) revalida em silêncio se hidratou do cache; troca de escopo
+  // mostra o loading normalmente.
+  useEffect(() => {
+    const silent = !montadoRef.current && hidratadoRef.current
+    montadoRef.current = true
+    void carregar(pessoalParam, { silent })
+  }, [escopo]) // eslint-disable-line react-hooks/exhaustive-deps
 
 
   async function salvarMeta(payload) {

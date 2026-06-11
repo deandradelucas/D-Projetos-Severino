@@ -17,6 +17,7 @@ import TaxaCdiBadge from '../components/TaxaCdiBadge.jsx'
 import { apiUrl } from '../lib/apiUrl'
 import { apiFetch } from '../lib/apiFetch'
 import { readHorizonteUser } from '../lib/horizonteSession'
+import { readInvestimentosCache, writeInvestimentosCache } from '../lib/investimentosCachePersist'
 import { redirectSeAuthBloqueada } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
 import { INVESTIMENTOS_PRESETS_LIST } from '../lib/investimentosPresets'
@@ -48,9 +49,21 @@ function buildOptimisticItem(payload, uid, id) {
 }
 
 export default function Investimentos() {
+  // Hidrata do cache persistido no cold start → pinta os investimentos na hora,
+  // sem spinner, e revalida em background.
+  const cacheInicialRef = useRef(undefined)
+  if (cacheInicialRef.current === undefined) {
+    const u = readHorizonteUser()
+    const cached = u?.id ? readInvestimentosCache(u.id) : null
+    cacheInicialRef.current = Array.isArray(cached) && cached.length ? cached : null
+  }
+  const investCache = cacheInicialRef.current
+  const hidratadoRef = useRef(!!investCache)
+  const montadoRef = useRef(false)
+
   const [menuAberto, setMenuAberto] = useState(false)
-  const [lista, setLista] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [lista, setLista] = useState(investCache || [])
+  const [loading, setLoading] = useState(!investCache)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalResetKey, setModalResetKey] = useState(0)
   const [submitting, setSubmitting] = useState(false)
@@ -77,9 +90,10 @@ export default function Investimentos() {
   const uid = session?.id ? String(session.id).trim() : ''
   const pregaoCdiHoje = ehDiaUtilComPregaoCdi()
 
-  const carregar = useCallback(async () => {
+  const carregar = useCallback(async ({ silent = false } = {}) => {
     if (!uid) return
-    setLoading(true)
+    // Com cache hidratado, revalida em background (sem flash de spinner).
+    if (!silent) setLoading(true)
     try {
       const res = await apiFetch(apiUrl('/api/investimentos'), {
         cache: 'no-store',
@@ -90,7 +104,9 @@ export default function Investimentos() {
         throw new Error(err.message || 'Não foi possível carregar os investimentos.')
       }
       const data = await res.json()
-      setLista(Array.isArray(data) ? data : [])
+      const listaNova = Array.isArray(data) ? data : []
+      setLista(listaNova)
+      writeInvestimentosCache(uid, listaNova)
     } catch (e) {
       showToast(e.message || 'Erro ao carregar investimentos.', 'error')
       setLista([])
@@ -100,7 +116,9 @@ export default function Investimentos() {
   }, [uid])
 
   useEffect(() => {
-    void carregar()
+    const silent = !montadoRef.current && hidratadoRef.current
+    montadoRef.current = true
+    void carregar({ silent })
   }, [carregar])
 
   useEffect(() => {
