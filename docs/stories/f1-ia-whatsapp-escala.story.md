@@ -1,6 +1,6 @@
 # Story F1 — Escala da IA do WhatsApp (fase custo-zero)
 
-**Status:** InReview (validado local, aguardando deploy+smoke) · **Origem:** Backlog pacote 5 / roadmap jun-2026 ("maior alavanca de escala")
+**Status:** Done (fase 1) — deployado em prod (commit f972efb, 10/jun). `GET /api/health` confirma `groq.configured:true`, `gemini.configured:true`, `ia:{dia}` presente. Fase 2 (provider pago/balanceamento) fica para quando a telemetria mostrar o consumo real. · **Origem:** Backlog pacote 5 / roadmap jun-2026 ("maior alavanca de escala")
 
 ## Verificação local (10/jun)
 - Núcleo novo: `ai-cache.mjs` (+8 testes), `ai-telemetry.mjs` (+4 testes), `redis-shared.mjs` (getRedis extraído do rate-limit), `groq-client.mjs` ganhou `groqTranscribeAudio` (Whisper).
