@@ -17,7 +17,10 @@ import {
   enriquecerCategoriaPorTexto,
   fallbackParseMensagemSimples,
 } from './domain/transaction-heuristics.mjs'
-import { groqChatCompletion } from './ai/groq-client.mjs'
+import { groqChatCompletion, groqTranscribeAudio } from './ai/groq-client.mjs'
+import { aiCacheKey, aiCacheGet, aiCacheSet, AI_CACHE_TTL } from './ai/ai-cache.mjs'
+import { recordAiCall, recordCache } from './ai/ai-telemetry.mjs'
+import { hojeYmdBrt } from './date-brt.mjs'
 
 const MAX_WHATSAPP_AUDIO_BYTES = 20 * 1024 * 1024
 
@@ -254,6 +257,19 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario, usu
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
 
+  // AC2: cache na frente — chave inclui data BRT para não vazar respostas "hoje/ontem"
+  const cacheKey = aiCacheKey('parse-tx', message.trim().toLowerCase(), hojeYmdBrt(), usuarioId)
+  try {
+    const cached = await aiCacheGet(cacheKey)
+    if (cached !== null) {
+      recordCache(true)
+      return cached
+    }
+    recordCache(false)
+  } catch {
+    // cache best-effort — nunca bloqueia o fluxo
+  }
+
   const catMap = categoriasUsuario.map((c) => {
     const subs = c.subcategorias.map((s) => `    • "${s.nome}" → ID: ${s.id}`).join('\n')
     return `▸ ${c.tipo} | Categoria: "${c.nome}" → ID: ${c.id}\n${subs}`
@@ -268,8 +284,11 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario, usu
 
   const models = resolveGeminiModelCandidates()
   let lastWhatsappErr = null
+  // AC6: flag para saber se todos os modelos Gemini falharam (HTTP OU exceção)
+  let geminiExhausted = false
 
   for (const mid of models) {
+    let httpFailed = false
     try {
       const genCfg = buildGeminiGenerationConfig(mid, { maxOutputTokens: 700, temperature: 0.15 })
 
@@ -282,6 +301,8 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario, usu
       if (!response.ok) {
         const t = await response.text()
         lastWhatsappErr = new Error(`Gemini ${response.status}: ${t.slice(0, 200)}`)
+        recordAiCall('gemini', 'parse-tx', 'fail')
+        httpFailed = true
         continue
       }
 
@@ -293,39 +314,53 @@ export async function parseWhatsAppMessageWithAI(message, categoriasUsuario, usu
 
       const sanitized = sanitizeTransacaoExtraidaIA(parsed, categoriasUsuario)
       const textoEnriquecimento = [message, parsed?.descricao].filter(Boolean).join(' ')
-      return enriquecerCategoriaPorTexto(textoEnriquecimento, sanitized, categoriasUsuario)
-    } catch {
-      const simples = fallbackParseMensagemSimples(message)
-      if (simples) return enriquecerCategoriaPorTexto(message, simples, categoriasUsuario)
+      const result = enriquecerCategoriaPorTexto(textoEnriquecimento, sanitized, categoriasUsuario)
+      recordAiCall('gemini', 'parse-tx', 'ok')
 
-      return {
-        tipo: 'CHAT',
-        valor: null,
-        descricao: 'Conversa',
-        resposta: 'Entendi o que você disse, mas não identifiquei uma transação financeira. Se quiser lançar um gasto, tente: "gastei 50 no mercado".',
+      // Só cacheia respostas úteis (não CHAT sem info, não erros)
+      if (result && result.tipo !== 'CHAT' && result.valor != null && result.descricao) {
+        try { await aiCacheSet(cacheKey, result, AI_CACHE_TTL.parseTransacao) } catch { /* noop */ }
+      }
+      return result
+    } catch (e) {
+      if (!httpFailed) {
+        // Exceção inesperada no modelo — marca como falha e continua para Groq
+        lastWhatsappErr = e
+        recordAiCall('gemini', 'parse-tx', 'fail')
       }
     }
   }
 
-  // Fallback Groq (Llama) — tenta quando todos os modelos Gemini falharam por erro HTTP
-  const groqKey = process.env.GROQ_API_KEY
-  if (groqKey) {
-    try {
-      const groqText = await groqChatCompletion({
-        apiKey: groqKey,
-        systemPrompt: systemInstruction,
-        userMessage,
-      })
-      const groqParsed = tryParseJsonBlock(groqText)
-      if (groqParsed && groqParsed.tipo) {
-        log.info('[ai-whatsapp] groq fallback ok', { tipo: groqParsed.tipo })
-        if (groqParsed.descricao) groqParsed.descricao = normalizarDescricao(groqParsed.descricao)
-        const sanitized = sanitizeTransacaoExtraidaIA(groqParsed, categoriasUsuario)
-        const textoEnriq = [message, groqParsed?.descricao].filter(Boolean).join(' ')
-        return enriquecerCategoriaPorTexto(textoEnriq, sanitized, categoriasUsuario)
+  geminiExhausted = true
+
+  // AC6: fallback Groq — dispara quando todos os modelos Gemini falharam (HTTP ou exceção)
+  if (geminiExhausted) {
+    const groqKey = process.env.GROQ_API_KEY
+    if (groqKey) {
+      try {
+        const groqText = await groqChatCompletion({
+          apiKey: groqKey,
+          systemPrompt: systemInstruction,
+          userMessage,
+        })
+        const groqParsed = tryParseJsonBlock(groqText)
+        if (groqParsed && groqParsed.tipo) {
+          log.info('[ai-whatsapp] groq fallback ok', { tipo: groqParsed.tipo })
+          if (groqParsed.descricao) groqParsed.descricao = normalizarDescricao(groqParsed.descricao)
+          const sanitized = sanitizeTransacaoExtraidaIA(groqParsed, categoriasUsuario)
+          const textoEnriq = [message, groqParsed?.descricao].filter(Boolean).join(' ')
+          const result = enriquecerCategoriaPorTexto(textoEnriq, sanitized, categoriasUsuario)
+          recordAiCall('groq', 'parse-tx', 'ok')
+          if (result && result.tipo !== 'CHAT' && result.valor != null && result.descricao) {
+            try { await aiCacheSet(cacheKey, result, AI_CACHE_TTL.parseTransacao) } catch { /* noop */ }
+          }
+          return result
+        }
+        recordAiCall('groq', 'parse-tx', 'fail')
+      } catch (e) {
+        recordAiCall('groq', 'parse-tx', 'fail')
+        log.warn('[ai-whatsapp] groq fallback error', e?.message)
       }
-    } catch (e) {
-      log.warn('[ai-whatsapp] groq fallback error', e?.message)
     }
   }
 
@@ -412,6 +447,26 @@ export async function parseWhatsAppAudioDirectWithAI(audioBytes, mimeHint = '', 
         if (e?.message?.includes?.('401')) throw e
         lastErr = e
       }
+    }
+  }
+
+  // AC4: fallback Groq Whisper — transcreve e reutiliza pipeline de texto (que tem cache + fallback)
+  const groqKey = process.env.GROQ_API_KEY
+  if (groqKey) {
+    try {
+      const transcricao = await groqTranscribeAudio({
+        apiKey: groqKey,
+        audio: buf,
+        filename: 'audio.ogg',
+        mime: mimeHint || 'audio/ogg',
+      })
+      recordAiCall('groq', 'audio-transcribe', 'ok')
+      if (transcricao && transcricao.trim()) {
+        return await parseWhatsAppMessageWithAI(transcricao.trim(), categoriasUsuario, usuarioId)
+      }
+    } catch (e) {
+      recordAiCall('groq', 'audio-transcribe', 'fail')
+      log.warn({ msg: 'whatsapp_audio_groq_whisper_failed', detail: String(e?.message || e) })
     }
   }
 

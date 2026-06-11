@@ -6,6 +6,27 @@ import {
 } from './ai/gemini-client.mjs'
 import { tryParseJsonBlock } from './ai/parsers.mjs'
 import { enriquecerCategoriaPorTexto } from './domain/transaction-heuristics.mjs'
+import { groqChatCompletion } from './ai/groq-client.mjs'
+import { aiCacheKey, aiCacheGet, aiCacheSet, AI_CACHE_TTL } from './ai/ai-cache.mjs'
+import { recordAiCall, recordCache } from './ai/ai-telemetry.mjs'
+
+/** Monta hash estável das categorias do usuário para chave de cache. */
+function hashCategorias(categoriasUsuario) {
+  return (categoriasUsuario || []).map((c) => c.id).sort().join(',')
+}
+
+/**
+ * Valida e extrai categoria/subcategoria do JSON parseado contra a lista do usuário.
+ */
+function validateCatResult(parsed, catsTipo) {
+  if (!parsed || typeof parsed !== 'object') return null
+  const cat = catsTipo.find((c) => c.id === parsed.categoria_id)
+  if (!cat) return { categoria_id: null, subcategoria_id: null }
+  const sub = parsed.subcategoria_id
+    ? (cat.subcategorias || []).find((s) => s.id === parsed.subcategoria_id)
+    : null
+  return { categoria_id: cat.id, subcategoria_id: sub?.id ?? null }
+}
 
 /**
  * Sugere categoria e subcategoria para uma transação a partir da descrição.
@@ -22,7 +43,19 @@ export async function suggestCategoryForTransaction(descricao, tipo, categoriasU
     return { categoria_id: enriched.categoria_id, subcategoria_id: enriched.subcategoria_id ?? null }
   }
 
-  // Passo 2: Gemini como fallback
+  // Passo 2: cache (chave: descricao normalizada + tipo + hash das categorias)
+  const cacheKey = aiCacheKey('categoria', texto.toLowerCase(), tipo, hashCategorias(categoriasUsuario))
+  try {
+    const cached = await aiCacheGet(cacheKey)
+    if (cached !== null) {
+      recordCache(true)
+      return cached
+    }
+    recordCache(false)
+  } catch {
+    // best-effort
+  }
+
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) return { categoria_id: null, subcategoria_id: null }
 
@@ -46,29 +79,58 @@ export async function suggestCategoryForTransaction(descricao, tipo, categoriasU
     `Se nenhuma categoria for adequada: {"categoria_id":null,"subcategoria_id":null}`
 
   const models = resolveGeminiModelCandidates()
+  let geminiOk = false
   for (const mid of models) {
     try {
       const response = await geminiPostGenerateContent(mid, apiKey, {
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: buildGeminiGenerationConfig(mid, { maxOutputTokens: 100, temperature: 0.1 }),
       })
-      if (!response.ok) continue
+      if (!response.ok) {
+        recordAiCall('gemini', 'categoria', 'fail')
+        continue
+      }
 
       const json = await response.json()
       const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''
-      const parsed = tryParseJsonBlock(text)
-      if (!parsed || typeof parsed !== 'object') continue
+      const result = validateCatResult(tryParseJsonBlock(text), catsTipo)
+      if (!result) {
+        recordAiCall('gemini', 'categoria', 'fail')
+        continue
+      }
 
-      const cat = catsTipo.find((c) => c.id === parsed.categoria_id)
-      if (!cat) return { categoria_id: null, subcategoria_id: null }
-
-      const sub = parsed.subcategoria_id
-        ? (cat.subcategorias || []).find((s) => s.id === parsed.subcategoria_id)
-        : null
-
-      return { categoria_id: cat.id, subcategoria_id: sub?.id ?? null }
+      recordAiCall('gemini', 'categoria', 'ok')
+      geminiOk = true
+      try { await aiCacheSet(cacheKey, result, AI_CACHE_TTL.categoria) } catch { /* noop */ }
+      return result
     } catch {
+      recordAiCall('gemini', 'categoria', 'fail')
       continue
+    }
+  }
+
+  // Fallback Groq quando todos os modelos Gemini falharam
+  if (!geminiOk) {
+    const groqKey = process.env.GROQ_API_KEY
+    if (groqKey) {
+      try {
+        const groqText = await groqChatCompletion({
+          apiKey: groqKey,
+          systemPrompt: 'Você categoriza transações financeiras em português. Retorne APENAS JSON válido.',
+          userMessage: prompt,
+          maxTokens: 100,
+          temperature: 0.1,
+        })
+        const result = validateCatResult(tryParseJsonBlock(groqText), catsTipo)
+        if (result) {
+          recordAiCall('groq', 'categoria', 'ok')
+          try { await aiCacheSet(cacheKey, result, AI_CACHE_TTL.categoria) } catch { /* noop */ }
+          return result
+        }
+        recordAiCall('groq', 'categoria', 'fail')
+      } catch {
+        recordAiCall('groq', 'categoria', 'fail')
+      }
     }
   }
 
@@ -77,7 +139,7 @@ export async function suggestCategoryForTransaction(descricao, tipo, categoriasU
 
 /**
  * Categoriza um array de transações em uma única chamada Gemini.
- * Heurísticas rodam primeiro; Gemini só para o que sobrar.
+ * Heurísticas rodam primeiro; cache item-a-item antes do chunk; Gemini só para o que sobrar.
  *
  * @param {Array<{descricao, tipo}>} rows
  * @param {Array} categoriasUsuario
@@ -97,8 +159,32 @@ export async function suggestCategoriesBatch(rows, categoriasUsuario) {
       : null
   })
 
-  const pendentes = results.map((r, i) => r === null ? i : null).filter((i) => i !== null)
+  let pendentes = results.map((r, i) => r === null ? i : null).filter((i) => i !== null)
   if (!pendentes.length) return results.map((r) => r || { categoria_id: null, subcategoria_id: null })
+
+  // Passo 2: cache item-a-item antes de qualquer chamada de API
+  const catHash = hashCategorias(categoriasUsuario)
+  const cacheHits = await Promise.all(
+    pendentes.map(async (idx) => {
+      const texto = String(rows[idx].descricao || '').trim().toLowerCase()
+      const key = aiCacheKey('categoria', texto, rows[idx].tipo, catHash)
+      try {
+        const cached = await aiCacheGet(key)
+        if (cached !== null) { recordCache(true); return { idx, result: cached, key } }
+        recordCache(false)
+      } catch { /* noop */ }
+      return { idx, result: null, key }
+    })
+  )
+  for (const { idx, result } of cacheHits) {
+    if (result !== null) results[idx] = result
+  }
+  // Recalcula pendentes após cache hits
+  pendentes = results.map((r, i) => r === null ? i : null).filter((i) => i !== null)
+  if (!pendentes.length) return results.map((r) => r || { categoria_id: null, subcategoria_id: null })
+
+  // Mapa key por índice para gravar cache após resposta da API
+  const cacheKeyMap = Object.fromEntries(cacheHits.map(({ idx, key }) => [idx, key]))
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -106,7 +192,7 @@ export async function suggestCategoriesBatch(rows, categoriasUsuario) {
     return results.map((r) => r || { categoria_id: null, subcategoria_id: null })
   }
 
-  // Passo 2: uma única chamada Gemini para todos os pendentes (chunks de 50)
+  // Passo 3: uma única chamada Gemini para todos os pendentes (chunks de 50)
   const CHUNK = 50
   for (let start = 0; start < pendentes.length; start += CHUNK) {
     const chunk = pendentes.slice(start, start + CHUNK)
@@ -138,18 +224,56 @@ export async function suggestCategoriesBatch(rows, categoriasUsuario) {
 
     const models = resolveGeminiModelCandidates()
     let batchParsed = null
+    let geminiChunkOk = false
     for (const mid of models) {
       try {
         const response = await geminiPostGenerateContent(mid, apiKey, {
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
           generationConfig: buildGeminiGenerationConfig(mid, { maxOutputTokens: 2048, temperature: 0.1 }),
         })
-        if (!response.ok) continue
+        if (!response.ok) {
+          recordAiCall('gemini', 'categoria', 'fail')
+          continue
+        }
         const json = await response.json()
         const text = json?.candidates?.[0]?.content?.parts?.find((p) => !p.thought && p.text)?.text || ''
         const parsed = tryParseJsonBlock(text)
-        if (Array.isArray(parsed)) { batchParsed = parsed; break }
-      } catch { continue }
+        if (Array.isArray(parsed)) {
+          batchParsed = parsed
+          geminiChunkOk = true
+          recordAiCall('gemini', 'categoria', 'ok')
+          break
+        }
+        recordAiCall('gemini', 'categoria', 'fail')
+      } catch {
+        recordAiCall('gemini', 'categoria', 'fail')
+        continue
+      }
+    }
+
+    // Fallback Groq para o chunk quando Gemini falhou
+    if (!geminiChunkOk) {
+      const groqKey = process.env.GROQ_API_KEY
+      if (groqKey) {
+        try {
+          const groqText = await groqChatCompletion({
+            apiKey: groqKey,
+            systemPrompt: 'Você categoriza transações financeiras em português. Retorne APENAS um array JSON válido, sem markdown.',
+            userMessage: prompt,
+            maxTokens: 2048,
+            temperature: 0.1,
+          })
+          const parsed = tryParseJsonBlock(groqText)
+          if (Array.isArray(parsed)) {
+            batchParsed = parsed
+            recordAiCall('groq', 'categoria', 'ok')
+          } else {
+            recordAiCall('groq', 'categoria', 'fail')
+          }
+        } catch {
+          recordAiCall('groq', 'categoria', 'fail')
+        }
+      }
     }
 
     if (batchParsed) {
@@ -163,11 +287,14 @@ export async function suggestCategoriesBatch(rows, categoriasUsuario) {
         const sub = entry.subcategoria_id
           ? (cat.subcategorias || []).find((s) => s.id === entry.subcategoria_id)
           : null
-        results[originalIdx] = { categoria_id: cat.id, subcategoria_id: sub?.id ?? null }
+        const result = { categoria_id: cat.id, subcategoria_id: sub?.id ?? null }
+        results[originalIdx] = result
+        // Gravar cache por item
+        try { await aiCacheSet(cacheKeyMap[originalIdx], result, AI_CACHE_TTL.categoria) } catch { /* noop */ }
       }
     }
 
-    // preenche qualquer pendente que o Gemini não respondeu
+    // preenche qualquer pendente que as APIs não responderam
     chunk.forEach((originalIdx) => {
       if (results[originalIdx] === null) results[originalIdx] = { categoria_id: null, subcategoria_id: null }
     })

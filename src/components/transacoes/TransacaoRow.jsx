@@ -1,6 +1,7 @@
 import React from 'react'
 import RecorrenciaArrowIcon from '../RecorrenciaArrowIcon'
-import { TransacaoCategoriaIcon, getCategoriaIconChipStyle } from '../TransacaoCategoriaIcon'
+import { TransacaoCategoriaIcon } from '../TransacaoCategoriaIcon'
+import { getCategoriaIconChipStyle } from '../../lib/categoriaIconStyle'
 import { formatCurrencyBRL } from '../../lib/formatCurrency'
 import { formatTransacaoListDateTime } from '../../lib/transacaoDateDisplay'
 import { transacaoDescricaoEfetiva } from '../../lib/transacaoUtils'

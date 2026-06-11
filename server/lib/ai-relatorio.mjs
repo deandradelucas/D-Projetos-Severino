@@ -6,6 +6,8 @@ import {
   resolveGeminiModelCandidates,
 } from './ai/gemini-client.mjs'
 import { extractTextFromGeminiResponse, contentsWithSystemPrepended } from './ai/parsers.mjs'
+import { groqChatCompletion } from './ai/groq-client.mjs'
+import { recordAiCall } from './ai/ai-telemetry.mjs'
 
 const fmtBrl = (v) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(v) || 0)
@@ -137,21 +139,49 @@ ${dadosBloco}
           const apiMsg = json?.error?.message || rawBody?.slice(0, 400) || 'sem detalhe'
           lastError = new Error(`Gemini API ${response.status}: ${apiMsg}`)
           log.warn('[analisarRelatorio] modelo falhou', { modelId, status: response.status })
+          recordAiCall('gemini', 'relatorio', 'fail')
           if (payload.systemInstruction) continue
           break
         }
 
         const extracted = extractTextFromGeminiResponse(json)
-        if (extracted.ok) return extracted.text
+        if (extracted.ok) {
+          recordAiCall('gemini', 'relatorio', 'ok')
+          return extracted.text
+        }
         if (extracted.kind === 'prompt_blocked' || extracted.kind === 'response_blocked') {
           throw new Error('Não foi possível gerar a análise deste período (filtro de segurança).')
         }
         lastError = new Error(`Resposta vazia da API do Gemini (${extracted.kind})`)
+        recordAiCall('gemini', 'relatorio', 'fail')
       } catch (e) {
         lastError = e
         if (/filtro de segurança/i.test(e?.message || '')) throw e
+        recordAiCall('gemini', 'relatorio', 'fail')
         continue
       }
+    }
+  }
+
+  // Fallback Groq quando todos os modelos Gemini falharam
+  const groqKey = process.env.GROQ_API_KEY
+  if (groqKey) {
+    try {
+      const text = await groqChatCompletion({
+        apiKey: groqKey,
+        systemPrompt,
+        userMessage: 'Analise meu período com base nos dados acima.',
+        maxTokens: 1024,
+        temperature: 0.6,
+      })
+      if (text && text.trim()) {
+        recordAiCall('groq', 'relatorio', 'ok')
+        return text.trim()
+      }
+      recordAiCall('groq', 'relatorio', 'fail')
+    } catch (e) {
+      recordAiCall('groq', 'relatorio', 'fail')
+      log.warn('[analisarRelatorio] groq fallback error', e?.message)
     }
   }
 

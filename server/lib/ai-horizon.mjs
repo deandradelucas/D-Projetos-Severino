@@ -12,6 +12,8 @@ import {
   buildGeminiContents,
   contentsWithSystemPrepended,
 } from './ai/parsers.mjs'
+import { groqChatCompletion } from './ai/groq-client.mjs'
+import { recordAiCall } from './ai/ai-telemetry.mjs'
 
 /**
  * Busca os investimentos do usuário para usar como contexto da IA (inclui rendimento estimado).
@@ -269,24 +271,57 @@ ${contextoAgenda ? `--- AGENDA (próximas semanas) ---\n${contextoAgenda}\n--- F
           const apiMsg = json?.error?.message || rawBody?.slice(0, 500) || 'sem detalhe'
           lastError = new Error(`Gemini API ${response.status}: ${apiMsg}`)
           log.warn('[askHorizon] modelo falhou', { modelId, status: response.status, apiMsg: String(apiMsg).slice(0, 200) })
+          recordAiCall('gemini', 'chat', 'fail')
           if (payload.systemInstruction) continue
           break
         }
 
         const extracted = extractTextFromGeminiResponse(json)
-        if (extracted.ok) return extracted.text
+        if (extracted.ok) {
+          recordAiCall('gemini', 'chat', 'ok')
+          return extracted.text
+        }
         if (extracted.kind === 'prompt_blocked' || extracted.kind === 'response_blocked') {
           throw new Error('O assistente não pôde responder a este pedido (filtro de segurança).')
         }
         lastError = new Error(
           `Resposta vazia da API do Gemini (${extracted.kind}${extracted.detail ? `: ${extracted.detail}` : ''})`,
         )
+        recordAiCall('gemini', 'chat', 'fail')
         log.warn('[askHorizon] resposta sem texto', { modelId, kind: extracted.kind, detail: extracted.detail })
       } catch (e) {
         lastError = e
         if (/filtro de segurança/i.test(e?.message || '')) throw e
+        recordAiCall('gemini', 'chat', 'fail')
         continue
       }
+    }
+  }
+
+  // Fallback Groq quando todos os modelos Gemini falharam
+  const groqKey = process.env.GROQ_API_KEY
+  if (groqKey) {
+    try {
+      // Monta uma única mensagem de usuário concatenando histórico + mensagem atual
+      const userMsg = [
+        ...historico.map((h) => `${h.role === 'user' ? 'Usuário' : 'Assistente'}: ${h.parts?.[0]?.text ?? ''}`),
+        `Usuário: ${message}`,
+      ].join('\n')
+      const text = await groqChatCompletion({
+        apiKey: groqKey,
+        systemPrompt,
+        userMessage: userMsg,
+        maxTokens: 2048,
+        temperature: 0.7,
+      })
+      if (text && text.trim()) {
+        recordAiCall('groq', 'chat', 'ok')
+        return text.trim()
+      }
+      recordAiCall('groq', 'chat', 'fail')
+    } catch (e) {
+      recordAiCall('groq', 'chat', 'fail')
+      log.warn('[askHorizon] groq fallback error', e?.message)
     }
   }
 

@@ -12,6 +12,9 @@ import { assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 import { groqChatCompletion } from '../ai/groq-client.mjs'
 import { geminiPostGenerateContent, resolveGeminiModelCandidates, buildGeminiGenerationConfig } from '../ai/gemini-client.mjs'
 import { logTituloExtracao, buscarExemplosFewShotTitulo } from './agenda-title-logger.mjs'
+import { aiCacheKey, aiCacheGet, aiCacheSet, AI_CACHE_TTL } from '../ai/ai-cache.mjs'
+import { recordAiCall, recordCache } from '../ai/ai-telemetry.mjs'
+import { hojeYmdBrt } from '../date-brt.mjs'
 
 const AGENDA_KEYWORD_RE =
   /\b(agenda|compromisso|compromissos|reuni[aã]o|reuniao|evento|consulta|consult[óo]rio|dentista|m[eé]dico|exame[s]?|vacina[s]?|anivers[aá]rio|viagem|voo|aula[s]?|treino|academia|apresenta[cç][aã]o|entrevista|cirurgia|check.?in|pagar|pagamento|boleto|conta|agendar|marcar|anotar|anota|cancelar|desmarcar|reagendar|remarcar|confirmar|concluir|finalizar|lembrete|lembra|lembrar|lembre|avise|avisar|alerte|alerta|alertar|buscar|pegar|levar|tomar|ligar)\b/i
@@ -601,9 +604,11 @@ async function extractTituloComGroq(apiKey, message, exemplos = []) {
       maxTokens: 60,
       temperature: 0.1,
     })
+    recordAiCall('groq', 'titulo-agenda', 'ok')
     const titulo = String(text || '').trim().replace(/^["'`]|["'`]$/g, '').trim()
     return titulo.length >= 2 && titulo.length <= 80 ? titulo : null
   } catch {
+    recordAiCall('groq', 'titulo-agenda', 'fail')
     return null
   }
 }
@@ -632,14 +637,22 @@ async function extractTituloComGeminiFlash(message, exemplos = []) {
         generationConfig: buildGeminiGenerationConfig(mid, { maxOutputTokens: 64, temperature: 0.1 }),
       }
       const resp = await geminiPostGenerateContent(mid, apiKey, body)
-      if (!resp.ok) continue
+      if (!resp.ok) {
+        recordAiCall('gemini', 'titulo-agenda', 'fail')
+        continue
+      }
       const json = await resp.json()
       const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || ''
       const titulo = String(text).trim().replace(/^["'`]|["'`]$/g, '').trim()
-      if (titulo.length >= 2 && titulo.length <= 80) return titulo
+      if (titulo.length >= 2 && titulo.length <= 80) {
+        recordAiCall('gemini', 'titulo-agenda', 'ok')
+        return titulo
+      }
+      recordAiCall('gemini', 'titulo-agenda', 'fail')
     }
     return null
   } catch {
+    recordAiCall('gemini', 'titulo-agenda', 'fail')
     return null
   }
 }
@@ -821,19 +834,40 @@ export async function processarMensagemAgenda(usuario, phone, rawMessage, aiTitu
       let tituloFinal = aiTitulo
       let tituloFonte = aiTitulo ? 'gemini' : null
       if (!tituloFinal) {
-        const tituloExemplos = await buscarExemplosFewShotTitulo(uid)
-        const groqKey = process.env.GROQ_API_KEY
-        if (groqKey) {
-          tituloFinal = await extractTituloComGroq(groqKey, message, tituloExemplos)
-          if (tituloFinal) tituloFonte = 'groq'
+        // Cache de título: chave inclui data BRT (contexto "hoje/amanhã" muda o título esperado)
+        const tituloCacheKey = aiCacheKey('titulo-agenda', message.trim().toLowerCase(), hojeYmdBrt())
+        try {
+          const cached = await aiCacheGet(tituloCacheKey)
+          if (cached !== null) {
+            recordCache(true)
+            tituloFinal = cached
+            tituloFonte = 'cache'
+          } else {
+            recordCache(false)
+          }
+        } catch {
+          // best-effort
         }
+
         if (!tituloFinal) {
-          tituloFinal = await extractTituloComGeminiFlash(message, tituloExemplos)
-          if (tituloFinal) tituloFonte = 'gemini-flash'
-        }
-        if (!tituloFinal) {
-          tituloFinal = titleForCreate(message)
-          tituloFonte = 'heuristico'
+          const tituloExemplos = await buscarExemplosFewShotTitulo(uid)
+          const groqKey = process.env.GROQ_API_KEY
+          if (groqKey) {
+            tituloFinal = await extractTituloComGroq(groqKey, message, tituloExemplos)
+            if (tituloFinal) tituloFonte = 'groq'
+          }
+          if (!tituloFinal) {
+            tituloFinal = await extractTituloComGeminiFlash(message, tituloExemplos)
+            if (tituloFinal) tituloFonte = 'gemini-flash'
+          }
+          if (!tituloFinal) {
+            tituloFinal = titleForCreate(message)
+            tituloFonte = 'heuristico'
+          }
+          // Grava no cache se foi obtido via IA (Groq ou Gemini — não heurística)
+          if (tituloFinal && tituloFonte !== 'heuristico') {
+            try { await aiCacheSet(tituloCacheKey, tituloFinal, AI_CACHE_TTL.tituloAgenda) } catch { /* noop */ }
+          }
         }
       }
 

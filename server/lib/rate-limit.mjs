@@ -1,27 +1,10 @@
 // @ts-check
-import Redis from 'ioredis'
+import { getRedis } from './redis-shared.mjs'
 
 /**
  * Rate limit com Redis (quando REDIS_URL está definida) ou in-memory como fallback.
  * Usa fixed-window com INCR + PEXPIRE — atômico e correto por design.
  */
-
-let _redis = null
-
-function getRedis() {
-  if (_redis) return _redis
-  const url = process.env.REDIS_URL
-  if (!url) return null
-  _redis = new Redis(url, {
-    lazyConnect: true,
-    enableReadyCheck: false,
-    maxRetriesPerRequest: 1,
-    connectTimeout: 3000,
-    commandTimeout: 2000,
-  })
-  _redis.on('error', () => { /* suprime stack trace — reconecta automaticamente */ })
-  return _redis
-}
 
 /* Fallback: in-memory (reinicia a cada deploy; adequado para worker único PM2) */
 const buckets = new Map()
