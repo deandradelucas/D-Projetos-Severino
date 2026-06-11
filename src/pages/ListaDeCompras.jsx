@@ -1117,8 +1117,9 @@ export default function ListaDeCompras() {
                   </div>
                 )}
 
-                {/* Adição rápida — só o nome, vira item com 1un e sem preço */}
-                {listaAtiva && !loadingItens && itens.length > 0 && (
+                {/* Adição rápida — só o nome, vira item com 1un e sem preço.
+                   Aparece também com a lista vazia, p/ adicionar o 1º item rápido. */}
+                {listaAtiva && !loadingItens && (
                   <form className="page-lista-compras__quick-add" onSubmit={adicionarRapido}>
                     <span className="page-lista-compras__quick-add-icon" aria-hidden="true"><IconPlus /></span>
                     <input

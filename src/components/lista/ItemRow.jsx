@@ -70,9 +70,9 @@ export function ItemRow({ item, onToggle, onRemover, onEditar, mostrarMedida = t
           {Math.max(1, Number(item.unidades) || 1)}un
         </span>
         )}
-        {item.preco_estimado != null && Number(item.preco_estimado) > 0 && (
+        {mostrarMedida && (
           <span className="page-lista-compras__item-price">
-            {formatarMoeda(Number(item.preco_estimado) * Math.max(1, Number(item.unidades) || 1))}
+            {formatarMoeda((Number(item.preco_estimado) || 0) * Math.max(1, Number(item.unidades) || 1))}
           </span>
         )}
       </div>
