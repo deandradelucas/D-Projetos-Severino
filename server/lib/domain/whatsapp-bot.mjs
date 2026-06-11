@@ -149,7 +149,11 @@ export function assertBotSecret(authHeader) {
   return { ok: true }
 }
 
-export async function calcularSaldo(usuarioId, { inicio = null, fim = null } = {}) {
+/**
+ * Saldo de transações EFETIVADAS (PENDENTE fora, igual ao hero do app).
+ * Default: mês corrente. `total: true` = saldo ATUAL (todo o histórico).
+ */
+export async function calcularSaldo(usuarioId, { inicio = null, fim = null, total = false } = {}) {
   const supabase = getSupabaseAdmin()
   const now = new Date()
   const mesInicio =
@@ -167,13 +171,15 @@ export async function calcularSaldo(usuarioId, { inicio = null, fim = null } = {
     return d.toISOString().split('T')[0]
   })()
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('transacoes')
     .select('tipo, valor')
     .eq('usuario_id', usuarioId)
     .eq('status', 'EFETIVADA')
-    .gte('data_transacao', mesInicio)
-    .lt('data_transacao', mesFimNext)
+  if (!total) {
+    query = query.gte('data_transacao', mesInicio).lt('data_transacao', mesFimNext)
+  }
+  const { data, error } = await query
   if (error) throw error
 
   let receitas = 0
@@ -434,8 +440,9 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
       const supabase = getSupabaseAdmin()
       const now = new Date()
       const mesInicio = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
-      const [saldoData, { data: ultimas }] = await Promise.all([
+      const [saldoData, saldoTotalData, { data: ultimas }] = await Promise.all([
         calcularSaldo(dataUsuarioId),
+        calcularSaldo(dataUsuarioId, { total: true }),
         supabase
           .from('transacoes')
           .select('tipo, valor, descricao, data_transacao, categorias(nome)')
@@ -448,7 +455,7 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
       const { saldo, receitas, despesas, periodo } = saldoData
       const nome = usuario.nome ? ` ${usuario.nome.split(' ')[0]}` : ''
       const mesLabel = fmtPeriodo(periodo.inicio)
-      let reply = `📊 *Resumo de ${mesLabel}${nome}:*\n\n✅ Receitas: ${fmt(receitas)}\n❌ Despesas: ${fmt(despesas)}\n\n💰 *Saldo do mês: ${fmt(saldo)}*`
+      let reply = `💰 *Saldo atual: ${fmt(saldoTotalData.saldo)}*\n\n📊 *Resumo de ${mesLabel}${nome}:*\n✅ Receitas: ${fmt(receitas)}\n❌ Despesas: ${fmt(despesas)}\n💵 Saldo do mês: ${fmt(saldo)}`
       if (ultimas?.length) {
         const linhas = ultimas.map(t => {
           const emoji = t.tipo === 'RECEITA' ? '✅' : '💸'
@@ -771,13 +778,12 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
     return { ok: false, reply: '❌ Erro ao salvar a transação. Tente novamente.' }
   }
 
-  // 7. Montar resposta de confirmação com saldo atualizado
+  // 7. Montar resposta de confirmação com saldo atualizado (saldo ATUAL =
+  // histórico completo, igual ao hero do app — não o recorte do mês)
   let saldoAtual = null
-  let saldoPeriodoLabel = null
   try {
-    const { saldo, periodo } = await calcularSaldo(dataUsuarioId)
+    const { saldo } = await calcularSaldo(dataUsuarioId, { total: true })
     saldoAtual = saldo
-    saldoPeriodoLabel = fmtPeriodo(periodo.inicio)
   } catch {
     // não crítico
   }
@@ -786,7 +792,7 @@ export async function processarMensagemBot(phone, rawMessage, options = {}) {
   const acao = parsed.tipo === 'RECEITA' ? 'Receita' : 'Despesa'
   const saldoLinha =
     saldoAtual !== null
-      ? `\n\n📊 Saldo de ${saldoPeriodoLabel}: *${fmt(saldoAtual)}*`
+      ? `\n\n📊 Saldo atual: *${fmt(saldoAtual)}*`
       : ''
   const dataLinha = dataExplicita
     ? `\n📅 *Data:* ${formatDataTransacaoReplyPtBr(dataTransacaoIso)}`
