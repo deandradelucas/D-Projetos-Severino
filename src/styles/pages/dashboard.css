@@ -340,13 +340,10 @@
   line-height: 1;
   color: var(--text-secondary);
 }
+/* % sempre no tom do card: entrada = verde, saída = vermelho (independe da
+   direção/semântica da variação). A seta ▲▼ continua indicando o sentido. */
 .ref-kpi-card--expense .ref-kpi-card__pct-value { color: var(--error); }
 .ref-kpi-card--income .ref-kpi-card__pct-value { color: var(--success); }
-/* Delta vs mês anterior — cor pela SEMÂNTICA da variação (subir gasto = ruim),
-   não pelo tipo do card. Mesma especificidade das regras acima; depois vence. */
-.ref-kpi-card .ref-kpi-card__pct-value--good { color: var(--success); }
-.ref-kpi-card .ref-kpi-card__pct-value--bad { color: var(--error); }
-.ref-kpi-card .ref-kpi-card__pct-value--flat { color: var(--text-secondary); }
 .ref-kpi-card__pct-label {
   font-size: 0.625rem;
   text-transform: uppercase;
