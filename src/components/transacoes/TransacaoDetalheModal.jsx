@@ -79,7 +79,7 @@ export function TransacaoDetalheModal({ tx, onClose, onEdit, onDelete, privacyMo
               categoriaNome={catNome}
               subcategoriaNome={subNome || undefined}
               isReceita={isRec}
-              size={30}
+              size={34}
             />
           </span>
           <p className={`tx-detalhe-modal__valor ${isRec ? 'is-pos' : 'is-neg'} ${privacyMode ? 'privacy-blur' : ''}`}>

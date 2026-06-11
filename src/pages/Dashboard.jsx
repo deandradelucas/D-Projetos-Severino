@@ -605,7 +605,7 @@ export default function Dashboard() {
                               categoriaNome={catNome}
                               subcategoriaNome={subNome}
                               isReceita={isRec}
-                              size={19}
+                              size={24}
                             />
                           </div>
                         </div>

@@ -2,14 +2,14 @@ import { getTransacaoCategoriaIconKey } from '../lib/transacaoCategoriaIconResol
 import { CATEGORIA_ICON_ALIAS } from '../lib/categoriaIconStyle.js'
 
 /**
- * Ícone da transação — PNGs 3D premium (Icons8 3D Fluency, 128px retina) em
- * /icons/categorias-3d, um por chave de categoria. Pix segue como SVG oficial
- * da marca (não existe 3D licenciado) e as setas receita/despesa continuam
- * SVG line-icon (fallback quando a transação não tem categoria reconhecida).
+ * Ícone da transação — PNGs Icons8 estilo Pulsar Color (traço + preenchimento
+ * colorido, 128px retina) em /icons/categorias, um por chave de categoria.
+ * Pix segue como SVG oficial da marca (não existe no catálogo Icons8) e as
+ * setas receita/despesa continuam SVG line-icon (fallback sem categoria).
  */
 
-/* Chaves com PNG 3D em public/icons/categorias-3d/{key}.png */
-const ICON_3D = new Set([
+/* Chaves com PNG em public/icons/categorias/{key}.png */
+const ICON_PNG = new Set([
   'utensils', 'fuel', 'car', 'home', 'health', 'education', 'leisure',
   'shopping', 'tech', 'subscription', 'fitness', 'receipt', 'pet', 'plane',
   'gift', 'wallet', 'work', 'investment', 'child', 'bank', 'sparkles',
@@ -30,10 +30,10 @@ export function TransacaoCategoriaIcon({ categoriaNome, subcategoriaNome, isRece
   const iconName = CATEGORIA_ICON_ALIAS[mapKey] || mapKey
 
   let icon
-  if (ICON_3D.has(iconName)) {
+  if (ICON_PNG.has(iconName)) {
     icon = (
       <img
-        src={`/icons/categorias-3d/${iconName}.png`}
+        src={`/icons/categorias/${iconName}.png`}
         width={size}
         height={size}
         alt=""
