@@ -17,15 +17,22 @@ import { apiFetch } from '../lib/apiFetch'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import { syncRecorrenciasMensais } from '../lib/syncRecorrenciasMensais'
 import { redirectSeAuthBloqueada } from '../lib/authRedirect'
-import { readHorizonteUser } from '../lib/horizonteSession'
+import { readHorizonteUser, subscribeHorizonteSessionRefresh } from '../lib/horizonteSession'
+import { readTxCache, writeTxCache, clearTxCache } from '../lib/txCachePersist'
 import { TransactionCacheContext, TRANSACOES_REVALIDATED_EVENT } from './transactionCacheStore'
 
 /**
  * Provider — deve envolver o App (ou pelo menos as páginas autenticadas).
  */
 export function TransactionCacheProvider({ children }) {
-  // Cache central: array de transações (pode ter dados stale)
-  const [transacoes, setTransacoes] = useState([])
+  // Cache central: array de transações (pode ter dados stale).
+  // Hidrata do localStorage no cold start → pinta instantâneo, sem skeleton,
+  // e revalida em background (SWR). Sem cache persistido, começa vazio.
+  const [transacoes, setTransacoes] = useState(() => {
+    const u = readHorizonteUser()
+    const cached = u?.id ? readTxCache(u.id) : null
+    return Array.isArray(cached) ? cached : []
+  })
   // true apenas no primeiro fetch — sem dados em cache ainda
   const [loadingInitial, setLoadingInitial] = useState(false)
   // true quando há revalidação silenciosa em background
@@ -34,8 +41,8 @@ export function TransactionCacheProvider({ children }) {
 
   // Evita revalidações concorrentes
   const fetchingRef = useRef(false)
-  // Indica se já carregou dados ao menos uma vez
-  const hasDataRef = useRef(false)
+  // Indica se já carregou dados ao menos uma vez (true se hidratou do cache)
+  const hasDataRef = useRef(transacoes.length > 0)
   // Timer compartilhado pelas mutações otimistas (debounce de revalidação)
   const optimisticRevalidateTimerRef = useRef(0)
 
@@ -72,7 +79,9 @@ export function TransactionCacheProvider({ children }) {
 
       if (res.ok) {
         const data = await res.json()
-        setTransacoes(Array.isArray(data) ? data : [])
+        const lista = Array.isArray(data) ? data : []
+        setTransacoes(lista)
+        writeTxCache(session.id, lista)
         hasDataRef.current = true
         setError('')
         if (typeof window !== 'undefined') {
@@ -90,6 +99,22 @@ export function TransactionCacheProvider({ children }) {
       setRevalidating(false)
       fetchingRef.current = false
     }
+  }, [])
+
+  /**
+   * Sessão que chega DEPOIS da montagem (login no mesmo carregamento): hidrata o
+   * cache persistido daquele usuário antes do fetch de rede retornar, para a UI
+   * pintar instantâneo também nesse caminho.
+   */
+  useEffect(() => {
+    return subscribeHorizonteSessionRefresh((u) => {
+      if (!u?.id || hasDataRef.current) return
+      const cached = readTxCache(u.id)
+      if (Array.isArray(cached) && cached.length) {
+        setTransacoes(cached)
+        hasDataRef.current = true
+      }
+    })
   }, [])
 
   /**
@@ -181,6 +206,8 @@ export function TransactionCacheProvider({ children }) {
    */
   const invalidateCache = useCallback(() => {
     hasDataRef.current = false
+    const u = readHorizonteUser()
+    if (u?.id) clearTxCache(u.id)
     setTransacoes([])
     setError('')
   }, [])
