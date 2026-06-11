@@ -19,6 +19,7 @@ import { registerOnboardingRoutes } from './register-onboarding.mjs'
 import { registerDigestRoutes } from './register-digest.mjs'
 import { registerTrialRoutes } from './register-trial.mjs'
 import { registerImportRoutes } from './register-import.mjs'
+import { registerIaCronRoutes } from './register-ia-cron.mjs'
 
 /** Regista todas as rotas `/api/*` (exceto health, montado em app.mjs). */
 export function registerApiDomainRoutes(app) {
@@ -43,4 +44,5 @@ export function registerApiDomainRoutes(app) {
   registerDigestRoutes(app)
   registerTrialRoutes(app)
   registerImportRoutes(app)
+  registerIaCronRoutes(app)
 }
