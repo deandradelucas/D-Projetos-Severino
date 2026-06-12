@@ -314,3 +314,28 @@
 @media (prefers-reduced-motion: reduce) {
   .page-cartoes__card { transition: none; }
 }
+
+/* ── Assinaturas vinculadas ao cartão (regra mensal, sempre visíveis) ────── */
+.page-cartoes__assinaturas {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed color-mix(in srgb, currentColor 25%, transparent);
+}
+.page-cartoes__assinaturas-label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+.page-cartoes__assinatura {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.page-cartoes__assinatura svg { flex-shrink: 0; opacity: 0.8; }

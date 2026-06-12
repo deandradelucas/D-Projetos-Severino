@@ -382,7 +382,7 @@ function ModalFatura({ cartao, pessoalParam, onClose }) {
 // ──────────────────────────────────────────────────────────────────────────
 // Card de cartão
 // ──────────────────────────────────────────────────────────────────────────
-function CartaoCard({ cartao, onVerFatura, onEditar, onExcluir }) {
+function CartaoCard({ cartao, assinaturas = [], onVerFatura, onEditar, onExcluir }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const fatura = cartao.fatura_atual || {}
   const total = Number(fatura.total) || 0
@@ -440,6 +440,23 @@ function CartaoCard({ cartao, onVerFatura, onEditar, onExcluir }) {
         </div>
       )}
 
+      {/* Assinaturas vinculadas (regra mensal): visíveis SEMPRE — a cobrança do
+          mês pode estar na fatura passada e a próxima só nasce no dia 1. */}
+      {assinaturas.length > 0 && (
+        <div className="page-cartoes__assinaturas">
+          <span className="page-cartoes__assinaturas-label">Assinaturas neste cartão</span>
+          {assinaturas.map((a) => (
+            <span key={a.id} className="page-cartoes__assinatura">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M17 2.1 21 6l-4 4" /><path d="M21 6H8a5 5 0 0 0-5 5" />
+                <path d="M7 21.9 3 18l4-4" /><path d="M3 18h13a5 5 0 0 0 5-5" />
+              </svg>
+              {a.descricao || 'Assinatura'} · {formatCurrencyBRL(Number(a.valor) || 0)}/mês
+            </span>
+          ))}
+        </div>
+      )}
+
       {cartao.dia_fechamento ? (
         <span className="page-cartoes__card-fech">
           Fecha dia {cartao.dia_fechamento}{melhorDia ? ` · melhor compra dia ${melhorDia}` : ''}
@@ -469,6 +486,7 @@ export default function Cartoes() {
 
   const [menuAberto, setMenuAberto] = useState(false)
   const [cartoes, setCartoes] = useState(cartoesCache || [])
+  const [assinaturas, setAssinaturas] = useState([]) // recorrências mensais ativas (p/ mostrar no cartão)
   const [loading, setLoading] = useState(!cartoesCache)
   const [isMembroConta, setIsMembroConta] = useState(false)
   const [escopo, setEscopo] = useState('familia')
@@ -537,6 +555,16 @@ export default function Cartoes() {
     apiFetch(apiUrl('/api/familia/meu-escopo'))
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => { if (data) setIsMembroConta(!!data.isMembroConta) })
+      .catch(() => {})
+  }, [])
+
+  // Assinaturas (recorrências mensais ativas) — exibidas no cartão vinculado.
+  // A cobrança do mês pode pertencer à fatura passada e a próxima ainda não ter
+  // sido gerada (vira só no dia 1): a REGRA é a fonte que nunca some do cartão.
+  useEffect(() => {
+    apiFetch(apiUrl('/api/recorrencias-mensais'), { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => { if (Array.isArray(data)) setAssinaturas(data) })
       .catch(() => {})
   }, [])
 
@@ -661,6 +689,7 @@ export default function Cartoes() {
                         <CartaoCard
                           key={c.id}
                           cartao={c}
+                          assinaturas={assinaturas.filter((a) => a.cartao_id === c.id)}
                           onVerFatura={(cartao) => setFaturaTarget(cartao)}
                           onEditar={(cartao) => { setCartaoEdit(cartao); setModalCartao(true) }}
                           onExcluir={(cartao) => setExcluirTarget(cartao)}

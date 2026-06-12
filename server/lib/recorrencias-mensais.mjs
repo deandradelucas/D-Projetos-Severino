@@ -160,7 +160,7 @@ export async function listarRecorrenciasMensais(usuarioId) {
   const { data, error } = await supabase
     .from('recorrencias_mensais')
     .select(
-      'id, tipo, valor, descricao, categoria_id, subcategoria_id, dia_mes, ativo, ultima_geracao_mes, mes_inicio, total_meses, created_at'
+      'id, tipo, valor, descricao, categoria_id, subcategoria_id, cartao_id, dia_mes, ativo, ultima_geracao_mes, mes_inicio, total_meses, created_at'
     )
     .eq('usuario_id', uid)
     .eq('ativo', true)
