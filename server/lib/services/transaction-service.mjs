@@ -124,10 +124,10 @@ export const TransactionService = {
       const valor = i === n ? +(valorBase + ajuste).toFixed(2) : valorBase
       const descricao = descricaoBase ? `${descricaoBase} (${i}/${n})` : `Parcela ${i}/${n}`
 
-      // Parcela já vencida (anterior a hoje) entra como paga (status escolhido);
-      // hoje e futuro = PENDENTE.
+      // Parcela vencida OU que vence HOJE entra como paga (status escolhido) —
+      // a compra feita hoje já tem a 1ª parcela efetivada; só o futuro é PENDENTE.
       const dataParcelaStr = dataIso.slice(0, 10)
-      const statusParcela = dataParcelaStr < hojeStr ? status : 'PENDENTE'
+      const statusParcela = dataParcelaStr <= hojeStr ? status : 'PENDENTE'
 
       const row = {
         usuario_id: userId,
