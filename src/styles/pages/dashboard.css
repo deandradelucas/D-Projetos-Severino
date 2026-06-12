@@ -683,11 +683,14 @@
 .dashboard-hub__tx-panel .ref-tx-list { display: flex; flex-direction: column; min-width: 0; }
 .dashboard-hub__tx-panel .ref-tx-table-subgrid { display: flex; flex-direction: column; }
 
-/* grade da tabela (desktop/tablet): ícone | data | categoria | subcategoria | rec | valor */
+/* grade da tabela (desktop/tablet): ícone | data | categoria | subcategoria | rec | valor.
+   Valor com largura FIXA (não `auto`): cada linha é um grid independente — com
+   `auto`, um valor largo (−R$ 100.000,00) alargava a coluna só naquela linha e
+   desalinhava categoria/subcategoria das demais. */
 .dashboard-hub__tx-panel .ref-tx-list-head,
 .dashboard-hub__tx-panel .ref-tx-row {
   display: grid;
-  grid-template-columns: 40px minmax(110px, 1fr) minmax(110px, 1.2fr) minmax(90px, 1fr) 24px auto;
+  grid-template-columns: 40px minmax(110px, 1fr) minmax(110px, 1.2fr) minmax(90px, 1fr) 24px 128px;
   align-items: center;
   gap: 12px;
 }
