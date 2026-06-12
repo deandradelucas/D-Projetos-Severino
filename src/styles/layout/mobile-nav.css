@@ -79,9 +79,13 @@
   padding-bottom: max(2px, calc(var(--safe-bottom, 0px) * 0.25));
 }
 .mobile-bottom-nav__bar {
-  display: flex;
+  /* GRID com colunas idênticas (minmax(0,1fr) por coluna): espaçamento dos
+     ícones é matematicamente igual, independente da largura dos rótulos —
+     flex:1 sofria com min-content ("Investimentos" alargava o slot). */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   align-items: stretch;
-  justify-content: space-around;
   height: 60px;
 }
 .mobile-bottom-nav__item {
