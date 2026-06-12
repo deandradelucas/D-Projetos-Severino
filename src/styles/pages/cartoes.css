@@ -28,10 +28,22 @@
 .page-cartoes__resumo-item:first-child { padding-left: 0; }
 .page-cartoes__resumo-item:last-child { padding-right: 0; }
 @media (max-width: 640px) {
-  /* celular: empilha com separador horizontal */
-  .page-cartoes__resumo { flex-direction: column; }
+  /* celular compacto: Total a pagar | Limite usado lado a lado; Próximo
+     vencimento numa linha cheia abaixo. */
+  .page-cartoes__resumo {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 14px;
+  }
   .page-cartoes__resumo-item { padding: 0; }
-  .page-cartoes__resumo-item + .page-cartoes__resumo-item { border-left: none; border-top: 1px solid var(--hairline); padding-top: 12px; margin-top: 12px; }
+  .page-cartoes__resumo-item + .page-cartoes__resumo-item { border-left: none; }
+  .page-cartoes__resumo-item:nth-child(2) { border-left: 1px solid var(--hairline); padding-left: 14px; }
+  .page-cartoes__resumo-item--full {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--hairline);
+    padding-top: 10px;
+  }
+  .page-cartoes__resumo-valor { font-size: 1.1rem; }
 }
 .page-cartoes__resumo-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
 .page-cartoes__resumo-valor { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }

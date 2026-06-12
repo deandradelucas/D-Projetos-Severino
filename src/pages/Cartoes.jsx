@@ -642,7 +642,7 @@ export default function Cartoes() {
                           </div>
                         )}
                         {resumo.proxVenc && (
-                          <div className="page-cartoes__resumo-item">
+                          <div className="page-cartoes__resumo-item page-cartoes__resumo-item--full">
                             <span className="page-cartoes__resumo-label">Próximo vencimento</span>
                             <strong className="page-cartoes__resumo-valor">{vencimentoLabel(resumo.proxVenc)}</strong>
                           </div>
