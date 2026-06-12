@@ -390,15 +390,15 @@ function CategoriaRow({ cat, usoSub, orcamento, onEdit, onMerge, onRemove, onPru
               {SvgPlus} Definir orçamento mensal
             </button>
           )}
+          {/* "+ Adicionar" no topo, logo abaixo de "Definir orçamento" */}
+          <button type="button" className="page-categorias__add-sub" onClick={() => onAddSub(cat)}>
+            {SvgPlus} Adicionar subcategoria
+          </button>
           {semUso > 0 && (
             <button type="button" className="page-categorias__prune" onClick={() => onPrune(cat, semUso)}>
               Ocultar {semUso} {semUso === 1 ? 'subcategoria sem uso' : 'subcategorias sem uso'}
             </button>
           )}
-          {/* "+ Adicionar" no TOPO da lista — ação principal sem precisar rolar */}
-          <button type="button" className="page-categorias__add-sub" onClick={() => onAddSub(cat)}>
-            {SvgPlus} Adicionar subcategoria
-          </button>
           {subs.map((s) => {
             const n = usoDe(s.id)
             return (
