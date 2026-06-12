@@ -8,6 +8,9 @@
    Importado em Transacoes.jsx (depois de dashboard.css).
    ============================================================================= */
 
+/* Ações (Importar + Nova transação) no FIM do hero — não coladas no título. */
+.page-transacoes .dashboard-hub__hero-actions { margin-left: auto; }
+
 /* ── Botão secundário do hero (Importar) ───────────────────────────────────── */
 .dashboard-hub__btn--secondary {
   display: inline-flex;

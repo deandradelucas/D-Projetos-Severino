@@ -620,17 +620,8 @@ export default function Transacoes() {
             <div className="dashboard-hub__hero-text">
               <h1 className="dashboard-hub__title">Transações</h1>
             </div>
+            {/* Ações no FIM do hero (margin-left:auto no CSS); Importar antes do CTA */}
             <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Atalhos da página">
-              <button
-                type="button"
-                className="dashboard-hub__btn dashboard-hub__btn--primary"
-                onClick={() => {
-                  setEditingTransaction(null)
-                  setIsModalOpen(true)
-                }}
-              >
-                + Nova transação
-              </button>
               <button
                 type="button"
                 className="dashboard-hub__btn dashboard-hub__btn--secondary"
@@ -644,6 +635,16 @@ export default function Transacoes() {
                   <path d="M12 15V3" />
                 </svg>
                 <span className="dashboard-hub__btn-label">Importar</span>
+              </button>
+              <button
+                type="button"
+                className="dashboard-hub__btn dashboard-hub__btn--primary"
+                onClick={() => {
+                  setEditingTransaction(null)
+                  setIsModalOpen(true)
+                }}
+              >
+                + Nova transação
               </button>
             </div>
           </div>
