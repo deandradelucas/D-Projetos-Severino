@@ -4,6 +4,7 @@ import {
   getCategorias,
   getTransacoes,
   getTransacoesVersion,
+  restaurarCategoriasPadrao,
   atualizarTransacao,
   deletarTransacao,
   deletarGrupoParcelado,
@@ -142,6 +143,10 @@ export function registerTransacoesRoutes(app) {
 
   app.post('/api/categorias/:id/podar-subcategorias', (c) =>
     categoriaMut(c, (uid, _body, ctx) => podarSubcategoriasSemUso(uid, paramUuid(ctx, 'id'))))
+
+  // Restaura a base padrão (desarquiva/recria o seed; não toca em personalizadas).
+  app.post('/api/categorias/restaurar-padrao', (c) =>
+    categoriaMut(c, (uid) => restaurarCategoriasPadrao(uid)))
 
   app.get('/api/transacoes', async (c) => {
     try {

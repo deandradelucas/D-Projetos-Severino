@@ -17,6 +17,7 @@ import {
   criarCategoria, atualizarCategoria, removerCategoria, fundirCategoria,
   criarSubcategoria, atualizarSubcategoria, removerSubcategoria,
   getUsoCategorias, listarSubcategoriasArquivadas, restaurarSubcategoria, podarSubcategoriasSemUso,
+  restaurarCategoriasPadrao,
   getOrcamentos, setOrcamento, removerOrcamento,
   ICONES_CATEGORIA, CORES_CATEGORIA,
 } from '../lib/apiCategoriasCrud'
@@ -488,6 +489,15 @@ export default function Categorias() {
       } else if (alvo.tipo === 'prune') {
         const r = await podarSubcategoriasSemUso(alvo.id)
         showToast(`${r.arquivadas} ${r.arquivadas === 1 ? 'subcategoria ocultada' : 'subcategorias ocultadas'}. Dá pra restaurar em "Ver arquivadas".`, 'success')
+      } else if (alvo.tipo === 'restaurar') {
+        const r = await restaurarCategoriasPadrao()
+        const total = (r.categorias_criadas || 0) + (r.categorias_restauradas || 0)
+        showToast(
+          total > 0 || (r.subs_criadas || 0) + (r.subs_restauradas || 0) > 0
+            ? 'Categorias padrão restauradas.'
+            : 'Tudo certo — a base padrão já estava completa.',
+          'success',
+        )
       } else {
         const r = await removerSubcategoria(alvo.id)
         showToast(r.modo === 'arquivada' ? 'Subcategoria arquivada.' : 'Subcategoria excluída.', 'success')
@@ -554,6 +564,15 @@ export default function Categorias() {
                   <>
                     {renderGrupo('Despesas', despesas)}
                     {renderGrupo('Receitas', receitas)}
+                    {/* Rede de segurança: recria/desarquiva a base padrão do app
+                        (não toca em personalizadas nem no histórico). */}
+                    <button
+                      type="button"
+                      className="page-categorias__restaurar-padrao"
+                      onClick={() => setConfirmar({ tipo: 'restaurar' })}
+                    >
+                      Restaurar categorias padrão
+                    </button>
                   </>
                 )}
               </section>
@@ -600,16 +619,24 @@ export default function Categorias() {
           title={
             confirmar.tipo === 'cat' ? 'Excluir categoria?'
               : confirmar.tipo === 'prune' ? 'Ocultar subcategorias sem uso?'
-                : 'Excluir subcategoria?'
+                : confirmar.tipo === 'restaurar' ? 'Restaurar categorias padrão?'
+                  : 'Excluir subcategoria?'
           }
           message={
             confirmar.tipo === 'cat'
               ? `"${confirmar.nome}" será arquivada se tiver transações (histórico preservado) ou excluída se estiver vazia.`
               : confirmar.tipo === 'prune'
                 ? `As ${confirmar.count} subcategorias de "${confirmar.nome}" sem nenhuma transação serão ocultadas. Você pode restaurá-las depois em "Ver arquivadas".`
-                : `"${confirmar.nome}" será arquivada se estiver em uso ou excluída se não.`
+                : confirmar.tipo === 'restaurar'
+                  ? 'A base de categorias e subcategorias padrão do aplicativo (a mesma do seu cadastro) será recriada. Suas categorias personalizadas e seu histórico de transações não são afetados.'
+                  : `"${confirmar.nome}" será arquivada se estiver em uso ou excluída se não.`
           }
-          confirmLabel={confirmar.tipo === 'prune' ? 'Ocultar' : 'Remover'}
+          confirmLabel={
+            confirmar.tipo === 'prune' ? 'Ocultar'
+              : confirmar.tipo === 'restaurar' ? 'Restaurar padrão'
+                : 'Remover'
+          }
+          tone={confirmar.tipo === 'restaurar' ? 'default' : 'danger'}
           onConfirm={confirmarRemocao}
           onClose={() => setConfirmar(null)}
         />

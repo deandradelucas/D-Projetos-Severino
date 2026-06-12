@@ -37,6 +37,8 @@ export const listarSubcategoriasArquivadas = (categoriaId) =>
 export const restaurarSubcategoria = (id) => mutate(`/api/subcategorias/${id}/restaurar`, { method: 'POST' })
 export const podarSubcategoriasSemUso = (categoriaId) =>
   mutate(`/api/categorias/${categoriaId}/podar-subcategorias`, { method: 'POST' })
+export const restaurarCategoriasPadrao = () =>
+  mutate('/api/categorias/restaurar-padrao', { method: 'POST' })
 
 export const criarCategoria = (body) => mutate('/api/categorias', { method: 'POST', body })
 export const atualizarCategoria = (id, body) => mutate(`/api/categorias/${id}`, { method: 'PUT', body })

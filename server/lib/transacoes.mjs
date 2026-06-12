@@ -210,6 +210,76 @@ async function _syncMissingDefaultCategories(usuario_id, supabaseAdmin, categori
   }
 }
 
+/**
+ * Restaura a base PADRÃO de categorias/subcategorias (a de quando o usuário se
+ * cadastrou): desarquiva as do seed que foram arquivadas e recria as que foram
+ * excluídas. NÃO toca em categorias personalizadas nem no histórico de
+ * transações. Acionado pelo botão "Restaurar padrão" na tela de Categorias.
+ */
+export async function restaurarCategoriasPadrao(usuarioId) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const uid = String(usuarioId || '').trim()
+  if (!uid) throw new Error('usuario_id ausente.')
+
+  const todas = await _fetchCategoriasUsuario(supabaseAdmin, uid)
+  const porChave = new Map(todas.map((c) => [_categoriaChaveUnica(c.nome, c.tipo), c]))
+  const stats = { categorias_restauradas: 0, categorias_criadas: 0, subs_restauradas: 0, subs_criadas: 0 }
+
+  for (const cat of DEFAULT_CATEGORIES) {
+    const tipo = normalizeTipoCategoria(cat.tipo)
+    let atual = porChave.get(_categoriaChaveUnica(cat.nome, tipo))
+
+    if (!atual) {
+      // Foi excluída de vez → recria com todas as subs do seed.
+      const { data: nova, error } = await supabaseAdmin
+        .from('categorias')
+        .insert({ usuario_id: uid, nome: cat.nome, tipo, cor: cat.cor })
+        .select('id')
+        .maybeSingle()
+      if (error || !nova?.id) {
+        log.warn('restaurar padrao: categoria nao criada', { uid, nome: cat.nome, message: error?.message })
+        continue
+      }
+      await _insertSubcategoriasRobusto(
+        supabaseAdmin,
+        cat.subcategorias.map((nome) => ({ categoria_id: nova.id, nome })),
+        { etapa: 'restaurar-padrao', categoria_id: nova.id },
+      )
+      stats.categorias_criadas += 1
+      stats.subs_criadas += cat.subcategorias.length
+      continue
+    }
+
+    if (atual.arquivada_em) {
+      await supabaseAdmin.from('categorias').update({ arquivada_em: null }).eq('id', atual.id).eq('usuario_id', uid)
+      stats.categorias_restauradas += 1
+    }
+
+    // Subcategorias do seed: desarquiva as arquivadas, cria as que faltam.
+    const { data: subs } = await supabaseAdmin
+      .from('subcategorias')
+      .select('id, nome, arquivada_em')
+      .eq('categoria_id', atual.id)
+    const subPorChave = new Map((subs || []).map((s) => [_subcategoriaChaveUnica(s.nome), s]))
+    const paraCriar = []
+    for (const nome of cat.subcategorias) {
+      const s = subPorChave.get(_subcategoriaChaveUnica(nome))
+      if (!s) {
+        paraCriar.push({ categoria_id: atual.id, nome })
+      } else if (s.arquivada_em) {
+        await supabaseAdmin.from('subcategorias').update({ arquivada_em: null }).eq('id', s.id).eq('categoria_id', atual.id)
+        stats.subs_restauradas += 1
+      }
+    }
+    if (paraCriar.length) {
+      await _insertSubcategoriasRobusto(supabaseAdmin, paraCriar, { etapa: 'restaurar-padrao', categoria_id: atual.id })
+      stats.subs_criadas += paraCriar.length
+    }
+  }
+
+  return stats
+}
+
 export async function inserirTransacao({
   usuario_id,
   conta_id,

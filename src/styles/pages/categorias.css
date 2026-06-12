@@ -540,3 +540,18 @@ body[data-theme='dark'] .page-categorias__icon-opt.is-active {
   background: color-mix(in srgb, var(--accent) 22%, #eef1f6);
   border-color: var(--accent);
 }
+
+/* "Restaurar categorias padrão" — link discreto no fim do painel. */
+.page-categorias__restaurar-padrao {
+  align-self: center;
+  margin-top: 6px;
+  padding: 8px 12px;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.page-categorias__restaurar-padrao:hover { color: var(--accent); }
