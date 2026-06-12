@@ -17,6 +17,7 @@ import { readHorizonteUser } from '../lib/horizonteSession'
 import { readMetasCache, writeMetasCache } from '../lib/metasCachePersist'
 import { redirectSeAuthBloqueada } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
+import { autoFocusDesktop } from '../lib/autoFocusDesktop'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../lib/currencyMaskBr'
 
@@ -91,7 +92,7 @@ function ModalMeta({ onClose, onSalvar, salvando, metaEdit = null }) {
               value={nome}
               onChange={(e) => setNome(e.target.value.slice(0, 80))}
               placeholder="Ex: Viagem, Reserva de emergência…"
-              autoFocus
+              autoFocus={autoFocusDesktop()}
             />
           </label>
 
@@ -208,7 +209,7 @@ function ModalAporte({ meta, onClose, onConfirmar, salvando }) {
               value={valorInput}
               onChange={(e) => setValorInput(maskCurrencyBRLInput(e.target.value))}
               placeholder="R$ 0,00"
-              autoFocus
+              autoFocus={autoFocusDesktop()}
             />
           </label>
           {tipo === 'guardar' && (

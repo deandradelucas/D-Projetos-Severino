@@ -9,6 +9,7 @@ import { TransacaoCategoriaIcon } from '../components/TransacaoCategoriaIcon.jsx
 import { useFabCompact } from '../hooks/useFabCompact'
 import { useSheetDragClose } from '../hooks/useSheetDragClose'
 import { showToast } from '../lib/toastStore'
+import { autoFocusDesktop } from '../lib/autoFocusDesktop'
 import { fetchCategorias } from '../lib/apiCategorias'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../lib/currencyMaskBr'
@@ -86,7 +87,7 @@ function CategoriaModal({ categoria, onClose, onSaved }) {
         <form onSubmit={submit} className="page-categorias__modal-body">
           <label className="page-categorias__field">
             <span className="page-categorias__label">Nome</span>
-            <input className="page-categorias__input" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={60} autoFocus placeholder="Ex.: Alimentação" />
+            <input className="page-categorias__input" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={60} autoFocus={autoFocusDesktop()} placeholder="Ex.: Alimentação" />
           </label>
 
           {!editando && (
@@ -171,7 +172,7 @@ function SubcategoriaModal({ categoriaId, sub, onClose, onSaved }) {
         <form onSubmit={submit} className="page-categorias__modal-body">
           <label className="page-categorias__field">
             <span className="page-categorias__label">Nome</span>
-            <input className="page-categorias__input" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={60} autoFocus />
+            <input className="page-categorias__input" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={60} autoFocus={autoFocusDesktop()} />
           </label>
           <div className="page-categorias__modal-actions">
             <button type="button" className="page-categorias__btn page-categorias__btn--ghost" onClick={onClose}>Cancelar</button>
@@ -287,7 +288,7 @@ function OrcamentoModal({ categoria, atual, onClose, onSaved }) {
           <label className="page-categorias__field">
             <span className="page-categorias__label">Limite mensal</span>
             <input
-              className="page-categorias__input" inputMode="decimal" autoFocus
+              className="page-categorias__input" inputMode="decimal" autoFocus={autoFocusDesktop()}
               value={valor} onChange={(e) => setValor(maskCurrencyBRLInput(e.target.value))} placeholder="R$ 0,00"
             />
           </label>

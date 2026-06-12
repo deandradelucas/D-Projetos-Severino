@@ -14,6 +14,7 @@ import { readHorizonteUser } from '../lib/horizonteSession'
 import { readCartoesCache, writeCartoesCache } from '../lib/cartoesCachePersist'
 import { redirectSeAuthBloqueada } from '../lib/authRedirect'
 import { showToast } from '../lib/toastStore'
+import { autoFocusDesktop } from '../lib/autoFocusDesktop'
 import { formatCurrencyBRL } from '../lib/formatCurrency'
 import { maskCurrencyBRLInput, parseCurrencyBRLMasked, valorToMaskedBRL } from '../lib/currencyMaskBr'
 
@@ -129,7 +130,7 @@ function ModalCartao({ cartaoEdit, onClose, onSalvar, salvando }) {
         <form onSubmit={handleSubmit} className="page-cartoes__modal-body">
           <label className="page-cartoes__field">
             <span className="page-cartoes__label">Nome do cartão</span>
-            <input className="page-cartoes__input" type="text" value={nome} onChange={(e) => setNome(e.target.value.slice(0, 60))} placeholder="Ex: Nubank, Itaú Black…" autoFocus />
+            <input className="page-cartoes__input" type="text" value={nome} onChange={(e) => setNome(e.target.value.slice(0, 60))} placeholder="Ex: Nubank, Itaú Black…" autoFocus={autoFocusDesktop()} />
           </label>
 
           <div className="page-cartoes__row">
