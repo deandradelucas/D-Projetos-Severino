@@ -10,6 +10,12 @@ import { isListaComprasMessage, processarMensagemListaCompras, responderPendente
 import { detectExtratoPedido, montarRespostaExtratoWhatsApp } from './whatsapp-extrato.mjs'
 import { resolveEscopoUsuario, assertFamiliaPodeEscrever } from '../conta-familiar.mjs'
 import { resolverCategoriaPorCorrecao } from './transacao-categoria-logger.mjs'
+import {
+  isCategoriaOutros,
+  montarPerguntaCategoriaOutros,
+  registrarPendenteCategoriaOutros,
+  responderPendenteCategoria,
+} from './wa-categoria-outros.mjs'
 import { computeAssinaturaFlags } from '../assinatura-flags.mjs'
 import { hojeYmdBrt } from '../date-brt.mjs'
 import { dispararAlertasTransacao, upsertLimiteOrcamento, listarLimitesOrcamento } from './alertas-financeiros.mjs'
@@ -392,6 +398,13 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
     if (pendReply) return pendReply
   } catch (e) {
     log.warn('[whatsapp-bot] responderPendenteLista error', e?.message)
+  }
+  // T2: resposta numérica à pergunta "em qual categoria encaixa?" (anti-Outros)
+  try {
+    const catReply = await responderPendenteCategoria(dataUsuarioId, usuario?.id ?? dataUsuarioId, phone, message)
+    if (catReply) return catReply
+  } catch (e) {
+    log.warn('[whatsapp-bot] responderPendenteCategoria error', e?.message)
   }
 
   if (/^(ajuda|help|menu)$/i.test(message.replace(/\s+/g, ' ').trim())) {
@@ -842,12 +855,11 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
   const parcelamento = parsed.parcelamento || null
   const recorrencia = parsed.recorrencia || null
 
+  let transacaoIdAlerta = null // hoisted: o follow-up anti-Outros (pós-try) usa
   try {
     const actorUid = usuario?.id ? String(usuario.id).trim() : ''
     const lancadoPor =
       actorUid && actorUid !== String(dataUsuarioId || '').trim() ? actorUid : undefined
-
-    let transacaoIdAlerta = null
     if (parcelamento) {
       // Compra parcelada ("em 3x") — mesma engine do app: parcelas mensais,
       // vencidas entram como pagas, futuras PENDENTE (transaction-service).
@@ -931,9 +943,30 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
       categoriaLinha = `\n🏷️ ${rotulo}`
     }
   }
-  const dicaCorrigir = categoriaLinha
+  let dicaCorrigir = categoriaLinha
     ? `\n\n_Categoria errada? Responda "corrigir categoria <nome>"._`
     : ''
+
+  // Anti-Outros (Fase 1.1): caiu no fallback "Outros"? Salva normal, mas pergunta
+  // em qual categoria encaixa (opções numeradas). A resposta recategoriza e vira
+  // aprendizado. Só para lançamento único (parcelado tem N linhas — fora do escopo).
+  try {
+    const catFinal = categorias.find((c) => c.id === finalCategoriaId)
+    if (!parcelamento && transacaoIdAlerta && isCategoriaOutros(catFinal)) {
+      const pergunta = montarPerguntaCategoriaOutros(categorias, parsed.tipo)
+      if (pergunta) {
+        await registrarPendenteCategoriaOutros(phone, {
+          transacaoId: transacaoIdAlerta,
+          tipo: parsed.tipo,
+          descricao: parsed.descricao || message.slice(0, 100),
+          opcoes: pergunta.opcoes,
+        })
+        dicaCorrigir = pergunta.texto
+      }
+    }
+  } catch (e) {
+    log.warn('[whatsapp-bot] pergunta categoria outros', e?.message)
+  }
 
   // T2 (passiva): valor verbal estilo "cinco e vinte" → declara a leitura
   const notaValor = valorVerbalAmbiguo(message, Number(parsed.valor))

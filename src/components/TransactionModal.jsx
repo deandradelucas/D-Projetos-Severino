@@ -649,6 +649,12 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                     Categoria sugerida pela IA
                   </span>
                 )}
+                {/* Anti-Outros (nudge, sem bloquear): "Outros" enfraquece relatórios e orçamento */}
+                {String(selectedCategoria?.nome || '').trim().toLowerCase() === 'outros' && (
+                  <p className="parcelamento-preview parcelamento-preview--hint" role="status">
+                    💡 Tente uma categoria específica — “Outros” deixa seus relatórios e orçamentos menos úteis.
+                  </p>
+                )}
               </div>
 
               {subcategorias.length > 0 && (
