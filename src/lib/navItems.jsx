@@ -123,10 +123,12 @@ export const MAIN_NAV_ITEMS = [
     end: true,
     title: 'Suas listas — compras e tarefas',
     icon: (props) => (
+      // Carrinho redesenhado dentro da área óptica 3..21 (o original ia de 1 a 23
+      // e parecia maior/mais baixo que os vizinhos na bottom-nav — desalinhava).
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden {...props}>
-        <circle cx="9" cy="21" r="1" />
-        <circle cx="20" cy="21" r="1" />
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+        <circle cx="9.5" cy="19.5" r="1.1" />
+        <circle cx="17.5" cy="19.5" r="1.1" />
+        <path d="M3.5 4.5h2.6l2.2 9.8a2 2 0 0 0 2 1.55h6.9a2 2 0 0 0 1.95-1.53L20.7 8.5H7" />
       </svg>
     ),
   },
