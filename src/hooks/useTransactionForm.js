@@ -193,6 +193,19 @@ export function useTransactionForm({ usuarioId, editingTransaction, isOpen, onSa
           // Transação não parcelada: o spread do formData traz recorrente_index: ''
           // — não pode ir ao backend (risco de zerar o campo no registro).
           delete payload.recorrente_index
+
+          // Parcelamento ligado na EDIÇÃO de despesa única → o backend converte
+          // a transação em compra parcelada (cria o grupo e remove a original).
+          if (formData.parcelado && !formData.prazo_indeterminado && numParcelas >= 2) {
+            const parcelamento = { num_parcelas: numParcelas }
+            const dpRaw = String(formData.data_pagamento || '').trim()
+            if (dpRaw) {
+              const dp = new Date(`${dpRaw}T12:00:00Z`)
+              if (!Number.isNaN(dp.getTime())) parcelamento.data_pagamento = dp.toISOString()
+            }
+            if (parcelaInicial > 1) parcelamento.parcela_inicial = parcelaInicial
+            payload.parcelamento = parcelamento
+          }
         }
         delete payload.recorrente_total
       }

@@ -372,6 +372,23 @@ export function registerTransacoesRoutes(app) {
         return c.json({ message: vBody.message }, 400)
       }
 
+      // Edição com parcelamento ligado → CONVERTE a transação única em compra
+      // parcelada (cria o grupo com os dados editados e remove a original).
+      if (body.parcelamento?.num_parcelas != null) {
+        const np = parseInt(body.parcelamento.num_parcelas, 10)
+        if (!Number.isInteger(np) || np < 2 || np > 120) {
+          return c.json({ message: 'Número de parcelas deve ser entre 2 e 120.' }, 400)
+        }
+        try {
+          const lp = parsed.actorId !== parsed.dataUsuarioId ? { lancadoPorUsuarioId: parsed.actorId } : {}
+          const r = await TransactionService.converterEmParcelado(parsed.dataUsuarioId, id, body, lp)
+          return c.json({ message: `Transação convertida em ${r.total_parcelas}x.`, grupo_id: r.grupo_id })
+        } catch (e) {
+          log.warn('converter em parcelado falhou', e?.message)
+          return c.json({ message: e?.message || 'Não foi possível converter em parcelado.' }, 400)
+        }
+      }
+
       // Estado anterior — para detectar correção de categoria (sinal de aprendizado)
       let catAntiga = null, descAntiga = null, tipoTx = null
       if (body.categoria_id) {

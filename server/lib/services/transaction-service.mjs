@@ -153,4 +153,44 @@ export const TransactionService = {
 
     return { grupo_id: grupoId, total_parcelas: n, parcelas: data }
   },
+
+  /**
+   * Converte uma transação ÚNICA existente em compra parcelada (edição → ligar
+   * parcelamento): cria o grupo de N parcelas com os dados editados e remove a
+   * transação original. Rollback: se a remoção falhar, o grupo recém-criado é
+   * apagado (não fica duplicado).
+   */
+  async converterEmParcelado(userId, transacaoId, payload, opts = {}) {
+    if (!userId) throw new Error('ID do usuário é obrigatório.')
+    const supabase = getSupabaseAdmin()
+
+    const { data: original, error: eGet } = await supabase
+      .from('transacoes')
+      .select('id, recorrente_grupo_id, recorrencia_mensal_id, tipo')
+      .eq('id', transacaoId)
+      .eq('usuario_id', userId)
+      .maybeSingle()
+    if (eGet) throw eGet
+    if (!original) throw new Error('Transação não encontrada.')
+    if (original.recorrente_grupo_id) throw new Error('Esta transação já é parcelada.')
+    if (original.recorrencia_mensal_id) throw new Error('Assinatura mensal não pode virar parcelamento — encerre a recorrência primeiro.')
+
+    const resultado = await this.createParcelamento(userId, payload, opts)
+
+    const { error: eDel } = await supabase
+      .from('transacoes')
+      .delete()
+      .eq('id', transacaoId)
+      .eq('usuario_id', userId)
+    if (eDel) {
+      // Rollback: apaga o grupo criado pra não duplicar o lançamento.
+      await supabase
+        .from('transacoes')
+        .delete()
+        .eq('usuario_id', userId)
+        .eq('recorrente_grupo_id', resultado.grupo_id)
+      throw new Error('Não foi possível substituir a transação original.')
+    }
+    return resultado
+  },
 }

@@ -860,8 +860,10 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
               </section>
             )}
 
-            {/* ── Seção: Parcelamento (só criação, e só despesa) ── */}
-            {!isEditMode && formData.tipo === 'DESPESA' && (() => {
+            {/* ── Seção: Parcelamento — criação E edição de despesa única (na
+                edição, ligar converte a transação em compra parcelada). Já
+                parcelada/assinatura: fora (a parcela é editada na seção acima). ── */}
+            {(!isEditMode || (!editingTransaction?.recorrente_grupo_id && !editingTransaction?.recorrencia_mensal_id)) && formData.tipo === 'DESPESA' && (() => {
               const numParcelas = parseInt(formData.num_parcelas, 10)
               const parcelaInicial = Math.max(1, parseInt(formData.parcela_inicial, 10) || 1)
               const numParcelasRestantes = numParcelas - parcelaInicial + 1
@@ -1017,19 +1019,23 @@ export default function TransactionModal({ isOpen, onClose, onSave, usuarioId, e
                             </div>
                           </>
                         )}
-                        <label htmlFor="tx-prazo-indeterminado" className="rec-vezes-row rec-vezes-row--toggle">
-                          <span className="rec-vezes-row__label">Prazo indeterminado</span>
-                          <span className={`ntx-switch${formData.prazo_indeterminado ? ' ntx-switch--on' : ''}`} aria-hidden>
-                            <span className="ntx-switch__thumb" />
-                          </span>
-                          <input
-                            id="tx-prazo-indeterminado"
-                            type="checkbox"
-                            checked={formData.prazo_indeterminado}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, prazo_indeterminado: e.target.checked }))}
-                            className="modal-recorrencia-toggle-row__checkbox modal-recorrencia-toggle-row__checkbox--hidden"
-                          />
-                        </label>
+                        {/* "Prazo indeterminado" (assinatura) é só de criação —
+                            na edição a conversão é apenas para N parcelas. */}
+                        {!isEditMode && (
+                          <label htmlFor="tx-prazo-indeterminado" className="rec-vezes-row rec-vezes-row--toggle">
+                            <span className="rec-vezes-row__label">Prazo indeterminado</span>
+                            <span className={`ntx-switch${formData.prazo_indeterminado ? ' ntx-switch--on' : ''}`} aria-hidden>
+                              <span className="ntx-switch__thumb" />
+                            </span>
+                            <input
+                              id="tx-prazo-indeterminado"
+                              type="checkbox"
+                              checked={formData.prazo_indeterminado}
+                              onChange={(e) => setFormData((prev) => ({ ...prev, prazo_indeterminado: e.target.checked }))}
+                              className="modal-recorrencia-toggle-row__checkbox modal-recorrencia-toggle-row__checkbox--hidden"
+                            />
+                          </label>
+                        )}
                         <div className="rec-vezes-row">
                           <label htmlFor="tx-data-pagamento" className="rec-vezes-row__label">
                             {parcelaInicial > 1 ? `Vencimento da ${parcelaInicial}ª parcela` : 'Data de vencimento'}
