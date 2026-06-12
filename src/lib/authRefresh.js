@@ -1,4 +1,5 @@
 import { apiUrl } from './apiUrl'
+import { clearAllUserCaches } from './clearUserCaches'
 import {
   readHorizonteRefreshToken,
   writeHorizonteAccessToken,
@@ -64,6 +65,9 @@ export function forceLogout() {
   clearHorizonteAccessToken()
   clearHorizonteRefreshToken()
   try {
+    // Caches financeiros de cold start saem junto da sessão (CACHE-01).
+    const uid = JSON.parse(localStorage.getItem('horizonte_user') || 'null')?.id
+    clearAllUserCaches(uid)
     localStorage.removeItem('horizonte_user')
   } catch {
     /* ignore */
