@@ -574,11 +574,34 @@ export async function atualizarTransacao(id, usuarioId, body) {
     .update(update)
     .eq('id', id)
     .eq('usuario_id', uid)
-    .select('id')
+    .select('id, recorrencia_mensal_id')
     .maybeSingle()
 
   if (error) throw error
   if (!data) throw new Error('Transação não encontrada.')
+
+  // Transação de assinatura (vinculada a regra mensal): propaga os campos de
+  // IDENTIDADE pra regra — renomear "Netflix" na transação renomeia a assinatura,
+  // e trocar o cartão muda onde os próximos meses debitam. Valor fica de fora
+  // (um mês pode divergir legitimamente: desconto, proporcional). Best-effort.
+  if (data.recorrencia_mensal_id) {
+    try {
+      const ruleUpdate = { updated_at: new Date().toISOString() }
+      if (typeof update.descricao === 'string' && update.descricao.trim()) ruleUpdate.descricao = update.descricao.trim()
+      if ('categoria_id' in update) ruleUpdate.categoria_id = update.categoria_id
+      if ('subcategoria_id' in update) ruleUpdate.subcategoria_id = update.subcategoria_id
+      if ('cartao_id' in update) ruleUpdate.cartao_id = update.cartao_id
+      if (Object.keys(ruleUpdate).length > 1) {
+        await supabaseAdmin
+          .from('recorrencias_mensais')
+          .update(ruleUpdate)
+          .eq('id', data.recorrencia_mensal_id)
+          .eq('usuario_id', uid)
+      }
+    } catch (e) {
+      log.warn('[atualizarTransacao] sync regra recorrente falhou', e?.message)
+    }
+  }
   return data
 }
 

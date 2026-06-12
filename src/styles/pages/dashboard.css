@@ -558,6 +558,9 @@
 .ai-insight--positivo { --ai-accent: var(--success); }
 .ai-insight--neutro { --ai-accent: var(--accent); }
 .ai-insight--destaque { --ai-accent: #8b5cf6; }
+/* Card com deep-link (ex.: triagem de "Outros"): afford de clique */
+.ai-insight--clicavel { cursor: pointer; }
+.ai-insight--clicavel:hover { background: var(--surface-sunken); }
 /* Urgência (orçamento >=90%): vermelho + fundo levemente tingido p/ saltar à vista */
 .ai-insight--urgencia {
   --ai-accent: var(--error);

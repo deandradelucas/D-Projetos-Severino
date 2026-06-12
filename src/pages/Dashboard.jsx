@@ -637,7 +637,13 @@ export default function Dashboard() {
             <div className="ai-insights__track-wrap">
               <div className="ai-insights__track" ref={iaTrackRef}>
                 {insights.map((it) => (
-                  <article key={it.id} className={`ai-insight ai-insight--${it.tom || 'neutro'}`}>
+                  <article
+                    key={it.id}
+                    className={`ai-insight ai-insight--${it.tom || 'neutro'}${it.href ? ' ai-insight--clicavel' : ''}`}
+                    {...(it.href
+                      ? { role: 'link', tabIndex: 0, onClick: () => navigate(it.href), onKeyDown: (e) => { if (e.key === 'Enter') navigate(it.href) } }
+                      : {})}
+                  >
                     <span className="ai-insight__icon"><InsightIcon tom={it.tom || 'neutro'} /></span>
                     <div className="ai-insight__body">
                       <h3 className="ai-insight__title">{it.titulo}</h3>

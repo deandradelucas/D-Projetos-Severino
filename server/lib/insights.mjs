@@ -205,6 +205,35 @@ export async function gerarInsights(usuarioId) {
     log.warn('[insights] metas', e.message || e)
   }
 
+  // 6b) Triagem de "Outros" (plano anti-Outros, Fase 2): lançamentos sem categoria
+  // de verdade enfraquecem relatórios/orçamento — card linka pra lista filtrada.
+  try {
+    let outrosId = null
+    for (const [cid, nome] of catNomePorId) {
+      if (String(nome).trim().toLowerCase() === 'outros') { outrosId = cid; break }
+    }
+    if (outrosId) {
+      let qtdOutros = 0
+      for (const t of txs) {
+        if (!isDespesa(t) || t.categoria_id !== outrosId) continue
+        const dataT = new Date(`${String(t.data_transacao).slice(0, 10)}T12:00:00`)
+        if (dataT >= inicioMesAtual) qtdOutros += 1
+      }
+      if (qtdOutros >= 2) {
+        insights.push({
+          id: 'outros-triagem',
+          icone: '🗂️',
+          tom: 'alerta',
+          titulo: `${qtdOutros} lançamentos em "Outros"`,
+          texto: 'Toque para ver e categorizar — seus relatórios e orçamentos ficam muito mais úteis.',
+          href: `/transacoes?categoria_id=${outrosId}`,
+        })
+      }
+    }
+  } catch (e) {
+    log.warn('[insights] outros-triagem', e.message || e)
+  }
+
   // 7) Orçamento por categoria batendo no limite: >=70% alerta, >=90% urgência.
   try {
     const { data: limites } = await supabase

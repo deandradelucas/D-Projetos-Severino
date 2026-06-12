@@ -32,6 +32,15 @@ export function formatarRelatorioIA(d) {
     `· heurística sobrepôs LLM: ${d?.heuristica_override_7d ?? 0}x\n` +
     `· transações no período: ${d?.transacoes_7d ?? 0}`
 
+  // Plano anti-Outros (Fase 3): % de lançamentos caindo em "Outros" — meta <5%.
+  if (d?.outros_7d != null) {
+    const outros = Number(d.outros_7d || 0)
+    const totalTx = Number(d?.transacoes_7d || 0)
+    const pctOutros = totalTx > 0 ? Math.round((outros / totalTx) * 100) : 0
+    const farol = pctOutros < 5 ? '🟢' : pctOutros < 15 ? '🟡' : '🔴'
+    msg += `\n· em "Outros": ${outros} (${pctOutros}%) ${farol} _meta <5%_`
+  }
+
   const tops = Array.isArray(d?.top_correcoes_90d) ? d.top_correcoes_90d : []
   if (tops.length) {
     msg += `\n\n🔁 *Mais corrigidas (90d — candidatas a heurística):*\n` +
@@ -48,11 +57,28 @@ export function formatarRelatorioIA(d) {
   return msg
 }
 
+/** Conta lançamentos dos últimos 7 dias que caíram em "Outros" (anti-Outros, Fase 3). */
+async function contarOutros7d(supabase) {
+  try {
+    const desde = new Date(Date.now() - 7 * 86400000).toISOString()
+    const { count } = await supabase
+      .from('transacoes')
+      .select('id, categorias!inner(nome)', { count: 'exact', head: true })
+      .ilike('categorias.nome', 'outros')
+      .gte('criado_em', desde)
+    return count ?? 0
+  } catch (e) {
+    log.warn('[relatorio-ia] contarOutros7d', e?.message)
+    return null
+  }
+}
+
 /** Gera o relatório (RPC no Supabase) e envia no Telegram. */
 export async function processarRelatorioIACron() {
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase.rpc('relatorio_correcoes_ia')
   if (error) throw new Error(`relatorio_correcoes_ia RPC: ${error.message}`)
+  data.outros_7d = await contarOutros7d(supabase)
   const msg = formatarRelatorioIA(data)
   await notifyTelegram(msg, { key: 'relatorio-ia-semanal', level: 'info', debounce: 'startup' })
   return { ok: true, enviado: true, dados: data }

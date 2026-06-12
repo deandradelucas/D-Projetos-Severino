@@ -91,15 +91,23 @@ export default function Transacoes() {
   // Grupos expandidos no modo "Parceladas" (Set de recorrente_grupo_id)
   const [parceladosExpandidos, setParceladosExpandidos] = useState(() => new Set())
 
-  // Filters State
-  const [filters, setFilters] = useState({
-    busca: '',
-    tipo: '',
-    categoria_id: '',
-    dataInicio: '',
-    dataFim: '',
-    /** '' = todos · 'recorrentes' = só parcelas / repetição mensal (API recorrentes=1) */
-    lancamentos: '',
+  // Filters State — categoria_id pode vir por deep-link (?categoria_id=...),
+  // usado pelo card de triagem de "Outros" do Severino IA no dashboard.
+  const [filters, setFilters] = useState(() => {
+    let categoriaUrl = ''
+    try {
+      const v = new URLSearchParams(window.location.search).get('categoria_id')
+      if (v && /^[0-9a-f-]{36}$/i.test(v)) categoriaUrl = v
+    } catch { /* indisponível */ }
+    return {
+      busca: '',
+      tipo: '',
+      categoria_id: categoriaUrl,
+      dataInicio: '',
+      dataFim: '',
+      /** '' = todos · 'recorrentes' = só parcelas / repetição mensal (API recorrentes=1) */
+      lancamentos: '',
+    }
   })
 
   const fetchCategorias = useCallback(async () => {
