@@ -204,6 +204,15 @@
   white-space: nowrap;
 }
 .page-categorias__orc-val.is-over { color: var(--error); }
+.page-categorias__orc-right { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.page-categorias__orc-edit {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+.page-categorias__orc-edit svg { width: 13px; height: 13px; }
+.page-categorias__orc:hover .page-categorias__orc-edit { color: var(--accent); }
 .page-categorias__orc-track {
   height: 6px;
   border-radius: 999px;

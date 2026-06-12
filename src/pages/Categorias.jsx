@@ -367,11 +367,15 @@ function CategoriaRow({ cat, usoSub, orcamento, onEdit, onMerge, onRemove, onPru
         </div>
       </div>
       {temOrc && (
-        <button type="button" className="page-categorias__orc" onClick={() => onOrcamento(cat, orcamento)}>
+        <button type="button" className="page-categorias__orc" onClick={() => onOrcamento(cat, orcamento)} aria-label={`Editar orçamento de ${cat.nome}`}>
           <div className="page-categorias__orc-top">
             <span className="page-categorias__orc-label">Orçamento do mês</span>
-            <span className={`page-categorias__orc-val${orcOver ? ' is-over' : ''}`}>
-              {formatCurrencyBRL(orcamento.gasto_mes)} / {formatCurrencyBRL(orcamento.limite_mensal)} · {orcPct}%
+            <span className="page-categorias__orc-right">
+              <span className={`page-categorias__orc-val${orcOver ? ' is-over' : ''}`}>
+                {formatCurrencyBRL(orcamento.gasto_mes)} / {formatCurrencyBRL(orcamento.limite_mensal)} · {orcPct}%
+              </span>
+              {/* lápis: afford de edição — o clique continua na área inteira */}
+              <span className="page-categorias__orc-edit" aria-hidden>{SvgEdit}</span>
             </span>
           </div>
           <div className="page-categorias__orc-track">
