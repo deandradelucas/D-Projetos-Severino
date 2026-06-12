@@ -67,6 +67,20 @@ function diaMesMidMorningIso(ym, dia) {
 }
 
 async function inserirTransacaoGerada(supabase, usuarioId, rule, dataIso) {
+  // Guard anti-duplicação: se o processo morreu entre o insert e o avanço de
+  // `ultima_geracao_mes` numa execução anterior, a transação do mês pode já
+  // existir. Verifica antes de inserir (evita dado financeiro duplicado).
+  const mesAlvo = String(dataIso).slice(0, 7) // YYYY-MM
+  const { data: existente } = await supabase
+    .from('transacoes')
+    .select('id')
+    .eq('recorrencia_mensal_id', rule.id)
+    .gte('data_transacao', `${mesAlvo}-01`)
+    .lt('data_transacao', `${proximoMesYm(mesAlvo)}-01`)
+    .limit(1)
+    .maybeSingle()
+  if (existente) return // já gerada neste mês — não duplica
+
   const { error } = await supabase.from('transacoes').insert({
     usuario_id: usuarioId,
     tipo: rule.tipo,
@@ -80,6 +94,11 @@ async function inserirTransacaoGerada(supabase, usuarioId, rule, dataIso) {
     recorrencia_mensal_id: rule.id,
   })
   if (error) throw error
+}
+
+function proximoMesYm(ym) {
+  const [y, m] = ym.split('-').map(Number)
+  return m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, '0')}`
 }
 
 function monthDiff(mesInicio, mesAlvo) {

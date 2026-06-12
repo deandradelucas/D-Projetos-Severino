@@ -260,6 +260,9 @@ export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {})
       } else {
         failed.push({ id: usuario.id, error: 'Evolution retornou false' })
       }
+      // Throttle: com 300+ usuários, envios em rajada estouram o rate limit da
+      // Evolution e as últimas mensagens falham. 150ms entre envios segura o ritmo.
+      await new Promise((r) => setTimeout(r, 150))
     } catch (err) {
       log.error('[digest] erro ao processar usuário', { id: usuario.id, error: err?.message || err })
       failed.push({ id: usuario.id, error: err?.message || 'Erro desconhecido' })

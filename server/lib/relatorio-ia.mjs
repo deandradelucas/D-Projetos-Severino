@@ -80,7 +80,9 @@ export async function processarRelatorioIACron() {
   if (error) throw new Error(`relatorio_correcoes_ia RPC: ${error.message}`)
   data.outros_7d = await contarOutros7d(supabase)
   const msg = formatarRelatorioIA(data)
-  await notifyTelegram(msg, { key: 'relatorio-ia-semanal', level: 'info', debounce: 'startup' })
+  // 'default' (5min) em vez de 'startup' (0ms): evita N mensagens iguais se o
+  // cron for chamado mais de uma vez em sequência (retry do n8n).
+  await notifyTelegram(msg, { key: 'relatorio-ia-semanal', level: 'info', debounce: 'default' })
   return { ok: true, enviado: true, dados: data }
 }
 

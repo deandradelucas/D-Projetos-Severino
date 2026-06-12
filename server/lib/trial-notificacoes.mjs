@@ -33,8 +33,10 @@ async function buscarTrialNaJanela(inicioHoras, fimHoras) {
     .not('isento_pagamento', 'eq', true)
 
   if (error) {
-    log.warn('[trial-notificacoes] query janela error', error.message)
-    return []
+    // Não engolir o erro: retornar [] silencioso fazia o cron reportar
+    // "ok, 0 enviados" mesmo com o banco fora — ninguém recebia e ninguém via.
+    log.error('[trial-notificacoes] query janela error', error.message)
+    throw new Error(`trial janela query: ${error.message}`)
   }
   return filtraComPhone(data)
 }
@@ -53,8 +55,8 @@ async function buscarTrialExpirado() {
     .not('isento_pagamento', 'eq', true)
 
   if (error) {
-    log.warn('[trial-notificacoes] query expirado error', error.message)
-    return []
+    log.error('[trial-notificacoes] query expirado error', error.message)
+    throw new Error(`trial expirado query: ${error.message}`)
   }
   return filtraComPhone(data)
 }
