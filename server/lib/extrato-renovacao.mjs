@@ -31,7 +31,7 @@ async function buscarUsuariosComRenovacaoEmDias(daysAhead) {
 
   const { data, error } = await supabase
     .from('usuarios')
-    .select('id, nome, usuario, telefone, whatsapp_id, assinatura_proxima_cobranca, criado_em, created_at')
+    .select('id, nome, usuario, telefone, whatsapp_id, assinatura_proxima_cobranca, criado_em, created_at, extrato_renovacao_em')
     .eq('assinatura_paga', true)
     .eq('assinatura_situacao', 'ativo')
     .or('isento_pagamento.is.null,isento_pagamento.eq.false')
@@ -116,14 +116,20 @@ export async function processExtratoRenovacaoCron({ daysAhead = 3 } = {}) {
     return { ok: false, skipped: true, reason: 'evolution_not_configured' }
   }
 
+  const supabase = getSupabaseAdmin()
   const usuarios = await buscarUsuariosComRenovacaoEmDias(daysAhead)
   log.info(`[extrato-renovacao] ${usuarios.length} usuário(s) com renovação em ${daysAhead} dia(s)`)
 
   const sent = []
   const failed = []
 
+  const corte20h = Date.now() - 20 * 3600000
   for (const usuario of usuarios) {
     try {
+      // Idempotência: já recebeu o extrato nas últimas 20h → não reenvia.
+      if (usuario.extrato_renovacao_em && new Date(usuario.extrato_renovacao_em).getTime() > corte20h) {
+        continue
+      }
       const stats = await buscarEstatisticasPagamento(usuario.id)
       const mensagem = buildExtratoMensagem(usuario, stats, daysAhead)
       const phone = String(usuario.whatsapp_id || usuario.telefone || '').replace(/\D/g, '')
@@ -136,6 +142,9 @@ export async function processExtratoRenovacaoCron({ daysAhead = 3 } = {}) {
 
       if (ok) {
         sent.push(usuario.id)
+        const { error: upErr } = await supabase
+          .from('usuarios').update({ extrato_renovacao_em: new Date().toISOString() }).eq('id', usuario.id)
+        if (upErr) log.warn('[extrato-renovacao] falha ao marcar envio', { id: usuario.id, error: upErr.message })
         log.info(`[extrato-renovacao] enviado uid=${usuario.id}`)
       } else {
         failed.push({ id: usuario.id, error: 'Evolution retornou falso' })

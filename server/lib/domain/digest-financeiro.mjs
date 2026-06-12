@@ -190,9 +190,14 @@ function formatMonthlyMessage(mes, anterior, { month, year }) {
 export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {}) {
   const supabase = getSupabaseAdmin()
 
+  // Idempotência: coluna e janela do período corrente (retry n8n não reenvia).
+  const colControle = tipo === 'semanal' ? 'digest_semanal_em' : 'digest_mensal_em'
+  const janelaMs = (tipo === 'semanal' ? 6 : 27) * 24 * 3600000
+  const corteEnvio = Date.now() - janelaMs
+
   const { data: usuarios, error } = await supabase
     .from('usuarios')
-    .select('id, nome, telefone, whatsapp_id, vinculo_conta_principal_id')
+    .select(`id, nome, telefone, whatsapp_id, vinculo_conta_principal_id, ${colControle}`)
     .limit(Math.min(Math.max(Number(limit) || 500, 1), 500))
 
   if (error) throw error
@@ -204,6 +209,12 @@ export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {})
   for (const usuario of usuarios || []) {
     const phone = normalizeBrazilWhatsAppNumber(usuario.whatsapp_id) || normalizeBrazilWhatsAppNumber(usuario.telefone)
     if (!phone) {
+      skipped.push(usuario.id)
+      continue
+    }
+
+    // Já recebeu este digest no período corrente → não reenvia.
+    if (usuario[colControle] && new Date(usuario[colControle]).getTime() > corteEnvio) {
       skipped.push(usuario.id)
       continue
     }
@@ -257,6 +268,10 @@ export async function processDigestBatch({ tipo = 'semanal', limit = 500 } = {})
 
       if (ok) {
         sent.push(usuario.id)
+        // Marca SÓ após envio bem-sucedido (idempotência do período).
+        const { error: upErr } = await supabase
+          .from('usuarios').update({ [colControle]: new Date().toISOString() }).eq('id', usuario.id)
+        if (upErr) log.warn('[digest] falha ao marcar envio', { id: usuario.id, error: upErr.message })
       } else {
         failed.push({ id: usuario.id, error: 'Evolution retornou false' })
       }

@@ -39,6 +39,10 @@ async function enviar(usuario, mensagem) {
       number: phone,
       text: mensagem,
     })
+    // Marca o envio (idempotência: skip se já enviado nas últimas 72h).
+    const { error } = await getSupabaseAdmin()
+      .from('usuarios').update({ reengajamento_em: new Date().toISOString() }).eq('id', usuario.id)
+    if (error) log.warn('[reengajamento] falha ao marcar envio', { userId: usuario.id, error: error.message })
     log.info('[reengajamento] enviado', { userId: usuario.id, phone })
     return true
   } catch (e) {
@@ -89,18 +93,21 @@ export async function processarReengajamentoCron() {
   // Buscar dados dos candidatos e checar acesso
   const { data: usuarios, error: errUsers } = await supabase
     .from('usuarios')
-    .select('id, nome, whatsapp_id, telefone, email, isento_pagamento, trial_ends_at, assinatura_paga, assinatura_asaas_status')
+    .select('id, nome, whatsapp_id, telefone, email, isento_pagamento, trial_ends_at, assinatura_paga, assinatura_asaas_status, reengajamento_em')
     .in('id', candidatos)
   if (errUsers) {
     log.warn('[reengajamento] query usuarios error', errUsers.message)
     return { ok: false, motivo: errUsers.message }
   }
 
-  // Filtra: tem acesso + tem telefone
+  // Filtra: tem acesso + tem telefone + não recebeu reengajamento nas últimas 72h
+  const corte72h = now - 72 * 3600000
   const elegíveis = filtraComPhone(
     (usuarios || []).filter((u) => {
       const flags = computeAssinaturaFlags(u)
-      return flags.acesso_app_liberado
+      if (!flags.acesso_app_liberado) return false
+      if (u.reengajamento_em && new Date(u.reengajamento_em).getTime() > corte72h) return false // idempotência
+      return true
     })
   )
 

@@ -18,7 +18,7 @@ function primeiroNome(usuario) {
   return usuario.nome ? usuario.nome.split(' ')[0] : 'você'
 }
 
-async function buscarTrialNaJanela(inicioHoras, fimHoras) {
+async function buscarTrialNaJanela(inicioHoras, fimHoras, colControle) {
   const supabase = getSupabaseAdmin()
   const now = Date.now()
   const inicio = new Date(now + inicioHoras * 3600000).toISOString()
@@ -31,6 +31,8 @@ async function buscarTrialNaJanela(inicioHoras, fimHoras) {
     .lt('trial_ends_at', fim)
     .is('assinatura_asaas_status', null)
     .not('isento_pagamento', 'eq', true)
+    // Idempotência: só quem ainda não recebeu esta etapa (retry n8n não duplica).
+    .is(colControle, null)
 
   if (error) {
     // Não engolir o erro: retornar [] silencioso fazia o cron reportar
@@ -53,6 +55,7 @@ async function buscarTrialExpirado() {
     .gte('trial_ends_at', seteDiasAtras)
     .is('assinatura_asaas_status', null)
     .not('isento_pagamento', 'eq', true)
+    .is('notif_trial_expirado_em', null) // idempotência
 
   if (error) {
     log.error('[trial-notificacoes] query expirado error', error.message)
@@ -102,7 +105,7 @@ function buildMsgExpirado(u) {
   )
 }
 
-async function enviar(usuario, mensagem) {
+async function enviar(usuario, mensagem, colControle) {
   const phone = String(usuario.whatsapp_id || usuario.telefone || '').replace(/\D/g, '')
   try {
     await sendEvolutionText({
@@ -110,6 +113,12 @@ async function enviar(usuario, mensagem) {
       number: phone,
       text: mensagem,
     })
+    // Marca o envio SÓ após sucesso — assim o filtro .is(col,null) bloqueia
+    // reenvio numa próxima execução. Se a marcação falhar, loga (no pior caso
+    // o usuário recebe de novo, mas nunca deixa de receber).
+    const { error } = await getSupabaseAdmin()
+      .from('usuarios').update({ [colControle]: new Date().toISOString() }).eq('id', usuario.id)
+    if (error) log.warn('[trial-notificacoes] falha ao marcar envio', { userId: usuario.id, col: colControle, error: error.message })
     log.info('[trial-notificacoes] enviado', { userId: usuario.id, phone })
     return true
   } catch (e) {
@@ -127,21 +136,21 @@ export async function processarTrialNotificacoesCron() {
   let erros = 0
 
   // T-3 dias — janela de ±6h em torno da marca de 72h
-  const lista3Dias = await buscarTrialNaJanela(66, 78)
+  const lista3Dias = await buscarTrialNaJanela(66, 78, 'notif_trial_3d_em')
   for (const u of lista3Dias) {
-    ;(await enviar(u, buildMsg3Dias(u))) ? enviados++ : erros++
+    ;(await enviar(u, buildMsg3Dias(u), 'notif_trial_3d_em')) ? enviados++ : erros++
   }
 
   // T-1 dia — janela de ±6h em torno da marca de 24h
-  const lista1Dia = await buscarTrialNaJanela(18, 30)
+  const lista1Dia = await buscarTrialNaJanela(18, 30, 'notif_trial_1d_em')
   for (const u of lista1Dia) {
-    ;(await enviar(u, buildMsg1Dia(u))) ? enviados++ : erros++
+    ;(await enviar(u, buildMsg1Dia(u), 'notif_trial_1d_em')) ? enviados++ : erros++
   }
 
   // Expirado — últimos 7 dias sem assinar
   const listaExpirados = await buscarTrialExpirado()
   for (const u of listaExpirados) {
-    ;(await enviar(u, buildMsgExpirado(u))) ? enviados++ : erros++
+    ;(await enviar(u, buildMsgExpirado(u), 'notif_trial_expirado_em')) ? enviados++ : erros++
   }
 
   log.info('[trial-notificacoes] cron concluído', { enviados, erros })
