@@ -258,8 +258,11 @@
 .agenda-field input:focus,
 .agenda-field select:focus,
 .agenda-field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
-.agenda-modal__actions { display: flex; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--hairline); }
-.agenda-modal__actions-main { display: flex; gap: 10px; flex: 1; justify-content: flex-end; }
+.agenda-modal__actions { display: flex; align-items: center; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--hairline); }
+.agenda-modal__actions-main { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
+/* Campos soltos (Título / Data e hora) ficam fora do __grid — precisam do
+   mesmo respiro lateral (na screenshot mobile colavam nas bordas). */
+.agenda-modal > .agenda-field { margin: 12px 20px 0; }
 
 /* Desktop: titulo ocupa o espaco e empurra o botao "+ Nova agenda" para o
    canto direito do hero; os stats (Hoje/Semana) ficam logo apos o titulo. */
@@ -292,6 +295,22 @@
   .agenda-field input,
   .agenda-field select,
   .agenda-field textarea { font-size: 16px; }
+  /* Modal vira bottom-sheet: alça (risco), cantos arredondados só no topo e
+     respiro do home indicator (iPhone). */
+  .agenda-modal {
+    max-width: none;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    padding-bottom: calc(10px + var(--safe-bottom, env(safe-area-inset-bottom, 0px)));
+  }
+  .agenda-modal::before {
+    content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 4px; border-radius: 999px; background: var(--text-muted); opacity: 0.4;
+    pointer-events: none; z-index: 3;
+  }
+  .agenda-modal__header { padding-top: 18px; }
+  /* O botão "Salvar item" usa dashboard-hub__btn--primary, que a regra global
+     mobile esconde (era pro CTA do hero, não pra dentro de modal). Restaura. */
+  .agenda-modal .dashboard-hub__btn--primary { display: inline-flex; }
 }
 
 @media (prefers-reduced-motion: reduce) {
