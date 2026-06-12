@@ -27,6 +27,16 @@
     z-index: 3;
   }
   .page-categorias__modal-head { padding-top: 18px; }
+  /* Ações (editar/fundir/excluir/expandir) descem pra uma linha própria,
+     alinhadas à direita — o nome da categoria aparece inteiro. */
+  .page-categorias__cat-head { flex-wrap: wrap; row-gap: 2px; }
+  .page-categorias__cat-acts {
+    flex-basis: 100%;
+    justify-content: flex-end;
+    border-top: 1px dashed var(--hairline);
+    margin-top: 6px;
+    padding-top: 2px;
+  }
 }
 
 /* Hero: alinha o título "Categorias" verticalmente com o menu sanduíche e o
