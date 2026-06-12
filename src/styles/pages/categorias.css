@@ -27,15 +27,13 @@
     z-index: 3;
   }
   .page-categorias__modal-head { padding-top: 18px; }
-  /* Ações (editar/fundir/excluir/expandir) descem pra uma linha própria,
-     alinhadas à direita — o nome da categoria aparece inteiro. */
-  .page-categorias__cat-head { flex-wrap: wrap; row-gap: 2px; }
+  /* Ações ancoradas embaixo-à-direita do card, na MESMA linha do "N sem uso" —
+     o nome da categoria ocupa a largura toda na 1ª linha. */
+  .page-categorias__cat-head { position: relative; }
   .page-categorias__cat-acts {
-    flex-basis: 100%;
-    justify-content: flex-end;
-    border-top: 1px dashed var(--hairline);
-    margin-top: 6px;
-    padding-top: 2px;
+    position: absolute;
+    right: 10px;
+    bottom: 6px;
   }
 }
 
@@ -551,4 +549,18 @@
   .page-categorias__subs { padding-left: 16px; }
   .page-categorias__icon-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .page-categorias__cor-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
+/* ── Dark theme: os PNGs Pulsar têm traço escuro fixo — fundo escuro os engole.
+   Mesmo padrão do cat-chip: chip pastel CLARO (cor misturada com branco). ── */
+body[data-theme='dark'] .page-categorias__cat-icon {
+  background: color-mix(in srgb, var(--cat-cor, #94a3b8) 22%, #eef1f6);
+}
+body[data-theme='dark'] .page-categorias__icon-opt {
+  background: #eef1f6;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+body[data-theme='dark'] .page-categorias__icon-opt.is-active {
+  background: color-mix(in srgb, var(--accent) 22%, #eef1f6);
+  border-color: var(--accent);
 }
