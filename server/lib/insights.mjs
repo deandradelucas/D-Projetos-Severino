@@ -64,6 +64,8 @@ export async function gerarInsights(usuarioId) {
   let gastoPassadoMesmoPeriodo = 0
   const catAtual = new Map()
   const catPassado = new Map()
+  const catAtualPorId = new Map() // categoria_id -> gasto do mês (p/ orçamento)
+  const catNomePorId = new Map() // categoria_id -> nome
   let maiorGasto = null
   const gastosMesAtual = [] // { valor, isParcela } — base para projeção
 
@@ -72,10 +74,12 @@ export async function gerarInsights(usuarioId) {
     const v = Number(t.valor) || 0
     const data = new Date(`${String(t.data_transacao).slice(0, 10)}T12:00:00`)
     const nomeCat = t.categorias?.nome || 'Outros'
+    if (t.categoria_id) catNomePorId.set(t.categoria_id, nomeCat)
     if (data >= inicioMesAtual) {
       gastoAtual += v
       gastosMesAtual.push({ valor: v, isParcela: Boolean(t.recorrente_grupo_id) })
       catAtual.set(nomeCat, (catAtual.get(nomeCat) || 0) + v)
+      if (t.categoria_id) catAtualPorId.set(t.categoria_id, (catAtualPorId.get(t.categoria_id) || 0) + v)
       if (!maiorGasto || v > maiorGasto.valor) maiorGasto = { valor: v, descricao: t.descricao, categoria: nomeCat }
     } else {
       catPassado.set(nomeCat, (catPassado.get(nomeCat) || 0) + v)
@@ -201,8 +205,38 @@ export async function gerarInsights(usuarioId) {
     log.warn('[insights] metas', e.message || e)
   }
 
-  // Ordena: alertas primeiro, depois positivos, depois neutros
-  const ordemTom = { alerta: 0, positivo: 1, destaque: 1, neutro: 2 }
+  // 7) Orçamento por categoria batendo no limite: >=70% alerta, >=90% urgência.
+  try {
+    const { data: limites } = await supabase
+      .from('limites_orcamento')
+      .select('categoria_id, limite_mensal')
+      .eq('usuario_id', usuarioId)
+    for (const l of limites || []) {
+      const limite = Number(l.limite_mensal) || 0
+      if (limite <= 0) continue
+      const gasto = catAtualPorId.get(l.categoria_id) || 0
+      const pct = Math.round((gasto / limite) * 100)
+      if (pct < 70) continue
+      const nome = catNomePorId.get(l.categoria_id) || 'uma categoria'
+      const urgente = pct >= 90
+      insights.push({
+        id: `orcamento-${l.categoria_id}`,
+        icone: urgente ? '🚨' : '⚠️',
+        tom: urgente ? 'urgencia' : 'alerta',
+        titulo: pct >= 100
+          ? `Orçamento de ${nome} estourado`
+          : `${nome}: ${pct}% do orçamento`,
+        texto: pct >= 100
+          ? `Você gastou ${brl(gasto)} em ${nome} — ${brl(gasto - limite)} acima do limite de ${brl(limite)}.`
+          : `Já foram ${brl(gasto)} dos ${brl(limite)} planejados para ${nome} este mês.`,
+      })
+    }
+  } catch (e) {
+    log.warn('[insights] orcamentos', e.message || e)
+  }
+
+  // Ordena: urgências primeiro, depois alertas, positivos e neutros
+  const ordemTom = { urgencia: -1, alerta: 0, positivo: 1, destaque: 1, neutro: 2 }
   insights.sort((a, b) => (ordemTom[a.tom] ?? 3) - (ordemTom[b.tom] ?? 3))
 
   return insights.slice(0, 6)

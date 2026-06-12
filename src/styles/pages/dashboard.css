@@ -558,6 +558,12 @@
 .ai-insight--positivo { --ai-accent: var(--success); }
 .ai-insight--neutro { --ai-accent: var(--accent); }
 .ai-insight--destaque { --ai-accent: #8b5cf6; }
+/* Urgência (orçamento >=90%): vermelho + fundo levemente tingido p/ saltar à vista */
+.ai-insight--urgencia {
+  --ai-accent: var(--error);
+  background: color-mix(in srgb, var(--error) 7%, var(--surface));
+  border-color: color-mix(in srgb, var(--error) 30%, var(--hairline));
+}
 
 .ai-insight__icon {
   flex-shrink: 0;
