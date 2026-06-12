@@ -283,8 +283,14 @@
   background: var(--accent-muted);
 }
 
-/* Uso / poda / arquivadas (#2 — enxugar subcategorias) */
-.page-categorias__cat-flag { color: var(--accent); }
+/* Uso / poda / arquivadas (#2 — enxugar subcategorias).
+   "N sem uso" em linha própria, abaixo de "N subcategorias" (não espreme o título). */
+.page-categorias__cat-flag {
+  display: block;
+  color: var(--accent);
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
 
 .page-categorias__sub-uso {
   font-size: 0.74rem;

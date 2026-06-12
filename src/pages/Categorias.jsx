@@ -353,8 +353,8 @@ function CategoriaRow({ cat, usoSub, orcamento, onEdit, onMerge, onRemove, onPru
           <span className="page-categorias__cat-title">{cat.nome}</span>
           <span className="page-categorias__cat-count">
             {subs.length} {subs.length === 1 ? 'subcategoria' : 'subcategorias'}
-            {semUso > 0 && <span className="page-categorias__cat-flag"> · {semUso} sem uso</span>}
           </span>
+          {semUso > 0 && <span className="page-categorias__cat-flag">{semUso} sem uso</span>}
         </button>
         <div className="page-categorias__cat-acts">
           <IconBtn label="Editar" onClick={() => onEdit(cat)}>{SvgEdit}</IconBtn>
