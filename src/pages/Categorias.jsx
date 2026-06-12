@@ -537,6 +537,13 @@ export default function Categorias() {
                   <div className="dashboard-hub__hero-text">
                     <h1 className="dashboard-hub__title">Categorias</h1>
                   </div>
+                  {/* Desktop: ação no hero. No mobile a classe --primary é
+                      escondida pela regra global e o FAB flutuante cobre. */}
+                  <div className="dashboard-hub__hero-actions" role="toolbar" aria-label="Ações">
+                    <button type="button" className="dashboard-hub__btn dashboard-hub__btn--primary" onClick={() => setCatModal({ categoria: null })}>
+                      + Nova categoria
+                    </button>
+                  </div>
                 </div>
               </section>
 
@@ -547,10 +554,6 @@ export default function Categorias() {
                   <>
                     {renderGrupo('Despesas', despesas)}
                     {renderGrupo('Receitas', receitas)}
-                    {/* Botão no fim da lista — desktop; no mobile o FAB cobre. */}
-                    <button type="button" className="page-categorias__nova" onClick={() => setCatModal({ categoria: null })}>
-                      {SvgPlus} Nova categoria
-                    </button>
                   </>
                 )}
               </section>
