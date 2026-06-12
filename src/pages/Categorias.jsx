@@ -395,6 +395,10 @@ function CategoriaRow({ cat, usoSub, orcamento, onEdit, onMerge, onRemove, onPru
               Ocultar {semUso} {semUso === 1 ? 'subcategoria sem uso' : 'subcategorias sem uso'}
             </button>
           )}
+          {/* "+ Adicionar" no TOPO da lista — ação principal sem precisar rolar */}
+          <button type="button" className="page-categorias__add-sub" onClick={() => onAddSub(cat)}>
+            {SvgPlus} Adicionar subcategoria
+          </button>
           {subs.map((s) => {
             const n = usoDe(s.id)
             return (
@@ -408,9 +412,6 @@ function CategoriaRow({ cat, usoSub, orcamento, onEdit, onMerge, onRemove, onPru
               </div>
             )
           })}
-          <button type="button" className="page-categorias__add-sub" onClick={() => onAddSub(cat)}>
-            {SvgPlus} Adicionar subcategoria
-          </button>
 
           <button type="button" className="page-categorias__ver-arquivadas" onClick={toggleArquivadas}>
             {verArquivadas ? 'Ocultar arquivadas' : 'Ver arquivadas'}

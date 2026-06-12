@@ -280,7 +280,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 6px;
+  margin: 4px 0 6px; /* agora no topo da lista: respiro p/ cima e p/ baixo */
   padding: 7px 10px;
   border: 1px dashed var(--hairline-strong);
   border-radius: var(--r-sm);
