@@ -536,7 +536,7 @@ export default function Metas() {
                           <span className="page-metas__resumo-label">Progresso geral</span>
                           <strong className="page-metas__resumo-valor">{resumo.pctGeral}%</strong>
                         </div>
-                        <div className="page-metas__resumo-item">
+                        <div className="page-metas__resumo-item page-metas__resumo-item--full">
                           <span className="page-metas__resumo-label">{resumo.proxima ? 'Mais perto de concluir' : 'Metas concluídas'}</span>
                           <strong className="page-metas__resumo-valor">{resumo.proxima ? <>{resumo.proxima.nome} <span className="page-metas__resumo-sub">{pct(resumo.proxima)}%</span></> : `${resumo.concluidas}/${metas.length}`}</strong>
                         </div>

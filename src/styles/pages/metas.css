@@ -109,9 +109,22 @@
 .page-metas__resumo-valor { font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .page-metas__resumo-sub { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); }
 @media (max-width: 640px) {
-  .page-metas__resumo { flex-direction: column; }
+  /* celular compacto: Total guardado | Progresso geral lado a lado;
+     "Mais perto de concluir" numa linha cheia abaixo (padrão dos Cartões). */
+  .page-metas__resumo {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 14px;
+  }
   .page-metas__resumo-item { padding: 0; }
-  .page-metas__resumo-item + .page-metas__resumo-item { border-left: none; border-top: 1px solid var(--hairline); padding-top: 12px; margin-top: 12px; }
+  .page-metas__resumo-item + .page-metas__resumo-item { border-left: none; margin-top: 0; }
+  .page-metas__resumo-item:nth-child(2) { border-left: 1px solid var(--hairline); padding-left: 14px; }
+  .page-metas__resumo-item--full {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--hairline);
+    padding-top: 10px;
+  }
+  .page-metas__resumo-valor { font-size: 1.1rem; }
 }
 
 /* ── Controles (filtro + ordenação) ────────────────────────────────────────── */
