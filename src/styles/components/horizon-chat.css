@@ -293,3 +293,14 @@
   .horizon-fab-pulse,
   .horizon-typing span { animation: none; }
 }
+
+/* O chat só existe no dashboard (HorizonChatGate). Esconde também:
+   1) durante o carregamento do chunk pós-login (Suspense — o pathname já é
+      /dashboard e o FAB aparecia sobre a tela de loading);
+   2) com o modal Nova Transação aberto (FAB/janela cobriam o formulário). */
+body:has(.route-page-fallback) .horizon-chat-fab,
+body:has(.route-page-fallback) .horizon-chat-window,
+body:has(.modal-content--nova-tx) .horizon-chat-fab,
+body:has(.modal-content--nova-tx) .horizon-chat-window {
+  display: none;
+}
