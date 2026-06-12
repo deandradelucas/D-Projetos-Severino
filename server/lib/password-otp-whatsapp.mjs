@@ -5,12 +5,19 @@ import { getSupabaseAdmin } from './supabase-admin.mjs'
 import { sendEvolutionText, evolutionEnvConfigured } from './evolution-send.mjs'
 import { normalizarDigitosWhatsappLog } from './usuarios.mjs'
 import { isValidEmail } from './password-reset.mjs'
+import { safeEqualStr } from './safe-equal.mjs'
 
 const OTP_WINDOW_MS = 15 * 60 * 1000
 const OTP_LENGTH = 6
 
 function otpPepper() {
-  return String(process.env.PASSWORD_OTP_PEPPER || process.env.HORIZONTE_OTP_PEPPER || 'horizonte-otp-v1')
+  const env = process.env.PASSWORD_OTP_PEPPER || process.env.HORIZONTE_OTP_PEPPER
+  // Mesmo guard dos módulos irmãos (email-otp/registration-otp): pepper fixo
+  // previsível NUNCA em produção (auditoria 11-jun, P3).
+  if (!env && process.env.NODE_ENV === 'production') {
+    throw new Error('PASSWORD_OTP_PEPPER não configurado em produção.')
+  }
+  return String(env || 'horizonte-otp-v1')
 }
 
 function hashOtp(userId, otpRaw) {
@@ -166,7 +173,7 @@ export async function confirmPasswordOtpWhatsApp(email, otpRaw, newPassword) {
   }
 
   const expectedHash = hashOtp(user.id, otp)
-  if (expectedHash !== user.reset_token_hash) {
+  if (!safeEqualStr(expectedHash, user.reset_token_hash)) {
     const e = new Error('Código incorreto.')
     e.statusCode = 400
     throw e

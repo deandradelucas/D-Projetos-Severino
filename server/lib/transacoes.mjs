@@ -563,9 +563,10 @@ export async function atualizarTransacao(id, usuarioId, body) {
   // Só altera o cartão se o campo veio no body (evita desvincular sem querer).
   if ('cartao_id' in body) update.cartao_id = body.cartao_id || null
 
-  // Permite alterar o índice da parcela (ex.: 1/10 → 2/10)
+  // Permite alterar o índice da parcela (ex.: 1/10 → 2/10) — com teto sane
+  // (auditoria 11-jun, MASS-ASSIGN-01: sem range, aceitava qualquer inteiro).
   const ri = body.recorrente_index != null ? parseInt(body.recorrente_index, 10) : null
-  if (ri != null && Number.isInteger(ri) && ri >= 1) {
+  if (ri != null && Number.isInteger(ri) && ri >= 1 && ri <= 500) {
     update.recorrente_index = ri
   }
 

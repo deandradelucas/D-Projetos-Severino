@@ -639,7 +639,8 @@ export default function Dashboard() {
                 {insights.map((it) => (
                   <article
                     key={it.id}
-                    className={`ai-insight ai-insight--${it.tom || 'neutro'}${it.href ? ' ai-insight--clicavel' : ''}`}
+                    /* allowlist: tom vem do servidor — nunca injetar classe arbitrária */
+                    className={`ai-insight ai-insight--${['alerta', 'positivo', 'neutro', 'destaque', 'urgencia'].includes(it.tom) ? it.tom : 'neutro'}${it.href ? ' ai-insight--clicavel' : ''}`}
                     {...(it.href
                       ? { role: 'link', tabIndex: 0, onClick: () => navigate(it.href), onKeyDown: (e) => { if (e.key === 'Enter') navigate(it.href) } }
                       : {})}

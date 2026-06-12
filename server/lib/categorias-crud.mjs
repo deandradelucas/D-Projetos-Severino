@@ -253,6 +253,7 @@ export async function atualizarSubcategoria(uid, subId, body) {
     .from('subcategorias')
     .update({ nome })
     .eq('id', subId)
+    .eq('categoria_id', atual.categoria_id) // guard de escopo na mutação (IDOR-02)
     .select('id, categoria_id, nome')
     .maybeSingle()
   if (error) throw error
@@ -303,11 +304,12 @@ export async function listarSubcategoriasArquivadas(uid, categoriaId) {
 /** Restaura (desarquiva) uma subcategoria. */
 export async function restaurarSubcategoria(uid, subId) {
   const db = getSupabaseAdmin()
-  await getSubDoUsuario(db, uid, subId)
+  const atual = await getSubDoUsuario(db, uid, subId)
   const { data, error } = await db
     .from('subcategorias')
     .update({ arquivada_em: null })
     .eq('id', subId)
+    .eq('categoria_id', atual.categoria_id) // guard de escopo na mutação (IDOR-02)
     .select('id, categoria_id, nome')
     .maybeSingle()
   if (error) throw error
@@ -352,7 +354,7 @@ export async function podarSubcategoriasSemUso(uid, categoriaId) {
 /** Arquiva a sub se usada em transações; apaga se não usada. */
 export async function removerSubcategoria(uid, subId) {
   const db = getSupabaseAdmin()
-  await getSubDoUsuario(db, uid, subId)
+  const atual = await getSubDoUsuario(db, uid, subId)
 
   const { count, error: eCount } = await db
     .from('transacoes')
@@ -361,15 +363,22 @@ export async function removerSubcategoria(uid, subId) {
     .eq('subcategoria_id', subId)
   if (eCount) throw eCount
 
+  // Guard de escopo repetido na MUTAÇÃO (não só no check) — fecha a janela
+  // TOCTOU entre verificação e escrita (auditoria 11-jun, IDOR-02).
   if ((count ?? 0) > 0) {
     const { error } = await db
       .from('subcategorias')
       .update({ arquivada_em: new Date().toISOString() })
       .eq('id', subId)
+      .eq('categoria_id', atual.categoria_id)
     if (error) throw error
     return { modo: 'arquivada' }
   }
-  const { error } = await db.from('subcategorias').delete().eq('id', subId)
+  const { error } = await db
+    .from('subcategorias')
+    .delete()
+    .eq('id', subId)
+    .eq('categoria_id', atual.categoria_id)
   if (error) throw error
   return { modo: 'excluida' }
 }

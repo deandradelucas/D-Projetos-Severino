@@ -35,9 +35,10 @@ export function montarPerguntaCategoriaOutros(categorias, tipoTx) {
 }
 
 /** Grava a pendência (TTL 5 min, mesmo mecanismo dos menus de lista). */
-export async function registrarPendenteCategoriaOutros(phone, { transacaoId, tipo, descricao, opcoes }) {
+export async function registrarPendenteCategoriaOutros(phone, { usuarioId, transacaoId, tipo, descricao, opcoes }) {
   await setPendente(phone, {
     tipo: 'categoria_outros',
+    usuario_id: usuarioId || null, // binding: só o mesmo usuário responde (WA-01)
     transacao_id: transacaoId,
     tx_tipo: tipo,
     descricao: String(descricao || '').slice(0, 120),
@@ -59,6 +60,9 @@ export async function responderPendenteCategoria(dataUsuarioId, actorId, phone, 
     return null
   }
   if (!pend || pend.tipo !== 'categoria_outros') return null
+  // Binding de usuário (WA-01): pendência criada por outro usuário (telefone
+  // compartilhado) não é respondível — segue o fluxo normal sem consumir.
+  if (pend.usuario_id && String(pend.usuario_id) !== String(dataUsuarioId)) return null
 
   const escolha = pend.opcoes?.[Number.parseInt(msg, 10) - 1]
   if (!escolha) {

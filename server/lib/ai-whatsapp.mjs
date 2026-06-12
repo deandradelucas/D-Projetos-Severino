@@ -179,15 +179,21 @@ function normalizarDescricao(desc) {
 /**
  * Monta o system_instruction de parse financeiro (compartilhado entre texto e áudio).
  */
+/** Achata input do usuário p/ uso em few-shot: sem quebras de linha (não vira
+ *  "instrução" no prompt — auditoria 11-jun, WA-03), aspas normalizadas, truncado. */
+function sanitizeFewShot(s, max = 80) {
+  return String(s || '').replace(/[\r\n\t]+/g, ' ').replace(/["“”]/g, "'").slice(0, max)
+}
+
 function buildTransactionParseSystemInstruction(catMap, dataAtual, tituloExemplos = [], categoriaExemplos = []) {
   const fewShot = Array.isArray(tituloExemplos) && tituloExemplos.length
     ? '\n\n━━━ TÍTULOS PREFERIDOS POR ESTE USUÁRIO (correções reais — imite ESTE estilo no campo "titulo" de AGENDA) ━━━\n' +
-      tituloExemplos.map((e) => `• "${e.transcricao}" → "${e.titulo}"`).join('\n')
+      tituloExemplos.map((e) => `• "${sanitizeFewShot(e.transcricao)}" → "${sanitizeFewShot(e.titulo)}"`).join('\n')
     : ''
   const catFewShot = Array.isArray(categoriaExemplos) && categoriaExemplos.length
     ? '\n\n━━━ REGRA PRIORITÁRIA — CORREÇÕES DESTE USUÁRIO (SOBREPÕEM o guia geral acima) ━━━\n' +
       'Se a descrição for igual ou muito parecida com um destes casos, use EXATAMENTE a categoria indicada, MESMO que o guia geral sugira outra. A escolha do usuário vale mais que a regra geral:\n' +
-      categoriaExemplos.map((e) => `• "${e.descricao}"${e.tipo ? ` (${e.tipo})` : ''} → use a categoria "${e.categoria_nome}"`).join('\n')
+      categoriaExemplos.map((e) => `• "${sanitizeFewShot(e.descricao, 60)}"${e.tipo ? ` (${e.tipo})` : ''} → use a categoria "${sanitizeFewShot(e.categoria_nome, 40)}"`).join('\n')
     : ''
   return `Você é o Severino, assistente pessoal brasileiro. Analise a mensagem e determine a intenção principal.
 

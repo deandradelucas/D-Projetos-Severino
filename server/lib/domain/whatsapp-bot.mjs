@@ -956,6 +956,7 @@ async function processarMensagemBotInterno(phone, rawMessage, options = {}) {
       const pergunta = montarPerguntaCategoriaOutros(categorias, parsed.tipo)
       if (pergunta) {
         await registrarPendenteCategoriaOutros(phone, {
+          usuarioId: dataUsuarioId,
           transacaoId: transacaoIdAlerta,
           tipo: parsed.tipo,
           descricao: parsed.descricao || message.slice(0, 100),

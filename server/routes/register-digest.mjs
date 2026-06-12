@@ -11,6 +11,7 @@ import { resolveRequestUserId } from '../lib/http/resolve-request-user-id.mjs'
 import { parseUsuarioEscopoApi } from '../lib/http/api-usuario-escopo.mjs'
 import { rateLimitTake, clientKeyFromHono } from '../lib/rate-limit.mjs'
 import { isUuidString } from '../lib/transacao-validate.mjs'
+import { getSupabaseAdmin } from '../lib/supabase-admin.mjs'
 
 export function registerDigestRoutes(app) {
   // GET /api/limites-orcamento — limites mensais por categoria (Orçado vs Real)
@@ -56,6 +57,15 @@ export function registerDigestRoutes(app) {
       const limite = Number(body?.limite_mensal)
       if (!isUuidString(categoriaId)) return c.json({ message: 'Categoria inválida.' }, 400)
       if (!Number.isFinite(limite) || limite <= 0) return c.json({ message: 'Informe um limite maior que zero.' }, 400)
+      // IDOR-01 (auditoria 11-jun): a categoria precisa pertencer ao titular —
+      // sem isso, gravava limite com categoria_id de outro usuário.
+      const { data: catOk } = await getSupabaseAdmin()
+        .from('categorias')
+        .select('id')
+        .eq('id', categoriaId)
+        .eq('usuario_id', parsed.dataUsuarioId)
+        .maybeSingle()
+      if (!catOk) return c.json({ message: 'Categoria não encontrada.' }, 404)
       await upsertLimiteOrcamento(parsed.dataUsuarioId, categoriaId, Math.round(limite * 100) / 100)
       return c.json({ categoria_id: categoriaId, limite_mensal: Math.round(limite * 100) / 100 })
     } catch (error) {
@@ -69,6 +79,10 @@ export function registerDigestRoutes(app) {
     try {
       const parsed = await parseUsuarioEscopoApi(resolveRequestUserId(c), { write: true })
       if (!parsed.ok) return c.json({ message: parsed.message }, parsed.status)
+      // RATE-LIMIT-01: mesma chave/janela do POST (faltava no DELETE).
+      if (!await rateLimitTake(`orc-mut:${parsed.actorId}:${clientKeyFromHono(c)}`, 60, 60_000)) {
+        return c.json({ message: 'Muitas alterações. Aguarde um momento.' }, 429)
+      }
       const categoriaId = c.req.param('categoriaId')
       if (!isUuidString(categoriaId)) return c.json({ message: 'Categoria inválida.' }, 400)
       await removerLimiteOrcamento(parsed.dataUsuarioId, categoriaId)
